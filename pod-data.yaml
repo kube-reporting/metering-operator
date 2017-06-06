@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: pod-data
+spec:
+  selector:
+    matchLabels:
+      app: pod-data
+  template:
+    metadata:
+      name: pod-data
+      labels:
+        app: pod-data
+    spec:
+      serviceAccountName: "pod-data"
+      containers:
+      - name: data
+        image: quay.io/fest-data-demo/pod-data:0.2
+        imagePullPolicy: Always
+        env:
+        - name: "POLL_INTERVAL"
+          value: "300"
+        - name: "AWS_ACCESS_KEY_ID"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: "AWS_SECRET_ACCESS_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        - name: "AWS_REGION"
+          value: "us-west-1"
+      restartPolicy: Always
