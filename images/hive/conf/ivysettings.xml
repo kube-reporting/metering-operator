@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE ***REMOVED***le distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this ***REMOVED***le to You under the Apache License, Version 2.0
+   (the "License"); you may not use this ***REMOVED***le except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the speci***REMOVED***c language governing permissions and
+   limitations under the License.
+   -->
+<!--This ***REMOVED***le is used by grapes to download dependencies from a maven repository.
+    This is just a template and can be edited to add more repositories.
+-->
+<ivysettings>
+  <!--name of the defaultResolver should always be 'downloadGrapes'. -->
+  <settings defaultResolver="downloadGrapes"/>
+  <!-- Only set maven.local.repository if not already set -->
+  <property name="maven.local.repository" value="${user.home}/.m2/repository" override="false"/>
+  <property name="m2-pattern" value="***REMOVED***le:${maven.local.repository}/[organisation]/[module]/[revision]/[module]-[revision](-[classi***REMOVED***er]).[ext]" override="false"/>
+  <resolvers>
+    <!-- more resolvers can be added here -->
+    <chain name="downloadGrapes">
+      <!-- This resolver uses ibiblio to ***REMOVED***nd artifacts, compatible with maven2 repository -->
+      <ibiblio name="central" m2compatible="true"/>
+      <url name="local-maven2" m2compatible="true">
+        <artifact pattern="${m2-pattern}"/>
+      </url>
+      <!-- File resolver to add jars from the local system. -->
+      <***REMOVED***lesystem name="test" checkmodi***REMOVED***ed="true">
+        <artifact pattern="/tmp/[module]-[revision](-[classi***REMOVED***er]).jar"/>
+      </***REMOVED***lesystem>
+    </chain>
+  </resolvers>
+</ivysettings>
