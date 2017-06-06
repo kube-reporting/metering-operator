@@ -1,0 +1,67 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: metastore
+  name: hive-metastore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      hive-app: metastore
+  serviceName: hive-metastore
+  template:
+    metadata:
+      labels:
+        hive-app: metastore
+    spec:
+      containers:
+      - name: postgres
+        # TODO(DG): Refactor and vendor this image, init logic looks iffy
+        image: bde2020/hive-metastore-postgresql:2.1.0
+        env:
+        - name: "PGDATA"
+          value: "/var/lib/postgresql/data/pgdata"
+        volumeMounts:
+        - name: pg-data
+          mountPath: /var/lib/postgresql/data
+      - name: metastore
+        args: ["/opt/hive/bin/hive", "--service", "metastore"]
+        image: quay.io/fest-data-demo/hive:0.1
+        imagePullPolicy: Always
+        ports:
+        - name: meta
+          containerPort: 9083
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        env:
+        - name: CORE_CONF_fs_s3n_awsAccessKeyId
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: CORE_CONF_fs_s3n_awsSecretAccessKey
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        - name: HADOOP_CLASSPATH
+          value: "/opt/hive/hcatalog/share/hcatalog/*:/opt/hadoop-2.8.0/share/hadoop/tools/lib/*"
+        - name: CORE_CONF_fs_defaultFS
+          value: hdfs://hdfs-namenode:8020
+        resources:
+          requests:
+            memory: "1000Mi"
+            cpu: "100m"
+          limits:
+            memory: "1500Mi"
+            cpu: "500m"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      # TODO(DG): change to PV after local testing
+      - name: pg-data
+        emptyDir:
+          medium: ""
