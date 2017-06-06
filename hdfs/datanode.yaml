@@ -1,0 +1,52 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: datanode
+  name: hdfs-datanode
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: datanode
+  serviceName: hdfs-datanode
+  template:
+    metadata:
+      labels:
+        app: datanode
+    spec:
+      containers:
+      - name: datanode
+        args: ["hdfs", "--con***REMOVED***g", "/etc/hadoop", "datanode"]
+        env:
+        - name: "HDFS_CONF_dfs_datanode_data_dir"
+          value: "***REMOVED***le:///hadoop/dfs/data"
+        image: quay.io/fest-data-demo/hadoop:0.1
+        imagePullPolicy: Always
+        ports:
+        - name: data
+          containerPort: 50010
+          protocol: TCP
+        - name: meta
+          containerPort: 50020
+          protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /hadoop/dfs/data
+        terminationMessagePath: /dev/termination-log
+        resources:
+          requests:
+            memory: "1000Mi"
+            cpu: "100m"
+          limits:
+            memory: "1500Mi"
+            cpu: "500m"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      # TODO(DG): change to PV after local testing
+      - name: data
+        emptyDir:
+          medium: ""
