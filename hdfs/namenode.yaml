@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: namenode
+  name: hdfs-namenode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namenode
+  serviceName: hdfs-namenode
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: namenode
+    spec:
+      containers:
+      - name: namenode
+        image: quay.io/fest-data-demo/hadoop:0.1
+        args: ["start-name.sh"]
+        env:
+        - name: "CLUSTER_NAME"
+          value: "coreosfest-k8s"
+        - name: "HDFS_CONF_dfs_namenode_name_dir"
+          value: "***REMOVED***le:///hadoop/dfs/name"
+        imagePullPolicy: Always
+        ports:
+        - name: fs
+          protocol: TCP
+          containerPort: 8020
+        volumeMounts:
+        - name: data
+          mountPath: /hadoop/dfs/name
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        resources:
+          requests:
+            memory: "1000Mi"
+            cpu: "100m"
+          limits:
+            memory: "1500Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            port: 50070
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 0
+      # TODO(DG): replace with non-ephemeral storage
+      volumes:
+      - name: data
+        emptyDir:
+          medium:
