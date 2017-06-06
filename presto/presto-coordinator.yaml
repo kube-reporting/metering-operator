@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    presto: coordinator
+  name: presto-coordinator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      presto: coordinator
+  template:
+    metadata:
+      labels:
+       presto: coordinator
+    spec:
+      containers:
+      - name: coordinator
+        image: quay.io/fest-data-demo/presto:0.2
+        imagePullPolicy: Always
+        env:
+        - name: "HIVE_CATALOG_hive_s3_aws___access___key"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: "HIVE_CATALOG_hive_s3_aws___secret___key"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        - name: "PRESTO_CONF_coordinator"
+          value: "true"
+        - name: "PRESTO_CONF_node___scheduler_include___coordinator"
+          value: "false"
+        - name: "PRESTO_CONF_discovery___server_enabled"
+          value: "true"
+        # For some reason doesn't like service
+        - name: "PRESTO_CONF_discovery_uri"
+          value: "http://localhost:8080"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        resources:
+          requests:
+            memory: "1000Mi"
+            cpu: "100m"
+          limits:
+            memory: "1500Mi"
+            cpu: "500m"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
