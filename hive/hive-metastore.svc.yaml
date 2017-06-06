@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    hive-app: metastore
+  name: hive-metastore
+spec:
+  ports:
+  - name: meta
+    port: 9083
+    protocol: TCP
+    targetPort: 9083
+  selector:
+    hive-app: metastore
+  sessionAffinity: None
+  type: ClusterIP
