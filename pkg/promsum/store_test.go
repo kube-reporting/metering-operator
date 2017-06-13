@@ -25,6 +25,18 @@ func TestFileStoreReadWrite(t *testing.T) {
 
 func testStoreReadWrite(t *testing.T, s Store) {
 	subject, query := "test-subject", "test-query"
+
+	all := Range{
+		Start: time.Unix(1, 0),
+		End:   time.Unix(4000, 0),
+	}
+
+	if read, err := s.Read(all, query, subject); err != nil {
+		t.Error("Could not perform read: ", err)
+	} else if len(read) != 0 {
+		t.Error("No records should have been returned, found ", len(read))
+	}
+
 	records := []BillingRecord{
 		{
 			Start:   time.Unix(5, 0),
@@ -64,10 +76,6 @@ func testStoreReadWrite(t *testing.T, s Store) {
 		}
 	}
 
-	all := Range{
-		Start: time.Unix(1, 0),
-		End:   time.Unix(4000, 0),
-	}
 	if read, err := s.Read(all, query, subject); err != nil {
 		t.Error("Could not perform read: ", err)
 	} else if len(read) != len(records) {

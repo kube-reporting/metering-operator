@@ -79,7 +79,11 @@ func (f FileStore) Write(record BillingRecord) error {
 func (f FileStore) Read(rng Range, query, subject string) (records []BillingRecord, err error) {
 	dir := f.Dir(query, subject)
 
-	err = filepath.Walk(dir, func(path string, file os.FileInfo, _ error) error {
+	err = filepath.Walk(dir, func(path string, file os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return err
+		}
+
 		// ignore directories
 		if file.IsDir() {
 			return nil
