@@ -20,7 +20,7 @@ type Store interface {
 
 var (
 	// FileStorePerms are the permissions files and directories storing billing records are created with.
-	FileStorePerms os.FileMode = 0644
+	FileStorePerms os.FileMode = 0700
 )
 
 // NewFileStore creates a store which writes records to the given path.

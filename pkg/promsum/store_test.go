@@ -66,17 +66,17 @@ func testStoreReadWrite(t *testing.T, s Store) {
 
 	all := Range{
 		Start: time.Unix(1, 0),
-		End:   time.Unix(100, 0),
+		End:   time.Unix(4000, 0),
 	}
 	if read, err := s.Read(all, query, subject); err != nil {
 		t.Error("Could not perform read: ", err)
-	} else if len(read) != 5 {
+	} else if len(read) != len(records) {
 		t.Error("Should have retrieved 5 records, found ", len(read))
 	}
 
 	some := Range{
-		Start: time.Unix(6, 0),
-		End:   time.Unix(31, 0),
+		Start: time.Unix(12, 0),
+		End:   time.Unix(40, 0),
 	}
 	if read, err := s.Read(some, query, subject); err != nil {
 		t.Error("Could not perform read: ", err)
