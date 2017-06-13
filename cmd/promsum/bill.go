@@ -9,17 +9,17 @@ import (
 )
 
 // bill generates billing records and persists them.
-func bill(p promsum.Promsum, pqlQuery string, billingRng promsum.Range, maxPeriodSize time.Duration) (err error) {
+func bill(p promsum.Promsum, store promsum.Store, query, subject string, rng promsum.Range, maxPeriod time.Duration) (err error) {
 	var billingRecords []promsum.BillingRecord
 	for {
-		billingRecords, err = p.Read(billingRng)
+		billingRecords, err = store.Read(rng, query, subject)
 		if err != nil {
 			log.Printf("Couldn't retrieve billing records, will save entire period (from %v to %v)",
-				billingRng.Start, billingRng.End)
+				rng.Start, rng.End)
 		}
 
 		// Determine what gaps exist in data that need to be ***REMOVED***lled
-		gaps, err := promsum.Gaps(billingRecords, billingRng)
+		gaps, err := promsum.Gaps(billingRecords, rng)
 		if err != nil {
 			return fmt.Errorf("Failed to determine which records are remaining to be generated: %v", err)
 		}
@@ -30,21 +30,21 @@ func bill(p promsum.Promsum, pqlQuery string, billingRng promsum.Range, maxPerio
 		}
 
 		// divide gaps that are larger than the max period size
-		gaps, err = promsum.Segment(gaps, maxPeriodSize)
+		gaps, err = promsum.Segment(gaps, maxPeriod)
 		if err != nil {
 			log.Fatal("Unable to determine billing periods from data gaps: ", err)
 		}
 
 		// attempt to create billing record for every period
 		for _, rng := range gaps {
-			record, err := p.Meter(pqlQuery, rng)
+			record, err := p.Meter(query, rng)
 			if err != nil {
 				log.Printf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
-					pqlQuery, rng.Start, rng.End, err)
+					query, rng.Start, rng.End, err)
 				continue
 			}
 
-			err = p.Write(record)
+			err = store.Write(record)
 			if err != nil {
 				log.Print("Failed to record: ", err)
 			}
