@@ -14,10 +14,4 @@ type Promsum interface {
 	// Meter creates a billing record for a given range and Prometheus query. It does this by summing usage
 	// between each Prometheus instant vector by multiplying rate against against the length of the interval.
 	Meter(pqlQuery string, rng Range) (BillingRecord, error)
-
-	// Write inserts the given record into storage.
-	Write(record BillingRecord) error
-
-	// Read retrieves billing queries within the given range.
-	Read(rng Range) ([]BillingRecord, error)
 }
