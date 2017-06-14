@@ -6,15 +6,15 @@ import (
 	"github.com/prometheus/client_golang/api"
 )
 
-func TestNewRemote(t *testing.T) {
+func TestNewPrometheus(t *testing.T) {
 	// check good con***REMOVED***guration
 	goodPromCfg := api.Con***REMOVED***g{
 		Address: "http://localhost:9090",
 	}
-	remote, err := NewRemote(goodPromCfg)
+	prom, err := NewPrometheus(goodPromCfg)
 	if err != nil {
 		t.Error("unexpected error setting up Prometheus: ", err)
-	} ***REMOVED*** if remote.api == nil {
+	} ***REMOVED*** if prom.api == nil {
 		t.Error("failed to setup API interface (was nil)")
 	}
 
@@ -22,7 +22,7 @@ func TestNewRemote(t *testing.T) {
 	badPromCfg := api.Con***REMOVED***g{
 		Address: "&&*://-localhost:9090",
 	}
-	remote, err = NewRemote(badPromCfg)
+	prom, err = NewPrometheus(badPromCfg)
 	if err == nil {
 		t.Error("error should have been returned for bad con***REMOVED***g")
 	}
