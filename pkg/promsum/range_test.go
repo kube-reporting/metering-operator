@@ -162,7 +162,9 @@ func TestRange_String(t *testing.T) {
 	rngStr := rng.String()
 	if !strings.Contains(rngStr, rng.Start.Format(time.RFC3339)) {
 		t.Errorf("did not find RFC3339 (%s) time for start, got: %s", rng.Start.Format(time.RFC3339), rngStr)
-	} else if !strings.Contains(rngStr, rng.End.Format(time.RFC3339)) {
+	}
+
+	if !strings.Contains(rngStr, rng.End.Format(time.RFC3339)) {
 		t.Errorf("did not find RFC3339 (%s) time for end, got: %s", rng.End.Format(time.RFC3339), rngStr)
 	}
 }
