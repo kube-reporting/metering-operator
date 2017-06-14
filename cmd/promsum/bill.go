@@ -29,12 +29,6 @@ func bill(p promsum.Promsum, store promsum.Store, query, subject string, rng pro
 			return nil
 		}
 
-		// divide gaps that are larger than the max period size
-		gaps, err = promsum.Segment(gaps, maxPeriod)
-		if err != nil {
-			log.Fatal("Unable to determine billing periods from data gaps: ", err)
-		}
-
 		// attempt to create billing record for every period
 		for _, rng := range gaps {
 			record, err := p.Meter(query, rng)

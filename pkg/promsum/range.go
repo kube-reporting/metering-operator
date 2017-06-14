@@ -38,8 +38,3 @@ func (r Range) Within(t time.Time) bool {
 	}
 	return true
 }
-
-// Segment divides the given ranges when a range exceeds the max period.
-func Segment(rngs []Range, max time.Duration) ([]Range, error) {
-	return nil, nil
-}
