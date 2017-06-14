@@ -19,12 +19,12 @@ var (
 )
 
 func init() {
-	flag.Parse()
-
 	flag.DurationVar(&before, "before", 1*time.Hour, "duration before present to start collect billing data")
 	flag.DurationVar(&maxPeriodSize, "max-period", 20*time.Minute, "duration after a range gets broken into another range")
 	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Second()), "name used to group billing data")
 	flag.StringVar(&storageDir, "path", "./data", "system path to read/write billing data")
+
+	flag.Parse()
 }
 
 func main() {
