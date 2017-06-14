@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"time"
 
-	"fmt"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
+
+	"github.com/prometheus/client_golang/api"
 )
 
 var (
@@ -39,6 +41,20 @@ func main() {
 		Start: now.Add(-before),
 		End:   now,
 	}
+
+	cfg := api.Con***REMOVED***g{
+		Address: "http://localhost:9090",
+	}
+	prom, err := promsum.NewRemote(cfg)
+	if err != nil {
+		log.Fatal("could not setup remote: ", err)
+	}
+
+	result, err := prom.Query(query, billingRng)
+	if err != nil {
+		log.Fatal("could not query prom: ", err)
+	}
+	fmt.Print("Type of result for query is:", result)
 
 	store, err := promsum.NewFileStore(storageDir)
 	if err != nil {
