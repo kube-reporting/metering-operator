@@ -45,25 +45,17 @@ func main() {
 	cfg := api.Config{
 		Address: "http://localhost:9090",
 	}
-	prom, err := promsum.NewPrometheus(cfg)
+	prom, err := NewPrometheus(cfg)
 	if err != nil {
 		log.Fatal("could not setup remote: ", err)
 	}
-
-	result, err := prom.Query(query, billingRng)
-	if err != nil {
-		log.Fatal("could not query prom: ", err)
-	}
-	fmt.Print("Type of result for query is:", result)
 
 	store, err := promsum.NewFileStore(storageDir)
 	if err != nil {
 		log.Fatal("Could not setup file storage: ", err)
 	}
 
-	// TODO: implement
-	var p promsum.Promsum
-	err = bill(p, store, query, subject, billingRng, maxPeriodSize)
+	err = bill(prom, store, query, subject, billingRng, maxPeriodSize)
 	if err != nil {
 		log.Fatalf("Failed to bill for period %v to %v for query '%s': %v",
 			billingRng.Start, billingRng.End, query, err)
