@@ -1,4 +1,4 @@
-package promsum
+package main
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ func TestNewPrometheus(t *testing.T) {
 	prom, err := NewPrometheus(goodPromCfg)
 	if err != nil {
 		t.Error("unexpected error setting up Prometheus: ", err)
-	} ***REMOVED*** if prom.api == nil {
+	} ***REMOVED*** if prom == nil {
 		t.Error("failed to setup API interface (was nil)")
 	}
 
