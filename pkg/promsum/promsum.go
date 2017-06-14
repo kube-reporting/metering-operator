@@ -5,7 +5,6 @@ package promsum
 // It performs this by:
 // - determining what gaps exist in the the billing data in storage
 // - ***REMOVED***lling the gaps using data from Prometheus query:
-//     - segment missing periods into blocks the size of the recording interval
 //     - query prometheus for rate of range series of scalar values for period
 //     - sum length of interval * rate for all time series in range
 //     - write billing record with query, range, amount, and unit into storage
