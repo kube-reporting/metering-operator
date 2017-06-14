@@ -45,7 +45,7 @@ func main() {
 	cfg := api.Config{
 		Address: "http://localhost:9090",
 	}
-	prom, err := promsum.NewRemote(cfg)
+	prom, err := promsum.NewPrometheus(cfg)
 	if err != nil {
 		log.Fatal("could not setup remote: ", err)
 	}
