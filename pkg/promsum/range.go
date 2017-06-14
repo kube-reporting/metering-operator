@@ -38,3 +38,14 @@ func (r Range) Within(t time.Time) bool {
 	}
 	return true
 }
+
+// Equal returns true if both ranges are identical.
+func (r Range) Equal(o Range) bool {
+	equal := (r.Start.Equal(o.Start) && r.End.Equal(o.End))
+	return equal
+}
+
+// String returns a human readable representation of a range.
+func (r Range) String() string {
+	return fmt.Sprintf("Range[%s to %s]", r.Start.Format(time.RFC3339), r.End.Format(time.RFC3339))
+}
