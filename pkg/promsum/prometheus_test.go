@@ -3,8 +3,11 @@ package promsum
 import (
 	"context"
 	"errors"
+	"sync/atomic"
+	"testing"
 	"time"
 
+	"fmt"
 	"github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 )
@@ -13,9 +16,10 @@ import (
 var _ v1.API = mockPromAPI{}
 
 // NewMockPromAPI initializes a mock of the Prometheus API.
-func NewMockPromAPI() mockPromAPI {
+func NewMockPromAPI(t *testing.T) mockPromAPI {
 	return mockPromAPI{
 		responseCh: make(chan mockPromResponse, 10),
+		T:          t,
 	}
 }
 
@@ -23,6 +27,10 @@ func NewMockPromAPI() mockPromAPI {
 type mockPromAPI struct {
 	// responseCh holds values that are returned when API queries are made.
 	responseCh chan mockPromResponse
+	// for test logging
+	*testing.T
+	// counts API calls for use in hashing
+	counter uint32
 }
 
 // mockPromResponse contains both a Value and Error to be returned in mocking.
@@ -33,8 +41,22 @@ type mockPromResponse struct {
 
 // QueryRange returns the next mockPromResponse as the response to any query.
 func (a mockPromAPI) QueryRange(ctx context.Context, query string, r v1.Range) (model.Value, error) {
+	id := a.id(query, r.Start, r.End)
+	a.Logf("%s: Mock Prometheus queried with '%s' for %v to %v.", id, query, r.Start.Unix(), r.End.Unix())
 	response := <-a.responseCh
+	a.Logf("%s: Mock Prometheus responded with value='%v', error='%v'", id, response.Value, response.error)
 	return response.Value, response.error
+}
+
+// id returns a unique identi***REMOVED***er for the query based on query text and optionally a series of times.
+func (a mockPromAPI) id(query string, times ...time.Time) string {
+	count := atomic.AddUint32(&a.counter, 1)
+	num := int64(0)
+	for _, t := range times {
+		num += t.Unix()
+	}
+	h := hash(fmt.Sprint(num, query))
+	return fmt.Sprintf("%x(%d)", h, count)
 }
 
 // satisfy interface
