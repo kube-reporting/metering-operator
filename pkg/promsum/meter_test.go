@@ -1,12 +1,11 @@
 package promsum
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
+	"fmt"
 
-	"github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 )
 
@@ -29,38 +28,54 @@ func TestMeterQueryError(t *testing.T) {
 	}
 }
 
-// mockPromAPI implements the Prometheus API interface.
-var _ v1.API = mockPromAPI{}
+func TestMeterScalarQuery(t *testing.T) {
+	prom := NewMockPromAPI()
 
-// NewMockPromAPI initializes a mock of the Prometheus API.
-func NewMockPromAPI() mockPromAPI {
-	return mockPromAPI{
-		responseCh: make(chan mockPromResponse, 10),
+	end := time.Now().UTC()
+	rng := Range{
+		Start: end.Add(-20 * time.Minute),
+		End:   end,
 	}
-}
+	query := 2
 
-// mockPromAPI allows Prometheus API responses to be injected for testing purposes.
-type mockPromAPI struct {
-	// responseCh holds values that are returned when API queries are made.
-	responseCh chan mockPromResponse
-}
+	// scalar queries will always return the same value
+	prom.responseCh <- mockPromResponse{
+		Value: model.Matrix{
+			{
+				Values: []model.SamplePair{
+					{
+						Timestamp: model.Time(rng.Start.Unix()),
+						Value:     model.SampleValue(query),
+					},
+					{
+						Timestamp: model.Time(rng.End.Unix()),
+						Value:     model.SampleValue(query),
+					},
+				},
+			},
+		},
+	}
+	queryStr := fmt.Sprintf("%d", query)
+	record, err := Meter(prom, queryStr, rng)
+	if err != nil {
+		t.Error("unexpected error: ", err)
+		return
+	}
 
-// mockPromResponse contains both a Value and Error to be returned in mocking.
-type mockPromResponse struct {
-	model.Value
-	error
-}
+	if !record.Start.Equal(rng.Start) {
+		t.Errorf("unexpected start time: want %v, got %v", rng.Start, record.Start)
+	}
 
-// QueryRange returns the next mockPromResponse as the response to any query.
-func (a mockPromAPI) QueryRange(ctx context.Context, query string, r v1.Range) (model.Value, error) {
-	response := <-a.responseCh
-	return response.Value, response.error
-}
+	if !record.End.Equal(rng.End) {
+		t.Errorf("unexpected end time: want %v, got %v", rng.End, record.End)
+	}
 
-// satisfy interface
-func (mockPromAPI) Query(ctx context.Context, query string, ts time.Time) (model.Value, error) {
-	return nil, errors.New("not implemented")
-}
-func (mockPromAPI) LabelValues(ctx context.Context, label string) (model.LabelValues, error) {
-	return nil, errors.New("not implemented")
+	if record.Query != queryStr {
+		t.Errorf("returned query does not match request: want %s, got %s", queryStr, record.Query)
+	}
+
+	expectedTotal := rng.End.Sub(rng.Start).Seconds() * float64(query)
+	if record.Amount != expectedTotal {
+		t.Errorf("amount billed does not match expected: want %f, got %f", expectedTotal, record.Amount)
+	}
 }
