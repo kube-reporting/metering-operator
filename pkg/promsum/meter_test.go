@@ -2,15 +2,15 @@ package promsum
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
-	"fmt"
 
 	"github.com/prometheus/common/model"
 )
 
 func TestMeterQueryError(t *testing.T) {
-	prom := NewMockPromAPI()
+	prom := NewMockPromAPI(t)
 	prom.responseCh <- mockPromResponse{
 		error: errors.New("any error"),
 	}
@@ -29,7 +29,7 @@ func TestMeterQueryError(t *testing.T) {
 }
 
 func TestMeterScalarQuery(t *testing.T) {
-	prom := NewMockPromAPI()
+	prom := NewMockPromAPI(t)
 
 	end := time.Now().UTC()
 	rng := Range{
