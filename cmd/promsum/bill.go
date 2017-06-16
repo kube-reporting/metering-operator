@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
+
+	promV1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
 // bill generates billing records and persists them.
-func bill(p promsum.Promsum, store promsum.Store, query, subject string, rng promsum.Range, maxPeriod time.Duration) (err error) {
+func bill(prom promV1.API, store promsum.Store, query, subject string, rng promsum.Range, maxPeriod time.Duration) (err error) {
 	var billingRecords []promsum.BillingRecord
 	for {
 		billingRecords, err = store.Read(rng, query, subject)
@@ -31,17 +33,20 @@ func bill(p promsum.Promsum, store promsum.Store, query, subject string, rng pro
 
 		// attempt to create billing record for every period
 		for _, rng := range gaps {
-			record, err := p.Meter(query, rng)
+			records, err := promsum.Meter(prom, query, rng)
 			if err != nil {
 				log.Printf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
 					query, rng.Start, rng.End, err)
 				continue
 			}
 
-			err = store.Write(record)
-			if err != nil {
-				log.Print("Failed to record: ", err)
+			for _, r := range records {
+				err = store.Write(r)
+				if err != nil {
+					log.Print("Failed to record: ", err)
+				}
 			}
+
 		}
 	}
 }

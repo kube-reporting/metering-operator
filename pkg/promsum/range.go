@@ -12,6 +12,7 @@ type Range struct {
 	End   time.Time
 }
 
+// ParseUnixRange takes 2 strings containing representations of integer Unix timestamps. The timestamps must be valid.
 func ParseUnixRange(startStr, endStr string) (Range, error) {
 	start, err := strconv.ParseInt(startStr, 10, 64)
 	if err != nil {
