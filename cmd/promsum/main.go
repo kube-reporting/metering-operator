@@ -13,14 +13,14 @@ import (
 
 var (
 	before        time.Duration
-	maxPeriodSize time.Duration
+	timePrecision time.Duration
 	subject       string
 	storageDir    string
 )
 
 func init() {
 	flag.DurationVar(&before, "before", 1*time.Hour, "duration before present to start collect billing data")
-	flag.DurationVar(&maxPeriodSize, "max-period", 20*time.Minute, "duration after a range gets broken into another range")
+	flag.DurationVar(&timePrecision, "precision", time.Second, "unit of time used for stored amounts")
 	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Second()), "name used to group billing data")
 	flag.StringVar(&storageDir, "path", "./data", "system path to read/write billing data")
 
@@ -51,15 +51,18 @@ func main() {
 	}
 
 	log.Println("Testing metering...")
-	records, err := promsum.Meter(prom, query, billingRng)
+	records, err := promsum.Meter(prom, query, billingRng, timePrecision)
 	if err != nil {
 		log.Fatalf("Failed to meter for %v for query '%s': %v", billingRng, query, err)
 	}
 
+	var total float64
 	fmt.Println("Produced records:")
 	for _, r := range records {
 		log.Println("- ", r)
+		total += r.Amount
 	}
+	fmt.Printf("Total usage over %v: %f\n", billingRng, total)
 
 	log.Println("Testing storage...")
 	store, err := promsum.NewFileStore(storageDir)
@@ -67,7 +70,7 @@ func main() {
 		log.Fatal("Could not setup ***REMOVED***le storage: ", err)
 	}
 
-	err = bill(prom, store, query, subject, billingRng, maxPeriodSize)
+	err = bill(prom, store, query, subject, billingRng, timePrecision)
 	if err != nil {
 		log.Fatalf("Failed to bill for period %v to %v for query '%s': %v",
 			billingRng.Start, billingRng.End, query, err)
