@@ -12,11 +12,6 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-const (
-	// PromTimePrecision is the smallest unit of time tracked by Prometheus.
-	PromTimePrecision = time.Millisecond
-)
-
 // mockPromAPI implements the Prometheus API interface.
 var _ v1.API = mockPromAPI{}
 
