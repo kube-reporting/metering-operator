@@ -31,12 +31,15 @@ func TestMeterQueryError(t *testing.T) {
 func TestMeterScalarQuery(t *testing.T) {
 	prom := NewMockPromAPI(t)
 
+	// track the interval 20 minutes into the past
 	end := time.Now().UTC()
+	start := end.Add(-20 * time.Minute)
+
 	rng := Range{
-		Start: end.Add(-20 * time.Minute),
-		End:   end,
+		Start: start.Round(PromTimePrecision),
+		End:   end.Round(PromTimePrecision),
 	}
-	query := 2
+	query := int64(2)
 
 	// scalar queries will always return the same value
 	prom.responseCh <- mockPromResponse{
@@ -44,11 +47,11 @@ func TestMeterScalarQuery(t *testing.T) {
 			{
 				Values: []model.SamplePair{
 					{
-						Timestamp: model.Time(rng.Start.Unix()),
+						Timestamp: model.TimeFromUnixNano(rng.Start.UnixNano()),
 						Value:     model.SampleValue(query),
 					},
 					{
-						Timestamp: model.Time(rng.End.Unix()),
+						Timestamp: model.TimeFromUnixNano(rng.End.UnixNano()),
 						Value:     model.SampleValue(query),
 					},
 				},
@@ -56,26 +59,29 @@ func TestMeterScalarQuery(t *testing.T) {
 		},
 	}
 	queryStr := fmt.Sprintf("%d", query)
-	record, err := Meter(prom, queryStr, rng)
+	records, err := Meter(prom, queryStr, rng)
 	if err != nil {
 		t.Error("unexpected error: ", err)
 		return
 	}
 
-	if !record.Start.Equal(rng.Start) {
-		t.Errorf("unexpected start time: want %v, got %v", rng.Start, record.Start)
-	}
+	for _, record := range records {
+		if !record.Start.Equal(rng.Start) {
+			t.Errorf("unexpected start time: want %v, got %v", rng.Start, record.Start)
+		}
 
-	if !record.End.Equal(rng.End) {
-		t.Errorf("unexpected end time: want %v, got %v", rng.End, record.End)
-	}
+		if !record.End.Equal(rng.End) {
+			t.Errorf("unexpected end time: want %v, got %v", rng.End, record.End)
+		}
 
-	if record.Query != queryStr {
-		t.Errorf("returned query does not match request: want %s, got %s", queryStr, record.Query)
-	}
+		if record.Query != queryStr {
+			t.Errorf("returned query does not match request: want %s, got %s", queryStr, record.Query)
+		}
 
-	expectedTotal := rng.End.Sub(rng.Start).Seconds() * float64(query)
-	if record.Amount != expectedTotal {
-		t.Errorf("amount billed does not match expected: want %f, got %f", expectedTotal, record.Amount)
+		duration := rng.End.Sub(rng.Start).Nanoseconds() / int64(time.Millisecond)
+		expectedTotal := float64(duration * query)
+		if record.Amount != expectedTotal {
+			t.Errorf("amount billed does not match expected: want %f, got %f", expectedTotal, record.Amount)
+		}
 	}
 }

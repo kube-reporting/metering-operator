@@ -3,13 +3,18 @@ package promsum
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"fmt"
 	"github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+)
+
+const (
+	// PromTimePrecision is the smallest unit of time tracked by Prometheus.
+	PromTimePrecision = time.Millisecond
 )
 
 // mockPromAPI implements the Prometheus API interface.
