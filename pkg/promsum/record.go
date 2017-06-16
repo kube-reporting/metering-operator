@@ -1,6 +1,7 @@
 package promsum
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -20,6 +21,12 @@ func (record BillingRecord) Range() Range {
 		Start: record.Start,
 		End:   record.End,
 	}
+}
+
+// String returns a human readable representation of a BillingRecord.
+func (record BillingRecord) String() string {
+	return fmt.Sprintf("BillingRecord[Labels: %v, Query: %s, Subject: %s, Amount: %f, Start: %v, End: %v]",
+		record.Labels, record.Query, record.Subject, record.Amount, record.Start, record.End)
 }
 
 // Gaps returns the ranges which don't yet have billing records.

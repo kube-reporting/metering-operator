@@ -33,17 +33,20 @@ func bill(prom promV1.API, store promsum.Store, query, subject string, rng proms
 
 		// attempt to create billing record for every period
 		for _, rng := range gaps {
-			record, err := promsum.Meter(prom, query, rng)
+			records, err := promsum.Meter(prom, query, rng)
 			if err != nil {
 				log.Printf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
 					query, rng.Start, rng.End, err)
 				continue
 			}
 
-			err = store.Write(record)
-			if err != nil {
-				log.Print("Failed to record: ", err)
+			for _, r := range records {
+				err = store.Write(r)
+				if err != nil {
+					log.Print("Failed to record: ", err)
+				}
 			}
+
 		}
 	}
 }

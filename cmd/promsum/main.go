@@ -50,6 +50,18 @@ func main() {
 		log.Fatal("could not setup remote: ", err)
 	}
 
+	log.Println("Testing metering...")
+	records, err := promsum.Meter(prom, query, billingRng)
+	if err != nil {
+		log.Fatalf("Failed to meter for %v for query '%s': %v", billingRng, query, err)
+	}
+
+	fmt.Println("Produced records:")
+	for _, r := range records {
+		log.Println("- ", r)
+	}
+
+	log.Println("Testing storage...")
 	store, err := promsum.NewFileStore(storageDir)
 	if err != nil {
 		log.Fatal("Could not setup file storage: ", err)
