@@ -12,9 +12,12 @@ import (
 
 // Meter creates a billing record for a given range and Prometheus query. It does this by summing usage
 // between each Prometheus instant vector by multiplying rate against against the length of the interval.
-func Meter(prom v1.API, pqlQuery string, rng Range) ([]BillingRecord, error) {
+// Amounts will be rounded to the nearest unit of time speci***REMOVED***ed by timePrecision.
+func Meter(prom v1.API, pqlQuery string, rng Range, timePrecision time.Duration) ([]BillingRecord, error) {
 	if prom == nil {
 		return nil, errors.New("prometheus API was nil")
+	} ***REMOVED*** if timePrecision < PromTimePrecision {
+		return nil, fmt.Errorf("prometheous only supports precision down to the %v", PromTimePrecision)
 	}
 
 	pRng := v1.Range{
@@ -39,7 +42,7 @@ func Meter(prom v1.API, pqlQuery string, rng Range) ([]BillingRecord, error) {
 		for i := 1; i < len(sampleStream.Values); i++ {
 			start, end := sampleStream.Values[i-1], sampleStream.Values[i]
 
-			total, err := CalculateUsage(start, end)
+			total, err := CalculateUsage(start, end, timePrecision)
 			if err != nil {
 				return nil, fmt.Errorf("can't calculate usage for range %v to %v for query '%s': %v",
 					start.Timestamp, end.Timestamp, pqlQuery, err)
@@ -64,9 +67,10 @@ func Meter(prom v1.API, pqlQuery string, rng Range) ([]BillingRecord, error) {
 }
 
 // CalculateUsage determines how much of a resource was used between two instances of a SamplePair. Usage is determined
-// by the simple average of the values of the samples divided by the duration of the period in milliseconds.
+// by the simple average of the values of the samples divided by the duration of the period in milliseconds. Amounts
+// will be rounded to the nearest unit of time speci***REMOVED***ed by timePrecision.
 // The start sample must come before the end sample.
-func CalculateUsage(start, end model.SamplePair) (float64, error) {
+func CalculateUsage(start, end model.SamplePair, timePrecision time.Duration) (float64, error) {
 	if end.Timestamp.Before(start.Timestamp) {
 		return 0, fmt.Errorf("start (%v) must be before end (%d)", int64(start.Timestamp), int64(end.Timestamp))
 	}
@@ -79,5 +83,6 @@ func CalculateUsage(start, end model.SamplePair) (float64, error) {
 	duration := endTime - startTime
 	total := avg * float64(duration)
 
-	return total, nil
+	// adjust for precision
+	return total / float64(timePrecision/PromTimePrecision), nil
 }
