@@ -6,11 +6,12 @@ import (
 
 // BillingRecord is a receipt of a usage determined by a query within a specific time range.
 type BillingRecord struct {
-	Query   string    `json:"query"`
-	Subject string    `json:"subject"`
-	Amount  float64   `json:"amount"`
-	Start   time.Time `json:"start"`
-	End     time.Time `json:"end"`
+	Labels  map[string]string `json:"labels"`
+	Query   string            `json:"query"`
+	Subject string            `json:"subject"`
+	Amount  float64           `json:"amount"`
+	Start   time.Time         `json:"start"`
+	End     time.Time         `json:"end"`
 }
 
 // Range returns the range of the billing record.
