@@ -1,19 +1,13 @@
 package promsum
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 	"time"
-
-	"github.com/prometheus/common/model"
 )
 
 func TestMeterQueryError(t *testing.T) {
 	prom := NewMockPromAPI(t)
-	prom.responseCh <- mockPromResponse{
-		error: errors.New("any error"),
-	}
 
 	rng := Range{Start: time.Unix(0, 0), End: time.Unix(100, 0)}
 	_, err := Meter(prom, "bad query", rng, PromTimePrecision)
@@ -43,22 +37,6 @@ func TestMeterScalarQuery(t *testing.T) {
 	timePrecision := time.Second
 
 	// scalar queries will always return the same value
-	prom.responseCh <- mockPromResponse{
-		Value: model.Matrix{
-			{
-				Values: []model.SamplePair{
-					{
-						Timestamp: model.TimeFromUnixNano(rng.Start.UnixNano()),
-						Value:     model.SampleValue(query),
-					},
-					{
-						Timestamp: model.TimeFromUnixNano(rng.End.UnixNano()),
-						Value:     model.SampleValue(query),
-					},
-				},
-			},
-		},
-	}
 	queryStr := fmt.Sprintf("%d", query)
 	records, err := Meter(prom, queryStr, rng, timePrecision)
 	if err != nil {
@@ -66,26 +44,27 @@ func TestMeterScalarQuery(t *testing.T) {
 		return
 	}
 
-	for _, record := range records {
-		if !record.Start.Equal(rng.Start) {
-			t.Errorf("unexpected start time: want %v, got %v", rng.Start, record.Start)
-		}
+	duration := rng.End.Sub(rng.Start).Nanoseconds() / int64(PromTimePrecision)
+	expectedTotal := float64(duration * query)
 
-		if !record.End.Equal(rng.End) {
-			t.Errorf("unexpected end time: want %v, got %v", rng.End, record.End)
+	// adjust for desired precision
+	expectedTotal = expectedTotal / float64(timePrecision/PromTimePrecision)
+
+	var actualTotal float64
+	for i := 0; i < len(records); i++ {
+		record := records[i]
+		if i != 0 && !records[i-1].End.Equal(record.Start) {
+			t.Errorf("next segment should start when the last ends: want %v, got %v",
+				records[i-1].End.Format(time.RFC3339), record.Start.Format(time.RFC3339))
 		}
 
 		if record.Query != queryStr {
 			t.Errorf("returned query does not match request: want %s, got %s", queryStr, record.Query)
 		}
+		actualTotal += record.Amount
+	}
 
-		duration := rng.End.Sub(rng.Start).Nanoseconds() / int64(PromTimePrecision)
-		expectedTotal := float64(duration * query)
-
-		// adjust for desired precision
-		expectedTotal = expectedTotal / float64(timePrecision/PromTimePrecision)
-		if record.Amount != expectedTotal {
-			t.Errorf("amount billed does not match expected: want %f, got %f", expectedTotal, record.Amount)
-		}
+	if actualTotal != expectedTotal {
+		t.Errorf("amount billed does not match expected: want %f, got %f", expectedTotal, actualTotal)
 	}
 }
