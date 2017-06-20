@@ -168,3 +168,75 @@ func TestRange_String(t *testing.T) {
 		t.Errorf("did not ***REMOVED***nd RFC3339 (%s) time for end, got: %s", rng.End.Format(time.RFC3339), rngStr)
 	}
 }
+
+func TestRange_Segment(t *testing.T) {
+	data := []struct {
+		rng      Range
+		interval time.Duration
+		expected []Range
+	}{
+		{ // equal increments
+			rng: Range{
+				Start: time.Unix(0, 0),
+				End:   time.Unix(125, 0),
+			},
+			interval: 25 * time.Second,
+			expected: []Range{
+				{Start: time.Unix(0, 0), End: time.Unix(25, 0)},
+				{Start: time.Unix(25, 0), End: time.Unix(50, 0)},
+				{Start: time.Unix(50, 0), End: time.Unix(75, 0)},
+				{Start: time.Unix(75, 0), End: time.Unix(100, 0)},
+				{Start: time.Unix(100, 0), End: time.Unix(125, 0)},
+			},
+		},
+		{ // remainder
+			rng: Range{
+				Start: time.Unix(0, 0),
+				End:   time.Unix(130, 0),
+			},
+			interval: 25 * time.Second,
+			expected: []Range{
+				{Start: time.Unix(0, 0), End: time.Unix(25, 0)},
+				{Start: time.Unix(25, 0), End: time.Unix(50, 0)},
+				{Start: time.Unix(50, 0), End: time.Unix(75, 0)},
+				{Start: time.Unix(75, 0), End: time.Unix(100, 0)},
+				{Start: time.Unix(100, 0), End: time.Unix(125, 0)},
+				{Start: time.Unix(125, 0), End: time.Unix(130, 0)},
+			},
+		},
+		{ // entire
+			rng: Range{
+				Start: time.Unix(0, 0),
+				End:   time.Unix(130, 0),
+			},
+			interval: 200 * time.Second,
+			expected: []Range{
+				{Start: time.Unix(0, 0), End: time.Unix(130, 0)},
+			},
+		},
+		{ // 0 interval
+			rng: Range{
+				Start: time.Unix(0, 0),
+				End:   time.Unix(130, 0),
+			},
+			interval: 0 * time.Second,
+			expected: []Range{},
+		},
+	}
+
+	for i, d := range data {
+		actual := d.rng.Segment(d.interval)
+		if len(actual) != len(d.expected) {
+			t.Errorf("%d: unxpected number of segments (%v) from range %v: wanted %d, got %d",
+				i, d.interval, d.rng, len(d.expected), len(actual))
+			break
+		}
+
+		for i, rng := range d.expected {
+			if !rng.Equal(actual[i]) {
+				t.Errorf("%d: unexpected range returned: wanted %v, got %v", i, rng, actual[i])
+				break
+			}
+		}
+	}
+}
