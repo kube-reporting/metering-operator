@@ -46,13 +46,15 @@ func (a mockPromAPI) QueryRange(ctx context.Context, query string, r v1.Range) (
 	// perform query
 	start, end := model.TimeFromUnixNano(r.Start.UnixNano()), model.TimeFromUnixNano(r.End.UnixNano())
 	pQuery, err := a.promTest.QueryEngine().NewRangeQuery(query, start, end, r.Step)
-	if err != nil {
-		return nil, err
+
+	var val model.Value
+	if err == nil {
+		response := pQuery.Exec(ctx)
+		val, err = response.Value, response.Err
 	}
 
-	response := pQuery.Exec(ctx)
-	a.Logf("%s: Mock Prometheus responded with value='%v', error='%v'", id, response.Value, response.Err)
-	return response.Value, response.Err
+	a.Logf("%s: Mock Prometheus responded with value='%v', error='%v'", id, val, err)
+	return val, err
 }
 
 // id returns a unique identi***REMOVED***er for the query based on query text and optionally a series of times.
