@@ -143,7 +143,7 @@ func PathWithinRange(path string, rng Range) (bool, error) {
 
 // hash implements a simple hashing function for queries.
 func hash(in string) (out uint64) {
-	p, m := uint64(4423), uint64(2277)
+	p, m := uint64(74207281), uint64(859433)
 	for _, char := range in {
 		out = m*out + uint64(char)
 	}
