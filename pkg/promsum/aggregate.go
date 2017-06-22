@@ -42,7 +42,8 @@ func Aggregate(records []BillingRecord, rng Range, mergeLabels []string) ([]Bill
 		if !ok {
 			storedRecord = record
 		} else if storedRecord.End != record.Start {
-			return nil, fmt.Errorf("beginining of %v doesnt match start of %v", storedRecord, record)
+			return nil, fmt.Errorf("end of (%v) doesnt match start of (%v), first: %v, second: %v",
+				storedRecord.End, record.Start, storedRecord, record)
 		} else {
 			storedRecord.Amount = storedRecord.Amount + record.Amount
 			storedRecord.End = record.End
