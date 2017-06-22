@@ -55,7 +55,7 @@ var _ Store = FileStore{}
 // Write stores a billing record as a file using the filename for ordering.
 // Will overwrite existing entries matching range, subject, and query.
 func (f FileStore) Write(record BillingRecord) error {
-	dir := f.Dir(record.Query, record.Subject)
+	dir := Dir(f.directory, record.Query, record.Subject)
 
 	// create directory, if exists don't error
 	if err := os.MkdirAll(dir, FileStorePerms); err != nil && !os.IsExist(err) {
@@ -67,7 +67,7 @@ func (f FileStore) Write(record BillingRecord) error {
 		return fmt.Errorf("could not record record: %v", err)
 	}
 
-	name := f.Name(record.Range())
+	name := Name(record.Range())
 	recordPath := filepath.Join(dir, name)
 	if err = ioutil.WriteFile(recordPath, data, FileStorePerms); err != nil {
 		return fmt.Errorf("failed to write billing record to '%s': %v", recordPath, err)
@@ -77,7 +77,7 @@ func (f FileStore) Write(record BillingRecord) error {
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
 func (f FileStore) Read(rng Range, query, subject string) (records []BillingRecord, err error) {
-	dir := f.Dir(query, subject)
+	dir := Dir(f.directory, query, subject)
 
 	err = filepath.Walk(dir, func(path string, file os.FileInfo, walkErr error) error {
 		if walkErr != nil {
@@ -89,14 +89,9 @@ func (f FileStore) Read(rng Range, query, subject string) (records []BillingReco
 			return nil
 		}
 
-		name := filepath.Base(path)
-		recordRng, err := rngFromName(name)
-		if err != nil {
-			return fmt.Errorf("could not determine record range from filename for '%s': %v", path, err)
-		}
-
-		// skip if record is not in desired range
-		if !rng.Within(recordRng.Start) && !rng.Within(recordRng.End) {
+		if ok, err := PathWithinRange(path, rng); err != nil {
+			return fmt.Errorf("failed to determine if path '%s' is in range: %v", path, err)
+		} else if !ok {
 			return nil
 		}
 
@@ -121,20 +116,29 @@ func (f FileStore) Read(rng Range, query, subject string) (records []BillingReco
 }
 
 // Name returns the name of the file for a given range.
-func (f FileStore) Name(rng Range) string {
+func Name(rng Range) string {
 	return fmt.Sprintf("%d-%d.json", rng.Start.Unix(), rng.End.Unix())
 }
 
 // Dir returns the path of the storage directory for the given query and subject
-func (f FileStore) Dir(query, subject string) string {
+func Dir(parent, query, subject string) string {
 	hashedQuery := fmt.Sprintf("%x", hash(query))
-	return filepath.Join(f.directory, subject, hashedQuery)
+	return filepath.Join(parent, subject, hashedQuery)
 }
 
-// Path returns the path where the given billing record is stored.
-func (f FileStore) Path(rng Range, query, subject string) string {
-	dir, name := f.Dir(query, subject), f.Name(rng)
-	return filepath.Join(dir, name)
+// PathWithinRange determines if the given filename represents a range within the one given.
+func PathWithinRange(path string, rng Range) (bool, error) {
+	name := filepath.Base(path)
+	recordRng, err := rngFromName(name)
+	if err != nil {
+		return false, fmt.Errorf("could not determine record range from filename for '%s': %v", path, err)
+	}
+
+	// skip if record is not in desired range
+	if !rng.Within(recordRng.Start) && !rng.Within(recordRng.End) {
+		return false, nil
+	}
+	return true, nil
 }
 
 // hash implements a simple hashing function for queries.
@@ -148,7 +152,7 @@ func hash(in string) (out uint64) {
 
 func rngFromName(name string) (Range, error) {
 	name = strings.TrimRight(name, ".json")
-	s := strings.Split(name, "-")
+	s := strings.SplitN(name, "-", 2)
 	if len(s) != 2 {
 		return Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
 	}
