@@ -16,13 +16,15 @@ var (
 	timePrecision time.Duration
 	subject       string
 	storageDir    string
+	aggregate     bool
 )
 
 func init() {
 	flag.DurationVar(&before, "before", 1*time.Hour, "duration before present to start collect billing data")
 	flag.DurationVar(&timePrecision, "precision", time.Second, "unit of time used for stored amounts")
-	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Second()), "name used to group billing data")
+	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Nanosecond()), "name used to group billing data")
 	flag.StringVar(&storageDir, "path", "./data", "system path to read/write billing data")
+	flag.BoolVar(&aggregate, "aggregate", false, "summarizes the ranged in as few billing records as possible")
 
 	flag.Parse()
 }
@@ -70,9 +72,21 @@ func main() {
 		log.Fatal("Could not setup ***REMOVED***le storage: ", err)
 	}
 
-	err = bill(prom, store, query, subject, billingRng, timePrecision)
+	records, err = bill(prom, store, query, subject, billingRng, timePrecision)
 	if err != nil {
 		log.Fatalf("Failed to bill for period %v to %v for query '%s': %v",
 			billingRng.Start, billingRng.End, query, err)
+	}
+
+	if aggregate {
+		totals, err := promsum.Aggregate(records, billingRng, []string{"pod", "namespace", "container"})
+		if err != nil {
+			log.Fatalf("Failed to aggregate for %s over %v: %v", query, billingRng, err)
+		}
+
+		log.Println("Found aggregates:")
+		for _, r := range totals {
+			log.Println(r.String())
+		}
 	}
 }
