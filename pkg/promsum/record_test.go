@@ -26,3 +26,55 @@ func TestBillingRecord_Range(t *testing.T) {
 		t.Errorf("record end (%v) does not match range end (%v)", record.End, rng.End)
 	}
 }
+
+func TestBillingRecord_Prorate(t *testing.T) {
+	data := []struct {
+		record BillingRecord
+		rng    Range
+		amount float64
+	}{
+		{ // entire range
+			record: BillingRecord{
+				Amount: 100,
+				Start:  time.Unix(100, 0),
+				End:    time.Unix(200, 0),
+			},
+			rng: Range{
+				Start: time.Unix(100, 0),
+				End:   time.Unix(200, 0),
+			},
+			amount: 100,
+		},
+		{ // half range
+			record: BillingRecord{
+				Amount: 100,
+				Start:  time.Unix(100, 0),
+				End:    time.Unix(200, 0),
+			},
+			rng: Range{
+				Start: time.Unix(150, 0),
+				End:   time.Unix(200, 0),
+			},
+			amount: 50,
+		},
+	}
+
+	for _, e := range data {
+		prorate, err := e.record.Prorate(e.rng)
+		if err != nil {
+			t.Errorf("could not prorate record %v: %v", e.record, err)
+		}
+
+		if prorate.Amount != e.amount {
+			t.Errorf("prorated amount unexpected: got %f, want %f", prorate.Amount, e.amount)
+		}
+
+		if prorate.Query != e.record.Query {
+			t.Errorf("query unexpected: got %s, want %s", prorate.Query, e.record.Query)
+		}
+
+		if prorate.Subject != e.record.Subject {
+			t.Errorf("subject unexpected: got %s, want %s", prorate.Subject, e.record.Subject)
+		}
+	}
+}
