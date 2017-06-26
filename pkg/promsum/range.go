@@ -50,3 +50,28 @@ func (r Range) Equal(o Range) bool {
 func (r Range) String() string {
 	return fmt.Sprintf("Range[%s to %s]", r.Start.Format(time.RFC3339), r.End.Format(time.RFC3339))
 }
+
+// Segment returns consecutive subranges the length of interval. If interval is larger then the remainder, the remainder
+// is returned. If interval is <= 0, an empty range is returned.
+func (r Range) Segment(interval time.Duration) (ranges []Range) {
+	if interval <= 0 {
+		return
+	}
+
+	start := r.Start
+	for start.Before(r.End) {
+		rng := Range{
+			Start: start,
+			End:   start.Add(interval),
+		}
+
+		// if rest of range is smaller than duration of segment, return full remainder
+		if !rng.End.Before(r.End) {
+			rng.End = r.End
+		}
+
+		ranges = append(ranges, rng)
+		start = rng.End
+	}
+	return
+}
