@@ -15,7 +15,7 @@ var (
 	before        time.Duration
 	timePrecision time.Duration
 	subject       string
-	storageDir    string
+	storeURL      string
 	aggregate     bool
 )
 
@@ -23,7 +23,7 @@ func init() {
 	flag.DurationVar(&before, "before", 1*time.Hour, "duration before present to start collect billing data")
 	flag.DurationVar(&timePrecision, "precision", time.Second, "unit of time used for stored amounts")
 	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Nanosecond()), "name used to group billing data")
-	flag.StringVar(&storageDir, "path", "./data", "system path to read/write billing data")
+	flag.StringVar(&storeURL, "path", "***REMOVED***le://data", "URL to the location that records should be stored")
 	flag.BoolVar(&aggregate, "aggregate", false, "summarizes the ranged in as few billing records as possible")
 
 	flag.Parse()
@@ -67,9 +67,9 @@ func main() {
 	fmt.Printf("Total usage over %v: %f\n", billingRng, total)
 
 	log.Println("Testing storage...")
-	store, err := promsum.NewFileStore(storageDir)
+	store, err := setupStore(storeURL)
 	if err != nil {
-		log.Fatal("Could not setup ***REMOVED***le storage: ", err)
+		log.Fatal("Could not setup storage: ", err)
 	}
 
 	records, err = bill(prom, store, query, subject, billingRng, timePrecision)
