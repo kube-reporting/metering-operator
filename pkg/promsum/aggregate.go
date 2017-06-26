@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+// Aggregate merges the given records into as few records as possible. The criteria used to determine if records can be
+// merged is if the key/value of the given mergeLabels matches.
 func Aggregate(records []BillingRecord, rng Range, mergeLabels []string) ([]BillingRecord, error) {
 	// create map[string][string]BillingRecord
 	recordMap := map[uint64]BillingRecord{}
