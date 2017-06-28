@@ -48,7 +48,7 @@ func Meter(prom v1.API, pqlQuery string, rng Range, timePrecision time.Duration)
 					start.Timestamp, end.Timestamp, pqlQuery, err)
 			}
 
-			labels := map[string]string{}
+			labels := make(map[string]string, len(sampleStream.Metric))
 			for k, v := range sampleStream.Metric {
 				labels[string(k)] = string(v)
 			}
@@ -67,7 +67,7 @@ func Meter(prom v1.API, pqlQuery string, rng Range, timePrecision time.Duration)
 }
 
 // CalculateUsage determines how much of a resource was used between two instances of a SamplePair. Usage is determined
-// by the simple average of the values of the samples divided by the duration of the period in milliseconds. Amounts
+// by the simple average of the values of the samples multiplied by the duration of the period in milliseconds. Amounts
 // will be rounded to the nearest unit of time specified by timePrecision.
 // The start sample must come before the end sample.
 func CalculateUsage(start, end model.SamplePair, timePrecision time.Duration) (float64, error) {
@@ -75,13 +75,9 @@ func CalculateUsage(start, end model.SamplePair, timePrecision time.Duration) (f
 		return 0, fmt.Errorf("start (%v) must be before end (%d)", int64(start.Timestamp), int64(end.Timestamp))
 	}
 
-	// use go primitives maintaining precision
-	startVal, endVal := float64(start.Value), float64(end.Value)
-	startTime, endTime := int64(start.Timestamp), int64(end.Timestamp)
-
-	avg := (startVal + endVal) / 2
-	duration := endTime - startTime
-	total := avg * float64(duration)
+	avg := float64(start.Value+end.Value) / 2
+	duration := float64(end.Timestamp - start.Timestamp)
+	total := avg * duration
 
 	// adjust for precision
 	return total / float64(timePrecision/PromTimePrecision), nil
