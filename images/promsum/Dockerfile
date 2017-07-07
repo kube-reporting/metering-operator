@@ -1,4 +1,6 @@
-FROM bash:4.4.12
+FROM alpine:3.6
+
+RUN apk --update add ca-certi***REMOVED***cates bash
 
 # add pod data collector binary
 ADD https://s3.amazonaws.com/promsum/promsum /usr/local/bin/promsum
