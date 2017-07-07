@@ -23,7 +23,7 @@ func Meter(prom v1.API, pqlQuery string, rng Range, timePrecision time.Duration)
 	pRng := v1.Range{
 		Start: rng.Start,
 		End:   rng.End,
-		Step:  1 * time.Minute,
+		Step:  5 * time.Minute,
 	}
 
 	pVal, err := prom.QueryRange(context.Background(), pqlQuery, pRng)

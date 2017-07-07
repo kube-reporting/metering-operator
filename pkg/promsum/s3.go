@@ -42,7 +42,7 @@ func (s S3Store) Write(record BillingRecord) error {
 	}
 
 	dir := Dir(s.Path, record.Query, record.Subject)
-	name := Name(record.Range())
+	name := Name(record.Range(), record.Labels)
 	key := ***REMOVED***lepath.Join(dir, name)
 
 	_, err = s.s3.PutObject(&s3.PutObjectInput{
