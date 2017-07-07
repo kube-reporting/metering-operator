@@ -9,3 +9,6 @@ sleep 5
 
 kubectl apply -f ./hive
 kubectl apply -f ./presto
+kubectl apply -f ./promsum
+kubectl apply -f prom.yaml
+kubectl apply -f kube-state-metrics.yaml
