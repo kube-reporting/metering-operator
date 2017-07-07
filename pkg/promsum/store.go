@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -67,7 +68,7 @@ func (f FileStore) Write(record BillingRecord) error {
 		return fmt.Errorf("could not record record: %v", err)
 	}
 
-	name := Name(record.Range())
+	name := Name(record.Range(), record.Labels)
 	recordPath := filepath.Join(dir, name)
 	if err = ioutil.WriteFile(recordPath, data, FileStorePerms); err != nil {
 		return fmt.Errorf("failed to write billing record to '%s': %v", recordPath, err)
@@ -116,8 +117,21 @@ func (f FileStore) Read(rng Range, query, subject string) (records []BillingReco
 }
 
 // Name returns the name of the file for a given range.
-func Name(rng Range) string {
-	return fmt.Sprintf("%d-%d.json", rng.Start.Unix(), rng.End.Unix())
+func Name(rng Range, labels map[string]string) string {
+	i := 0
+	keys := make([]string, len(labels))
+	for k := range labels {
+		keys[i] = k
+	}
+	sort.Strings(keys)
+
+	flatLabels := ""
+	for _, k := range keys {
+		v := labels[k]
+		flatLabels += fmt.Sprintf("%s:%s,", k, v)
+	}
+
+	return fmt.Sprintf("%d-%d-%x.json", rng.Start.Unix(), rng.End.Unix(), hash(flatLabels))
 }
 
 // Dir returns the path of the storage directory for the given query and subject
@@ -152,8 +166,8 @@ func hash(in string) (out uint64) {
 
 func rngFromName(name string) (Range, error) {
 	name = strings.TrimRight(name, ".json")
-	s := strings.SplitN(name, "-", 2)
-	if len(s) != 2 {
+	s := strings.SplitN(name, "-", 3)
+	if len(s) != 3 {
 		return Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
 	}
 	startStr, endStr := s[0], s[1]
