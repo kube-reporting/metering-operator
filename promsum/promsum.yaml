@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: promsum
+spec:
+  selector:
+    matchLabels:
+      app: promsum
+  template:
+    metadata:
+      name: promsum
+      labels:
+        app: promsum
+    spec:
+      containers:
+      - name: promsum
+        image: quay.io/coreos/promsum:0.1
+        imagePullPolicy: Always
+        env:
+        - name: "POLL_INTERVAL"
+          value: "300"
+        - name: "AWS_ACCESS_KEY_ID"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: "AWS_SECRET_ACCESS_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        - name: "AWS_REGION"
+          value: "us-west-1"
+        - name: "S3_BUCKET"
+          value: "coreos-team-chargeback"
+        - name: "S3_PATH"
+          value: "july-pod-data"
+        - name: "QUERY"
+          value: "kube_pod_container_resource_requests_memory_bytes"
+      restartPolicy: Always
