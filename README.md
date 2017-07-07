@@ -9,3 +9,7 @@ This installation assumes that you are using Tectonic 1.6.4-tectonic.1 or greate
 ```
 ./install.sh
 ```
+
+## Design
+![Chargeback architecture](/Documentation/architecture.jpeg?raw=true "Optional Title")
+
