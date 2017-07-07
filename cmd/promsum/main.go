@@ -17,6 +17,7 @@ var (
 	subject       string
 	storeURL      string
 	aggregate     bool
+	promURL       string
 )
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
 	flag.DurationVar(&timePrecision, "precision", time.Second, "unit of time used for stored amounts")
 	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Nanosecond()), "name used to group billing data")
 	flag.StringVar(&storeURL, "path", "***REMOVED***le://data", "URL to the location that records should be stored")
+	flag.StringVar(&promURL, "prom", "http://localhost:9090", "URL of the Prometheus to be queried")
 	flag.BoolVar(&aggregate, "aggregate", false, "summarizes the ranged in as few billing records as possible")
 
 	flag.Parse()
@@ -45,7 +47,7 @@ func main() {
 	}
 
 	cfg := api.Con***REMOVED***g{
-		Address: "http://localhost:9090",
+		Address: promURL,
 	}
 	prom, err := NewPrometheus(cfg)
 	if err != nil {
