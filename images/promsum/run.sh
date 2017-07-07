@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 POLL_INTERVAL=${POLL_INTERVAL:-300}
 
