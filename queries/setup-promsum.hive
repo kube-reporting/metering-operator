@@ -1,0 +1,14 @@
+DROP table promsum;
+CREATE EXTERNAL TABLE promsum (
+    subject string,
+    amount float,
+    `start` timestamp,
+    `end` timestamp,
+    labels map<string, string>
+)
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+WITH SERDEPROPERTIES (
+    'timestamp.formats' = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+) LOCATION "s3n://coreos-team-chargeback/july-pod-data/kube-chargeback/407374e";
+    
+    
