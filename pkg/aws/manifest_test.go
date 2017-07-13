@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestUnmarshalManifest(t *testing.T) {
-	manifestText := `{
+const (
+	manifestText = `{
   "assemblyId":"ea74f90b-e82f-9c72-fab6-abc716793752",
   "account":"826591639284",
   "columns":[{
@@ -38,9 +38,25 @@ func TestUnmarshalManifest(t *testing.T) {
   "reportKeys":["billing-path/20170701-20170801/ea74f90b-e82f-9c72-fab6-abc716793752/sample-report-1.csv.gz","billing-path/20170701-20170801/ea74f90b-e82f-9c72-fab6-abc716793752/sample-report-2.csv.gz"],
   "additionalArtifactKeys":[]
 }`
+)
 
+func TestManifest_Paths(t *testing.T) {
 	var manifest Manifest
 	if err := json.Unmarshal([]byte(manifestText), &manifest); err != nil {
 		t.Error("failed to marshal error: ", err)
+	}
+
+	numExpectedPaths := 1
+	expectedPath := "billing-path/20170701-20170801/ea74f90b-e82f-9c72-fab6-abc716793752"
+	if paths := manifest.Paths(); len(paths) != numExpectedPaths {
+		t.Errorf("unexpected number of paths: got %d, want %d", len(paths), numExpectedPaths)
+	} ***REMOVED*** if paths[0] != expectedPath {
+		t.Errorf("unexpected path: got %s, want %s", paths[0], expectedPath)
+	}
+
+	// manifests without report keys should not return paths
+	manifest.ReportKeys = nil
+	if paths := manifest.Paths(); len(paths) != 0 {
+		t.Error("manifests without report keys should not produce paths")
 	}
 }
