@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 )
 
 type Query struct {
@@ -18,8 +16,7 @@ type Query struct {
 
 type QuerySpec struct {
 	// Range of time to be queried.
-	// TODO: Move from promsum
-	promsum.Range `json:"range"`
+	Range `json:"range"`
 
 	S3 S3Output `json:"s3"`
 }

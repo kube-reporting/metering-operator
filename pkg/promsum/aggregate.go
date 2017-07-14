@@ -2,11 +2,13 @@ package promsum
 
 import (
 	"fmt"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // Aggregate merges the given records into as few records as possible. The criteria used to determine if records can be
 // merged is if the key/value of the given mergeLabels matches.
-func Aggregate(records []BillingRecord, rng Range, mergeLabels []string) ([]BillingRecord, error) {
+func Aggregate(records []BillingRecord, rng cb.Range, mergeLabels []string) ([]BillingRecord, error) {
 	// create map[string][string]BillingRecord
 	recordMap := map[uint64]BillingRecord{}
 	// iterate through every BillingRecord (r) within range
@@ -19,10 +21,10 @@ func Aggregate(records []BillingRecord, rng Range, mergeLabels []string) ([]Bill
 			// entire record is within range, prorate range
 			record, err = record.Prorate(rng)
 		} else if !rng.Within(record.Start) && rng.Within(record.End) {
-			prorateRng := Range{rng.Start, record.End}
+			prorateRng := cb.Range{rng.Start, record.End}
 			record, err = record.Prorate(prorateRng)
 		} else if !rng.Within(record.End) && rng.Within(record.Start) {
-			prorateRng := Range{record.Start, rng.End}
+			prorateRng := cb.Range{record.Start, rng.End}
 			record, err = record.Prorate(prorateRng)
 		} else {
 			err = fmt.Errorf("record range (%v) is not within given range (%v)", record.Range(), rng)

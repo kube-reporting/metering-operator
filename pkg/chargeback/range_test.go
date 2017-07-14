@@ -1,4 +1,4 @@
-package promsum
+package chargeback
 
 import (
 	"strings"
