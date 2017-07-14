@@ -11,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // NewS3Store con***REMOVED***gures an S3 client and returns a Store for a given bucket and path.
@@ -55,7 +57,7 @@ func (s S3Store) Write(record BillingRecord) error {
 }
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
-func (s S3Store) Read(rng Range, query, subject string) (records []BillingRecord, err error) {
+func (s S3Store) Read(rng cb.Range, query, subject string) (records []BillingRecord, err error) {
 	dir := Dir(s.Path, query, subject)
 
 	list, err := s.s3.ListObjectsV2(&s3.ListObjectsV2Input{

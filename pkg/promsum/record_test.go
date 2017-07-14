@@ -3,6 +3,8 @@ package promsum
 import (
 	"testing"
 	"time"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 func TestBillingRecord_Range(t *testing.T) {
@@ -30,7 +32,7 @@ func TestBillingRecord_Range(t *testing.T) {
 func TestBillingRecord_Prorate(t *testing.T) {
 	data := []struct {
 		record BillingRecord
-		rng    Range
+		rng    cb.Range
 		amount float64
 	}{
 		{ // entire range
@@ -39,7 +41,7 @@ func TestBillingRecord_Prorate(t *testing.T) {
 				Start:  time.Unix(100, 0),
 				End:    time.Unix(200, 0),
 			},
-			rng: Range{
+			rng: cb.Range{
 				Start: time.Unix(100, 0),
 				End:   time.Unix(200, 0),
 			},
@@ -51,7 +53,7 @@ func TestBillingRecord_Prorate(t *testing.T) {
 				Start:  time.Unix(100, 0),
 				End:    time.Unix(200, 0),
 			},
-			rng: Range{
+			rng: cb.Range{
 				Start: time.Unix(150, 0),
 				End:   time.Unix(200, 0),
 			},

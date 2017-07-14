@@ -3,6 +3,8 @@ package promsum
 import (
 	"testing"
 	"time"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 var (
@@ -17,7 +19,7 @@ func TestAggregate(t *testing.T) {
 	now := time.Now().UTC()
 	data := []struct {
 		in          []BillingRecord
-		rng         Range
+		rng         cb.Range
 		mergeLabels []string
 		out         []BillingRecord
 		err         string
@@ -41,7 +43,7 @@ func TestAggregate(t *testing.T) {
 					Amount:  100,
 				},
 			},
-			rng: Range{
+			rng: cb.Range{
 				Start: now,
 				End:   now.Add(10 * time.Minute),
 			},
@@ -84,7 +86,7 @@ func TestAggregate(t *testing.T) {
 					Amount:  200,
 				},
 			},
-			rng: Range{
+			rng: cb.Range{
 				Start: now.Add(-5 * time.Minute),
 				End:   now.Add(30 * time.Minute),
 			},
