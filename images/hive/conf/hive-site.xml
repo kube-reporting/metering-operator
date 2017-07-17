@@ -41,4 +41,16 @@
     <name>javax.jdo.option.ConnectionUserName</name>
     <value>hive</value>
   </property>
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>hive.server2.use.SSL</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>NOSASL</value>
+  </property>
 </configuration>
