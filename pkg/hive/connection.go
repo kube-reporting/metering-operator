@@ -9,6 +9,11 @@ import (
 	hive "github.com/coreos-inc/kube-chargeback/pkg/hive/hive_thrift"
 )
 
+var (
+	// ThriftVersion is the version of the Thrift protocol used to connect to Hive.
+	ThriftVersion = hive.TProtocolVersion_HIVE_CLI_SERVICE_PROTOCOL_V8
+)
+
 // Connection to a Hive server.
 type Connection struct {
 	client  *hive.TCLIServiceClient
@@ -32,9 +37,7 @@ func Connect(host string) (*Connection, error) {
 	client := hive.NewTCLIServiceClientFactory(transport, protocol)
 
 	req := hive.NewTOpenSessionReq()
-	req.Con***REMOVED***guration = map[string]string{
-		"hive.server2.authentication": "NONE",
-	}
+	req.ClientProtocol = ThriftVersion
 
 	resp, err := client.OpenSession(req)
 	if err != nil {
