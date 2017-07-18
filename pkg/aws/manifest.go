@@ -28,21 +28,26 @@ const (
 var (
 	// S3Client allows mocks to be injected for testing.
 	S3Client s3iface.S3API
+
+	// timestampFields are the AWS billing fields that should be created in Hive as timestamps.
+	timestampFields = []string{
+		"bill_BillingPeriodStartDate",
+		"bill_BillingPeriodEndDate",
+		"lineItem_UsageStartDate",
+		"lineItem_UsageEndDate",
+	}
 )
 
 // Manifest is a representation of the file AWS provides with metadata for current usage information.
 type Manifest struct {
-	AssemblyID string `json:"assemblyId"`
-	Account    string `json:"account"`
-	Columns    []struct {
-		Category string `json:"category"`
-		Name     string `json:"name"`
-	} `json:"columns"`
-	Charset       string `json:"charset"`
-	Compression   string `json:"compression"`
-	ContentType   string `json:"contentType"`
-	ReportID      string `json:"reportId"`
-	ReportName    string `json:"reportName"`
+	AssemblyID    string   `json:"assemblyId"`
+	Account       string   `json:"account"`
+	Columns       []Column `json:"columns"`
+	Charset       string   `json:"charset"`
+	Compression   string   `json:"compression"`
+	ContentType   string   `json:"contentType"`
+	ReportID      string   `json:"reportId"`
+	ReportName    string   `json:"reportName"`
 	BillingPeriod struct {
 		Start string `json:"start"`
 		End   string `json:"end"`

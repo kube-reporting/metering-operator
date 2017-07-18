@@ -80,6 +80,7 @@ func (c *Connection) Close() error {
 		if resp, err := c.client.CloseSession(req); err != nil {
 			return fmt.Errorf("couldn't close connection: %+v, %v", resp, err)
 		}
+		c.session = nil
 	}
 	return nil
 }
