@@ -1,0 +1,45 @@
+package hive
+
+import (
+	"fmt"
+)
+
+// createExternalTbl returns a query for a CREATE statement which instantiates a new external Hive table.
+func createExternalTbl(name, location, serde string, serdeProps map[string]string, columns []string) string {
+	serdePropsStr := fmtSerdeProps(serdeProps)
+	columnsStr := fmtColumnText(columns)
+
+	query := "CREATE EXTERNAL TABLE %s (%s) ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s) LOCATION \"%s\""
+	return fmt.Sprintf(query, name, columnsStr, serde, serdePropsStr, location)
+}
+
+// fmtSerdeProps returns a formatted a set of SerDe properties for a Hive query.
+func fmtSerdeProps(props map[string]string) (propsTxt string) {
+	***REMOVED***rst := true
+	for k, v := range props {
+		if !***REMOVED***rst {
+			propsTxt += ", "
+		}
+		***REMOVED***rst = false
+
+		pairStr := fmt.Sprintf("%q = %q", k, v)
+		propsTxt += pairStr
+	}
+	return
+}
+
+// fmtColumnText returns a Hive CREATE column string from a slice of name/type pairs. For example, "columnName string".
+func fmtColumnText(columns []string) (colTxt string) {
+	for i, col := range columns {
+		if i != 0 {
+			colTxt += ", "
+		}
+		colTxt += col
+	}
+	return
+}
+
+// s3nLocation returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
+func s3nLocation(bucket, pre***REMOVED***x string) string {
+	return fmt.Sprintf("s3n://%s/%s", bucket, pre***REMOVED***x)
+}
