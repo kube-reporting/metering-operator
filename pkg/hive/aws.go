@@ -24,7 +24,7 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func CreateAWSUsageTable(conn *Connection, bucket string, manifest aws.Manifest) error {
+func CreateAWSUsageTable(conn *Connection, tableName, bucket string, manifest aws.Manifest) error {
 	if conn == nil {
 		return errors.New("connection to Hive cannot be nil")
 	} else if conn.session == nil {
@@ -35,6 +35,7 @@ func CreateAWSUsageTable(conn *Connection, bucket string, manifest aws.Manifest)
 	location := s3nLocation(bucket, manifest.Paths()[0])
 	columns := manifest.Columns.HQL()
 
-	query := createTable(AWSUsageTableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true)
+	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true)
+	print(query)
 	return conn.Query(query)
 }

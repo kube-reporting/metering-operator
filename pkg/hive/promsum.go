@@ -26,7 +26,7 @@ var (
 )
 
 // CreatePromsumTable instantiates a new external Hive table for Prometheus observation data stored in S3.
-func CreatePromsumTable(conn *Connection, bucket, prefix string) error {
+func CreatePromsumTable(conn *Connection, tableName, bucket, prefix string) error {
 	if conn == nil {
 		return errors.New("connection to Hive cannot be nil")
 	} else if conn.session == nil {

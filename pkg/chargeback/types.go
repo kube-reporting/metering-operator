@@ -2,6 +2,7 @@ package chargeback
 
 import (
 	"fmt"
+	"time"
 
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -15,8 +16,11 @@ type Query struct {
 }
 
 type QuerySpec struct {
-	// ReportingRange is the period of time that the report will be based on.
-	ReportingRange Range `json:"reportingRange"`
+	// ReportingStart is the beginning period of time that the report will be based on.
+	ReportingStart time.Time `json:"reportingStart"`
+
+	// ReportingEnd is the end period of time that the report will be based on.
+	ReportingEnd time.Time `json:"reportingEnd"`
 
 	// Chargeback is the bucket that stores chargeback metering data.
 	Chargeback S3Bucket `json:"chargeback"`
@@ -71,4 +75,10 @@ type AWSUsage struct {
 
 	// Bucket that the report is configured to store in. Setup in AWS Console.
 	Bucket string `json:"bucket"`
+}
+
+type QueryList struct {
+	meta.TypeMeta `json:",inline"`
+	meta.ListMeta `json:"metadata,omitempty"`
+	Items         []*Query `json:"items"`
 }
