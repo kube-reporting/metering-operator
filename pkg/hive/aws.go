@@ -2,7 +2,6 @@ package hive
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 )
@@ -12,7 +11,7 @@ var (
 	AWSUsageTableName = "awsBilling"
 
 	// AWSUsageSerde is the Hadoop serialization/deserialization implementation used with AWS billing data.
-	AWSUsageSerde = "org.apache.hive.hcatalog.data.JsonSerDe"
+	AWSUsageSerde = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
 
 	// AWSUsageSerdeProps configure the SerDe used with AWS Billing Data.
 	AWSUsageSerdeProps = map[string]string{
@@ -34,11 +33,7 @@ func CreateAWSUsageTable(conn *Connection, bucket string, manifest aws.Manifest)
 
 	// TODO: support for multiple partitions
 	location := s3nLocation(bucket, manifest.Paths()[0])
-
-	columns := make([]string, len(manifest.Columns))
-	for i, c := range manifest.Columns {
-		columns[i] = fmt.Sprintf("%s %s", c.HiveName(), c.HiveType())
-	}
+	columns := manifest.Columns.HQL()
 
 	query := createExternalTbl(AWSUsageTableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns)
 	return conn.Query(query)
