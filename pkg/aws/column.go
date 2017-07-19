@@ -9,8 +9,6 @@ import (
 var (
 	// timestampFields are the AWS billing ***REMOVED***elds that should be created in Hive as timestamps.
 	timestampFields = []string{
-		"bill_billingperiodstartdate",
-		"bill_billingperiodenddate",
 		"lineitem_usagestartdate",
 		"lineitem_usageenddate",
 	}
