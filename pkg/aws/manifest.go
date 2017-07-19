@@ -85,6 +85,9 @@ func RetrieveManifests(bucket, reportPrefix, reportName string, rng cb.Range) ([
 		key := *obj.Key
 		suffix := strings.TrimPrefix(key, prefix)
 		kParts := strings.SplitN(suffix, "/", 3)
+		if len(kParts) < 2 {
+			continue
+		}
 		rngStr, file := kParts[0], kParts[1]
 
 		// only look for manifest files
