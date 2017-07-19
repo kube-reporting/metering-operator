@@ -19,7 +19,7 @@ func TestCreatePromsumTable(t *testing.T) {
 		t.Errorf("Could not delete existing table: %v", err)
 	}
 
-	if err = CreatePromsumTable(conn, s3Bucket, s3Pre***REMOVED***x); err != nil {
+	if err = CreatePromsumTable(conn, PromsumTableName, s3Bucket, s3Pre***REMOVED***x); err != nil {
 		t.Error("error perfoming query: ", err)
 	}
 

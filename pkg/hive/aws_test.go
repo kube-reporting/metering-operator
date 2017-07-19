@@ -24,7 +24,7 @@ func TestCreateAWSUsageTable(t *testing.T) {
 	}
 
 	manifests := getAWSManifests(t)
-	if err = CreateAWSUsageTable(conn, s3Bucket, manifests[0]); err != nil {
+	if err = CreateAWSUsageTable(conn, AWSUsageTableName, s3Bucket, manifests[0]); err != nil {
 		t.Error("error perfoming query: ", err)
 	}
 
@@ -36,9 +36,9 @@ func TestCreateAWSUsageTable(t *testing.T) {
 
 func getAWSManifests(t *testing.T) []aws.Manifest {
 	bucket, reportName := "coreos-team-chargeback", "team-chargeback-testing"
-	reportPre***REMOVED***x := "coreos-detailed-billing/coreosinc//coreos-detailed-billing-001"
-	begin := time.Date(2017, time.June, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2017, time.June, 29, 0, 0, 0, 0, time.UTC)
+	reportPre***REMOVED***x := "coreos-detailed-billing/coreosinc/coreos-detailed-billing-001"
+	begin := time.Date(2017, time.July, 2, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2017, time.July, 29, 0, 0, 0, 0, time.UTC)
 	rng := cb.Range{begin, end}
 	manifests, err := aws.RetrieveManifests(bucket, reportPre***REMOVED***x, reportName, rng)
 	if err != nil {
