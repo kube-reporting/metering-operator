@@ -85,6 +85,9 @@ func RetrieveManifests(bucket, reportPre***REMOVED***x, reportName string, rng c
 		key := *obj.Key
 		suf***REMOVED***x := strings.TrimPre***REMOVED***x(key, pre***REMOVED***x)
 		kParts := strings.SplitN(suf***REMOVED***x, "/", 3)
+		if len(kParts) < 2 {
+			continue
+		}
 		rngStr, ***REMOVED***le := kParts[0], kParts[1]
 
 		// only look for manifest ***REMOVED***les
