@@ -15,10 +15,17 @@ type Query struct {
 }
 
 type QuerySpec struct {
-	// Range of time to be queried.
-	Range `json:"range"`
+	// ReportingRange is the period of time that the report will be based on.
+	ReportingRange Range `json:"reportingRange"`
 
-	S3 S3Output `json:"s3"`
+	// Chargeback is the bucket that stores chargeback metering data.
+	Chargeback S3Bucket `json:"chargeback"`
+
+	// AWS identi***REMOVED***es the location of the a billing report, as con***REMOVED***gured in the AWS Console.
+	AWS AWSUsage `json:"aws"`
+
+	// Output is the S3 bucket where results are sent.
+	Output S3Bucket `json:"output"`
 }
 
 type QueryStatus struct {
@@ -49,8 +56,19 @@ func (p *QueryPhase) UnmarshalText(text []byte) error {
 	return nil
 }
 
-type S3Output struct {
+type S3Bucket struct {
 	Bucket string `json:"bucket"`
 	Pre***REMOVED***x string `json:"pre***REMOVED***x"`
-	Secret string `json:"secret"`
+}
+
+// AWSPodCostReport details the expense of running a Pod over a period of time on Amazon Web Services.
+type AWSUsage struct {
+	// ReportName as con***REMOVED***gured in AWS Console.
+	ReportName string `json:"reportName"`
+
+	// ReportPre***REMOVED***x as con***REMOVED***gured in AWS Console.
+	ReportPre***REMOVED***x string `json:"reportPre***REMOVED***x"`
+
+	// Bucket that the report is con***REMOVED***gured to store in. Setup in AWS Console.
+	Bucket string `json:"bucket"`
 }
