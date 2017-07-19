@@ -1,10 +1,12 @@
-hash: 5f710d65863e14a5a08d28255000c21073c424381cece9567e2f35d67af2c648
-updated: 2017-07-16T21:32:52.481151224-07:00
+hash: ba1999e9a1b059c6219d169de223a5e20d4b991a93d7f9a889accf916a7d4a17
+updated: 2017-07-19T01:23:46.92189897-07:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
   subpackages:
   - lib/go/thrift
+- name: github.com/avct/prestgo
+  version: d2e4cf3e229165c67c3e953efa2a5d60a3265f4e
 - name: github.com/aws/aws-sdk-go
   version: aa827991a3c164e7d129a20edf80028605195eef
   subpackages:
@@ -192,7 +194,7 @@ testImports:
   - leveldb/table
   - leveldb/util
 - name: golang.org/x/sys
-  version: 4cd6d1a821c7175768725b55ca82f14683a29ea4
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
   - unix
   - windows

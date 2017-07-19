@@ -24,6 +24,8 @@ import:
   version: a13245d02534abe88286859b547d041816f9a3f4
   subpackages:
   - pkg/apis/meta/v1
+- package: github.com/avct/prestgo
+  version: d2e4cf3e229165c67c3e953efa2a5d60a3265f4e
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
