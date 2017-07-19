@@ -35,6 +35,6 @@ func CreatePromsumTable(conn *Connection, bucket, pre***REMOVED***x string) erro
 
 	// use s3n HDFS driver for s3
 	location := s3nLocation(bucket, pre***REMOVED***x)
-	query := createExternalTbl(PromsumTableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns)
+	query := createTable(PromsumTableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true)
 	return conn.Query(query)
 }
