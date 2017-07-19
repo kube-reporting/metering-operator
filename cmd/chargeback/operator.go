@@ -15,8 +15,12 @@ func main() {
 		PrestoHost: PrestoHost,
 	}
 
-	_, err := operator.New(cfg)
+	op, err := operator.New(cfg)
 	if err != nil {
+		panic(err)
+	}
+
+	if err = op.Run(); err != nil {
 		panic(err)
 	}
 }
