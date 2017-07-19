@@ -82,7 +82,7 @@ func (c *Chargeback) createTPRs() error {
 	tprs := []*extensions.ThirdPartyResource{
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "chargeback." + chargeback.Group,
+				Name: "query." + chargeback.Group,
 			},
 			Versions: []extensions.APIVersion{
 				{Name: chargeback.Version},
