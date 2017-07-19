@@ -20,10 +20,12 @@ func TestRunAWSPodDollarReport(t *testing.T) {
 	defer db.Close()
 
 	outTable := "billingReport1"
-	begin := time.Date(2017, time.July, 2, 0, 0, 0, 0, time.UTC)
+	begin := time.Date(2017, time.July, 14, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2017, time.July, 29, 0, 0, 0, 0, time.UTC)
 	rng := cb.Range{begin, end}
-	err = RunAWSPodDollarReport(db, hive.PromsumTableName, hive.AWSUsageTableName, outTable, rng)
+	if err = RunAWSPodDollarReport(db, hive.PromsumTableName, hive.AWSUsageTableName, outTable, rng); err != nil {
+		t.Fatal("could not create report table ", err)
+	}
 
 	selectQuery := fmt.Sprint("SELECT COUNT(*) FROM ", outTable)
 	if _, err = db.Query(selectQuery); err != nil {

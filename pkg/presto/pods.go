@@ -19,13 +19,20 @@ func RunAWSPodDollarReport(presto *sql.DB, promsumTable, awsTable, outTable stri
 
 	reportQuery := podDollarQuery(promsumTable, awsTable, rng.Start, rng.End)
 	insert := fmt.Sprintf("INSERT INTO %s %s", outTable, reportQuery)
-	_, err := presto.Query(insert)
+	result, err := presto.Query(insert)
+	if err == nil {
+		cols, err := result.Columns()
+		if err != nil {
+			return fmt.Errorf("could not get columns: %v", err)
+		}
+		fmt.Println(cols)
+	}
 	return err
 }
 
 // podDollarQuery is a Presto query which calculates Cost Per Pod over a period.
 func podDollarQuery(promsumTable, awsBillingTable string, startPeriod, endPeriod time.Time) string {
-	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost
+	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost, min(begin) as begin, max(stop) as stop
 	FROM (
 	    SELECT kubeUsage.subject,
 		kubeUsage.amount as amount,
