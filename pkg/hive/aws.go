@@ -35,6 +35,6 @@ func CreateAWSUsageTable(conn *Connection, bucket string, manifest aws.Manifest)
 	location := s3nLocation(bucket, manifest.Paths()[0])
 	columns := manifest.Columns.HQL()
 
-	query := createExternalTbl(AWSUsageTableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns)
+	query := createTable(AWSUsageTableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true)
 	return conn.Query(query)
 }
