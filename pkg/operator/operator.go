@@ -74,7 +74,12 @@ func (c *Chargeback) Run() error {
 	// TODO: implement polling
 	time.Sleep(40 * time.Second)
 
-	c.queryInform.Run(nil)
+	stopCh := make(<-chan struct{})
+	go c.queryInform.Run(stopCh)
+
+	fmt.Println("running")
+
+	<-stopCh
 	return nil
 }
 

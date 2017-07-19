@@ -12,6 +12,7 @@ import (
 )
 
 func (c *Chargeback) handleAddQuery(obj interface{}) {
+	fmt.Println("New object added!")
 	query := obj.(*chargeback.Query)
 
 	// update status
