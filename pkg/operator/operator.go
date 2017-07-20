@@ -72,11 +72,10 @@ func (c *Chargeback) Run() error {
 	}
 
 	// TODO: implement polling
-	time.Sleep(40 * time.Second)
+	time.Sleep(15 * time.Second)
 
 	stopCh := make(<-chan struct{})
 	go c.queryInform.Run(stopCh)
-	go c.other()
 
 	fmt.Println("running")
 
@@ -121,25 +120,4 @@ func (c *Chargeback) prestoConn() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to presto: %v", err)
 	}
 	return db, nil
-}
-
-func (c *Chargeback) other() {
-	for {
-		list, err := c.charge.Queries("default").List(metav1.ListOptions{})
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-
-		for _, obj := range list.(*chargeback.QueryList).Items {
-			switch obj.Status.Phase {
-			case chargeback.QueryPhaseStarted:
-			case chargeback.QueryPhaseFinished:
-			case chargeback.QueryPhaseError:
-			default:
-				c.handleAddQuery(obj)
-			}
-		}
-
-		time.Sleep(45 * time.Second)
-	}
 }
