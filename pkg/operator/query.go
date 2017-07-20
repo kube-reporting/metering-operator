@@ -3,13 +3,18 @@ package operator
 import (
 	"errors"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
-	"math/rand"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func (c *Chargeback) handleAddQuery(obj interface{}) {
 	fmt.Println("New object added!")
@@ -51,22 +56,25 @@ func (c *Chargeback) handleAddQuery(obj interface{}) {
 	}
 	defer prestoCon.Close()
 
-	reportTable := fmt.Sprintf("%s%d", query.Spec.Output.Prefix, rand.Int31())
+	reportTable := fmt.Sprintf("%s_%d", "cost_per_pod", rand.Int31())
 	bucket, prefix := query.Spec.Output.Bucket, query.Spec.Output.Prefix
+	fmt.Printf("Creating table for %s.", reportTable)
 	if err = hive.CreatePodCostTable(hiveCon, reportTable, bucket, prefix); err != nil {
 		c.setError(query, fmt.Errorf("Couldn't create table for output report: %v", err))
 		return
 	}
 
-	promsumTable := fmt.Sprintf("%s%d", query.Spec.Chargeback.Prefix, rand.Int31())
+	promsumTable := fmt.Sprintf("%s_%d", "kube_usage", rand.Int31())
 	bucket, prefix = query.Spec.Chargeback.Bucket, query.Spec.Chargeback.Prefix
+	fmt.Printf("Creating table for %s.", promsumTable)
 	if err = hive.CreatePromsumTable(hiveCon, promsumTable, bucket, prefix); err != nil {
 		c.setError(query, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
 		return
 	}
 
-	awsTable := fmt.Sprintf("%s%d", results[0].AssemblyID, rand.Int31())
+	awsTable := fmt.Sprintf("%s_%d", "aws_usage", rand.Int31())
 	bucket = query.Spec.AWS.Bucket
+	fmt.Printf("Creating table for %s.", awsTable)
 	if err = hive.CreateAWSUsageTable(hiveCon, awsTable, bucket, results[0]); err != nil {
 		c.setError(query, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
 		return
