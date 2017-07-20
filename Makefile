@@ -5,13 +5,26 @@ GO_PKG := github.com/coreos-inc/kube-chargeback
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
+# TODO: Add tests
+all: fmt chargeback-image
+
 out:
 	mkdir $@
+
+chargeback-image: images/chargeback/chargeback
+	$(dir $<)/build.sh
 
 # Update dependencies
 vendor: glide.yaml
 	glide up --strip-vendor
 	glide-vc --use-lock-file --no-tests --only-code
+
+# Runs gofmt on all files in project except vendored source and Hive Thrift definitions
+fmt:
+	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
+
+images/chargeback/chargeback: cmd/chargeback pkg/hive/hive_thrift
+	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
 # Download Hive git repo.
 out/thrift.git: out
@@ -27,4 +40,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor
+.PHONY: vendor chargeback-image fmt
