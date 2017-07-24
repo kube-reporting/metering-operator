@@ -3,6 +3,8 @@ package promsum
 import (
 	"fmt"
 	"time"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // BillingRecord is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
@@ -16,8 +18,8 @@ type BillingRecord struct {
 }
 
 // Range returns the range of the billing record.
-func (record BillingRecord) Range() Range {
-	return Range{
+func (record BillingRecord) Range() cb.Range {
+	return cb.Range{
 		Start: record.Start,
 		End:   record.End,
 	}
@@ -30,7 +32,7 @@ func (record BillingRecord) String() string {
 }
 
 // Prorate returns a new BillingRecord for a portion of this period. The amount is determined proportionally.
-func (record BillingRecord) Prorate(rng Range) (BillingRecord, error) {
+func (record BillingRecord) Prorate(rng cb.Range) (BillingRecord, error) {
 	if rng.Start.Before(record.Start) || rng.End.After(record.End) {
 		return BillingRecord{}, fmt.Errorf("prorate (%v) must be in range of the BillingRecord (%v)", rng, record.Range())
 	}

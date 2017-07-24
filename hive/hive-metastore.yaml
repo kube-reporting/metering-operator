@@ -28,7 +28,7 @@ spec:
           mountPath: /var/lib/postgresql/data
       - name: metastore
         args: ["/opt/hive/bin/hive", "--service", "metastore"]
-        image: quay.io/fest-data-demo/hive:0.1
+        image: quay.io/fest-data-demo/hive:0.2
         imagePullPolicy: Always
         ports:
         - name: meta

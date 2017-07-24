@@ -1,19 +1,60 @@
 package: github.com/coreos-inc/kube-chargeback
+subpackages:
+- pkg/aws
+- pkg/chargeback
+- pkg/hive
+- pkg/hive/hive_thrift
+- pkg/operator
+- pkg/presto
+- pkg/promsum
 import:
+- package: git.apache.org/thrift.git
+  version: 0dd823580c78a79ae9696eb9b3650e400fff140
+  subpackages:
+  - lib/go/thrift
+- package: github.com/avct/prestgo
+  version: d2e4cf3e229165c67c3e953efa2a5d60a3265f4e
+- package: github.com/aws/aws-sdk-go
+  version: aa827991a3c164e7d129a20edf80028605195ee
+  subpackages:
+  - aws
+  - aws/session
+  - service/s3
+  - service/s3/s3iface
 - package: github.com/prometheus/client_golang
   version: de4d4ffe63b9eff7f27484fdef6e421597e6abb4
   subpackages:
   - api
   - api/prometheus/v1
 - package: github.com/prometheus/common
+  version: 0d0c3d572886e0f2323ed376557f9eb99b97d25
   subpackages:
   - model
+- package: k8s.io/apimachinery
+  version: a13245d02534abe88286859b547d041816f9a3f4
+  subpackages:
+  - pkg/api/errors
+  - pkg/apis/meta/v1
+  - pkg/apis/meta/v1/unstructured
+  - pkg/runtime
+  - pkg/runtime/schema
+  - pkg/runtime/serializer
+  - pkg/watch
+- package: k8s.io/client-go
+  version: ~4.0.0-beta.0
+  subpackages:
+  - dynamic
+  - kubernetes
+  - pkg/api
+  - pkg/apis/extensions/v1beta1
+  - rest
+  - tools/cache
 testImport:
+- package: github.com/kubernetes/contrib
+  version: ~0.7.0
+  subpackages:
+  - compare/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws
 - package: github.com/prometheus/prometheus
-  version: 3afb3fffa3a29c3de865e1172fb740442e9d0133 # v1.7.1
+  version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
   subpackages:
   - promql
-- package: github.com/opentracing/opentracing-go
-  version: 6edb48674bd9467b8e91fda004f2bd7202d60ce4
-excludeDirs:
-- cmd/pod-data # ignore old project to prevent vendoring kube

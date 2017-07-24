@@ -8,6 +8,8 @@ import (
 	"path/***REMOVED***lepath"
 	"sort"
 	"strings"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // Store manages the persistence of billing records.
@@ -16,7 +18,7 @@ type Store interface {
 	Write(record BillingRecord) error
 
 	// Read retrieves billing records within the given range. There are no ordering guarantees.
-	Read(rng Range, query, subject string) ([]BillingRecord, error)
+	Read(rng cb.Range, query, subject string) ([]BillingRecord, error)
 }
 
 var (
@@ -77,7 +79,7 @@ func (f FileStore) Write(record BillingRecord) error {
 }
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
-func (f FileStore) Read(rng Range, query, subject string) (records []BillingRecord, err error) {
+func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingRecord, err error) {
 	dir := Dir(f.directory, query, subject)
 
 	err = ***REMOVED***lepath.Walk(dir, func(path string, ***REMOVED***le os.FileInfo, walkErr error) error {
@@ -117,7 +119,7 @@ func (f FileStore) Read(rng Range, query, subject string) (records []BillingReco
 }
 
 // Name returns the name of the ***REMOVED***le for a given range.
-func Name(rng Range, labels map[string]string) string {
+func Name(rng cb.Range, labels map[string]string) string {
 	i := 0
 	keys := make([]string, len(labels))
 	for k := range labels {
@@ -141,7 +143,7 @@ func Dir(parent, query, subject string) string {
 }
 
 // PathWithinRange determines if the given ***REMOVED***lename represents a range within the one given.
-func PathWithinRange(path string, rng Range) (bool, error) {
+func PathWithinRange(path string, rng cb.Range) (bool, error) {
 	name := ***REMOVED***lepath.Base(path)
 	recordRng, err := rngFromName(name)
 	if err != nil {
@@ -164,12 +166,12 @@ func hash(in string) (out uint64) {
 	return uint64(out % p)
 }
 
-func rngFromName(name string) (Range, error) {
+func rngFromName(name string) (cb.Range, error) {
 	name = strings.TrimRight(name, ".json")
 	s := strings.SplitN(name, "-", 3)
 	if len(s) != 3 {
-		return Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
+		return cb.Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
 	}
 	startStr, endStr := s[0], s[1]
-	return ParseUnixRange(startStr, endStr)
+	return cb.ParseUnixRange(startStr, endStr)
 }
