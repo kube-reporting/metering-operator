@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 func TestMeterQueryError(t *testing.T) {
 	prom := NewMockPromAPI(t)
 
-	rng := Range{Start: time.Unix(0, 0), End: time.Unix(100, 0)}
+	rng := cb.Range{Start: time.Unix(0, 0), End: time.Unix(100, 0)}
 	_, err := Meter(prom, "bad query", rng, PromTimePrecision)
 	if err == nil {
 		t.Error("metering should have failed due to error")
@@ -29,7 +31,7 @@ func TestMeterScalarQuery(t *testing.T) {
 	end := time.Now().UTC()
 	start := end.Add(-20 * time.Minute)
 
-	rng := Range{
+	rng := cb.Range{
 		Start: start.Round(PromTimePrecision),
 		End:   end.Round(PromTimePrecision),
 	}

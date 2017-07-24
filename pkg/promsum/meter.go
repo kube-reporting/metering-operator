@@ -8,12 +8,14 @@ import (
 
 	"github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // Meter creates a billing record for a given range and Prometheus query. It does this by summing usage
 // between each Prometheus instant vector by multiplying rate against against the length of the interval.
 // Amounts will be rounded to the nearest unit of time specified by timePrecision.
-func Meter(prom v1.API, pqlQuery string, rng Range, timePrecision time.Duration) ([]BillingRecord, error) {
+func Meter(prom v1.API, pqlQuery string, rng cb.Range, timePrecision time.Duration) ([]BillingRecord, error) {
 	if prom == nil {
 		return nil, errors.New("prometheus API was nil")
 	} else if timePrecision < PromTimePrecision {

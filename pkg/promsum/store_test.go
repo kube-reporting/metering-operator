@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 func TestFileStoreReadWrite(t *testing.T) {
@@ -25,7 +27,7 @@ func TestFileStoreReadWrite(t *testing.T) {
 func testStoreReadWrite(t *testing.T, s Store) {
 	subject, query := "test-subject", "test-query"
 
-	all := Range{
+	all := cb.Range{
 		Start: time.Unix(1, 0),
 		End:   time.Unix(4000, 0),
 	}
@@ -81,7 +83,7 @@ func testStoreReadWrite(t *testing.T, s Store) {
 		t.Error("Should have retrieved 5 records, found ", len(read))
 	}
 
-	some := Range{
+	some := cb.Range{
 		Start: time.Unix(12, 0),
 		End:   time.Unix(40, 0),
 	}
