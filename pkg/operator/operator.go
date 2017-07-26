@@ -40,16 +40,16 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 		return nil, err
 	}
 
-	cb.queryInform = cache.NewSharedIndexInformer(
+	cb.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  cb.charge.Queries(api.NamespaceAll).List,
-			WatchFunc: cb.charge.Queries(api.NamespaceAll).Watch,
+			ListFunc:  cb.charge.Reports(api.NamespaceAll).List,
+			WatchFunc: cb.charge.Reports(api.NamespaceAll).Watch,
 		},
-		&chargeback.Query{}, 3*time.Minute, cache.Indexers{},
+		&chargeback.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
-	cb.queryInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: cb.handleAddQuery,
+	cb.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: cb.handleAddReport,
 	})
 
 	return cb, nil
@@ -59,7 +59,7 @@ type Chargeback struct {
 	kube   *kubernetes.Clientset
 	charge *chargeback.ChargebackClient
 
-	queryInform cache.SharedIndexInformer
+	reportInform cache.SharedIndexInformer
 
 	hiveHost   string
 	prestoHost string
@@ -75,7 +75,7 @@ func (c *Chargeback) Run() error {
 	time.Sleep(15 * time.Second)
 
 	stopCh := make(<-chan struct{})
-	go c.queryInform.Run(stopCh)
+	go c.reportInform.Run(stopCh)
 
 	fmt.Println("running")
 
@@ -87,12 +87,12 @@ func (c *Chargeback) createTPRs() error {
 	tprs := []*extensions.ThirdPartyResource{
 		{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "query." + chargeback.Group,
+				Name: "report." + chargeback.Group,
 			},
 			Versions: []extensions.APIVersion{
 				{Name: chargeback.Version},
 			},
-			Description: "Billing query",
+			Description: "Billing report",
 		},
 	}
 	tprClient := c.kube.ThirdPartyResources()

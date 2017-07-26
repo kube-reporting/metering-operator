@@ -7,15 +7,15 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type Query struct {
+type Report struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   QuerySpec   `json:"spec"`
-	Status QueryStatus `json:"status"`
+	Spec   ReportSpec   `json:"spec"`
+	Status ReportStatus `json:"status"`
 }
 
-type QuerySpec struct {
+type ReportSpec struct {
 	// ReportingStart is the beginning period of time that the report will be based on.
 	ReportingStart time.Time `json:"reportingStart"`
 
@@ -32,29 +32,29 @@ type QuerySpec struct {
 	Output S3Bucket `json:"output"`
 }
 
-type QueryStatus struct {
-	Phase  QueryPhase `json:"phase"`
-	Output string     `json:"output"`
+type ReportStatus struct {
+	Phase  ReportPhase `json:"phase"`
+	Output string      `json:"output"`
 }
 
-type QueryPhase string
+type ReportPhase string
 
 const (
-	QueryPhaseFinished QueryPhase = "Finished"
-	QueryPhaseWaiting  QueryPhase = "Waiting"
-	QueryPhaseStarted  QueryPhase = "Started"
-	QueryPhaseError    QueryPhase = "Error"
+	ReportPhaseFinished ReportPhase = "Finished"
+	ReportPhaseWaiting  ReportPhase = "Waiting"
+	ReportPhaseStarted  ReportPhase = "Started"
+	ReportPhaseError    ReportPhase = "Error"
 )
 
-func (p *QueryPhase) UnmarshalText(text []byte) error {
-	phase := QueryPhase(text)
+func (p *ReportPhase) UnmarshalText(text []byte) error {
+	phase := ReportPhase(text)
 	switch phase {
-	case QueryPhaseFinished:
-	case QueryPhaseWaiting:
-	case QueryPhaseStarted:
-	case QueryPhaseError:
+	case ReportPhaseFinished:
+	case ReportPhaseWaiting:
+	case ReportPhaseStarted:
+	case ReportPhaseError:
 	default:
-		return fmt.Errorf("'%s' is not a QueryPhase", phase)
+		return fmt.Errorf("'%s' is not a ReportPhase", phase)
 	}
 	*p = phase
 	return nil
@@ -77,8 +77,8 @@ type AWSUsage struct {
 	Bucket string `json:"bucket"`
 }
 
-type QueryList struct {
+type ReportList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
-	Items         []*Query `json:"items"`
+	Items         []*Report `json:"items"`
 }
