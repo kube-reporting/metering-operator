@@ -12,36 +12,36 @@ import (
 )
 
 const (
-	QueryKind = "Query"
-	QueryName = "queries"
+	ReportKind = "Report"
+	ReportName = "reports"
 )
 
-type QueryGetter interface {
-	Queries(namespace string) QueryInterface
+type ReportGetter interface {
+	Reports(namespace string) ReportInterface
 }
 
-type QueryInterface interface {
-	Create(*Query) (*Query, error)
-	Get(name string) (*Query, error)
-	Update(*Query) (*Query, error)
+type ReportInterface interface {
+	Create(*Report) (*Report, error)
+	Get(name string) (*Report, error)
+	Update(*Report) (*Report, error)
 	Delete(name string, options *metav1.DeleteOptions) error
 	List(opts metav1.ListOptions) (runtime.Object, error)
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
 }
 
-type queries struct {
+type reports struct {
 	restClient rest.Interface
 	client     *dynamic.ResourceClient
 	ns         string
 }
 
-func newQueries(r rest.Interface, c *dynamic.Client, namespace string) *queries {
-	return &queries{
+func newReports(r rest.Interface, c *dynamic.Client, namespace string) *reports {
+	return &reports{
 		r,
 		c.Resource(
 			&metav1.APIResource{
-				Kind:       QueryKind,
-				Name:       QueryName,
+				Kind:       ReportKind,
+				Name:       ReportName,
 				Namespaced: true,
 			},
 			namespace,
@@ -50,8 +50,8 @@ func newQueries(r rest.Interface, c *dynamic.Client, namespace string) *queries 
 	}
 }
 
-func (p *queries) Create(o *Query) (*Query, error) {
-	up, err := UnstructuredFromQuery(o)
+func (p *reports) Create(o *Report) (*Report, error) {
+	up, err := UnstructuredFromReport(o)
 	if err != nil {
 		return nil, err
 	}
@@ -61,19 +61,19 @@ func (p *queries) Create(o *Query) (*Query, error) {
 		return nil, err
 	}
 
-	return QueryFromUnstructured(up)
+	return ReportFromUnstructured(up)
 }
 
-func (p *queries) Get(name string) (*Query, error) {
+func (p *reports) Get(name string) (*Report, error) {
 	obj, err := p.client.Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
-	return QueryFromUnstructured(obj)
+	return ReportFromUnstructured(obj)
 }
 
-func (p *queries) Update(o *Query) (*Query, error) {
-	up, err := UnstructuredFromQuery(o)
+func (p *reports) Update(o *Report) (*Report, error) {
+	up, err := UnstructuredFromReport(o)
 	if err != nil {
 		return nil, err
 	}
@@ -83,62 +83,61 @@ func (p *queries) Update(o *Query) (*Query, error) {
 		return nil, err
 	}
 
-	return QueryFromUnstructured(up)
+	return ReportFromUnstructured(up)
 }
 
-func (p *queries) Delete(name string, options *metav1.DeleteOptions) error {
+func (p *reports) Delete(name string, options *metav1.DeleteOptions) error {
 	return p.client.Delete(name, options)
 }
 
-func (p *queries) List(opts metav1.ListOptions) (runtime.Object, error) {
+func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
 		Namespace(p.ns).
-		Resource(QueryName).
+		Resource(ReportName).
 		FieldsSelectorParam(nil)
 
 	b, err := req.DoRaw()
 	if err != nil {
 		return nil, err
 	}
-	var queries QueryList
-	return &queries, json.Unmarshal(b, &queries)
+	var reports ReportList
+	return &reports, json.Unmarshal(b, &reports)
 }
 
-func (p *queries) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Prefix("watch").
 		Namespace(p.ns).
-		Resource(QueryName).
-		// VersionedParams(&options, v1.ParameterCodec).
+		Resource(ReportName).
 		FieldsSelectorParam(nil).
 		Stream()
 	if err != nil {
 		return nil, err
 	}
-	return watch.NewStreamWatcher(&queryDecoder{
+	return watch.NewStreamWatcher(&reportDecoder{
 		dec:   json.NewDecoder(r),
 		close: r.Close,
 	}), nil
 }
 
-// QueryFromUnstructured unmarshals a Query object.
-func QueryFromUnstructured(r *unstructured.Unstructured) (*Query, error) {
+// ReportFromUnstructured unmarshals a Report object.
+func ReportFromUnstructured(r *unstructured.Unstructured) (*Report, error) {
 	b, err := json.Marshal(r.Object)
 	if err != nil {
 		return nil, err
 	}
-	var p Query
+	var p Report
 	if err := json.Unmarshal(b, &p); err != nil {
 		return nil, err
 	}
-	p.TypeMeta.Kind = QueryKind
+	p.TypeMeta.Kind = ReportKind
 	p.TypeMeta.APIVersion = Group + "/" + Version
 	return &p, nil
 }
 
-// UnstructuredFromQuery marshals a Query object.
-func UnstructuredFromQuery(p *Query) (*unstructured.Unstructured, error) {
-	p.TypeMeta.Kind = QueryKind
+// UnstructuredFromReport marshals a Report object.
+func UnstructuredFromReport(p *Report) (*unstructured.Unstructured, error) {
+	p.TypeMeta.Kind = ReportKind
 	p.TypeMeta.APIVersion = Group + "/" + Version
 	b, err := json.Marshal(p)
 	if err != nil {
@@ -151,19 +150,19 @@ func UnstructuredFromQuery(p *Query) (*unstructured.Unstructured, error) {
 	return &r, nil
 }
 
-type queryDecoder struct {
+type reportDecoder struct {
 	dec   *json.Decoder
 	close func() error
 }
 
-func (d *queryDecoder) Close() {
+func (d *reportDecoder) Close() {
 	d.close()
 }
 
-func (d *queryDecoder) Decode() (action watch.EventType, object runtime.Object, err error) {
+func (d *reportDecoder) Decode() (action watch.EventType, object runtime.Object, err error) {
 	var e struct {
 		Type   watch.EventType
-		Object Query
+		Object Report
 	}
 	if err := d.dec.Decode(&e); err != nil {
 		return watch.Error, nil, err

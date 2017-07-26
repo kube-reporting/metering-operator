@@ -15,7 +15,7 @@ const (
 
 type ChargebackInterface interface {
 	RESTClient() rest.Interface
-	QueryGetter
+	ReportGetter
 }
 
 func NewForConfig(c *rest.Config) (*ChargebackClient, error) {
@@ -45,6 +45,6 @@ type ChargebackClient struct {
 	dynamicClient *dynamic.Client
 }
 
-func (c *ChargebackClient) Queries(namespace string) QueryInterface {
-	return newQueries(c.restClient, c.dynamicClient, namespace)
+func (c *ChargebackClient) Reports(namespace string) ReportInterface {
+	return newReports(c.restClient, c.dynamicClient, namespace)
 }
