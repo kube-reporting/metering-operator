@@ -17,7 +17,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	certi***REMOVED***cates "k8s.io/client-go/pkg/apis/certi***REMOVED***cates/v1beta1"
+	certi***REMOVED***cates "k8s.io/api/certi***REMOVED***cates/v1beta1"
 )
 
 type Certi***REMOVED***cateSigningRequestExpansion interface {

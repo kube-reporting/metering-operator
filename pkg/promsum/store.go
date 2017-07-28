@@ -15,7 +15,7 @@ import (
 // Store manages the persistence of billing records.
 type Store interface {
 	// Write inserts the given record into storage.
-	Write(record BillingRecord) error
+	Write(record []BillingRecord) error
 
 	// Read retrieves billing records within the given range. There are no ordering guarantees.
 	Read(rng cb.Range, query, subject string) ([]BillingRecord, error)

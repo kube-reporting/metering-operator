@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: chargeback
+spec:
+  selector:
+    matchLabels:
+      app: chargeback
+  template:
+    metadata:
+      name: chargeback
+      labels:
+        app: chargeback
+    spec:
+      containers:
+      - name: chargeback
+        image: quay.io/coreos/chargeback:0.1
+        imagePullPolicy: Always
+        env:
+        - name: "AWS_ACCESS_KEY_ID"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: "AWS_SECRET_ACCESS_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_REGION
+          value: us-west-1
+      restartPolicy: Always
+      serviceAccount: chargeback
