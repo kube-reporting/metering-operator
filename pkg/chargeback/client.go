@@ -46,6 +46,6 @@ type ChargebackClient struct {
 	dynamicClient *dynamic.Client
 }
 
-func (c *ChargebackClient) Reports(namespace string) ReportInterface {
-	return newReports(c.restClient, c.dynamicClient, namespace)
+func (c *ChargebackClient) Reports() ReportInterface {
+	return newReports(c.restClient, c.dynamicClient)
 }

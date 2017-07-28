@@ -1,8 +1,9 @@
 {
   "apiVersion": "chargeback.coreos.com/prealpha",
-  "kind": "Query",
+  "kind": "Report",
   "metadata": {
-    "name": "default"
+    "name": "default",
+    "namespace": "default"
   },
   "spec": {
     "reportingStart": "2017-07-02T00:00:00Z",

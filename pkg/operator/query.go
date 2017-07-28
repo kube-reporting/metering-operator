@@ -17,17 +17,22 @@ func init() {
 }
 
 func (c *Chargeback) handleAddReport(obj interface{}) {
+	if obj == nil {
+		fmt.Println("received nil object!")
+		return
+	}
+
 	fmt.Println("New object added!")
 	report := obj.(*chargeback.Report)
 
 	// update status
 	report.Status.Phase = chargeback.ReportPhaseStarted
-	report, err := c.charge.Reports(report.Namespace).Update(report)
+	report, err := c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
 
-	rng := chargeback.Range{report.Spec.ReportingStart, report.Spec.ReportingEnd}
+	rng := chargeback.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
 	results, err := aws.RetrieveManifests(report.Spec.AWS.Bucket, report.Spec.AWS.ReportPrefix, report.Spec.AWS.ReportName, rng)
 	if err != nil {
 		c.setError(report, err)
@@ -87,7 +92,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	// update status
 	report.Status.Phase = chargeback.ReportPhaseFinished
-	report, err = c.charge.Reports(report.Namespace).Update(report)
+	report, err = c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
@@ -96,7 +101,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 func (c *Chargeback) setError(q *chargeback.Report, err error) {
 	q.Status.Phase = chargeback.ReportPhaseError
 	q.Status.Output = err.Error()
-	_, err = c.charge.Reports(q.Namespace).Update(q)
+	_, err = c.charge.Reports().Update(q)
 	if err != nil {
 		fmt.Println("FAILED TO REPORT ERROR: ", err)
 	}
