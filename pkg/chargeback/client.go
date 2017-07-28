@@ -1,10 +1,10 @@
 package chargeback
 
 import (
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/rest"
 )
 
@@ -15,17 +15,18 @@ const (
 
 type ChargebackInterface interface {
 	RESTClient() rest.Interface
-	QueryGetter
+	ReportGetter
 }
 
 func NewForConfig(c *rest.Config) (*ChargebackClient, error) {
+	scheme := runtime.NewScheme()
 	newC := *c
 	newC.GroupVersion = &schema.GroupVersion{
 		Group:   Group,
 		Version: Version,
 	}
 	newC.APIPath = "/apis"
-	newC.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
+	newC.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)}
 
 	client, err := rest.RESTClientFor(&newC)
 	if err != nil {
@@ -45,6 +46,6 @@ type ChargebackClient struct {
 	dynamicClient *dynamic.Client
 }
 
-func (c *ChargebackClient) Queries(namespace string) QueryInterface {
-	return newQueries(c.restClient, c.dynamicClient, namespace)
+func (c *ChargebackClient) Reports() ReportInterface {
+	return newReports(c.restClient, c.dynamicClient)
 }

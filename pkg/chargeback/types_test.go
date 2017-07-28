@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-func TestQueryPhase(t *testing.T) {
-	badQuery := []byte(`{"status":{"phase":"closed"}}`)
+func TestReportPhase(t *testing.T) {
+	badReport := []byte(`{"status":{"phase":"closed"}}`)
 
-	var actualQuery Query
-	if err := json.Unmarshal(badQuery, &actualQuery); err == nil {
-		t.Error("should have errored, bad query")
+	var actualReport Report
+	if err := json.Unmarshal(badReport, &actualReport); err == nil {
+		t.Error("should have errored, bad report")
 	}
 
-	goodQuery := []byte(`{"status":{"phase":"Started"}}`)
-	if err := json.Unmarshal(goodQuery, &actualQuery); err != nil {
+	goodReport := []byte(`{"status":{"phase":"Started"}}`)
+	if err := json.Unmarshal(goodReport, &actualReport); err != nil {
 		t.Error("shouldn't have errored: ", err)
-	} else if actualQuery.Status.Phase != QueryPhaseStarted {
-		t.Errorf("phase mismatch: want %s, got %s", QueryPhaseStarted, actualQuery.Status.Phase)
+	} else if actualReport.Status.Phase != ReportPhaseStarted {
+		t.Errorf("phase mismatch: want %s, got %s", ReportPhaseStarted, actualReport.Status.Phase)
 	}
 }

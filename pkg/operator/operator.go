@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -32,41 +29,45 @@ func New(cfg Config) (*Chargeback, error) {
 		return nil, err
 	}
 
-	if cb.kube, err = kubernetes.NewForConfig(config); err != nil {
+	fmt.Println("setting up extensions client...")
+	if cb.extension, err = ext_client.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
+	fmt.Println("setting up chargeback client...")
 	if cb.charge, err = chargeback.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
-	cb.queryInform = cache.NewSharedIndexInformer(
+	cb.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  cb.charge.Queries(api.NamespaceAll).List,
-			WatchFunc: cb.charge.Queries(api.NamespaceAll).Watch,
+			ListFunc:  cb.charge.Reports().List,
+			WatchFunc: cb.charge.Reports().Watch,
 		},
-		&chargeback.Query{}, 3*time.Minute, cache.Indexers{},
+		&chargeback.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
-	cb.queryInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: cb.handleAddQuery,
+	fmt.Println("configuring event listeners")
+	cb.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: cb.handleAddReport,
 	})
 
+	fmt.Println("All set up!")
 	return cb, nil
 }
 
 type Chargeback struct {
-	kube   *kubernetes.Clientset
-	charge *chargeback.ChargebackClient
+	extension *ext_client.Clientset
+	charge    *chargeback.ChargebackClient
 
-	queryInform cache.SharedIndexInformer
+	reportInform cache.SharedIndexInformer
 
 	hiveHost   string
 	prestoHost string
 }
 
 func (c *Chargeback) Run() error {
-	err := c.createTPRs()
+	err := c.createResources()
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +76,7 @@ func (c *Chargeback) Run() error {
 	time.Sleep(15 * time.Second)
 
 	stopCh := make(<-chan struct{})
-	go c.queryInform.Run(stopCh)
+	go c.reportInform.Run(stopCh)
 
 	fmt.Println("running")
 
@@ -83,22 +84,10 @@ func (c *Chargeback) Run() error {
 	return nil
 }
 
-func (c *Chargeback) createTPRs() error {
-	tprs := []*extensions.ThirdPartyResource{
-		{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "query." + chargeback.Group,
-			},
-			Versions: []extensions.APIVersion{
-				{Name: chargeback.Version},
-			},
-			Description: "Billing query",
-		},
-	}
-	tprClient := c.kube.ThirdPartyResources()
-
-	for _, tpr := range tprs {
-		if _, err := tprClient.Create(tpr); err != nil && !apierrors.IsAlreadyExists(err) {
+func (c *Chargeback) createResources() error {
+	cdrClient := c.extension.CustomResourceDefinitions()
+	for _, cdr := range chargeback.Resources {
+		if _, err := cdrClient.Create(cdr); err != nil && !apierrors.IsAlreadyExists(err) {
 			return err
 		}
 	}

@@ -16,87 +16,92 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func (c *Chargeback) handleAddQuery(obj interface{}) {
+func (c *Chargeback) handleAddReport(obj interface{}) {
+	if obj == nil {
+		fmt.Println("received nil object!")
+		return
+	}
+
 	fmt.Println("New object added!")
-	query := obj.(*chargeback.Query)
+	report := obj.(*chargeback.Report)
 
 	// update status
-	query.Status.Phase = chargeback.QueryPhaseStarted
-	query, err := c.charge.Queries(query.Namespace).Update(query)
+	report.Status.Phase = chargeback.ReportPhaseStarted
+	report, err := c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
 
-	rng := chargeback.Range{query.Spec.ReportingStart, query.Spec.ReportingEnd}
-	results, err := aws.RetrieveManifests(query.Spec.AWS.Bucket, query.Spec.AWS.ReportPrefix, query.Spec.AWS.ReportName, rng)
+	rng := chargeback.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
+	results, err := aws.RetrieveManifests(report.Spec.AWS.Bucket, report.Spec.AWS.ReportPrefix, report.Spec.AWS.ReportName, rng)
 	if err != nil {
-		c.setError(query, err)
+		c.setError(report, err)
 		return
 	}
 
 	if len(results) > 1 {
-		c.setError(query, errors.New("currently only a single month can be reported on"))
+		c.setError(report, errors.New("currently only a single month can be reported on"))
 		return
 	} else if len(results) < 1 {
-		c.setError(query, errors.New("no report data was returned for the given range"))
+		c.setError(report, errors.New("no report data was returned for the given range"))
 		return
 	}
 
 	hiveCon, err := c.hiveConn()
 	if err != nil {
-		c.setError(query, fmt.Errorf("Failed to configure Hive connection: %v", err))
+		c.setError(report, fmt.Errorf("Failed to configure Hive connection: %v", err))
 		return
 	}
 	defer hiveCon.Close()
 
 	prestoCon, err := c.prestoConn()
 	if err != nil {
-		c.setError(query, fmt.Errorf("Failed to configure Presto connection: %v", err))
+		c.setError(report, fmt.Errorf("Failed to configure Presto connection: %v", err))
 		return
 	}
 	defer prestoCon.Close()
 
 	reportTable := fmt.Sprintf("%s_%d", "cost_per_pod", rand.Int31())
-	bucket, prefix := query.Spec.Output.Bucket, query.Spec.Output.Prefix
+	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
 	fmt.Printf("Creating table for %s.", reportTable)
 	if err = hive.CreatePodCostTable(hiveCon, reportTable, bucket, prefix); err != nil {
-		c.setError(query, fmt.Errorf("Couldn't create table for output report: %v", err))
+		c.setError(report, fmt.Errorf("Couldn't create table for output report: %v", err))
 		return
 	}
 
 	promsumTable := fmt.Sprintf("%s_%d", "kube_usage", rand.Int31())
-	bucket, prefix = query.Spec.Chargeback.Bucket, query.Spec.Chargeback.Prefix
+	bucket, prefix = report.Spec.Chargeback.Bucket, report.Spec.Chargeback.Prefix
 	fmt.Printf("Creating table for %s.", promsumTable)
 	if err = hive.CreatePromsumTable(hiveCon, promsumTable, bucket, prefix); err != nil {
-		c.setError(query, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
+		c.setError(report, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
 		return
 	}
 
 	awsTable := fmt.Sprintf("%s_%d", "aws_usage", rand.Int31())
-	bucket = query.Spec.AWS.Bucket
+	bucket = report.Spec.AWS.Bucket
 	fmt.Printf("Creating table for %s.", awsTable)
 	if err = hive.CreateAWSUsageTable(hiveCon, awsTable, bucket, results[0]); err != nil {
-		c.setError(query, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
+		c.setError(report, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
 		return
 	}
 
 	if err = presto.RunAWSPodDollarReport(prestoCon, promsumTable, awsTable, reportTable, rng); err != nil {
-		c.setError(query, fmt.Errorf("Failed to execute Pod Dollar report: %v", err))
+		c.setError(report, fmt.Errorf("Failed to execute Pod Dollar report: %v", err))
 		return
 	}
 
 	// update status
-	query.Status.Phase = chargeback.QueryPhaseFinished
-	query, err = c.charge.Queries(query.Namespace).Update(query)
+	report.Status.Phase = chargeback.ReportPhaseFinished
+	report, err = c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
 }
 
-func (c *Chargeback) setError(q *chargeback.Query, err error) {
-	q.Status.Phase = chargeback.QueryPhaseError
+func (c *Chargeback) setError(q *chargeback.Report, err error) {
+	q.Status.Phase = chargeback.ReportPhaseError
 	q.Status.Output = err.Error()
-	_, err = c.charge.Queries(q.Namespace).Update(q)
+	_, err = c.charge.Reports().Update(q)
 	if err != nil {
 		fmt.Println("FAILED TO REPORT ERROR: ", err)
 	}
