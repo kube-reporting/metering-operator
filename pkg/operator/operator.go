@@ -5,12 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	api "k8s.io/api/core/v1"
-	extensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -33,26 +29,30 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 		return nil, err
 	}
 
+	fmt.Println("setting up extensions client...")
 	if cb.extension, err = ext_client.NewForCon***REMOVED***g(con***REMOVED***g); err != nil {
 		return nil, err
 	}
 
+	fmt.Println("setting up chargeback client...")
 	if cb.charge, err = chargeback.NewForCon***REMOVED***g(con***REMOVED***g); err != nil {
 		return nil, err
 	}
 
 	cb.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  cb.charge.Reports(api.NamespaceAll).List,
-			WatchFunc: cb.charge.Reports(api.NamespaceAll).Watch,
+			ListFunc:  cb.charge.Reports().List,
+			WatchFunc: cb.charge.Reports().Watch,
 		},
 		&chargeback.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
+	fmt.Println("con***REMOVED***guring event listeners")
 	cb.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: cb.handleAddReport,
 	})
 
+	fmt.Println("All set up!")
 	return cb, nil
 }
 

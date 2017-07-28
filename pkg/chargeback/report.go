@@ -32,21 +32,19 @@ type ReportInterface interface {
 type reports struct {
 	restClient rest.Interface
 	client     *dynamic.ResourceClient
-	ns         string
 }
 
-func newReports(r rest.Interface, c *dynamic.Client, namespace string) *reports {
+func newReports(r rest.Interface, c *dynamic.Client) *reports {
 	return &reports{
 		r,
 		c.Resource(
 			&metav1.APIResource{
 				Kind:       ReportKind,
 				Name:       ReportPlural,
-				Namespaced: true,
+				Namespaced: false,
 			},
-			namespace,
+			"",
 		),
-		namespace,
 	}
 }
 
@@ -92,7 +90,6 @@ func (p *reports) Delete(name string, options *metav1.DeleteOptions) error {
 
 func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
-		Namespace(p.ns).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil)
 
@@ -107,7 +104,6 @@ func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Pre***REMOVED***x("watch").
-		Namespace(p.ns).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil).
 		Stream()
