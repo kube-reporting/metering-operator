@@ -1,10 +1,10 @@
 package chargeback
 
 import (
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/rest"
 )
 
@@ -19,13 +19,14 @@ type ChargebackInterface interface {
 }
 
 func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*ChargebackClient, error) {
+	scheme := runtime.NewScheme()
 	newC := *c
 	newC.GroupVersion = &schema.GroupVersion{
 		Group:   Group,
 		Version: Version,
 	}
 	newC.APIPath = "/apis"
-	newC.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
+	newC.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(scheme)}
 
 	client, err := rest.RESTClientFor(&newC)
 	if err != nil {

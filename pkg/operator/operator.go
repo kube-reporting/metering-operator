@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	api "k8s.io/api/core/v1"
+	extensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api"
-	extensions "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -32,7 +33,7 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 		return nil, err
 	}
 
-	if cb.kube, err = kubernetes.NewForCon***REMOVED***g(con***REMOVED***g); err != nil {
+	if cb.extension, err = ext_client.NewForCon***REMOVED***g(con***REMOVED***g); err != nil {
 		return nil, err
 	}
 
@@ -56,8 +57,8 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 }
 
 type Chargeback struct {
-	kube   *kubernetes.Clientset
-	charge *chargeback.ChargebackClient
+	extension *ext_client.Clientset
+	charge    *chargeback.ChargebackClient
 
 	reportInform cache.SharedIndexInformer
 
@@ -66,7 +67,7 @@ type Chargeback struct {
 }
 
 func (c *Chargeback) Run() error {
-	err := c.createTPRs()
+	err := c.createResources()
 	if err != nil {
 		panic(err)
 	}
@@ -83,22 +84,10 @@ func (c *Chargeback) Run() error {
 	return nil
 }
 
-func (c *Chargeback) createTPRs() error {
-	tprs := []*extensions.ThirdPartyResource{
-		{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "report." + chargeback.Group,
-			},
-			Versions: []extensions.APIVersion{
-				{Name: chargeback.Version},
-			},
-			Description: "Billing report",
-		},
-	}
-	tprClient := c.kube.ThirdPartyResources()
-
-	for _, tpr := range tprs {
-		if _, err := tprClient.Create(tpr); err != nil && !apierrors.IsAlreadyExists(err) {
+func (c *Chargeback) createResources() error {
+	cdrClient := c.extension.CustomResourceDe***REMOVED***nitions()
+	for _, cdr := range chargeback.Resources {
+		if _, err := cdrClient.Create(cdr); err != nil && !apierrors.IsAlreadyExists(err) {
 			return err
 		}
 	}
