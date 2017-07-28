@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	ReportKind = "Report"
-	ReportName = "reports"
+	ReportPlural = "reports"
+	ReportKind   = "Report"
 )
 
 type ReportGetter interface {
@@ -41,7 +41,7 @@ func newReports(r rest.Interface, c *dynamic.Client, namespace string) *reports 
 		c.Resource(
 			&metav1.APIResource{
 				Kind:       ReportKind,
-				Name:       ReportName,
+				Name:       ReportPlural,
 				Namespaced: true,
 			},
 			namespace,
@@ -93,7 +93,7 @@ func (p *reports) Delete(name string, options *metav1.DeleteOptions) error {
 func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
 		Namespace(p.ns).
-		Resource(ReportName).
+		Resource(ReportPlural).
 		FieldsSelectorParam(nil)
 
 	b, err := req.DoRaw()
@@ -108,7 +108,7 @@ func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Prefix("watch").
 		Namespace(p.ns).
-		Resource(ReportName).
+		Resource(ReportPlural).
 		FieldsSelectorParam(nil).
 		Stream()
 	if err != nil {
