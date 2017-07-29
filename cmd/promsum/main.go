@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 
 	"github.com/prometheus/client_golang/api"
@@ -41,7 +42,7 @@ func main() {
 
 	now := time.Now().UTC()
 	// create range starting the given duration before now to now
-	billingRng := promsum.Range{
+	billingRng := cb.Range{
 		Start: now.Add(-before),
 		End:   now,
 	}
@@ -55,7 +56,7 @@ func main() {
 	}
 
 	log.Println("Testing metering...")
-	records, err := promsum.Meter(prom, query, billingRng, timePrecision)
+	records, err := promsum.Meter(prom, query, subject, billingRng, timePrecision)
 	if err != nil {
 		log.Fatalf("Failed to meter for %v for query '%s': %v", billingRng, query, err)
 	}
