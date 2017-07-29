@@ -6,15 +6,17 @@ import (
 	"io/ioutil"
 	"os"
 	"path/***REMOVED***lepath"
-	"sort"
 	"strings"
+	"time"
+
+	"github.com/segmentio/ksuid"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 // Store manages the persistence of billing records.
 type Store interface {
-	// Write inserts the given record into storage.
+	// Write inserts the given records into storage.
 	Write(record []BillingRecord) error
 
 	// Read retrieves billing records within the given range. There are no ordering guarantees.
@@ -34,10 +36,6 @@ func NewFileStore(dir string) (FileStore, error) {
 		if !os.IsNotExist(err) {
 			return FileStore{}, fmt.Errorf("could not access path '%s': %v", dir, err)
 		}
-
-		if err = os.MkdirAll(dir, FileStorePerms); err != nil {
-			return FileStore{}, fmt.Errorf("could not create directory '%s': %v", dir, err)
-		}
 	} ***REMOVED*** if !***REMOVED***le.IsDir() {
 		return FileStore{}, fmt.Errorf("the path '%s' is a ***REMOVED***le", dir)
 	}
@@ -55,23 +53,29 @@ type FileStore struct {
 // FileStore must implement the Store interface
 var _ Store = FileStore{}
 
-// Write stores a billing record as a ***REMOVED***le using the ***REMOVED***lename for ordering.
+// Write stores billing records as a ***REMOVED***le using the ***REMOVED***lename for ordering.
 // Will overwrite existing entries matching range, subject, and query.
-func (f FileStore) Write(record BillingRecord) error {
-	dir := Dir(f.directory, record.Query, record.Subject)
-
+func (f FileStore) Write(records []BillingRecord) error {
 	// create directory, if exists don't error
-	if err := os.MkdirAll(dir, FileStorePerms); err != nil && !os.IsExist(err) {
-		return fmt.Errorf("Could not create directory at '%s': %v", dir, err)
+	if err := os.MkdirAll(f.directory, FileStorePerms); err != nil && !os.IsExist(err) {
+		return fmt.Errorf("Could not create directory at '%s': %v", f.directory, err)
 	}
 
-	data, err := json.Marshal(&record)
+	data, err := json.Marshal(records)
 	if err != nil {
 		return fmt.Errorf("could not record record: %v", err)
 	}
 
-	name := Name(record.Range(), record.Labels)
-	recordPath := ***REMOVED***lepath.Join(dir, name)
+	uuid, err := ksuid.NewRandom()
+	if err != nil {
+		return fmt.Errorf("failed to generate ***REMOVED***le uuid: %s", err)
+	}
+
+	min, max := extrema(records)
+	rng := cb.Range{min, max}
+	name := Name(rng, uuid.String())
+
+	recordPath := ***REMOVED***lepath.Join(f.directory, name)
 	if err = ioutil.WriteFile(recordPath, data, FileStorePerms); err != nil {
 		return fmt.Errorf("failed to write billing record to '%s': %v", recordPath, err)
 	}
@@ -80,9 +84,7 @@ func (f FileStore) Write(record BillingRecord) error {
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
 func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingRecord, err error) {
-	dir := Dir(f.directory, query, subject)
-
-	err = ***REMOVED***lepath.Walk(dir, func(path string, ***REMOVED***le os.FileInfo, walkErr error) error {
+	err = ***REMOVED***lepath.Walk(f.directory, func(path string, ***REMOVED***le os.FileInfo, walkErr error) error {
 		if walkErr != nil {
 			return err
 		}
@@ -104,11 +106,11 @@ func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingR
 			return fmt.Errorf("failed to read ***REMOVED***le '%s': %v", path, err)
 		}
 
-		var record BillingRecord
-		if err = json.Unmarshal(data, &record); err != nil {
-			return fmt.Errorf("could not read record for '%s': %v", path, err)
+		***REMOVED***leRecords, err := decodeRelevantRecords(data, rng)
+		if err != nil {
+			return fmt.Errorf("failed to read ***REMOVED***le '%s': %v", path, err)
 		}
-		records = append(records, record)
+		records = append(records, ***REMOVED***leRecords...)
 		return nil
 	})
 
@@ -119,27 +121,8 @@ func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingR
 }
 
 // Name returns the name of the ***REMOVED***le for a given range.
-func Name(rng cb.Range, labels map[string]string) string {
-	i := 0
-	keys := make([]string, len(labels))
-	for k := range labels {
-		keys[i] = k
-	}
-	sort.Strings(keys)
-
-	flatLabels := ""
-	for _, k := range keys {
-		v := labels[k]
-		flatLabels += fmt.Sprintf("%s:%s,", k, v)
-	}
-
-	return fmt.Sprintf("%d-%d-%x.json", rng.Start.Unix(), rng.End.Unix(), hash(flatLabels))
-}
-
-// Dir returns the path of the storage directory for the given query and subject
-func Dir(parent, query, subject string) string {
-	hashedQuery := fmt.Sprintf("%x", hash(query))
-	return ***REMOVED***lepath.Join(parent, subject, hashedQuery)
+func Name(rng cb.Range, suf***REMOVED***x string) string {
+	return fmt.Sprintf("%d-%d-%x.json", rng.Start.Unix(), rng.End.Unix(), suf***REMOVED***x)
 }
 
 // PathWithinRange determines if the given ***REMOVED***lename represents a range within the one given.
@@ -151,7 +134,7 @@ func PathWithinRange(path string, rng cb.Range) (bool, error) {
 	}
 
 	// skip if record is not in desired range
-	if !rng.Within(recordRng.Start) && !rng.Within(recordRng.End) {
+	if recordRng.Start.After(rng.End) || recordRng.End.Before(rng.Start) {
 		return false, nil
 	}
 	return true, nil
@@ -174,4 +157,39 @@ func rngFromName(name string) (cb.Range, error) {
 	}
 	startStr, endStr := s[0], s[1]
 	return cb.ParseUnixRange(startStr, endStr)
+}
+
+// extrema returns the min and max of a range
+func extrema(records []BillingRecord) (min, max time.Time) {
+	if len(records) < 1 {
+		return
+	}
+
+	min = records[0].Start
+	max = records[0].End
+	for _, r := range records {
+		if r.Start.Before(min) {
+			min = r.Start
+		}
+
+		if r.End.After(max) {
+			max = r.End
+		}
+	}
+	return
+}
+
+func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
+	var allRecords []BillingRecord
+	if err := json.Unmarshal(data, &allRecords); err != nil {
+		return nil, fmt.Errorf("could not decode record data: %v", err)
+	}
+
+	records := allRecords[:0]
+	for _, r := range allRecords {
+		if rng.Within(r.Start) || rng.Within(r.End) {
+			records = append(records, r)
+		}
+	}
+	return records, nil
 }

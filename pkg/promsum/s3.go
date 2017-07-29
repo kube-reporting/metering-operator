@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/segmentio/ksuid"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
@@ -37,15 +38,21 @@ var _ Store = S3Store{}
 
 // Write stores a billing record in an S3 bucket at under the given path.
 // Will overwrite existing entries matching range, subject, and query.
-func (s S3Store) Write(record BillingRecord) error {
-	data, err := json.Marshal(&record)
+func (s S3Store) Write(records []BillingRecord) error {
+	data, err := json.Marshal(records)
 	if err != nil {
 		return fmt.Errorf("could not record record: %v", err)
 	}
 
-	dir := Dir(s.Path, record.Query, record.Subject)
-	name := Name(record.Range(), record.Labels)
-	key := ***REMOVED***lepath.Join(dir, name)
+	uuid, err := ksuid.NewRandom()
+	if err != nil {
+		return fmt.Errorf("failed to generate ***REMOVED***le uuid: %s", err)
+	}
+
+	min, max := extrema(records)
+	rng := cb.Range{min, max}
+	name := Name(rng, uuid.String())
+	key := ***REMOVED***lepath.Join(s.Path, name)
 
 	_, err = s.s3.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(s.Bucket),
@@ -58,14 +65,12 @@ func (s S3Store) Write(record BillingRecord) error {
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
 func (s S3Store) Read(rng cb.Range, query, subject string) (records []BillingRecord, err error) {
-	dir := Dir(s.Path, query, subject)
-
 	list, err := s.s3.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(s.Bucket),
-		Pre***REMOVED***x: aws.String(dir),
+		Pre***REMOVED***x: aws.String(s.Path),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list S3 for 's3://%s/%s': %v", s.Bucket, dir, err)
+		return nil, fmt.Errorf("failed to list S3 for 's3://%s/%s': %v", s.Bucket, s.Path, err)
 	}
 
 	for _, obj := range list.Contents {
@@ -80,7 +85,7 @@ func (s S3Store) Read(rng cb.Range, query, subject string) (records []BillingRec
 			Key:    aws.String(*obj.Key),
 		})
 		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve 's3://%s/%s': %v", s.Bucket, obj.Key, err)
+			return nil, fmt.Errorf("failed to retrieve 's3://%s/%s': %v", s.Bucket, *obj.Key, err)
 		}
 
 		data, err := ioutil.ReadAll(out.Body)
@@ -89,11 +94,11 @@ func (s S3Store) Read(rng cb.Range, query, subject string) (records []BillingRec
 				s.Bucket, obj.Key, err)
 		}
 
-		var record BillingRecord
-		if err = json.Unmarshal(data, &record); err != nil {
-			return nil, fmt.Errorf("could not read record for 's3://%s/%s': %v", s.Bucket, obj.Key, err)
+		***REMOVED***leRecords, err := decodeRelevantRecords(data, rng)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read ***REMOVED***le '%s': %v", *obj.Key, err)
 		}
-		records = append(records, record)
+		records = append(records, ***REMOVED***leRecords...)
 	}
 	return
 }
