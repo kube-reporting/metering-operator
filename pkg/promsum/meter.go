@@ -15,7 +15,7 @@ import (
 // Meter creates a billing record for a given range and Prometheus query. It does this by summing usage
 // between each Prometheus instant vector by multiplying rate against against the length of the interval.
 // Amounts will be rounded to the nearest unit of time speci***REMOVED***ed by timePrecision.
-func Meter(prom v1.API, pqlQuery string, rng cb.Range, timePrecision time.Duration) ([]BillingRecord, error) {
+func Meter(prom v1.API, pqlQuery, subject string, rng cb.Range, timePrecision time.Duration) ([]BillingRecord, error) {
 	if prom == nil {
 		return nil, errors.New("prometheus API was nil")
 	} ***REMOVED*** if timePrecision < PromTimePrecision {
@@ -56,11 +56,12 @@ func Meter(prom v1.API, pqlQuery string, rng cb.Range, timePrecision time.Durati
 			}
 
 			record := BillingRecord{
-				Labels: labels,
-				Query:  pqlQuery,
-				Amount: total,
-				Start:  start.Timestamp.Time().UTC(),
-				End:    end.Timestamp.Time().UTC(),
+				Labels:  labels,
+				Query:   pqlQuery,
+				Amount:  total,
+				Start:   start.Timestamp.Time().UTC(),
+				End:     end.Timestamp.Time().UTC(),
+				Subject: subject,
 			}
 			records = append(records, record)
 		}
