@@ -1,6 +1,5 @@
-FROM gliderlabs/alpine:3.6
-
-RUN apk-install ca-certificates
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
 # add pod data collector binary
 ADD promsum /usr/local/bin/promsum
