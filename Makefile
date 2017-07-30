@@ -11,6 +11,9 @@ all: fmt chargeback-image
 out:
 	mkdir $@
 
+promsum-image: images/promsum/promsum
+	$(dir $<)/build.sh
+
 chargeback-image: images/chargeback/chargeback
 	$(dir $<)/build.sh
 
@@ -24,6 +27,9 @@ fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
 images/chargeback/chargeback: cmd/chargeback pkg/hive/hive_thrift
+	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+
+images/promsum/promsum: cmd/promsum
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
 # Download Hive git repo.
@@ -40,4 +46,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_pre***REMOVED***x=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor chargeback-image fmt
+.PHONY: vendor chargeback-image promsum-image fmt
