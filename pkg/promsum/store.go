@@ -1,6 +1,8 @@
 package promsum
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +14,11 @@ import (
 	"github.com/segmentio/ksuid"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+)
+
+const (
+	// StorageComment intenti***REMOVED***es stored data as being produced by Chargeback.
+	StorageComment = "CoreOS Chargeback Usage Data"
 )
 
 // Store manages the persistence of billing records.
@@ -61,11 +68,6 @@ func (f FileStore) Write(records []BillingRecord) error {
 		return fmt.Errorf("Could not create directory at '%s': %v", f.directory, err)
 	}
 
-	data, err := json.Marshal(records)
-	if err != nil {
-		return fmt.Errorf("could not record record: %v", err)
-	}
-
 	uuid, err := ksuid.NewRandom()
 	if err != nil {
 		return fmt.Errorf("failed to generate ***REMOVED***le uuid: %s", err)
@@ -74,6 +76,11 @@ func (f FileStore) Write(records []BillingRecord) error {
 	min, max := extrema(records)
 	rng := cb.Range{min, max}
 	name := Name(rng, uuid.String())
+
+	data, err := encodeRecords(records, name)
+	if err != nil {
+		return fmt.Errorf("could not encode record: %v", err)
+	}
 
 	recordPath := ***REMOVED***lepath.Join(f.directory, name)
 	if err = ioutil.WriteFile(recordPath, data, FileStorePerms); err != nil {
@@ -122,7 +129,7 @@ func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingR
 
 // Name returns the name of the ***REMOVED***le for a given range.
 func Name(rng cb.Range, suf***REMOVED***x string) string {
-	return fmt.Sprintf("%d-%d-%x.json", rng.Start.Unix(), rng.End.Unix(), suf***REMOVED***x)
+	return fmt.Sprintf("%d-%d-%x.json.gz", rng.Start.Unix(), rng.End.Unix(), suf***REMOVED***x)
 }
 
 // PathWithinRange determines if the given ***REMOVED***lename represents a range within the one given.
@@ -150,10 +157,10 @@ func hash(in string) (out uint64) {
 }
 
 func rngFromName(name string) (cb.Range, error) {
-	name = strings.TrimRight(name, ".json")
+	name = strings.TrimRight(name, ".json.gz")
 	s := strings.SplitN(name, "-", 3)
 	if len(s) != 3 {
-		return cb.Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
+		return cb.Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json.gz'", name)
 	}
 	startStr, endStr := s[0], s[1]
 	return cb.ParseUnixRange(startStr, endStr)
@@ -179,9 +186,17 @@ func extrema(records []BillingRecord) (min, max time.Time) {
 	return
 }
 
+// decodeRelevantRecords unmarshals and decompresses encoded record data and returns the records within the given range.
 func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
+	bRead := bytes.NewReader(data)
+	gzIn, err := gzip.NewReader(bRead)
+	if err != nil {
+		return nil, err
+	}
+	defer gzIn.Close()
+
 	var allRecords []BillingRecord
-	if err := json.Unmarshal(data, &allRecords); err != nil {
+	if err = json.NewDecoder(gzIn).Decode(&allRecords); err != nil {
 		return nil, fmt.Errorf("could not decode record data: %v", err)
 	}
 
@@ -192,4 +207,27 @@ func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
 		}
 	}
 	return records, nil
+}
+
+// encodeRecords marshals and compresses billing records into bytes.
+func encodeRecords(records []BillingRecord, name string) (data []byte, err error) {
+	if data, err = json.Marshal(&records); err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	gzOut := gzip.NewWriter(&buf)
+
+	// set metadata in gzip header
+	gzOut.Name = name
+	gzOut.Comment = StorageComment
+	gzOut.ModTime = time.Now().UTC()
+
+	// compress record data
+	if _, err = gzOut.Write(data); err != nil {
+		return
+	}
+	err = gzOut.Close()
+	data = buf.Bytes()
+	return
 }
