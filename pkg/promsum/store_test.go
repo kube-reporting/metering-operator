@@ -71,10 +71,8 @@ func testStoreReadWrite(t *testing.T, s Store) {
 		},
 	}
 
-	for _, r := range records {
-		if err := s.Write(r); err != nil {
-			t.Error("could not write record to store: ", err)
-		}
+	if err := s.Write(records); err != nil {
+		t.Error("could not write record to store: ", err)
 	}
 
 	if read, err := s.Read(all, query, subject); err != nil {

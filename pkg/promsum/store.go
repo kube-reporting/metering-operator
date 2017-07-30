@@ -1,20 +1,29 @@
 package promsum
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
+	"time"
+
+	"github.com/segmentio/ksuid"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
+const (
+	// StorageComment intentifies stored data as being produced by Chargeback.
+	StorageComment = "CoreOS Chargeback Usage Data"
+)
+
 // Store manages the persistence of billing records.
 type Store interface {
-	// Write inserts the given record into storage.
+	// Write inserts the given records into storage.
 	Write(record []BillingRecord) error
 
 	// Read retrieves billing records within the given range. There are no ordering guarantees.
@@ -34,10 +43,6 @@ func NewFileStore(dir string) (FileStore, error) {
 		if !os.IsNotExist(err) {
 			return FileStore{}, fmt.Errorf("could not access path '%s': %v", dir, err)
 		}
-
-		if err = os.MkdirAll(dir, FileStorePerms); err != nil {
-			return FileStore{}, fmt.Errorf("could not create directory '%s': %v", dir, err)
-		}
 	} else if !file.IsDir() {
 		return FileStore{}, fmt.Errorf("the path '%s' is a file", dir)
 	}
@@ -55,23 +60,29 @@ type FileStore struct {
 // FileStore must implement the Store interface
 var _ Store = FileStore{}
 
-// Write stores a billing record as a file using the filename for ordering.
+// Write stores billing records as a file using the filename for ordering.
 // Will overwrite existing entries matching range, subject, and query.
-func (f FileStore) Write(record BillingRecord) error {
-	dir := Dir(f.directory, record.Query, record.Subject)
-
+func (f FileStore) Write(records []BillingRecord) error {
 	// create directory, if exists don't error
-	if err := os.MkdirAll(dir, FileStorePerms); err != nil && !os.IsExist(err) {
-		return fmt.Errorf("Could not create directory at '%s': %v", dir, err)
+	if err := os.MkdirAll(f.directory, FileStorePerms); err != nil && !os.IsExist(err) {
+		return fmt.Errorf("Could not create directory at '%s': %v", f.directory, err)
 	}
 
-	data, err := json.Marshal(&record)
+	uuid, err := ksuid.NewRandom()
 	if err != nil {
-		return fmt.Errorf("could not record record: %v", err)
+		return fmt.Errorf("failed to generate file uuid: %s", err)
 	}
 
-	name := Name(record.Range(), record.Labels)
-	recordPath := filepath.Join(dir, name)
+	min, max := extrema(records)
+	rng := cb.Range{min, max}
+	name := Name(rng, uuid.String())
+
+	data, err := encodeRecords(records, name)
+	if err != nil {
+		return fmt.Errorf("could not encode record: %v", err)
+	}
+
+	recordPath := filepath.Join(f.directory, name)
 	if err = ioutil.WriteFile(recordPath, data, FileStorePerms); err != nil {
 		return fmt.Errorf("failed to write billing record to '%s': %v", recordPath, err)
 	}
@@ -80,9 +91,7 @@ func (f FileStore) Write(record BillingRecord) error {
 
 // Read retrieves all billing records for the given range, query, and subject. There are no ordering guarantees.
 func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingRecord, err error) {
-	dir := Dir(f.directory, query, subject)
-
-	err = filepath.Walk(dir, func(path string, file os.FileInfo, walkErr error) error {
+	err = filepath.Walk(f.directory, func(path string, file os.FileInfo, walkErr error) error {
 		if walkErr != nil {
 			return err
 		}
@@ -104,11 +113,11 @@ func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingR
 			return fmt.Errorf("failed to read file '%s': %v", path, err)
 		}
 
-		var record BillingRecord
-		if err = json.Unmarshal(data, &record); err != nil {
-			return fmt.Errorf("could not read record for '%s': %v", path, err)
+		fileRecords, err := decodeRelevantRecords(data, rng)
+		if err != nil {
+			return fmt.Errorf("failed to read file '%s': %v", path, err)
 		}
-		records = append(records, record)
+		records = append(records, fileRecords...)
 		return nil
 	})
 
@@ -119,27 +128,8 @@ func (f FileStore) Read(rng cb.Range, query, subject string) (records []BillingR
 }
 
 // Name returns the name of the file for a given range.
-func Name(rng cb.Range, labels map[string]string) string {
-	i := 0
-	keys := make([]string, len(labels))
-	for k := range labels {
-		keys[i] = k
-	}
-	sort.Strings(keys)
-
-	flatLabels := ""
-	for _, k := range keys {
-		v := labels[k]
-		flatLabels += fmt.Sprintf("%s:%s,", k, v)
-	}
-
-	return fmt.Sprintf("%d-%d-%x.json", rng.Start.Unix(), rng.End.Unix(), hash(flatLabels))
-}
-
-// Dir returns the path of the storage directory for the given query and subject
-func Dir(parent, query, subject string) string {
-	hashedQuery := fmt.Sprintf("%x", hash(query))
-	return filepath.Join(parent, subject, hashedQuery)
+func Name(rng cb.Range, suffix string) string {
+	return fmt.Sprintf("%d-%d-%x.json.gz", rng.Start.Unix(), rng.End.Unix(), suffix)
 }
 
 // PathWithinRange determines if the given filename represents a range within the one given.
@@ -151,7 +141,7 @@ func PathWithinRange(path string, rng cb.Range) (bool, error) {
 	}
 
 	// skip if record is not in desired range
-	if !rng.Within(recordRng.Start) && !rng.Within(recordRng.End) {
+	if recordRng.Start.After(rng.End) || recordRng.End.Before(rng.Start) {
 		return false, nil
 	}
 	return true, nil
@@ -167,11 +157,77 @@ func hash(in string) (out uint64) {
 }
 
 func rngFromName(name string) (cb.Range, error) {
-	name = strings.TrimRight(name, ".json")
+	name = strings.TrimRight(name, ".json.gz")
 	s := strings.SplitN(name, "-", 3)
 	if len(s) != 3 {
-		return cb.Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json'", name)
+		return cb.Range{}, fmt.Errorf("'%s' does not match the format 'StartRange-EndRange.json.gz'", name)
 	}
 	startStr, endStr := s[0], s[1]
 	return cb.ParseUnixRange(startStr, endStr)
+}
+
+// extrema returns the min and max of a range
+func extrema(records []BillingRecord) (min, max time.Time) {
+	if len(records) < 1 {
+		return
+	}
+
+	min = records[0].Start
+	max = records[0].End
+	for _, r := range records {
+		if r.Start.Before(min) {
+			min = r.Start
+		}
+
+		if r.End.After(max) {
+			max = r.End
+		}
+	}
+	return
+}
+
+// decodeRelevantRecords unmarshals and decompresses encoded record data and returns the records within the given range.
+func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
+	bRead := bytes.NewReader(data)
+	gzIn, err := gzip.NewReader(bRead)
+	if err != nil {
+		return nil, err
+	}
+	defer gzIn.Close()
+
+	var allRecords []BillingRecord
+	if err = json.NewDecoder(gzIn).Decode(&allRecords); err != nil {
+		return nil, fmt.Errorf("could not decode record data: %v", err)
+	}
+
+	records := allRecords[:0]
+	for _, r := range allRecords {
+		if rng.Within(r.Start) || rng.Within(r.End) {
+			records = append(records, r)
+		}
+	}
+	return records, nil
+}
+
+// encodeRecords marshals and compresses billing records into bytes.
+func encodeRecords(records []BillingRecord, name string) (data []byte, err error) {
+	if data, err = json.Marshal(&records); err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	gzOut := gzip.NewWriter(&buf)
+
+	// set metadata in gzip header
+	gzOut.Name = name
+	gzOut.Comment = StorageComment
+	gzOut.ModTime = time.Now().UTC()
+
+	// compress record data
+	if _, err = gzOut.Write(data); err != nil {
+		return
+	}
+	err = gzOut.Close()
+	data = buf.Bytes()
+	return
 }

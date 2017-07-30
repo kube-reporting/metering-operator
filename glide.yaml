@@ -45,6 +45,8 @@ import:
   - pkg/apis/extensions/v1beta1
   - rest
   - tools/cache
+- package: github.com/segmentio/ksuid
+  version: e3c9952840557adbb3538b1039e783d44c21ae4a
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
