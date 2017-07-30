@@ -2,7 +2,6 @@ package promsum
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -39,11 +38,6 @@ var _ Store = S3Store{}
 // Write stores a billing record in an S3 bucket at under the given path.
 // Will overwrite existing entries matching range, subject, and query.
 func (s S3Store) Write(records []BillingRecord) error {
-	data, err := json.Marshal(records)
-	if err != nil {
-		return fmt.Errorf("could not record record: %v", err)
-	}
-
 	uuid, err := ksuid.NewRandom()
 	if err != nil {
 		return fmt.Errorf("failed to generate file uuid: %s", err)
@@ -53,6 +47,11 @@ func (s S3Store) Write(records []BillingRecord) error {
 	rng := cb.Range{min, max}
 	name := Name(rng, uuid.String())
 	key := filepath.Join(s.Path, name)
+
+	data, err := encodeRecords(records, name)
+	if err != nil {
+		return fmt.Errorf("could not encode record: %v", err)
+	}
 
 	_, err = s.s3.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(s.Bucket),
