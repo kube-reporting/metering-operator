@@ -41,7 +41,7 @@ images/promsum/promsum: cmd/promsum
 
 # Download Hive git repo.
 out/thrift.git: | out
-	git clone --single-branch --bare --depth 1 ${HIVE_REPO} $@
+	git clone --single-branch --bare ${HIVE_REPO} $@
 
 # Retrieve Hive thrift de***REMOVED***nition from git repo.
 thrift/TCLIService.thrift: out/thrift.git
