@@ -5,14 +5,24 @@ GO_PKG := github.com/coreos-inc/kube-chargeback
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
+# Contains the SHA of the current base image.
+BASE_IMAGE := images/base/IMAGE
+BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
+
 # TODO: Add tests
 all: fmt chargeback-image
 
 out:
 	mkdir $@
 
-chargeback-image: images/chargeback/chargeback
-	$(dir $<)/build.sh
+promsum-image: images/promsum/IMAGE images/promsum/promsum $(BASE_IMAGE)
+	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
+
+chargeback-image: images/chargeback/IMAGE images/chargeback/chargeback $(BASE_IMAGE)
+	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
+
+images/base/IMAGE: images/base/Dockerfile
+	docker build --iidfile $@ $(dir $<)
 
 # Update dependencies
 vendor: glide.yaml
@@ -26,9 +36,12 @@ fmt:
 images/chargeback/chargeback: cmd/chargeback pkg/hive/hive_thrift
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
+images/promsum/promsum: cmd/promsum
+	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+
 # Download Hive git repo.
-out/thrift.git: out
-	git clone --single-branch --bare --depth 1 ${HIVE_REPO} $@
+out/thrift.git: | out
+	git clone --single-branch --bare ${HIVE_REPO} $@
 
 # Retrieve Hive thrift definition from git repo.
 thrift/TCLIService.thrift: out/thrift.git
@@ -40,4 +53,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor chargeback-image fmt
+.PHONY: vendor chargeback-image promsum-image fmt
