@@ -12,8 +12,8 @@ import (
 )
 
 // bill generates billing records and persists them.
-func bill(prom promV1.API, store promsum.Store, query, subject string, rng cb.Range, timePrecision time.Duration) (records []promsum.BillingRecord, err error) {
-	records, err = promsum.Meter(prom, query, subject, rng, timePrecision)
+func bill(prom promV1.API, store promsum.Store, query, subject string, rng cb.Range, unit, window time.Duration) (records []promsum.BillingRecord, err error) {
+	records, err = promsum.Meter(prom, query, subject, rng, unit, window)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
 			query, rng.Start, rng.End, err)

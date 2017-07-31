@@ -11,15 +11,17 @@ import (
 func TestMeterQueryError(t *testing.T) {
 	prom := NewMockPromAPI(t)
 	subject := "unitTestingQuery"
+	window := time.Second
 
 	rng := cb.Range{Start: time.Unix(0, 0), End: time.Unix(100, 0)}
-	_, err := Meter(prom, "bad query", subject, rng, PromTimePrecision)
+	_, err := Meter(prom, "bad query", subject, rng, PromTimePrecision, window)
 	if err == nil {
 		t.Error("metering should have failed due to error")
 	}
 
 	// check handling when prom is nil
-	_, err = Meter(nil, "cluster_namespace_controller_pod_container:memory_usage:bytes", subject, rng, PromTimePrecision)
+	query := "cluster_namespace_controller_pod_container:memory_usage:bytes"
+	_, err = Meter(nil, query, subject, rng, PromTimePrecision, window)
 	if err == nil {
 		t.Error("error should be returned if prometheus API is nil")
 	}
@@ -28,6 +30,7 @@ func TestMeterQueryError(t *testing.T) {
 func TestMeterScalarQuery(t *testing.T) {
 	prom := NewMockPromAPI(t)
 	subject := "unitTestingScalar"
+	window := time.Second
 
 	// track the interval 20 minutes into the past
 	end := time.Now().UTC()
@@ -42,7 +45,7 @@ func TestMeterScalarQuery(t *testing.T) {
 
 	// scalar queries will always return the same value
 	queryStr := fmt.Sprintf("%d", query)
-	records, err := Meter(prom, queryStr, subject, rng, timePrecision)
+	records, err := Meter(prom, queryStr, subject, rng, timePrecision, window)
 	if err != nil {
 		t.Error("unexpected error: ", err)
 		return
