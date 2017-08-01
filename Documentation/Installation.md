@@ -22,3 +22,6 @@ data:
   AWS_ACCESS_KEY_ID: <base64 encoded ID>
   AWS_SECRET_ACCESS_KEY: <base64 encoded Secret>
 ```
+
+### Verifying operation
+Check the logs of the "promsum" deployment. There should be no errors and you should see billing records printed to stdout.
