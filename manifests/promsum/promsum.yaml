@@ -18,7 +18,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: "POLL_INTERVAL"
-          value: "300"
+          value: "1800"
         - name: "AWS_ACCESS_KEY_ID"
           valueFrom:
             secretKeyRef:
