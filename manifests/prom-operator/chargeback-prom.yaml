@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: Prometheus
 metadata:
   name: chargeback
-  namespace: tectonic-system
+  namespace: tectonic-chargeback
   labels:
     chargeback-app: prometheus
     prometheus: chargeback
@@ -10,7 +10,7 @@ spec:
   replicas: 1
   baseImage: quay.io/prometheus/prometheus
   version: v1.7.1
-  serviceAccountName: prometheus-k8s
+  serviceAccountName: prometheus-chargeback
   ruleSelector:
     matchLabels:
       prom: chargeback-state
@@ -24,22 +24,3 @@ spec:
     requests:
       cpu: 100m
       memory: 500Mi
----
-apiVersion: monitoring.coreos.com/v1alpha1
-kind: ServiceMonitor
-metadata:
-  name: chargeback-state-metrics
-  namespace: tectonic-system
-  labels:
-    chargeback-app: metrics
-spec:
-  jobLabel: chargeback-app
-  selector:
-    matchLabels:
-      chargeback-app: metrics
-  namespaceSelector:
-    matchNames: ['tectonic-system']
-  endpoints:
-  - port: http-metrics
-    interval: 30s
-    honorLabels: true
