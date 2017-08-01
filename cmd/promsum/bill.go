@@ -24,9 +24,12 @@ func bill(prom promV1.API, store p.Store, query, subject string, rng cb.Range, u
 			query, rng.Start, rng.End, err)
 	}
 
-	records, err = rollupRecords(records, rng, rollup)
-	if err != nil {
-		log.Fatal("Couldn't rollup records: ", err)
+	// rollups require a duration
+	if rollup != 0 {
+		records, err = rollupRecords(records, rng, rollup)
+		if err != nil {
+			log.Fatal("Couldn't rollup records: ", err)
+		}
 	}
 
 	err = store.Write(records)
