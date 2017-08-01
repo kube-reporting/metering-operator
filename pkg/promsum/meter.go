@@ -14,21 +14,22 @@ import (
 
 // Meter creates a billing record for a given range and Prometheus query. It does this by summing usage
 // between each Prometheus instant vector by multiplying rate against against the length of the interval.
-// Amounts will be rounded to the nearest unit of time specified by timePrecision.
-func Meter(prom v1.API, pqlQuery, subject string, rng cb.Range, timePrecision time.Duration) ([]BillingRecord, error) {
+// Amounts are rounded to the nearest time duration specified by unit. The amount of time between each Prometheus result
+// is determined by window. Higher accuracy is achieved with a smaller window down to the stored resolution.
+func Meter(prom v1.API, query, subject string, rng cb.Range, unit, window time.Duration) ([]BillingRecord, error) {
 	if prom == nil {
 		return nil, errors.New("prometheus API was nil")
-	} else if timePrecision < PromTimePrecision {
+	} else if unit < PromTimePrecision {
 		return nil, fmt.Errorf("prometheous only supports precision down to the %v", PromTimePrecision)
 	}
 
 	pRng := v1.Range{
 		Start: rng.Start,
 		End:   rng.End,
-		Step:  5 * time.Minute,
+		Step:  window,
 	}
 
-	pVal, err := prom.QueryRange(context.Background(), pqlQuery, pRng)
+	pVal, err := prom.QueryRange(context.Background(), query, pRng)
 	if err != nil {
 		return nil, fmt.Errorf("failed to perform billing query: %v", err)
 	}
@@ -44,10 +45,10 @@ func Meter(prom v1.API, pqlQuery, subject string, rng cb.Range, timePrecision ti
 		for i := 1; i < len(sampleStream.Values); i++ {
 			start, end := sampleStream.Values[i-1], sampleStream.Values[i]
 
-			total, err := CalculateUsage(start, end, timePrecision)
+			total, err := CalculateUsage(start, end, unit)
 			if err != nil {
 				return nil, fmt.Errorf("can't calculate usage for range %v to %v for query '%s': %v",
-					start.Timestamp, end.Timestamp, pqlQuery, err)
+					start.Timestamp, end.Timestamp, query, err)
 			}
 
 			labels := make(map[string]string, len(sampleStream.Metric))
@@ -57,7 +58,7 @@ func Meter(prom v1.API, pqlQuery, subject string, rng cb.Range, timePrecision ti
 
 			record := BillingRecord{
 				Labels:  labels,
-				Query:   pqlQuery,
+				Query:   query,
 				Amount:  total,
 				Start:   start.Timestamp.Time().UTC(),
 				End:     end.Timestamp.Time().UTC(),
