@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: ServiceMonitor
 metadata:
   name: chargeback-state-metrics
-  namespace: tectonic-system
+  namespace: tectonic-chargeback
   labels:
     chargeback-app: metrics
 spec:
@@ -11,7 +11,7 @@ spec:
     matchLabels:
       chargeback-app: metrics
   namespaceSelector:
-    matchNames: ['tectonic-system']
+    matchNames: ['tectonic-chargeback']
   endpoints:
   - port: http-metrics
     interval: 30s
