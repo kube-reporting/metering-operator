@@ -24,22 +24,3 @@ spec:
     requests:
       cpu: 100m
       memory: 500Mi
----
-apiVersion: monitoring.coreos.com/v1alpha1
-kind: ServiceMonitor
-metadata:
-  name: chargeback-state-metrics
-  namespace: tectonic-system
-  labels:
-    chargeback-app: metrics
-spec:
-  jobLabel: chargeback-app
-  selector:
-    matchLabels:
-      chargeback-app: metrics
-  namespaceSelector:
-    matchNames: ['tectonic-system']
-  endpoints:
-  - port: http-metrics
-    interval: 30s
-    honorLabels: true
