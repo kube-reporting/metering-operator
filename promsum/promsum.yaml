@@ -34,7 +34,7 @@ spec:
         - name: "S3_BUCKET"
           value: "coreos-team-chargeback"
         - name: "S3_PATH"
-          value: "july-pod-data"
+          value: "august-pod-data"
         - name: "QUERY"
           value: "(kube_pod_container_resource_requests_memory_bytes / on(node) group_left kube_node_status_capacity_memory_bytes) * on(node) group_left(provider_id) kube_node_info"
       restartPolicy: Always
