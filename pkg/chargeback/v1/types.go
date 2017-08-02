@@ -33,6 +33,12 @@ type ReportSpec struct {
 	Output S3Bucket `json:"output"`
 }
 
+type ReportTemplateSpec struct {
+	meta.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec ReportSpec `json:"spec"`
+}
+
 // +k8s:deepcopy-gen=true
 type ReportStatus struct {
 	Phase  ReportPhase `json:"phase"`
