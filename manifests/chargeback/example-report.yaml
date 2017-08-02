@@ -7,11 +7,11 @@ spec:
   reportingEnd: '2017-07-29T00:00:00Z'
   chargeback:
     bucket: coreos-team-chargeback
-    pre***REMOVED***x: july-pod-data/kube-chargeback/407374e/
+    pre***REMOVED***x: august-promsum-data
   aws:
     bucket: coreos-team-chargeback
     reportName: team-chargeback-testing
     reportPre***REMOVED***x: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001
   output:
     bucket: coreos-team-chargeback
-    pre***REMOVED***x: billingReport2
+    pre***REMOVED***x: billingReport4

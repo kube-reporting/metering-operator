@@ -1,6 +1,7 @@
 package promsum
 
 import (
+	"bu***REMOVED***o"
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
@@ -196,37 +197,46 @@ func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
 	defer gzIn.Close()
 
 	var allRecords []BillingRecord
-	if err = json.NewDecoder(gzIn).Decode(&allRecords); err != nil {
-		return nil, fmt.Errorf("could not decode record data: %v", err)
-	}
 
-	records := allRecords[:0]
-	for _, r := range allRecords {
+	scanner := bu***REMOVED***o.NewScanner(gzIn)
+	var r BillingRecord
+	for scanner.Scan() {
+		if err = json.Unmarshal(scanner.Bytes(), &r); err != nil {
+			return nil, fmt.Errorf("could not decode record data: %v", err)
+		}
+
 		if rng.Within(r.Start) || rng.Within(r.End) {
-			records = append(records, r)
+			allRecords = append(allRecords, r)
 		}
 	}
-	return records, nil
+	return allRecords, nil
 }
 
 // encodeRecords marshals and compresses billing records into bytes.
 func encodeRecords(records []BillingRecord, name string) (data []byte, err error) {
-	if data, err = json.Marshal(&records); err != nil {
-		return
-	}
-
-	var buf bytes.Buffer
-	gzOut := gzip.NewWriter(&buf)
+	buf := new(bytes.Buffer)
+	gzOut := gzip.NewWriter(buf)
 
 	// set metadata in gzip header
 	gzOut.Name = name
 	gzOut.Comment = StorageComment
 	gzOut.ModTime = time.Now().UTC()
 
-	// compress record data
-	if _, err = gzOut.Write(data); err != nil {
-		return
+	// write records
+	for l, r := range records {
+		if data, err = json.Marshal(&r); err == nil {
+			if _, err = gzOut.Write(data); err != nil {
+				return nil, fmt.Errorf("error (line %d) encoding: %v", l, err)
+			}
+
+			if _, err = fmt.Fprintln(gzOut); err != nil {
+				return nil, fmt.Errorf("error (line %d) encoding: %v", l, err)
+			}
+		} ***REMOVED*** {
+			return nil, fmt.Errorf("error (line %d) encoding: %v", l, err)
+		}
 	}
+
 	err = gzOut.Close()
 	data = buf.Bytes()
 	return
