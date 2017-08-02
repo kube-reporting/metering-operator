@@ -4,6 +4,7 @@ metadata:
   labels:
     app: hive
   name: hive
+  namespace: tectonic-chargeback
 spec:
   replicas: 1
   selector:

@@ -4,6 +4,7 @@ metadata:
   labels:
     presto: node
   name: presto-nodes
+  namespace: tectonic-chargeback
 spec:
   replicas: 5
   selector:

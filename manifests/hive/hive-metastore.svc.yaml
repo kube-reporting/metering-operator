@@ -5,6 +5,7 @@ metadata:
   labels:
     hive-app: metastore
   name: hive-metastore
+  namespace: tectonic-chargeback
 spec:
   ports:
   - name: meta
