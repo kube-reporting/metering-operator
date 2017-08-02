@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 func TestCreateAWSUsageTable(t *testing.T) {

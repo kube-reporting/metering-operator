@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 func TestBillingRecord_Range(t *testing.T) {

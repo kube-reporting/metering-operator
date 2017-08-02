@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/segmentio/ksuid"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 // NewS3Store con***REMOVED***gures an S3 client and returns a Store for a given bucket and path.

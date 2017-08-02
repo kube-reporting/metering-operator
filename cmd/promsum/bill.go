@@ -7,7 +7,7 @@ import (
 
 	promV1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 )
 
