@@ -5,6 +5,7 @@ metadata:
   labels:
     app: datanode
   name: hdfs-datanode
+  namespace: tectonic-chargeback
 spec:
   replicas: 3
   selector:

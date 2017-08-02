@@ -3,6 +3,7 @@ kind: Cron
 metadata:
   name: 1-minute
 spec:
+  suspend: false
   schedule: "@every 20s"
   reportTemplate:
     metadata:

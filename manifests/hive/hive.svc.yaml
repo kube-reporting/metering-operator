@@ -4,6 +4,7 @@ metadata:
   labels:
     hive-app: server
   name: hive
+  namespace: tectonic-chargeback
 spec:
   ports:
   - name: thrift

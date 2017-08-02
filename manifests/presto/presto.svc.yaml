@@ -4,6 +4,7 @@ metadata:
   labels:
     app: presto
   name: presto
+  namespace: tectonic-chargeback
 spec:
   ports:
   - name: http
