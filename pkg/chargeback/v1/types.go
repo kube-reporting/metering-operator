@@ -1,4 +1,4 @@
-package chargeback
+package v1
 
 import (
 	"fmt"
@@ -31,6 +31,12 @@ type ReportSpec struct {
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
+}
+
+type ReportTemplateSpec struct {
+	meta.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec ReportSpec `json:"spec"`
 }
 
 // +k8s:deepcopy-gen=true

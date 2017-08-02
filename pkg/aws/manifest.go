@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 const (

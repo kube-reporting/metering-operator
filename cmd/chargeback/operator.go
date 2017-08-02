@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/coreos-inc/kube-chargeback/pkg/operator"
+	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 var (
@@ -10,17 +10,18 @@ var (
 )
 
 func main() {
-	cfg := operator.Con***REMOVED***g{
+	cfg := chargeback.Con***REMOVED***g{
 		HiveHost:   HiveHost,
 		PrestoHost: PrestoHost,
 	}
 
-	op, err := operator.New(cfg)
+	op, err := chargeback.New(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	if err = op.Run(); err != nil {
+	stopCh := make(<-chan struct{})
+	if err = op.Run(stopCh); err != nil {
 		panic(err)
 	}
 }

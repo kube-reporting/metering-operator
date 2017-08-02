@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 // BillingRecord is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
