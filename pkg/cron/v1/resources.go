@@ -14,12 +14,12 @@ const (
 
 var (
 	// Resources are the CRDs deployed for Cron.
-	Resources = []extensions.CustomResourceDefinition{
+	Resources = []*extensions.CustomResourceDefinition{
 		ReportResource,
 	}
 )
 
-var ReportResource = extensions.CustomResourceDefinition{
+var ReportResource = &extensions.CustomResourceDefinition{
 	ObjectMeta: metav1.ObjectMeta{
 		Name: fmt.Sprintf("%s.%s", CronPlural, Group),
 	},
