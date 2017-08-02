@@ -30,6 +30,6 @@ var ReportResource = &extensions.CustomResourceDefinition{
 			Plural: CronPlural,
 			Kind:   CronKind,
 		},
-		Scope: extensions.NamespaceScoped,
+		Scope: extensions.ClusterScoped,
 	},
 }

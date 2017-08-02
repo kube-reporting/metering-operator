@@ -20,7 +20,8 @@ func main() {
 		panic(err)
 	}
 
-	if err = op.Run(); err != nil {
+	stopCh := make(<-chan struct{})
+	if err = op.Run(stopCh); err != nil {
 		panic(err)
 	}
 }

@@ -41,6 +41,6 @@ type CronClient struct {
 	dynamicClient *dynamic.Client
 }
 
-func (c *CronClient) Crons(namespace string) CronInterface {
-	return newCrons(c.restClient, c.dynamicClient, namespace)
+func (c *CronClient) Crons() CronInterface {
+	return newCrons(c.restClient, c.dynamicClient)
 }
