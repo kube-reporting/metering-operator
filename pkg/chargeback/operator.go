@@ -1,4 +1,4 @@
-package operator
+package chargeback
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -20,7 +20,7 @@ type Config struct {
 }
 
 func New(cfg Config) (*Chargeback, error) {
-	cb := &Chargeback{
+	op := &Chargeback{
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
 	}
@@ -30,35 +30,35 @@ func New(cfg Config) (*Chargeback, error) {
 	}
 
 	fmt.Println("setting up extensions client...")
-	if cb.extension, err = ext_client.NewForConfig(config); err != nil {
+	if op.extension, err = ext_client.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
 	fmt.Println("setting up chargeback client...")
-	if cb.charge, err = chargeback.NewForConfig(config); err != nil {
+	if op.charge, err = cb.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
-	cb.reportInform = cache.NewSharedIndexInformer(
+	op.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  cb.charge.Reports().List,
-			WatchFunc: cb.charge.Reports().Watch,
+			ListFunc:  op.charge.Reports().List,
+			WatchFunc: op.charge.Reports().Watch,
 		},
-		&chargeback.Report{}, 3*time.Minute, cache.Indexers{},
+		&cb.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
 	fmt.Println("configuring event listeners")
-	cb.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: cb.handleAddReport,
+	op.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: op.handleAddReport,
 	})
 
 	fmt.Println("All set up!")
-	return cb, nil
+	return op, nil
 }
 
 type Chargeback struct {
 	extension *ext_client.Clientset
-	charge    *chargeback.ChargebackClient
+	charge    *cb.ChargebackClient
 
 	reportInform cache.SharedIndexInformer
 
@@ -86,7 +86,7 @@ func (c *Chargeback) Run() error {
 
 func (c *Chargeback) createResources() error {
 	cdrClient := c.extension.CustomResourceDefinitions()
-	for _, cdr := range chargeback.Resources {
+	for _, cdr := range cb.Resources {
 		if _, err := cdrClient.Create(cdr); err != nil && !apierrors.IsAlreadyExists(err) {
 			return err
 		}

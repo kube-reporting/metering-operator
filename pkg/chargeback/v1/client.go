@@ -1,4 +1,4 @@
-package chargeback
+package v1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"

@@ -1,4 +1,4 @@
-package operator
+package chargeback
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
@@ -23,16 +23,16 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	fmt.Println("New object added!")
-	report := obj.(*chargeback.Report)
+	report := obj.(*cb.Report)
 
 	// update status
-	report.Status.Phase = chargeback.ReportPhaseStarted
+	report.Status.Phase = cb.ReportPhaseStarted
 	report, err := c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
 
-	rng := chargeback.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
+	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
 	results, err := aws.RetrieveManifests(report.Spec.AWS.Bucket, report.Spec.AWS.ReportPrefix, report.Spec.AWS.ReportName, rng)
 	if err != nil {
 		c.setError(report, err)
@@ -91,15 +91,15 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	// update status
-	report.Status.Phase = chargeback.ReportPhaseFinished
+	report.Status.Phase = cb.ReportPhaseFinished
 	report, err = c.charge.Reports().Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
 }
 
-func (c *Chargeback) setError(q *chargeback.Report, err error) {
-	q.Status.Phase = chargeback.ReportPhaseError
+func (c *Chargeback) setError(q *cb.Report, err error) {
+	q.Status.Phase = cb.ReportPhaseError
 	q.Status.Output = err.Error()
 	_, err = c.charge.Reports().Update(q)
 	if err != nil {
