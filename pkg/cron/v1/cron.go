@@ -17,7 +17,7 @@ const (
 )
 
 type CronGetter interface {
-	Crons(namespace string) CronInterface
+	Crons() CronInterface
 }
 
 type CronInterface interface {
@@ -32,10 +32,9 @@ type CronInterface interface {
 type crons struct {
 	restClient rest.Interface
 	client     *dynamic.ResourceClient
-	ns         string
 }
 
-func newCrons(r rest.Interface, c *dynamic.Client, namespace string) *crons {
+func newCrons(r rest.Interface, c *dynamic.Client) *crons {
 	return &crons{
 		r,
 		c.Resource(
@@ -44,9 +43,8 @@ func newCrons(r rest.Interface, c *dynamic.Client, namespace string) *crons {
 				Name:       CronPlural,
 				Namespaced: true,
 			},
-			namespace,
+			"",
 		),
-		namespace,
 	}
 }
 
@@ -92,7 +90,6 @@ func (p *crons) Delete(name string, options *metav1.DeleteOptions) error {
 
 func (p *crons) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
-		Namespace(p.ns).
 		Resource(CronPlural).
 		FieldsSelectorParam(nil)
 
@@ -107,7 +104,6 @@ func (p *crons) List(opts metav1.ListOptions) (runtime.Object, error) {
 func (p *crons) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Pre***REMOVED***x("watch").
-		Namespace(p.ns).
 		Resource(CronPlural).
 		FieldsSelectorParam(nil).
 		Stream()

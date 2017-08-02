@@ -8,7 +8,6 @@ import (
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -33,8 +32,8 @@ func New(cfg *rest.Con***REMOVED***g) (op *Operator, err error) {
 	// setup informer for cron
 	op.cronInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  op.cron.Crons(api.NamespaceAll).List,
-			WatchFunc: op.cron.Crons(api.NamespaceAll).Watch,
+			ListFunc:  op.cron.Crons().List,
+			WatchFunc: op.cron.Crons().Watch,
 		},
 		&cron.Cron{}, 3*time.Minute, cache.Indexers{},
 	)
@@ -48,6 +47,7 @@ func New(cfg *rest.Con***REMOVED***g) (op *Operator, err error) {
 
 	// setup scheduler
 	op.schedule = scheduler.New()
+	op.uidToEntry = map[types.UID]scheduler.EntryID{}
 
 	return op, nil
 }
@@ -70,10 +70,12 @@ func (o *Operator) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	go o.cronInform.Run(stopCh)
-
 	// TODO: implement polling
 	time.Sleep(15 * time.Second)
+
+	go o.cronInform.Run(stopCh)
+	go o.schedule.Start()
+	defer o.schedule.Stop()
 
 	fmt.Println("running")
 

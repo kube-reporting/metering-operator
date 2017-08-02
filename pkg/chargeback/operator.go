@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
+	"github.com/coreos-inc/kube-chargeback/pkg/cron"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -39,6 +40,10 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 		return nil, err
 	}
 
+	if op.cronOp, err = cron.New(con***REMOVED***g); err != nil {
+		return nil, err
+	}
+
 	op.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc:  op.charge.Reports().List,
@@ -62,11 +67,13 @@ type Chargeback struct {
 
 	reportInform cache.SharedIndexInformer
 
+	cronOp *cron.Operator
+
 	hiveHost   string
 	prestoHost string
 }
 
-func (c *Chargeback) Run() error {
+func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	err := c.createResources()
 	if err != nil {
 		panic(err)
@@ -75,8 +82,8 @@ func (c *Chargeback) Run() error {
 	// TODO: implement polling
 	time.Sleep(15 * time.Second)
 
-	stopCh := make(<-chan struct{})
 	go c.reportInform.Run(stopCh)
+	go c.cronOp.Run(stopCh)
 
 	fmt.Println("running")
 
