@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	scheduler "github.com/robfig/cron"
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -37,6 +39,16 @@ func New(cfg *rest.Config) (op *Operator, err error) {
 		&cron.Cron{}, 3*time.Minute, cache.Indexers{},
 	)
 
+	// configure event listeners
+	op.cronInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.handleAddCron,
+		UpdateFunc: op.handleUpdateCron,
+		DeleteFunc: op.handleDeleteCron,
+	})
+
+	// setup scheduler
+	op.schedule = scheduler.New()
+
 	return op, nil
 }
 
@@ -47,14 +59,17 @@ type Operator struct {
 	cron      *cron.CronClient
 
 	cronInform cache.SharedIndexInformer
+
+	schedule *scheduler.Cron
+	// uidToEntry maps Kubernetes UIDs to scheduler entries
+	uidToEntry map[types.UID]scheduler.EntryID
 }
 
-func (o *Operator) Run() error {
+func (o *Operator) Run(stopCh <-chan struct{}) error {
 	if err := o.createResources(); err != nil {
 		return err
 	}
 
-	stopCh := make(<-chan struct{})
 	go o.cronInform.Run(stopCh)
 
 	// TODO: implement polling

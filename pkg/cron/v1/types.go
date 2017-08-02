@@ -24,7 +24,7 @@ type CronSpec struct {
 	Suspend *bool `json:"suspend,omitempty"`
 
 	// ReportTemplate dictates the report which is created at the given schedule.
-	ReportTemplate cb.ReportSpec `json:"reportTemplate"`
+	ReportTemplate cb.ReportTemplateSpec `json:"reportTemplate"`
 }
 
 // CronStatus displays the state of a Cron schedule.
