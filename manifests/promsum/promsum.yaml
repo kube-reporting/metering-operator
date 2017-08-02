@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: promsum
-        image: quay.io/coreos/promsum:0.2
+        image: quay.io/coreos/promsum:0.3
         imagePullPolicy: Always
         env:
         - name: "POLL_INTERVAL"
@@ -35,7 +35,7 @@ spec:
         - name: "S3_BUCKET"
           value: "coreos-team-chargeback"
         - name: "S3_PATH"
-          value: "july-pod-data"
+          value: "august-promsum-data"
         - name: "QUERY"
           value: "(kube_pod_container_resource_requests_memory_bytes / on(node) group_left kube_node_status_capacity_memory_bytes) * on(node) group_left(provider_id) kube_node_info"
       restartPolicy: Always
