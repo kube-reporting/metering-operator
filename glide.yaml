@@ -26,6 +26,7 @@ import:
   version: 6d8c23d2e66ce61e2a7e34f92e8eb3eec13279fa
   subpackages:
   - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset
 - package: k8s.io/apimachinery
   version: a13245d02534abe88286859b547d041816f9a3f4
   subpackages:
@@ -35,6 +36,7 @@ import:
   - pkg/runtime
   - pkg/runtime/schema
   - pkg/runtime/serializer
+  - pkg/types
   - pkg/watch
 - package: k8s.io/client-go
   version: 1850dd66e4213a26bd70d0b85fee4176d324b845
@@ -47,6 +49,8 @@ import:
   - tools/cache
 - package: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
+- package: github.com/robfig/cron
+  version: be2e0b0deed5a68ffee390b4583a13aff8321535
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133

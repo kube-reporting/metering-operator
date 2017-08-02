@@ -1,4 +1,4 @@
-package chargeback
+package v1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
@@ -8,17 +8,12 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-const (
-	Group   = "chargeback.coreos.com"
-	Version = "prealpha"
-)
-
-type ChargebackInterface interface {
+type CronClientInterface interface {
 	RESTClient() rest.Interface
-	ReportGetter
+	CronGetter
 }
 
-func NewForConfig(c *rest.Config) (*ChargebackClient, error) {
+func NewForConfig(c *rest.Config) (*CronClient, error) {
 	scheme := runtime.NewScheme()
 	newC := *c
 	newC.GroupVersion = &schema.GroupVersion{
@@ -38,14 +33,14 @@ func NewForConfig(c *rest.Config) (*ChargebackClient, error) {
 		return nil, err
 	}
 
-	return &ChargebackClient{client, dynamicClient}, nil
+	return &CronClient{client, dynamicClient}, nil
 }
 
-type ChargebackClient struct {
+type CronClient struct {
 	restClient    rest.Interface
 	dynamicClient *dynamic.Client
 }
 
-func (c *ChargebackClient) Reports() ReportInterface {
-	return newReports(c.restClient, c.dynamicClient)
+func (c *CronClient) Crons() CronInterface {
+	return newCrons(c.restClient, c.dynamicClient)
 }

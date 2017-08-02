@@ -3,7 +3,7 @@ package promsum
 import (
 	"fmt"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 // Aggregate merges the given records into as few records as possible. The criteria used to determine if records can be

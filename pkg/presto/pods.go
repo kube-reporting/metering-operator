@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/avct/prestgo"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 // RunAWSPodDollarReport runs Presto queries to create a Pod Cost summary with AWS billing and Kubernetes usage data.

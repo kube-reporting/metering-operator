@@ -1,5 +1,5 @@
-hash: d3bb380f7556e1796bd93b9aa15089302c26dcc106fa750c066fc7e932d108df
-updated: 2017-07-29T12:02:37.01472478-07:00
+hash: fc5dfe8bda834d2f37e9a3f5622cedafcbd500e854532241732673ef17e01549
+updated: 2017-08-02T03:28:01.067178901-07:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -113,6 +113,8 @@ imports:
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
+- name: github.com/robfig/cron
+  version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - name: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
 - name: github.com/spf13/pflag

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 
 	"github.com/prometheus/client_golang/api"

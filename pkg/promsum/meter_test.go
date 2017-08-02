@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 func TestMeterQueryError(t *testing.T) {
