@@ -41,8 +41,8 @@ type ReportTemplateSpec struct {
 
 // +k8s:deepcopy-gen=true
 type ReportStatus struct {
-	Phase  ReportPhase `json:"phase"`
-	Output string      `json:"output"`
+	Phase  ReportPhase `json:"phase,omitempty"`
+	Output string      `json:"output,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -62,6 +62,8 @@ func (p *ReportPhase) UnmarshalText(text []byte) error {
 	case ReportPhaseWaiting:
 	case ReportPhaseStarted:
 	case ReportPhaseError:
+	case ReportPhase(""): // default to waiting
+		phase = ReportPhaseWaiting
 	default:
 		return fmt.Errorf("'%s' is not a ReportPhase", phase)
 	}
