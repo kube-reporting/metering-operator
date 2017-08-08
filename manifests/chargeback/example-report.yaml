@@ -10,8 +10,7 @@ spec:
     prefix: july-pod-data/kube-chargeback/407374e/
   aws:
     bucket: coreos-team-chargeback
-    reportName: team-chargeback-testing
-    reportPrefix: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001
+    prefix: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001/team-chargeback-testing
   output:
     bucket: coreos-team-chargeback
     prefix: billingReport2
