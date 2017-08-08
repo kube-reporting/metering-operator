@@ -16,8 +16,7 @@ spec:
         pre***REMOVED***x: july-pod-data
       aws:
         bucket: coreos-team-chargeback
-        reportName: team-chargeback-testing
-        reportPre***REMOVED***x: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001
+        pre***REMOVED***x: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001/team-chargeback-testing
       output:
         bucket: coreos-team-chargeback
         pre***REMOVED***x: billingReport3

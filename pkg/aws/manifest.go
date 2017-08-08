@@ -64,11 +64,13 @@ func (m Manifest) Paths() (paths []string) {
 }
 
 // RetrieveManifests downloads the billing manifest for the given bucket, pre***REMOVED***x, and report name.
-func RetrieveManifests(bucket, reportPre***REMOVED***x, reportName string, rng cb.Range) ([]Manifest, error) {
+func RetrieveManifests(bucket, pre***REMOVED***x string, rng cb.Range) ([]Manifest, error) {
 	client := getS3Client()
 
+	// ensure that there is a slash at end of location
+	pre***REMOVED***x = fmt.Sprintf("%s/", ***REMOVED***lepath.Join(pre***REMOVED***x))
+
 	// list all in <report-pre***REMOVED***x>/<report-name>/ of bucket
-	pre***REMOVED***x := fmt.Sprintf("%s/%s/", reportPre***REMOVED***x, reportName)
 	dateRngs, err := client.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
 		Pre***REMOVED***x: aws.String(pre***REMOVED***x),
@@ -83,20 +85,21 @@ func RetrieveManifests(bucket, reportPre***REMOVED***x, reportName string, rng c
 	manifests := []Manifest{}
 	for _, obj := range dateRngs.Contents {
 		key := *obj.Key
-		suf***REMOVED***x := strings.TrimPre***REMOVED***x(key, pre***REMOVED***x)
-		kParts := strings.SplitN(suf***REMOVED***x, "/", 3)
-		if len(kParts) < 2 {
-			continue
-		}
-		rngStr, ***REMOVED***le := kParts[0], kParts[1]
 
 		// only look for manifest ***REMOVED***les
-		if !strings.HasSuf***REMOVED***x(***REMOVED***le, ManifestSuf***REMOVED***x) {
+		if !strings.HasSuf***REMOVED***x(key, ManifestSuf***REMOVED***x) {
 			continue
 		}
 
+		dirParts := strings.Split(key, "/")
+		if len(dirParts) < 2 {
+			return nil, fmt.Errorf("could not determine month of reports: %s", key)
+		}
+
+		rngStr := dirParts[len(dirParts)-2]
 		if dirRng, err := rngFromDirName(rngStr); err != nil {
-			return nil, fmt.Errorf("failed to determine range for '%s': %v", *obj.Key, err)
+			fmt.Printf("failed to determine range for '%s': %v", *obj.Key, err)
+			continue
 		} ***REMOVED*** if !dirRng.Within(rng.Start) && !dirRng.Within(rng.End) {
 			// directory is not within range
 			continue
