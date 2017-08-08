@@ -32,13 +32,13 @@ func RunAWSPodDollarReport(presto *sql.DB, promsumTable, awsTable, outTable stri
 
 // podDollarQuery is a Presto query which calculates Cost Per Pod over a period.
 func podDollarQuery(promsumTable, awsBillingTable string, startPeriod, endPeriod time.Time) string {
-	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost, min(begin) as begin, max(stop) as stop
+	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost, min(begin) as begin, max(stop) as stop, labels
 	FROM (
 	    SELECT kubeUsage.subject,
 		kubeUsage.amount as amount,
 		kubeUsage."start" as begin,
 		kubeUsage."end" as stop,
-		kubeUsage.labels,
+		kubeUsage.labels as labels,
 		kubeUsage.labels['pod'] as pod,
 		kubeUsage.labels['namespace'] as namespace,
 		awsBilling.lineItem_resourceId as node,
@@ -64,6 +64,6 @@ func podDollarQuery(promsumTable, awsBillingTable string, startPeriod, endPeriod
 	    AND awsBilling.lineItem_UsageStartDate <= kubeUsage."end"
 	    AND awsBilling.lineItem_UsageEndDate >= kubeUsage."start"
 	)
-	GROUP BY pod, namespace, node`
+	GROUP BY pod, namespace, node, labels`
 	return fmt.Sprintf(query, promsumTable, awsBillingTable, prestoTime(startPeriod), prestoTime(endPeriod))
 }
