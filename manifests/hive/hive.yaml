@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: hive
-        image: quay.io/fest-data-demo/hive:0.2
+        image: quay.io/fest-data-demo/hive:0.3
         imagePullPolicy: Always
         ports:
         - name: thrift
@@ -41,7 +41,7 @@ spec:
         - name: HADOOP_CLASSPATH
           value: "/opt/hive/hcatalog/share/hcatalog/*:/opt/hadoop-2.8.0/share/hadoop/tools/lib/*"
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode:8020
+          value: ***REMOVED***le://user/hive/warehouse
         - name: HIVE_AUX_JARS_PATH
           value: /usr/hdp/current/hive-server2/auxlib
         resources:
