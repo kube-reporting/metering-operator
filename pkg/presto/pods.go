@@ -43,7 +43,7 @@ func executeInsertQuery(presto *sql.DB, target, query string) error {
 
 // podUsageQuery is a Presto query calculating Pod usage based on request.
 func podUsageQuery(promsumTable string, startPeriod, endPeriod time.Time) string {
-	query := `SELECT pod, namespace, node, sum(amount) as usage, min(begin) as begin, max(stop) as stop, labels
+	query := `SELECT pod, namespace, node, sum(amount) as usage, min(begin) as begin, max(stop) as stop, json_format(CAST(labels AS JSON)) as labels
 	FROM (
 	    SELECT kubeUsage.subject,
 		kubeUsage.amount as amount,
@@ -64,7 +64,7 @@ GROUP BY pod, namespace, node, labels`
 
 // podDollarQuery is a Presto query which calculates Cost Per Pod over a period.
 func podDollarQuery(promsumTable, awsBillingTable string, startPeriod, endPeriod time.Time) string {
-	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost, min(begin) as begin, max(stop) as stop, labels
+	query := `SELECT pod, namespace, node, sum(amount * periodCost * percentPeriod) as cost, min(begin) as begin, max(stop) as stop, json_format(CAST(labels AS JSON)) as labels
 	FROM (
 	    SELECT kubeUsage.subject,
 		kubeUsage.amount as amount,

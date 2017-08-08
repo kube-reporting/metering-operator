@@ -10,7 +10,7 @@ var (
 		"cost double",
 		"begin timestamp",
 		"stop timestamp",
-		"labels map<string, string>",
+		"labels string",
 	}
 
 	PodUsageColumns = []string{
@@ -20,7 +20,7 @@ var (
 		"usage double",
 		"begin timestamp",
 		"stop timestamp",
-		"labels map<string, string>",
+		"labels string",
 	}
 )
 
