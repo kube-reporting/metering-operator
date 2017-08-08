@@ -25,6 +25,14 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	fmt.Println("New object added!")
 	report := obj.(*cb.Report)
 
+	switch report.Status.Phase {
+	case cb.ReportPhaseFinished:
+		fallthrough
+	case cb.ReportPhaseError:
+		fmt.Printf("Ignoring %s, status: %s", report.GetSelfLink(), report.Status.Phase)
+		return
+	}
+
 	// update status
 	report.Status.Phase = cb.ReportPhaseStarted
 	report, err := c.charge.Reports().Update(report)
