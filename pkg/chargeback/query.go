@@ -33,19 +33,6 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-	results, err := aws.RetrieveManifests(report.Spec.AWSReport.Bucket, report.Spec.AWSReport.Pre***REMOVED***x, rng)
-	if err != nil {
-		c.setError(report, err)
-		return
-	}
-
-	if len(results) > 1 {
-		c.setError(report, errors.New("currently only a single month can be reported on"))
-		return
-	} ***REMOVED*** if len(results) < 1 {
-		c.setError(report, errors.New("no report data was returned for the given range"))
-		return
-	}
 
 	hiveCon, err := c.hiveConn()
 	if err != nil {
@@ -61,33 +48,62 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 	defer prestoCon.Close()
 
-	reportTable := fmt.Sprintf("%s_%d", "cost_per_pod", rand.Int31())
-	bucket, pre***REMOVED***x := report.Spec.Output.Bucket, report.Spec.Output.Pre***REMOVED***x
-	fmt.Printf("Creating table for %s.", reportTable)
-	if err = hive.CreatePodCostTable(hiveCon, reportTable, bucket, pre***REMOVED***x); err != nil {
-		c.setError(report, fmt.Errorf("Couldn't create table for output report: %v", err))
-		return
-	}
-
 	promsumTable := fmt.Sprintf("%s_%d", "kube_usage", rand.Int31())
-	bucket, pre***REMOVED***x = report.Spec.Chargeback.Bucket, report.Spec.Chargeback.Pre***REMOVED***x
+	bucket, pre***REMOVED***x := report.Spec.Chargeback.Bucket, report.Spec.Chargeback.Pre***REMOVED***x
 	fmt.Printf("Creating table for %s.", promsumTable)
 	if err = hive.CreatePromsumTable(hiveCon, promsumTable, bucket, pre***REMOVED***x); err != nil {
 		c.setError(report, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
 		return
 	}
 
-	awsTable := fmt.Sprintf("%s_%d", "aws_usage", rand.Int31())
-	bucket = report.Spec.AWSReport.Bucket
-	fmt.Printf("Creating table for %s.", awsTable)
-	if err = hive.CreateAWSUsageTable(hiveCon, awsTable, bucket, results[0]); err != nil {
-		c.setError(report, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
-		return
-	}
+	if report.Spec.AWSReport != nil {
+		results, err := aws.RetrieveManifests(report.Spec.AWSReport.Bucket, report.Spec.AWSReport.Pre***REMOVED***x, rng)
+		if err != nil {
+			c.setError(report, err)
+			return
+		}
 
-	if err = presto.RunAWSPodDollarReport(prestoCon, promsumTable, awsTable, reportTable, rng); err != nil {
-		c.setError(report, fmt.Errorf("Failed to execute Pod Dollar report: %v", err))
-		return
+		if len(results) > 1 {
+			c.setError(report, errors.New("currently only a single month can be reported on"))
+			return
+		} ***REMOVED*** if len(results) < 1 {
+			c.setError(report, errors.New("no report data was returned for the given range"))
+			return
+		}
+
+		reportTable := fmt.Sprintf("%s_%d", "cost_per_pod", rand.Int31())
+		bucket, pre***REMOVED***x = report.Spec.Output.Bucket, report.Spec.Output.Pre***REMOVED***x
+		fmt.Printf("Creating table for %s.", reportTable)
+		if err = hive.CreatePodCostTable(hiveCon, reportTable, bucket, pre***REMOVED***x); err != nil {
+			c.setError(report, fmt.Errorf("Couldn't create table for output report: %v", err))
+			return
+		}
+
+		awsTable := fmt.Sprintf("%s_%d", "aws_usage", rand.Int31())
+		bucket = report.Spec.AWSReport.Bucket
+		fmt.Printf("Creating table for %s.", awsTable)
+		if err = hive.CreateAWSUsageTable(hiveCon, awsTable, bucket, results[0]); err != nil {
+			c.setError(report, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
+			return
+		}
+
+		if err = presto.RunAWSPodDollarReport(prestoCon, promsumTable, awsTable, reportTable, rng); err != nil {
+			c.setError(report, fmt.Errorf("Failed to execute Pod Dollar report: %v", err))
+			return
+		}
+	} ***REMOVED*** {
+		reportTable := fmt.Sprintf("%s_%d", "pod_usage", rand.Int31())
+		bucket, pre***REMOVED***x = report.Spec.Output.Bucket, report.Spec.Output.Pre***REMOVED***x
+		fmt.Printf("Creating table for %s.", reportTable)
+		if err = hive.CreatePodUsageTable(hiveCon, reportTable, bucket, pre***REMOVED***x); err != nil {
+			c.setError(report, fmt.Errorf("Couldn't create table for output report: %v", err))
+			return
+		}
+
+		if err = presto.RunAWSPodUsageReport(prestoCon, promsumTable, reportTable, rng); err != nil {
+			c.setError(report, fmt.Errorf("Failed to execute Pod Usage report: %v", err))
+			return
+		}
 	}
 
 	// update status
