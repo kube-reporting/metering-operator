@@ -27,7 +27,7 @@ type ReportSpec struct {
 	Chargeback S3Bucket `json:"chargeback"`
 
 	// AWSReport details the expense of running a Pod over a period of time on Amazon Web Services.
-	AWSReport S3Bucket `json:"aws"`
+	AWSReport *S3Bucket `json:"aws,omitempty"`
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
