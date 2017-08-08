@@ -10,6 +10,7 @@ var (
 		"cost double",
 		"begin timestamp",
 		"stop timestamp",
+		"labels map<string, string>",
 	}
 )
 
