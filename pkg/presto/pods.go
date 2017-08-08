@@ -11,8 +11,8 @@ import (
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
-// RunAWSPodUsageReport creates a report with Pod usage.
-func RunAWSPodUsageReport(presto *sql.DB, promsumTable, outTable string, rng cb.Range) error {
+// RunPodUsageReport creates a report with Pod usage.
+func RunPodUsageReport(presto *sql.DB, promsumTable, outTable string, rng cb.Range) error {
 	reportQuery := podUsageQuery(promsumTable, rng.Start, rng.End)
 	return executeInsertQuery(presto, outTable, reportQuery)
 }
