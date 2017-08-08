@@ -53,4 +53,8 @@
     <name>hive.server2.authentication</name>
     <value>NOSASL</value>
   </property>
+  <property>
+    <name>hive.output.file.extension</name>
+    <value>.csv.gz</value>
+  </property>
 </configuration>
