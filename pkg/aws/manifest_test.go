@@ -66,12 +66,12 @@ func TestManifest_Paths(t *testing.T) {
 }
 
 func TestRetrieveManifests(t *testing.T) {
-	bucket, reportName := "coreos-team-chargeback", "team-chargeback-testing"
-	reportPre***REMOVED***x := "coreos-detailed-billing/coreosinc//coreos-detailed-billing-001"
+	bucket := "coreos-team-chargeback"
+	pre***REMOVED***x := "coreos-detailed-billing/coreosinc//coreos-detailed-billing-001/team-chargeback-testing"
 	begin := time.Date(2017, time.June, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2017, time.June, 29, 0, 0, 0, 0, time.UTC)
 	rng := cb.Range{begin, end}
-	manifests, err := RetrieveManifests(bucket, reportPre***REMOVED***x, reportName, rng)
+	manifests, err := RetrieveManifests(bucket, pre***REMOVED***x, rng)
 	if err != nil {
 		t.Error("unexpected error: ", err)
 	}

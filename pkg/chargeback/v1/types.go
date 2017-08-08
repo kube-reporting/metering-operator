@@ -26,8 +26,8 @@ type ReportSpec struct {
 	// Chargeback is the bucket that stores chargeback metering data.
 	Chargeback S3Bucket `json:"chargeback"`
 
-	// AWS identi***REMOVED***es the location of the a billing report, as con***REMOVED***gured in the AWS Console.
-	AWS AWSUsage `json:"aws"`
+	// AWSReport details the expense of running a Pod over a period of time on Amazon Web Services.
+	AWSReport S3Bucket `json:"aws"`
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
@@ -75,19 +75,6 @@ func (p *ReportPhase) UnmarshalText(text []byte) error {
 type S3Bucket struct {
 	Bucket string `json:"bucket"`
 	Pre***REMOVED***x string `json:"pre***REMOVED***x"`
-}
-
-// +k8s:deepcopy-gen=true
-// AWSPodCostReport details the expense of running a Pod over a period of time on Amazon Web Services.
-type AWSUsage struct {
-	// ReportName as con***REMOVED***gured in AWS Console.
-	ReportName string `json:"reportName"`
-
-	// ReportPre***REMOVED***x as con***REMOVED***gured in AWS Console.
-	ReportPre***REMOVED***x string `json:"reportPre***REMOVED***x"`
-
-	// Bucket that the report is con***REMOVED***gured to store in. Setup in AWS Console.
-	Bucket string `json:"bucket"`
 }
 
 // +k8s:deepcopy-gen=true

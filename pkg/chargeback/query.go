@@ -33,7 +33,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-	results, err := aws.RetrieveManifests(report.Spec.AWS.Bucket, report.Spec.AWS.ReportPre***REMOVED***x, report.Spec.AWS.ReportName, rng)
+	results, err := aws.RetrieveManifests(report.Spec.AWSReport.Bucket, report.Spec.AWSReport.Pre***REMOVED***x, rng)
 	if err != nil {
 		c.setError(report, err)
 		return
@@ -78,7 +78,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	awsTable := fmt.Sprintf("%s_%d", "aws_usage", rand.Int31())
-	bucket = report.Spec.AWS.Bucket
+	bucket = report.Spec.AWSReport.Bucket
 	fmt.Printf("Creating table for %s.", awsTable)
 	if err = hive.CreateAWSUsageTable(hiveCon, awsTable, bucket, results[0]); err != nil {
 		c.setError(report, fmt.Errorf("Couldn't create table for AWS usage data: %v", err))
