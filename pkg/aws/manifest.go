@@ -64,11 +64,13 @@ func (m Manifest) Paths() (paths []string) {
 }
 
 // RetrieveManifests downloads the billing manifest for the given bucket, prefix, and report name.
-func RetrieveManifests(bucket, reportPrefix, reportName string, rng cb.Range) ([]Manifest, error) {
+func RetrieveManifests(bucket, prefix string, rng cb.Range) ([]Manifest, error) {
 	client := getS3Client()
 
+	// ensure that there is a slash at end of location
+	prefix = fmt.Sprintf("%s/", filepath.Join(prefix))
+
 	// list all in <report-prefix>/<report-name>/ of bucket
-	prefix := fmt.Sprintf("%s/%s/", reportPrefix, reportName)
 	dateRngs, err := client.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(prefix),
@@ -83,20 +85,21 @@ func RetrieveManifests(bucket, reportPrefix, reportName string, rng cb.Range) ([
 	manifests := []Manifest{}
 	for _, obj := range dateRngs.Contents {
 		key := *obj.Key
-		suffix := strings.TrimPrefix(key, prefix)
-		kParts := strings.SplitN(suffix, "/", 3)
-		if len(kParts) < 2 {
-			continue
-		}
-		rngStr, file := kParts[0], kParts[1]
 
 		// only look for manifest files
-		if !strings.HasSuffix(file, ManifestSuffix) {
+		if !strings.HasSuffix(key, ManifestSuffix) {
 			continue
 		}
 
+		dirParts := strings.Split(key, "/")
+		if len(dirParts) < 2 {
+			return nil, fmt.Errorf("could not determine month of reports: %s", key)
+		}
+
+		rngStr := dirParts[len(dirParts)-2]
 		if dirRng, err := rngFromDirName(rngStr); err != nil {
-			return nil, fmt.Errorf("failed to determine range for '%s': %v", *obj.Key, err)
+			fmt.Printf("failed to determine range for '%s': %v", *obj.Key, err)
+			continue
 		} else if !dirRng.Within(rng.Start) && !dirRng.Within(rng.End) {
 			// directory is not within range
 			continue
