@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Modify a Tectonic install to use the new kube-state-metrics that has node ID working
-kubectl -n tectonic-system patch deployment kube-state-metrics -p '{"spec":{"template":{"spec":{"containers":[{"name":"kube-state-metrics","image":"quay.io/dan_gillespie/kube-state-metrics:v0.5.0"}]}}}}'
+# Create chargeback namespace
+kubectl apply -f manifests/chargeback/namespace.yaml
 
-# install query layer (optional for collection)
-kubectl apply -f ./hdfs
-sleep 5
+# Install collection layer
+kubectl apply -f manifests/kube-state-metrics # unofficial build of kube-state-metrics with Node info
+kubectl apply -f manifests/promsum
+kubectl apply -f manifests/prom-operator
 
-kubectl apply -f ./hive
-kubectl apply -f ./presto
-kubectl apply -f ./promsum
-kubectl apply -f prom.yaml
-kubectl apply -f kube-state-metrics.yaml
+# Install query layer
+kubectl apply -f manifests/hive
+kubectl apply -f manifests/presto
+kubectl apply -f manifests/chargeback
