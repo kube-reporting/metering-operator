@@ -12,9 +12,12 @@ BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
 # TODO: Add tests
 all: fmt chargeback-image
 
-dist: Documentation/Installation.md manifests/chargeback
+dist: Documentation/Installation.md manifests install.sh uninstall.sh
 	mkdir -p $@
 	cp -Lr $? $@
+
+dist.zip: dist
+	zip -r $@ $?
 
 out:
 	mkdir $@

@@ -17,3 +17,4 @@ pkg/hive/hive_thrift
 thrift
 out
 dist
+dist.zip
