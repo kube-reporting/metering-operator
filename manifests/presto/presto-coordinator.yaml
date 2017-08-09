@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: coordinator
-        image: quay.io/fest-data-demo/presto:0.2
+        image: quay.io/coreos/chargeback-presto:0.2
         imagePullPolicy: Always
         env:
         - name: "HIVE_CATALOG_hive_s3_aws___access___key"
@@ -52,6 +52,8 @@ spec:
           limits:
             memory: "1500Mi"
             cpu: "500m"
+      imagePullSecrets:
+      - name: coreos-pull-secret
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

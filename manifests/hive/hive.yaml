@@ -1,5 +1,5 @@
 apiVersion: apps/v1beta1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     app: hive
@@ -9,15 +9,38 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      hive-app: server
+      app: hive
+  serviceName: hive
   template:
     metadata:
       labels:
-        hive-app: server
+        app: hive
     spec:
       containers:
+      - name: metastore
+        args: ["/opt/hive/bin/hive", "--service", "metastore"]
+        image: quay.io/coreos/chargeback-hive:0.3
+        ports:
+        - name: meta
+          containerPort: 9083
+          protocol: TCP
+        env:
+        - name: CORE_CONF_fs_s3n_awsAccessKeyId
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_ACCESS_KEY_ID
+        - name: CORE_CONF_fs_s3n_awsSecretAccessKey
+          valueFrom:
+            secretKeyRef:
+              name: aws
+              key: AWS_SECRET_ACCESS_KEY
+        volumeMounts:
+        - name: hive-data
+          mountPath: /var/lib/hive
       - name: hive
-        image: quay.io/fest-data-demo/hive:0.3
+        args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
+        image: quay.io/coreos/chargeback-hive:0.3
         imagePullPolicy: Always
         ports:
         - name: thrift
@@ -38,12 +61,6 @@ spec:
             secretKeyRef:
               name: aws
               key: AWS_SECRET_ACCESS_KEY
-        - name: HADOOP_CLASSPATH
-          value: "/opt/hive/hcatalog/share/hcatalog/*:/opt/hadoop-2.8.0/share/hadoop/tools/lib/*"
-        - name: CORE_CONF_fs_defaultFS
-          value: ***REMOVED***le://user/hive/warehouse
-        - name: HIVE_AUX_JARS_PATH
-          value: /usr/hdp/current/hive-server2/auxlib
         resources:
           requests:
             memory: "1000Mi"
@@ -53,4 +70,10 @@ spec:
             cpu: "500m"
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 5
+      imagePullSecrets:
+      - name: coreos-pull-secret
+      volumes:
+      - name: hive-data
+        emptyDir:
+          medium: ""

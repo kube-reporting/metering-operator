@@ -9,8 +9,6 @@ HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 BASE_IMAGE := images/base/IMAGE
 BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
 
-PUSH_IMAGE = false
-
 # TODO: Add tests
 all: fmt chargeback-image
 
