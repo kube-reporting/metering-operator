@@ -32,3 +32,5 @@ spec:
           value: us-west-1
       restartPolicy: Always
       serviceAccount: chargeback
+      imagePullSecrets:
+      - name: coreos-pull-secret

@@ -16,7 +16,4 @@ RUN curl --fail -o $HIVE_HOME/lib/postgresql-jdbc.jar https://jdbc.postgresql.or
 RUN mkdir -p /usr/hdp/current/hive-server2/auxlib
 ADD json-serde-1.3.8-jar-with-dependencies.jar /usr/hdp/current/hive-server2/auxlib
 
-ADD startup.sh /usr/local/bin/
 ADD conf/* $HIVE_HOME/conf/
-
-CMD ["startup.sh"]
