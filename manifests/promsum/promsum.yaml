@@ -30,12 +30,12 @@ spec:
             secretKeyRef:
               name: aws
               key: AWS_SECRET_ACCESS_KEY
-        - name: "AWS_REGION"
-          value: "us-west-1"
         - name: "S3_BUCKET"
-          value: "coreos-team-chargeback"
+          value: <Promsum bucket>
         - name: "S3_PATH"
-          value: "august-promsum-data"
+          value: <Promsum pre***REMOVED***x>
+        - name: "AWS_REGION"
+          value: <Promsum bucket region>
         - name: "QUERY"
           value: "(kube_pod_container_resource_requests_memory_bytes / on(node) group_left kube_node_status_capacity_memory_bytes) * on(node) group_left(provider_id) kube_node_info"
       restartPolicy: Always

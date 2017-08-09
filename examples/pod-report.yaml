@@ -1,0 +1,13 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: Report
+metadata:
+  name: pods
+spec:
+  reportingStart: '2017-07-02T00:00:00Z'
+  reportingEnd: '2017-07-29T00:00:00Z'
+  aws:
+    bucket: <INSERT BUCKET FROM PROMSUM>
+    pre***REMOVED***x: <INSERT S3 PREFIX FROM PROMSUM>
+  output:
+    bucket: <OUTPUT BUCKET>
+    pre***REMOVED***x: <OUTPUT PREFIX>
