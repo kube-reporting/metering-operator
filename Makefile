@@ -9,6 +9,8 @@ HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 BASE_IMAGE := images/base/IMAGE
 BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
 
+PUSH_IMAGE = false
+
 # TODO: Add tests
 all: fmt chargeback-image
 
@@ -20,6 +22,12 @@ promsum-image: images/promsum/IMAGE images/promsum/promsum $(BASE_IMAGE)
 
 chargeback-image: images/chargeback/IMAGE images/chargeback/chargeback $(BASE_IMAGE)
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
+
+presto-image: images/presto/IMAGE
+	docker build -t $$(cat $<) $(dir $<)
+
+hive-image: images/hive/IMAGE
+	docker build -t $$(cat $<) $(dir $<)
 
 images/base/IMAGE: images/base/Docker***REMOVED***le
 	docker build --iid***REMOVED***le $@ $(dir $<)

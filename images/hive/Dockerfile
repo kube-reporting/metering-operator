@@ -1,4 +1,4 @@
-FROM quay.io/fest-data-demo/hadoop:0.1
+FROM quay.io/coreos/chargeback-hadoop:0.2
 
 ENV HIVE_VERSION=2.1.1
 ENV HIVE_HOME=/opt/hive
