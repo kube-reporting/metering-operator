@@ -12,11 +12,11 @@ spec:
       reportingStart: '2017-07-28T00:00:00Z'
       reportingEnd: '2017-07-29T00:00:00Z'
       chargeback:
-        bucket: coreos-team-chargeback
-        prefix: july-pod-data
+        bucket: <Promsum bucket>
+        prefix: <Promsum bucket prefix>
       aws:
-        bucket: coreos-team-chargeback
-        prefix: coreos-detailed-billing/coreosinc/coreos-detailed-billing-001/team-chargeback-testing
+        bucket: <AWS report data bucket>
+        prefix: <AWS report prefix>
       output:
-        bucket: coreos-team-chargeback
-        prefix: billingReport3
+        bucket: <Output bucket>
+        prefix: <Output prefix>

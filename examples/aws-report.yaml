@@ -1,0 +1,16 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: Report
+metadata:
+  name: default
+spec:
+  reportingStart: '2017-07-02T00:00:00Z'
+  reportingEnd: '2017-07-29T00:00:00Z'
+  chargeback:
+    bucket: <Promsum bucket>
+    prefix: <Promsum prefix>
+  aws:
+    bucket: <AWS Report bucket>
+    prefix: <AWS Report Prefix>/<AWS Report Name>
+  output:
+    bucket: <Output bucket>
+    prefix: <Output prefix>
