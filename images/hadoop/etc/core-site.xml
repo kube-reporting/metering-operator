@@ -20,7 +20,7 @@
   </property>
   <property>
     <name>fs.defaultFS</name>
-    <value>hdfs://hdfs-namenode.default.svc.cluster.local:8020</value>
+    <value>***REMOVED***le://user/hive/warehouse</value>
   </property>
   <property>
     <name>hadoop.proxyuser.hue.groups</name>

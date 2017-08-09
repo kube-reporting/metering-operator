@@ -28,6 +28,9 @@ function con***REMOVED***gure() {
     done
 }
 
+export HADOOP_CLASSPATH="/opt/hive/hcatalog/share/hcatalog/*:/opt/hadoop-2.8.0/share/hadoop/tools/lib/*"
+export HIVE_AUX_JARS_PATH=/usr/hdp/current/hive-server2/auxlib
+
 con***REMOVED***gure /opt/hive/conf/hive-site.xml hive HIVE_SITE_CONF
 con***REMOVED***gure /etc/hadoop/core-site.xml core CORE_CONF
 con***REMOVED***gure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF

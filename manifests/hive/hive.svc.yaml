@@ -2,11 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    hive-app: server
+    app: hive
   name: hive
   namespace: tectonic-chargeback
 spec:
   ports:
+  - name: meta
+    port: 9083
+    protocol: TCP
+    targetPort: 9083
   - name: thrift
     port: 10000
     protocol: TCP
@@ -16,4 +20,6 @@ spec:
     protocol: TCP
     targetPort: 10002
   selector:
-    hive-app: server
+    app: hive
+  sessionAf***REMOVED***nity: None
+  type: ClusterIP

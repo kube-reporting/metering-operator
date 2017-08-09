@@ -19,27 +19,15 @@
 <con***REMOVED***guration>
   <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://hive-metastore:9083</value>
-  </property>
-  <property>
-    <name>datanucleus.autoCreateSchema</name>
-    <value>false</value>
+    <value>thrift://localhost:9083</value>
   </property>
   <property>
     <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:postgresql://127.0.0.1/metastore</value>
+    <value>jdbc:derby:;databaseName=/var/lib/hive/data;create=true</value>
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>org.postgresql.Driver</value>
-  </property>
-  <property>
-    <name>javax.jdo.option.ConnectionPassword</name>
-    <value>hive</value>
-  </property>
-  <property>
-    <name>javax.jdo.option.ConnectionUserName</name>
-    <value>hive</value>
+    <value>org.apache.derby.jdbc.EmbeddedDriver</value>
   </property>
   <property>
     <name>hive.server2.enable.doAs</name>
@@ -52,5 +40,13 @@
   <property>
     <name>hive.server2.authentication</name>
     <value>NOSASL</value>
+  </property>
+  <property>
+    <name>datanucleus.schema.autoCreateAll</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.metastore.schema.veri***REMOVED***cation</name>
+    <value>false</value>
   </property>
 </con***REMOVED***guration>
