@@ -3,6 +3,7 @@
 CHARGEBACK_NAMESPACE="tectonic-chargeback"
 TECTONIC_NAMESPACE="tectonic-system"
 TECTONIC_PULL_SECRET="coreos-pull-secret"
+AWS_SECRET="aws"
 
 function kube-install() {
   local files=$(kubectl_files $@)
@@ -31,4 +32,24 @@ function kubectl_files() {
     str="${str-} -f ${f}"
   done
   echo ${str}
+}
+
+function aws_secret() {
+  local id=${1}
+  local secret=${2}
+  cat <<EOF
+{
+    "kind": "Secret",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "${AWS_SECRET}",
+        "namespace": "${CHARGEBACK_NAMESPACE}"
+    },
+    "data": {
+        "AWS_ACCESS_KEY_ID": "${id}",
+        "AWS_SECRET_ACCESS_KEY": "${secret}"
+    },
+    "type": "Opaque"
+}
+EOF
 }
