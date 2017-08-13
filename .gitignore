@@ -13,8 +13,17 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
+# Hive thift defintions and generated code (automated with Makefile)
 pkg/hive/hive_thrift
 thrift
 out
+
+# Distribution packages
 dist
 dist.zip
+
+# Hidden data (like Secrets)
+private
+
+# IDE support
+.idea
