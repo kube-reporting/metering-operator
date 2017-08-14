@@ -61,9 +61,9 @@ apiVersion: chargeback.coreos.com/prealpha
 kind: Report
 metadata:
   name: pods
-  spec:
-    reportingStart: '2017-07-02T00:00:00Z'
-    reportingEnd: '2017-07-29T00:00:00Z'
+spec:
+  reportingStart: '2017-07-02T00:00:00Z'
+  reportingEnd: '2017-07-29T00:00:00Z'
   chargeback:
     bucket: <INSERT BUCKET FROM PROMSUM>
     pre***REMOVED***x: <INSERT S3 PREFIX FROM PROMSUM>
@@ -86,7 +86,7 @@ The report contains the following columns sequentially:
 #### AWS Pod Cost
 This report determines the cost of running a Pod over a given period by rating the amount of memory requested by a Pod (same as Pod usage) against AWS billing data. This gives a measure of the cost of operating speci***REMOVED***c software on Kubernetes.
 
-This report is run by specifying the `chargeback` ***REMOVED***eld (using instructions above) and a bucket for the AWS usage data in `aws`. The bucket should be the one speci***REMOVED***ed when creating the usage report in the AWS console. The bucket `pre***REMOVED***x` should take the form "<AWS Report Pre***REMOVED***x>/<AWS Report Name>" based on the values entered when creating the AWS report.
+This report is run by specifying the `chargeback` ***REMOVED***eld (using instructions above) and a bucket for the AWS usage data in `aws`. The bucket should be the one speci***REMOVED***ed when creating the usage report in the AWS console. The bucket `pre***REMOVED***x` should take the form `<AWS Report Pre***REMOVED***x>/<AWS Report Name>` based on the values entered when creating the AWS report.
 
 *Example*
 ```yaml
@@ -94,9 +94,12 @@ apiVersion: chargeback.coreos.com/prealpha
 kind: Report
 metadata:
   name: pods
-  spec:
-    reportingStart: '2017-07-02T00:00:00Z'
-    reportingEnd: '2017-07-29T00:00:00Z'
+spec:
+  reportingStart: '2017-07-02T00:00:00Z'
+  reportingEnd: '2017-07-29T00:00:00Z'
+  chargeback:
+    bucket: <INSERT BUCKET FROM PROMSUM>
+    pre***REMOVED***x: <INSERT S3 PREFIX FROM PROMSUM>
   aws:
     bucket: <AWS Report bucket>
     pre***REMOVED***x: <AWS Report Pre***REMOVED***x>/<AWS Report Name>
