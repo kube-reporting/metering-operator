@@ -5,7 +5,7 @@ metadata:
 spec:
   reportingStart: '2017-07-02T00:00:00Z'
   reportingEnd: '2017-07-29T00:00:00Z'
-  aws:
+  chargeback:
     bucket: <INSERT BUCKET FROM PROMSUM>
     prefix: <INSERT S3 PREFIX FROM PROMSUM>
   output:
