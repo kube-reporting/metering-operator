@@ -19,7 +19,7 @@ Instances of a timestamps should be [RFC3339](https://tools.ietf.org/html/rfc333
 ### S3 bucket
 Chargeback uses S3 buckets to collect data and write reports after it's been analyzed. The location is given as the `bucket` and the `prefix` of keys where data is stored.
 
-**Example**
+*Example*
 ```yaml
 bucket: east-region-clusters
 prefix: july-data
@@ -31,7 +31,7 @@ The type of report that is performed and what data is used is determined by the 
 #### Period
 The period that a report is generated for is specified by the interval between `reportingStart` and `reportingEnd`.
 
-**Example**
+*Example*
 ```yaml
 reportingStart: '2017-07-02T00:00:00Z'
 reportingEnd: '2017-07-29T00:00:00Z'
@@ -40,7 +40,7 @@ reportingEnd: '2017-07-29T00:00:00Z'
 #### Output
 The result of a report is stored in the S3 bucket given by the `output` field.
 
-**Example**
+*Example*
 ```yaml
 output:
   bucket: usage-reports
@@ -55,7 +55,7 @@ This report returns total memory [requested](https://kubernetes.io/docs/api-refe
 
 This report is run by specifying an S3 bucket in the `chargeback` field. The values here should match the `S3_BUCKET` and `S3_PATH` in the Deployment of **manifests/promsum/promsum.yaml** created in the cluster being reported on.
 
-**Example**
+*Example*
 ```yaml
 apiVersion: chargeback.coreos.com/prealpha
 kind: Report
@@ -72,7 +72,8 @@ metadata:
     prefix: <OUTPUT PREFIX>
 ```
 
-**Report columns**
+*Report columns*
+
 The report contains the following columns sequentially:
 1. Pod name
 1. Namespace
@@ -87,7 +88,7 @@ This report determines the cost of running a Pod over a given period by rating t
 
 This report is run by specifying the `chargeback` field (using instructions above) and a bucket for the AWS usage data in `aws`. The bucket should be the one specified when creating the usage report in the AWS console. The bucket `prefix` should take the form "<AWS Report Prefix>/<AWS Report Name>" based on the values entered when creating the AWS report.
 
-**Example**
+*Example*
 ```yaml
 apiVersion: chargeback.coreos.com/prealpha
 kind: Report
@@ -104,7 +105,8 @@ metadata:
     prefix: <OUTPUT PREFIX>
 ```
 
-**Report columns**
+*Report columns*
+
 The report contains the following columns sequentially:
 1. Pod name
 1. Namespace
