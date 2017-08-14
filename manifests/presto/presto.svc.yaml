@@ -13,4 +13,3 @@ spec:
     targetPort: 8080
   selector:
     presto: coordinator
-  type: LoadBalancer

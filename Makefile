@@ -12,7 +12,7 @@ BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
 # TODO: Add tests
 all: fmt chargeback-image
 
-dist: Documentation manifests examples install.sh uninstall.sh
+dist: Documentation manifests examples hack/*.sh
 	mkdir -p $@
 	cp -Lr $? $@
 
@@ -66,4 +66,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_pre***REMOVED***x=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor chargeback-image promsum-image fmt
+.PHONY: vendor chargeback-image promsum-image presto-image hive-image fmt

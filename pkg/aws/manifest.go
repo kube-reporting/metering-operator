@@ -103,6 +103,9 @@ func RetrieveManifests(bucket, pre***REMOVED***x string, rng cb.Range) ([]Manife
 		} ***REMOVED*** if !dirRng.Within(rng.Start) && !dirRng.Within(rng.End) {
 			// directory is not within range
 			continue
+		} ***REMOVED*** if rng.Start.Equal(dirRng.End) || rng.End.Equal(dirRng.Start) {
+			// don't include directories which just touch the range
+			continue
 		}
 
 		manifest, err := retrieveManifest(client, bucket, key)
