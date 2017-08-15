@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
@@ -17,8 +19,8 @@ type Cron struct {
 
 // CronSpec defines which report should be run and when.
 type CronSpec struct {
-	// Schedule is defined using a CRON expression. Details at https://en.wikipedia.org/wiki/Cron.
-	Schedule string `json:"schedule"`
+	// Frequency specifies how often a report is run and determines report period if range isn't set in ReportSpec.
+	Frequency CronFrequency `json:"frequency"`
 
 	// Suspend stops execution of the schedule.
 	Suspend *bool `json:"suspend,omitempty"`
@@ -38,4 +40,26 @@ type CronList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
 	Items         []*Cron `json:"items"`
+}
+
+// CronFrequency offers fixed options for recurring reports.
+type CronFrequency string
+
+const (
+	CronFrequencyHourly CronFrequency = "Hourly"
+	CronFrequencyDaily  CronFrequency = "Daily"
+	CronFrequencyWeekly CronFrequency = "Weekly"
+)
+
+func (f *CronFrequency) UnmarshalText(text []byte) error {
+	freq := CronFrequency(text)
+	switch freq {
+	case CronFrequencyHourly:
+	case CronFrequencyDaily:
+	case CronFrequencyWeekly:
+	default:
+		return fmt.Errorf("'%s' is not a CronFrequency", freq)
+	}
+	*f = freq
+	return nil
 }

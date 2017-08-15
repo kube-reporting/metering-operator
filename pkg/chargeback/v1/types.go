@@ -18,10 +18,10 @@ type Report struct {
 // +k8s:deepcopy-gen=true
 type ReportSpec struct {
 	// ReportingStart is the beginning period of time that the report will be based on.
-	ReportingStart meta.Time `json:"reportingStart"`
+	ReportingStart *meta.Time `json:"reportingStart,omitempty"`
 
 	// ReportingEnd is the end period of time that the report will be based on.
-	ReportingEnd meta.Time `json:"reportingEnd"`
+	ReportingEnd *meta.Time `json:"reportingEnd,omitempty"`
 
 	// Chargeback is the bucket that stores chargeback metering data.
 	Chargeback S3Bucket `json:"chargeback"`
