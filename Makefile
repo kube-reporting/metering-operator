@@ -14,7 +14,7 @@ all: fmt chargeback-image
 
 dist: Documentation manifests examples hack/*.sh
 	mkdir -p $@
-	cp -Lr $? $@
+	cp -r $? $@
 
 dist.zip: dist
 	zip -r $@ $?
