@@ -45,6 +45,9 @@ func New(cfg *rest.Config) (op *Operator, err error) {
 		DeleteFunc: op.handleDeleteCron,
 	})
 
+	// use UTC from Cron scheduling
+	time.Local = time.UTC
+
 	// setup scheduler
 	op.schedule = scheduler.New()
 	op.uidToEntry = map[types.UID]scheduler.EntryID{}

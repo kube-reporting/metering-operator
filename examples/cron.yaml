@@ -1,16 +1,14 @@
 apiVersion: cron.coreos.com/v1
 kind: Cron
 metadata:
-  name: 1-minute
+  name: hourly-aws
 spec:
   suspend: false
-  schedule: "@every 20s"
+  frequency: Hourly
   reportTemplate:
     metadata:
-      generateName: minute
+      generateName: hourly
     spec:
-      reportingStart: '2017-07-28T00:00:00Z'
-      reportingEnd: '2017-07-29T00:00:00Z'
       chargeback:
         bucket: <Promsum bucket>
         prefix: <Promsum bucket prefix>
