@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: promsum
-        image: quay.io/coreos/promsum:0.3
+        image: quay.io/coreos/promsum:0.4
         imagePullPolicy: Always
         env:
         - name: "POLL_INTERVAL"

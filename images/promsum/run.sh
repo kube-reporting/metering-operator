@@ -22,6 +22,12 @@ fi
 echo "Logging usage data for cluster..."
 while true; do
   promsum -subject ${SUBJECT} -prom ${PROM} -path s3:///${S3_BUCKET}/${S3_PATH} -before ${POLL_INTERVAL}s "${QUERY}"
+
+  status=${?}
+  if [[ "${status}" != "0" ]]; then
+    exit ${status}
+  fi
+
   echo "Waiting ${POLL_INTERVAL} seconds before polling again."
   sleep ${POLL_INTERVAL}
 done
