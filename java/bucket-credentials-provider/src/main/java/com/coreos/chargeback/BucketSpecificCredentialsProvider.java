@@ -2,6 +2,8 @@ package com.coreos.chargeback;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
 import io.kubernetes.client.ApiException;
 import java.io.IOException;
 import java.net.URI;
@@ -31,15 +33,22 @@ public class BucketSpecificCredentialsProvider implements AWSCredentialsProvider
   }
 
   public AWSCredentials getCredentials() {
-    // use bucket name to retrieve secret name and class name from ConfigMap
-    // if credentialsProvider is given then load the class and delegate to it
-    // if secret is given, retrieve it's contents from an API server
-    // If no credentialsProvider and no secret are given then use the default chaining provider
-    // otherwise:
-    //  - ensure secret has "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"
-    //  - if has "AWS_SESSION_TOKEN" use static sts provider, otherwise use static credentials
-    // provider
-    return null;
+    if (secret == null) {
+      throw new RuntimeException("credentials haven't been refreshed yet.");
+    }
+
+    if (secret.AWSCredentialsProvider != null) {
+      // TODO(DG): chain to other providers
+      throw new UnsupportedOperationException(
+          "specifying alternative providers not yet implemented.");
+    }
+
+    // use AWS STS if possible
+    if (secret.AWSSessionToken != null) {
+      return new BasicSessionCredentials(
+          secret.AWSAccessKeyID, secret.AWSSecretAccessKey, secret.AWSSessionToken);
+    }
+    return new BasicAWSCredentials(secret.AWSAccessKeyID, secret.AWSSecretAccessKey);
   }
 
   public void refresh() {
