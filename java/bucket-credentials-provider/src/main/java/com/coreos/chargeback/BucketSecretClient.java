@@ -1,10 +1,14 @@
 package com.coreos.chargeback;
 
+import static io.kubernetes.client.util.Config.*;
+
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Secret;
 import io.kubernetes.client.util.Config;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 
@@ -34,7 +38,7 @@ public class BucketSecretClient extends CoreV1Api {
    * @throws IOException when client cannot be configured
    */
   public BucketSecretClient(String namespace) throws IOException {
-    this(Config.defaultClient(), namespace);
+    this(client(), namespace);
   }
 
   /**
@@ -65,5 +69,47 @@ public class BucketSecretClient extends CoreV1Api {
     bucketSecret.AWSSessionToken = data.get(AWS_SESSION_STR);
     bucketSecret.AWSCredentialsProvider = data.get(AWS_CRED_PROVIDER_STR);
     return bucketSecret;
+  }
+
+  /**
+   * Attempt to use default configuration but fallback to vendored Pod service account logic.
+   *
+   * @return
+   * @throws IOException
+   */
+  public static ApiClient client() throws IOException {
+    try {
+      return Config.defaultClient();
+    } catch (RuntimeException e) {
+      return inClusterClient();
+    }
+  }
+
+  public static ApiClient inClusterClient() throws IOException {
+    // API server URL
+    String apiHost = System.getenv(ENV_SERVICE_HOST);
+    String apiPort = System.getenv(ENV_SERVICE_PORT);
+    String apiServer = String.format("https://%s:%s", apiHost, apiPort);
+
+    // load token from service account
+    String token = readFile(SERVICEACCOUNT_TOKEN_PATH);
+
+    // read CA from disk
+    FileInputStream caIn = new FileInputStream(SERVICEACCOUNT_CA_PATH);
+
+    ApiClient client = fromUrl(apiServer);
+    client.setApiKey("Bearer " + token);
+    client.setSslCaCert(caIn);
+    return client;
+  }
+
+  private static String readFile(String path) throws IOException {
+    File f = new File(path);
+    FileInputStream in = new FileInputStream(f);
+    byte[] data = new byte[(int) f.length()];
+    in.read(data);
+    in.close();
+
+    return new String(data, "UTF-8");
   }
 }
