@@ -2,14 +2,18 @@ package com.coreos.chargeback;
 
 import static io.kubernetes.client.util.Config.*;
 
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Call;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
+import io.kubernetes.client.ApiResponse;
 import io.kubernetes.client.apis.CoreV1Api;
-import io.kubernetes.client.models.V1Secret;
+import io.kubernetes.client.models.V1ConfigMap;
 import io.kubernetes.client.util.Config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 
 /** Extends Kubernetes API with Chargeback specific configuration types. */
@@ -60,14 +64,18 @@ public class BucketSecretClient extends CoreV1Api {
    * @throws ApiException if cannot talk to API server or Secret does not exist
    */
   public BucketSecret readBucketSecret(String secretName) throws ApiException {
-    V1Secret secret = this.readNamespacedSecret(secretName, this.namespace, "", false, true);
-    Map<String, String> data = secret.getStringData();
+    Call call =
+        this.readNamespacedSecretCall(secretName, this.namespace, "", false, true, null, null);
+    // hack to workaround broken secret support
+    ApiResponse<V1ConfigMap> secret =
+        this.getApiClient().execute(call, new TypeToken<V1ConfigMap>() {}.getType());
+    Map<String, String> data = secret.getData().getData();
 
     BucketSecret bucketSecret = new BucketSecret();
-    bucketSecret.AWSAccessKeyID = data.get(AWS_ID_STR);
-    bucketSecret.AWSSecretAccessKey = data.get(AWS_KEY_STR);
-    bucketSecret.AWSSessionToken = data.get(AWS_SESSION_STR);
-    bucketSecret.AWSCredentialsProvider = data.get(AWS_CRED_PROVIDER_STR);
+    bucketSecret.AWSAccessKeyID = decodeB64(data.get(AWS_ID_STR));
+    bucketSecret.AWSSecretAccessKey = decodeB64(data.get(AWS_KEY_STR));
+    bucketSecret.AWSSessionToken = decodeB64(data.get(AWS_SESSION_STR));
+    bucketSecret.AWSCredentialsProvider = decodeB64(data.get(AWS_CRED_PROVIDER_STR));
     return bucketSecret;
   }
 
@@ -111,5 +119,13 @@ public class BucketSecretClient extends CoreV1Api {
     in.close();
 
     return new String(data, "UTF-8");
+  }
+
+  private static String decodeB64(String in) {
+    if (in == null) {
+      return null;
+    }
+
+    return new String(Base64.getDecoder().decode(in));
   }
 }
