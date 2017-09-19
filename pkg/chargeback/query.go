@@ -62,9 +62,9 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	if report.Spec.AWSReport != nil {
-		err = runAWSBillingReport(report, rng, promsumTable, hiveCon, prestoCon)
+		err = runAWSBillingReport(report, rng, promsumTable, hiveCon, prestoCon, report.Spec.Scope)
 	} else {
-		err = runPodUsageReport(report, rng, promsumTable, hiveCon, prestoCon)
+		err = runUsageReport(report, rng, promsumTable, hiveCon, prestoCon, report.Spec.Scope)
 	}
 
 	if err != nil {
