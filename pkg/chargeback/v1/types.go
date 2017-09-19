@@ -92,12 +92,14 @@ type ReportScope string
 
 const (
 	ReportScopePod       ReportScope = "pod"
+	ReportScopeNamespace ReportScope = "namespace"
 )
 
 func (s *ReportScope) UnmarshalText(text []byte) error {
 	reportScope := ReportScope(text)
 	switch reportScope {
 	case ReportScopePod:
+	case ReportScopeNamespace:
 	case ReportScope(""): // default to pod
 		reportScope = ReportScopePod
 	default:

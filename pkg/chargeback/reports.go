@@ -12,19 +12,30 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
-// Maps cb.ReportScopes to matching presto usage report generating functions.
-var scopeToUsageFunc = map[cb.ReportScope]func(*sql.DB, string, string, cb.Range) error{
-	cb.ReportScopePod:       presto.RunPodUsageReport,
+type scopeFuncStruct struct {
+	RunUsageReport       func(*sql.DB, string, string, cb.Range) error
+	RunAWSDollarReport   func(*sql.DB, string, string, string, cb.Range) error
+	CreateAWSDollarTable func(*hive.Connection, string, string, string) error
+	CreateUsageTable     func(*hive.Connection, string, string, string) error
 }
 
-// Maps cb.ReportScopes to matching presto AWS dollar report generating
-// functions.
-var scopeToAWSDollarFunc = map[cb.ReportScope]func(*sql.DB, string, string, string, cb.Range) error{
-	cb.ReportScopePod:       presto.RunAWSPodDollarReport,
+var scopeFuncs = map[cb.ReportScope]scopeFuncStruct{
+	cb.ReportScopePod: {
+		RunUsageReport:       presto.RunPodUsageReport,
+		RunAWSDollarReport:   presto.RunAWSPodDollarReport,
+		CreateAWSDollarTable: hive.CreatePodCostTable,
+		CreateUsageTable:     hive.CreatePodUsageTable,
+	},
+	cb.ReportScopeNamespace: {
+		RunUsageReport:       presto.RunNamespaceUsageReport,
+		RunAWSDollarReport:   presto.RunAWSNamespaceDollarReport,
+		CreateAWSDollarTable: hive.CreateNamespaceCostTable,
+		CreateUsageTable:     hive.CreateNamespaceUsageTable,
+	},
 }
 
 func runAWSBillingReport(report *cb.Report, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB, reportScope cb.ReportScope) error {
-	runAWSDollarReportFunc, ok := scopeToAWSDollarFunc[reportScope]
+	_, ok := scopeFuncs[reportScope]
 	if !ok {
 		return fmt.Errorf("unknown report scope: %s", reportScope)
 	}
@@ -43,7 +54,7 @@ func runAWSBillingReport(report *cb.Report, rng cb.Range, promsumTbl string, hiv
 	reportTable := fmt.Sprintf("%s_per_pod_%d", reportScope, rand.Int31())
 	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
 	fmt.Printf("Creating table for %s.", reportTable)
-	if err = hive.CreatePodCostTable(hiveCon, reportTable, bucket, prefix); err != nil {
+	if err = scopeFuncs[reportScope].CreateAWSDollarTable(hiveCon, reportTable, bucket, prefix); err != nil {
 		return fmt.Errorf("Couldn't create table for output report: %v", err)
 	}
 
@@ -54,26 +65,25 @@ func runAWSBillingReport(report *cb.Report, rng cb.Range, promsumTbl string, hiv
 		return fmt.Errorf("Couldn't create table for AWS usage data: %v", err)
 	}
 
-	if err = runAWSDollarReportFunc(prestoCon, promsumTbl, awsTable, reportTable, rng); err != nil {
+	if err = scopeFuncs[reportScope].RunAWSDollarReport(prestoCon, promsumTbl, awsTable, reportTable, rng); err != nil {
 		return fmt.Errorf("Failed to execute Pod Dollar report: %v", err)
 	}
 	return nil
 }
 
 func runUsageReport(report *cb.Report, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB, reportScope cb.ReportScope) error {
-	runUsageReportFunc, ok := scopeToUsageFunc[reportScope]
+	_, ok := scopeFuncs[reportScope]
 	if !ok {
 		return fmt.Errorf("unknown report scope: %s", reportScope)
 	}
 
 	reportTable := fmt.Sprintf("%s_usage_%d", reportScope, rand.Int31())
 	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
-	fmt.Printf("Creating table for %s.", reportTable)
-	if err := hive.CreatePodUsageTable(hiveCon, reportTable, bucket, prefix); err != nil {
+	if err := scopeFuncs[reportScope].CreateUsageTable(hiveCon, reportTable, bucket, prefix); err != nil {
 		return fmt.Errorf("Couldn't create table for output report: %v", err)
 	}
 
-	if err := runUsageReportFunc(prestoCon, promsumTbl, reportTable, rng); err != nil {
+	if err := scopeFuncs[reportScope].RunUsageReport(prestoCon, promsumTbl, reportTable, rng); err != nil {
 		return fmt.Errorf("Failed to execute %s usage report: %v", reportScope, err)
 	}
 	return nil

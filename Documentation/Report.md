@@ -32,6 +32,7 @@ The type of report that is performed and what data is used is determined by the 
 A report can be generated with different scopes, which influences the level of detail contained in the report. These are the currently supported scopes for a report:
 
 - `pod`
+- `namespace`
 
 If unspecified, the default scope is `pod`.
 
