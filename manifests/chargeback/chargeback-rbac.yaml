@@ -24,10 +24,8 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: chargeback
-  namespace: tectonic-chargeback
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: chargeback
-  namespace: tectonic-chargeback

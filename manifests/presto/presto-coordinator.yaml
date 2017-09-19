@@ -5,7 +5,6 @@ metadata:
   labels:
     presto: coordinator
   name: presto-coordinator
-  namespace: tectonic-chargeback
 spec:
   replicas: 1
   selector:
@@ -53,7 +52,7 @@ spec:
             memory: "1500Mi"
             cpu: "500m"
       imagePullSecrets:
-      - name: coreos-pull-secret
+      - name: derek-gonyeo-pull-secret
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

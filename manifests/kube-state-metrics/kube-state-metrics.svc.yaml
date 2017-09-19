@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chargeback-state-metrics
-  namespace: tectonic-chargeback
+  namespace: team-chargeback
   labels:
     chargeback-app: metrics
 spec:
