@@ -62,7 +62,11 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 
 	if report.Spec.AWSReport != nil {
-		err = runAWSBillingReport(report, rng, promsumTable, hiveCon, prestoCon)
+		var bucketSecret BucketSecret
+		if bucketSecret, err = c.getBucketSecret(report.Spec.AWSReport.Bucket); err == nil {
+			creds := bucketSecret.AWSCreds()
+			err = runAWSBillingReport(report, rng, promsumTable, hiveCon, prestoCon, creds)
+		}
 	} else {
 		err = runPodUsageReport(report, rng, promsumTable, hiveCon, prestoCon)
 	}

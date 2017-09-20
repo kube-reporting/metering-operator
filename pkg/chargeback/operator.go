@@ -2,11 +2,13 @@ package chargeback
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -16,17 +18,28 @@ import (
 )
 
 type Config struct {
+	ClientCfg *rest.Config
+
+	Namespace string
+
 	HiveHost   string
 	PrestoHost string
 }
 
 func New(cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
+		namespace:  cfg.Namespace,
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
 	}
-	config, err := rest.InClusterConfig()
-	if err != nil {
+	config := cfg.ClientCfg
+	if config == nil {
+		return nil, errors.New("client config for Kubernetes cannot but nil")
+	}
+
+	fmt.Println("setting up core client...")
+	var err error
+	if op.core, err = kubernetes.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
@@ -62,6 +75,9 @@ func New(cfg Config) (*Chargeback, error) {
 }
 
 type Chargeback struct {
+	namespace string
+
+	core      *kubernetes.Clientset
 	extension *ext_client.Clientset
 	charge    *cb.ChargebackClient
 

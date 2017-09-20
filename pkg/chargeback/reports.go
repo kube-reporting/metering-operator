@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
+
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
-func runAWSBillingReport(report *cb.Report, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) error {
-	results, err := aws.RetrieveManifests(report.Spec.AWSReport.Bucket, report.Spec.AWSReport.Prefix, rng)
+func runAWSBillingReport(report *cb.Report, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB, creds *credentials.Credentials) error {
+	results, err := aws.RetrieveManifests(report.Spec.AWSReport.Bucket, report.Spec.AWSReport.Prefix, rng, creds)
 	if err != nil {
 		return err
 	}
