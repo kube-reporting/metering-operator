@@ -47,10 +47,10 @@ fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
 images/chargeback/chargeback: cmd/chargeback pkg/hive/hive_thrift
-	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o $@ ${GO_PKG}/$<
 
 images/promsum/promsum: cmd/promsum
-	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o $@ ${GO_PKG}/$<
 
 # Download Hive git repo.
 out/thrift.git: | out
