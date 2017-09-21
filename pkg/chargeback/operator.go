@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -21,6 +22,11 @@ type Config struct {
 	PrestoHost string
 }
 
+func init() {
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+}
+
 func New(cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
 		namespace:  cfg.Namespace,
@@ -32,12 +38,12 @@ func New(cfg Config) (*Chargeback, error) {
 		return nil, err
 	}
 
-	fmt.Println("setting up extensions client...")
+	log.Debugf("setting up extensions client...")
 	if op.extension, err = ext_client.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
-	fmt.Println("setting up chargeback client...")
+	log.Debugf("setting up chargeback client...")
 	if op.charge, err = cb.NewForConfig(config); err != nil {
 		return nil, err
 	}
@@ -54,12 +60,11 @@ func New(cfg Config) (*Chargeback, error) {
 		&cb.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
-	fmt.Println("configuring event listeners")
+	log.Debugf("configuring event listeners...")
 	op.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: op.handleAddReport,
 	})
 
-	fmt.Println("All set up!")
 	return op, nil
 }
 
@@ -83,7 +88,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	go c.reportInform.Run(stopCh)
 	go c.cronOp.Run(stopCh)
 
-	fmt.Println("running")
+	log.Infof("chargeback successfully initialized, waiting for reports...")
 
 	<-stopCh
 	return nil

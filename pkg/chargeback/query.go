@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
@@ -15,18 +17,24 @@ func init() {
 
 func (c *Chargeback) handleAddReport(obj interface{}) {
 	if obj == nil {
-		fmt.Println("received nil object!")
+		log.Debugf("received nil object!")
 		return
 	}
 
-	fmt.Println("New object added!")
 	report := obj.(*cb.Report)
+
+	log.WithFields(log.Fields{
+		"name":  report.Name,
+		"scope": report.Spec.Scope,
+		"start": report.Spec.ReportingStart,
+		"end":   report.Spec.ReportingEnd,
+	}).Infof("new report discovered")
 
 	switch report.Status.Phase {
 	case cb.ReportPhaseFinished:
 		fallthrough
 	case cb.ReportPhaseError:
-		fmt.Printf("Ignoring %s, status: %s", report.GetSelfLink(), report.Status.Phase)
+		log.Warnf("ignoring %s, status: %s", report.GetSelfLink(), report.Status.Phase)
 		return
 	}
 
@@ -34,7 +42,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	report.Status.Phase = cb.ReportPhaseStarted
 	report, err := c.charge.Reports(c.namespace).Update(report)
 	if err != nil {
-		fmt.Println("Failed to update: ", err)
+		log.Warnf("failed to update report status for %q: %v", report.Name, err)
 	}
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
@@ -55,7 +63,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	promsumTable := fmt.Sprintf("%s_%d", "kube_usage", rand.Int31())
 	bucket, prefix := report.Spec.Chargeback.Bucket, report.Spec.Chargeback.Prefix
-	fmt.Printf("Creating table for %s.", promsumTable)
+	log.Debugf("Creating table for promsum: %q.", promsumTable)
 	if err = hive.CreatePromsumTable(hiveCon, promsumTable, bucket, prefix); err != nil {
 		c.setError(report, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
 		return
@@ -76,15 +84,18 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	report.Status.Phase = cb.ReportPhaseFinished
 	report, err = c.charge.Reports(c.namespace).Update(report)
 	if err != nil {
-		fmt.Println("Failed to update: ", err)
+		log.Warnf("failed to update report status for %q: ", report.Name, err)
+	} else {
+		log.Infof("finished report %q", report.Name)
 	}
 }
 
 func (c *Chargeback) setError(q *cb.Report, err error) {
+	log.Warnf("%v", err)
 	q.Status.Phase = cb.ReportPhaseError
 	q.Status.Output = err.Error()
 	_, err = c.charge.Reports(c.namespace).Update(q)
 	if err != nil {
-		fmt.Println("FAILED TO REPORT ERROR: ", err)
+		log.Warnf("FAILED TO REPORT ERROR: %v", err)
 	}
 }
