@@ -16,12 +16,15 @@ import (
 )
 
 type Config struct {
+	Namespace string
+
 	HiveHost   string
 	PrestoHost string
 }
 
 func New(cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
+		namespace:  cfg.Namespace,
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
 	}
@@ -46,8 +49,8 @@ func New(cfg Config) (*Chargeback, error) {
 
 	op.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  op.charge.Reports().List,
-			WatchFunc: op.charge.Reports().Watch,
+			ListFunc:  op.charge.Reports(cfg.Namespace).List,
+			WatchFunc: op.charge.Reports(cfg.Namespace).Watch,
 		},
 		&cb.Report{}, 3*time.Minute, cache.Indexers{},
 	)
@@ -69,6 +72,7 @@ type Chargeback struct {
 
 	cronOp *cron.Operator
 
+	namespace  string
 	hiveHost   string
 	prestoHost string
 }

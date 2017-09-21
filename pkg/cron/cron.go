@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 	cron "github.com/coreos-inc/kube-chargeback/pkg/cron/v1"
 )
 
@@ -23,12 +24,28 @@ func (o *Operator) updateSchedule(c *cron.Cron) error {
 	return o.createSchedule(c)
 }
 
+type job struct {
+	r func()
+}
+
+func (j job) Run() {
+	j.r()
+}
+
 func (o *Operator) createSchedule(c *cron.Cron) error {
 	if c == nil {
 		return errors.New("cron object can't be nil")
 	}
 
-	job := o.createReportJob(&c.Spec.ReportTemplate)
+	job := job{func() {
+		report := &cb.Report{
+			ObjectMeta: c.Spec.ReportTemplate.ObjectMeta,
+			Spec:       c.Spec.ReportTemplate.Spec,
+		}
+		if _, err := o.charge.Reports(c.GetNamespace()).Create(report); err != nil {
+			fmt.Printf("Failed to create scheduled report: %v", err)
+		}
+	}}
 	entryID, err := o.schedule.AddJob(c.Spec.Schedule, job)
 	if err != nil {
 		return fmt.Errorf("couldn't add report to scheduler: %v", err)

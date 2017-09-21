@@ -32,7 +32,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	// update status
 	report.Status.Phase = cb.ReportPhaseStarted
-	report, err := c.charge.Reports().Update(report)
+	report, err := c.charge.Reports(c.namespace).Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
@@ -74,7 +74,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	// update status
 	report.Status.Phase = cb.ReportPhaseFinished
-	report, err = c.charge.Reports().Update(report)
+	report, err = c.charge.Reports(c.namespace).Update(report)
 	if err != nil {
 		fmt.Println("Failed to update: ", err)
 	}
@@ -83,7 +83,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 func (c *Chargeback) setError(q *cb.Report, err error) {
 	q.Status.Phase = cb.ReportPhaseError
 	q.Status.Output = err.Error()
-	_, err = c.charge.Reports().Update(q)
+	_, err = c.charge.Reports(c.namespace).Update(q)
 	if err != nil {
 		fmt.Println("FAILED TO REPORT ERROR: ", err)
 	}

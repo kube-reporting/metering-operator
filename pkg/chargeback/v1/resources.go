@@ -8,12 +8,13 @@ import (
 )
 
 var Resources = []*extensions.CustomResourceDefinition{
-	ReportResource,
+//ReportResource,
 }
 
 var ReportResource = &extensions.CustomResourceDefinition{
 	ObjectMeta: metav1.ObjectMeta{
-		Name: fmt.Sprintf("%s.%s", ReportPlural, Group),
+		Name:      fmt.Sprintf("%s.%s", ReportPlural, Group),
+		Namespace: "team-chargeback",
 	},
 	Spec: extensions.CustomResourceDefinitionSpec{
 		Group:   Group,
@@ -22,6 +23,6 @@ var ReportResource = &extensions.CustomResourceDefinition{
 			Plural: ReportPlural,
 			Kind:   ReportKind,
 		},
-		Scope: extensions.ClusterScoped,
+		Scope: extensions.NamespaceScoped,
 	},
 }
