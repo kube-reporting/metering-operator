@@ -1,5 +1,5 @@
-hash: fc5dfe8bda834d2f37e9a3f5622cedafcbd500e854532241732673ef17e01549
-updated: 2017-08-02T03:28:01.067178901-07:00
+hash: d80af9501a1b85945c04739eea90515aac71b2b2b61c469c898ab92fd37ba660
+updated: 2017-09-21T11:51:51.819484601-07:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -36,6 +36,12 @@ imports:
   - service/s3
   - service/s3/s3iface
   - service/sts
+- name: github.com/colinmarc/hdfs
+  version: cdda132fb253decd0fb23f1bb183bad5fd8c7fe4
+  subpackages:
+  - protocol/hadoop_common
+  - protocol/hadoop_hdfs
+  - rpc
 - name: github.com/davecgh/go-spew
   version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
@@ -49,7 +55,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-ini/ini
-  version: 3d73f4b845efdf9989fffd4b4e562727744a34ba
+  version: c787282c39ac1fc618827141a1f762240def08a3
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -58,6 +64,8 @@ imports:
   version: 6aced65f8501fe1217321abf0749d354824ba2ff
 - name: github.com/go-openapi/swag
   version: 1d0bd113de87027671077d3c71eb3ac5d7dbba72
+- name: github.com/gocarina/gocsv
+  version: f266cf0be5f037d9a61782dafa0f342f96919188
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -68,7 +76,6 @@ imports:
 - name: github.com/golang/protobuf
   version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
-  - jsonpb
   - proto
   - ptypes
   - ptypes/any
@@ -86,8 +93,12 @@ imports:
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
   - simplelru
+- name: github.com/howeyc/gopass
+  version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
+- name: github.com/imdario/mergo
+  version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/jmespath/go-jmespath
-  version: 3433f3ea46d9f8019119e7dd41274e112a2359a9
+  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
 - name: github.com/juju/ratelimit
   version: 5b9ff866471762aa2ab2dced63c9fb6f53921342
 - name: github.com/mailru/easyjson
@@ -117,12 +128,20 @@ imports:
   version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - name: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
+- name: github.com/Sirupsen/logrus
+  version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/ugorji/go
   version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
+- name: golang.org/x/crypto
+  version: d172538b2cfce0c13cee31e647d0367aa8cd2486
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/net
   version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
@@ -132,10 +151,15 @@ imports:
   - http2
   - http2/hpack
   - idna
-  - internal/timeseries
   - lex/httplex
-  - trace
   - websocket
+- name: golang.org/x/sys
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  subpackages:
+  - unix
+  - windows
+  - windows/registry
+  - windows/svc/eventlog
 - name: golang.org/x/text
   version: 2910a502d2bf9e43193af9d68ca516529614eed3
   subpackages:
@@ -154,7 +178,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/api
-  version: 4fe9229aaa9d704f8a2a21cdcd50de2bbb6e1b57
+  version: e532fdb5587debfd7aade56dabe9eb5df9544baf
   subpackages:
   - admissionregistration/v1alpha1
   - apps/v1beta1
@@ -169,6 +193,7 @@ imports:
   - certificates/v1beta1
   - core/v1
   - extensions/v1beta1
+  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1alpha1
@@ -234,17 +259,44 @@ imports:
   - dynamic
   - kubernetes
   - kubernetes/scheme
+  - kubernetes/typed/admissionregistration/v1alpha1
+  - kubernetes/typed/apps/v1beta1
+  - kubernetes/typed/authentication/v1
+  - kubernetes/typed/authentication/v1beta1
+  - kubernetes/typed/authorization/v1
+  - kubernetes/typed/authorization/v1beta1
+  - kubernetes/typed/autoscaling/v1
+  - kubernetes/typed/autoscaling/v2alpha1
+  - kubernetes/typed/batch/v1
+  - kubernetes/typed/batch/v2alpha1
+  - kubernetes/typed/certificates/v1beta1
+  - kubernetes/typed/core/v1
+  - kubernetes/typed/extensions/v1beta1
+  - kubernetes/typed/networking/v1
+  - kubernetes/typed/policy/v1beta1
+  - kubernetes/typed/rbac/v1alpha1
+  - kubernetes/typed/rbac/v1beta1
+  - kubernetes/typed/settings/v1alpha1
+  - kubernetes/typed/storage/v1
+  - kubernetes/typed/storage/v1beta1
   - pkg/api
+  - pkg/api/v1
+  - pkg/api/v1/ref
   - pkg/apis/extensions/v1beta1
   - pkg/version
   - rest
   - rest/watch
+  - tools/auth
   - tools/cache
+  - tools/clientcmd
   - tools/clientcmd/api
+  - tools/clientcmd/api/latest
+  - tools/clientcmd/api/v1
   - tools/metrics
   - transport
   - util/cert
   - util/flowcontrol
+  - util/homedir
   - util/integer
 testImports:
 - name: github.com/beorn7/perks
@@ -258,7 +310,7 @@ testImports:
   subpackages:
   - pbutil
 - name: github.com/opentracing/opentracing-go
-  version: 06f47b42c792fef2796e9681353e1d908c417827
+  version: 8ebe5d4e236eed9fd88e593c288bfb804d630b8c
   subpackages:
   - log
 - name: github.com/prometheus/client_model
@@ -283,10 +335,8 @@ testImports:
   - util/stats
   - util/strutil
   - util/testutil
-- name: github.com/sirupsen/logrus
-  version: a3f95b5c423586578a4e099b11a46c2479628cac
 - name: github.com/syndtr/goleveldb
-  version: 8c81ea47d4c41a385645e133e15510fc6a2a74b4
+  version: b89cc31ef7977104127d34c1bd31ebd1a9db2199
   subpackages:
   - leveldb
   - leveldb/cache
@@ -300,10 +350,3 @@ testImports:
   - leveldb/storage
   - leveldb/table
   - leveldb/util
-- name: golang.org/x/sys
-  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
-  subpackages:
-  - unix
-  - windows
-  - windows/registry
-  - windows/svc/eventlog
