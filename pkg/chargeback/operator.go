@@ -6,7 +6,6 @@ import (
 	"time"
 
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -78,11 +77,6 @@ type Chargeback struct {
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
-	err := c.createResources()
-	if err != nil {
-		panic(err)
-	}
-
 	// TODO: implement polling
 	time.Sleep(15 * time.Second)
 
@@ -92,16 +86,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	fmt.Println("running")
 
 	<-stopCh
-	return nil
-}
-
-func (c *Chargeback) createResources() error {
-	cdrClient := c.extension.CustomResourceDefinitions()
-	for _, cdr := range cb.Resources {
-		if _, err := cdrClient.Create(cdr); err != nil && !apierrors.IsAlreadyExists(err) {
-			return err
-		}
-	}
 	return nil
 }
 
