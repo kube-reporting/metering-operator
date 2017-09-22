@@ -4,7 +4,6 @@ metadata:
   labels:
     app: hive
   name: hive
-  namespace: tectonic-chargeback
 spec:
   replicas: 1
   selector:
@@ -72,7 +71,7 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 5
       imagePullSecrets:
-      - name: coreos-pull-secret
+      - name: derek-gonyeo-pull-secret
       volumes:
       - name: hive-data
         emptyDir:

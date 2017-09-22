@@ -22,6 +22,19 @@ var (
 		"stop timestamp",
 		"labels string",
 	}
+	NamespaceCostColumns = []string{
+		"namespace string",
+		"cost double",
+		"begin timestamp",
+		"stop timestamp",
+	}
+
+	NamespaceUsageColumns = []string{
+		"namespace string",
+		"usage double",
+		"begin timestamp",
+		"stop timestamp",
+	}
 )
 
 // CreatePodCostTable instantiates a new Hive table to hold the result of a Pod/dollar report.
@@ -32,6 +45,17 @@ func CreatePodCostTable(conn *Connection, tableName, bucket, prefix string) erro
 // CreatePodUsageTable instantiates a table for Pod usage aggregates.
 func CreatePodUsageTable(conn *Connection, tableName, bucket, prefix string) error {
 	return createReportTable(conn, tableName, bucket, prefix, PodUsageColumns)
+}
+
+// CreateNamespaceCostTable instantiates a new Hive table to hold the result of
+// a Namespace/dollar report.
+func CreateNamespaceCostTable(conn *Connection, tableName, bucket, prefix string) error {
+	return createReportTable(conn, tableName, bucket, prefix, NamespaceCostColumns)
+}
+
+// CreateNamespaceUsageTable instantiates a table for Namespace usage aggregates.
+func CreateNamespaceUsageTable(conn *Connection, tableName, bucket, prefix string) error {
+	return createReportTable(conn, tableName, bucket, prefix, NamespaceUsageColumns)
 }
 
 func createReportTable(conn *Connection, tableName, bucket, prefix string, columns []string) error {

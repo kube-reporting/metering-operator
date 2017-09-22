@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: tectonic-chargeback
+  namespace: team-chargeback
   labels:
     chargeback-app: metrics
   name: chargeback-state-metrics

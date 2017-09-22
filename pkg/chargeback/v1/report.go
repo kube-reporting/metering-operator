@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -32,19 +33,21 @@ type ReportInterface interface {
 type reports struct {
 	restClient rest.Interface
 	client     *dynamic.ResourceClient
+	namespace  string
 }
 
-func newReports(r rest.Interface, c *dynamic.Client) *reports {
+func newReports(r rest.Interface, c *dynamic.Client, namespace string) *reports {
 	return &reports{
 		r,
 		c.Resource(
 			&metav1.APIResource{
 				Kind:       ReportKind,
 				Name:       ReportPlural,
-				Namespaced: false,
+				Namespaced: true,
 			},
-			"",
+			namespace,
 		),
+		namespace,
 	}
 }
 
@@ -90,20 +93,24 @@ func (p *reports) Delete(name string, options *metav1.DeleteOptions) error {
 
 func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
+		Namespace(p.namespace).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil)
 
 	b, err := req.DoRaw()
 	if err != nil {
+		fmt.Printf("list op for namespace %q got err: %v\n", p.namespace, err)
 		return nil, err
 	}
 	var reports ReportList
+	fmt.Printf("list op returning successfully\n")
 	return &reports, json.Unmarshal(b, &reports)
 }
 
 func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Prefix("watch").
+		Namespace(p.namespace).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil).
 		Stream()

@@ -31,6 +31,9 @@ type ReportSpec struct {
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
+
+	// Scope of report to run.
+	Scope ReportScope `json:"scope"`
 }
 
 type ReportTemplateSpec struct {
@@ -82,4 +85,26 @@ type ReportList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
 	Items         []*Report `json:"items"`
+}
+
+// +k8s:deepcopy-gen=true
+type ReportScope string
+
+const (
+	ReportScopePod       ReportScope = "pod"
+	ReportScopeNamespace ReportScope = "namespace"
+)
+
+func (s *ReportScope) UnmarshalText(text []byte) error {
+	reportScope := ReportScope(text)
+	switch reportScope {
+	case ReportScopePod:
+	case ReportScopeNamespace:
+	case ReportScope(""): // default to pod
+		reportScope = ReportScopePod
+	default:
+		return fmt.Errorf("'%s' is not a ReportScope", reportScope)
+	}
+	*s = reportScope
+	return nil
 }
