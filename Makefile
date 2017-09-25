@@ -5,10 +5,6 @@ GO_PKG := github.com/coreos-inc/kube-chargeback
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-# Contains the SHA of the current base image.
-BASE_IMAGE := images/base/IMAGE
-BUILD_ARGS := --build-arg BASE_IMAGE=$$(cat $(BASE_IMAGE))
-
 # TODO: Add tests
 all: fmt chargeback-image
 
@@ -22,10 +18,10 @@ dist.zip: dist
 out:
 	mkdir $@
 
-promsum-image: images/promsum/IMAGE images/promsum/promsum $(BASE_IMAGE)
+promsum-image: images/promsum/IMAGE images/promsum/promsum
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
-chargeback-image: images/chargeback/IMAGE images/chargeback/chargeback $(BASE_IMAGE)
+chargeback-image: images/chargeback/IMAGE images/chargeback/chargeback
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
 presto-image: images/presto/IMAGE
@@ -33,9 +29,6 @@ presto-image: images/presto/IMAGE
 
 hive-image: images/hive/IMAGE
 	docker build -t $$(cat $<) $(dir $<)
-
-images/base/IMAGE: images/base/Docker***REMOVED***le
-	docker build --iid***REMOVED***le $@ $(dir $<)
 
 # Update dependencies
 vendor: glide.yaml
