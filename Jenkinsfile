@@ -61,28 +61,11 @@ podTemplate(
                     // Build & install thrift
                     sh """#!/bin/bash
                     set -e
-                    apk add make go libtool autoconf automake bison libc-dev g++ boost curl
+                    apk add make go libc-dev
                     """
                 }
 
                 stage('build') {
-                    // Build & install thrift if it's not already installed.
-                    // These pod agents may be re-used, and this will speed up
-                    // subsequent builds
-                    sh """#!/bin/bash
-                    set -e
-                    if ! command -v thrift >/dev/null 2>&1; then
-                      curl \
-                        http://mirrors.sonic.net/apache/thrift/0.10.0/thrift-0.10.0.tar.gz \
-                        -o ./thrift-0.10.0.tar.gz \
-                        -z ./thrift-0.10.0.tar.gz
-                      tar -xvf thrift-0.10.0.tar.gz
-                      cd thrift-0.10.0
-                      ./con***REMOVED***gure --without-python
-                      make install
-                    ***REMOVED***
-                    """
-
                     sh """#!/bin/bash
                     export GOPATH=${env.WORKSPACE}/go
                     cd ${kubeChargebackDir}
