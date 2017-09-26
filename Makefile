@@ -60,10 +60,10 @@ fmt:
 
 images/chargeback/bin/chargeback: cmd/chargeback
 	mkdir -p $(dir $@)
-	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+	GOOS=linux go build -i -o $@ ${GO_PKG}/$<
 images/promsum/bin/promsum: cmd/promsum
 	mkdir -p $(dir $@)
-	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+	GOOS=linux go build -i -o $@ ${GO_PKG}/$<
 
 .PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build hadoop-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push hadoop-docker-push docker-build docker-push regenerate-hive-thrift
 

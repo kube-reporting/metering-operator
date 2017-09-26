@@ -10,12 +10,12 @@ ENV HADOOP_SIGNATURE_URL https://dist.apache.org/repos/dist/release/hadoop/commo
 ENV HADOOP_GPG_KEYS_URL https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
 
 RUN set -x \
-    && curl -fSL "$HADOOP_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz \
-    && curl -fSL "$HADOOP_SIGNATURE_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz.asc \
-    && curl -fSL "$HADOOP_GPG_KEYS_URL" -o /tmp/hadoop-gpg-keys \
+    && curl -fSLs "$HADOOP_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz \
+    && curl -fSLs "$HADOOP_SIGNATURE_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz.asc \
+    && curl -fSLs "$HADOOP_GPG_KEYS_URL" -o /tmp/hadoop-gpg-keys \
     && gpg --import /tmp/hadoop-gpg-keys \
     && gpg --verify /tmp/hadoop-$HADOOP_VERSION.tar.gz.asc \
-    && tar -xvf /tmp/hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \
+    && tar -xf /tmp/hadoop-$HADOOP_VERSION.tar.gz -C /opt/ \
     && rm /tmp/hadoop-$HADOOP_VERSION.tar.gz
 
 RUN ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop
