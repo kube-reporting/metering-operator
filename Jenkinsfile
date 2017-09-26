@@ -65,20 +65,21 @@ podTemplate(
                     """
                 }
 
-                stage('build') {
-                    ansiColor('xterm') {
-                        sh """#!/bin/bash
-                        export GOPATH=${env.WORKSPACE}/go
-                        cd ${kubeChargebackDir}
-                        make docker-build
+                dir(kubeChargebackDir) {
+                    stage('build') {
+                        ansiColor('xterm') {
+                            sh """#!/bin/bash
+                            export GOPATH=${env.WORKSPACE}/go
+                            make docker-build
+                            """
+                        }
+                    }
+
+                    stage('push') {
+                        sh """
+                        make docker-push
                         """
                     }
-                }
-
-                stage('push') {
-                    sh """
-                    make docker-push
-                    """
                 }
             }
 
