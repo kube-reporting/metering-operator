@@ -37,7 +37,13 @@ presto-docker-build: images/presto/IMAGE
 presto-docker-push: images/presto/IMAGE
 	docker push $$(cat $<)
 
-hive-docker-build: images/hive/IMAGE
+hadoop-docker-build: images/hadoop/IMAGE
+	docker build -t $$(cat $<) $(dir $<)
+
+hadoop-docker-push: images/hadoop/IMAGE
+	docker push $$(cat $<)
+
+hive-docker-build: images/hive/IMAGE hadoop-docker-build
 	docker build -t $$(cat $<) $(dir $<)
 
 hive-docker-push: images/hive/IMAGE
@@ -55,12 +61,11 @@ fmt:
 images/chargeback/bin/chargeback: cmd/chargeback
 	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
-
 images/promsum/bin/promsum: cmd/promsum
 	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
-.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push docker-build docker-push regenerate-hive-thrift
+.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build hadoop-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push hadoop-docker-push docker-build docker-push regenerate-hive-thrift
 
 # The results of these targets get vendored, but the targets exist for
 # regenerating if needed.
