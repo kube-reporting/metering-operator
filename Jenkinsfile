@@ -66,11 +66,13 @@ podTemplate(
                 }
 
                 stage('build') {
-                    sh """#!/bin/bash
-                    export GOPATH=${env.WORKSPACE}/go
-                    cd ${kubeChargebackDir}
-                    make docker-build
-                    """
+                    ansiColor('xterm') {
+                        sh """#!/bin/bash
+                        export GOPATH=${env.WORKSPACE}/go
+                        cd ${kubeChargebackDir}
+                        make docker-build
+                        """
+                    }
                 }
 
                 stage('push') {
