@@ -7,11 +7,13 @@ HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 
-GIT_SHA = $(shell git rev-parse HEAD)
+GIT_SHA := $(shell git rev-parse HEAD)
+GIT_TAG := $(shell git describe --tags --exact-match HEAD 2>/dev/null)
 
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
+
 
 # TODO: Add tests
 all: fmt chargeback-docker-build
@@ -30,42 +32,72 @@ dist.zip: dist
 promsum-docker-build: images/promsum/Docker***REMOVED***le images/promsum/bin/promsum
 	docker build $(BUILD_ARGS) -t $(PROMSUM_IMAGE):$(GIT_SHA) $(dir $<)
 	docker tag $(PROMSUM_IMAGE):$(GIT_SHA) $(PROMSUM_IMAGE):latest
+ifdef GIT_TAG
+	docker tag $(PROMSUM_IMAGE):$(GIT_SHA) $(PROMSUM_IMAGE):$(GIT_TAG)
+endif
 
 promsum-docker-push:
 	docker push $(PROMSUM_IMAGE):$(GIT_SHA)
 	docker push $(PROMSUM_IMAGE):latest
+ifdef GIT_TAG
+	docker push $(PROMSUM_IMAGE):$(GIT_TAG)
+endif
 
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	docker build $(BUILD_ARGS) -t $(CHARGEBACK_IMAGE):$(GIT_SHA) $(dir $<)
 	docker tag $(CHARGEBACK_IMAGE):$(GIT_SHA) $(CHARGEBACK_IMAGE):latest
+ifdef GIT_TAG
+	docker tag $(CHARGEBACK_IMAGE):$(GIT_SHA) $(CHARGEBACK_IMAGE):$(GIT_TAG)
+endif
 
 chargeback-docker-push:
 	docker push $(CHARGEBACK_IMAGE):$(GIT_SHA)
 	docker push $(CHARGEBACK_IMAGE):latest
+ifdef GIT_TAG
+	docker push $(CHARGEBACK_IMAGE):$(GIT_TAG)
+endif
 
 presto-docker-build: images/presto/Docker***REMOVED***le
 	docker build $(BUILD_ARGS) -t $(PRESTO_IMAGE):$(GIT_SHA) $(dir $<)
 	docker tag $(PRESTO_IMAGE):$(GIT_SHA) $(PRESTO_IMAGE):latest
+ifdef GIT_TAG
+	docker tag $(PRESTO_IMAGE):$(GIT_SHA) $(PRESTO_IMAGE):$(GIT_TAG)
+endif
 
 presto-docker-push:
 	docker push $(PRESTO_IMAGE):$(GIT_SHA)
 	docker push $(PRESTO_IMAGE):latest
+ifdef GIT_TAG
+	docker push $(PRESTO_IMAGE):$(GIT_TAG)
+endif
 
 hadoop-docker-build: images/hadoop/Docker***REMOVED***le
 	docker build $(BUILD_ARGS) -t $(HADOOP_IMAGE):$(GIT_SHA) $(dir $<)
 	docker tag $(HADOOP_IMAGE):$(GIT_SHA) $(HADOOP_IMAGE):latest
+ifdef GIT_TAG
+	docker tag $(HADOOP_IMAGE):$(GIT_SHA) $(HADOOP_IMAGE):$(GIT_TAG)
+endif
 
 hadoop-docker-push:
 	docker push $(HADOOP_IMAGE):$(GIT_SHA)
 	docker push $(HADOOP_IMAGE):latest
+ifdef GIT_TAG
+	docker push $(HADOOP_IMAGE):$(GIT_TAG)
+endif
 
 hive-docker-build: images/hive/Docker***REMOVED***le hadoop-docker-build
 	docker build $(BUILD_ARGS) -t $(HIVE_IMAGE):$(GIT_SHA) $(dir $<)
 	docker tag $(HIVE_IMAGE):$(GIT_SHA) $(HIVE_IMAGE):latest
+ifdef GIT_TAG
+	docker tag $(HIVE_IMAGE):$(GIT_SHA) $(HIVE_IMAGE):$(GIT_TAG)
+endif
 
 hive-docker-push:
 	docker push $(HIVE_IMAGE):$(GIT_SHA)
 	docker push $(HIVE_IMAGE):latest
+ifdef GIT_TAG
+	docker push $(HIVE_IMAGE):$(GIT_TAG)
+endif
 
 # Update dependencies
 vendor: glide.yaml
