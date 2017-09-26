@@ -1,6 +1,14 @@
 # Package
 GO_PKG := github.com/coreos-inc/kube-chargeback
 
+CHARGEBACK_IMAGE := quay.io/coreos/chargeback
+PROMSUM_IMAGE := quay.io/coreos/promsum
+HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
+HIVE_IMAGE := quay.io/coreos/chargeback-hive
+PRESTO_IMAGE := quay.io/coreos/chargeback-presto
+
+GIT_SHA = $(shell git rev-parse HEAD)
+
 # Hive Git repository for Thrift definitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
@@ -19,35 +27,45 @@ dist: Documentation manifests examples hack/*.sh
 dist.zip: dist
 	zip -r $@ $?
 
-promsum-docker-build: images/promsum/IMAGE images/promsum/bin/promsum
-	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
+promsum-docker-build: images/promsum/Dockerfile images/promsum/bin/promsum
+	docker build $(BUILD_ARGS) -t $(PROMSUM_IMAGE):$(GIT_SHA) $(dir $<)
+	docker tag $(PROMSUM_IMAGE):$(GIT_SHA) $(PROMSUM_IMAGE):latest
 
-promsum-docker-push: images/promsum/IMAGE
-	docker push $$(cat $<)
+promsum-docker-push:
+	docker push $(PROMSUM_IMAGE):$(GIT_SHA)
+	docker push $(PROMSUM_IMAGE):latest
 
-chargeback-docker-build: images/chargeback/IMAGE images/chargeback/bin/chargeback
-	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
+chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/chargeback
+	docker build $(BUILD_ARGS) -t $(CHARGEBACK_IMAGE):$(GIT_SHA) $(dir $<)
+	docker tag $(CHARGEBACK_IMAGE):$(GIT_SHA) $(CHARGEBACK_IMAGE):latest
 
-chargeback-docker-push: images/chargeback/IMAGE
-	docker push $$(cat $<)
+chargeback-docker-push:
+	docker push $(CHARGEBACK_IMAGE):$(GIT_SHA)
+	docker push $(CHARGEBACK_IMAGE):latest
 
-presto-docker-build: images/presto/IMAGE
-	docker build -t $$(cat $<) $(dir $<)
+presto-docker-build: images/presto/Dockerfile
+	docker build $(BUILD_ARGS) -t $(PRESTO_IMAGE):$(GIT_SHA) $(dir $<)
+	docker tag $(PRESTO_IMAGE):$(GIT_SHA) $(PRESTO_IMAGE):latest
 
-presto-docker-push: images/presto/IMAGE
-	docker push $$(cat $<)
+presto-docker-push:
+	docker push $(PRESTO_IMAGE):$(GIT_SHA)
+	docker push $(PRESTO_IMAGE):latest
 
-hadoop-docker-build: images/hadoop/IMAGE
-	docker build -t $$(cat $<) $(dir $<)
+hadoop-docker-build: images/hadoop/Dockerfile
+	docker build $(BUILD_ARGS) -t $(HADOOP_IMAGE):$(GIT_SHA) $(dir $<)
+	docker tag $(HADOOP_IMAGE):$(GIT_SHA) $(HADOOP_IMAGE):latest
 
-hadoop-docker-push: images/hadoop/IMAGE
-	docker push $$(cat $<)
+hadoop-docker-push:
+	docker push $(HADOOP_IMAGE):$(GIT_SHA)
+	docker push $(HADOOP_IMAGE):latest
 
-hive-docker-build: images/hive/IMAGE hadoop-docker-build
-	docker build -t $$(cat $<) $(dir $<)
+hive-docker-build: images/hive/Dockerfile hadoop-docker-build
+	docker build $(BUILD_ARGS) -t $(HIVE_IMAGE):$(GIT_SHA) $(dir $<)
+	docker tag $(HIVE_IMAGE):$(GIT_SHA) $(HIVE_IMAGE):latest
 
-hive-docker-push: images/hive/IMAGE
-	docker push $$(cat $<)
+hive-docker-push:
+	docker push $(HIVE_IMAGE):$(GIT_SHA)
+	docker push $(HIVE_IMAGE):latest
 
 # Update dependencies
 vendor: glide.yaml
