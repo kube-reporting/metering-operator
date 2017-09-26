@@ -18,10 +18,10 @@ dist.zip: dist
 out:
 	mkdir $@
 
-promsum-image: images/promsum/IMAGE images/promsum/promsum
+promsum-image: images/promsum/IMAGE images/promsum/bin/promsum
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
-chargeback-image: images/chargeback/IMAGE images/chargeback/chargeback
+chargeback-image: images/chargeback/IMAGE images/chargeback/bin/chargeback
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
 presto-image: images/presto/IMAGE
@@ -39,10 +39,12 @@ vendor: glide.yaml
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
-images/chargeback/chargeback: cmd/chargeback pkg/hive/hive_thrift
+images/chargeback/bin/chargeback: cmd/chargeback pkg/hive/hive_thrift
+	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
-images/promsum/promsum: cmd/promsum
+images/promsum/bin/promsum: cmd/promsum
+	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
 # Download Hive git repo.
