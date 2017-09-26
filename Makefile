@@ -6,7 +6,11 @@ HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
 # TODO: Add tests
-all: fmt chargeback-image
+all: fmt chargeback-docker-build
+
+docker-build: chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build
+
+docker-push: chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push
 
 dist: Documentation manifests examples hack/*.sh
 	mkdir -p $@
@@ -15,20 +19,29 @@ dist: Documentation manifests examples hack/*.sh
 dist.zip: dist
 	zip -r $@ $?
 
-out:
-	mkdir $@
-
-promsum-image: images/promsum/IMAGE images/promsum/bin/promsum
+promsum-docker-build: images/promsum/IMAGE images/promsum/bin/promsum
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
-chargeback-image: images/chargeback/IMAGE images/chargeback/bin/chargeback
+promsum-docker-push: images/promsum/IMAGE
+	docker push $$(cat $<)
+
+chargeback-docker-build: images/chargeback/IMAGE images/chargeback/bin/chargeback
 	docker build $(BUILD_ARGS) -t $$(cat $<) $(dir $<)
 
-presto-image: images/presto/IMAGE
+chargeback-docker-push: images/chargeback/IMAGE
+	docker push $$(cat $<)
+
+presto-docker-build: images/presto/IMAGE
 	docker build -t $$(cat $<) $(dir $<)
 
-hive-image: images/hive/IMAGE
+presto-docker-push: images/presto/IMAGE
+	docker push $$(cat $<)
+
+hive-docker-build: images/hive/IMAGE
 	docker build -t $$(cat $<) $(dir $<)
+
+hive-docker-push: images/hive/IMAGE
+	docker push $$(cat $<)
 
 # Update dependencies
 vendor: glide.yaml
@@ -48,7 +61,8 @@ images/promsum/bin/promsum: cmd/promsum
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
 # Download Hive git repo.
-out/thrift.git: | out
+out/thrift.git:
+	mkdir -p out
 	git clone --single-branch --bare ${HIVE_REPO} $@
 
 # Retrieve Hive thrift definition from git repo.
@@ -61,4 +75,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor chargeback-image promsum-image presto-image hive-image fmt
+.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push docker-build docker-push

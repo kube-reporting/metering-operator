@@ -86,7 +86,13 @@ podTemplate(
                     sh """#!/bin/bash
                     export GOPATH=${env.WORKSPACE}/go
                     cd ${kubeChargebackDir}
-                    make
+                    make docker-build
+                    """
+                }
+
+                stage('push') {
+                    sh """
+                    make docker-push
                     """
                 }
             }
