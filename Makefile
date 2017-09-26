@@ -52,13 +52,19 @@ vendor: glide.yaml
 fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
-images/chargeback/bin/chargeback: cmd/chargeback pkg/hive/hive_thrift
+images/chargeback/bin/chargeback: cmd/chargeback
 	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
 
 images/promsum/bin/promsum: cmd/promsum
 	mkdir -p $(dir $@)
 	GOOS=linux go build -i -v -o $@ ${GO_PKG}/$<
+
+.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push docker-build docker-push regenerate-hive-thrift
+
+# The results of these targets get vendored, but the targets exist for
+# regenerating if needed.
+regenerate-hive-thrift: pkg/hive/hive_thrift
 
 # Download Hive git repo.
 out/thrift.git:
@@ -75,4 +81,3 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
-.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push docker-build docker-push
