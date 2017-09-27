@@ -72,14 +72,14 @@ podTemplate(
                         stage('build') {
                             ansiColor('xterm') {
                                 sh """#!/bin/bash
-                                make docker-build
+                                make docker-build-all
                                 """
                             }
                         }
 
                         stage('push') {
                             sh """
-                            make docker-push
+                            make docker-push-all
                             """
                         }
                     }
