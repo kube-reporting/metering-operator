@@ -92,6 +92,7 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } finally {
+            cleanWs notFailBuild: true
             // notifyBuild(currentBuild.result)
         }
     }
