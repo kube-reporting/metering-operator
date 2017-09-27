@@ -20,6 +20,7 @@ spec:
       - name: metastore
         args: ["/opt/hive/bin/hive", "--service", "metastore"]
         image: quay.io/coreos/chargeback-hive:0.3
+        imagePullPolicy: Always
         ports:
         - name: meta
           containerPort: 9083
