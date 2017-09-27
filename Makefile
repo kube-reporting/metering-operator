@@ -1,3 +1,5 @@
+ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
+
 # Package
 GO_PKG := github.com/coreos-inc/kube-chargeback
 
@@ -7,20 +9,39 @@ HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 
-GIT_SHA := $(shell git rev-parse HEAD)
-GIT_TAG := $(shell git describe --tags --exact-match HEAD 2>/dev/null)
+GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
+GIT_TAG := $(shell git -C $(ROOT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
 
 # Hive Git repository for Thrift definitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-
 # TODO: Add tests
 all: fmt chargeback-docker-build
 
-docker-build: chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build
+docker-build-all: chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build
 
-docker-push: chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push
+docker-push-all: chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push
+
+# Usage:
+#	make docker-build DOCKERFILE= IMAGE_NAME=
+
+docker-build:
+	docker build $(BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(dir $(DOCKERFILE))
+	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
+ifdef GIT_TAG
+	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(GIT_TAG)
+endif
+
+# Usage:
+#	make docker-push IMAGE_NAME=
+
+docker-push:
+	docker push $(IMAGE_NAME):$(GIT_SHA)
+	docker push $(IMAGE_NAME):latest
+ifdef GIT_TAG
+	docker push $(IMAGE_NAME):$(GIT_TAG)
+endif
 
 dist: Documentation manifests examples hack/*.sh
 	mkdir -p $@
@@ -30,74 +51,34 @@ dist.zip: dist
 	zip -r $@ $?
 
 promsum-docker-build: images/promsum/Dockerfile images/promsum/bin/promsum
-	docker build $(BUILD_ARGS) -t $(PROMSUM_IMAGE):$(GIT_SHA) $(dir $<)
-	docker tag $(PROMSUM_IMAGE):$(GIT_SHA) $(PROMSUM_IMAGE):latest
-ifdef GIT_TAG
-	docker tag $(PROMSUM_IMAGE):$(GIT_SHA) $(PROMSUM_IMAGE):$(GIT_TAG)
-endif
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(PROMSUM_IMAGE)
 
 promsum-docker-push:
-	docker push $(PROMSUM_IMAGE):$(GIT_SHA)
-	docker push $(PROMSUM_IMAGE):latest
-ifdef GIT_TAG
-	docker push $(PROMSUM_IMAGE):$(GIT_TAG)
-endif
+	make docker-push IMAGE_NAME=$(PROMSUM_IMAGE)
 
 chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/chargeback
-	docker build $(BUILD_ARGS) -t $(CHARGEBACK_IMAGE):$(GIT_SHA) $(dir $<)
-	docker tag $(CHARGEBACK_IMAGE):$(GIT_SHA) $(CHARGEBACK_IMAGE):latest
-ifdef GIT_TAG
-	docker tag $(CHARGEBACK_IMAGE):$(GIT_SHA) $(CHARGEBACK_IMAGE):$(GIT_TAG)
-endif
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
 chargeback-docker-push:
-	docker push $(CHARGEBACK_IMAGE):$(GIT_SHA)
-	docker push $(CHARGEBACK_IMAGE):latest
-ifdef GIT_TAG
-	docker push $(CHARGEBACK_IMAGE):$(GIT_TAG)
-endif
+	make docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
 presto-docker-build: images/presto/Dockerfile
-	docker build $(BUILD_ARGS) -t $(PRESTO_IMAGE):$(GIT_SHA) $(dir $<)
-	docker tag $(PRESTO_IMAGE):$(GIT_SHA) $(PRESTO_IMAGE):latest
-ifdef GIT_TAG
-	docker tag $(PRESTO_IMAGE):$(GIT_SHA) $(PRESTO_IMAGE):$(GIT_TAG)
-endif
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
 
 presto-docker-push:
-	docker push $(PRESTO_IMAGE):$(GIT_SHA)
-	docker push $(PRESTO_IMAGE):latest
-ifdef GIT_TAG
-	docker push $(PRESTO_IMAGE):$(GIT_TAG)
-endif
+	make docker-push IMAGE_NAME=$(PRESTO_IMAGE)
 
 hadoop-docker-build: images/hadoop/Dockerfile
-	docker build $(BUILD_ARGS) -t $(HADOOP_IMAGE):$(GIT_SHA) $(dir $<)
-	docker tag $(HADOOP_IMAGE):$(GIT_SHA) $(HADOOP_IMAGE):latest
-ifdef GIT_TAG
-	docker tag $(HADOOP_IMAGE):$(GIT_SHA) $(HADOOP_IMAGE):$(GIT_TAG)
-endif
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE)
 
 hadoop-docker-push:
-	docker push $(HADOOP_IMAGE):$(GIT_SHA)
-	docker push $(HADOOP_IMAGE):latest
-ifdef GIT_TAG
-	docker push $(HADOOP_IMAGE):$(GIT_TAG)
-endif
+	make docker-push IMAGE_NAME=$(HADOOP_IMAGE)
 
 hive-docker-build: images/hive/Dockerfile hadoop-docker-build
-	docker build $(BUILD_ARGS) -t $(HIVE_IMAGE):$(GIT_SHA) $(dir $<)
-	docker tag $(HIVE_IMAGE):$(GIT_SHA) $(HIVE_IMAGE):latest
-ifdef GIT_TAG
-	docker tag $(HIVE_IMAGE):$(GIT_SHA) $(HIVE_IMAGE):$(GIT_TAG)
-endif
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
 hive-docker-push:
-	docker push $(HIVE_IMAGE):$(GIT_SHA)
-	docker push $(HIVE_IMAGE):latest
-ifdef GIT_TAG
-	docker push $(HIVE_IMAGE):$(GIT_TAG)
-endif
+	make docker-push IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
 vendor: glide.yaml
@@ -115,7 +96,13 @@ images/promsum/bin/promsum: cmd/promsum
 	mkdir -p $(dir $@)
 	GOOS=linux go build -i -o $@ ${GO_PKG}/$<
 
-.PHONY: vendor fmt chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build hadoop-docker-build chargeback-docker-push promsum-docker-push presto-docker-push hive-docker-push hadoop-docker-push docker-build docker-push regenerate-hive-thrift
+.PHONY: vendor fmt regenerate-hive-thrift \
+	chargeback-docker-build promsum-docker-build \
+	presto-docker-build hive-docker-build hadoop-docker-build \
+	chargeback-docker-push promsum-docker-push presto-docker-push \
+	hive-docker-push hadoop-docker-push \
+	docker-build docker-push \
+	docker-build-all docker-push-all \
 
 # The results of these targets get vendored, but the targets exist for
 # regenerating if needed.
