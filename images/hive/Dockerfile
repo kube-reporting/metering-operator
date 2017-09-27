@@ -2,7 +2,7 @@ FROM quay.io/coreos/chargeback-hadoop:latest
 
 ENV HIVE_VERSION=2.1.1
 ENV HIVE_HOME=/opt/hive
-ENV PATH=$HIVE_HOME/bin:$PATH HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
+ENV PATH=$HIVE_HOME/bin:$PATH
 
 WORKDIR /opt
 
