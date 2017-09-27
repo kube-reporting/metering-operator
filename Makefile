@@ -20,7 +20,7 @@ HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
 # TODO: Add tests
-all: fmt chargeback-docker-build
+all: fmt docker-build-all
 
 docker-build-all: chargeback-docker-build promsum-docker-build presto-docker-build hive-docker-build
 
