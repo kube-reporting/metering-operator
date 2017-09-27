@@ -27,9 +27,10 @@ ADD entrypoint.sh /usr/local/bin
 ADD start-name.sh /usr/local/bin
 ADD etc /etc/hadoop
 
-ENV HADOOP_CLASSPATH=/opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/*:$HADOOP_CLASSPATH
+ENV HADOOP_CLASSPATH=/opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/*
 ENV HADOOP_PREFIX=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
+ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
 ENV PATH=$HADOOP_PREFIX/bin/:$PATH
 
 ENTRYPOINT ["entrypoint.sh"]
