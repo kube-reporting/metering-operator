@@ -3,6 +3,7 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 # Package
 GO_PKG := github.com/coreos-inc/kube-chargeback
 
+DOCKER_BUILD_ARGS := --no-cache
 GO_BUILD_ARGS := -i -ldflags '-extldflags "-static"'
 
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
@@ -29,7 +30,7 @@ docker-push-all: chargeback-docker-push promsum-docker-push presto-docker-push h
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-	docker build $(BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(dir $(DOCKERFILE))
+	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(dir $(DOCKERFILE))
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
 ifdef GIT_TAG
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(GIT_TAG)
