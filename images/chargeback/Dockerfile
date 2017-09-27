@@ -1,6 +1,7 @@
-FROM gliderlabs/alpine:3.6
+FROM alpine
 
-RUN apk-install ca-certificates bash
+RUN apk update
+RUN apk add ca-certificates bash
 # add pod data collector binary
 ADD ./bin/chargeback /usr/local/bin/chargeback
 
