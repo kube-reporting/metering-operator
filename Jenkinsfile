@@ -92,6 +92,7 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } ***REMOVED***nally {
+            cleanWs notFailBuild: true
             // notifyBuild(currentBuild.result)
         }
     }
