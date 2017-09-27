@@ -3,6 +3,8 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 # Package
 GO_PKG := github.com/coreos-inc/kube-chargeback
 
+GO_BUILD_ARGS := -i -ldflags '-extldflags "-static"'
+
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
 PROMSUM_IMAGE := quay.io/coreos/promsum
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
@@ -91,10 +93,10 @@ fmt:
 
 images/chargeback/bin/chargeback: cmd/chargeback
 	mkdir -p $(dir $@)
-	GOOS=linux go build -i -o $@ ${GO_PKG}/$<
+	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ ${GO_PKG}/$<
 images/promsum/bin/promsum: cmd/promsum
 	mkdir -p $(dir $@)
-	GOOS=linux go build -i -o $@ ${GO_PKG}/$<
+	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ ${GO_PKG}/$<
 
 .PHONY: vendor fmt regenerate-hive-thrift \
 	chargeback-docker-build promsum-docker-build \
