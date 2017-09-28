@@ -28,7 +28,7 @@ function configure() {
     done
 }
 
-export HADOOP_CLASSPATH="/opt/hive/hcatalog/share/hcatalog/*:/opt/hadoop-2.8.0/share/hadoop/tools/lib/*"
+export HADOOP_CLASSPATH="/opt/hive/hcatalog/share/hcatalog/*:$HADOOP_CLASSPATH"
 export HIVE_AUX_JARS_PATH=/usr/hdp/current/hive-server2/auxlib
 
 configure /opt/hive/conf/hive-site.xml hive HIVE_SITE_CONF

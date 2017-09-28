@@ -1,16 +1,16 @@
-FROM quay.io/coreos/chargeback-hadoop:0.2
+FROM quay.io/coreos/chargeback-hadoop:latest
 
 ENV HIVE_VERSION=2.1.1
 ENV HIVE_HOME=/opt/hive
-ENV PATH=$HIVE_HOME/bin:$PATH HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
+ENV PATH=$HIVE_HOME/bin:$PATH
 
 WORKDIR /opt
 
 # Install Hive
-RUN curl --fail http://www-eu.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xzv && mv apache-hive-$HIVE_VERSION-bin hive
+RUN curl -fSLs http://www-eu.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xz && mv apache-hive-$HIVE_VERSION-bin hive
 
 # Install PostgreSQL JDBC
-RUN curl --fail -o $HIVE_HOME/lib/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
+RUN curl -fSLs -o $HIVE_HOME/lib/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
 
 # Add Serde JSON Serialization Jar
 RUN mkdir -p /usr/hdp/current/hive-server2/auxlib
