@@ -1,3 +1,14 @@
+properties([
+    buildDiscarder(logRotator(
+        artifactDaysToKeepStr: '14',
+        artifactNumToKeepStr: '30',
+        daysToKeepStr: '14',
+        numToKeepStr: '30',
+    )),
+    disableConcurrentBuilds(),
+    pipelineTriggers([]),
+])
+
 podTemplate(
     cloud: 'kubernetes',
     containers: [
