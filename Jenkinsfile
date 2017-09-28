@@ -27,9 +27,12 @@ podTemplate(
 ) {
     node ('kube-chargeback-build') {
         def gitCommit;
+        def isMasterBranch = env.BRANCH_NAME == "master"
+
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
+                "USE_LATEST_TAG=${isMasterBranch}"
             ]){
                 container('docker'){
 
@@ -72,14 +75,14 @@ podTemplate(
                         stage('build') {
                             ansiColor('xterm') {
                                 sh """#!/bin/bash
-                                make docker-build-all
+                                make docker-build-all USE_LATEST_TAG=${USE_LATEST_TAG}
                                 """
                             }
                         }
 
                         stage('push') {
                             sh """
-                            make docker-push-all
+                            make docker-push-all USE_LATEST_TAG=${USE_LATEST_TAG}
                             """
                         }
                     }
