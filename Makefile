@@ -78,7 +78,7 @@ presto-docker-push:
 	make docker-push IMAGE_NAME=$(PRESTO_IMAGE)
 
 hadoop-docker-build: images/hadoop/Docker***REMOVED***le
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE)
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
 
 hadoop-docker-push:
 	make docker-push IMAGE_NAME=$(HADOOP_IMAGE)
