@@ -15,6 +15,8 @@ PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 GIT_TAG := $(shell git -C $(ROOT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
 
+USE_LATEST_TAG ?= false
+
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
@@ -31,7 +33,9 @@ docker-push-all: chargeback-docker-push promsum-docker-push presto-docker-push h
 
 docker-build:
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(dir $(DOCKERFILE))
+ifeq ($(USE_LATEST_TAG), true)
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
+endif
 ifdef GIT_TAG
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(GIT_TAG)
 endif
@@ -41,7 +45,9 @@ endif
 
 docker-push:
 	docker push $(IMAGE_NAME):$(GIT_SHA)
+ifeq ($(USE_LATEST_TAG), true)
 	docker push $(IMAGE_NAME):latest
+endif
 ifdef GIT_TAG
 	docker push $(IMAGE_NAME):$(GIT_TAG)
 endif
