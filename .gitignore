@@ -14,8 +14,6 @@
 .glide/
 
 # Hive thift de***REMOVED***ntions and generated code (automated with Make***REMOVED***le)
-pkg/hive/hive_thrift
-thrift
 out
 
 # Distribution packages

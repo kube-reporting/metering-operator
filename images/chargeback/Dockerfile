@@ -1,7 +1,8 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM alpine
 
+RUN apk update
+RUN apk add ca-certi***REMOVED***cates bash
 # add pod data collector binary
-ADD ./chargeback /usr/local/bin/chargeback
+ADD ./bin/chargeback /usr/local/bin/chargeback
 
 ENTRYPOINT ["chargeback"]
