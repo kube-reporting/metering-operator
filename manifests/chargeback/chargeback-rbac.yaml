@@ -31,3 +31,31 @@ kind: ServiceAccount
 metadata:
   name: chargeback
   namespace: tectonic-chargeback
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: chargeback
+  namespace: tectonic-chargeback
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["buckets"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: chargeback
+  namespace: tectonic-chargeback
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: chargeback
+subjects:
+- kind: ServiceAccount
+  name: chargeback
+  namespace: tectonic-chargeback

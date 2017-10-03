@@ -71,7 +71,7 @@ func TestRetrieveManifests(t *testing.T) {
 	begin := time.Date(2017, time.June, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2017, time.June, 29, 0, 0, 0, 0, time.UTC)
 	rng := cb.Range{begin, end}
-	manifests, err := RetrieveManifests(bucket, prefix, rng)
+	manifests, err := RetrieveManifests(bucket, prefix, rng, nil)
 	if err != nil {
 		t.Error("unexpected error: ", err)
 	}

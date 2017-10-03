@@ -40,7 +40,7 @@ func getAWSManifests(t *testing.T) []aws.Manifest {
 	begin := time.Date(2017, time.July, 2, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2017, time.July, 29, 0, 0, 0, 0, time.UTC)
 	rng := cb.Range{begin, end}
-	manifests, err := aws.RetrieveManifests(bucket, prefix, rng)
+	manifests, err := aws.RetrieveManifests(bucket, prefix, rng, nil)
 	if err != nil {
 		t.Error("unexpected error: ", err)
 	}

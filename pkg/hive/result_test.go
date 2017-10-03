@@ -24,9 +24,4 @@ func TestCreateResultTable(t *testing.T) {
 	if err = CreatePodCostTable(conn, resultTable, s3Bucket, s3Prefix); err != nil {
 		t.Error("error perfoming query: ", err)
 	}
-
-	selectQuery := fmt.Sprint("SELECT * FROM ", resultTable)
-	if err = conn.Query(selectQuery); err != nil {
-		t.Error("could not select from sample data: ", err)
-	}
 }
