@@ -173,15 +173,15 @@ func extrema(records []BillingRecord) (min, max time.Time) {
 		return
 	}
 
-	min = records[0].Start
-	max = records[0].End
+	min = records[0].Timestamp
+	max = records[0].Timestamp
 	for _, r := range records {
-		if r.Start.Before(min) {
-			min = r.Start
+		if r.Timestamp.Before(min) {
+			min = r.Timestamp
 		}
 
-		if r.End.After(max) {
-			max = r.End
+		if r.Timestamp.After(max) {
+			max = r.Timestamp
 		}
 	}
 	return
@@ -205,7 +205,7 @@ func decodeRelevantRecords(data []byte, rng cb.Range) ([]BillingRecord, error) {
 			return nil, fmt.Errorf("could not decode record data: %v", err)
 		}
 
-		if rng.Within(r.Start) || rng.Within(r.End) {
+		if rng.Within(r.Timestamp) {
 			allRecords = append(allRecords, r)
 		}
 	}

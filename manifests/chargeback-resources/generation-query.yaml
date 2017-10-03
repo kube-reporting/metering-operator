@@ -1,0 +1,51 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: ReportGenerationQuery
+metadata:
+    name: "pod-usage-by-node"
+spec:
+    reportDataStore: "default-datastore"
+    columns:
+        - name: pod
+          type: string
+        - name: namespace
+          type: string
+        - name: node
+          type: string
+        - name: provider_id
+          type: string
+        - name: memoryUsage
+          type: double
+    query: |
+        WITH usage_period AS (
+            SELECT kubeUsage.labels['pod'] as pod,
+                   kubeUsage.labels['namespace'] as namespace,
+                   kubeUsage.labels['node'] as node,
+                   kubeUsage.labels as labels,
+                   kubeUsage.amount as amount,
+                   split_part(split_part(element_at(kubeUsage.labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
+                   kubeUsage."timestamp" as timestamp
+                   {{addAdditionalLabels .Labels}}
+            FROM {{.TableName}} as kubeUsage
+            WHERE kubeUsage."timestamp" >= timestamp '{{.StartPeriod}}'
+            AND kubeUsage."timestamp" <= timestamp '{{.EndPeriod}}'
+        ),
+        computed_usage AS (
+            SELECT pod,
+                   namespace,
+                   node,
+                   provider_id,
+                   "timestamp" as curr,
+                   lag("timestamp") OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC) as prev,
+                   (amount + lag(amount) OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC)) / 2 as usage
+                   {{listAdditionalLabels .Labels}}
+            FROM usage_period
+        )
+        SELECT
+            pod,
+            namespace,
+            node,
+            provider_id,
+            sum(usage * date_diff('millisecond', prev, curr)) as usage
+           {{listAdditionalLabels .Labels}}
+        FROM computed_usage
+        GROUP BY pod, namespace, node, provider_id {{listAdditionalLabels .Labels}}

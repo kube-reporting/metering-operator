@@ -2,7 +2,6 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: chargeback
-  namespace: tectonic-chargeback
 spec:
   selector:
     matchLabels:

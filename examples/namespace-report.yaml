@@ -1,0 +1,14 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: Report
+metadata:
+  name: namespaces
+spec:
+  reportingStart: '2017-09-01T00:00:00Z'
+  reportingEnd: '2017-09-30T23:59:59Z'
+  chargeback:
+    bucket: dgonyeo-testfiles
+    prefix: promsum
+  output:
+    bucket: dgonyeo-testfiles
+    prefix: results
+  scope: namespace

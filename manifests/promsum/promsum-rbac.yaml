@@ -1,8 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: chargeback
+  name: promsum
 rules:
+- apiGroups: ["promsum.coreos.com"]
+  resources: ["*"]
+  verbs: ["*"]
 - apiGroups: ["chargeback.coreos.com"]
   resources: ["*"]
   verbs: ["*"]
@@ -16,16 +19,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: chargeback
+  name: promsum
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: chargeback
+  name: promsum
 subjects:
 - kind: ServiceAccount
-  name: chargeback
+  name: promsum
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: chargeback
+  name: promsum

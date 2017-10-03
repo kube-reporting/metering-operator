@@ -4,22 +4,18 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"path"
 	"strings"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 )
 
 // setupStore configures a store using the given URL.
-func setupStore(in string) (promsum.Store, error) {
-	u, err := url.Parse(in)
-	if err != nil {
-		return nil, fmt.Errorf("a valid path with scheme (s3:// or file://) must be given: %v", err)
-	}
-
+func setupStore(u url.URL) (promsum.Store, error) {
 	if u.Scheme == "file" {
 		return setupFS(u.Path)
 	} else if u.Scheme == "s3" {
-		return setupS3(u.Path)
+		return setupS3(path.Join(u.Host, u.Path))
 	} else {
 		return nil, fmt.Errorf("unknown scheme '%s' given, please provide either s3:// or file://", u.Scheme)
 	}
@@ -36,10 +32,6 @@ func setupFS(path string) (promsum.Store, error) {
 
 // setupS3 configures writing to a temporary file and then pushing to S3 on file close
 func setupS3(path string) (promsum.Store, error) {
-	// remove initial slash from name
-	// ie. /bucket-name/file => bucket-name/file
-	path = path[1:]
-
 	// determine bucket name and object key
 	slash := strings.Index(path, "/")
 	bucket, key := path[0:slash], path[slash:]

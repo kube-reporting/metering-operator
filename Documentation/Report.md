@@ -4,7 +4,7 @@ Chargeback produces reports derived from usage data sources which can be used in
 ## Execution time
 Reports take a variable amount of time to complete and can potentially need to run for very long periods.
 
-The duration a report takes to runn is determined by:
+The duration a report takes to run is determined by:
 * report type
 * amount of data being analyzed
 * system performance (memory, CPU)
@@ -27,6 +27,14 @@ prefix: july-data
 
 ### Spec
 The type of report that is performed and what data is used is determined by the `spec` section of the report object. There is configuration properties shared by all reports and others that are specific to a report type.
+
+#### Scope
+A report can be generated with different scopes, which influences the level of detail contained in the report. These are the currently supported scopes for a report:
+
+- `pod`
+- `namespace`
+
+If unspecified, the default scope is `pod`.
 
 #### Period
 The period that a report is generated for is specified by the interval between `reportingStart` and `reportingEnd`.

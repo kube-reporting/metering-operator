@@ -1,0 +1,7 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: ReportPrometheusQuery
+metadata:
+    name: "get-cpu-by-pod"
+spec:
+    query: |
+        (kube_pod_container_resource_requests_cpu_cores / on(node) group_left kube_node_status_capacity_cpu_cores) * on(node) group_left(provider_id) kube_node_info

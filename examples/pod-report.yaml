@@ -1,13 +1,13 @@
 apiVersion: chargeback.coreos.com/prealpha
 kind: Report
 metadata:
-  name: pods
+    name: pods
 spec:
-  reportingStart: '2017-07-02T00:00:00Z'
-  reportingEnd: '2017-07-29T00:00:00Z'
-  chargeback:
-    bucket: <INSERT BUCKET FROM PROMSUM>
-    prefix: <INSERT S3 PREFIX FROM PROMSUM>
-  output:
-    bucket: <OUTPUT BUCKET>
-    prefix: <OUTPUT PREFIX>
+    reportingStart: '2017-10-01T00:00:00Z'
+    reportingEnd: '2017-10-30T23:59:59Z'
+    generationQuery: "pod-usage-by-node"
+    output:
+        bucket: "dgonyeo-testfiles"
+        prefix: "results"
+    additionalLabels:
+    - "service"
