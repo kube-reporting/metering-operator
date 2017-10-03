@@ -1,18 +1,29 @@
 # This should not be invoked directly. It provides functions and data for other scripts.
 
-CHARGEBACK_NAMESPACE="tectonic-chargeback"
+CHARGEBACK_NAMESPACE="team-chargeback"
 TECTONIC_NAMESPACE="tectonic-system"
 TECTONIC_PULL_SECRET="coreos-pull-secret"
 AWS_SECRET="aws"
 
+function kubectl_cmd() {
+    echo "kubectl --namespace=${CHARGEBACK_NAMESPACE}"
+}
+
 function kube-install() {
+  local cmd=$(kubectl_cmd)
   local ***REMOVED***les=$(kubectl_***REMOVED***les $@)
-  kubectl apply ${***REMOVED***les}
+  ${cmd} apply ${***REMOVED***les}
+}
+
+function kube-remove-non-***REMOVED***le() {
+  local cmd=$(kubectl_cmd)
+  ${cmd} delete $@
 }
 
 function kube-remove() {
+  local cmd=$(kubectl_cmd)
   local ***REMOVED***les=$(kubectl_***REMOVED***les $@)
-  kubectl delete ${***REMOVED***les}
+  ${cmd} delete ${***REMOVED***les}
 }
 
 function msg() {

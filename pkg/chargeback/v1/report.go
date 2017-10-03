@@ -9,6 +9,8 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+
+	"github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 )
 
 const (
@@ -21,9 +23,9 @@ type ReportGetter interface {
 }
 
 type ReportInterface interface {
-	Create(*Report) (*Report, error)
-	Get(name string) (*Report, error)
-	Update(*Report) (*Report, error)
+	Create(*types.Report) (*types.Report, error)
+	Get(name string) (*types.Report, error)
+	Update(*types.Report) (*types.Report, error)
 	Delete(name string, options *metav1.DeleteOptions) error
 	List(opts metav1.ListOptions) (runtime.Object, error)
 	Watch(opts metav1.ListOptions) (watch.Interface, error)
@@ -32,23 +34,25 @@ type ReportInterface interface {
 type reports struct {
 	restClient rest.Interface
 	client     *dynamic.ResourceClient
+	namespace  string
 }
 
-func newReports(r rest.Interface, c *dynamic.Client) *reports {
+func newReports(r rest.Interface, c *dynamic.Client, namespace string) *reports {
 	return &reports{
 		r,
 		c.Resource(
 			&metav1.APIResource{
 				Kind:       ReportKind,
 				Name:       ReportPlural,
-				Namespaced: false,
+				Namespaced: true,
 			},
-			"",
+			namespace,
 		),
+		namespace,
 	}
 }
 
-func (p *reports) Create(o *Report) (*Report, error) {
+func (p *reports) Create(o *types.Report) (*types.Report, error) {
 	up, err := UnstructuredFromReport(o)
 	if err != nil {
 		return nil, err
@@ -62,7 +66,7 @@ func (p *reports) Create(o *Report) (*Report, error) {
 	return ReportFromUnstructured(up)
 }
 
-func (p *reports) Get(name string) (*Report, error) {
+func (p *reports) Get(name string) (*types.Report, error) {
 	obj, err := p.client.Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -70,7 +74,7 @@ func (p *reports) Get(name string) (*Report, error) {
 	return ReportFromUnstructured(obj)
 }
 
-func (p *reports) Update(o *Report) (*Report, error) {
+func (p *reports) Update(o *types.Report) (*types.Report, error) {
 	up, err := UnstructuredFromReport(o)
 	if err != nil {
 		return nil, err
@@ -90,6 +94,7 @@ func (p *reports) Delete(name string, options *metav1.DeleteOptions) error {
 
 func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	req := p.restClient.Get().
+		Namespace(p.namespace).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil)
 
@@ -97,13 +102,14 @@ func (p *reports) List(opts metav1.ListOptions) (runtime.Object, error) {
 	if err != nil {
 		return nil, err
 	}
-	var reports ReportList
+	var reports types.ReportList
 	return &reports, json.Unmarshal(b, &reports)
 }
 
 func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 	r, err := p.restClient.Get().
 		Pre***REMOVED***x("watch").
+		Namespace(p.namespace).
 		Resource(ReportPlural).
 		FieldsSelectorParam(nil).
 		Stream()
@@ -117,12 +123,12 @@ func (p *reports) Watch(opts metav1.ListOptions) (watch.Interface, error) {
 }
 
 // ReportFromUnstructured unmarshals a Report object.
-func ReportFromUnstructured(r *unstructured.Unstructured) (*Report, error) {
+func ReportFromUnstructured(r *unstructured.Unstructured) (*types.Report, error) {
 	b, err := json.Marshal(r.Object)
 	if err != nil {
 		return nil, err
 	}
-	var p Report
+	var p types.Report
 	if err := json.Unmarshal(b, &p); err != nil {
 		return nil, err
 	}
@@ -132,7 +138,7 @@ func ReportFromUnstructured(r *unstructured.Unstructured) (*Report, error) {
 }
 
 // UnstructuredFromReport marshals a Report object.
-func UnstructuredFromReport(p *Report) (*unstructured.Unstructured, error) {
+func UnstructuredFromReport(p *types.Report) (*unstructured.Unstructured, error) {
 	p.TypeMeta.Kind = ReportKind
 	p.TypeMeta.APIVersion = Group + "/" + Version
 	b, err := json.Marshal(p)
@@ -158,7 +164,7 @@ func (d *reportDecoder) Close() {
 func (d *reportDecoder) Decode() (action watch.EventType, object runtime.Object, err error) {
 	var e struct {
 		Type   watch.EventType
-		Object Report
+		Object types.Report
 	}
 	if err := d.dec.Decode(&e); err != nil {
 		return watch.Error, nil, err
