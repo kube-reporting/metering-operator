@@ -2,6 +2,8 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 # Package
 GO_PKG := github.com/coreos-inc/kube-chargeback
+CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
+PROMSUM_GO_PKG := $(GO_PKG)/cmd/promsum
 
 DOCKER_BUILD_ARGS := --no-cache
 GO_BUILD_ARGS := -i -ldflags '-extldflags "-static"'
@@ -20,6 +22,10 @@ USE_LATEST_TAG ?= false
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
+
+CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+
+PROMSUM_GO_FILES := $(shell go list -json $(PROMSUM_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
 # TODO: Add tests
 all: fmt docker-build-all
@@ -104,12 +110,12 @@ vendor: glide.yaml
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
-images/chargeback/bin/chargeback: cmd/chargeback
+images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
-	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ ${GO_PKG}/$<
-images/promsum/bin/promsum: cmd/promsum
+	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
+images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	mkdir -p $(dir $@)
-	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ ${GO_PKG}/$<
+	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
 
 .PHONY: vendor fmt regenerate-hive-thrift \
 	chargeback-docker-build promsum-docker-build \

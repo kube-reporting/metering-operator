@@ -52,7 +52,7 @@ podTemplate(
                     stage('checkout') {
                         sh """
                         apk update
-                        apk add git bash
+                        apk add git bash jq
                         """
 
                         checkout([
