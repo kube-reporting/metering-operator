@@ -36,6 +36,9 @@ docker-build:
 ifeq ($(USE_LATEST_TAG), true)
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
 endif
+ifdef BRANCH_TAG
+	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(BRANCH_TAG)
+endif
 ifdef GIT_TAG
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(GIT_TAG)
 endif
@@ -47,6 +50,9 @@ docker-push:
 	docker push $(IMAGE_NAME):$(GIT_SHA)
 ifeq ($(USE_LATEST_TAG), true)
 	docker push $(IMAGE_NAME):latest
+endif
+ifdef BRANCH_TAG
+	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 ifdef GIT_TAG
 	docker push $(IMAGE_NAME):$(GIT_TAG)

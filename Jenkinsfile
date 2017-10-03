@@ -43,7 +43,8 @@ podTemplate(
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
-                "USE_LATEST_TAG=${isMasterBranch}"
+                "USE_LATEST_TAG=${isMasterBranch}",
+                "BRANCH_TAG=${env.BRANCH_NAME}"
             ]){
                 container('docker'){
 
@@ -86,14 +87,18 @@ podTemplate(
                         stage('build') {
                             ansiColor('xterm') {
                                 sh """#!/bin/bash
-                                make docker-build-all USE_LATEST_TAG=${USE_LATEST_TAG}
+                                make docker-build-all \
+                                    USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                    BRANCH_TAG=${BRANCH_TAG}
                                 """
                             }
                         }
 
                         stage('push') {
                             sh """
-                            make docker-push-all USE_LATEST_TAG=${USE_LATEST_TAG}
+                            make docker-push-all \
+                                USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                BRANCH_TAG=${BRANCH_TAG}
                             """
                         }
                     }
