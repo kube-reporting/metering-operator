@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"io/ioutil"
 	"log"
+	"net/url"
 	"time"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 
 	"github.com/prometheus/client_golang/api"
@@ -15,8 +17,6 @@ import (
 var (
 	before        time.Duration
 	timePrecision time.Duration
-	subject       string
-	storeURL      string
 	aggregate     bool
 	promURL       string
 )
@@ -24,24 +24,39 @@ var (
 func init() {
 	flag.DurationVar(&before, "before", 1*time.Hour, "duration before present to start collect billing data")
 	flag.DurationVar(&timePrecision, "precision", time.Second, "unit of time used for stored amounts")
-	flag.StringVar(&subject, "subject", fmt.Sprintf("%x", time.Now().Nanosecond()), "name used to group billing data")
-	flag.StringVar(&storeURL, "path", "***REMOVED***le://data", "URL to the location that records should be stored")
 	flag.StringVar(&promURL, "prom", "http://localhost:9090", "URL of the Prometheus to be queried")
-	flag.BoolVar(&aggregate, "aggregate", false, "summarizes the ranged in as few billing records as possible")
 
 	flag.Parse()
 }
 
 func main() {
-	if flag.NArg() == 0 {
-		log.Fatal("a pql query must be speci***REMOVED***ed")
+	if flag.NArg() != 0 {
+		log.Fatal("no arguments are expected")
 	}
 
-	// pql query to be executed
-	query := flag.Arg(0)
+	// Get our namespace, make a new rest client, and list all the data stores
+	namespaceBytes, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	if err != nil {
+		log.Fatal("could not determine namespace: ", err)
+	}
+	namespace := string(namespaceBytes)
 
+	restClient, err := cbTypes.GetRestClient()
+	if err != nil {
+		log.Fatal("could not setup rest client: ", err)
+	}
+
+	dataStores, err := cbTypes.ListReportDataStores(restClient, namespace)
+	if err != nil {
+		log.Fatal("could not list data stores: ", err)
+	}
+
+	// TODO: we should track what times we query, store the last query point in
+	// a CRD, and query from there instead of a blind value like how this
+	// currently works.
+
+	// Calculate the range of time to query, and create a new prometheus client
 	now := time.Now().UTC()
-	// create range starting the given duration before now to now
 	billingRng := cb.Range{
 		Start: now.Add(-before),
 		End:   now,
@@ -55,41 +70,41 @@ func main() {
 		log.Fatal("could not setup remote: ", err)
 	}
 
-	log.Println("Testing metering...")
-	records, err := promsum.Meter(prom, query, subject, billingRng, timePrecision)
-	if err != nil {
-		log.Fatalf("Failed to meter for %v for query '%s': %v", billingRng, query, err)
-	}
-
-	var total float64
-	fmt.Println("Produced records:")
-	for _, r := range records {
-		log.Println("- ", r)
-		total += r.Amount
-	}
-	fmt.Printf("Total usage over %v: %f\n", billingRng, total)
-
-	log.Println("Testing storage...")
-	store, err := setupStore(storeURL)
-	if err != nil {
-		log.Fatal("Could not setup storage: ", err)
-	}
-
-	records, err = bill(prom, store, query, subject, billingRng, timePrecision)
-	if err != nil {
-		log.Fatalf("Failed to bill for period %v to %v for query '%s': %v",
-			billingRng.Start, billingRng.End, query, err)
-	}
-
-	if aggregate {
-		totals, err := promsum.Aggregate(records, billingRng, []string{"pod", "namespace", "container"})
+	// For every data store, look up and perform each query, storing in the
+	// designated location.
+	for _, ds := range dataStores.Items {
+		if ds.Spec.Storage.Type != "s3" {
+			log.Fatal("unsupported storage type (must be s3): ", ds.Spec.Storage.Type)
+		}
+		if ds.Spec.Storage.Format != "json" {
+			log.Fatal("unsupported storage type (must be json): ", ds.Spec.Storage.Format)
+		}
+		storeURL := url.URL{
+			Scheme: "s3",
+			Host:   ds.Spec.Storage.Bucket,
+			Path:   ds.Spec.Storage.Pre***REMOVED***x,
+		}
+		store, err := setupStore(storeURL)
 		if err != nil {
-			log.Fatalf("Failed to aggregate for %s over %v: %v", query, billingRng, err)
+			log.Fatal("Could not setup storage: ", err)
 		}
 
-		log.Println("Found aggregates:")
-		for _, r := range totals {
-			log.Println(r.String())
+		for _, queryName := range ds.Spec.Queries {
+			query, err := cbTypes.GetReportPrometheusQuery(restClient, namespace, queryName)
+			if err != nil {
+				log.Fatal("Could not get prometheus query: ", err)
+			}
+
+			records, err := promsum.Meter(prom, query.Spec.Query, queryName, billingRng, timePrecision)
+			if err != nil {
+				log.Fatalf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
+					query, billingRng.Start, billingRng.End, err)
+			}
+
+			err = store.Write(records)
+			if err != nil {
+				log.Print("Failed to record: ", err)
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@ CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 PROMSUM_GO_PKG := $(GO_PKG)/cmd/promsum
 
 DOCKER_BUILD_ARGS := --no-cache
-GO_BUILD_ARGS := -i -ldflags '-extldflags "-static"'
+GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
 PROMSUM_IMAGE := quay.io/coreos/promsum
@@ -112,10 +112,10 @@ fmt:
 
 images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
-	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
+	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	mkdir -p $(dir $@)
-	GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
+	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
 
 .PHONY: vendor fmt regenerate-hive-thrift \
 	chargeback-docker-build promsum-docker-build \

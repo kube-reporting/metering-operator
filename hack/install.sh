@@ -2,9 +2,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
-msg "Creating chargeback namespace"
-kube-install manifests/chargeback/namespace.yaml
-
 accessKey=${AWS_ACCESS_KEY_ID-"<base64 encoded AWS_ACCESS_KEY_ID>"}
 accessSecret=${AWS_SECRET_ACCESS_KEY-"<base64 encoded AWS_SECRET_ACCESS_KEY>"}
 setupAWS=n
@@ -29,8 +26,11 @@ if [[ "${setupAWS}" == "y" ]]; then
 msg "Con***REMOVED***guring pull secrets"
 copy-tectonic-pull
 
-msg "Installing collection layer (with build of kube-state-metrics with Node info)"
-kube-install manifests/kube-state-metrics manifests/promsum manifests/prom-operator
-
 msg "Installing query layer"
 kube-install manifests/hive manifests/presto manifests/chargeback
+
+msg "Populating chargeback CRDs"
+kube-install manifests/chargeback-resources
+
+msg "Installing collection layer"
+kube-install manifests/promsum

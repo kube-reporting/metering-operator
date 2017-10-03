@@ -3,7 +3,7 @@ package v1
 import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 )
 
 // Cron allows reports to be scheduled.
@@ -24,7 +24,7 @@ type CronSpec struct {
 	Suspend *bool `json:"suspend,omitempty"`
 
 	// ReportTemplate dictates the report which is created at the given schedule.
-	ReportTemplate cb.ReportTemplateSpec `json:"reportTemplate"`
+	ReportTemplate cbTypes.ReportTemplateSpec `json:"reportTemplate"`
 }
 
 // CronStatus displays the state of a Cron schedule.

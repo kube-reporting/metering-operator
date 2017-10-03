@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	"io/ioutil"
 )
 
 var (
@@ -10,7 +11,12 @@ var (
 )
 
 func main() {
+	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	if err != nil {
+		panic(err)
+	}
 	cfg := chargeback.Con***REMOVED***g{
+		Namespace:  string(namespace),
 		HiveHost:   HiveHost,
 		PrestoHost: PrestoHost,
 	}

@@ -35,6 +35,7 @@ type Entry struct {
 	Time time.Time
 
 	// Level the log entry was logged at: Debug, Info, Warn, Error, Fatal or Panic
+	// This ***REMOVED***eld will be set on entry ***REMOVED***ring and the value will be equal to the one in Logger struct ***REMOVED***eld.
 	Level Level
 
 	// Message passed to Debug, Info, Warn, Error, Fatal or Panic

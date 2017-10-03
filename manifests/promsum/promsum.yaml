@@ -2,7 +2,6 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: promsum
-  namespace: tectonic-chargeback
 spec:
   selector:
     matchLabels:
@@ -18,8 +17,12 @@ spec:
         image: quay.io/coreos/promsum:0.4
         imagePullPolicy: Always
         env:
+        - name: "PROM"
+          value: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
         - name: "POLL_INTERVAL"
           value: "1800"
+        - name: "AWS_REGION"
+          value: "us-west-1"
         - name: "AWS_ACCESS_KEY_ID"
           valueFrom:
             secretKeyRef:
@@ -30,12 +33,5 @@ spec:
             secretKeyRef:
               name: aws
               key: AWS_SECRET_ACCESS_KEY
-        - name: "S3_BUCKET"
-          value: <Promsum bucket>
-        - name: "S3_PATH"
-          value: <Promsum pre***REMOVED***x>
-        - name: "AWS_REGION"
-          value: <Promsum bucket region>
-        - name: "QUERY"
-          value: "(kube_pod_container_resource_requests_memory_bytes / on(node) group_left kube_node_status_capacity_memory_bytes) * on(node) group_left(provider_id) kube_node_info"
       restartPolicy: Always
+      serviceAccount: promsum
