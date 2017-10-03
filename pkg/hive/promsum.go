@@ -17,10 +17,10 @@ var (
 	}
 
 	PromsumColumns = []string{
-		"subject string",
+		"query string",
 		"amount float",
-		"`start` timestamp",
-		"`end` timestamp",
+		"`timestamp` timestamp",
+		"`timePrecision` float",
 		"labels map<string, string>",
 	}
 )

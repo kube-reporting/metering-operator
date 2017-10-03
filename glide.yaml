@@ -51,6 +51,8 @@ import:
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
 - package: github.com/robfig/cron
   version: be2e0b0deed5a68ffee390b4583a13aff8321535
+- package: github.com/sirupsen/logrus
+  version: v1.0.3
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133

@@ -5,23 +5,37 @@ import (
 	"fmt"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 	"github.com/coreos-inc/kube-chargeback/pkg/cron"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
+const (
+	connBackoff     = time.Second * 15
+	maxConnWaitTime = time.Minute * 3
+)
+
 type Config struct {
+	Namespace string
+
 	HiveHost   string
 	PrestoHost string
 }
 
+func init() {
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+}
+
 func New(cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
+		namespace:  cfg.Namespace,
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
 	}
@@ -30,12 +44,12 @@ func New(cfg Config) (*Chargeback, error) {
 		return nil, err
 	}
 
-	fmt.Println("setting up extensions client...")
+	log.Debugf("setting up extensions client...")
 	if op.extension, err = ext_client.NewForConfig(config); err != nil {
 		return nil, err
 	}
 
-	fmt.Println("setting up chargeback client...")
+	log.Debugf("setting up chargeback client...")
 	if op.charge, err = cb.NewForConfig(config); err != nil {
 		return nil, err
 	}
@@ -46,18 +60,17 @@ func New(cfg Config) (*Chargeback, error) {
 
 	op.reportInform = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
-			ListFunc:  op.charge.Reports().List,
-			WatchFunc: op.charge.Reports().Watch,
+			ListFunc:  op.charge.Reports(cfg.Namespace).List,
+			WatchFunc: op.charge.Reports(cfg.Namespace).Watch,
 		},
-		&cb.Report{}, 3*time.Minute, cache.Indexers{},
+		&cbTypes.Report{}, 3*time.Minute, cache.Indexers{},
 	)
 
-	fmt.Println("configuring event listeners")
+	log.Debugf("configuring event listeners...")
 	op.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: op.handleAddReport,
 	})
 
-	fmt.Println("All set up!")
 	return op, nil
 }
 
@@ -69,51 +82,59 @@ type Chargeback struct {
 
 	cronOp *cron.Operator
 
+	namespace  string
 	hiveHost   string
 	prestoHost string
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
-	err := c.createResources()
-	if err != nil {
-		panic(err)
-	}
-
 	// TODO: implement polling
 	time.Sleep(15 * time.Second)
 
 	go c.reportInform.Run(stopCh)
 	go c.cronOp.Run(stopCh)
 
-	fmt.Println("running")
+	log.Infof("chargeback successfully initialized, waiting for reports...")
 
 	<-stopCh
 	return nil
 }
 
-func (c *Chargeback) createResources() error {
-	cdrClient := c.extension.CustomResourceDefinitions()
-	for _, cdr := range cb.Resources {
-		if _, err := cdrClient.Create(cdr); err != nil && !apierrors.IsAlreadyExists(err) {
-			return err
-		}
-	}
-	return nil
-}
-
 func (c *Chargeback) hiveConn() (*hive.Connection, error) {
-	hive, err := hive.Connect(c.hiveHost)
-	if err != nil {
-		return nil, err
+	// Hive may take longer to start than chargeback, so keep attempting to
+	// connect in a loop in case we were just started and hive is still coming
+	// up.
+	startTime := time.Now()
+	log.Debugf("getting hive connection")
+	for {
+		hive, err := hive.Connect(c.hiveHost)
+		if err == nil {
+			return hive, nil
+		} else if time.Since(startTime) > maxConnWaitTime {
+			log.Debugf("attempts timed out, failed to get hive connection")
+			return nil, err
+		}
+		log.Debugf("error encountered, backing off and trying again: %v", err)
+		time.Sleep(connBackoff)
 	}
-	return hive, nil
 }
 
 func (c *Chargeback) prestoConn() (*sql.DB, error) {
+	// Presto may take longer to start than chargeback, so keep attempting to
+	// connect in a loop in case we were just started and presto is still coming
+	// up.
 	connStr := fmt.Sprintf("presto://%s/hive/default", c.prestoHost)
-	db, err := sql.Open("prestgo", connStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to presto: %v", err)
+	startTime := time.Now()
+	log.Debugf("getting presto connection")
+	for {
+		db, err := sql.Open("prestgo", connStr)
+		if err == nil {
+			return db, nil
+		} else if time.Since(startTime) > maxConnWaitTime {
+			log.Debugf("attempts timed out, failed to get presto connection")
+			return nil, fmt.Errorf("failed to connect to presto: %v", err)
+		}
+		log.Debugf("error encountered, backing off and trying again: %v", err)
+		time.Sleep(connBackoff)
 	}
-	return db, nil
 }

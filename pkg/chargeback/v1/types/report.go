@@ -1,4 +1,4 @@
-package v1
+package types
 
 import (
 	"fmt"
@@ -23,14 +23,15 @@ type ReportSpec struct {
 	// ReportingEnd is the end period of time that the report will be based on.
 	ReportingEnd meta.Time `json:"reportingEnd"`
 
-	// Chargeback is the bucket that stores chargeback metering data.
-	Chargeback S3Bucket `json:"chargeback"`
+	GenerationQueryName string `json:"generationQuery"`
 
-	// AWSReport details the expense of running a Pod over a period of time on Amazon Web Services.
-	AWSReport *S3Bucket `json:"aws,omitempty"`
+	//// AWSReport details the expense of running a Pod over a period of time on Amazon Web Services.
+	//AWSReport *S3Bucket `json:"aws,omitempty"`
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
+
+	AdditionalLabels []string `json:"additionalLabels"`
 }
 
 type ReportTemplateSpec struct {
@@ -82,4 +83,26 @@ type ReportList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
 	Items         []*Report `json:"items"`
+}
+
+// +k8s:deepcopy-gen=true
+type ReportScope string
+
+const (
+	ReportScopePod       ReportScope = "pod"
+	ReportScopeNamespace ReportScope = "namespace"
+)
+
+func (s *ReportScope) UnmarshalText(text []byte) error {
+	reportScope := ReportScope(text)
+	switch reportScope {
+	case ReportScopePod:
+	case ReportScopeNamespace:
+	case ReportScope(""): // default to pod
+		reportScope = ReportScopePod
+	default:
+		return fmt.Errorf("'%s' is not a ReportScope", reportScope)
+	}
+	*s = reportScope
+	return nil
 }
