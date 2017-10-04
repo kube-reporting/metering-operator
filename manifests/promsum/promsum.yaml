@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: promsum
-        image: quay.io/coreos/promsum:0.4
+        image: quay.io/coreos/promsum:latest
         imagePullPolicy: Always
         env:
         - name: "PROM"

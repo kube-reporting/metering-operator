@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: coordinator
-        image: quay.io/coreos/chargeback-presto:0.2
+        image: quay.io/coreos/chargeback-presto:latest
         imagePullPolicy: Always
         env:
         - name: "HIVE_CATALOG_hive_s3_aws___access___key"
