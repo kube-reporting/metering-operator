@@ -4,16 +4,16 @@ metadata:
   creationTimestamp: null
   labels:
     presto: coordinator
+    app: presto
   name: presto-coordinator
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      presto: coordinator
   template:
     metadata:
       labels:
        presto: coordinator
+       app: presto
     spec:
       containers:
       - name: coordinator
