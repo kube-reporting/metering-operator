@@ -14,24 +14,33 @@ spec:
     spec:
       containers:
       - name: promsum
-        image: quay.io/coreos/promsum:0.4
+        image: quay.io/coreos/promsum:latest
         imagePullPolicy: Always
         env:
-        - name: "PROM"
-          value: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
-        - name: "POLL_INTERVAL"
-          value: "1800"
-        - name: "AWS_REGION"
-          value: "us-west-1"
-        - name: "AWS_ACCESS_KEY_ID"
+        - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_ACCESS_KEY_ID
-        - name: "AWS_SECRET_ACCESS_KEY"
+              name: chargeback-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_SECRET_ACCESS_KEY
+              name: chargeback-secrets
+              key: aws-secret-access-key
+        - name: AWS_REGION
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: aws-region
+        - name: PROM
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: prometheus-url
+        - name: POLL_INTERVAL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: promsum-poll-interval
       restartPolicy: Always
       serviceAccount: promsum
