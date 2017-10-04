@@ -1,9 +1,9 @@
 apiVersion: chargeback.coreos.com/prealpha
 kind: ReportGenerationQuery
 metadata:
-    name: "pod-usage-by-node"
+    name: "pod-memory-usage-by-node"
 spec:
-    reportDataStore: "default-datastore"
+    reportDataStore: "pod-memory-usage"
     columns:
         - name: pod
           type: string
