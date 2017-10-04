@@ -25,14 +25,18 @@ func ExecuteInsertQuery(presto *sql.DB, target, query string) error {
 	}
 
 	insert := fmt.Sprintf("INSERT INTO %s %s", target, query)
-	result, err := presto.Query(insert)
+	rows, err := presto.Query(insert)
 	if err != nil {
 		return err
 	}
-	for result.Next() {
-		if err := result.Err(); err != nil {
-			return fmt.Errorf("presto SQL error: %v", err)
-		}
+	// Must call rows.Next() in order for errors to be populated correctly
+	// because Query() only submits the query, and doesn't handle
+	// success/failure. Next() is the method which inspects the submitted
+	// queries status and causes errors to get stored in the sql.Rows object.
+	for rows.Next() {
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("presto SQL error: %v", err)
 	}
 	return nil
 }
