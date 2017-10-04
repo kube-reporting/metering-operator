@@ -25,11 +25,6 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
-        - name: AWS_REGION
-          valueFrom:
-            configMapKeyRef:
-              name: chargeback-config
-              key: aws-region
         - name: LOG_REPORT
           valueFrom:
             configMapKeyRef:
