@@ -7,20 +7,19 @@ accessSecret=${AWS_SECRET_ACCESS_KEY-"<base64 encoded AWS_SECRET_ACCESS_KEY>"}
 setupAWS=n
 if [[ $accessKey != \<b* ]] && [[ $accessKey != \<b* ]]; then
   if [ -t 0 ] && [ -t 1 ]; then
-    read -p "AWS credentials (${accessKey}) detected. Would you like to create a secret for Chargeback using them? [y/N]" setupAWS
+    read -p "AWS credentials (${accessKey}) detected. Would you like to create a secret for Chargeback using them? [y/N]: " setupAWS
   fi
-  accessKey=$(printf "${accessKey}" | base64)
-  accessSecret=$(printf "${accessSecret}" | base64)
 fi
 
 if [[ "${setupAWS}" == "y" ]]; then
-  aws_secret ${accessKey} ${accessSecret} | kube-install -
+  sed \
+      -e 's/aws-access-key-id: "REPLACEME"/aws-access-key-id: "'$(echo -n ${accessKey} | base64)'"/g' \
+      -e 's/aws-secret-access-key: "REPLACEME"/aws-secret-access-key: "'$(echo -n ${accessSecret} | base64)'"/g' \
+      manifests/chargeback/chargeback-secrets.yaml.dist \
+      > manifests/chargeback/chargeback-secrets.yaml
 else
   echo "To have chargeback setup AWS credentials for you: set AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY, and re-run this script."
-  echo "Alternatively, you can manually create the secret using the manifest below:"
-  echo "-------"
-  aws_secret "${accessKey}" "${accessSecret}"
-  echo "-------"
+  echo "Alternatively, you can manually create the secret by copying the manifest manifests/chargeback/chargeback-secrets.yaml.dist to: manfiests/chargeback/chargeback-secrets.yaml and updating it with your credentials."
 fi
 
 msg "Configuring pull secrets"

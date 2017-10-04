@@ -1,9 +1,8 @@
 # This should not be invoked directly. It provides functions and data for other scripts.
 
-CHARGEBACK_NAMESPACE="team-chargeback"
-TECTONIC_NAMESPACE="tectonic-system"
-TECTONIC_PULL_SECRET="coreos-pull-secret"
-AWS_SECRET="aws"
+: "${CHARGEBACK_NAMESPACE:=team-chargeback}"
+: "${PULL_SECRET_NAMESPACE:=tectonic-system}"
+: "${PULL_SECRET:=coreos-pull-secret}"
 
 function kubectl_cmd() {
     echo "kubectl --namespace=${CHARGEBACK_NAMESPACE}"
@@ -31,8 +30,8 @@ function msg() {
 }
 
 function copy-tectonic-pull() {
-  local pullSecret=$(kubectl --namespace=${TECTONIC_NAMESPACE} get secrets ${TECTONIC_PULL_SECRET} -o json)
-  pullSecret="${pullSecret/${TECTONIC_NAMESPACE}/${CHARGEBACK_NAMESPACE}}"
+  local pullSecret=$(kubectl --namespace=${PULL_SECRET_NAMESPACE} get secrets ${PULL_SECRET} -o json)
+  pullSecret="${pullSecret/${PULL_SECRET_NAMESPACE}/${CHARGEBACK_NAMESPACE}}"
   echo ${pullSecret} | kube-install -
 }
 
@@ -43,24 +42,4 @@ function kubectl_files() {
     str="${str-} -f ${f}"
   done
   echo ${str}
-}
-
-function aws_secret() {
-  local id=${1}
-  local secret=${2}
-  cat <<EOF
-{
-    "kind": "Secret",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "${AWS_SECRET}",
-        "namespace": "${CHARGEBACK_NAMESPACE}"
-    },
-    "data": {
-        "AWS_ACCESS_KEY_ID": "${id}",
-        "AWS_SECRET_ACCESS_KEY": "${secret}"
-    },
-    "type": "Opaque"
-}
-EOF
 }

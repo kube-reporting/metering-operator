@@ -18,7 +18,7 @@ spec:
       containers:
       - name: metastore
         args: ["/opt/hive/bin/hive", "--service", "metastore"]
-        image: quay.io/coreos/chargeback-hive:0.3
+        image: quay.io/coreos/chargeback-hive:latest
         imagePullPolicy: Always
         ports:
         - name: meta
@@ -28,19 +28,19 @@ spec:
         - name: CORE_CONF_fs_s3n_awsAccessKeyId
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_ACCESS_KEY_ID
+              name: chargeback-secrets
+              key: aws-access-key-id
         - name: CORE_CONF_fs_s3n_awsSecretAccessKey
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_SECRET_ACCESS_KEY
+              name: chargeback-secrets
+              key: aws-secret-access-key
         volumeMounts:
         - name: hive-data
           mountPath: /var/lib/hive
       - name: hive
         args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
-        image: quay.io/coreos/chargeback-hive:0.3
+        image: quay.io/coreos/chargeback-hive:latest
         imagePullPolicy: Always
         ports:
         - name: thrift
@@ -54,13 +54,13 @@ spec:
         - name: CORE_CONF_fs_s3n_awsAccessKeyId
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_ACCESS_KEY_ID
+              name: chargeback-secrets
+              key: aws-access-key-id
         - name: CORE_CONF_fs_s3n_awsSecretAccessKey
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_SECRET_ACCESS_KEY
+              name: chargeback-secrets
+              key: aws-secret-access-key
         resources:
           requests:
             memory: "1000Mi"
