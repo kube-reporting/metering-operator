@@ -1,6 +1,7 @@
 package chargeback
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -92,10 +93,18 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 		return
 	}
 
-	err = generateReport(logger, report, genQuery, rng, promsumTable, hiveCon, prestoCon)
+	results, err := generateReport(logger, report, genQuery, rng, promsumTable, hiveCon, prestoCon)
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("Report execution failed: %v", err))
 		return
+	}
+	if c.logReport {
+		resultsJSON, err := json.MarshalIndent(results, "", " ")
+		if err != nil {
+			c.setError(logger, report, fmt.Errorf("Unable to marshal report into JSON: %v", err))
+			return
+		}
+		logger.Debugf("results: %s", string(resultsJSON))
 	}
 
 	// update status
