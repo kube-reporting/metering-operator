@@ -26,6 +26,7 @@ type Config struct {
 
 	HiveHost   string
 	PrestoHost string
+	LogReport  bool
 }
 
 func init() {
@@ -34,10 +35,13 @@ func init() {
 }
 
 func New(cfg Config) (*Chargeback, error) {
+	log.Debugf("Config: %+v", cfg)
+
 	op := &Chargeback{
 		namespace:  cfg.Namespace,
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
+		logReport:  cfg.LogReport,
 	}
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -85,6 +89,7 @@ type Chargeback struct {
 	namespace  string
 	hiveHost   string
 	prestoHost string
+	logReport  bool
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {

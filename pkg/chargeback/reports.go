@@ -69,18 +69,18 @@ func generateHiveColumns(report *cbTypes.Report, genQuery cbTypes.ReportGenerati
 	return columns
 }
 
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) error {
+func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating
 	tmpl, err := template.New("request").Funcs(templateFuncMap).Parse(genQuery.Spec.Query)
 	if err != nil {
-		return fmt.Errorf("error parsing query: %v", err)
+		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
 	buf := &bytes.Buffer{}
 	err = tmpl.Execute(buf, newTemplateInfo(promsumTbl, report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time, report.Spec.AdditionalLabels))
 	if err != nil {
-		return fmt.Errorf("error executing template: %v", err)
+		return nil, fmt.Errorf("error executing template: %v", err)
 	}
 	query := string(buf.Bytes())
 
@@ -93,15 +93,53 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.
 	logger.Debugf("creating output table %s", reportTable)
 	err = hive.CreateReportTable(hiveCon, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
 	if err != nil {
-		return fmt.Errorf("Couldn't create table for output report: %v", err)
+		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
 	}
 
 	// Run the report
 	logger.Debugf("running report generation query")
 	err = presto.ExecuteInsertQuery(prestoCon, reportTable, query)
 	if err != nil {
-		logger.WithError(err).Errorf("usage report FAILED!")
-		return fmt.Errorf("Failed to execute %s usage report: %v", genQuery.Name, err)
+		logger.WithError(err).Errorf("creating usage report FAILED!")
+		return nil, fmt.Errorf("Failed to execute %s usage report: %v", genQuery.Name, err)
 	}
-	return nil
+
+	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
+	rows, err := prestoCon.Query(getReportQuery)
+	if err != nil {
+		logger.WithError(err).Errorf("getting usage report FAILED!")
+		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
+	}
+	cols, err := rows.Columns()
+	if err != nil {
+		logger.WithError(err).Errorf("getting usage report FAILED!")
+		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
+	}
+
+	var results []map[string]interface{}
+	for rows.Next() {
+		// Create a slice of interface{}'s to represent each column,
+		// and a second slice to contain pointers to each item in the columns slice.
+		columns := make([]interface{}, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i, _ := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		// Scan the result into the column pointers...
+		if err := rows.Scan(columnPointers...); err != nil {
+			return nil, err
+		}
+
+		// Create our map, and retrieve the value for each column from the pointers slice,
+		// storing it in the map with the name of the column as the key.
+		m := make(map[string]interface{})
+		for i, colName := range cols {
+			val := columnPointers[i].(*interface{})
+			m[colName] = *val
+		}
+		results = append(results, m)
+	}
+
+	return results, nil
 }
