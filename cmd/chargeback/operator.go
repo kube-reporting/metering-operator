@@ -1,16 +1,28 @@
 package main
 
 import (
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 	"io/ioutil"
+	"os"
+	"strconv"
+
+	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 var (
 	HiveHost   = "hive:10000"
 	PrestoHost = "presto:8080"
+
+	logReport bool
 )
 
 func main() {
+	if logReportEnv := os.Getenv("LOG_REPORT"); logReportEnv != "" {
+		var err error
+		logReport, err = strconv.ParseBool(logReportEnv)
+		if err != nil {
+			panic(err)
+		}
+	}
 	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		panic(err)
@@ -19,6 +31,7 @@ func main() {
 		Namespace:  string(namespace),
 		HiveHost:   HiveHost,
 		PrestoHost: PrestoHost,
+		LogReport:  logReport,
 	}
 
 	op, err := chargeback.New(cfg)
