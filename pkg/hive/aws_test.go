@@ -27,11 +27,6 @@ func TestCreateAWSUsageTable(t *testing.T) {
 	if err = CreateAWSUsageTable(conn, AWSUsageTableName, s3Bucket, manifests[0]); err != nil {
 		t.Error("error perfoming query: ", err)
 	}
-
-	selectQuery := fmt.Sprint("SELECT * FROM ", AWSUsageTableName, " LIMIT 10")
-	if err = conn.Query(selectQuery); err != nil {
-		t.Error("could not select from sample data: ", err)
-	}
 }
 
 func getAWSManifests(t *testing.T) []aws.Manifest {

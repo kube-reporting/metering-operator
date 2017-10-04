@@ -45,7 +45,7 @@ func fmtColumnText(columns []string) (colTxt string) {
 	return
 }
 
-// s3nLocation returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
-func s3nLocation(bucket, pre***REMOVED***x string) string {
-	return fmt.Sprintf("s3n://%s/%s", bucket, pre***REMOVED***x)
+// s3Location returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
+func s3Location(bucket, pre***REMOVED***x string) string {
+	return fmt.Sprintf("s3a://%s/%s", bucket, pre***REMOVED***x)
 }

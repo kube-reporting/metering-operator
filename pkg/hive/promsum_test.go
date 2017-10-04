@@ -22,9 +22,4 @@ func TestCreatePromsumTable(t *testing.T) {
 	if err = CreatePromsumTable(conn, PromsumTableName, s3Bucket, s3Pre***REMOVED***x); err != nil {
 		t.Error("error perfoming query: ", err)
 	}
-
-	selectQuery := fmt.Sprint("SELECT * FROM ", PromsumTableName)
-	if err = conn.Query(selectQuery); err != nil {
-		t.Error("could not select from sample data: ", err)
-	}
 }

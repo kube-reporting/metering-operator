@@ -12,7 +12,7 @@ func CreateReportTable(conn *Connection, tableName, bucket, pre***REMOVED***x st
 	}
 
 	// use s3n HDFS driver for s3
-	location := s3nLocation(bucket, pre***REMOVED***x)
+	location := s3Location(bucket, pre***REMOVED***x)
 	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, false)
 	return conn.Query(query)
 }
