@@ -26,6 +26,7 @@ type Con***REMOVED***g struct {
 
 	HiveHost   string
 	PrestoHost string
+	LogReport  bool
 }
 
 func init() {
@@ -34,10 +35,13 @@ func init() {
 }
 
 func New(cfg Con***REMOVED***g) (*Chargeback, error) {
+	log.Debugf("Con***REMOVED***g: %+v", cfg)
+
 	op := &Chargeback{
 		namespace:  cfg.Namespace,
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
+		logReport:  cfg.LogReport,
 	}
 	con***REMOVED***g, err := rest.InClusterCon***REMOVED***g()
 	if err != nil {
@@ -85,6 +89,7 @@ type Chargeback struct {
 	namespace  string
 	hiveHost   string
 	prestoHost string
+	logReport  bool
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
