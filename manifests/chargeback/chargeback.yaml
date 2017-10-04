@@ -4,8 +4,6 @@ metadata:
   name: chargeback
 spec:
   selector:
-    matchLabels:
-      app: chargeback
   template:
     metadata:
       name: chargeback
@@ -17,18 +15,26 @@ spec:
         image: quay.io/coreos/chargeback:latest
         imagePullPolicy: Always
         env:
-        - name: "AWS_ACCESS_KEY_ID"
+        - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_ACCESS_KEY_ID
-        - name: "AWS_SECRET_ACCESS_KEY"
+              name: chargeback-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: aws
-              key: AWS_SECRET_ACCESS_KEY
+              name: chargeback-secrets
+              key: aws-secret-access-key
         - name: AWS_REGION
-          value: us-west-1
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: aws-region
+        - name: LOG_REPORT
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: log-reports
       restartPolicy: Always
       serviceAccount: chargeback
       imagePullSecrets:

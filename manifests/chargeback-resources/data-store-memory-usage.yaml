@@ -1,7 +1,7 @@
 apiVersion: chargeback.coreos.com/prealpha
 kind: ReportDataStore
 metadata:
-  name: "pod-cpu-usage"
+  name: "pod-memory-usage"
   labels:
     tectonic-chargeback: "true"
 spec:
@@ -9,6 +9,6 @@ spec:
     type: "s3"
     format: "json"
     bucket: "REPLACEME"
-    prefix: "promsum/cpu_by_pod"
+    prefix: "promsum/memory_by_pod"
   queries:
-  - "get-cpu-by-pod"
+  - "get-memory-by-pod"

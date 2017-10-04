@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chargeback-config
+  labels:
+    app: chargeback
+data:
+  aws-region: "us-west-1"
+  prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
+  promsum-poll-interval: "60"
+  log-reports: "false"
