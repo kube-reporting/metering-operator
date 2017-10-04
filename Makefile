@@ -23,9 +23,9 @@ USE_LATEST_TAG ?= false
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(CHARGEBACK_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
-PROMSUM_GO_FILES := $(shell go list -json $(PROMSUM_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+PROMSUM_GO_FILES := $(shell go list -json $(PROMSUM_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(PROMSUM_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
 # TODO: Add tests
 all: fmt docker-build-all
