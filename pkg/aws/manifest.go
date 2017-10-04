@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -23,11 +24,9 @@ const (
 
 	// ManifestSuffix is the extension of AWS Usage Data manifests.
 	ManifestSuffix = ".json"
-)
 
-var (
-	// S3Client allows mocks to be injected for testing.
-	S3Client s3iface.S3API
+	// defaultS3Region is used to make the API call used to determine a bucket's region.
+	defaultS3Region = "us-east-1"
 )
 
 // Manifest is a representation of the file AWS provides with metadata for current usage information.
@@ -65,7 +64,10 @@ func (m Manifest) Paths() (paths []string) {
 
 // RetrieveManifests downloads the billing manifest for the given bucket, prefix, and report name.
 func RetrieveManifests(bucket, prefix string, rng cb.Range) ([]Manifest, error) {
-	client := getS3Client()
+	client, err := getS3Client(bucket, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	// ensure that there is a slash at end of location
 	prefix = fmt.Sprintf("%s/", filepath.Join(prefix))
@@ -118,6 +120,20 @@ func RetrieveManifests(bucket, prefix string, rng cb.Range) ([]Manifest, error) 
 	return manifests, nil
 }
 
+// retrieveRegion performs a request to determine the region the bucket has been created in.
+func retrieveRegion(client s3iface.S3API, bucket string) (*string, error) {
+	get := &s3.GetBucketLocationInput{Bucket: aws.String(bucket)}
+	bucketResp, err := client.GetBucketLocation(get)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve bucket region: %v", err)
+	}
+
+	if bucketResp == nil || bucketResp.LocationConstraint == nil {
+		return nil, errors.New("bucket response or bucket name was nil")
+	}
+	return bucketResp.LocationConstraint, nil
+}
+
 // retrieveManifest retrieves a manifest from the given bucket and key.
 func retrieveManifest(client s3iface.S3API, bucket, key string) (Manifest, error) {
 	get := &s3.GetObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)}
@@ -162,10 +178,17 @@ func parseBillingDate(dateStr string) (t time.Time, err error) {
 }
 
 // getS3Client returns the singleton client.
-func getS3Client() s3iface.S3API {
-	if S3Client == nil {
-		awsSession := session.Must(session.NewSession())
-		S3Client = s3.New(awsSession)
+func getS3Client(bucket string, creds *credentials.Credentials) (s3iface.S3API, error) {
+	awsSession := session.Must(session.NewSession())
+	if creds != nil {
+		awsSession.Config.Credentials = creds
 	}
-	return S3Client
+
+	var err error
+	tmpClient := s3.New(awsSession, aws.NewConfig().WithRegion(defaultS3Region))
+	if awsSession.Config.Region, err = retrieveRegion(tmpClient, bucket); err != nil {
+		return nil, err
+	}
+
+	return s3.New(awsSession), nil
 }
