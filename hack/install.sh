@@ -25,9 +25,20 @@ if [[ "${setupAWS}" == "y" ]]; then
 msg "Con***REMOVED***guring pull secrets"
 copy-tectonic-pull
 
-msg "Installing query and collection layer"
-kube-install manifests/hive manifests/presto manifests/chargeback
+msg "Installing Custom Resource De***REMOVED***nitions"
+kube-install \
+    manifests/custom-resource-de***REMOVED***nitons
 
-msg "Populating chargeback CRDs"
-kube-install manifests/chargeback-resources
+msg "Installing query and collection layer"
+kube-install \
+    manifests/hive \
+    manifests/presto \
+    manifests/chargeback
+
+
+msg "Installing Custom Resources"
+kube-install \
+    manifests/custom-resources/prom-queries \
+    manifests/custom-resources/datastores \
+    manifests/custom-resources/report-queries
 
