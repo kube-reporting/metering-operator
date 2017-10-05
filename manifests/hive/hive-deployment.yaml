@@ -25,12 +25,12 @@ spec:
           containerPort: 9083
           protocol: TCP
         env:
-        - name: CORE_CONF_fs_s3n_awsAccessKeyId
+        - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-access-key-id
-        - name: CORE_CONF_fs_s3n_awsSecretAccessKey
+        - name: CORE_CONF_fs_s3a_secret_key
           valueFrom:
             secretKeyRef:
               name: chargeback-secrets
@@ -51,12 +51,12 @@ spec:
           protocol: TCP
         terminationMessagePath: /dev/termination-log
         env:
-        - name: CORE_CONF_fs_s3n_awsAccessKeyId
+        - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-access-key-id
-        - name: CORE_CONF_fs_s3n_awsSecretAccessKey
+        - name: CORE_CONF_fs_s3a_secret_key
           valueFrom:
             secretKeyRef:
               name: chargeback-secrets
