@@ -5,8 +5,19 @@ source ${DIR}/util.sh
 msg "Removing pull secrets"
 kube-remove-non-***REMOVED***le secret coreos-pull-secret
 
-msg "Removing query layer"
-kube-remove manifests/hive manifests/presto manifests/chargeback
+msg "Removing query and collection layer"
+kube-remove \
+    manifests/hive \
+    manifests/presto \
+    manifests/chargeback
 
-msg "Removing collection layer"
-kube-remove manifests/promsum
+msg "Removing Custom Resources"
+kube-remove \
+    manifests/custom-resources/prom-queries \
+    manifests/custom-resources/datastores \
+    manifests/custom-resources/report-queries
+
+msg "Removing Custom Resource De***REMOVED***nitions"
+kube-remove \
+    manifests/custom-resource-de***REMOVED***nitons
+
