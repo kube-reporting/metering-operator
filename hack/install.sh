@@ -25,11 +25,20 @@ fi
 msg "Configuring pull secrets"
 copy-tectonic-pull
 
-msg "Installing query layer"
-kube-install manifests/hive manifests/presto manifests/chargeback
+msg "Installing Custom Resource Definitions"
+kube-install \
+    manifests/custom-resource-definitons
 
-msg "Populating chargeback CRDs"
-kube-install manifests/chargeback-resources
+msg "Installing query and collection layer"
+kube-install \
+    manifests/hive \
+    manifests/presto \
+    manifests/chargeback
 
-msg "Installing collection layer"
-kube-install manifests/promsum
+
+msg "Installing Custom Resources"
+kube-install \
+    manifests/custom-resources/prom-queries \
+    manifests/custom-resources/datastores \
+    manifests/custom-resources/report-queries
+
