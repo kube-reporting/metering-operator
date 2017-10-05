@@ -1,0 +1,31 @@
+apiVersion: chargeback.coreos.com/prealpha
+kind: ReportGenerationQuery
+metadata:
+    name: "pod-memory-usage-by-namespace"
+spec:
+    reportDataStore: "pod-memory-usage"
+    columns:
+    - name: namespace
+      type: string
+    - name: memoryUsage
+      type: double
+    query: |
+      WITH usage_period AS (
+        SELECT kubeUsage.labels['namespace'] as namespace,
+               kubeUsage.amount as amount,
+               kubeUsage."timestamp" as timestamp
+        FROM {{.TableName}} as kubeUsage
+        WHERE kubeUsage."timestamp" >= timestamp '{{.StartPeriod}}'
+        AND kubeUsage."timestamp" <= timestamp '{{.EndPeriod}}'
+      ),
+      computed_usage AS (
+        SELECT namespace,
+               "timestamp" as curr,
+              lag("timestamp") OVER (PARTITION BY namespace ORDER BY "timestamp" ASC) as prev,
+              (amount + lag(amount) OVER (PARTITION BY namespace ORDER BY "timestamp" ASC)) / 2 as usage
+        FROM usage_period
+      )
+      SELECT namespace,
+             sum(usage * date_diff('millisecond', prev, curr)) as usage
+      FROM computed_usage
+      GROUP BY namespace
