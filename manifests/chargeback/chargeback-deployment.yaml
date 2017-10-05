@@ -30,6 +30,10 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: log-reports
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
       restartPolicy: Always
       serviceAccount: chargeback
       imagePullSecrets:
