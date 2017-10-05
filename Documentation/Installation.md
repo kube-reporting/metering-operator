@@ -37,9 +37,9 @@ can be generated. More information on this is available in the [documentation on
 Chargeback's CRD model][crd-model], but the data stores must be modi***REMOVED***ed to
 point to a valid S3 bucket.
 
-Modify the `bucket` and `pre***REMOVED***x` keys in
-`manifests/chargeback-resources/data-store.yaml` to match
-where the collected usage data should be stored.
+Modify the `bucket` and `pre***REMOVED***x` keys in the ***REMOVED***les from
+`manifests/custom-resources/datastores` to match where the collected usage
+data should be stored.
 
 As an example:
 
@@ -119,11 +119,11 @@ examples of report objects exist in the `manifests/custom-resources/reports`
 directory.
 
 To deploy an example pod usage by memory report, ***REMOVED***rst modify
-`manifests/custom-resources/reports/pod-report.yaml` and set your `bucket` and
+`manifests/custom-resources/reports/pod-memory-usage-by-node.yaml` and set your `bucket` and
 `reportStart`/`reportEnd`, then create the report in Kubernetes:
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE create -f manifests/custom-resources/reports/pod-memory-usage-by-node-report.yaml
+kubectl -n $CHARGEBACK_NAMESPACE create -f manifests/custom-resources/reports/pod-memory-usage-by-node.yaml
 ```
 
 Existing reports can be viewed in Kubernetes with the following command:
