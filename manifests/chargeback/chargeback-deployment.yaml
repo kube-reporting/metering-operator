@@ -30,6 +30,10 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: log-reports
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
       restartPolicy: Always
       serviceAccount: chargeback
       imagePullSecrets:
