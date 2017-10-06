@@ -2,7 +2,6 @@
 
 POLL_INTERVAL=${POLL_INTERVAL:-300}
 PROM=${PROM:-http://prometheus.tectonic-system.svc.cluster.local:9090}
-SUBJECT=${SUBJECT:-kube-chargeback}
 
 echo "Logging usage data for cluster..."
 while true; do
