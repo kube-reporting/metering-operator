@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:8
 ENV DEBIAN_FRONTEND noninteractive
 ENV PRESTO_VERSION 0.166
 
