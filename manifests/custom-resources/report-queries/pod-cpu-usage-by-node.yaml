@@ -11,12 +11,15 @@ spec:
           type: string
         - name: node
           type: string
+        - name: provider_id
+          type: string
         - name: cpuUsage
           type: double
     query: |
         WITH usage_period AS (
             SELECT kubeUsage.labels['pod'] as pod,
                    kubeUsage.labels['namespace'] as namespace,
+                   kubeUsage.labels['node'] as node,
                    kubeUsage.labels as labels,
                    kubeUsage.amount as amount,
                    split_part(split_part(element_at(kubeUsage.labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
@@ -30,6 +33,7 @@ spec:
             SELECT pod,
                    namespace,
                    node,
+                   provider_id,
                    "timestamp" as curr,
                    lag("timestamp") OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC) as prev,
                    (amount + lag(amount) OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC)) / 2 as usage
@@ -40,7 +44,8 @@ spec:
             pod,
             namespace,
             node,
+            provider_id,
             sum(usage * date_diff('millisecond', prev, curr)) as usage
            {{listAdditionalLabels .Labels}}
         FROM computed_usage
-        GROUP BY pod, namespace, node {{listAdditionalLabels .Labels}}
+        GROUP BY pod, namespace, node, provider_id {{listAdditionalLabels .Labels}}
