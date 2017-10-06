@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -85,15 +86,16 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 	}
 	defer prestoCon.Close()
 
-	promsumTable := fmt.Sprintf("%s_%d", "kube_usage", rand.Int31())
+	replacer := strings.NewReplacer("-", "_", ".", "_")
+	datastoreTable := fmt.Sprintf("datastore_%s", replacer.Replace(dataStore.Name))
 	bucket, pre***REMOVED***x := dataStore.Spec.Storage.Bucket, dataStore.Spec.Storage.Pre***REMOVED***x
-	logger.Debugf("Creating table pointing to bucket/pre***REMOVED***x %q for promsum: %q.", bucket+"/"+pre***REMOVED***x, promsumTable)
-	if err = hive.CreatePromsumTable(hiveCon, promsumTable, bucket, pre***REMOVED***x); err != nil {
+	logger.Debugf("Creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", datastoreTable, bucket, pre***REMOVED***x)
+	if err = hive.CreatePromsumTable(hiveCon, datastoreTable, bucket, pre***REMOVED***x); err != nil {
 		c.setError(logger, report, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
 		return
 	}
 
-	results, err := generateReport(logger, report, genQuery, rng, promsumTable, hiveCon, prestoCon)
+	results, err := generateReport(logger, report, genQuery, rng, datastoreTable, hiveCon, prestoCon)
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("Report execution failed: %v", err))
 		return
