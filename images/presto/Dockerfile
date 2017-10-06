@@ -1,6 +1,10 @@
-FROM java:8
+FROM openjdk:8
 ENV DEBIAN_FRONTEND noninteractive
 ENV PRESTO_VERSION 0.166
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        less \
+        && rm -rf /var/lib/apt/lists/*
 
 RUN set -x \
     && curl -fSLs -o /tmp/presto.tar.gz http://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
@@ -9,7 +13,9 @@ RUN set -x \
     && rm /tmp/presto.tar.gz
 
 ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
-
+RUN curl -fSLs -o /opt/presto/presto-server-$PRESTO_VERSION/presto-cli https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/$PRESTO_VERSION/presto-cli-$PRESTO_VERSION-executable.jar \
+        && chmod +x /opt/presto/presto-server-$PRESTO_VERSION/presto-cli \
+        && ln -s /opt/presto/presto-server-$PRESTO_VERSION/presto-cli /usr/local/bin/presto-cli
 COPY etc/ $PRESTO_HOME/etc/
 
 # Configure JSON serialization
