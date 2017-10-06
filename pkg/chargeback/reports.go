@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"math/rand"
 	"strings"
 	"text/template"
 	"time"
@@ -87,10 +86,9 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.
 	logger.Debugf("query generated:\n%s", query)
 
 	// Create a table to write to
-	reportTable := fmt.Sprintf("%s_%d", strings.Replace(genQuery.Name, "-", "_", -1), rand.Int31())
+	reportTable := fmt.Sprintf("report_%s_%d", strings.Replace(report.Name, "-", "_", -1), time.Now().Unix())
 	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
-	logger.Infof("found S3 bucket to write to: %q", bucket+"/"+prefix)
-	logger.Debugf("creating output table %s", reportTable)
+	logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
 	err = hive.CreateReportTable(hiveCon, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
