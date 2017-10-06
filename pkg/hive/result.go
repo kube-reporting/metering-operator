@@ -11,8 +11,10 @@ func CreateReportTable(conn *Connection, tableName, bucket, prefix string, colum
 		return errors.New("the Hive session has closed")
 	}
 
-	// use s3n HDFS driver for s3
-	location := s3Location(bucket, prefix)
+	location, err := s3Location(bucket, prefix)
+	if err != nil {
+		return err
+	}
 	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, false)
 	return conn.Query(query)
 }
