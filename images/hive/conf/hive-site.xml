@@ -49,4 +49,8 @@
     <name>hive.metastore.schema.verification</name>
     <value>false</value>
   </property>
+  <property>
+    <name>hive.output.file.extension</name>
+    <value>.csv.gz</value>
+  </property>
 </configuration>
