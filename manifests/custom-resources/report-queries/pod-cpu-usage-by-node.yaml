@@ -19,7 +19,7 @@ spec:
                    kubeUsage.labels['namespace'] as namespace,
                    kubeUsage.labels as labels,
                    kubeUsage.amount as amount,
-                   split_part(split_part(kubeUsage.labels['provider_id'], ':///', 2), '/', 2) as node,
+                   split_part(split_part(element_at(kubeUsage.labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
                    kubeUsage."timestamp" as timestamp
                    {{addAdditionalLabels .Labels}}
             FROM {{.TableName}} as kubeUsage
