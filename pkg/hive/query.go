@@ -8,7 +8,7 @@ import (
 
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
-func createTable(name, location, serde string, serdeProps map[string]string, columns []string, external bool) string {
+func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns []string, external, ignoreExists bool) string {
 	serdePropsStr := fmtSerdeProps(serdeProps)
 	columnsStr := fmtColumnText(columns)
 
@@ -16,9 +16,19 @@ func createTable(name, location, serde string, serdeProps map[string]string, col
 	if external {
 		tableType = "EXTERNAL"
 	}
-
-	query := "CREATE %s TABLE %s (%s) ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s) LOCATION \"%s\""
-	return fmt.Sprintf(query, tableType, name, columnsStr, serde, serdePropsStr, location)
+	ifNotExists := ""
+	if ignoreExists {
+		ifNotExists = "IF NOT EXISTS"
+	}
+	return fmt.Sprintf(
+		`
+CREATE %s TABLE %s
+%s ( %s)
+ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s) LOCATION "%s"`,
+		tableType, ifNotExists,
+		name, columnsStr,
+		serdeFmt, serdePropsStr, location,
+	)
 }
 
 // fmtSerdeProps returns a formatted a set of SerDe properties for a Hive query.
