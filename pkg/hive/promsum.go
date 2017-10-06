@@ -37,6 +37,6 @@ func CreatePromsumTable(conn *Connection, tableName, bucket, pre***REMOVED***x s
 	if err != nil {
 		return err
 	}
-	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true)
+	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true, true)
 	return conn.Query(query)
 }

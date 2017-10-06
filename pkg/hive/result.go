@@ -15,6 +15,6 @@ func CreateReportTable(conn *Connection, tableName, bucket, pre***REMOVED***x st
 	if err != nil {
 		return err
 	}
-	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, false)
+	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, false, false)
 	return conn.Query(query)
 }

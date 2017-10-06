@@ -38,7 +38,7 @@ func CreateAWSUsageTable(conn *Connection, tableName, bucket string, manifest aw
 	}
 	columns := manifest.Columns.HQL()
 
-	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true)
+	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true, false)
 	print(query)
 	return conn.Query(query)
 }
