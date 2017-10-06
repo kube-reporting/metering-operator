@@ -2,6 +2,8 @@ package hive
 
 import (
 	"fmt"
+	"net/url"
+	"path"
 )
 
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
@@ -46,6 +48,17 @@ func fmtColumnText(columns []string) (colTxt string) {
 }
 
 // s3Location returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
-func s3Location(bucket, pre***REMOVED***x string) string {
-	return fmt.Sprintf("s3a://%s/%s", bucket, pre***REMOVED***x)
+func s3Location(bucket, pre***REMOVED***x string) (string, error) {
+	bucket = path.Join(bucket, pre***REMOVED***x)
+	// Ensure the bucket URL has a trailing slash
+	if bucket[len(bucket)-1] != '/' {
+		bucket = bucket + "/"
+	}
+	location := "s3a://" + bucket
+
+	locationURL, err := url.Parse(location)
+	if err != nil {
+		return "", err
+	}
+	return locationURL.String(), nil
 }

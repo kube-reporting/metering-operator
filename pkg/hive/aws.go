@@ -32,7 +32,10 @@ func CreateAWSUsageTable(conn *Connection, tableName, bucket string, manifest aw
 	}
 
 	// TODO: support for multiple partitions
-	location := s3Location(bucket, manifest.Paths()[0])
+	location, err := s3Location(bucket, manifest.Paths()[0])
+	if err != nil {
+		return err
+	}
 	columns := manifest.Columns.HQL()
 
 	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, true)
