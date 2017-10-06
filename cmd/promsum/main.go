@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"io/ioutil"
-	"log"
 	"net/url"
+	"path"
 	"time"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
@@ -12,6 +12,7 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
 
 	"github.com/prometheus/client_golang/api"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -81,9 +82,10 @@ func main() {
 		}
 		storeURL := url.URL{
 			Scheme: "s3",
-			Host:   ds.Spec.Storage.Bucket,
-			Path:   ds.Spec.Storage.Pre***REMOVED***x,
+			Path:   path.Join(ds.Spec.Storage.Bucket, ds.Spec.Storage.Pre***REMOVED***x),
 		}
+
+		log.Infof("storeURL: %s", storeURL.String())
 		store, err := setupStore(storeURL)
 		if err != nil {
 			log.Fatal("Could not setup storage: ", err)
