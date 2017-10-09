@@ -42,5 +42,9 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: promsum-poll-interval
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "50m"
       restartPolicy: Always
       serviceAccount: promsum
