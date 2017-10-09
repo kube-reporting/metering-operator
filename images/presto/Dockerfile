@@ -16,6 +16,7 @@ ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
 RUN curl -fSLs -o /opt/presto/presto-server-$PRESTO_VERSION/presto-cli https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/$PRESTO_VERSION/presto-cli-$PRESTO_VERSION-executable.jar \
         && chmod +x /opt/presto/presto-server-$PRESTO_VERSION/presto-cli \
         && ln -s /opt/presto/presto-server-$PRESTO_VERSION/presto-cli /usr/local/bin/presto-cli
+ENV TERM=linux
 COPY etc/ $PRESTO_HOME/etc/
 
 # Con***REMOVED***gure JSON serialization

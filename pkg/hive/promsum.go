@@ -33,8 +33,10 @@ func CreatePromsumTable(conn *Connection, tableName, bucket, pre***REMOVED***x s
 		return errors.New("the Hive session has closed")
 	}
 
-	// use s3n HDFS driver for s3
-	location := s3Location(bucket, pre***REMOVED***x)
-	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true)
+	location, err := s3Location(bucket, pre***REMOVED***x)
+	if err != nil {
+		return err
+	}
+	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true, true)
 	return conn.Query(query)
 }
