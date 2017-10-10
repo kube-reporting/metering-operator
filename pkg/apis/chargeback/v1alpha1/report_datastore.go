@@ -1,4 +1,4 @@
-package prealpha
+package v1alpha1
 
 import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
