@@ -13,6 +13,7 @@ PROMSUM_IMAGE := quay.io/coreos/promsum
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
+CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 GIT_TAG := $(shell git -C $(ROOT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
@@ -126,6 +127,9 @@ images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	hive-docker-push hadoop-docker-push \
 	docker-build docker-push \
 	docker-build-all docker-push-all \
+
+codegen-docker-build: hack/codegen/Dockerfile
+	make docker-build DOCKERFILE=$< IMAGE_NAME=$(CODEGEN_IMAGE) USE_LATEST_TAG=true
 
 k8s-update-codegen:
 	./hack/update-codegen.sh
