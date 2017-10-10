@@ -10,8 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
@@ -57,7 +57,7 @@ func addAdditionalLabels(labels []string) string {
 	return output
 }
 
-func generateHiveColumns(report *cbTypes.Report, genQuery cbTypes.ReportGenerationQuery) []string {
+func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []string {
 	columns := []string{}
 	for _, c := range genQuery.Spec.Columns {
 		columns = append(columns, fmt.Sprintf("%s %s", c.Name, c.Type))
@@ -72,7 +72,7 @@ func reportTableName(reportName string) string {
 	return fmt.Sprintf("report_%s", strings.Replace(reportName, "-", "_", -1))
 }
 
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) ([]map[string]interface{}, error) {
+func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating
