@@ -68,6 +68,10 @@ func generateHiveColumns(report *cbTypes.Report, genQuery cbTypes.ReportGenerati
 	return columns
 }
 
+func reportTableName(reportName string) string {
+	return fmt.Sprintf("report_%s", strings.Replace(reportName, "-", "_", -1))
+}
+
 func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
@@ -86,12 +90,18 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.
 	logger.Debugf("query generated:\n%s", query)
 
 	// Create a table to write to
-	reportTable := fmt.Sprintf("report_%s_%d", strings.Replace(report.Name, "-", "_", -1), time.Now().Unix())
+	reportTable := reportTableName(report.Name)
 	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
 	logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
 	err = hive.CreateReportTable(hiveCon, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
+	}
+
+	logger.Debugf("deleting any preexisting rows in %s", reportTable)
+	err = hive.ExecuteTruncate(hiveCon, reportTable)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", reportTable, err)
 	}
 
 	// Run the report
@@ -103,41 +113,10 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery cbTypes.
 	}
 
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	rows, err := prestoCon.Query(getReportQuery)
+	results, err := presto.ExecuteSelect(prestoCon, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("getting usage report FAILED!")
 		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
 	}
-	cols, err := rows.Columns()
-	if err != nil {
-		logger.WithError(err).Errorf("getting usage report FAILED!")
-		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
-	}
-
-	var results []map[string]interface{}
-	for rows.Next() {
-		// Create a slice of interface{}'s to represent each column,
-		// and a second slice to contain pointers to each item in the columns slice.
-		columns := make([]interface{}, len(cols))
-		columnPointers := make([]interface{}, len(cols))
-		for i, _ := range columns {
-			columnPointers[i] = &columns[i]
-		}
-
-		// Scan the result into the column pointers...
-		if err := rows.Scan(columnPointers...); err != nil {
-			return nil, err
-		}
-
-		// Create our map, and retrieve the value for each column from the pointers slice,
-		// storing it in the map with the name of the column as the key.
-		m := make(map[string]interface{})
-		for i, colName := range cols {
-			val := columnPointers[i].(*interface{})
-			m[colName] = *val
-		}
-		results = append(results, m)
-	}
-
 	return results, nil
 }
