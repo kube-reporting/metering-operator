@@ -1,5 +1,37 @@
 package: github.com/coreos-inc/kube-chargeback
 import:
+- package: k8s.io/code-generator
+  version: 4f9758469fda3ab9e9a17c3300f3476cc13a83b2
+  subpackages:
+  - cmd/client-gen
+  - cmd/client-gen/args
+  - cmd/client-gen/generators
+  - cmd/client-gen/generators/scheme
+  - cmd/client-gen/generators/util
+  - cmd/client-gen/generators/fake
+  - cmd/client-gen/path
+  - cmd/client-gen/types
+  - cmd/informer-gen
+  - cmd/informer-gen/generators
+  - cmd/lister-gen
+  - cmd/lister-gen/generators
+  - cmd/deepcopy-gen
+  - third_party/forked/golang/reflect
+- package: k8s.io/gengo
+  version: 75356185a9af8f0464efa792e2e9508d5b4be83c
+  subpackages:
+  - examples
+  - examples/deepcopy-gen/generators
+  - examples/defaulter-gen/generators
+  - examples/import-boss/generators
+  - examples/set-gen/generators
+  - examples/set-gen/sets
+  - args
+  - boilerplate
+  - generator
+  - namer
+  - parser
+  - types
 - package: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140
   subpackages:
@@ -22,13 +54,15 @@ import:
   version: 0d0c3d572886e0f2323ed376557f9eb99b97d25
   subpackages:
   - model
+- package: k8s.io/api
+  version: 926789af7ddda62752e08bc9b93f1d1ebbc7b2de
 - package: k8s.io/apiextensions-apiserver
-  version: 6d8c23d2e66ce61e2a7e34f92e8eb3eec13279fa
+  version: 2bfb07d318ed549813240d1165fcebad6250c666
   subpackages:
   - pkg/apis/apiextensions/v1beta1
   - pkg/client/clientset/clientset
 - package: k8s.io/apimachinery
-  version: a13245d02534abe88286859b547d041816f9a3f4
+  version: a28c9b0b532638dcfb2c8b1b6f8f1e4a21041752
   subpackages:
   - pkg/api/errors
   - pkg/apis/meta/v1
@@ -38,8 +72,9 @@ import:
   - pkg/runtime/serializer
   - pkg/types
   - pkg/watch
+  - pkg/apimachinery/registered
 - package: k8s.io/client-go
-  version: 1850dd66e4213a26bd70d0b85fee4176d324b845
+  version: c6f8cf2c47d21d55fa0df928291b2580544886c8
   subpackages:
   - dynamic
   - kubernetes
@@ -49,8 +84,6 @@ import:
   - tools/cache
 - package: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
-- package: github.com/robfig/cron
-  version: be2e0b0deed5a68ffee390b4583a13aff8321535
 - package: github.com/sirupsen/logrus
   version: v1.0.3
 testImport:
