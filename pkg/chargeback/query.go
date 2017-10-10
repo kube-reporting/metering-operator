@@ -71,7 +71,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
 
-	// get give and presto connections
+	// get hive and presto connections
 	hiveCon, err := c.hiveConn()
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("Failed to configure Hive connection: %v", err))
