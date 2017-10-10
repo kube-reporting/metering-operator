@@ -13,13 +13,63 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *Chargeback) handleAddReport(obj interface{}) {
-	if obj == nil {
-		log.Debugf("received nil object!")
+func (c *Chargeback) runReportWorker() {
+	for c.processReport() {
+
+	}
+}
+
+func (c *Chargeback) processReport() bool {
+	key, quit := c.reportQueue.Get()
+	if quit {
+		return false
+	}
+	defer c.reportQueue.Done(key)
+
+	err := c.syncReport(key.(string))
+	c.handleErr(err, key)
+	return true
+}
+
+func (c *Chargeback) syncReport(key string) error {
+	indexer := c.reportInformer.GetIndexer()
+	obj, exists, err := indexer.GetByKey(key)
+	if err != nil {
+		log.Errorf("Fetching object with key %s from store failed with %v", key, err)
+		return err
+	}
+
+	if !exists {
+		log.Infof("Report %s does not exist anymore", key)
+	} else {
+		report := obj.(*cbTypes.Report)
+		log.Infof("Sync/Add/Update for Report %s", report.GetName())
+		c.handleReport(report)
+	}
+	return nil
+}
+
+// handleErr checks if an error happened and makes sure we will retry later.
+func (c *Chargeback) handleErr(err error, key interface{}) {
+	if err == nil {
+		c.reportQueue.Forget(key)
 		return
 	}
 
-	report := obj.(*cbTypes.Report).DeepCopy()
+	// This controller retries 5 times if something goes wrong. After that, it stops trying.
+	if c.reportQueue.NumRequeues(key) < 5 {
+		log.WithError(err).Error("Error syncing report %v", key)
+
+		c.reportQueue.AddRateLimited(key)
+		return
+	}
+
+	c.reportQueue.Forget(key)
+	log.WithError(err).Infof("Dropping report %q out of the queue", key)
+}
+
+func (c *Chargeback) handleReport(report *cbTypes.Report) {
+	report = report.DeepCopy()
 
 	logger := log.WithFields(log.Fields{
 		"name":            report.Name,
@@ -27,14 +77,13 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 		"start":           report.Spec.ReportingStart,
 		"end":             report.Spec.ReportingEnd,
 	})
-	logger.Infof("new report discovered")
 
 	switch report.Status.Phase {
-	case cbTypes.ReportPhaseFinished:
-		fallthrough
-	case cbTypes.ReportPhaseError:
-		logger.Warnf("ignoring %s, status: %s", report.GetSelfLink(), report.Status.Phase)
+	case cbTypes.ReportPhaseStarted, cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
+		logger.Warnf("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return
+	default:
+		logger.Infof("new report discovered")
 	}
 
 	// update status
