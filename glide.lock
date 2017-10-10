@@ -1,5 +1,5 @@
-hash: 5525413d2eca8be86a184c51d11f0bfcf1dcd14988364c83d94cbab8f1899bc8
-updated: 2017-10-10T13:42:35.600899462-07:00
+hash: 9875efc92029fc775109dd2a8826530ab8c049dc83a85d00485e2121ffa3349e
+updated: 2017-10-10T16:07:38.864167335-07:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -266,9 +266,11 @@ imports:
   - tools/metrics
   - tools/pager
   - transport
+  - util
   - util/cert
   - util/flowcontrol
   - util/integer
+  - util/workqueue
 - name: k8s.io/code-generator
   version: 4f9758469fda3ab9e9a17c3300f3476cc13a83b2
   subpackages:
