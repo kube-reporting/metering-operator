@@ -34,6 +34,10 @@ type Con***REMOVED***g struct {
 	// Bearer token for authentication
 	BearerToken string
 
+	// CacheDir is the directory where we'll store HTTP cached responses.
+	// If set to empty string, no caching mechanism will be used.
+	CacheDir string
+
 	// Impersonate is the con***REMOVED***g that this Con***REMOVED***g will impersonate using
 	Impersonate ImpersonationCon***REMOVED***g
 

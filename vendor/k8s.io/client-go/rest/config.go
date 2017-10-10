@@ -71,6 +71,10 @@ type Con***REMOVED***g struct {
 	// TODO: demonstrate an OAuth2 compatible client.
 	BearerToken string
 
+	// CacheDir is the directory where we'll store HTTP cached responses.
+	// If set to empty string, no caching mechanism will be used.
+	CacheDir string
+
 	// Impersonate is the con***REMOVED***guration that RESTClient will use for impersonation.
 	Impersonate ImpersonationCon***REMOVED***g
 
@@ -126,6 +130,7 @@ type ImpersonationCon***REMOVED***g struct {
 	Extra map[string][]string
 }
 
+// +k8s:deepcopy-gen=true
 // TLSClientCon***REMOVED***g contains settings to enable transport layer security
 type TLSClientCon***REMOVED***g struct {
 	// Server should be accessed without verifying the TLS certi***REMOVED***cate. For testing only.

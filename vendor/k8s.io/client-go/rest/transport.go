@@ -89,6 +89,7 @@ func (c *Con***REMOVED***g) TransportCon***REMOVED***g() (*transport.Con***REMOV
 		},
 		Username:    c.Username,
 		Password:    c.Password,
+		CacheDir:    c.CacheDir,
 		BearerToken: c.BearerToken,
 		Impersonate: transport.ImpersonationCon***REMOVED***g{
 			UserName: c.Impersonate.UserName,

@@ -138,13 +138,27 @@ func CertsFromFile(***REMOVED***le string) ([]*x509.Certi***REMOVED***cate, erro
 // PrivateKeyFromFile returns the private key in rsa.PrivateKey or ecdsa.PrivateKey format from a given PEM-encoded ***REMOVED***le.
 // Returns an error if the ***REMOVED***le could not be read or if the private key could not be parsed.
 func PrivateKeyFromFile(***REMOVED***le string) (interface{}, error) {
-	pemBlock, err := ioutil.ReadFile(***REMOVED***le)
+	data, err := ioutil.ReadFile(***REMOVED***le)
 	if err != nil {
 		return nil, err
 	}
-	key, err := ParsePrivateKeyPEM(pemBlock)
+	key, err := ParsePrivateKeyPEM(data)
 	if err != nil {
-		return nil, fmt.Errorf("error reading %s: %v", ***REMOVED***le, err)
+		return nil, fmt.Errorf("error reading private key ***REMOVED***le %s: %v", ***REMOVED***le, err)
 	}
 	return key, nil
+}
+
+// PublicKeysFromFile returns the public keys in rsa.PublicKey or ecdsa.PublicKey format from a given PEM-encoded ***REMOVED***le.
+// Reads public keys from both public and private key ***REMOVED***les.
+func PublicKeysFromFile(***REMOVED***le string) ([]interface{}, error) {
+	data, err := ioutil.ReadFile(***REMOVED***le)
+	if err != nil {
+		return nil, err
+	}
+	keys, err := ParsePublicKeysPEM(data)
+	if err != nil {
+		return nil, fmt.Errorf("error reading public key ***REMOVED***le %s: %v", ***REMOVED***le, err)
+	}
+	return keys, nil
 }

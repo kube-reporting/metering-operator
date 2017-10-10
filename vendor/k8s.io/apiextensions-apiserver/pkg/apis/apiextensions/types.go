@@ -113,8 +113,9 @@ type CustomResourceDe***REMOVED***nitionStatus struct {
 // a CustomResourceDe***REMOVED***nition
 const CustomResourceCleanupFinalizer = "customresourcecleanup.apiextensions.k8s.io"
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient
+// +genclient:nonNamespaced
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // CustomResourceDe***REMOVED***nition represents a resource that should be exposed on the API server.  Its name MUST be in the format
 // <.spec.name>.<.spec.group>.
@@ -127,6 +128,8 @@ type CustomResourceDe***REMOVED***nition struct {
 	// Status indicates the actual state of the CustomResourceDe***REMOVED***nition
 	Status CustomResourceDe***REMOVED***nitionStatus
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // CustomResourceDe***REMOVED***nitionList is a list of CustomResourceDe***REMOVED***nition objects.
 type CustomResourceDe***REMOVED***nitionList struct {

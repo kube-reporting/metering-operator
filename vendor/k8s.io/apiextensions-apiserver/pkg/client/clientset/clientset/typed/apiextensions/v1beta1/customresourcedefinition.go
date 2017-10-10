@@ -57,6 +57,38 @@ func newCustomResourceDe***REMOVED***nitions(c *ApiextensionsV1beta1Client) *cus
 	}
 }
 
+// Get takes name of the customResourceDe***REMOVED***nition, and returns the corresponding customResourceDe***REMOVED***nition object, and an error if there is any.
+func (c *customResourceDe***REMOVED***nitions) Get(name string, options v1.GetOptions) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
+	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
+	err = c.client.Get().
+		Resource("customresourcede***REMOVED***nitions").
+		Name(name).
+		VersionedParams(&options, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// List takes label and ***REMOVED***eld selectors, and returns the list of CustomResourceDe***REMOVED***nitions that match those selectors.
+func (c *customResourceDe***REMOVED***nitions) List(opts v1.ListOptions) (result *v1beta1.CustomResourceDe***REMOVED***nitionList, err error) {
+	result = &v1beta1.CustomResourceDe***REMOVED***nitionList{}
+	err = c.client.Get().
+		Resource("customresourcede***REMOVED***nitions").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Do().
+		Into(result)
+	return
+}
+
+// Watch returns a watch.Interface that watches the requested customResourceDe***REMOVED***nitions.
+func (c *customResourceDe***REMOVED***nitions) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	opts.Watch = true
+	return c.client.Get().
+		Resource("customresourcede***REMOVED***nitions").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Watch()
+}
+
 // Create takes the representation of a customResourceDe***REMOVED***nition and creates it.  Returns the server's representation of the customResourceDe***REMOVED***nition, and an error, if there is any.
 func (c *customResourceDe***REMOVED***nitions) Create(customResourceDe***REMOVED***nition *v1beta1.CustomResourceDe***REMOVED***nition) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
 	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
@@ -81,7 +113,7 @@ func (c *customResourceDe***REMOVED***nitions) Update(customResourceDe***REMOVED
 }
 
 // UpdateStatus was generated because the type contains a Status member.
-// Add a +genclientstatus=false comment above the type to avoid generating UpdateStatus().
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
 func (c *customResourceDe***REMOVED***nitions) UpdateStatus(customResourceDe***REMOVED***nition *v1beta1.CustomResourceDe***REMOVED***nition) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
 	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
@@ -113,38 +145,6 @@ func (c *customResourceDe***REMOVED***nitions) DeleteCollection(options *v1.Dele
 		Body(options).
 		Do().
 		Error()
-}
-
-// Get takes name of the customResourceDe***REMOVED***nition, and returns the corresponding customResourceDe***REMOVED***nition object, and an error if there is any.
-func (c *customResourceDe***REMOVED***nitions) Get(name string, options v1.GetOptions) (result *v1beta1.CustomResourceDe***REMOVED***nition, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nition{}
-	err = c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// List takes label and ***REMOVED***eld selectors, and returns the list of CustomResourceDe***REMOVED***nitions that match those selectors.
-func (c *customResourceDe***REMOVED***nitions) List(opts v1.ListOptions) (result *v1beta1.CustomResourceDe***REMOVED***nitionList, err error) {
-	result = &v1beta1.CustomResourceDe***REMOVED***nitionList{}
-	err = c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested customResourceDe***REMOVED***nitions.
-func (c *customResourceDe***REMOVED***nitions) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	opts.Watch = true
-	return c.client.Get().
-		Resource("customresourcede***REMOVED***nitions").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Watch()
 }
 
 // Patch applies the patch and returns the patched customResourceDe***REMOVED***nition.

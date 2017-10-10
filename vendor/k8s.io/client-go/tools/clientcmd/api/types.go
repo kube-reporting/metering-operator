@@ -25,6 +25,7 @@ import (
 
 // Con***REMOVED***g holds the information needed to build connect to remote kubernetes clusters as a given user
 // IMPORTANT if you add ***REMOVED***elds to this struct, please update IsCon***REMOVED***gEmpty()
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type Con***REMOVED***g struct {
 	// Legacy ***REMOVED***eld from pkg/api/types.go TypeMeta.
 	// TODO(jlowdermilk): remove this after eliminating downstream dependencies.

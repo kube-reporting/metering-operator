@@ -35,24 +35,18 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	*apiextensionsv1beta1.ApiextensionsV1beta1Client
+	apiextensionsV1beta1 *apiextensionsv1beta1.ApiextensionsV1beta1Client
 }
 
 // ApiextensionsV1beta1 retrieves the ApiextensionsV1beta1Client
 func (c *Clientset) ApiextensionsV1beta1() apiextensionsv1beta1.ApiextensionsV1beta1Interface {
-	if c == nil {
-		return nil
-	}
-	return c.ApiextensionsV1beta1Client
+	return c.apiextensionsV1beta1
 }
 
 // Deprecated: Apiextensions retrieves the default version of ApiextensionsClient.
 // Please explicitly pick a version.
 func (c *Clientset) Apiextensions() apiextensionsv1beta1.ApiextensionsV1beta1Interface {
-	if c == nil {
-		return nil
-	}
-	return c.ApiextensionsV1beta1Client
+	return c.apiextensionsV1beta1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -71,7 +65,7 @@ func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.ApiextensionsV1beta1Client, err = apiextensionsv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.apiextensionsV1beta1, err = apiextensionsv1beta1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +82,7 @@ func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
 // panics if there is an error in the con***REMOVED***g.
 func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
 	var cs Clientset
-	cs.ApiextensionsV1beta1Client = apiextensionsv1beta1.NewForCon***REMOVED***gOrDie(c)
+	cs.apiextensionsV1beta1 = apiextensionsv1beta1.NewForCon***REMOVED***gOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForCon***REMOVED***gOrDie(c)
 	return &cs
@@ -97,7 +91,7 @@ func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.ApiextensionsV1beta1Client = apiextensionsv1beta1.New(c)
+	cs.apiextensionsV1beta1 = apiextensionsv1beta1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

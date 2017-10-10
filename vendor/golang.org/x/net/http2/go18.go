@@ -12,7 +12,11 @@ import (
 	"net/http"
 )
 
-func cloneTLSCon***REMOVED***g(c *tls.Con***REMOVED***g) *tls.Con***REMOVED***g { return c.Clone() }
+func cloneTLSCon***REMOVED***g(c *tls.Con***REMOVED***g) *tls.Con***REMOVED***g {
+	c2 := c.Clone()
+	c2.GetClientCerti***REMOVED***cate = c.GetClientCerti***REMOVED***cate // golang.org/issue/19264
+	return c2
+}
 
 var _ http.Pusher = (*responseWriter)(nil)
 
@@ -48,3 +52,5 @@ func reqGetBody(req *http.Request) func() (io.ReadCloser, error) {
 func reqBodyIsNoBody(body io.ReadCloser) bool {
 	return body == http.NoBody
 }
+
+func go18httpNoBody() io.ReadCloser { return http.NoBody } // for tests only

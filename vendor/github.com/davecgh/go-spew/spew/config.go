@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Dave Collins <dave@davec.name>
+ * Copyright (c) 2013-2016 Dave Collins <dave@davec.name>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -64,8 +64,17 @@ type Con***REMOVED***gState struct {
 	// inside these interface methods.  As a result, this option relies on
 	// access to the unsafe package, so it will not have any effect when
 	// running in environments without access to the unsafe package such as
-	// Google App Engine or with the "disableunsafe" build tag speci***REMOVED***ed.
+	// Google App Engine or with the "safe" build tag speci***REMOVED***ed.
 	DisablePointerMethods bool
+
+	// DisablePointerAddresses speci***REMOVED***es whether to disable the printing of
+	// pointer addresses. This is useful when dif***REMOVED***ng data structures in tests.
+	DisablePointerAddresses bool
+
+	// DisableCapacities speci***REMOVED***es whether to disable the printing of capacities
+	// for arrays, slices, maps and channels. This is useful when dif***REMOVED***ng
+	// data structures in tests.
+	DisableCapacities bool
 
 	// ContinueOnMethod speci***REMOVED***es whether or not recursion should continue once
 	// a custom error or Stringer interface is invoked.  The default, false,
