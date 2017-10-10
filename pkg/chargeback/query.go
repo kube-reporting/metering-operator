@@ -3,20 +3,15 @@ package chargeback
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"strings"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 func (c *Chargeback) handleAddReport(obj interface{}) {
 	if obj == nil {
@@ -24,7 +19,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 		return
 	}
 
-	report := obj.(*cbTypes.Report)
+	report := obj.(*cbTypes.Report).DeepCopy()
 
 	logger := log.WithFields(log.Fields{
 		"name":            report.Name,
@@ -44,26 +39,19 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	report, err := c.charge.Reports(c.namespace).Update(report)
+	report, err := c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("failed to update report status for %q: %v", report.Name, err))
 		return
 	}
 
-	// lookup report generation query and data store
-	restClient, err := cbTypes.GetRestClient()
-	if err != nil {
-		c.setError(logger, report, fmt.Errorf("failed to get rest client: %v", err))
-		return
-	}
-
-	genQuery, err := cbTypes.GetReportGenerationQuery(restClient, c.namespace, report.Spec.GenerationQueryName)
+	genQuery, err := c.chargebackClient.ChargebackV1alpha1().ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName, metav1.GetOptions{})
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("failed to get report generation query: %v", err))
 		return
 	}
 
-	dataStore, err := cbTypes.GetReportDataStore(restClient, c.namespace, genQuery.Spec.DataStoreName)
+	dataStore, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(c.namespace).Get(genQuery.Spec.DataStoreName, metav1.GetOptions{})
 	if err != nil {
 		c.setError(logger, report, fmt.Errorf("failed to get report data store: %v", err))
 		return
@@ -111,7 +99,7 @@ func (c *Chargeback) handleAddReport(obj interface{}) {
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseFinished
-	report, err = c.charge.Reports(c.namespace).Update(report)
+	report, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
 	if err != nil {
 		logger.Warnf("failed to update report status for %q: ", report.Name, err)
 	} else {
@@ -123,7 +111,7 @@ func (c *Chargeback) setError(logger *log.Entry, q *cbTypes.Report, err error) {
 	logger.WithError(err).Errorf("error encountered")
 	q.Status.Phase = cbTypes.ReportPhaseError
 	q.Status.Output = err.Error()
-	_, err = c.charge.Reports(c.namespace).Update(q)
+	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(q)
 	if err != nil {
 		logger.Errorf("FAILED TO REPORT ERROR: %v", err)
 	}
