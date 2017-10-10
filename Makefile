@@ -104,7 +104,7 @@ hive-docker-push:
 # Update dependencies
 vendor: glide.yaml
 	glide up --strip-vendor
-	glide-vc --use-lock-file --no-tests --only-code
+	glide-vc --use-lock-file --no-tests --only-code --keep k8s.io/gengo/boilerplate/*txt
 
 # Runs gofmt on all files in project except vendored source and Hive Thrift definitions
 fmt:
@@ -117,13 +117,21 @@ images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
 
-.PHONY: vendor fmt regenerate-hive-thrift \
+.PHONY: \
+	vendor fmt regenerate-hive-thrift \
+	k8s-codegen \
 	chargeback-docker-build promsum-docker-build \
 	presto-docker-build hive-docker-build hadoop-docker-build \
 	chargeback-docker-push promsum-docker-push presto-docker-push \
 	hive-docker-push hadoop-docker-push \
 	docker-build docker-push \
 	docker-build-all docker-push-all \
+
+k8s-update-codegen:
+	./hack/update-codegen.sh
+
+k8s-verify-codegen:
+	./hack/verify-codegen.sh
 
 # The results of these targets get vendored, but the targets exist for
 # regenerating if needed.
