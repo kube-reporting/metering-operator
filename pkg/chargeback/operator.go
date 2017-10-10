@@ -7,8 +7,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	ext_client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
 
 	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
@@ -53,17 +55,27 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 	}
 
 	log.Debugf("setting up chargeback client...")
-
 	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(con***REMOVED***g)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Debugf("con***REMOVED***guring event listeners...")
-
+	op.reportQueue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	op.reportInformer = cbInformers.NewReportInformer(op.chargebackClient, cfg.Namespace, time.Minute, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	op.reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: op.handleAddReport,
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				op.reportQueue.Add(key)
+			}
+		},
+		UpdateFunc: func(old, current interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(current)
+			if err == nil {
+				op.reportQueue.Add(key)
+			}
+		},
 	})
 
 	return op, nil
@@ -72,6 +84,7 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 type Chargeback struct {
 	extension *ext_client.Clientset
 
+	reportQueue      workqueue.RateLimitingInterface
 	reportInformer   cache.SharedIndexInformer
 	chargebackClient cbClientset.Interface
 
@@ -82,8 +95,9 @@ type Chargeback struct {
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
-	// TODO: implement polling
-	time.Sleep(15 * time.Second)
+	log.Info("starting Chargeback operator")
+
+	defer c.reportQueue.ShutDown()
 
 	go c.reportInformer.Run(stopCh)
 	go c.startHTTPServer()
@@ -92,9 +106,13 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
 
+	go wait.Until(c.runReportWorker, time.Second, stopCh)
+
 	log.Infof("chargeback successfully initialized, waiting for reports...")
 
 	<-stopCh
+
+	log.Info("stopping Chargeback operator")
 	return nil
 }
 
