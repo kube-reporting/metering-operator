@@ -3,13 +3,11 @@ package chargeback
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,19 +18,19 @@ func (c *Chargeback) runReportWorker() {
 }
 
 func (c *Chargeback) processReport() bool {
-	key, quit := c.reportQueue.Get()
+	key, quit := c.informers.reportQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.reportQueue.Done(key)
+	defer c.informers.reportQueue.Done(key)
 
 	err := c.syncReport(key.(string))
-	c.handleErr(err, key)
+	c.handleErr(err, "report", key, c.informers.reportQueue)
 	return true
 }
 
 func (c *Chargeback) syncReport(key string) error {
-	indexer := c.reportInformer.GetIndexer()
+	indexer := c.informers.reportInformer.GetIndexer()
 	obj, exists, err := indexer.GetByKey(key)
 	if err != nil {
 		c.logger.Errorf("Fetching object with key %s from store failed with %v", key, err)
@@ -44,42 +42,27 @@ func (c *Chargeback) syncReport(key string) error {
 	} else {
 		report := obj.(*cbTypes.Report)
 		c.logger.Infof("syncing report %s", report.GetName())
-		return c.handleReport(report)
+		err = c.handleReport(report)
+		if err != nil {
+			c.logger.WithError(err).Errorf("error syncing report %s", report.GetName())
+		}
+		c.logger.Infof("successfully synced report %s", report.GetName())
 	}
 	return nil
-}
-
-// handleErr checks if an error happened and makes sure we will retry later.
-func (c *Chargeback) handleErr(err error, key interface{}) {
-	if err == nil {
-		c.reportQueue.Forget(key)
-		return
-	}
-
-	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if c.reportQueue.NumRequeues(key) < 5 {
-		c.logger.WithError(err).Error("Error syncing report %v", key)
-
-		c.reportQueue.AddRateLimited(key)
-		return
-	}
-
-	c.reportQueue.Forget(key)
-	c.logger.WithError(err).Infof("Dropping report %q out of the queue", key)
 }
 
 func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
 	logger := c.logger.WithFields(log.Fields{
-		"name":            report.Name,
-		"generationQuery": report.Spec.GenerationQueryName,
-		"start":           report.Spec.ReportingStart,
-		"end":             report.Spec.ReportingEnd,
+		"name": report.Name,
 	})
-
 	switch report.Status.Phase {
-	case cbTypes.ReportPhaseStarted, cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
+	case cbTypes.ReportPhaseStarted:
+		// How to handle this
+		logger.Infof("found already started report, checking if report exists")
+		// c.hiveConn.Query("SHOW TABLES IN ")
+	case cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
 	default:
@@ -95,6 +78,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	}
 	report = newReport
 
+	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
 	genQuery, err := c.chargebackClient.ChargebackV1alpha1().ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName, metav1.GetOptions{})
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
@@ -107,34 +91,18 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 		return err
 	}
 
-	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-
 	// get hive and presto connections
-	hiveCon, err := c.hiveConn()
-	if err != nil {
-		logger.WithError(err).Errorf("failed to configure Hive connection")
-		return err
-	}
-	defer hiveCon.Close()
-
-	prestoCon, err := c.prestoConn()
-	if err != nil {
-		logger.WithError(err).Errorf("failed to configure Presto connection")
-		return err
-	}
-	defer prestoCon.Close()
-
-	replacer := strings.NewReplacer("-", "_", ".", "_")
-	datastoreTable := fmt.Sprintf("datastore_%s", replacer.Replace(dataStore.Name))
-	bucket, prefix := dataStore.Spec.Storage.Bucket, dataStore.Spec.Storage.Prefix
-	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", datastoreTable, bucket, prefix)
-	if err = hive.CreatePromsumTable(hiveCon, datastoreTable, bucket, prefix); err != nil {
-		// TODO(chance): return the error and handle retrying
-		c.setReportError(logger, report, err, "couldn't create table for cluster usage metric data")
-		return nil
+	if dataStore.TableName == "" {
+		return fmt.Errorf("datastore table not created yet")
 	}
 
-	results, err := generateReport(logger, report, genQuery, rng, datastoreTable, hiveCon, prestoCon)
+	logger = c.logger.WithFields(log.Fields{
+		"reportStart": report.Spec.ReportingStart,
+		"reportEnd":   report.Spec.ReportingEnd,
+	})
+
+	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
+	results, err := generateReport(logger, report, genQuery, rng, dataStore.TableName, c.hiveConn, c.prestoConn)
 	if err != nil {
 		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")

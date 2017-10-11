@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	connBackoff     = time.Second * 15
-	maxConnWaitTime = time.Minute * 3
+	connBackoff         = time.Second * 15
+	maxConnWaitTime     = time.Minute * 3
+	defaultResyncPeriod = time.Minute
 )
 
 type Config struct {
@@ -55,34 +56,100 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 		logger.Fatal(err)
 	}
 
+	op.informers = setupInformers(op.chargebackClient, cfg.Namespace, defaultResyncPeriod)
+
 	logger.Debugf("configuring event listeners...")
-	op.reportQueue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	op.reportInformer = cbInformers.NewReportInformer(op.chargebackClient, cfg.Namespace, time.Minute, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	op.reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	return op, nil
+}
+
+type informers struct {
+	informerList []cache.SharedIndexInformer
+	queueList    []workqueue.RateLimitingInterface
+
+	reportQueue             workqueue.RateLimitingInterface
+	reportInformer          cache.SharedIndexInformer
+	reportDataStoreQueue    workqueue.RateLimitingInterface
+	reportDataStoreInformer cache.SharedIndexInformer
+}
+
+func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
+	reportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	reportInformer := cbInformers.NewReportInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
-				op.reportQueue.Add(key)
+				reportQueue.Add(key)
 			}
 		},
 		UpdateFunc: func(old, current interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(current)
 			if err == nil {
-				op.reportQueue.Add(key)
+				reportQueue.Add(key)
 			}
 		},
 	})
 
-	return op, nil
+	reportDataStoreQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	reportDataStoreInformer := cbInformers.NewReportDataStoreInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportDataStoreInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				reportDataStoreQueue.Add(key)
+			}
+		},
+		UpdateFunc: func(old, current interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(current)
+			if err == nil {
+				reportDataStoreQueue.Add(key)
+			}
+		},
+	})
+
+	return informers{
+		informerList: []cache.SharedIndexInformer{
+			reportDataStoreInformer,
+			reportInformer,
+		},
+		queueList: []workqueue.RateLimitingInterface{
+			reportDataStoreQueue,
+			reportQueue,
+		},
+		reportQueue:             reportQueue,
+		reportInformer:          reportInformer,
+		reportDataStoreQueue:    reportDataStoreQueue,
+		reportDataStoreInformer: reportDataStoreInformer,
+	}
+}
+
+func (inf informers) Run(stopCh <-chan struct{}) {
+	for _, informer := range inf.informerList {
+		go informer.Run(stopCh)
+	}
+}
+
+func (inf informers) WaitForCacheSync(stopCh <-chan struct{}) bool {
+	for _, informer := range inf.informerList {
+		if !cache.WaitForCacheSync(stopCh, informer.HasSynced) {
+			return false
+		}
+	}
+	return true
+}
+
+func (inf informers) ShutdownQueues() {
+	for _, queue := range inf.queueList {
+		queue.ShutDown()
+	}
 }
 
 type Chargeback struct {
-	reportQueue      workqueue.RateLimitingInterface
-	reportInformer   cache.SharedIndexInformer
+	informers        informers
 	chargebackClient cbClientset.Interface
 
-	hive   *hive.Connection
-	presto *sql.DB
+	hiveConn   *hive.Connection
+	prestoConn *sql.DB
 
 	logger log.FieldLogger
 
@@ -95,28 +162,30 @@ type Chargeback struct {
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("starting Chargeback operator")
 
-	defer c.reportQueue.ShutDown()
-
-	go c.reportInformer.Run(stopCh)
+	defer c.informers.ShutdownQueues()
+	go c.informers.Run(stopCh)
 	go c.startHTTPServer()
 
-	if !cache.WaitForCacheSync(stopCh, c.reportInformer.HasSynced) {
+	if !c.informers.WaitForCacheSync(stopCh) {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
 
 	c.logger.Infof("setting up DB connections")
 	var err error
-	c.hive, err = c.hiveConn()
+	c.hiveConn, err = c.newHiveConn()
 	if err != nil {
 		return err
 	}
-	c.presto, err = c.prestoConn()
+	defer c.hiveConn.Close()
+	c.prestoConn, err = c.newPrestoConn()
 	if err != nil {
 		return err
 	}
+	defer c.prestoConn.Close()
 
 	c.logger.Infof("starting report worker")
 	go wait.Until(c.runReportWorker, time.Second, stopCh)
+	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
 
 	c.logger.Infof("chargeback successfully initialized, waiting for reports...")
 
@@ -126,7 +195,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	return nil
 }
 
-func (c *Chargeback) hiveConn() (*hive.Connection, error) {
+func (c *Chargeback) newHiveConn() (*hive.Connection, error) {
 	// Hive may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and hive is still coming
 	// up.
@@ -145,7 +214,7 @@ func (c *Chargeback) hiveConn() (*hive.Connection, error) {
 	}
 }
 
-func (c *Chargeback) prestoConn() (*sql.DB, error) {
+func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
 	// up.
@@ -163,4 +232,23 @@ func (c *Chargeback) prestoConn() (*sql.DB, error) {
 		c.logger.Debugf("error encountered, backing off and trying again: %v", err)
 		time.Sleep(connBackoff)
 	}
+}
+
+// handleErr checks if an error happened and makes sure we will retry later.
+func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
+	if err == nil {
+		queue.Forget(key)
+		return
+	}
+
+	// This controller retries 5 times if something goes wrong. After that, it stops trying.
+	if queue.NumRequeues(key) < 5 {
+		c.logger.WithError(err).Error("Error syncing %s %q", objType, key)
+
+		queue.AddRateLimited(key)
+		return
+	}
+
+	queue.Forget(key)
+	c.logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
 }
