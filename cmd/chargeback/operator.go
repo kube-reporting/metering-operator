@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
@@ -16,16 +18,19 @@ var (
 )
 
 func main() {
+	logger := log.WithFields(log.Fields{
+		"app": "chargeback-operator",
+	})
 	if logReportEnv := os.Getenv("LOG_REPORT"); logReportEnv != "" {
 		var err error
 		logReport, err = strconv.ParseBool(logReportEnv)
 		if err != nil {
-			panic(err)
+			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logReportEnv)
 		}
 	}
 	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("could not determine namespace")
 	}
 	cfg := chargeback.Config{
 		Namespace:  string(namespace),
@@ -34,13 +39,13 @@ func main() {
 		LogReport:  logReport,
 	}
 
-	op, err := chargeback.New(cfg)
+	op, err := chargeback.New(logger, cfg)
 	if err != nil {
-		panic(err)
+		logger.WithError(err).Fatal("unable to setup Chargeback operator")
 	}
 
 	stopCh := make(<-chan struct{})
 	if err = op.Run(stopCh); err != nil {
-		panic(err)
+		logger.WithError(err).Fatalf("error occurred while the Chargeback operator was running")
 	}
 }
