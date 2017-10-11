@@ -84,6 +84,11 @@ podTemplate(
                     }
 
                     dir(kubeChargebackDir) {
+                        stage('test') {
+                            sh """#!/bin/bash
+                            make k8s-verify-codegen
+                            """
+                        }
                         stage('build') {
                             ansiColor('xterm') {
                                 sh """#!/bin/bash

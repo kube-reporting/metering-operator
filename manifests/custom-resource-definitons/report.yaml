@@ -4,7 +4,7 @@ metadata:
   name: reports.chargeback.coreos.com
 spec:
   group: chargeback.coreos.com
-  version: prealpha
+  version: v1alpha1
   scope: Namespaced
   names:
     plural: reports
