@@ -123,11 +123,7 @@ func Convert_v1beta1_CustomResourceDe***REMOVED***nitionList_To_apiextensions_Cu
 
 func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionList_To_v1beta1_CustomResourceDe***REMOVED***nitionList(in *apiextensions.CustomResourceDe***REMOVED***nitionList, out *CustomResourceDe***REMOVED***nitionList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	if in.Items == nil {
-		out.Items = make([]CustomResourceDe***REMOVED***nition, 0)
-	} ***REMOVED*** {
-		out.Items = *(*[]CustomResourceDe***REMOVED***nition)(unsafe.Pointer(&in.Items))
-	}
+	out.Items = *(*[]CustomResourceDe***REMOVED***nition)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
@@ -208,11 +204,7 @@ func Convert_v1beta1_CustomResourceDe***REMOVED***nitionStatus_To_apiextensions_
 }
 
 func autoConvert_apiextensions_CustomResourceDe***REMOVED***nitionStatus_To_v1beta1_CustomResourceDe***REMOVED***nitionStatus(in *apiextensions.CustomResourceDe***REMOVED***nitionStatus, out *CustomResourceDe***REMOVED***nitionStatus, s conversion.Scope) error {
-	if in.Conditions == nil {
-		out.Conditions = make([]CustomResourceDe***REMOVED***nitionCondition, 0)
-	} ***REMOVED*** {
-		out.Conditions = *(*[]CustomResourceDe***REMOVED***nitionCondition)(unsafe.Pointer(&in.Conditions))
-	}
+	out.Conditions = *(*[]CustomResourceDe***REMOVED***nitionCondition)(unsafe.Pointer(&in.Conditions))
 	if err := Convert_apiextensions_CustomResourceDe***REMOVED***nitionNames_To_v1beta1_CustomResourceDe***REMOVED***nitionNames(&in.AcceptedNames, &out.AcceptedNames, s); err != nil {
 		return err
 	}

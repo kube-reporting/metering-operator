@@ -8,8 +8,10 @@ import (
 	"time"
 
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
+	cbClientSet "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	"github.com/coreos-inc/kube-chargeback/pkg/promsum"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/rest"
 
 	"github.com/prometheus/client_golang/api"
 	log "github.com/sirupsen/logrus"
@@ -42,12 +44,17 @@ func main() {
 	}
 	namespace := string(namespaceBytes)
 
-	restClient, err := cbTypes.GetRestClient()
+	cfg, err := rest.InClusterCon***REMOVED***g()
 	if err != nil {
-		log.Fatal("could not setup rest client: ", err)
+		log.Fatal(err)
 	}
 
-	dataStores, err := cbTypes.ListReportDataStores(restClient, namespace)
+	clientSet, err := cbClientSet.NewForCon***REMOVED***g(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dataStores, err := clientSet.ChargebackV1alpha1().ReportDataStores(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		log.Fatal("could not list data stores: ", err)
 	}
@@ -63,10 +70,10 @@ func main() {
 		End:   now,
 	}
 
-	cfg := api.Con***REMOVED***g{
+	promCfg := api.Con***REMOVED***g{
 		Address: promURL,
 	}
-	prom, err := NewPrometheus(cfg)
+	prom, err := NewPrometheus(promCfg)
 	if err != nil {
 		log.Fatal("could not setup remote: ", err)
 	}
@@ -92,7 +99,7 @@ func main() {
 		}
 
 		for _, queryName := range ds.Spec.Queries {
-			query, err := cbTypes.GetReportPrometheusQuery(restClient, namespace, queryName)
+			query, err := clientSet.ChargebackV1alpha1().ReportPrometheusQueries(namespace).Get(queryName, metav1.GetOptions{})
 			if err != nil {
 				log.Fatal("Could not get prometheus query: ", err)
 			}
@@ -100,7 +107,7 @@ func main() {
 			records, err := promsum.Meter(prom, query.Spec.Query, queryName, billingRng, timePrecision)
 			if err != nil {
 				log.Fatalf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
-					query, billingRng.Start, billingRng.End, err)
+					query.Name, billingRng.Start, billingRng.End, err)
 			}
 
 			err = store.Write(records)

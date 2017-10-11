@@ -1,4 +1,4 @@
-apiVersion: chargeback.coreos.com/prealpha
+apiVersion: chargeback.coreos.com/v1alpha1
 kind: Report
 metadata:
   name: pod-cpu-usage-by-namespace

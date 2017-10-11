@@ -20,8 +20,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient
+// +genclient:nonNamespaced
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // InitializerCon***REMOVED***guration describes the con***REMOVED***guration of initializers.
 type InitializerCon***REMOVED***guration struct {
@@ -41,6 +42,8 @@ type InitializerCon***REMOVED***guration struct {
 	// +optional
 	Initializers []Initializer `json:"initializers,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,2,rep,name=initializers"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // InitializerCon***REMOVED***gurationList is a list of InitializerCon***REMOVED***guration.
 type InitializerCon***REMOVED***gurationList struct {
@@ -69,13 +72,6 @@ type Initializer struct {
 	// The initializer cares about an operation if it matches _any_ Rule.
 	// Rule.Resources must not include subresources.
 	Rules []Rule `json:"rules,omitempty" protobuf:"bytes,2,rep,name=rules"`
-
-	// FailurePolicy de***REMOVED***nes what happens if the responsible initializer controller
-	// fails to takes action. Allowed values are Ignore, or Fail. If "Ignore" is
-	// set, initializer is removed from the initializers list of an object if
-	// the timeout is reached; If "Fail" is set, admissionregistration returns timeout error
-	// if the timeout is reached.
-	FailurePolicy *FailurePolicyType `json:"failurePolicy,omitempty" protobuf:"bytes,3,opt,name=failurePolicy,casttype=FailurePolicyType"`
 }
 
 // Rule is a tuple of APIGroups, APIVersion, and Resources.It is recommended
@@ -120,8 +116,9 @@ const (
 	Fail FailurePolicyType = "Fail"
 )
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient
+// +genclient:nonNamespaced
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ExternalAdmissionHookCon***REMOVED***guration describes the con***REMOVED***guration of initializers.
 type ExternalAdmissionHookCon***REMOVED***guration struct {
@@ -136,6 +133,8 @@ type ExternalAdmissionHookCon***REMOVED***guration struct {
 	// +patchStrategy=merge
 	ExternalAdmissionHooks []ExternalAdmissionHook `json:"externalAdmissionHooks,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,2,rep,name=externalAdmissionHooks"`
 }
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ExternalAdmissionHookCon***REMOVED***gurationList is a list of ExternalAdmissionHookCon***REMOVED***guration.
 type ExternalAdmissionHookCon***REMOVED***gurationList struct {

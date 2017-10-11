@@ -10,9 +10,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1/types"
-	"github.com/coreos-inc/kube-chargeback/pkg/cron"
+	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
+	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -54,24 +53,16 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 	}
 
 	log.Debugf("setting up chargeback client...")
-	if op.charge, err = cb.NewForCon***REMOVED***g(con***REMOVED***g); err != nil {
-		return nil, err
-	}
 
-	if op.cronOp, err = cron.New(con***REMOVED***g); err != nil {
-		return nil, err
+	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(con***REMOVED***g)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	op.reportInform = cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc:  op.charge.Reports(cfg.Namespace).List,
-			WatchFunc: op.charge.Reports(cfg.Namespace).Watch,
-		},
-		&cbTypes.Report{}, 3*time.Minute, cache.Indexers{},
-	)
 
 	log.Debugf("con***REMOVED***guring event listeners...")
-	op.reportInform.AddEventHandler(cache.ResourceEventHandlerFuncs{
+
+	op.reportInformer = cbInformers.NewReportInformer(op.chargebackClient, cfg.Namespace, time.Minute, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	op.reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: op.handleAddReport,
 	})
 
@@ -80,11 +71,9 @@ func New(cfg Con***REMOVED***g) (*Chargeback, error) {
 
 type Chargeback struct {
 	extension *ext_client.Clientset
-	charge    *cb.ChargebackClient
 
-	reportInform cache.SharedIndexInformer
-
-	cronOp *cron.Operator
+	reportInformer   cache.SharedIndexInformer
+	chargebackClient cbClientset.Interface
 
 	namespace  string
 	hiveHost   string
@@ -96,9 +85,12 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	// TODO: implement polling
 	time.Sleep(15 * time.Second)
 
-	go c.reportInform.Run(stopCh)
-	go c.cronOp.Run(stopCh)
+	go c.reportInformer.Run(stopCh)
 	go c.startHTTPServer()
+
+	if !cache.WaitForCacheSync(stopCh, c.reportInformer.HasSynced) {
+		return fmt.Errorf("cache for reports not synced in time")
+	}
 
 	log.Infof("chargeback successfully initialized, waiting for reports...")
 

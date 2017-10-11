@@ -25,29 +25,30 @@ import (
 	"strings"
 )
 
-var ***REMOVED***le_cache map[string][]byte
-var info_cache map[string]interface{}
+var ***REMOVED***leCache map[string][]byte
+var infoCache map[string]interface{}
 var count int64
 
-var VERBOSE_READER = false
+var verboseReader = false
 
 func initializeFileCache() {
-	if ***REMOVED***le_cache == nil {
-		***REMOVED***le_cache = make(map[string][]byte, 0)
+	if ***REMOVED***leCache == nil {
+		***REMOVED***leCache = make(map[string][]byte, 0)
 	}
 }
 
 func initializeInfoCache() {
-	if info_cache == nil {
-		info_cache = make(map[string]interface{}, 0)
+	if infoCache == nil {
+		infoCache = make(map[string]interface{}, 0)
 	}
 }
 
+// FetchFile gets a speci***REMOVED***ed ***REMOVED***le from the local ***REMOVED***lesystem or a remote location.
 func FetchFile(***REMOVED***leurl string) ([]byte, error) {
 	initializeFileCache()
-	bytes, ok := ***REMOVED***le_cache[***REMOVED***leurl]
+	bytes, ok := ***REMOVED***leCache[***REMOVED***leurl]
 	if ok {
-		if VERBOSE_READER {
+		if verboseReader {
 			log.Printf("Cache hit %s", ***REMOVED***leurl)
 		}
 		return bytes, nil
@@ -56,30 +57,17 @@ func FetchFile(***REMOVED***leurl string) ([]byte, error) {
 	response, err := http.Get(***REMOVED***leurl)
 	if err != nil {
 		return nil, err
-	} ***REMOVED*** {
-		defer response.Body.Close()
-		bytes, err := ioutil.ReadAll(response.Body)
-		if err == nil {
-			***REMOVED***le_cache[***REMOVED***leurl] = bytes
-		}
-		return bytes, err
 	}
+	defer response.Body.Close()
+	bytes, err = ioutil.ReadAll(response.Body)
+	if err == nil {
+		***REMOVED***leCache[***REMOVED***leurl] = bytes
+	}
+	return bytes, err
 }
 
-// read a ***REMOVED***le and unmarshal it as a yaml.MapSlice
-func ReadInfoForFile(***REMOVED***lename string) (interface{}, error) {
-	initializeInfoCache()
-	info, ok := info_cache[***REMOVED***lename]
-	if ok {
-		if VERBOSE_READER {
-			log.Printf("Cache hit info for ***REMOVED***le %s", ***REMOVED***lename)
-		}
-		return info, nil
-	}
-	if VERBOSE_READER {
-		log.Printf("Reading info for ***REMOVED***le %s", ***REMOVED***lename)
-	}
-
+// ReadBytesForFile reads the bytes of a ***REMOVED***le.
+func ReadBytesForFile(***REMOVED***lename string) ([]byte, error) {
 	// is the ***REMOVED***lename a url?
 	***REMOVED***leurl, _ := url.Parse(***REMOVED***lename)
 	if ***REMOVED***leurl.Scheme != "" {
@@ -88,43 +76,51 @@ func ReadInfoForFile(***REMOVED***lename string) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		var info yaml.MapSlice
-		err = yaml.Unmarshal(bytes, &info)
-		if err != nil {
-			return nil, err
-		}
-		info_cache[***REMOVED***lename] = info
-		return info, nil
-	} ***REMOVED*** {
-		// no, it's a local ***REMOVED***lename
-		bytes, err := ioutil.ReadFile(***REMOVED***lename)
-		if err != nil {
-			log.Printf("File error: %v\n", err)
-			return nil, err
-		}
-		var info yaml.MapSlice
-		err = yaml.Unmarshal(bytes, &info)
-		if err != nil {
-			return nil, err
-		}
-		info_cache[***REMOVED***lename] = info
-		return info, nil
+		return bytes, nil
 	}
+	// no, it's a local ***REMOVED***lename
+	bytes, err := ioutil.ReadFile(***REMOVED***lename)
+	if err != nil {
+		return nil, err
+	}
+	return bytes, nil
 }
 
-// read a ***REMOVED***le and return the fragment needed to resolve a $ref
+// ReadInfoFromBytes unmarshals a ***REMOVED***le as a yaml.MapSlice.
+func ReadInfoFromBytes(***REMOVED***lename string, bytes []byte) (interface{}, error) {
+	initializeInfoCache()
+	cachedInfo, ok := infoCache[***REMOVED***lename]
+	if ok {
+		if verboseReader {
+			log.Printf("Cache hit info for ***REMOVED***le %s", ***REMOVED***lename)
+		}
+		return cachedInfo, nil
+	}
+	if verboseReader {
+		log.Printf("Reading info for ***REMOVED***le %s", ***REMOVED***lename)
+	}
+	var info yaml.MapSlice
+	err := yaml.Unmarshal(bytes, &info)
+	if err != nil {
+		return nil, err
+	}
+	infoCache[***REMOVED***lename] = info
+	return info, nil
+}
+
+// ReadInfoForRef reads a ***REMOVED***le and return the fragment needed to resolve a $ref.
 func ReadInfoForRef(base***REMOVED***le string, ref string) (interface{}, error) {
 	initializeInfoCache()
 	{
-		info, ok := info_cache[ref]
+		info, ok := infoCache[ref]
 		if ok {
-			if VERBOSE_READER {
+			if verboseReader {
 				log.Printf("Cache hit for ref %s#%s", base***REMOVED***le, ref)
 			}
 			return info, nil
 		}
 	}
-	if VERBOSE_READER {
+	if verboseReader {
 		log.Printf("Reading info for ref %s#%s", base***REMOVED***le, ref)
 	}
 	count = count + 1
@@ -136,7 +132,11 @@ func ReadInfoForRef(base***REMOVED***le string, ref string) (interface{}, error)
 	} ***REMOVED*** {
 		***REMOVED***lename = base***REMOVED***le
 	}
-	info, err := ReadInfoForFile(***REMOVED***lename)
+	bytes, err := ReadBytesForFile(***REMOVED***lename)
+	if err != nil {
+		return nil, err
+	}
+	info, err := ReadInfoFromBytes(***REMOVED***lename, bytes)
 	if err != nil {
 		log.Printf("File error: %v\n", err)
 	} ***REMOVED*** {
@@ -154,7 +154,7 @@ func ReadInfoForRef(base***REMOVED***le string, ref string) (interface{}, error)
 							}
 						}
 						if !found {
-							info_cache[ref] = nil
+							infoCache[ref] = nil
 							return nil, NewError(nil, fmt.Sprintf("could not resolve %s", ref))
 						}
 					}
@@ -162,6 +162,6 @@ func ReadInfoForRef(base***REMOVED***le string, ref string) (interface{}, error)
 			}
 		}
 	}
-	info_cache[ref] = info
+	infoCache[ref] = info
 	return info, nil
 }

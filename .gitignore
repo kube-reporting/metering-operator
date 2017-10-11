@@ -25,3 +25,9 @@ private
 
 # IDE support
 .idea
+_tmp
+
+deepcopy-gen
+client-gen
+lister-gen
+informer-gen

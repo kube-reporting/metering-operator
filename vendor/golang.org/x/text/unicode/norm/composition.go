@@ -33,17 +33,9 @@ const (
 // streamSafe implements the policy of when a CGJ should be inserted.
 type streamSafe uint8
 
-// mkStreamSafe is a shorthand for declaring a streamSafe var and calling
-// ***REMOVED***rst on it.
-func mkStreamSafe(p Properties) streamSafe {
-	return streamSafe(p.nTrailingNonStarters())
-}
-
-// ***REMOVED***rst inserts the ***REMOVED***rst rune of a segment.
+// ***REMOVED***rst inserts the ***REMOVED***rst rune of a segment. It is a faster version of next if
+// it is known p represents the ***REMOVED***rst rune in a segment.
 func (ss *streamSafe) ***REMOVED***rst(p Properties) {
-	if *ss != 0 {
-		panic("!= 0")
-	}
 	*ss = streamSafe(p.nTrailingNonStarters())
 }
 
@@ -66,7 +58,7 @@ func (ss *streamSafe) next(p Properties) ssState {
 	// be a non-starter. Note that it always hold that if nLead > 0 then
 	// nLead == nTrail.
 	if n == 0 {
-		*ss = 0
+		*ss = streamSafe(p.nTrailingNonStarters())
 		return ssStarter
 	}
 	return ssSuccess
@@ -142,7 +134,6 @@ func (rb *reorderBuffer) setFlusher(out []byte, f func(*reorderBuffer) bool) {
 func (rb *reorderBuffer) reset() {
 	rb.nrune = 0
 	rb.nbyte = 0
-	rb.ss = 0
 }
 
 func (rb *reorderBuffer) doFlush() bool {
@@ -257,6 +248,9 @@ func (rb *reorderBuffer) insertUnsafe(src input, i int, info Properties) {
 // It flushes the buffer on each new segment start.
 func (rb *reorderBuffer) insertDecomposed(dcomp []byte) insertErr {
 	rb.tmpBytes.setBytes(dcomp)
+	// As the streamSafe accounting already handles the counting for modi***REMOVED***ers,
+	// we don't have to call next. However, we do need to keep the accounting
+	// intact when flushing the buffer.
 	for i := 0; i < len(dcomp); {
 		info := rb.f.info(rb.tmpBytes, i)
 		if info.BoundaryBefore() && rb.nrune > 0 && !rb.doFlush() {

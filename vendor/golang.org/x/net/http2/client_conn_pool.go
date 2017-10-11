@@ -247,7 +247,7 @@ func ***REMOVED***lterOutClientConn(in []*ClientConn, exclude *ClientConn) []*Cl
 }
 
 // noDialClientConnPool is an implementation of http2.ClientConnPool
-// which never dials.  We let the HTTP/1.1 client dial and use its TLS
+// which never dials. We let the HTTP/1.1 client dial and use its TLS
 // connection instead.
 type noDialClientConnPool struct{ *clientConnPool }
 
