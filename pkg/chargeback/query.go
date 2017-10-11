@@ -35,16 +35,16 @@ func (c *Chargeback) syncReport(key string) error {
 	indexer := c.reportInformer.GetIndexer()
 	obj, exists, err := indexer.GetByKey(key)
 	if err != nil {
-		log.Errorf("Fetching object with key %s from store failed with %v", key, err)
+		c.logger.Errorf("Fetching object with key %s from store failed with %v", key, err)
 		return err
 	}
 
 	if !exists {
-		log.Infof("Report %s does not exist anymore", key)
+		c.logger.Infof("Report %s does not exist anymore", key)
 	} ***REMOVED*** {
 		report := obj.(*cbTypes.Report)
-		log.Infof("Sync/Add/Update for Report %s", report.GetName())
-		c.handleReport(report)
+		c.logger.Infof("syncing report %s", report.GetName())
+		return c.handleReport(report)
 	}
 	return nil
 }
@@ -58,20 +58,20 @@ func (c *Chargeback) handleErr(err error, key interface{}) {
 
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if c.reportQueue.NumRequeues(key) < 5 {
-		log.WithError(err).Error("Error syncing report %v", key)
+		c.logger.WithError(err).Error("Error syncing report %v", key)
 
 		c.reportQueue.AddRateLimited(key)
 		return
 	}
 
 	c.reportQueue.Forget(key)
-	log.WithError(err).Infof("Dropping report %q out of the queue", key)
+	c.logger.WithError(err).Infof("Dropping report %q out of the queue", key)
 }
 
-func (c *Chargeback) handleReport(report *cbTypes.Report) {
+func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
-	logger := log.WithFields(log.Fields{
+	logger := c.logger.WithFields(log.Fields{
 		"name":            report.Name,
 		"generationQuery": report.Spec.GenerationQueryName,
 		"start":           report.Spec.ReportingStart,
@@ -80,30 +80,31 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) {
 
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted, cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
-		logger.Warnf("ignoring report %s, status: %s", report.Name, report.Status.Phase)
-		return
+		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
+		return nil
 	default:
 		logger.Infof("new report discovered")
 	}
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	report, err := c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
+	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("failed to update report status for %q: %v", report.Name, err))
-		return
+		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
+		return err
 	}
+	report = newReport
 
 	genQuery, err := c.chargebackClient.ChargebackV1alpha1().ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName, metav1.GetOptions{})
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("failed to get report generation query: %v", err))
-		return
+		logger.WithError(err).Errorf("failed to get report generation query")
+		return err
 	}
 
 	dataStore, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(c.namespace).Get(genQuery.Spec.DataStoreName, metav1.GetOptions{})
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("failed to get report data store: %v", err))
-		return
+		logger.WithError(err).Errorf("failed to get report data store")
+		return err
 	}
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
@@ -111,57 +112,60 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) {
 	// get hive and presto connections
 	hiveCon, err := c.hiveConn()
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("Failed to con***REMOVED***gure Hive connection: %v", err))
-		return
+		logger.WithError(err).Errorf("failed to con***REMOVED***gure Hive connection")
+		return err
 	}
 	defer hiveCon.Close()
 
 	prestoCon, err := c.prestoConn()
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("Failed to con***REMOVED***gure Presto connection: %v", err))
-		return
+		logger.WithError(err).Errorf("failed to con***REMOVED***gure Presto connection")
+		return err
 	}
 	defer prestoCon.Close()
 
 	replacer := strings.NewReplacer("-", "_", ".", "_")
 	datastoreTable := fmt.Sprintf("datastore_%s", replacer.Replace(dataStore.Name))
 	bucket, pre***REMOVED***x := dataStore.Spec.Storage.Bucket, dataStore.Spec.Storage.Pre***REMOVED***x
-	logger.Debugf("Creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", datastoreTable, bucket, pre***REMOVED***x)
+	logger.Debugf("creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", datastoreTable, bucket, pre***REMOVED***x)
 	if err = hive.CreatePromsumTable(hiveCon, datastoreTable, bucket, pre***REMOVED***x); err != nil {
-		c.setError(logger, report, fmt.Errorf("Couldn't create table for cluster usage metric data: %v", err))
-		return
+		// TODO(chance): return the error and handle retrying
+		c.setReportError(logger, report, err, "couldn't create table for cluster usage metric data")
+		return nil
 	}
 
 	results, err := generateReport(logger, report, genQuery, rng, datastoreTable, hiveCon, prestoCon)
 	if err != nil {
-		c.setError(logger, report, fmt.Errorf("Report execution failed: %v", err))
-		return
+		// TODO(chance): return the error and handle retrying
+		c.setReportError(logger, report, err, "report execution failed")
+		return nil
 	}
 	if c.logReport {
 		resultsJSON, err := json.MarshalIndent(results, "", " ")
 		if err != nil {
-			c.setError(logger, report, fmt.Errorf("Unable to marshal report into JSON: %v", err))
-			return
+			logger.WithError(err).Errorf("unable to marshal report into JSON")
+			return nil
 		}
 		logger.Debugf("results: %s", string(resultsJSON))
 	}
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseFinished
-	report, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
+	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
 	if err != nil {
-		logger.Warnf("failed to update report status for %q: ", report.Name, err)
+		logger.WithError(err).Warnf("failed to update report status to ***REMOVED***nished for %q", report.Name)
 	} ***REMOVED*** {
 		logger.Infof("***REMOVED***nished report %q", report.Name)
 	}
+	return nil
 }
 
-func (c *Chargeback) setError(logger *log.Entry, q *cbTypes.Report, err error) {
-	logger.WithError(err).Errorf("error encountered")
+func (c *Chargeback) setReportError(logger *log.Entry, q *cbTypes.Report, err error, errMsg string) {
+	logger.WithError(err).Errorf(errMsg)
 	q.Status.Phase = cbTypes.ReportPhaseError
 	q.Status.Output = err.Error()
 	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(q)
 	if err != nil {
-		logger.Errorf("FAILED TO REPORT ERROR: %v", err)
+		logger.WithError(err).Errorf("unable to update report status to error")
 	}
 }
