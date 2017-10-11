@@ -96,17 +96,10 @@ func checkForFields(***REMOVED***elds []string, vals url.Values) error {
 }
 
 func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
-	prestoCon, err := c.prestoConn()
-	if err != nil {
-		log.Errorf("failed to con***REMOVED***gure presto connection: %v", err)
-		reportError(w, http.StatusInternalServerError, "failed to con***REMOVED***gure presto connection (see chargeback logs for more details)", err)
-		return
-	}
-	defer prestoCon.Close()
 
 	reportTable := reportTableName(name)
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	results, err := presto.ExecuteSelect(prestoCon, getReportQuery)
+	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
 	if err != nil {
 		c.logger.Errorf("failed to perform presto query: %v", err)
 		c.reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details)", err)
