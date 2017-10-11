@@ -98,6 +98,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	go c.reportInform.Run(stopCh)
 	go c.cronOp.Run(stopCh)
+	go c.startHTTPServer()
 
 	log.Infof("chargeback successfully initialized, waiting for reports...")
 

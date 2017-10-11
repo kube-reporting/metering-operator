@@ -6,6 +6,15 @@ import (
 	"path"
 )
 
+func dropTable(name string, ignoreNotExists bool) string {
+	ifExists := ""
+	if ignoreNotExists {
+		ifExists = "IF EXISTS"
+	}
+
+	return fmt.Sprintf("DROP TABLE %s %s", ifExists, name)
+}
+
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
 func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns []string, external, ignoreExists bool) string {
