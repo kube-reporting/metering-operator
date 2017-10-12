@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/client-go/tools/cache"
+
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
-	log "github.com/sirupsen/logrus"
 )
 
 func (c *Chargeback) runReportDataStoreWorker() {
@@ -28,24 +31,28 @@ func (c *Chargeback) processReportDataStore() bool {
 }
 
 func (c *Chargeback) syncReportDataStore(key string) error {
-	indexer := c.informers.reportDataStoreInformer.GetIndexer()
-	obj, exists, err := indexer.GetByKey(key)
+	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		c.logger.Errorf("Fetching object with key %s from store failed with %v", key, err)
+		c.logger.WithError(err).Errorf("invalid resource key :%s", key)
+		return nil
+	}
+
+	reportDataStore, err := c.informers.reportDataStoreLister.ReportDataStores(namespace).Get(name)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			c.logger.Infof("ReportDataStore %s does not exist anymore", key)
+			return nil
+		}
 		return err
 	}
 
-	if !exists {
-		c.logger.Infof("ReportDataStore %s does not exist anymore", key)
-	} else {
-		reportDataStore := obj.(*cbTypes.ReportDataStore)
-		c.logger.Infof("syncing reportDataStore %s", reportDataStore.GetName())
-		err = c.handleReportDataStore(reportDataStore)
-		if err != nil {
-			c.logger.WithError(err).Errorf("error syncing reportDataStore %s", reportDataStore.GetName())
-		}
-		c.logger.Infof("successfully synced reportDataStore %s", reportDataStore.GetName())
+	c.logger.Infof("syncing reportDataStore %s", reportDataStore.GetName())
+	err = c.handleReportDataStore(reportDataStore)
+	if err != nil {
+		c.logger.WithError(err).Errorf("error syncing reportDataStore %s", reportDataStore.GetName())
+		return err
 	}
+	c.logger.Infof("successfully synced reportDataStore %s", reportDataStore.GetName())
 	return nil
 }
 
@@ -73,7 +80,7 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 	}
 	dataStore.TableName = tableName
 
-	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(c.namespace).Update(dataStore)
+	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(dataStore.Namespace).Update(dataStore)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportDataStore table name for %q", dataStore.Name)
 		return err
