@@ -17,66 +17,66 @@ import (
 func (c *Chargeback) startHTTPServer() {
 	http.HandleFunc("/api/v1/reports/get", c.getReportHandler)
 	http.HandleFunc("/api/v1/reports/run", c.runReportHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	c.logger.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func logRequest(r *http.Request) {
-	log.WithFields(log.Fields{
+func (c *Chargeback) logRequest(r *http.Request) {
+	c.logger.WithFields(log.Fields{
 		"method": r.Method,
 		"url":    r.URL.String(),
 	}).Info("new request")
 }
 
-func reportError(w http.ResponseWriter, status int, message string, args ...interface{}) {
+func (c *Chargeback) reportError(w http.ResponseWriter, status int, message string, args ...interface{}) {
 	w.WriteHeader(status)
 	_, err := w.Write([]byte(fmt.Sprintf(message, args...)))
 	if err != nil {
-		log.Warnf("error sending client error: %v", err)
+		c.logger.Warnf("error sending client error: %v", err)
 	}
 }
 
 func (c *Chargeback) getReportHandler(w http.ResponseWriter, r *http.Request) {
-	logRequest(r)
+	c.logRequest(r)
 	if r.Method != "GET" {
-		reportError(w, http.StatusNotFound, "Not found")
+		c.reportError(w, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		c.reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"name", "format"}, vals)
 	if err != nil {
-		reportError(w, http.StatusBadRequest, "%v", err)
+		c.reportError(w, http.StatusBadRequest, "%v", err)
 		return
 	}
 	switch vals["format"][0] {
 	case "json", "csv":
 		break
 	default:
-		reportError(w, http.StatusBadRequest, "format must be one of: csv, json")
+		c.reportError(w, http.StatusBadRequest, "format must be one of: csv, json")
 		return
 	}
 	c.getReport(vals["name"][0], vals["format"][0], w)
 }
 
 func (c *Chargeback) runReportHandler(w http.ResponseWriter, r *http.Request) {
-	logRequest(r)
+	c.logRequest(r)
 	if r.Method != "GET" {
-		reportError(w, http.StatusNotFound, "Not found")
+		c.reportError(w, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		c.reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"query", "start", "end"}, vals)
 	if err != nil {
-		reportError(w, http.StatusBadRequest, "%v", err)
+		c.reportError(w, http.StatusBadRequest, "%v", err)
 		return
 	}
 	c.runReport(vals["query"][0], vals["start"][0], vals["end"][0], w)
@@ -96,20 +96,13 @@ func checkForFields(fields []string, vals url.Values) error {
 }
 
 func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
-	prestoCon, err := c.prestoConn()
-	if err != nil {
-		log.Errorf("failed to configure presto connection: %v", err)
-		reportError(w, http.StatusInternalServerError, "failed to configure presto connection (see chargeback logs for more details)", err)
-		return
-	}
-	defer prestoCon.Close()
 
 	reportTable := reportTableName(name)
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	results, err := presto.ExecuteSelect(prestoCon, getReportQuery)
+	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
 	if err != nil {
-		log.Errorf("failed to perform presto query: %v", err)
-		reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details)", err)
+		c.logger.Errorf("failed to perform presto query: %v", err)
+		c.reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details)", err)
 		return
 	}
 
@@ -118,7 +111,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 		e := json.NewEncoder(w)
 		err := e.Encode(results)
 		if err != nil {
-			log.Errorf("error marshalling json: %v", err)
+			c.logger.Errorf("error marshalling json: %v", err)
 			return
 		}
 	case "csv":
@@ -133,7 +126,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 			}
 			err := csvWriter.Write(keys)
 			if err != nil {
-				log.Errorf("failed to write headers: %v", err)
+				c.logger.Errorf("failed to write headers: %v", err)
 				return
 			}
 		}
@@ -159,14 +152,14 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 				case nil:
 					vals[i] = ""
 				default:
-					log.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
-					reportError(w, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
+					c.logger.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
+					c.reportError(w, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
 					return
 				}
 			}
 			err := csvWriter.Write(vals)
 			if err != nil {
-				log.Errorf("failed to write csv row: %v", err)
+				c.logger.Errorf("failed to write csv row: %v", err)
 				return
 			}
 		}

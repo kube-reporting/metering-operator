@@ -19,7 +19,8 @@ type ReportDataStore struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec ReportDataStoreSpec `json:"spec"`
+	Spec      ReportDataStoreSpec `json:"spec"`
+	TableName string              `json:"table_name"`
 }
 
 type ReportDataStoreSpec struct {

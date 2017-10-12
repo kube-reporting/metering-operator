@@ -111,9 +111,14 @@ vendor: glide.yaml
 fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
 
+chargeback-bin: images/chargeback/bin/chargeback
+
 images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
+
+promsum-bin: images/promsum/bin/promsum
+
 images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
@@ -127,6 +132,7 @@ images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	hive-docker-push hadoop-docker-push \
 	docker-build docker-push \
 	docker-build-all docker-push-all \
+	chargeback-bin promsum-bin
 
 codegen-docker-build: hack/codegen/Dockerfile
 	make docker-build DOCKERFILE=$< IMAGE_NAME=$(CODEGEN_IMAGE) USE_LATEST_TAG=true
