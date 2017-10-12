@@ -30,12 +30,17 @@ func init() {
 	flag.StringVar(&promURL, "prom", "http://localhost:9090", "URL of the Prometheus to be queried")
 
 	flag.Parse()
+
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 }
 
 func main() {
 	if flag.NArg() != 0 {
 		log.Fatal("no arguments are expected")
 	}
+
+	log.SetLevel(log.DebugLevel)
 
 	// Get our namespace, make a new rest client, and list all the data stores
 	namespaceBytes, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
@@ -81,15 +86,22 @@ func main() {
 	// For every data store, look up and perform each query, storing in the
 	// designated location.
 	for _, ds := range dataStores.Items {
-		if ds.Spec.Storage.Type != "s3" {
-			log.Fatal("unsupported storage type (must be s3): ", ds.Spec.Storage.Type)
+		if ds.Spec.Promsum == nil {
+			log.Debugf("datastore %q: skipping, not promsum datastore", ds.Name)
+			continue
 		}
-		if ds.Spec.Storage.Format != "json" {
-			log.Fatal("unsupported storage type (must be json): ", ds.Spec.Storage.Format)
+		storage := ds.Spec.Promsum.Storage
+		if storage == nil {
+			log.Errorf("datastore %q: improperly configured datastore, storage is empty", ds.Name)
+			continue
+		}
+		if storage.S3 == nil {
+			log.Errorf("datastore %q: unsupported storage type (must be s3)", ds.Name)
+			continue
 		}
 		storeURL := url.URL{
 			Scheme: "s3",
-			Path:   path.Join(ds.Spec.Storage.Bucket, ds.Spec.Storage.Prefix),
+			Path:   path.Join(storage.S3.Bucket, storage.S3.Prefix),
 		}
 
 		log.Infof("storeURL: %s", storeURL.String())
@@ -98,7 +110,7 @@ func main() {
 			log.Fatal("Could not setup storage: ", err)
 		}
 
-		for _, queryName := range ds.Spec.Queries {
+		for _, queryName := range ds.Spec.Promsum.Queries {
 			query, err := clientSet.ChargebackV1alpha1().ReportPrometheusQueries(namespace).Get(queryName, metav1.GetOptions{})
 			if err != nil {
 				log.Fatal("Could not get prometheus query: ", err)

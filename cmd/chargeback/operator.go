@@ -17,6 +17,11 @@ var (
 	logReport bool
 )
 
+func init() {
+	log.SetLevel(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+}
+
 func main() {
 	logger := log.WithFields(log.Fields{
 		"app": "chargeback-operator",

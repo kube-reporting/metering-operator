@@ -70,12 +70,24 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 		return nil
 	}
 
+	if dataStore.Spec.Promsum == nil {
+		log.Infof("datastore %q: skipping, not promsum datastore", dataStore.Name)
+		return nil
+	}
+
+	storage := dataStore.Spec.Promsum.Storage
+	if storage == nil {
+		return fmt.Errorf("datastore %q: improperly configured datastore, storage is empty", dataStore.Name)
+	}
+	if storage.S3 == nil {
+		return fmt.Errorf("datastore %q: unsupported storage type (must be s3)", dataStore.Name)
+	}
+
 	replacer := strings.NewReplacer("-", "_", ".", "_")
 	tableName := fmt.Sprintf("datastore_%s", replacer.Replace(dataStore.Name))
-	bucket, prefix := dataStore.Spec.Storage.Bucket, dataStore.Spec.Storage.Prefix
 
-	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", tableName, bucket, prefix)
-	if err := hive.CreatePromsumTable(c.hiveConn, tableName, bucket, prefix); err != nil {
+	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+	if err := hive.CreatePromsumTable(c.hiveConn, tableName, storage.S3.Bucket, storage.S3.Prefix); err != nil {
 		return err
 	}
 	dataStore.TableName = tableName
