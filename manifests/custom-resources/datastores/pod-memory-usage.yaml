@@ -5,10 +5,10 @@ metadata:
   labels:
     tectonic-chargeback: "true"
 spec:
-  storage:
-    type: "s3"
-    format: "json"
-    bucket: "REPLACEME"
-    pre***REMOVED***x: "promsum/memory_by_pod"
-  queries:
-  - "get-memory-by-pod"
+  promsum:
+    storage:
+      s3:
+        bucket: "REPLACEME"
+        pre***REMOVED***x: "promsum/memory_by_pod"
+    queries:
+    - "get-memory-by-pod"
