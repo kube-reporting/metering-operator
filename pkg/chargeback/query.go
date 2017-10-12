@@ -76,7 +76,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
+	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
 		return err
@@ -84,13 +84,13 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	report = newReport
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	dataStore, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).Get(genQuery.Spec.DataStoreName)
+	dataStore, err := c.informers.reportDataStoreLister.ReportDataStores(report.Namespace).Get(genQuery.Spec.DataStoreName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report data store")
 		return err
@@ -124,7 +124,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseFinished
-	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(report)
+	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Warnf("failed to update report status to ***REMOVED***nished for %q", report.Name)
 	} ***REMOVED*** {
@@ -133,11 +133,11 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	return nil
 }
 
-func (c *Chargeback) setReportError(logger *log.Entry, q *cbTypes.Report, err error, errMsg string) {
+func (c *Chargeback) setReportError(logger *log.Entry, report *cbTypes.Report, err error, errMsg string) {
 	logger.WithError(err).Errorf(errMsg)
-	q.Status.Phase = cbTypes.ReportPhaseError
-	q.Status.Output = err.Error()
-	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(c.namespace).Update(q)
+	report.Status.Phase = cbTypes.ReportPhaseError
+	report.Status.Output = err.Error()
+	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}

@@ -80,7 +80,7 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 	}
 	dataStore.TableName = tableName
 
-	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(c.namespace).Update(dataStore)
+	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(dataStore.Namespace).Update(dataStore)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportDataStore table name for %q", dataStore.Name)
 		return err
