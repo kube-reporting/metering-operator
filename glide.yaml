@@ -82,6 +82,7 @@ import:
   - pkg/apis/extensions/v1beta1
   - rest
   - tools/cache
+  - util
 - package: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
 - package: github.com/sirupsen/logrus
