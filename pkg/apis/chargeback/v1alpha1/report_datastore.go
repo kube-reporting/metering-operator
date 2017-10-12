@@ -20,17 +20,34 @@ type ReportDataStore struct {
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec      ReportDataStoreSpec `json:"spec"`
-	TableName string              `json:"table_name"`
+	TableName string              `json:"tableName"`
 }
 
 type ReportDataStoreSpec struct {
-	Storage ReportDataStoreStorage `json:"storage"`
-	Queries []string               `json:"queries"`
+	DataStoreSource `json:",inline"`
 }
 
-type ReportDataStoreStorage struct {
-	Type   string `json:"type"`
-	Format string `json:"format"`
-	Bucket string `json:"bucket"`
-	Prefix string `json:"prefix"`
+type DataStoreSource struct {
+	// Prommsum represents a datastore which holds Prometheus metrics
+	Promsum *PromsumDataSource `json:"promsum"`
+	// AWSBilling represents a datastore which points to a pre-existing S3
+	// bucket.
+	AWSBilling *AWSBillingDataSource `json:"awsBilling"`
+}
+
+type AWSBillingDataSource struct {
+	Source *S3Bucket `json:"source"`
+}
+
+type PromsumDataSource struct {
+	Queries []string          `json:"queries"`
+	Storage *DataStoreStorage `json:"storage"`
+}
+
+type DataStoreStorage struct {
+	S3    *S3Bucket     `json:"s3"`
+	Local *LocalStorage `json:"local"`
+}
+
+type LocalStorage struct {
 }

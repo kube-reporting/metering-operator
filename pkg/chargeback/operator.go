@@ -31,11 +31,6 @@ type Config struct {
 	LogReport  bool
 }
 
-func init() {
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
-}
-
 func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
 		namespace:  cfg.Namespace,
