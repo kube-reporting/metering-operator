@@ -31,11 +31,6 @@ type Con***REMOVED***g struct {
 	LogReport  bool
 }
 
-func init() {
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
-}
-
 func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Chargeback, error) {
 	op := &Chargeback{
 		namespace:  cfg.Namespace,
