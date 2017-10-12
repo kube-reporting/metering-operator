@@ -59,9 +59,9 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	})
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
-		// How to handle this
-		logger.Infof("found already started report, checking if report exists")
-		// c.hiveConn.Query("SHOW TABLES IN ")
+		err := fmt.Errorf("unable to determine if report generation succeeded")
+		c.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
+		return nil
 	case cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
