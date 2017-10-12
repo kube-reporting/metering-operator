@@ -28,6 +28,10 @@ CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] 
 
 PROMSUM_GO_FILES := $(shell go list -json $(PROMSUM_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} find $(GOPATH)/src/$(PROMSUM_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
+CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_files.sh)
+
+CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_trigger_regenerate_if_changed.sh)
+
 # TODO: Add tests
 all: fmt docker-build-all
 
@@ -113,19 +117,19 @@ fmt:
 
 chargeback-bin: images/chargeback/bin/chargeback
 
-images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
+images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES) $(CODEGEN_OUTPUT_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
 promsum-bin: images/promsum/bin/promsum
 
-images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
+images/promsum/bin/promsum: $(PROMSUM_GO_FILES) $(CODEGEN_OUTPUT_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(PROMSUM_GO_PKG)
 
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
-	k8s-codegen \
+	k8s-update-codegen k8s-verify-codegen \
 	chargeback-docker-build promsum-docker-build \
 	presto-docker-build hive-docker-build hadoop-docker-build \
 	chargeback-docker-push promsum-docker-push presto-docker-push \
@@ -134,10 +138,9 @@ images/promsum/bin/promsum: $(PROMSUM_GO_FILES)
 	docker-build-all docker-push-all \
 	chargeback-bin promsum-bin
 
-codegen-docker-build: hack/codegen/Dockerfile
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(CODEGEN_IMAGE) USE_LATEST_TAG=true
+k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 
-k8s-update-codegen:
+$(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
 	./hack/update-codegen.sh
 
 k8s-verify-codegen:
