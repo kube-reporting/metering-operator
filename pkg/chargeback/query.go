@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (c *Chargeback) runReportWorker() {
@@ -30,24 +31,28 @@ func (c *Chargeback) processReport() bool {
 }
 
 func (c *Chargeback) syncReport(key string) error {
-	indexer := c.informers.reportInformer.GetIndexer()
-	obj, exists, err := indexer.GetByKey(key)
+	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		c.logger.Errorf("Fetching object with key %s from store failed with %v", key, err)
+		c.logger.WithError(err).Errorf("invalid resource key :%s", key)
+		return nil
+	}
+
+	report, err := c.informers.reportLister.Reports(namespace).Get(name)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			c.logger.Infof("Report %s does not exist anymore", key)
+			return nil
+		}
 		return err
 	}
 
-	if !exists {
-		c.logger.Infof("Report %s does not exist anymore", key)
-	} ***REMOVED*** {
-		report := obj.(*cbTypes.Report)
-		c.logger.Infof("syncing report %s", report.GetName())
-		err = c.handleReport(report)
-		if err != nil {
-			c.logger.WithError(err).Errorf("error syncing report %s", report.GetName())
-		}
-		c.logger.Infof("successfully synced report %s", report.GetName())
+	c.logger.Infof("syncing report %s", report.GetName())
+	err = c.handleReport(report)
+	if err != nil {
+		c.logger.WithError(err).Errorf("error syncing report %s", report.GetName())
+		return err
 	}
+	c.logger.Infof("successfully synced report %s", report.GetName())
 	return nil
 }
 
@@ -79,13 +84,13 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	report = newReport
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := c.chargebackClient.ChargebackV1alpha1().ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName, metav1.GetOptions{})
+	genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(c.namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	dataStore, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(c.namespace).Get(genQuery.Spec.DataStoreName, metav1.GetOptions{})
+	dataStore, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).Get(genQuery.Spec.DataStoreName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report data store")
 		return err

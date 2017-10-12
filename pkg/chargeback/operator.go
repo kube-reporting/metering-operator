@@ -13,6 +13,7 @@ import (
 
 	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
+	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -66,15 +67,24 @@ type informers struct {
 	informerList []cache.SharedIndexInformer
 	queueList    []workqueue.RateLimitingInterface
 
-	reportQueue             workqueue.RateLimitingInterface
-	reportInformer          cache.SharedIndexInformer
+	reportQueue    workqueue.RateLimitingInterface
+	reportInformer cache.SharedIndexInformer
+	reportLister   cbListers.ReportLister
+
 	reportDataStoreQueue    workqueue.RateLimitingInterface
 	reportDataStoreInformer cache.SharedIndexInformer
+	reportDataStoreLister   cbListers.ReportDataStoreLister
+
+	reportGenerationQueryQueue    workqueue.RateLimitingInterface
+	reportGenerationQueryInformer cache.SharedIndexInformer
+	reportGenerationQueryLister   cbListers.ReportGenerationQueryLister
 }
 
 func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
 	reportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	reportInformer := cbInformers.NewReportInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportLister := cbListers.NewReportLister(reportInformer.GetIndexer())
+
 	reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -92,6 +102,8 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 
 	reportDataStoreQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	reportDataStoreInformer := cbInformers.NewReportDataStoreInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportDataStoreLister := cbListers.NewReportDataStoreLister(reportDataStoreInformer.GetIndexer())
+
 	reportDataStoreInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -107,19 +119,33 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		},
 	})
 
+	reportGenerationQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportGenerationQueryLister := cbListers.NewReportGenerationQueryLister(reportGenerationQueryInformer.GetIndexer())
+
 	return informers{
 		informerList: []cache.SharedIndexInformer{
+			reportGenerationQueryInformer,
 			reportDataStoreInformer,
 			reportInformer,
 		},
 		queueList: []workqueue.RateLimitingInterface{
+			reportGenerationQueryQueue,
 			reportDataStoreQueue,
 			reportQueue,
 		},
-		reportQueue:             reportQueue,
-		reportInformer:          reportInformer,
+
+		reportQueue:    reportQueue,
+		reportInformer: reportInformer,
+		reportLister:   reportLister,
+
 		reportDataStoreQueue:    reportDataStoreQueue,
 		reportDataStoreInformer: reportDataStoreInformer,
+		reportDataStoreLister:   reportDataStoreLister,
+
+		reportGenerationQueryQueue:    reportGenerationQueryQueue,
+		reportGenerationQueryInformer: reportGenerationQueryInformer,
+		reportGenerationQueryLister:   reportGenerationQueryLister,
 	}
 }
 
