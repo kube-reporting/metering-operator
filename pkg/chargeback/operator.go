@@ -19,6 +19,9 @@ import (
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
 	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+
+	promapi "github.com/prometheus/client_golang/api"
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
 const (
@@ -30,10 +33,15 @@ const (
 type Con***REMOVED***g struct {
 	Namespace string
 
-	HiveHost   string
-	PrestoHost string
-	LogReport  bool
-	LogQueries bool
+	HiveHost       string
+	PrestoHost     string
+	PromHost       string
+	DisablePromsum bool
+	LogReport      bool
+	LogQueries     bool
+
+	PromsumInterval  time.Duration
+	PromsumPrecision time.Duration
 }
 
 type Chargeback struct {
@@ -42,24 +50,34 @@ type Chargeback struct {
 
 	prestoConn  *sql.DB
 	hiveQueryer *hiveQueryer
+	promConn    prom.API
 
 	logger log.FieldLogger
 
-	namespace  string
-	hiveHost   string
-	prestoHost string
-	logReport  bool
-	logQueries bool
+	namespace      string
+	hiveHost       string
+	prestoHost     string
+	promHost       string
+	disablePromsum bool
+	logReport      bool
+	logQueries     bool
+
+	promsumInterval  time.Duration
+	promsumPrecision time.Duration
 }
 
 func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Chargeback, error) {
 	op := &Chargeback{
-		namespace:  cfg.Namespace,
-		hiveHost:   cfg.HiveHost,
-		prestoHost: cfg.PrestoHost,
-		logReport:  cfg.LogReport,
-		logQueries: cfg.LogQueries,
-		logger:     logger,
+		namespace:        cfg.Namespace,
+		hiveHost:         cfg.HiveHost,
+		prestoHost:       cfg.PrestoHost,
+		promHost:         cfg.PromHost,
+		disablePromsum:   cfg.DisablePromsum,
+		logReport:        cfg.LogReport,
+		logQueries:       cfg.LogQueries,
+		promsumInterval:  cfg.PromsumInterval,
+		promsumPrecision: cfg.PromsumPrecision,
+		logger:           logger,
 	}
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
 
@@ -97,6 +115,10 @@ type informers struct {
 	reportGenerationQueryQueue    workqueue.RateLimitingInterface
 	reportGenerationQueryInformer cache.SharedIndexInformer
 	reportGenerationQueryLister   cbListers.ReportGenerationQueryLister
+
+	reportPrometheusQueryQueue    workqueue.RateLimitingInterface
+	reportPrometheusQueryInformer cache.SharedIndexInformer
+	reportPrometheusQueryLister   cbListers.ReportPrometheusQueryLister
 }
 
 func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
@@ -142,13 +164,19 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportGenerationQueryLister := cbListers.NewReportGenerationQueryLister(reportGenerationQueryInformer.GetIndexer())
 
+	reportPrometheusQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportPrometheusQueryLister := cbListers.NewReportPrometheusQueryLister(reportPrometheusQueryInformer.GetIndexer())
+
 	return informers{
 		informerList: []cache.SharedIndexInformer{
+			reportPrometheusQueryInformer,
 			reportGenerationQueryInformer,
 			reportDataStoreInformer,
 			reportInformer,
 		},
 		queueList: []workqueue.RateLimitingInterface{
+			reportPrometheusQueryQueue,
 			reportGenerationQueryQueue,
 			reportDataStoreQueue,
 			reportQueue,
@@ -165,6 +193,10 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		reportGenerationQueryQueue:    reportGenerationQueryQueue,
 		reportGenerationQueryInformer: reportGenerationQueryInformer,
 		reportGenerationQueryLister:   reportGenerationQueryLister,
+
+		reportPrometheusQueryQueue:    reportPrometheusQueryQueue,
+		reportPrometheusQueryInformer: reportPrometheusQueryInformer,
+		reportPrometheusQueryLister:   reportPrometheusQueryLister,
 	}
 }
 
@@ -214,9 +246,23 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 	defer c.hiveQueryer.closeHiveConnection()
 
-	c.logger.Infof("starting report worker")
+	if !c.disablePromsum {
+		c.promConn, err = c.newPrometheusConn(promapi.Con***REMOVED***g{
+			Address: c.promHost,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	defer c.logger.Infof("starting report worker")
 	go wait.Until(c.runReportWorker, time.Second, stopCh)
 	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
+
+	if !c.disablePromsum {
+		c.logger.Debugf("starting promsum collector")
+		go c.runPromsumWorker(stopCh)
+	}
 
 	c.logger.Infof("chargeback successfully initialized, waiting for reports...")
 
@@ -244,6 +290,14 @@ func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
 		c.logger.Debugf("error encountered, backing off and trying again: %v", err)
 		time.Sleep(connBackoff)
 	}
+}
+
+func (c *Chargeback) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
+	client, err := promapi.NewClient(promCon***REMOVED***g)
+	if err != nil {
+		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
+	}
+	return prom.NewAPI(client), nil
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
