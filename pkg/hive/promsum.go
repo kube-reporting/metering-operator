@@ -1,9 +1,5 @@
 package hive
 
-import (
-	"errors"
-)
-
 var (
 	// PromsumTableName is the Hive identifier to use for usage data.
 	PromsumTableName = "promsum"
@@ -26,17 +22,11 @@ var (
 )
 
 // CreatePromsumTable instantiates a new external Hive table for Prometheus observation data stored in S3.
-func CreatePromsumTable(conn *Connection, tableName, bucket, prefix string) error {
-	if conn == nil {
-		return errors.New("connection to Hive cannot be nil")
-	} else if conn.session == nil {
-		return errors.New("the Hive session has closed")
-	}
-
+func CreatePromsumTable(queryer Queryer, tableName, bucket, prefix string) error {
 	location, err := s3Location(bucket, prefix)
 	if err != nil {
 		return err
 	}
-	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true, true)
-	return conn.Query(query)
+	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, nil, true, true)
+	return queryer.Query(query)
 }

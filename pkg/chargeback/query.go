@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
@@ -64,7 +65,28 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	})
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
-		err := fmt.Errorf("unable to determine if report generation succeeded")
+		// If it's started, query the API to get the most up to date resource,
+		// as it's possible it's finished, but we haven't gotten it yet.
+		newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		c.informers.reportInformer.GetIndexer().Update(report)
+		if err != nil {
+			logger.WithError(err).Warnf("unable to update report cache with updated report")
+		}
+
+		// It's no longer started, requeue it
+		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
+			key, err := cache.MetaNamespaceKeyFunc(newReport)
+			if err == nil {
+				c.informers.reportQueue.Add(key)
+			}
+			return nil
+		}
+
+		err = fmt.Errorf("unable to determine if report generation succeeded")
 		c.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
 		return nil
 	case cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
@@ -107,7 +129,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	})
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-	results, err := generateReport(logger, report, genQuery, rng, dataStore.TableName, c.hiveConn, c.prestoConn)
+	results, err := generateReport(logger, report, genQuery, rng, dataStore.TableName, c.hiveQueryer, c.prestoConn)
 	if err != nil {
 		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")
