@@ -72,14 +72,14 @@ func (c *Connection) Query(query string) error {
 	}
 	resp, err := c.client.ExecuteStatement(req)
 	if err != nil {
-		return fmt.Errorf("Error executing query '%s':  %+v, %v", query, resp, err)
+		return err
 	}
 
 	switch resp.Status.GetStatusCode() {
 	case hive.TStatusCode_SUCCESS_STATUS:
 	case hive.TStatusCode_SUCCESS_WITH_INFO_STATUS:
 	default:
-		return fmt.Errorf("encountered error: %s", resp.Status.String())
+		return fmt.Errorf("encountered error: code: %d, sqlState: %s, message: %s", resp.Status.GetErrorCode(), resp.Status.GetSqlState(), resp.Status.GetErrorMessage())
 	}
 	return nil
 }
