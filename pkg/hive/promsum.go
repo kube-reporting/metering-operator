@@ -27,6 +27,6 @@ func CreatePromsumTable(queryer Queryer, tableName, bucket, prefix string) error
 	if err != nil {
 		return err
 	}
-	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, true, true)
+	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, nil, true, true)
 	return queryer.Query(query)
 }
