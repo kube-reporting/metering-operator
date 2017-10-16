@@ -1,194 +1,61 @@
 package aws
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
 	"path/filepath"
-	"strings"
 	"time"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-)
-
-const (
-	// BillingDateFormat is the layout for parsing the AWS date format of 'yyyymmdd'.
-	BillingDateFormat = "20060102"
-
-	// ManifestSuffix is the extension of AWS Usage Data manifests.
-	ManifestSuffix = ".json"
-
-	// defaultS3Region is used to make the API call used to determine a bucket's region.
-	defaultS3Region = "us-east-1"
 )
 
 // Manifest is a representation of the file AWS provides with metadata for current usage information.
 type Manifest struct {
-	AssemblyID    string  `json:"assemblyId"`
-	Account       string  `json:"account"`
-	Columns       Columns `json:"columns"`
-	Charset       string  `json:"charset"`
-	Compression   string  `json:"compression"`
-	ContentType   string  `json:"contentType"`
-	ReportID      string  `json:"reportId"`
-	ReportName    string  `json:"reportName"`
-	BillingPeriod struct {
-		Start string `json:"start"`
-		End   string `json:"end"`
-	} `json:"billingPeriod"`
-	Bucket                 string   `json:"bucket"`
-	ReportKeys             []string `json:"reportKeys"`
-	AdditionalArtifactKeys []string `json:"additionalArtifactKeys"`
+	AssemblyID             string        `json:"assemblyId"`
+	Account                string        `json:"account"`
+	Columns                Columns       `json:"columns"`
+	Charset                string        `json:"charset"`
+	Compression            string        `json:"compression"`
+	ContentType            string        `json:"contentType"`
+	ReportID               string        `json:"reportId"`
+	ReportName             string        `json:"reportName"`
+	BillingPeriod          BillingPeriod `json:"billingPeriod"`
+	Bucket                 string        `json:"bucket"`
+	ReportKeys             []string      `json:"reportKeys"`
+	AdditionalArtifactKeys []string      `json:"additionalArtifactKeys"`
+}
+
+type BillingPeriod struct {
+	Start Time `json:"start"`
+	End   Time `json:"end"`
 }
 
 // Paths returns the directories containing usage data. The result will be free of duplicates.
 func (m Manifest) Paths() (paths []string) {
-	pathMap := map[string]bool{}
+	pathMap := map[string]struct{}{}
 	for _, key := range m.ReportKeys {
 		dirPath := filepath.Dir(key)
-		pathMap[dirPath] = true
+		pathMap[dirPath] = struct{}{}
 	}
 
 	for path := range pathMap {
 		paths = append(paths, path)
 	}
+
 	return
 }
 
-// RetrieveManifests downloads the billing manifest for the given bucket, prefix, and report name.
-func RetrieveManifests(bucket, prefix string, rng cb.Range) ([]Manifest, error) {
-	client, err := getS3Client(bucket, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// ensure that there is a slash at end of location
-	prefix = fmt.Sprintf("%s/", filepath.Join(prefix))
-
-	// list all in <report-prefix>/<report-name>/ of bucket
-	dateRngs, err := client.ListObjectsV2(&s3.ListObjectsV2Input{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(prefix),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("could not list retrieve AWS billing report keys: %v", err)
-	}
-
-	// use UTC for all times
-	rng.Start, rng.End = rng.Start.UTC(), rng.End.UTC()
-
-	manifests := []Manifest{}
-	for _, obj := range dateRngs.Contents {
-		key := *obj.Key
-
-		// only look for manifest files
-		if !strings.HasSuffix(key, ManifestSuffix) {
-			continue
-		}
-
-		dirParts := strings.Split(key, "/")
-		if len(dirParts) < 2 {
-			return nil, fmt.Errorf("could not determine month of reports: %s", key)
-		}
-
-		rngStr := dirParts[len(dirParts)-2]
-		if dirRng, err := rngFromDirName(rngStr); err != nil {
-			fmt.Printf("failed to determine range for '%s': %v", *obj.Key, err)
-			continue
-		} else if !dirRng.Within(rng.Start) && !dirRng.Within(rng.End) {
-			// directory is not within range
-			continue
-		} else if rng.Start.Equal(dirRng.End) || rng.End.Equal(dirRng.Start) {
-			// don't include directories which just touch the range
-			continue
-		}
-
-		manifest, err := retrieveManifest(client, bucket, key)
-		if err != nil {
-			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", bucket, key, err)
-		}
-		manifests = append(manifests, manifest)
-
-	}
-	return manifests, nil
+type Time struct {
+	time.Time
 }
 
-// retrieveRegion performs a request to determine the region the bucket has been created in.
-func retrieveRegion(client s3iface.S3API, bucket string) (*string, error) {
-	get := &s3.GetBucketLocationInput{Bucket: aws.String(bucket)}
-	bucketResp, err := client.GetBucketLocation(get)
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve bucket region: %v", err)
-	}
+const manifestTime = "20060102T000000.000Z"
 
-	if bucketResp == nil || bucketResp.LocationConstraint == nil {
-		return nil, errors.New("bucket response or bucket name was nil")
+func (t *Time) UnmarshalJSON(b []byte) error {
+	// b contains quotes around the timestamp
+	tt, err := time.Parse(manifestTime, string(b[1:len(b)-1]))
+	if err == nil {
+		*t = Time{tt}
 	}
-	return bucketResp.LocationConstraint, nil
+	return err
 }
 
-// retrieveManifest retrieves a manifest from the given bucket and key.
-func retrieveManifest(client s3iface.S3API, bucket, key string) (Manifest, error) {
-	get := &s3.GetObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)}
-	obj, err := client.GetObject(get)
-	if err != nil {
-		return Manifest{}, err
-	}
-
-	data, err := ioutil.ReadAll(obj.Body)
-	if err != nil {
-		return Manifest{}, err
-	}
-
-	manifest := Manifest{}
-	err = json.Unmarshal(data, &manifest)
-	return manifest, err
-}
-
-// rangeFromDirName returns the start and end times encoded in an AWS usage record directory name.
-func rngFromDirName(dir string) (rng cb.Range, err error) {
-	rngParts := strings.Split(dir, "-")
-	if len(rngParts) != 2 {
-		err = errors.New("expected only 1 instance of '-'")
-	} else if rng.Start, err = parseBillingDate(rngParts[0]); err != nil {
-		err = fmt.Errorf("can't determine start: %v", err)
-	} else if rng.End, err = parseBillingDate(rngParts[1]); err != nil {
-		err = fmt.Errorf("can't determine end: %v", err)
-	}
-
-	if err != nil {
-		err = fmt.Errorf("expected format for billing dates is 'yyyymmdd-yyyymmdd', given '%s': %v", dir, err)
-	}
-	return
-}
-
-// parseBillingDate returns a Time based on a date string formatted in the pattern 'yyyymmdd'. Times will be UTC.
-func parseBillingDate(dateStr string) (t time.Time, err error) {
-	if t, err = time.Parse(BillingDateFormat, dateStr); err != nil {
-		err = fmt.Errorf("failed to parse date from '%s': %v", dateStr, err)
-	}
-	return
-}
-
-// getS3Client returns the singleton client.
-func getS3Client(bucket string, creds *credentials.Credentials) (s3iface.S3API, error) {
-	awsSession := session.Must(session.NewSession())
-	if creds != nil {
-		awsSession.Config.Credentials = creds
-	}
-
-	var err error
-	tmpClient := s3.New(awsSession, aws.NewConfig().WithRegion(defaultS3Region))
-	if awsSession.Config.Region, err = retrieveRegion(tmpClient, bucket); err != nil {
-		return nil, err
-	}
-
-	return s3.New(awsSession), nil
+func (t *Time) String() string {
+	return t.Format(manifestTime)
 }
