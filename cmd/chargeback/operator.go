@@ -14,7 +14,8 @@ var (
 	HiveHost   = "hive:10000"
 	PrestoHost = "presto:8080"
 
-	logReport bool
+	logReport  bool
+	logQueries bool
 )
 
 func init() {
@@ -33,6 +34,13 @@ func main() {
 			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logReportEnv)
 		}
 	}
+	if logQueriesStr := os.Getenv("LOG_QUERIES"); logQueriesStr != "" {
+		var err error
+		logQueries, err = strconv.ParseBool(logQueriesStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logQueriesStr)
+		}
+	}
 	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		logger.WithError(err).Fatal("could not determine namespace")
@@ -42,6 +50,7 @@ func main() {
 		HiveHost:   HiveHost,
 		PrestoHost: PrestoHost,
 		LogReport:  logReport,
+		LogQueries: logQueries,
 	}
 
 	op, err := chargeback.New(logger, cfg)
