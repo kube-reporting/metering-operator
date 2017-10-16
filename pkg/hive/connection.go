@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
+	log "github.com/sirupsen/logrus"
 
 	hive "github.com/coreos-inc/kube-chargeback/pkg/hive/hive_thrift"
 )
@@ -16,12 +17,19 @@ var (
 
 // Connection to a Hive server.
 type Connection struct {
-	client  *hive.TCLIServiceClient
-	session *hive.TSessionHandle
+	client     *hive.TCLIServiceClient
+	session    *hive.TSessionHandle
+	logger     log.FieldLogger
+	logQueries bool
+}
+
+type Queryer interface {
+	Query(query string) error
 }
 
 // Connect to a Hive cluster.
 func Connect(host string) (*Connection, error) {
+	logger := log.WithField("package", "hive")
 	transport, err := thrift.NewTSocket(host)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to '%s': %v", host, err)
@@ -49,6 +57,7 @@ func Connect(host string) (*Connection, error) {
 	return &Connection{
 		client:  client,
 		session: resp.SessionHandle,
+		logger:  logger,
 	}, nil
 }
 
@@ -58,6 +67,9 @@ func (c *Connection) Query(query string) error {
 	req.SessionHandle = c.session
 	req.Statement = query
 
+	if c.logQueries {
+		c.logger.Debugf("QUERY: \n%s\n", query)
+	}
 	resp, err := c.client.ExecuteStatement(req)
 	if err != nil {
 		return fmt.Errorf("Error executing query '%s':  %+v, %v", query, resp, err)
@@ -83,4 +95,8 @@ func (c *Connection) Close() error {
 		c.session = nil
 	}
 	return nil
+}
+
+func (c *Connection) SetLogQueries(logQueries bool) {
+	c.logQueries = logQueries
 }
