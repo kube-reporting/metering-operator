@@ -2,7 +2,6 @@ package chargeback
 
 import (
 	"fmt"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -70,11 +69,18 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 		return nil
 	}
 
-	if dataStore.Spec.Promsum == nil {
-		log.Infof("datastore %q: skipping, not promsum datastore", dataStore.Name)
+	switch {
+	case dataStore.Spec.Promsum != nil:
+		return c.handlePromsumDataStore(logger, dataStore)
+	case dataStore.Spec.AWSBilling != nil:
+		logger.Debugf("AWSBilling datastore not implemented yet")
 		return nil
+	default:
+		return fmt.Errorf("datastore %s: improperly configured missing promsum or awsBilling configuration", dataStore.Name)
 	}
+}
 
+func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
 	storage := dataStore.Spec.Promsum.Storage
 	if storage == nil {
 		return fmt.Errorf("datastore %q: improperly configured datastore, storage is empty", dataStore.Name)
@@ -83,20 +89,23 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 		return fmt.Errorf("datastore %q: unsupported storage type (must be s3)", dataStore.Name)
 	}
 
-	replacer := strings.NewReplacer("-", "_", ".", "_")
-	tableName := fmt.Sprintf("datastore_%s", replacer.Replace(dataStore.Name))
+	tableName := dataStoreTableName(dataStore.Name)
 
 	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
-	if err := hive.CreatePromsumTable(c.hiveConn, tableName, storage.S3.Bucket, storage.S3.Prefix); err != nil {
+	if err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Prefix); err != nil {
 		return err
 	}
-	dataStore.TableName = tableName
+	logger.Debugf("successfully created table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
 
+	return c.updateDataStoreTableName(logger, dataStore, tableName)
+}
+
+func (c *Chargeback) updateDataStoreTableName(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore, tableName string) error {
+	dataStore.TableName = tableName
 	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(dataStore.Namespace).Update(dataStore)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportDataStore table name for %q", dataStore.Name)
 		return err
 	}
-
 	return nil
 }

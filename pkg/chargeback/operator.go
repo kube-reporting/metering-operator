@@ -3,6 +3,10 @@ package chargeback
 import (
 	"database/sql"
 	"fmt"
+	"io"
+	"net"
+	"sync"
+	"syscall"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -19,7 +23,7 @@ import (
 
 const (
 	connBackoff         = time.Second * 15
-	maxConnWaitTime     = time.Minute * 3
+	maxConnWaitTime     = time.Minute
 	defaultResyncPeriod = time.Minute
 )
 
@@ -29,6 +33,23 @@ type Config struct {
 	HiveHost   string
 	PrestoHost string
 	LogReport  bool
+	LogQueries bool
+}
+
+type Chargeback struct {
+	informers        informers
+	chargebackClient cbClientset.Interface
+
+	prestoConn  *sql.DB
+	hiveQueryer *hiveQueryer
+
+	logger log.FieldLogger
+
+	namespace  string
+	hiveHost   string
+	prestoHost string
+	logReport  bool
+	logQueries bool
 }
 
 func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
@@ -37,6 +58,7 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 		hiveHost:   cfg.HiveHost,
 		prestoHost: cfg.PrestoHost,
 		logReport:  cfg.LogReport,
+		logQueries: cfg.LogQueries,
 		logger:     logger,
 	}
 	logger.Debugf("Config: %+v", cfg)
@@ -53,6 +75,8 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 	}
 
 	op.informers = setupInformers(op.chargebackClient, cfg.Namespace, defaultResyncPeriod)
+
+	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogQueries)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
@@ -165,21 +189,6 @@ func (inf informers) ShutdownQueues() {
 	}
 }
 
-type Chargeback struct {
-	informers        informers
-	chargebackClient cbClientset.Interface
-
-	hiveConn   *hive.Connection
-	prestoConn *sql.DB
-
-	logger log.FieldLogger
-
-	namespace  string
-	hiveHost   string
-	prestoHost string
-	logReport  bool
-}
-
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("starting Chargeback operator")
 
@@ -193,16 +202,17 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	c.logger.Infof("setting up DB connections")
 	var err error
-	c.hiveConn, err = c.newHiveConn()
-	if err != nil {
-		return err
-	}
-	defer c.hiveConn.Close()
 	c.prestoConn, err = c.newPrestoConn()
 	if err != nil {
 		return err
 	}
 	defer c.prestoConn.Close()
+
+	_, err = c.hiveQueryer.getHiveConnection()
+	if err != nil {
+		return err
+	}
+	defer c.hiveQueryer.closeHiveConnection()
 
 	c.logger.Infof("starting report worker")
 	go wait.Until(c.runReportWorker, time.Second, stopCh)
@@ -214,25 +224,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	c.logger.Info("stopping Chargeback operator")
 	return nil
-}
-
-func (c *Chargeback) newHiveConn() (*hive.Connection, error) {
-	// Hive may take longer to start than chargeback, so keep attempting to
-	// connect in a loop in case we were just started and hive is still coming
-	// up.
-	startTime := time.Now()
-	c.logger.Debugf("getting hive connection")
-	for {
-		hive, err := hive.Connect(c.hiveHost)
-		if err == nil {
-			return hive, nil
-		} else if time.Since(startTime) > maxConnWaitTime {
-			c.logger.Debugf("attempts timed out, failed to get hive connection")
-			return nil, err
-		}
-		c.logger.Debugf("error encountered, backing off and trying again: %v", err)
-		time.Sleep(connBackoff)
-	}
 }
 
 func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
@@ -264,7 +255,7 @@ func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue
 
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if queue.NumRequeues(key) < 5 {
-		c.logger.WithError(err).Error("Error syncing %s %q", objType, key)
+		c.logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
 
 		queue.AddRateLimited(key)
 		return
@@ -272,4 +263,104 @@ func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue
 
 	queue.Forget(key)
 	c.logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
+}
+
+type hiveQueryer struct {
+	hiveHost   string
+	logger     log.FieldLogger
+	logQueries bool
+
+	mu       sync.Mutex
+	hiveConn *hive.Connection
+}
+
+func newHiveQueryer(hiveHost string, logger log.FieldLogger, logQueries bool) *hiveQueryer {
+	return &hiveQueryer{
+
+		hiveHost:   hiveHost,
+		logger:     logger,
+		logQueries: logQueries,
+	}
+}
+
+func (q *hiveQueryer) Query(query string) error {
+	maxRetries := 3
+	retries := 0
+	for {
+		if retries >= maxRetries {
+			q.closeHiveConnection()
+			return fmt.Errorf("unable to create new hive connection after existing  hive connection closed")
+		}
+
+		hiveConn, err := q.getHiveConnection()
+		if err != nil {
+			if err == io.EOF || isErrBrokenPipe(err) {
+				q.logger.Debugf("got err=%v while getting connection, attempting to create new connection and retry", err)
+				retries += 1
+				q.closeHiveConnection()
+				continue
+			}
+			return err
+		}
+		err = hiveConn.Query(query)
+		if err != nil {
+			if err == io.EOF || isErrBrokenPipe(err) {
+				q.logger.Debugf("got err=%v while making query, attempting to create new connection and retry", err)
+				retries += 1
+				q.closeHiveConnection()
+				continue
+			}
+
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
+func (q *hiveQueryer) getHiveConnection() (*hive.Connection, error) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	var err error
+	if q.hiveConn == nil {
+		q.hiveConn, err = q.newHiveConn()
+	}
+	return q.hiveConn, err
+}
+
+func (q *hiveQueryer) closeHiveConnection() {
+	q.mu.Lock()
+	if q.hiveConn != nil {
+		q.hiveConn.Close()
+	}
+	// Discard our connection so we create a new one in getHiveConnection
+	q.hiveConn = nil
+	q.mu.Unlock()
+}
+
+func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
+	// Hive may take longer to start than chargeback, so keep attempting to
+	// connect in a loop in case we were just started and hive is still coming
+	// up.
+	startTime := time.Now()
+	q.logger.Debugf("getting hive connection")
+	for {
+		hive, err := hive.Connect(q.hiveHost)
+		if err == nil {
+			hive.SetLogQueries(q.logQueries)
+			return hive, nil
+		} else if time.Since(startTime) > maxConnWaitTime {
+			q.logger.WithError(err).Error("attempts timed out, failed to get hive connection")
+			return nil, err
+		}
+		q.logger.WithError(err).Debugf("error encountered when connecting to hive, backing off and trying again")
+		time.Sleep(connBackoff)
+	}
+}
+
+func isErrBrokenPipe(err error) bool {
+	if netErr, ok := err.(*net.OpError); ok {
+		return netErr.Err == syscall.EPIPE
+	}
+	return false
 }

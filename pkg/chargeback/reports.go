@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"strings"
 	"text/template"
 	"time"
 
@@ -68,11 +67,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 	return columns
 }
 
-func reportTableName(reportName string) string {
-	return fmt.Sprintf("report_%s", strings.Replace(reportName, "-", "_", -1))
-}
-
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, hiveCon *hive.Connection, prestoCon *sql.DB) ([]map[string]interface{}, error) {
+func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon *sql.DB) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating
@@ -87,19 +82,17 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes
 	}
 	query := string(buf.Bytes())
 
-	logger.Debugf("query generated:\n%s", query)
-
 	// Create a table to write to
 	reportTable := reportTableName(report.Name)
 	bucket, prefix := report.Spec.Output.Bucket, report.Spec.Output.Prefix
 	logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
-	err = hive.CreateReportTable(hiveCon, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
+	err = hive.CreateReportTable(queryer, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
 	}
 
 	logger.Debugf("deleting any preexisting rows in %s", reportTable)
-	err = hive.ExecuteTruncate(hiveCon, reportTable)
+	err = hive.ExecuteTruncate(queryer, reportTable)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", reportTable, err)
 	}
