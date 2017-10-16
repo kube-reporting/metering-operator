@@ -18,7 +18,7 @@ func CreateReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x str
 		return err
 	}
 
-	query = createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, false, true)
+	query = createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, nil, false, true)
 	return queryer.Query(query)
 }
 
