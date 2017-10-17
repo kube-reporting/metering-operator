@@ -25,6 +25,11 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
+        - name: LOG_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: log-queries
         - name: LOG_REPORT
           valueFrom:
             configMapKeyRef:
