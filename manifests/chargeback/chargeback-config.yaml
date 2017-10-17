@@ -9,3 +9,4 @@ data:
   prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
   promsum-poll-interval: "60"
   log-reports: "false"
+  log-queries: "false"
