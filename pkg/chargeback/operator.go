@@ -276,7 +276,6 @@ type hiveQueryer struct {
 
 func newHiveQueryer(hiveHost string, logger log.FieldLogger, logQueries bool) *hiveQueryer {
 	return &hiveQueryer{
-
 		hiveHost:   hiveHost,
 		logger:     logger,
 		logQueries: logQueries,
@@ -284,38 +283,37 @@ func newHiveQueryer(hiveHost string, logger log.FieldLogger, logQueries bool) *h
 }
 
 func (q *hiveQueryer) Query(query string) error {
-	maxRetries := 3
-	retries := 0
-	for {
-		if retries >= maxRetries {
-			q.closeHiveConnection()
-			return fmt.Errorf("unable to create new hive connection after existing  hive connection closed")
-		}
-
+	const maxRetries = 3
+	for retries := 0; retries < maxRetries; retries++ {
 		hiveConn, err := q.getHiveConnection()
 		if err != nil {
 			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.Debugf("got err=%v while getting connection, attempting to create new connection and retry", err)
-				retries += 1
+				q.logger.WithError(err).Debugf("error occurred while getting connection, attempting to create new connection and retry")
 				q.closeHiveConnection()
 				continue
 			}
+			// We don't close the connection here because we got an error while
+			// getting it
 			return err
 		}
 		err = hiveConn.Query(query)
 		if err != nil {
 			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.Debugf("got err=%v while making query, attempting to create new connection and retry", err)
-				retries += 1
+				q.logger.WithError(err).Debugf("error occurred while making query, attempting to create new connection and retry")
 				q.closeHiveConnection()
 				continue
 			}
-
+			// We don't close the connection here because we got a good
+			// connection, and made the query, but the query itself had an
+			// error.
 			return err
 		}
 		return nil
 	}
-	return nil
+
+	// We've tries 3 times, so close any connection and return an error
+	q.closeHiveConnection()
+	return fmt.Errorf("unable to create new hive connection after existing hive connection closed")
 }
 
 func (q *hiveQueryer) getHiveConnection() (*hive.Connection, error) {
