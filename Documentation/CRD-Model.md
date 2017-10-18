@@ -24,7 +24,7 @@ spec:
 
 The `ReportDataStore` object lists `ReportPrometheusQuery`s, and lists a
 location and format for the results of these queries to be stored. When
-`promsum` runs, it lists all `ReportDataStore`s, runs all Prometheus queries
+`chargeback` runs, it lists all `ReportDataStore`s, runs all Prometheus queries
 listed by each store, and saves the results into each location. This means that
 Prometheus queries which are not pointed to by a `ReportDataStore` will not be
 run.
