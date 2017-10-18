@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -14,8 +15,13 @@ var (
 	HiveHost   = "hive:10000"
 	PrestoHost = "presto:8080"
 
+	defaultPromHost = "http://prometheus.tectonic-system.svc.cluster.local:9090"
+
 	logReport  bool
 	logQueries bool
+
+	promsumInterval  = time.Minute * 5
+	promsumPrecision = time.Minute
 )
 
 func init() {
@@ -41,16 +47,42 @@ func main() {
 			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logQueriesStr)
 		}
 	}
+	if promsumIntervalStr := os.Getenv("PROMSUM_INTERVAL"); promsumIntervalStr != "" {
+		var err error
+		promsumInterval, err = time.ParseDuration(promsumIntervalStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("PROMSUM_INTERVAL environment variable was not a duration, got %q", promsumIntervalStr)
+		}
+	}
+	if promsumPrecisionStr := os.Getenv("PROMSUM_PRECISION"); promsumPrecisionStr != "" {
+		var err error
+		promsumPrecision, err = time.ParseDuration(promsumPrecisionStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("PROMSUM_PRECISION environment variable was not a duration, got %q", promsumPrecisionStr)
+		}
+	}
+	promHost := os.Getenv("PROMETHEUS_HOST")
+	if promHost == "" {
+		promHost = defaultPromHost
+	}
+	disablePromsum := false
+	if os.Getenv("DISABLE_PROMSUM") != "" {
+		disablePromsum = true
+	}
 	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		logger.WithError(err).Fatal("could not determine namespace")
 	}
 	cfg := chargeback.Con***REMOVED***g{
-		Namespace:  string(namespace),
-		HiveHost:   HiveHost,
-		PrestoHost: PrestoHost,
-		LogReport:  logReport,
-		LogQueries: logQueries,
+		Namespace:        string(namespace),
+		HiveHost:         HiveHost,
+		PrestoHost:       PrestoHost,
+		PromHost:         promHost,
+		DisablePromsum:   disablePromsum,
+		LogReport:        logReport,
+		LogQueries:       logQueries,
+		PromsumInterval:  promsumInterval,
+		PromsumPrecision: promsumPrecision,
 	}
 
 	op, err := chargeback.New(logger, cfg)
