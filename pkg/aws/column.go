@@ -6,19 +6,6 @@ import (
 	"strings"
 )
 
-var (
-	// timestampFields are the AWS billing fields that should be created in Hive as timestamps.
-	timestampFields = []string{
-		"lineitem_usagestartdate",
-		"lineitem_usageenddate",
-	}
-
-	// doubleFields are created as the Hive double type.
-	doubleFields = []string{
-		"lineitem_blendedcost",
-	}
-)
-
 // Column is a description of a field from a AWS usage report manifest file.
 type Column struct {
 	Category string `json:"category"`
@@ -36,18 +23,14 @@ func (c Column) HiveName() string {
 
 // HiveType is the data type a column is created as in Hive.
 func (c Column) HiveType() string {
-	for _, col := range timestampFields {
-		if c.HiveName() == col {
-			return "timestamp"
-		}
+	switch c.HiveName() {
+	case "lineitem_usagestartdate", "lineitem_usageenddate":
+		return "timestamp"
+	case "lineitem_blendedcost":
+		return "double"
+	default:
+		return "string"
 	}
-
-	for _, col := range doubleFields {
-		if c.HiveName() == col {
-			return "double"
-		}
-	}
-	return "string"
 }
 
 // Columns are a set of AWS Usage columns.
