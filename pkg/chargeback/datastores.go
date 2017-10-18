@@ -8,6 +8,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -73,8 +74,7 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 	case dataStore.Spec.Promsum != nil:
 		return c.handlePromsumDataStore(logger, dataStore)
 	case dataStore.Spec.AWSBilling != nil:
-		logger.Debugf("AWSBilling datastore not implemented yet")
-		return nil
+		return c.handleAWSBillingDataStore(logger, dataStore)
 	default:
 		return fmt.Errorf("datastore %s: improperly configured missing promsum or awsBilling configuration", dataStore.Name)
 	}
@@ -96,6 +96,47 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		return err
 	}
 	logger.Debugf("successfully created table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+
+	return c.updateDataStoreTableName(logger, dataStore, tableName)
+}
+
+func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
+	source := dataStore.Spec.AWSBilling.Source
+	if source == nil {
+		return fmt.Errorf("datastore %q: improperly configured datastore, source is empty", dataStore.Name)
+	}
+
+	manifestRetriever, err := aws.NewManifestRetriever(source.Bucket, source.Prefix)
+	if err != nil {
+		return err
+	}
+
+	manifests, err := manifestRetriever.RetrieveManifests()
+	if err != nil {
+		return err
+	}
+
+	if len(manifests) == 0 {
+		logger.Infof("datastore %q has no report manifests in it's bucket, the first report has likely not been generated yet", dataStore.Name)
+		return nil
+	}
+
+	manifest := manifests[0]
+
+	tableName := dataStoreTableName(dataStore.Name)
+	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
+	err = hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Prefix, manifest)
+	if err != nil {
+		return err
+	}
+	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
+
+	logger.Debugf("updating table %s partitions", tableName)
+	err = hive.UpdateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Prefix, manifests)
+	if err != nil {
+		return err
+	}
+	logger.Debugf("successfully updated table %s partitions", tableName)
 
 	return c.updateDataStoreTableName(logger, dataStore, tableName)
 }
