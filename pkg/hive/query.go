@@ -18,7 +18,7 @@ func dropTable(name string, ignoreNotExists bool) string {
 
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
-func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns []string, partitions map[string]string, external, ignoreExists bool) string {
+func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns, partitions []Column, external, ignoreExists bool) string {
 	serdePropsStr := fmtSerdeProps(serdeProps)
 	columnsStr := fmtColumnText(columns)
 
@@ -26,31 +26,46 @@ func createTable(name, location, serdeFmt string, serdeProps map[string]string, 
 	if external {
 		tableType = "EXTERNAL"
 	}
+
 	ifNotExists := ""
 	if ignoreExists {
 		ifNotExists = "IF NOT EXISTS"
 	}
+
 	partitionedBy := ""
 	if partitions != nil {
-		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtPartitionColText(partitions))
+		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtColumnText(partitions))
+	}
+
+	serdeFormatStr := ""
+	if serdeFmt != "" && serdeProps != nil {
+		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", serdeFmt, fmtSerdeProps(serdeProps))
 	}
 	return fmt.Sprintf(
-		`
-CREATE %s TABLE %s
+		`CREATE %s TABLE %s
 %s (%s) %s
-ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s) LOCATION "%s"`,
+%s LOCATION "%s"`,
 		tableType, ifNotExists,
 		name, columnsStr, partitionedBy,
-		serdeFmt, serdePropsStr, location,
+		serdeFormatStr, location,
 	)
 }
 
-func fmtPartitionColText(columns map[string]string) string {
-	var c []string
-	for columnName, columnType := range columns {
-		c = append(c, fmt.Sprintf("`%s` %s", columnName, columnType))
+type Column struct {
+	Name string
+	Type string
+}
+
+func fmtColumnText(columns []Column) string {
+	c := make([]string, len(columns))
+	for i, col := range columns {
+		c[i] = escapeColumn(col.Name, col.Type)
 	}
 	return strings.Join(c, ",")
+}
+
+func escapeColumn(columnName, columnType string) string {
+	return fmt.Sprintf("`%s` %s", columnName, columnType)
 }
 
 // fmtSerdeProps returns a formatted a set of SerDe properties for a Hive query.
@@ -69,16 +84,6 @@ func fmtSerdeProps(props map[string]string) (propsTxt string) {
 }
 
 // fmtColumnText returns a Hive CREATE column string from a slice of name/type pairs. For example, "columnName string".
-func fmtColumnText(columns []string) (colTxt string) {
-	for i, col := range columns {
-		if i != 0 {
-			colTxt += ", "
-		}
-		colTxt += col
-	}
-	return
-}
-
 // s3Location returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
 func s3Location(bucket, pre***REMOVED***x string) (string, error) {
 	bucket = path.Join(bucket, pre***REMOVED***x)

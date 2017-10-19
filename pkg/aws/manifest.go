@@ -3,13 +3,15 @@ package aws
 import (
 	"path/***REMOVED***lepath"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Manifest is a representation of the ***REMOVED***le AWS provides with metadata for current usage information.
 type Manifest struct {
 	AssemblyID             string        `json:"assemblyId"`
 	Account                string        `json:"account"`
-	Columns                Columns       `json:"columns"`
+	Columns                []Column      `json:"columns"`
 	Charset                string        `json:"charset"`
 	Compression            string        `json:"compression"`
 	ContentType            string        `json:"contentType"`
@@ -26,19 +28,26 @@ type BillingPeriod struct {
 	End   Time `json:"end"`
 }
 
+// Column is a description of a ***REMOVED***eld from a AWS usage report manifest ***REMOVED***le.
+type Column struct {
+	Category string `json:"category"`
+	Name     string `json:"name"`
+}
+
 // Paths returns the directories containing usage data. The result will be free of duplicates.
-func (m Manifest) Paths() (paths []string) {
-	pathMap := map[string]struct{}{}
+func (m Manifest) DataDirectory() string {
+	var dirPath string
+	pathMap := make(map[string]struct{})
 	for _, key := range m.ReportKeys {
-		dirPath := ***REMOVED***lepath.Dir(key)
+		dirPath = ***REMOVED***lepath.Dir(key)
 		pathMap[dirPath] = struct{}{}
 	}
 
-	for path := range pathMap {
-		paths = append(paths, path)
+	if len(pathMap) != 1 {
+		logrus.Errorf("aws manifest %s has multiple directories containing usage data, expected 1, reportKeys: %v", m.AssemblyID, m.ReportKeys)
 	}
 
-	return
+	return dirPath
 }
 
 type Time struct {

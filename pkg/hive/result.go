@@ -6,7 +6,7 @@ import (
 
 // CreateReportTable creates a new table backed by the given bucket/pre***REMOVED***x with
 // the speci***REMOVED***ed columns
-func CreateReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []string) error {
+func CreateReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column) error {
 	location, err := s3Location(bucket, pre***REMOVED***x)
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func CreateReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x str
 		return err
 	}
 
-	query = createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, nil, false, true)
+	query = createTable(tableName, location, "", nil, columns, nil, false, true)
 	return queryer.Query(query)
 }
 
