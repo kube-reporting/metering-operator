@@ -56,13 +56,13 @@ func addAdditionalLabels(labels []string) string {
 	return output
 }
 
-func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []string {
-	columns := []string{}
+func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
+	columns := make([]hive.Column, 0)
 	for _, c := range genQuery.Spec.Columns {
-		columns = append(columns, fmt.Sprintf("%s %s", c.Name, c.Type))
+		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
 	}
-	for _, l := range report.Spec.AdditionalLabels {
-		columns = append(columns, fmt.Sprintf("%s string", l))
+	for _, label := range report.Spec.AdditionalLabels {
+		columns = append(columns, hive.Column{Name: label, Type: "string"})
 	}
 	return columns
 }
