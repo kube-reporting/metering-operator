@@ -29,22 +29,28 @@ func createTable(name, location, serdeFmt string, serdeProps map[string]string, 
 	if external {
 		tableType = "EXTERNAL"
 	}
+
 	ifNotExists := ""
 	if ignoreExists {
 		ifNotExists = "IF NOT EXISTS"
 	}
+
 	partitionedBy := ""
 	if partitions != nil {
 		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtColumnText(partitions))
 	}
+
+	serdeFormatStr := ""
+	if serdeFmt != "" && serdeProps != nil {
+		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", serdeFmt, fmtSerdeProps(serdeProps))
+	}
 	return fmt.Sprintf(
-		`
-CREATE %s TABLE %s
+		`CREATE %s TABLE %s
 %s (%s) %s
-ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s) LOCATION "%s"`,
+%s LOCATION "%s"`,
 		tableType, ifNotExists,
 		name, columnsStr, partitionedBy,
-		serdeFmt, serdePropsStr, location,
+		serdeFormatStr, location,
 	)
 }
 
