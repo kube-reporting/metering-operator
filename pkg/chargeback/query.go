@@ -72,16 +72,23 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 			return err
 		}
 
-		c.informers.reportInformer.GetIndexer().Update(report)
+		if report.UID != newReport.UID {
+			logger.Warn("started report has different UUID in API than in cache, waiting for resync to process")
+			return nil
+		}
+
+		c.informers.reportInformer.GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
+			// if we cannot update it, don't re queue it
+			return nil
 		}
 
 		// It's no longer started, requeue it
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
 			key, err := cache.MetaNamespaceKeyFunc(newReport)
 			if err == nil {
-				c.informers.reportQueue.Add(key)
+				c.informers.reportQueue.AddRateLimited(key)
 			}
 			return nil
 		}
