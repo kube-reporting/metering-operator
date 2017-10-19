@@ -22,6 +22,7 @@ var (
 
 	promsumInterval  = time.Minute * 5
 	promsumPrecision = time.Minute
+	disablePromsum   = false
 )
 
 func init() {
@@ -65,9 +66,12 @@ func main() {
 	if promHost == "" {
 		promHost = defaultPromHost
 	}
-	disablePromsum := false
-	if os.Getenv("DISABLE_PROMSUM") != "" {
-		disablePromsum = true
+	if disablePromsumStr := os.Getenv("DISABLE_PROMSUM"); disablePromsumStr != "" {
+		var err error
+		disablePromsum, err = strconv.ParseBool(disablePromsumStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("DISABLE_PROMSUM environment variable was not a bool, got %q", disablePromsumStr)
+		}
 	}
 	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
