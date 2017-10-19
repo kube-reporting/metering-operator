@@ -60,26 +60,18 @@ const HiveDateStringLayout = "20060102"
 func UpdateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, manifests []*aws.Manifest) error {
 	partitionStr := "PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
 	var stmts []string
-	// A map containing locations we've already added to ensure we do not
-	// attempt to add a partition multiple times
-	locations := make(map[string]struct{})
 	for _, manifest := range manifests {
-		for _, manifestPath := range manifest.Paths() {
-			location, err := s3Location(bucket, manifestPath)
-			if err != nil {
-				return err
-			}
-			if _, exists := locations[location]; exists {
-				continue
-			}
-			locations[location] = struct{}{}
-			stmt := fmt.Sprintf(partitionStr,
-				manifest.BillingPeriod.Start.Format(HiveDateStringLayout),
-				manifest.BillingPeriod.End.Format(HiveDateStringLayout),
-				location,
-			)
-			stmts = append(stmts, stmt)
+		manifestPath := manifest.DataDirectory()
+		location, err := s3Location(bucket, manifestPath)
+		if err != nil {
+			return err
 		}
+		stmt := fmt.Sprintf(partitionStr,
+			manifest.BillingPeriod.Start.Format(HiveDateStringLayout),
+			manifest.BillingPeriod.End.Format(HiveDateStringLayout),
+			location,
+		)
+		stmts = append(stmts, stmt)
 
 	}
 	if len(stmts) == 0 {
