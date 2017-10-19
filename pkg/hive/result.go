@@ -12,7 +12,7 @@ func CreateReportTable(queryer Queryer, tableName, bucket, prefix string, column
 		return err
 	}
 
-	query := dropTable(tableName, true)
+	query := dropTable(tableName, true, true)
 	err = queryer.Query(query)
 	if err != nil {
 		return err
