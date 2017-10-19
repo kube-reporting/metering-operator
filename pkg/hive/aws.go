@@ -28,13 +28,28 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifest *aws.Manifest) error {
+func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
 	location, err := s3Location(bucket, pre***REMOVED***x)
 	if err != nil {
 		return err
 	}
 
-	columns := awsBillingColumns(manifest.Columns)
+	// Since the billing data likely exists already, we need to enumerate all
+	// columns for all manifests to get the entire set of columns used
+	// historically.
+	// TODO(chance): We will likely want to do this when we add partitions
+	// to avoid having to do it all up front.
+	columns := make([]Column, 0)
+	seen := make(map[string]struct{})
+	for _, manifest := range manifests {
+		manifestColumns := awsBillingColumns(manifest.Columns)
+		for _, col := range manifestColumns {
+			if _, exists := seen[col.Name]; !exists {
+				seen[col.Name] = struct{}{}
+				columns = append(columns, col)
+			}
+		}
+	}
 
 	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, awsPartitions, true, true)
 	return queryer.Query(query)
