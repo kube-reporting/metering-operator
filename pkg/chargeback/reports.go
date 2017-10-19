@@ -2,7 +2,6 @@ package chargeback
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"text/template"
 	"time"
@@ -67,7 +66,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 	return columns
 }
 
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon *sql.DB) ([]map[string]interface{}, error) {
+func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon presto.Queryer) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating

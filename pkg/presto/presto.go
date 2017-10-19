@@ -2,7 +2,6 @@ package presto
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -19,13 +18,9 @@ func prestoTime(t time.Time) string {
 }
 
 // ExecuteInsertQuery performs the query an INSERT into the table target. It's expected target has the correct schema.
-func ExecuteInsertQuery(presto *sql.DB, target, query string) error {
-	if presto == nil {
-		return errors.New("presto instance of DB cannot be nil")
-	}
-
+func ExecuteInsertQuery(queryer Queryer, target, query string) error {
 	insert := fmt.Sprintf("INSERT INTO %s %s", target, query)
-	rows, err := presto.Query(insert)
+	rows, err := queryer.Query(insert)
 	if err != nil {
 		return err
 	}
@@ -43,12 +38,8 @@ func ExecuteInsertQuery(presto *sql.DB, target, query string) error {
 
 // ExecuteSelectQuery performs the query on the table target. It's expected
 // target has the correct schema.
-func ExecuteSelect(prestoCon *sql.DB, query string) ([]map[string]interface{}, error) {
-	if prestoCon == nil {
-		return nil, errors.New("presto instance of DB cannot be nil")
-	}
-
-	rows, err := prestoCon.Query(query)
+func ExecuteSelect(queryer Queryer, query string) ([]map[string]interface{}, error) {
+	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -86,4 +77,8 @@ func ExecuteSelect(prestoCon *sql.DB, query string) ([]map[string]interface{}, e
 	}
 
 	return results, nil
+}
+
+type Queryer interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
