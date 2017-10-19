@@ -2,6 +2,7 @@ package hive
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
@@ -20,9 +21,9 @@ var (
 		"timestamp.formats":    "yyyy-MM-dd'T'HH:mm:ssZ",
 	}
 
-	awsPartitions = map[string]string{
-		"billing_period_start": "string",
-		"billing_period_end":   "string",
+	awsPartitions = []Column{
+		{Name: "billing_period_start", Type: "string"},
+		{Name: "billing_period_end", Type: "string"},
 	}
 )
 
@@ -32,7 +33,8 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 	if err != nil {
 		return err
 	}
-	columns := manifest.Columns.HQL()
+
+	columns := awsBillingColumns(manifest.Columns)
 
 	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, awsPartitions, true, true)
 	return queryer.Query(query)
@@ -82,4 +84,52 @@ func UpdateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 	}
 
 	return nil
+}
+
+// hiveName is the identi***REMOVED***er used for Hive columns.
+func hiveName(c aws.Column) string {
+	name := fmt.Sprintf("%s_%s", c.Category, c.Name)
+	// hive does not allow ':' or '.' in identi***REMOVED***ers
+	name = strings.Replace(name, ":", "_", -1)
+	name = strings.Replace(name, ".", "_", -1)
+	return strings.ToLower(name)
+}
+
+// hiveType is the data type a column is created as in Hive.
+func hiveType(c aws.Column) string {
+	switch hiveName(c) {
+	case "lineitem_usagestartdate", "lineitem_usageenddate":
+		return "timestamp"
+	case "lineitem_blendedcost":
+		return "double"
+	default:
+		return "string"
+	}
+}
+
+// Columns returns a map of hive column name to it's hive column type.
+// Duplicate columns will be suf***REMOVED***xed by an incrementing ordinal. This can
+// happen with user de***REMOVED***ned ***REMOVED***elds like tags.
+func awsBillingColumns(cols []aws.Column) []Column {
+	out := make([]Column, 0)
+	seen := make(map[string]int, len(cols))
+
+	for _, c := range cols {
+		name := hiveName(c)
+		colType := hiveType(c)
+
+		// prevent duplicates by numbering them
+		times, exists := seen[name]
+		seen[name] = times + 1
+
+		if exists {
+			name += strconv.Itoa(times)
+		}
+
+		out = append(out, Column{
+			Name: name,
+			Type: colType,
+		})
+	}
+	return out
 }

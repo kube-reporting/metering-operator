@@ -9,7 +9,7 @@ import (
 type Manifest struct {
 	AssemblyID             string        `json:"assemblyId"`
 	Account                string        `json:"account"`
-	Columns                Columns       `json:"columns"`
+	Columns                []Column      `json:"columns"`
 	Charset                string        `json:"charset"`
 	Compression            string        `json:"compression"`
 	ContentType            string        `json:"contentType"`
@@ -24,6 +24,12 @@ type Manifest struct {
 type BillingPeriod struct {
 	Start Time `json:"start"`
 	End   Time `json:"end"`
+}
+
+// Column is a description of a ***REMOVED***eld from a AWS usage report manifest ***REMOVED***le.
+type Column struct {
+	Category string `json:"category"`
+	Name     string `json:"name"`
 }
 
 // Paths returns the directories containing usage data. The result will be free of duplicates.

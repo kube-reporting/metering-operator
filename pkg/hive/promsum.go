@@ -1,9 +1,6 @@
 package hive
 
 var (
-	// PromsumTableName is the Hive identi***REMOVED***er to use for usage data.
-	PromsumTableName = "promsum"
-
 	// PromsumSerde speci***REMOVED***es the Hadoop serialization/deserialization implementation to be used.
 	PromsumSerde = "org.apache.hive.hcatalog.data.JsonSerDe"
 
@@ -12,12 +9,12 @@ var (
 		"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
 	}
 
-	PromsumColumns = []string{
-		"query string",
-		"amount double",
-		"`timestamp` timestamp",
-		"`timePrecision` double",
-		"labels map<string, string>",
+	PromsumColumns = []Column{
+		{Name: "query", Type: "string"},
+		{Name: "amount", Type: "double"},
+		{Name: "timestamp", Type: "timestamp"},
+		{Name: "timePrecision", Type: "double"},
+		{Name: "labels", Type: "map<string, string>"},
 	}
 )
 
