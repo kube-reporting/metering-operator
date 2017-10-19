@@ -3,10 +3,8 @@ kind: Deployment
 metadata:
   name: chargeback
 spec:
-  selector:
   template:
     metadata:
-      name: chargeback
       labels:
         app: chargeback
     spec:
@@ -35,10 +33,28 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: log-reports
+        - name: PROMETHEUS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: prometheus-url
+        - name: PROMSUM_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: promsum-poll-interval
+        - name: DISABLE_PROMSUM
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: disable-promsum
         resources:
           requests:
             memory: "50Mi"
             cpu: "50m"
+        ports:
+        - name: "http"
+          containerPort: 8080
       restartPolicy: Always
       serviceAccount: chargeback
       imagePullSecrets:

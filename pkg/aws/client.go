@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 const (
@@ -60,17 +57,36 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		prefix += "/"
 	}
 
+	var keys []string
+	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
+		keys = append(keys, r.filterObjects(prefix, out.Contents)...)
+		return true
+	}
+
 	// list all in <report-prefix>/<report-name>/ of bucket
-	dateRngs, err := r.s3API.ListObjectsV2(&s3.ListObjectsV2Input{
+	err := r.s3API.ListObjectsV2Pages(&s3.ListObjectsV2Input{
 		Bucket: aws.String(r.bucket),
 		Prefix: aws.String(prefix),
-	})
+	}, pageFn)
 	if err != nil {
 		return nil, fmt.Errorf("could not list retrieve AWS billing report keys: %v", err)
 	}
 
 	var manifests []*Manifest
-	for _, obj := range dateRngs.Contents {
+
+	for _, key := range keys {
+		manifest, err := retrieveManifest(r.s3API, r.bucket, key)
+		if err != nil {
+			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
+		}
+		manifests = append(manifests, manifest)
+	}
+	return manifests, nil
+}
+
+func (r *manifestRetriever) filterObjects(prefix string, objects []*s3.Object) []string {
+	var keys []string
+	for _, obj := range objects {
 		key := *obj.Key
 
 		// only look for manifest files
@@ -102,15 +118,9 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		}
 		// If we've gotten this far, then "key" is a top-level manifest that we
 		// care about.
-
-		manifest, err := retrieveManifest(r.s3API, r.bucket, key)
-		if err != nil {
-			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
-		}
-		manifests = append(manifests, manifest)
-
+		keys = append(keys, key)
 	}
-	return manifests, nil
+	return keys
 }
 
 // retrieveManifest retrieves a manifest from the given bucket and key.
@@ -132,31 +142,6 @@ func retrieveManifest(client s3iface.S3API, bucket, key string) (*Manifest, erro
 		return nil, err
 	}
 	return &manifest, err
-}
-
-// rangeFromDirName returns the start and end times encoded in an AWS usage record directory name.
-func rngFromDirName(dir string) (rng cb.Range, err error) {
-	rngParts := strings.Split(dir, "-")
-	if len(rngParts) != 2 {
-		err = errors.New("expected only 1 instance of '-'")
-	} else if rng.Start, err = parseBillingDate(rngParts[0]); err != nil {
-		err = fmt.Errorf("can't determine start: %v", err)
-	} else if rng.End, err = parseBillingDate(rngParts[1]); err != nil {
-		err = fmt.Errorf("can't determine end: %v", err)
-	}
-
-	if err != nil {
-		err = fmt.Errorf("expected format for billing dates is 'yyyymmdd-yyyymmdd', given '%s': %v", dir, err)
-	}
-	return
-}
-
-// parseBillingDate returns a Time based on a date string formatted in the pattern 'yyyymmdd'. Times will be UTC.
-func parseBillingDate(dateStr string) (t time.Time, err error) {
-	if t, err = time.Parse(BillingDateFormat, dateStr); err != nil {
-		err = fmt.Errorf("failed to parse date from '%s': %v", dateStr, err)
-	}
-	return
 }
 
 // getS3Client returns the singleton client.

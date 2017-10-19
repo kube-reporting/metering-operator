@@ -121,11 +121,9 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 		return nil
 	}
 
-	manifest := manifests[0]
-
 	tableName := dataStoreTableName(dataStore.Name)
 	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
-	err = hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Prefix, manifest)
+	err = hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Prefix, manifests)
 	if err != nil {
 		return err
 	}

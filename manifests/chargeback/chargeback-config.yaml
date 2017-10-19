@@ -6,7 +6,8 @@ metadata:
     app: chargeback
 data:
   aws-region: "us-west-1"
-  prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
-  promsum-poll-interval: "60"
   log-reports: "false"
   log-queries: "false"
+  disable-promsum: ""
+  prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
+  promsum-poll-interval: "5m"

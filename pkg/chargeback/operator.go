@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	promapi "github.com/prometheus/client_golang/api"
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
@@ -19,14 +21,12 @@ import (
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
 	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
-
-	promapi "github.com/prometheus/client_golang/api"
-	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
 const (
 	connBackoff         = time.Second * 15
-	maxConnWaitTime     = time.Minute
+	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
 )
 
@@ -48,7 +48,7 @@ type Chargeback struct {
 	informers        informers
 	chargebackClient cbClientset.Interface
 
-	prestoConn  *sql.DB
+	prestoConn  *prestoQueryer
 	hiveQueryer *hiveQueryer
 	promConn    prom.API
 
@@ -234,11 +234,12 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	c.logger.Infof("setting up DB connections")
 	var err error
-	c.prestoConn, err = c.newPrestoConn()
+	prestoConn, err := c.newPrestoConn()
 	if err != nil {
 		return err
 	}
-	defer c.prestoConn.Close()
+	defer prestoConn.Close()
+	c.prestoConn = newPrestoQueryer(prestoConn, c.logger, c.logQueries)
 
 	_, err = c.hiveQueryer.getHiveConnection()
 	if err != nil {
@@ -272,6 +273,48 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	return nil
 }
 
+// handleErr checks if an error happened and makes sure we will retry later.
+func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
+	if err == nil {
+		queue.Forget(key)
+		return
+	}
+
+	// This controller retries 5 times if something goes wrong. After that, it stops trying.
+	if queue.NumRequeues(key) < 5 {
+		c.logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
+
+		queue.AddRateLimited(key)
+		return
+	}
+
+	queue.Forget(key)
+	c.logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
+}
+
+type prestoQueryer struct {
+	logger     log.FieldLogger
+	logQueries bool
+
+	queryer presto.Queryer
+}
+
+func newPrestoQueryer(queryer presto.Queryer, logger log.FieldLogger, logQueries bool) *prestoQueryer {
+	return &prestoQueryer{
+		queryer:    queryer,
+		logger:     logger,
+		logQueries: logQueries,
+	}
+}
+
+func (q *prestoQueryer) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if q.logQueries {
+		margs := argsString(args...)
+		q.logger.Debugf("QUERY: %s [%s]", query, margs)
+	}
+	return q.queryer.Query(query, args...)
+}
+
 func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
@@ -298,25 +341,6 @@ func (c *Chargeback) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-// handleErr checks if an error happened and makes sure we will retry later.
-func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
-	if err == nil {
-		queue.Forget(key)
-		return
-	}
-
-	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if queue.NumRequeues(key) < 5 {
-		c.logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
-
-		queue.AddRateLimited(key)
-		return
-	}
-
-	queue.Forget(key)
-	c.logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
 }
 
 type hiveQueryer struct {

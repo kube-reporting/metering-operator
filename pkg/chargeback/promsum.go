@@ -31,6 +31,7 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 			// after the timeout run the promsum logic
 		}
 
+		now := time.Now().UTC()
 		dataStores, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).List(labels.Everything())
 		if err != nil {
 			c.logger.Errorf("couldn't list data stores: %v", err)
@@ -66,36 +67,37 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 			if len(results) == 0 {
 				// Looks like we haven't populated any data in this table yet.
 				// Let's backfill 6 hours.
-				lastTimestamp = time.Now().UTC().Add(time.Hour * -6)
+				lastTimestamp = now.Add(time.Hour * -6)
 				c.logger.Debugf("no data in data store %s yet, backfilling 6 hours", dataStore.Name)
 			} else {
 				lastTimestamp = results[0]["timestamp"].(time.Time)
 				c.logger.Debugf("last fetched data for data store %s at %s", dataStore.Name, lastTimestamp.String())
 			}
 
-			if lastTimestamp.After(time.Now().UTC()) {
+			if lastTimestamp.After(now) {
 				c.logger.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
 				continue
 			}
 
-			timeIndex := lastTimestamp
+			timeStart := lastTimestamp
 
 			var timeRanges []cb.Range
 
 			// Chunk the prometheus queries at 5x the precision level
 			chunkDurationSize := c.promsumPrecision * 5
 
-			for time.Since(timeIndex) > chunkDurationSize {
+			for time.Since(timeStart) > chunkDurationSize {
+				timeEnd := timeStart.Add(chunkDurationSize)
 				timeRanges = append(timeRanges, cb.Range{
-					Start: timeIndex,
-					End:   timeIndex.Add(chunkDurationSize),
+					Start: timeStart,
+					End:   timeEnd,
 				})
-				timeIndex = timeIndex.Add(chunkDurationSize)
+				timeStart = timeEnd
 			}
 
 			timeRanges = append(timeRanges, cb.Range{
-				Start: timeIndex,
-				End:   time.Now().UTC(),
+				Start: timeStart,
+				End:   now,
 			})
 
 			// capacity prestoQueryCap, length 0
