@@ -24,7 +24,6 @@ spec:
                kubeUsage.amount as amount,
                split_part(split_part(element_at(kubeUsage.labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
                kubeUsage."timestamp" as timestamp
-               {{addAdditionalLabels .Labels}}
         FROM {{.TableName}} as kubeUsage
     ),
     computed_usage AS (
@@ -35,7 +34,6 @@ spec:
                "timestamp" as period_end,
                lag("timestamp") OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC) as period_start,
                (amount + lag(amount) OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC)) / 2 as usage
-               {{listAdditionalLabels .Labels}}
         FROM usage_period
     )
     SELECT
@@ -44,7 +42,6 @@ spec:
         node,
         provider_id,
         sum(usage * date_diff('millisecond', prev, curr)) as cpu_usage
-        {{listAdditionalLabels .Labels}}
     FROM computed_usage
     WHERE period_start >= timestamp '{{.StartPeriod | prestoTimestamp }}'
     AND period_end <= timestamp '{{ .EndPeriod | prestoTimestamp }}'

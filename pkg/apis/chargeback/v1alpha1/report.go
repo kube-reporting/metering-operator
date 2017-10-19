@@ -39,8 +39,6 @@ type ReportSpec struct {
 
 	// Output is the S3 bucket where results are sent.
 	Output S3Bucket `json:"output"`
-
-	AdditionalLabels []string `json:"additionalLabels"`
 }
 
 type ReportTemplateSpec struct {
