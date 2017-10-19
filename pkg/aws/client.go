@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 const (
@@ -132,31 +129,6 @@ func retrieveManifest(client s3iface.S3API, bucket, key string) (*Manifest, erro
 		return nil, err
 	}
 	return &manifest, err
-}
-
-// rangeFromDirName returns the start and end times encoded in an AWS usage record directory name.
-func rngFromDirName(dir string) (rng cb.Range, err error) {
-	rngParts := strings.Split(dir, "-")
-	if len(rngParts) != 2 {
-		err = errors.New("expected only 1 instance of '-'")
-	} else if rng.Start, err = parseBillingDate(rngParts[0]); err != nil {
-		err = fmt.Errorf("can't determine start: %v", err)
-	} else if rng.End, err = parseBillingDate(rngParts[1]); err != nil {
-		err = fmt.Errorf("can't determine end: %v", err)
-	}
-
-	if err != nil {
-		err = fmt.Errorf("expected format for billing dates is 'yyyymmdd-yyyymmdd', given '%s': %v", dir, err)
-	}
-	return
-}
-
-// parseBillingDate returns a Time based on a date string formatted in the pattern 'yyyymmdd'. Times will be UTC.
-func parseBillingDate(dateStr string) (t time.Time, err error) {
-	if t, err = time.Parse(BillingDateFormat, dateStr); err != nil {
-		err = fmt.Errorf("failed to parse date from '%s': %v", dateStr, err)
-	}
-	return
 }
 
 // getS3Client returns the singleton client.
