@@ -72,16 +72,23 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 			return err
 		}
 
-		c.informers.reportInformer.GetIndexer().Update(report)
+		if report.UID != newReport.UID {
+			logger.Warn("started report has different UUID in API than in cache, waiting for resync to process")
+			return nil
+		}
+
+		c.informers.reportInformer.GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
+			// if we cannot update it, don't re queue it
+			return nil
 		}
 
 		// It's no longer started, requeue it
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
 			key, err := cache.MetaNamespaceKeyFunc(newReport)
 			if err == nil {
-				c.informers.reportQueue.Add(key)
+				c.informers.reportQueue.AddRateLimited(key)
 			}
 			return nil
 		}
@@ -95,15 +102,6 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	default:
 		logger.Infof("new report discovered")
 	}
-
-	// update status
-	report.Status.Phase = cbTypes.ReportPhaseStarted
-	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
-		return err
-	}
-	report = newReport
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
 	genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
@@ -127,6 +125,15 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 		"reportStart": report.Spec.ReportingStart,
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
+
+	// update status
+	report.Status.Phase = cbTypes.ReportPhaseStarted
+	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
+		return err
+	}
+	report = newReport
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
 	results, err := generateReport(logger, report, genQuery, rng, dataStore.TableName, c.hiveQueryer, c.prestoConn)
