@@ -7,13 +7,17 @@ import (
 	"strings"
 )
 
-func dropTable(name string, ignoreNotExists bool) string {
+func dropTable(name string, ignoreNotExists, purge bool) string {
 	ifExists := ""
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
 	}
+	purgeStr := ""
+	if purge {
+		purgeStr = "PURGE"
+	}
 
-	return fmt.Sprintf("DROP TABLE %s %s", ifExists, name)
+	return fmt.Sprintf("DROP TABLE %s %s %s", ifExists, name, purgeStr)
 }
 
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
