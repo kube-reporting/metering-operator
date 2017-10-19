@@ -41,7 +41,7 @@ spec:
         namespace,
         node,
         provider_id,
-        sum(usage * date_diff('millisecond', prev, curr)) as cpu_usage
+        sum(usage * date_diff('millisecond', period_start, period_end)) as cpu_usage
     FROM computed_usage
     WHERE period_start >= timestamp '{{.StartPeriod | prestoTimestamp }}'
     AND period_end <= timestamp '{{ .EndPeriod | prestoTimestamp }}'
