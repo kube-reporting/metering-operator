@@ -3,10 +3,8 @@ kind: Deployment
 metadata:
   name: chargeback
 spec:
-  selector:
   template:
     metadata:
-      name: chargeback
       labels:
         app: chargeback
     spec:
@@ -35,6 +33,21 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: log-reports
+        - name: PROMETHEUS_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: prometheus-url
+        - name: PROMSUM_INTERVAL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: promsum-poll-interval
+        - name: DISABLE_PROMSUM
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: disable-promsum
         resources:
           requests:
             memory: "50Mi"
