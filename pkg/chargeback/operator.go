@@ -26,7 +26,7 @@ import (
 
 const (
 	connBackoff         = time.Second * 15
-	maxConnWaitTime     = time.Minute
+	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
 )
 
