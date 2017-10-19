@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	// AWSUsageSerde is the Hadoop serialization/deserialization implementation used with AWS billing data.
-	AWSUsageSerde = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
+	// awsUsageSerde is the Hadoop serialization/deserialization implementation used with AWS billing data.
+	awsUsageSerde = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
 
-	// AWSUsageSerdeProps con***REMOVED***gure the SerDe used with AWS Billing Data.
-	AWSUsageSerdeProps = map[string]string{
+	// awsUsageSerdeProps con***REMOVED***gure the SerDe used with AWS Billing Data.
+	awsUsageSerdeProps = map[string]string{
 		"serialization.format": ",",
 		"***REMOVED***eld.delim":          ",",
 		"collection.delim":     "unde***REMOVED***ned",
@@ -51,7 +51,7 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 		}
 	}
 
-	query := createTable(tableName, location, AWSUsageSerde, AWSUsageSerdeProps, columns, awsPartitions, true, true)
+	query := createTable(tableName, location, awsUsageSerde, awsUsageSerdeProps, columns, awsPartitions, true, true)
 	return queryer.Query(query)
 }
 

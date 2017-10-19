@@ -1,15 +1,7 @@
 package hive
 
 var (
-	// PromsumSerde speci***REMOVED***es the Hadoop serialization/deserialization implementation to be used.
-	PromsumSerde = "org.apache.hive.hcatalog.data.JsonSerDe"
-
-	// PromsumSerdeProps de***REMOVED***ne the behavior of the SerDe used with promsum data.
-	PromsumSerdeProps = map[string]string{
-		"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
-	}
-
-	PromsumColumns = []Column{
+	promsumColumns = []Column{
 		{Name: "query", Type: "string"},
 		{Name: "amount", Type: "double"},
 		{Name: "timestamp", Type: "timestamp"},
@@ -24,6 +16,6 @@ func CreatePromsumTable(queryer Queryer, tableName, bucket, pre***REMOVED***x st
 	if err != nil {
 		return err
 	}
-	query := createTable(tableName, location, PromsumSerde, PromsumSerdeProps, PromsumColumns, nil, false, true)
+	query := createTable(tableName, location, "", nil, promsumColumns, nil, false, true)
 	return queryer.Query(query)
 }
