@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: chargeback
+spec:
+  selector:
+    app: chargeback
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: "http"
