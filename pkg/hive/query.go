@@ -19,7 +19,6 @@ func dropTable(name string, ignoreNotExists bool) string {
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
 func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns, partitions []Column, external, ignoreExists bool) string {
-	serdePropsStr := fmtSerdeProps(serdeProps)
 	columnsStr := fmtColumnText(columns)
 
 	tableType := ""
