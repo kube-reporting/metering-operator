@@ -591,11 +591,6 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 	in.ReportingStart.DeepCopyInto(&out.ReportingStart)
 	in.ReportingEnd.DeepCopyInto(&out.ReportingEnd)
 	out.Output = in.Output
-	if in.AdditionalLabels != nil {
-		in, out := &in.AdditionalLabels, &out.AdditionalLabels
-		*out = make([]string, len(*in))
-		copy(*out, *in)
-	}
 	return
 }
 

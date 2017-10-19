@@ -21,25 +21,20 @@ const (
 )
 
 var templateFuncMap = template.FuncMap{
-	"listAdditionalLabels":      listAdditionalLabels,
-	"addAdditionalLabels":       addAdditionalLabels,
-	"prestoTimestamp":           prestoTimestamp,
-	"hiveAWSPartitionTimestamp": hiveAWSPartitionTimestamp,
+	"prestoTimestamp": prestoTimestamp,
 }
 
 type TemplateInfo struct {
 	TableName   string
 	StartPeriod time.Time
 	EndPeriod   time.Time
-	Labels      []string
 }
 
-func newTemplateInfo(tableName string, startPeriod, endPeriod time.Time, labels []string) TemplateInfo {
+func newTemplateInfo(tableName string, startPeriod, endPeriod time.Time) TemplateInfo {
 	return TemplateInfo{
 		TableName:   tableName,
 		StartPeriod: startPeriod,
 		EndPeriod:   endPeriod,
-		Labels:      labels,
 	}
 }
 
@@ -51,29 +46,10 @@ func prestoTimestamp(date time.Time) string {
 	return date.Format(PrestoTimestampFormat)
 }
 
-func listAdditionalLabels(labels []string) string {
-	output := ""
-	for _, l := range labels {
-		output += fmt.Sprintf(", label_%s", l)
-	}
-	return output
-}
-
-func addAdditionalLabels(labels []string) string {
-	output := ""
-	for _, l := range labels {
-		output += fmt.Sprintf(", kubeUsage.labels['%s'] as label_%s", l, l)
-	}
-	return output
-}
-
 func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
 	columns := make([]hive.Column, 0)
 	for _, c := range genQuery.Spec.Columns {
 		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
-	}
-	for _, label := range report.Spec.AdditionalLabels {
-		columns = append(columns, hive.Column{Name: label, Type: "string"})
 	}
 	return columns
 }
@@ -91,7 +67,6 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes
 		promsumTbl,
 		report.Spec.ReportingStart.Time,
 		report.Spec.ReportingEnd.Time,
-		report.Spec.AdditionalLabels,
 	))
 	if err != nil {
 		return nil, fmt.Errorf("error executing template: %v", err)
