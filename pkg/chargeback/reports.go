@@ -16,53 +16,40 @@ import (
 )
 
 const (
-	// TimestampFormat is the time format string used to produce Presto timestamps.
-	TimestampFormat = "2006-01-02 15:04:05.000"
+	// PrestoTimestampFormat is the time format string used to produce Presto timestamps.
+	PrestoTimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-func prestoTime(t time.Time) string {
-	return t.Format(TimestampFormat)
-}
-
 var templateFuncMap = template.FuncMap{
-	"listAdditionalLabels": listAdditionalLabels,
-	"addAdditionalLabels":  addAdditionalLabels,
+	"prestoTimestamp": prestoTimestamp,
 }
 
 type TemplateInfo struct {
 	TableName   string
-	StartPeriod string
-	EndPeriod   string
-	Labels      []string
+	StartPeriod time.Time
+	EndPeriod   time.Time
 }
 
-func newTemplateInfo(tableName string, startPeriod, endPeriod time.Time, labels []string) TemplateInfo {
-	return TemplateInfo{tableName, prestoTime(startPeriod), prestoTime(endPeriod), labels}
-}
-
-func listAdditionalLabels(labels []string) string {
-	output := ""
-	for _, l := range labels {
-		output += fmt.Sprintf(", label_%s", l)
+func newTemplateInfo(tableName string, startPeriod, endPeriod time.Time) TemplateInfo {
+	return TemplateInfo{
+		TableName:   tableName,
+		StartPeriod: startPeriod,
+		EndPeriod:   endPeriod,
 	}
-	return output
 }
 
-func addAdditionalLabels(labels []string) string {
-	output := ""
-	for _, l := range labels {
-		output += fmt.Sprintf(", kubeUsage.labels['%s'] as label_%s", l, l)
-	}
-	return output
+func hiveAWSPartitionTimestamp(date time.Time) string {
+	return date.Format(hive.HiveDateStringLayout)
+}
+
+func prestoTimestamp(date time.Time) string {
+	return date.Format(PrestoTimestampFormat)
 }
 
 func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
 	columns := make([]hive.Column, 0)
 	for _, c := range genQuery.Spec.Columns {
 		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
-	}
-	for _, label := range report.Spec.AdditionalLabels {
-		columns = append(columns, hive.Column{Name: label, Type: "string"})
 	}
 	return columns
 }
@@ -76,7 +63,11 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
 	buf := &bytes.Buffer{}
-	err = tmpl.Execute(buf, newTemplateInfo(promsumTbl, report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time, report.Spec.AdditionalLabels))
+	err = tmpl.Execute(buf, newTemplateInfo(
+		promsumTbl,
+		report.Spec.ReportingStart.Time,
+		report.Spec.ReportingEnd.Time,
+	))
 	if err != nil {
 		return nil, fmt.Errorf("error executing template: %v", err)
 	}

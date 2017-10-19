@@ -55,8 +55,7 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, mani
 	return queryer.Query(query)
 }
 
-const hiveTimestampLayout = "2006-01-02 15:04:05.000000000"
-const hiveDateStringLayout = "20060102"
+const HiveDateStringLayout = "20060102"
 
 func UpdateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, manifests []*aws.Manifest) error {
 	partitionStr := "PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
@@ -68,8 +67,8 @@ func UpdateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, mani
 			return err
 		}
 		stmt := fmt.Sprintf(partitionStr,
-			manifest.BillingPeriod.Start.Format(hiveDateStringLayout),
-			manifest.BillingPeriod.End.Format(hiveDateStringLayout),
+			manifest.BillingPeriod.Start.Format(HiveDateStringLayout),
+			manifest.BillingPeriod.End.Format(HiveDateStringLayout),
 			location,
 		)
 		stmts = append(stmts, stmt)
