@@ -16,28 +16,39 @@ import (
 )
 
 const (
-	// TimestampFormat is the time format string used to produce Presto timestamps.
-	TimestampFormat = "2006-01-02 15:04:05.000"
+	// PrestoTimestampFormat is the time format string used to produce Presto timestamps.
+	PrestoTimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-func prestoTime(t time.Time) string {
-	return t.Format(TimestampFormat)
-}
-
 var templateFuncMap = template.FuncMap{
-	"listAdditionalLabels": listAdditionalLabels,
-	"addAdditionalLabels":  addAdditionalLabels,
+	"listAdditionalLabels":      listAdditionalLabels,
+	"addAdditionalLabels":       addAdditionalLabels,
+	"prestoTimestamp":           prestoTimestamp,
+	"hiveAWSPartitionTimestamp": hiveAWSPartitionTimestamp,
 }
 
 type TemplateInfo struct {
 	TableName   string
-	StartPeriod string
-	EndPeriod   string
+	StartPeriod time.Time
+	EndPeriod   time.Time
 	Labels      []string
 }
 
 func newTemplateInfo(tableName string, startPeriod, endPeriod time.Time, labels []string) TemplateInfo {
-	return TemplateInfo{tableName, prestoTime(startPeriod), prestoTime(endPeriod), labels}
+	return TemplateInfo{
+		TableName:   tableName,
+		StartPeriod: startPeriod,
+		EndPeriod:   endPeriod,
+		Labels:      labels,
+	}
+}
+
+func hiveAWSPartitionTimestamp(date time.Time) string {
+	return date.Format(hive.HiveDateStringLayout)
+}
+
+func prestoTimestamp(date time.Time) string {
+	return date.Format(PrestoTimestampFormat)
 }
 
 func listAdditionalLabels(labels []string) string {
@@ -76,7 +87,12 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
 	buf := &bytes.Buffer{}
-	err = tmpl.Execute(buf, newTemplateInfo(promsumTbl, report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time, report.Spec.AdditionalLabels))
+	err = tmpl.Execute(buf, newTemplateInfo(
+		promsumTbl,
+		report.Spec.ReportingStart.Time,
+		report.Spec.ReportingEnd.Time,
+		report.Spec.AdditionalLabels,
+	))
 	if err != nil {
 		return nil, fmt.Errorf("error executing template: %v", err)
 	}
