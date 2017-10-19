@@ -2,7 +2,6 @@ package chargeback
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"text/template"
 	"time"
@@ -11,6 +10,7 @@ import (
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
+	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
@@ -67,7 +67,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 	return columns
 }
 
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon *sql.DB) ([]map[string]interface{}, error) {
+func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon db.Queryer) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating
