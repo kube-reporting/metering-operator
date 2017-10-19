@@ -60,17 +60,36 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		prefix += "/"
 	}
 
+	var keys []string
+	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
+		keys = append(keys, r.filterObjects(prefix, out.Contents)...)
+		return true
+	}
+
 	// list all in <report-prefix>/<report-name>/ of bucket
-	dateRngs, err := r.s3API.ListObjectsV2(&s3.ListObjectsV2Input{
+	err := r.s3API.ListObjectsV2Pages(&s3.ListObjectsV2Input{
 		Bucket: aws.String(r.bucket),
 		Prefix: aws.String(prefix),
-	})
+	}, pageFn)
 	if err != nil {
 		return nil, fmt.Errorf("could not list retrieve AWS billing report keys: %v", err)
 	}
 
 	var manifests []*Manifest
-	for _, obj := range dateRngs.Contents {
+
+	for _, key := range keys {
+		manifest, err := retrieveManifest(r.s3API, r.bucket, key)
+		if err != nil {
+			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
+		}
+		manifests = append(manifests, manifest)
+	}
+	return manifests, nil
+}
+
+func (r *manifestRetriever) filterObjects(prefix string, objects []*s3.Object) []string {
+	var keys []string
+	for _, obj := range objects {
 		key := *obj.Key
 
 		// only look for manifest files
@@ -102,15 +121,9 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		}
 		// If we've gotten this far, then "key" is a top-level manifest that we
 		// care about.
-
-		manifest, err := retrieveManifest(r.s3API, r.bucket, key)
-		if err != nil {
-			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
-		}
-		manifests = append(manifests, manifest)
-
+		keys = append(keys, key)
 	}
-	return manifests, nil
+	return keys
 }
 
 // retrieveManifest retrieves a manifest from the given bucket and key.
