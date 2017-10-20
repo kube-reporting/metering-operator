@@ -10,7 +10,6 @@ import (
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
-	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
@@ -54,7 +53,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 	return columns
 }
 
-func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string, queryer hive.Queryer, prestoCon db.Queryer) ([]map[string]interface{}, error) {
+func (c *Chargeback) generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery, rng cb.Range, promsumTbl string) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 
 	// Perform query templating
@@ -75,29 +74,38 @@ func generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes
 
 	// Create a table to write to
 	reportTable := reportTableName(report.Name)
-	bucket, pre***REMOVED***x := report.Spec.Output.Bucket, report.Spec.Output.Pre***REMOVED***x
-	logger.Debugf("Creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", reportTable, bucket, pre***REMOVED***x)
-	err = hive.CreateReportTable(queryer, reportTable, bucket, pre***REMOVED***x, generateHiveColumns(report, genQuery))
+	storage := report.Spec.Output
+	switch {
+	case storage == nil || storage.Local != nil:
+		logger.Debugf("Creating table %s backed by local storage", reportTable)
+		err = hive.CreateLocalReportTable(c.hiveQueryer, reportTable, generateHiveColumns(report, genQuery))
+	case storage.S3 != nil:
+		bucket, pre***REMOVED***x := storage.S3.Bucket, storage.S3.Pre***REMOVED***x
+		logger.Debugf("Creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", reportTable, bucket, pre***REMOVED***x)
+		err = hive.CreateReportTable(c.hiveQueryer, reportTable, bucket, pre***REMOVED***x, generateHiveColumns(report, genQuery))
+	default:
+		return nil, fmt.Errorf("storage incorrectly con***REMOVED***gured on report %s", report.Name)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
 	}
 
 	logger.Debugf("deleting any preexisting rows in %s", reportTable)
-	err = hive.ExecuteTruncate(queryer, reportTable)
+	_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("DELETE FROM %s", reportTable))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", reportTable, err)
 	}
 
 	// Run the report
 	logger.Debugf("running report generation query")
-	err = presto.ExecuteInsertQuery(prestoCon, reportTable, query)
+	err = presto.ExecuteInsertQuery(c.prestoConn, reportTable, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")
 		return nil, fmt.Errorf("Failed to execute %s usage report: %v", genQuery.Name, err)
 	}
 
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	results, err := presto.ExecuteSelect(prestoCon, getReportQuery)
+	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("getting usage report FAILED!")
 		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
