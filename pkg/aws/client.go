@@ -53,7 +53,9 @@ func NewManifestRetriever(bucket, prefix string) (ManifestRetriever, error) {
 func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	// ensure that there is a slash at end of location
 	prefix := r.prefix
-	if prefix[len(prefix)-1] != '/' {
+	if len(prefix) == 0 {
+		prefix = "/"
+	} else if prefix[len(prefix)-1] != '/' {
 		prefix += "/"
 	}
 

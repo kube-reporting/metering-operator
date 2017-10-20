@@ -44,10 +44,13 @@ func createTable(name, location, serdeFmt string, serdeProps map[string]string, 
 	if serdeFmt != "" && serdeProps != nil {
 		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", serdeFmt, fmtSerdeProps(serdeProps))
 	}
+	if location != "" {
+		location = fmt.Sprintf(`LOCATION "%s"`, location)
+	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
 %s (%s) %s
-%s LOCATION "%s"`,
+%s %s`,
 		tableType, ifNotExists,
 		name, columnsStr, partitionedBy,
 		serdeFormatStr, location,

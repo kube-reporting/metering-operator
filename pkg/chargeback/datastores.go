@@ -82,20 +82,26 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 
 func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
 	storage := dataStore.Spec.Promsum.Storage
-	if storage == nil {
-		return fmt.Errorf("datastore %q: improperly configured datastore, storage is empty", dataStore.Name)
-	}
-	if storage.S3 == nil {
-		return fmt.Errorf("datastore %q: unsupported storage type (must be s3)", dataStore.Name)
-	}
-
 	tableName := dataStoreTableName(dataStore.Name)
-
-	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
-	if err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Prefix); err != nil {
-		return err
+	switch {
+	case storage == nil || storage.Local != nil:
+		logger.Debugf("creating local table %s", tableName)
+		// store the data locally
+		err := hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
+		if err != nil {
+			return err
+		}
+	case storage.S3 != nil:
+		// store the data in S3
+		logger.Debugf("creating table %s backed by s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+		err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Prefix)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("storage incorrectly configured on datastore %s", dataStore.Name)
 	}
-	logger.Debugf("successfully created table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+	logger.Debugf("successfully created table %s", tableName)
 
 	return c.updateDataStoreTableName(logger, dataStore, tableName)
 }

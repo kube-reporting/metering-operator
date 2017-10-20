@@ -1,9 +1,5 @@
 package hive
 
-import (
-	"fmt"
-)
-
 // CreateReportTable creates a new table backed by the given bucket/prefix with
 // the specified columns
 func CreateReportTable(queryer Queryer, tableName, bucket, prefix string, columns []Column) error {
@@ -22,6 +18,13 @@ func CreateReportTable(queryer Queryer, tableName, bucket, prefix string, column
 	return queryer.Query(query)
 }
 
-func ExecuteTruncate(queryer Queryer, tableName string) error {
-	return queryer.Query(fmt.Sprintf("TRUNCATE TABLE %s", tableName))
+func CreateLocalReportTable(queryer Queryer, tableName string, columns []Column) error {
+	query := dropTable(tableName, true, true)
+	err := queryer.Query(query)
+	if err != nil {
+		return err
+	}
+
+	query = createTable(tableName, "", "", nil, columns, nil, false, true)
+	return queryer.Query(query)
 }
