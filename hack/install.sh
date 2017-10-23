@@ -18,8 +18,11 @@ if [[ "${setupAWS}" == "y" ]]; then
       manifests/chargeback/chargeback-secrets.yaml.dist \
       > manifests/chargeback/chargeback-secrets.yaml
 ***REMOVED***
-  echo "To have chargeback setup AWS credentials for you: set AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY, and re-run this script."
-  echo "Alternatively, you can manually create the secret by copying the manifest manifests/chargeback/chargeback-secrets.yaml.dist to: man***REMOVED***ests/chargeback/chargeback-secrets.yaml and updating it with your credentials."
+  sed \
+      -e 's/aws-access-key-id: "REPLACEME"/aws-access-key-id: /g' \
+      -e 's/aws-secret-access-key: "REPLACEME"/aws-secret-access-key: /g' \
+      manifests/chargeback/chargeback-secrets.yaml.dist \
+      > manifests/chargeback/chargeback-secrets.yaml
 ***REMOVED***
 
 msg "Con***REMOVED***guring pull secrets"
