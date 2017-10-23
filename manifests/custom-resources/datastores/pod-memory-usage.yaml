@@ -6,9 +6,7 @@ metadata:
     tectonic-chargeback: "true"
 spec:
   promsum:
-    storage:
-      s3:
-        bucket: "REPLACEME"
-        prefix: "promsum/memory_by_pod"
     queries:
     - "get-memory-by-pod"
+  storage:
+    local: {}
