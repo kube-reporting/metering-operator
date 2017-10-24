@@ -31,7 +31,7 @@ func (c *Chargeback) reportError(w http.ResponseWriter, status int, message stri
 	w.WriteHeader(status)
 	_, err := w.Write([]byte(fmt.Sprintf(message, args...)))
 	if err != nil {
-		c.logger.Warnf("error sending client error: %v", err)
+		c.logger.WithError(err).Warnf("error sending client error")
 	}
 }
 
@@ -101,8 +101,8 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
 	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
 	if err != nil {
-		c.logger.Errorf("failed to perform presto query: %v", err)
-		c.reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details)", err)
+		c.logger.WithError(err).Errorf("failed to perform presto query")
+		c.reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 			}
 			err := csvWriter.Write(keys)
 			if err != nil {
-				c.logger.Errorf("failed to write headers: %v", err)
+				c.logger.WithError(err).Errorf("failed to write headers")
 				return
 			}
 		}
