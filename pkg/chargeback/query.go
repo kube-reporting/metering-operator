@@ -121,7 +121,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 		return fmt.Errorf("datastore table not created yet")
 	}
 
-	logger = c.logger.WithFields(log.Fields{
+	logger = logger.WithFields(log.Fields{
 		"reportStart": report.Spec.ReportingStart,
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
