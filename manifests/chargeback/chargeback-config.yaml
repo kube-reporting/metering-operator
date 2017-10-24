@@ -12,3 +12,5 @@ data:
   disable-promsum: ""
   prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
   promsum-poll-interval: "5m"
+  promsum-chunk-size: "5m"
+  promsum-step-size: "60s"

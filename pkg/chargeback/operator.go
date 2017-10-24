@@ -43,7 +43,8 @@ type Con***REMOVED***g struct {
 	LogDDLQueries bool
 
 	PromsumInterval  time.Duration
-	PromsumPrecision time.Duration
+	PromsumStepSize  time.Duration
+	PromsumChunkSize time.Duration
 }
 
 type Chargeback struct {
@@ -62,10 +63,13 @@ type Chargeback struct {
 	promHost       string
 	disablePromsum bool
 	logReport      bool
-	logQueries     bool
+
+	logDMLQueries bool
+	logDDLQueries bool
 
 	promsumInterval  time.Duration
-	promsumPrecision time.Duration
+	promsumStepSize  time.Duration
+	promsumChunkSize time.Duration
 }
 
 func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Chargeback, error) {
@@ -79,7 +83,8 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Chargeback, error) {
 		logDDLQueries:    cfg.LogDDLQueries,
 		logDMLQueries:    cfg.LogDMLQueries,
 		promsumInterval:  cfg.PromsumInterval,
-		promsumPrecision: cfg.PromsumPrecision,
+		promsumStepSize:  cfg.PromsumStepSize,
+		promsumChunkSize: cfg.PromsumChunkSize,
 		logger:           logger,
 	}
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
