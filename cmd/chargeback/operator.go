@@ -17,8 +17,9 @@ var (
 
 	defaultPromHost = "http://prometheus.tectonic-system.svc.cluster.local:9090"
 
-	logReport  bool
-	logQueries bool
+	logReport     bool
+	logDMLQueries bool
+	logDDLQueries bool
 
 	promsumInterval  = time.Minute * 5
 	promsumPrecision = time.Minute
@@ -41,11 +42,18 @@ func main() {
 			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logReportEnv)
 		}
 	}
-	if logQueriesStr := os.Getenv("LOG_QUERIES"); logQueriesStr != "" {
+	if logDMLQueriesStr := os.Getenv("LOG_DML_QUERIES"); logDMLQueriesStr != "" {
 		var err error
-		logQueries, err = strconv.ParseBool(logQueriesStr)
+		logDMLQueries, err = strconv.ParseBool(logDMLQueriesStr)
 		if err != nil {
-			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logQueriesStr)
+			logger.WithError(err).Fatalf("LOG_DML_REPORT environment variable was not a bool, got %v", logDMLQueriesStr)
+		}
+	}
+	if logDDLQueriesStr := os.Getenv("LOG_DDL_QUERIES"); logDDLQueriesStr != "" {
+		var err error
+		logDDLQueries, err = strconv.ParseBool(logDDLQueriesStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("LOG_DDL_REPORT environment variable was not a bool, got %v", logDDLQueriesStr)
 		}
 	}
 	if promsumIntervalStr := os.Getenv("PROMSUM_INTERVAL"); promsumIntervalStr != "" {
@@ -84,7 +92,8 @@ func main() {
 		PromHost:         promHost,
 		DisablePromsum:   disablePromsum,
 		LogReport:        logReport,
-		LogQueries:       logQueries,
+		LogDMLQueries:    logDMLQueries,
+		LogDDLQueries:    logDDLQueries,
 		PromsumInterval:  promsumInterval,
 		PromsumPrecision: promsumPrecision,
 	}

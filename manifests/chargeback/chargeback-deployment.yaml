@@ -23,11 +23,16 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
-        - name: LOG_QUERIES
+        - name: LOG__DML_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
-              key: log-queries
+              key: log-dml-queries
+        - name: LOG__DDL_QUERIES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: log-ddl-queries
         - name: LOG_REPORT
           valueFrom:
             con***REMOVED***gMapKeyRef:

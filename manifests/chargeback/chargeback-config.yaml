@@ -7,7 +7,8 @@ metadata:
 data:
   aws-region: "us-west-1"
   log-reports: "false"
-  log-queries: "false"
+  log-ddl-queries: "false"
+  log-dml-queries: "false"
   disable-promsum: ""
   prometheus-url: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
   promsum-poll-interval: "5m"
