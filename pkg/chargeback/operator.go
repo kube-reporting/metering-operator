@@ -37,8 +37,10 @@ type Config struct {
 	PrestoHost     string
 	PromHost       string
 	DisablePromsum bool
-	LogReport      bool
-	LogQueries     bool
+
+	LogReport     bool
+	LogDMLQueries bool
+	LogDDLQueries bool
 
 	PromsumInterval  time.Duration
 	PromsumPrecision time.Duration
@@ -74,7 +76,8 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 		promHost:         cfg.PromHost,
 		disablePromsum:   cfg.DisablePromsum,
 		logReport:        cfg.LogReport,
-		logQueries:       cfg.LogQueries,
+		logDDLQueries:    cfg.LogDDLQueries,
+		logDMLQueries:    cfg.LogDMLQueries,
 		promsumInterval:  cfg.PromsumInterval,
 		promsumPrecision: cfg.PromsumPrecision,
 		logger:           logger,
@@ -94,7 +97,7 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 
 	op.informers = setupInformers(op.chargebackClient, cfg.Namespace, defaultResyncPeriod)
 
-	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogQueries)
+	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogDMLQueries)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
@@ -239,7 +242,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 	defer prestoConn.Close()
-	c.prestoConn = db.New(prestoConn, c.logger, c.logQueries)
+	c.prestoConn = db.New(prestoConn, c.logger, c.logDDLQueries)
 
 	_, err = c.hiveQueryer.getHiveConnection()
 	if err != nil {
