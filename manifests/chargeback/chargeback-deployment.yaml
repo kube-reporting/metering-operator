@@ -48,6 +48,16 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: promsum-poll-interval
+        - name: PROMSUM_CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: promsum-chunk-size
+        - name: PROMSUM_STEP_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: promsum-step-size
         - name: DISABLE_PROMSUM
           valueFrom:
             configMapKeyRef:

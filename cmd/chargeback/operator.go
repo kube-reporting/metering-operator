@@ -22,7 +22,8 @@ var (
 	logDDLQueries bool
 
 	promsumInterval  = time.Minute * 5
-	promsumPrecision = time.Minute
+	promsumStepSize  = time.Minute
+	promsumChunkSize = time.Minute * 5
 	disablePromsum   = false
 )
 
@@ -63,11 +64,18 @@ func main() {
 			logger.WithError(err).Fatalf("PROMSUM_INTERVAL environment variable was not a duration, got %q", promsumIntervalStr)
 		}
 	}
-	if promsumPrecisionStr := os.Getenv("PROMSUM_PRECISION"); promsumPrecisionStr != "" {
+	if promsumStepSizeStr := os.Getenv("PROMSUM_STEP_SIZE"); promsumStepSizeStr != "" {
 		var err error
-		promsumPrecision, err = time.ParseDuration(promsumPrecisionStr)
+		promsumStepSize, err = time.ParseDuration(promsumStepSizeStr)
 		if err != nil {
-			logger.WithError(err).Fatalf("PROMSUM_PRECISION environment variable was not a duration, got %q", promsumPrecisionStr)
+			logger.WithError(err).Fatalf("PROMSUM_STEP_SIZE environment variable was not a duration, got %q", promsumStepSizeStr)
+		}
+	}
+	if promsumChunkSizeStr := os.Getenv("PROMSUM_CHUNK_SIZE"); promsumChunkSizeStr != "" {
+		var err error
+		promsumChunkSize, err = time.ParseDuration(promsumChunkSizeStr)
+		if err != nil {
+			logger.WithError(err).Fatalf("PROMSUM_CHUNK_SIZE environment variable was not a duration, got %q", promsumChunkSize)
 		}
 	}
 	promHost := os.Getenv("PROMETHEUS_HOST")
@@ -95,7 +103,8 @@ func main() {
 		LogDMLQueries:    logDMLQueries,
 		LogDDLQueries:    logDDLQueries,
 		PromsumInterval:  promsumInterval,
-		PromsumPrecision: promsumPrecision,
+		PromsumStepSize:  promsumStepSize,
+		PromsumChunkSize: promsumChunkSize,
 	}
 
 	op, err := chargeback.New(logger, cfg)
