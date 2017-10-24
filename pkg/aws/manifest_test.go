@@ -2,11 +2,7 @@ package aws
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
-	"time"
-
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 const (
@@ -52,7 +48,7 @@ func TestManifest_Paths(t *testing.T) {
 
 	numExpectedPaths := 1
 	expectedPath := "billing-path/20170701-20170801/ea74f90b-e82f-9c72-fab6-abc716793752"
-	if paths := manifest.Paths(); len(paths) != numExpectedPaths {
+	if paths := manifest.paths(); len(paths) != numExpectedPaths {
 		t.Errorf("unexpected number of paths: got %d, want %d", len(paths), numExpectedPaths)
 	} else if paths[0] != expectedPath {
 		t.Errorf("unexpected path: got %s, want %s", paths[0], expectedPath)
@@ -60,23 +56,7 @@ func TestManifest_Paths(t *testing.T) {
 
 	// manifests without report keys should not return paths
 	manifest.ReportKeys = nil
-	if paths := manifest.Paths(); len(paths) != 0 {
+	if paths := manifest.paths(); len(paths) != 0 {
 		t.Error("manifests without report keys should not produce paths")
-	}
-}
-
-func TestRetrieveManifests(t *testing.T) {
-	bucket := "coreos-team-chargeback"
-	prefix := "coreos-detailed-billing/coreosinc//coreos-detailed-billing-001/team-chargeback-testing"
-	begin := time.Date(2017, time.June, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2017, time.June, 29, 0, 0, 0, 0, time.UTC)
-	rng := cb.Range{begin, end}
-	manifests, err := RetrieveManifests(bucket, prefix, rng)
-	if err != nil {
-		t.Error("unexpected error: ", err)
-	}
-
-	for _, m := range manifests {
-		fmt.Println("Start: ", m.BillingPeriod.Start, ", End: ", m.BillingPeriod.End)
 	}
 }
