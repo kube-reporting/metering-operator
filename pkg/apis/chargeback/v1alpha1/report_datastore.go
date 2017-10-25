@@ -40,14 +40,6 @@ type AWSBillingDataSource struct {
 }
 
 type PromsumDataSource struct {
-	Queries []string          `json:"queries"`
-	Storage *DataStoreStorage `json:"storage"`
-}
-
-type DataStoreStorage struct {
-	S3    *S3Bucket     `json:"s3"`
-	Local *LocalStorage `json:"local"`
-}
-
-type LocalStorage struct {
+	Queries []string         `json:"queries"`
+	Storage *StorageLocation `json:"storage"`
 }

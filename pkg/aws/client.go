@@ -53,7 +53,9 @@ func NewManifestRetriever(bucket, pre***REMOVED***x string) (ManifestRetriever, 
 func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	// ensure that there is a slash at end of location
 	pre***REMOVED***x := r.pre***REMOVED***x
-	if pre***REMOVED***x[len(pre***REMOVED***x)-1] != '/' {
+	if len(pre***REMOVED***x) == 0 {
+		pre***REMOVED***x = "/"
+	} ***REMOVED*** if pre***REMOVED***x[len(pre***REMOVED***x)-1] != '/' {
 		pre***REMOVED***x += "/"
 	}
 
