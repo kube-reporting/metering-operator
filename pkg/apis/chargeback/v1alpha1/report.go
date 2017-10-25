@@ -38,7 +38,7 @@ type ReportSpec struct {
 	//AWSReport *S3Bucket `json:"aws,omitempty"`
 
 	// Output is the S3 bucket where results are sent.
-	Output S3Bucket `json:"output"`
+	Output *StorageLocation `json:"output"`
 }
 
 type ReportTemplateSpec struct {
@@ -75,9 +75,4 @@ func (p *ReportPhase) UnmarshalText(text []byte) error {
 	}
 	*p = phase
 	return nil
-}
-
-type S3Bucket struct {
-	Bucket string `json:"bucket"`
-	Prefix string `json:"prefix"`
 }

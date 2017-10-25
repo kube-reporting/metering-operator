@@ -10,6 +10,7 @@ import (
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
 func (c *Chargeback) runReportDataStoreWorker() {
@@ -82,20 +83,47 @@ func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) e
 
 func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
 	storage := dataStore.Spec.Promsum.Storage
-	if storage == nil {
-		return fmt.Errorf("datastore %q: improperly configured datastore, storage is empty", dataStore.Name)
-	}
-	if storage.S3 == nil {
-		return fmt.Errorf("datastore %q: unsupported storage type (must be s3)", dataStore.Name)
-	}
-
 	tableName := dataStoreTableName(dataStore.Name)
+	switch {
+	case storage == nil || storage.Local != nil:
+		logger.Debugf("creating local table %s", tableName)
+		// store the data locally
+		err := hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
+		if err != nil {
+			return err
+		}
 
-	logger.Debugf("creating table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
-	if err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Prefix); err != nil {
-		return err
+		// There's currently a strange issue where selects in presto will fail
+		// unless an insert has been made first. Don't ask me why.
+
+		// After creating foobar via the hive cli:
+
+		//presto:default> select * from foobar;
+
+		//Query 20171025_185138_00002_cu5nq, FAILED, 1 node
+		//Splits: 16 total, 0 done (0.00%)
+		//0:05 [0 rows, 0B] [0 rows/s, 0B/s]
+
+		//Query 20171025_185138_00002_cu5nq failed: Partition location does not exist: file:/user/hive/warehouse/foobar
+		_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("INSERT INTO %s VALUES ('',0.0,null,0.0,map(ARRAY[],ARRAY[]))", tableName))
+		if err != nil {
+			return err
+		}
+		_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("DELETE FROM %s", tableName))
+		if err != nil {
+			return err
+		}
+	case storage.S3 != nil:
+		// store the data in S3
+		logger.Debugf("creating table %s backed by s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+		err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Prefix)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("storage incorrectly configured on datastore %s", dataStore.Name)
 	}
-	logger.Debugf("successfully created table %s pointing to s3 bucket %s at prefix %s", tableName, storage.S3.Bucket, storage.S3.Prefix)
+	logger.Debugf("successfully created table %s", tableName)
 
 	return c.updateDataStoreTableName(logger, dataStore, tableName)
 }

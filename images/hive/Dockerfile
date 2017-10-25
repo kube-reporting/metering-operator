@@ -17,3 +17,5 @@ RUN mkdir -p /usr/hdp/current/hive-server2/auxlib && ln -s ${HADOOP_HOME}/share/
 ADD json-serde-1.3.8-jar-with-dependencies.jar /usr/hdp/current/hive-server2/auxlib
 
 ADD conf/* $HIVE_HOME/conf/
+
+VOLUME /user/hive/warehouse

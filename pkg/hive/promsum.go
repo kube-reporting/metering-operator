@@ -19,3 +19,10 @@ func CreatePromsumTable(queryer Queryer, tableName, bucket, prefix string) error
 	query := createTable(tableName, location, "", nil, promsumColumns, nil, false, true)
 	return queryer.Query(query)
 }
+
+// CreateLocalPromsumTable instantiates a new external Hive table for Prometheus
+// observation data stored locally
+func CreateLocalPromsumTable(queryer Queryer, tableName string) error {
+	query := createTable(tableName, "", "", nil, promsumColumns, nil, false, true)
+	return queryer.Query(query)
+}

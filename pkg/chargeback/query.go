@@ -136,7 +136,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	report = newReport
 
 	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-	results, err := generateReport(logger, report, genQuery, rng, dataStore.TableName, c.hiveQueryer, c.prestoConn)
+	results, err := c.generateReport(logger, report, genQuery, rng, dataStore.TableName)
 	if err != nil {
 		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")
