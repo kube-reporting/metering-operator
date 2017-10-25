@@ -9,6 +9,7 @@ import (
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/labels"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
@@ -44,156 +45,174 @@ func (c *Chargeback) collectPromsumData() {
 		return
 	}
 
-	chunkDurationSize := c.promsumChunkSize
 	now := time.Now().UTC()
-
 	for _, dataStore := range dataStores {
 		logger := c.logger.WithField("datastore", dataStore.Name)
-		logger.Debugf("processing data store %q", dataStore.Name)
-		if dataStore.Spec.DataStoreSource.Promsum == nil {
-			logger.Debugf("not a promsum store, skipping %q", dataStore.Name)
-			continue
-		}
-		if dataStore.TableName == "" {
-			// This data store doesn't have a table yet, let's skip it and
-			// hope it'll have one next time.
-			logger.Debugf("no table set, skipping data store %q", dataStore.Name)
-			continue
-		}
-
-		// Get the most recent timestamp in the table for this query
-		getLastTimestampQuery := fmt.Sprintf(`
-				SELECT timestamp
-				FROM %s
-				ORDER BY timestamp DESC
-				LIMIT 1`, dataStore.TableName)
-
-		results, err := presto.ExecuteSelect(c.prestoConn, getLastTimestampQuery)
+		err := c.collectPromsumDatastoreData(logger, dataStore, now)
 		if err != nil {
-			logger.Warnf("error getting last timestamp for table, maybe table doesn't exist yet? %v", err)
-			continue
+			logger.WithError(err).Errorf("error collecting promsum data for datastore")
 		}
+	}
+}
 
-		var lastTimestamp time.Time
-		if len(results) == 0 {
-			// Looks like we haven't populated any data in this table yet.
-			// Let's back***REMOVED***ll our last 1 chunk.
-			// we multiple by 2 because the most recent chunk will have a
-			// chunkEnd == now, so it won't be queried, so this gets the chunk
-			// before the latest
-			lastTimestamp = now.Add(-2 * chunkDurationSize)
-			logger.Debugf("no data in data store %s yet", dataStore.Name)
-		} ***REMOVED*** {
-			lastTimestamp = results[0]["timestamp"].(time.Time)
-			// We don't want duplicate the lastTimestamp record so add
-			// the step size so that we start at the next interval no longer in
-			// our range.
-			lastTimestamp = lastTimestamp.Add(c.promsumStepSize)
-			logger.Debugf("last fetched data for data store %s at %s", dataStore.Name, lastTimestamp.String())
-		}
+func (c *Chargeback) collectPromsumDatastoreData(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) error {
+	logger.Debugf("processing data store %q", dataStore.Name)
+	if dataStore.Spec.DataStoreSource.Promsum == nil {
+		logger.Debugf("not a promsum store, skipping %q", dataStore.Name)
+		return nil
+	}
+	if dataStore.TableName == "" {
+		// This data store doesn't have a table yet, let's skip it and
+		// hope it'll have one next time.
+		logger.Debugf("no table set, skipping data store %q", dataStore.Name)
+		return nil
+	}
 
-		if lastTimestamp.After(now) {
-			logger.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
-			continue
-		}
-
-		var timeRanges []prom.Range
-
-		chunkStart := lastTimestamp
-		chunkEnd := chunkStart.Add(chunkDurationSize)
-
-		if chunkStart.Equal(chunkEnd) {
-			logger.Warnf("skipping querying for data, start and end are the same: %v", chunkStart.String())
-			continue
-		}
-
-		// Only get chunks that are a full chunk size
-		for chunkEnd.Before(now) {
-			if chunkStart.Equal(chunkEnd) {
-				continue
-			}
-			timeRanges = append(timeRanges, prom.Range{
-				Start: chunkStart,
-				End:   chunkEnd,
-				Step:  c.promsumStepSize,
-			})
-
-			// Add the metrics step size to the start time so that we don't
-			// re-query the previous ranges end time in this range
-			chunkStart = chunkEnd.Add(c.promsumStepSize)
-			chunkEnd = chunkStart.Add(chunkDurationSize)
+	for _, queryName := range dataStore.Spec.DataStoreSource.Promsum.Queries {
+		timeRanges, err := c.promsumGetTimeRanges(logger, dataStore, queryName, now)
+		if err != nil {
+			return fmt.Errorf("couldn't get time ranges to for query %s: %v", queryName, err)
 		}
 		logger.Debugf("time ranges to query: %+v", timeRanges)
 
 		if len(timeRanges) == 0 {
 			logger.Info("no time ranges to query yet")
-			continue
+			return nil
 		} ***REMOVED*** {
 			begin := timeRanges[0].Start
 			end := timeRanges[len(timeRanges)-1].End
 			logger.Infof("querying for data between %s and %s", begin, end)
 		}
 
-		// capacity prestoQueryCap, length 0
-		queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
-
 		for _, queryRng := range timeRanges {
-			for _, queryName := range dataStore.Spec.DataStoreSource.Promsum.Queries {
-				query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(queryName)
-				if err != nil {
-					logger.Errorf("Could not get prometheus query: ", err)
-					return
-				}
-
-				records, err := c.promsumMeter(query, queryRng)
-				if err != nil {
-					logger.Errorf("Failed to generate billing report for query '%s' in the range %v to %v: %v",
-						query.Name, queryRng.Start, queryRng.End, err)
-					continue
-				}
-
-				var queryValues [][]string
-
-				for _, record := range records {
-					queryValues = append(queryValues, []string{generateRecordValues(record)})
-				}
-				queryBuf.Reset()
-				queryBuf.WriteString("VALUES ")
-				queryBufIsEmpty := true
-				for _, values := range queryValues {
-					if !queryBufIsEmpty {
-						queryBuf.WriteString(",")
-					}
-
-					currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
-
-					// There's a character limit of prestoQueryCap on insert
-					// queries, so let's chunk them at that limit.
-					if len(currValue)+queryBuf.Len() > prestoQueryCap {
-						err = presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
-						if err != nil {
-							logger.Errorf("Failed to record: %v", err)
-						}
-						queryBuf.Reset()
-						queryBuf.WriteString("VALUES ")
-						queryBuf.WriteString(currValue)
-						queryBufIsEmpty = false
-					} ***REMOVED*** {
-						queryBuf.WriteString(currValue)
-						queryBufIsEmpty = false
-					}
-				}
-				if !queryBufIsEmpty {
-					err = presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
-					if err != nil {
-						logger.Errorf("Failed to record: %v", err)
-					}
-				}
+			query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(queryName)
+			if err != nil {
+				return fmt.Errorf("could not get prometheus query: ", err)
 			}
 
+			records, err := c.promsumQuery(query, queryRng)
+			if err != nil {
+				return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
+					query.Name, queryRng.Start, queryRng.End, err)
+			}
+
+			err = c.promsumStoreRecords(logger, dataStore, records)
+			if err != nil {
+				return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
+					query.Name, queryRng.Start, queryRng.End, err)
+			}
 		}
-		logger.Debugf("processing complete for data store %q", dataStore.Name)
 	}
+	logger.Debugf("processing complete for data store %q", dataStore.Name)
+	return nil
+}
+
+func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, queryName string, now time.Time) ([]prom.Range, error) {
+	// Get the most recent timestamp in the table for this query
+	getLastTimestampQuery := fmt.Sprintf(`
+				SELECT "timestamp"
+				FROM %s
+				WHERE query = '%s'
+				ORDER BY "timestamp" DESC
+				LIMIT 1`, dataStore.TableName, resourceNameReplacer.Replace(queryName))
+
+	results, err := presto.ExecuteSelect(c.prestoConn, getLastTimestampQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error getting last timestamp for table, maybe table doesn't exist yet? %v", err)
+	}
+
+	var lastTimestamp time.Time
+	if len(results) == 0 {
+		// Looks like we haven't populated any data in this table yet.
+		// Let's back***REMOVED***ll our last 1 chunk.
+		// we multiple by 2 because the most recent chunk will have a
+		// chunkEnd == now, so it won't be queried, so this gets the chunk
+		// before the latest
+		lastTimestamp = now.Add(-2 * c.promsumChunkSize)
+		logger.Debugf("no data in data store %s yet", dataStore.Name)
+	} ***REMOVED*** {
+		lastTimestamp = results[0]["timestamp"].(time.Time)
+		// We don't want duplicate the lastTimestamp record so add
+		// the step size so that we start at the next interval no longer in
+		// our range.
+		lastTimestamp = lastTimestamp.Add(c.promsumStepSize)
+		logger.Debugf("last fetched data for data store %s at %s", dataStore.Name, lastTimestamp.String())
+	}
+
+	if lastTimestamp.After(now) {
+		return nil, fmt.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
+	}
+
+	chunkStart := lastTimestamp
+	chunkEnd := chunkStart.Add(c.promsumChunkSize)
+
+	if chunkStart.Equal(chunkEnd) {
+		return nil, fmt.Errorf("error querying for data, start and end are the same: %v", chunkStart.String())
+	}
+
+	var timeRanges []prom.Range
+	// Only get chunks that are a full chunk size
+	for chunkEnd.Before(now) {
+		if chunkStart.Equal(chunkEnd) {
+			logger.Warnf("skipping querying for data, start and end are the same: %v", chunkStart.String())
+			continue
+		}
+		timeRanges = append(timeRanges, prom.Range{
+			Start: chunkStart,
+			End:   chunkEnd,
+			Step:  c.promsumStepSize,
+		})
+
+		// Add the metrics step size to the start time so that we don't
+		// re-query the previous ranges end time in this range
+		chunkStart = chunkEnd.Add(c.promsumStepSize)
+		chunkEnd = chunkStart.Add(c.promsumChunkSize)
+	}
+
+	return timeRanges, nil
+}
+
+func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, records []BillingRecord) error {
+	var queryValues [][]string
+
+	for _, record := range records {
+		queryValues = append(queryValues, []string{generateRecordValues(record)})
+	}
+	// capacity prestoQueryCap, length 0
+	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
+	// queryBuf.Reset()
+	queryBuf.WriteString("VALUES ")
+	queryBufIsEmpty := true
+	for _, values := range queryValues {
+		if !queryBufIsEmpty {
+			queryBuf.WriteString(",")
+		}
+
+		currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
+
+		// There's a character limit of prestoQueryCap on insert
+		// queries, so let's chunk them at that limit.
+		if len(currValue)+queryBuf.Len() > prestoQueryCap {
+			err := presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
+			if err != nil {
+				return fmt.Errorf("failed to store metrics into presto: %v", err)
+			}
+			queryBuf.Reset()
+			queryBuf.WriteString("VALUES ")
+			queryBuf.WriteString(currValue)
+			queryBufIsEmpty = false
+		} ***REMOVED*** {
+			queryBuf.WriteString(currValue)
+			queryBufIsEmpty = false
+		}
+	}
+	if !queryBufIsEmpty {
+		err := presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
+		if err != nil {
+			return fmt.Errorf("failed to store metrics into presto: %v", err)
+		}
+	}
+	return nil
 }
 
 func generateRecordValues(record BillingRecord) string {
@@ -218,7 +237,7 @@ type BillingRecord struct {
 	Timestamp time.Time         `json:"timestamp"`
 }
 
-func (c *Chargeback) promsumMeter(query *cbTypes.ReportPrometheusQuery, queryRng prom.Range) ([]BillingRecord, error) {
+func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng prom.Range) ([]BillingRecord, error) {
 	pVal, err := c.promConn.QueryRange(context.Background(), query.Spec.Query, queryRng)
 	if err != nil {
 		return nil, fmt.Errorf("failed to perform billing query: %v", err)
