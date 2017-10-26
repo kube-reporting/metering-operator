@@ -10,7 +10,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	cb "github.com/coreos-inc/kube-chargeback/pkg/chargeback/v1"
 )
 
 func (c *Chargeback) runReportWorker() {
@@ -121,7 +120,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 		return fmt.Errorf("datastore table not created yet")
 	}
 
-	logger = c.logger.WithFields(log.Fields{
+	logger = logger.WithFields(log.Fields{
 		"reportStart": report.Spec.ReportingStart,
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
@@ -135,8 +134,7 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	}
 	report = newReport
 
-	rng := cb.Range{report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time}
-	results, err := c.generateReport(logger, report, genQuery, rng, dataStore.TableName)
+	results, err := c.generateReport(logger, report, genQuery, report.Spec.ReportingStart.Time, report.Spec.ReportingEnd.Time, dataStore.TableName)
 	if err != nil {
 		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")
