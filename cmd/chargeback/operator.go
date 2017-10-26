@@ -17,12 +17,23 @@ var (
 
 	defaultPromHost = "http://prometheus.tectonic-system.svc.cluster.local:9090"
 
-	logReport     bool
+	// logReport logs out report results after creating a report result table
+	logReport bool
+	// logDMLQueries controls if we log data manipulation queries made via
+	// Presto (SELECT, INSERT, etc)
 	logDMLQueries bool
+	// logDDLQueries controls if we log data definition language queries made
+	// via Hive (CREATE TABLE, DROP TABLE, etc).
 	logDDLQueries bool
 
-	promsumInterval  = time.Minute * 5
-	promsumStepSize  = time.Minute
+	// promsumInterval is how often we poll prometheus
+	promsumInterval = time.Minute * 5
+	// promsumStepSize is the query step size for Promethus query. This
+	// controls resolution of results.
+	promsumStepSize = time.Minute
+	// promsumChunkSize controls how much the range query window size
+	// by limiting the range query to a range of time no longer than this
+	// duration.
 	promsumChunkSize = time.Minute * 5
 	disablePromsum   = false
 )
