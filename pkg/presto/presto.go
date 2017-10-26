@@ -18,9 +18,13 @@ func prestoTime(t time.Time) string {
 	return t.Format(TimestampFormat)
 }
 
+func FormatInsertQuery(target, query string) string {
+	return fmt.Sprintf("INSERT INTO %s %s", target, query)
+}
+
 // ExecuteInsertQuery performs the query an INSERT into the table target. It's expected target has the correct schema.
 func ExecuteInsertQuery(queryer db.Queryer, target, query string) error {
-	insert := fmt.Sprintf("INSERT INTO %s %s", target, query)
+	insert := FormatInsertQuery(target, query)
 	rows, err := queryer.Query(insert)
 	if err != nil {
 		return err

@@ -190,9 +190,11 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataStore *c
 
 		currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
 
+		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(dataStore.TableName, ""))
+
 		// There's a character limit of prestoQueryCap on insert
 		// queries, so let's chunk them at that limit.
-		if len(currValue)+queryBuf.Len() > prestoQueryCap {
+		if len(currValue)+queryBuf.Len() > queryCap {
 			err := presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
 			if err != nil {
 				return fmt.Errorf("failed to store metrics into presto: %v", err)
