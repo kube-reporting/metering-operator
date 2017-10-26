@@ -36,18 +36,31 @@ type Column struct {
 
 // Paths returns the directories containing usage data. The result will be free of duplicates.
 func (m Manifest) DataDirectory() string {
-	var dirPath string
-	pathMap := make(map[string]struct{})
+	paths := m.paths()
+	pathsLen := len(paths)
+	var path string
+	if pathsLen > 0 {
+		path = paths[0]
+	}
+	if pathsLen != 1 {
+		logrus.Errorf("aws manifest %s does not have exactly 1 data directory containing report data, reportKeys: %v", m.AssemblyID, m.ReportKeys)
+	}
+
+	return path
+}
+
+func (m Manifest) paths() []string {
+	seen := make(map[string]struct{})
+	var paths []string
 	for _, key := range m.ReportKeys {
-		dirPath = filepath.Dir(key)
-		pathMap[dirPath] = struct{}{}
+		dirPath := filepath.Dir(key)
+		if _, exists := seen[dirPath]; exists {
+			continue
+		}
+		seen[dirPath] = struct{}{}
+		paths = append(paths, dirPath)
 	}
-
-	if len(pathMap) != 1 {
-		logrus.Errorf("aws manifest %s has multiple directories containing usage data, expected 1, reportKeys: %v", m.AssemblyID, m.ReportKeys)
-	}
-
-	return dirPath
+	return paths
 }
 
 type Time struct {

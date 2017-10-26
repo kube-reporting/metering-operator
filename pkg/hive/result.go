@@ -14,7 +14,7 @@ func CreateReportTable(queryer Queryer, tableName, bucket, prefix string, column
 		return err
 	}
 
-	query = createTable(tableName, location, "", nil, columns, nil, false, true)
+	query = createTable(tableName, location, "", nil, columns, nil, false, false)
 	return queryer.Query(query)
 }
 

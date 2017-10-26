@@ -23,11 +23,16 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
-        - name: LOG_QUERIES
+        - name: LOG__DML_QUERIES
           valueFrom:
             configMapKeyRef:
               name: chargeback-config
-              key: log-queries
+              key: log-dml-queries
+        - name: LOG__DDL_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: log-ddl-queries
         - name: LOG_REPORT
           valueFrom:
             configMapKeyRef:
@@ -43,6 +48,16 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: promsum-poll-interval
+        - name: PROMSUM_CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: promsum-chunk-size
+        - name: PROMSUM_STEP_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: promsum-step-size
         - name: DISABLE_PROMSUM
           valueFrom:
             configMapKeyRef:
