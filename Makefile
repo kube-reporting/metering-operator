@@ -73,28 +73,28 @@ dist.zip: dist
 	zip -r $@ $?
 
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
 chargeback-docker-push:
-	make docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
+	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
 presto-docker-build: images/presto/Docker***REMOVED***le
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
 
 presto-docker-push:
-	make docker-push IMAGE_NAME=$(PRESTO_IMAGE)
+	$(MAKE) docker-push IMAGE_NAME=$(PRESTO_IMAGE)
 
 hadoop-docker-build: images/hadoop/Docker***REMOVED***le
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
 
 hadoop-docker-push:
-	make docker-push IMAGE_NAME=$(HADOOP_IMAGE)
+	$(MAKE) docker-push IMAGE_NAME=$(HADOOP_IMAGE)
 
 hive-docker-build: images/hive/Docker***REMOVED***le hadoop-docker-build
-	make docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
 hive-docker-push:
-	make docker-push IMAGE_NAME=$(HIVE_IMAGE)
+	$(MAKE) docker-push IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
 vendor: glide.yaml
@@ -108,7 +108,7 @@ fmt:
 chargeback-bin: images/chargeback/bin/chargeback
 
 images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
-	make k8s-update-codegen
+	$(MAKE) k8s-update-codegen
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
