@@ -7,5 +7,5 @@ spec:
   reportingEnd: '2017-12-30T23:59:59Z'
   generationQuery: "pod-memory-usage-by-namespace"
   runImmediately: false
-  storage:
+  output:
     local: {}
