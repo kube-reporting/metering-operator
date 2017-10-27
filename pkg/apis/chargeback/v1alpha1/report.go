@@ -34,8 +34,13 @@ type ReportSpec struct {
 
 	GenerationQueryName string `json:"generationQuery"`
 
-	//// AWSReport details the expense of running a Pod over a period of time on Amazon Web Services.
-	//AWSReport *S3Bucket `json:"aws,omitempty"`
+	// RunImmediately will run the report immediately, ignoring ReportingEnd and
+	// GracePeriod.
+	RunImmediately bool `json:"runImmediately,omitempty"`
+
+	// GracePeriod controls how long after `ReportingEnd` to wait until running
+	// the report
+	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`
 
 	// Output is the S3 bucket where results are sent.
 	Output *StorageLocation `json:"output"`

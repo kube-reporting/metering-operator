@@ -3,6 +3,7 @@ package chargeback
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -12,6 +13,11 @@ import (
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
+)
+
+var (
+	defaultRunImmediately = true
+	defaultGracePeriod    = metav1.Duration{Duration: time.Minute * 5}
 )
 
 func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
@@ -109,7 +115,20 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
 	default:
+
 		logger.Infof("new report discovered")
+	}
+
+	// set the default grace period
+	if report.Spec.GracePeriod == nil {
+		report.Spec.GracePeriod = &defaultGracePeriod
+	}
+
+	// If we're waiting until the end and we're not past the end time + grace
+	// period, ignore this report
+	if !report.Spec.RunImmediately && report.Spec.ReportingEnd.Add(report.Spec.GracePeriod.Duration).After(time.Now()) {
+		logger.Infof("report %s not past grace period yet, ignoring for now", report.Name)
+		return nil
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
