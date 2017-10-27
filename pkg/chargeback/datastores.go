@@ -105,7 +105,7 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		//0:05 [0 rows, 0B] [0 rows/s, 0B/s]
 
 		//Query 20171025_185138_00002_cu5nq failed: Partition location does not exist: file:/user/hive/warehouse/foobar
-		_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("INSERT INTO %s VALUES ('',0.0,null,0.0,map(ARRAY[],ARRAY[]))", tableName))
+		_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("INSERT INTO %s VALUES (0.0,null,0.0,map(ARRAY[],ARRAY[]))", tableName))
 		if err != nil {
 			return err
 		}
