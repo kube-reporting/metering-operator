@@ -45,6 +45,19 @@ reportingStart: '2017-07-02T00:00:00Z'
 reportingEnd: '2017-07-29T00:00:00Z'
 ```
 
+#### Running reports immediately
+Reports will by default wait until 5 minutes after `reportingEnd`. This 5 minute grace period can be con***REMOVED***gured with the `gracePeriod` ***REMOVED***eld, and reports can be set to run immediately regardless of the end time with the `runImmediately` flag.
+
+*Example*
+```
+runImmediately: true
+```
+
+*Example*
+```
+gracePeriod: 30s
+```
+
 #### Output
 The result of a report is stored in the S3 bucket given by the `output` ***REMOVED***eld.
 
