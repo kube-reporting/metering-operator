@@ -52,17 +52,16 @@ store data in the `chargeback` bucket under the `promsum/cpu_by_pod` prefix:
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportDataStore
 metadata:
-  name: "pod-cpu-usage"
+  name: "pod-request-cpu-cores"
   labels:
     tectonic-chargeback: "true"
 spec:
   promsum:
-    queries:
-    - "get-cpu-by-pod"
+    query: "pod-request-cpu-cores"
   storage:
     s3:
       bucket: chargeback
-      prefix: promsum/cpu_by_pod
+      prefix: promsum/pod_request_cpu_cores
 ```
 
 ## Set an output location on reports
