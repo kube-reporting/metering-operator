@@ -1,7 +1,17 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
-  name: "get-cpu-by-pod"
+  name: "pod-request-cpu-cores"
 spec:
   query: |
-    sum(kube_pod_container_resource_requests_cpu_cores * on(node) group_left(provider_id) kube_node_info) by (pod, namespace, node) keep_common
+    sum(kube_pod_container_resource_requests_cpu_cores) by (pod, namespace, node) keep_common
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-limit-cpu-cores"
+spec:
+  query: |
+    sum(kube_pod_container_resource_limits_cpu_cores) by (pod, namespace, node) keep_common
