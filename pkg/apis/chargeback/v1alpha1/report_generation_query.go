@@ -20,12 +20,23 @@ type ReportGenerationQuery struct {
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec ReportGenerationQuerySpec `json:"spec"`
+	// ViewName is the name of the view in Presto for this query, if the view
+	// has been created. If it is empty, the view does not exist.
+	ViewName string `json:"viewName,omitempty"`
 }
 
 type ReportGenerationQuerySpec struct {
-	DataStoreName string           `json:"reportDataStore"`
+	ReportQueries []string         `json:"reportQueries"`
+	DataStores    []string         `json:"reportDataStores"`
 	Query         string           `json:"query"`
 	Columns       []GenQueryColumn `json:"columns"`
+	View          GenQueryView     `json:"view"`
+}
+
+type GenQueryView struct {
+	// Disabled controls whether or not to create a view in presto for this
+	// ReportGenerationQuery
+	Disabled bool `json:"disabled"`
 }
 
 type GenQueryColumn struct {
