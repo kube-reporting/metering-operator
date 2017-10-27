@@ -2,7 +2,6 @@ package hive
 
 var (
 	promsumColumns = []Column{
-		{Name: "query", Type: "string"},
 		{Name: "amount", Type: "double"},
 		{Name: "timestamp", Type: "timestamp"},
 		{Name: "timePrecision", Type: "double"},

@@ -3,7 +3,10 @@ kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-by-node"
 spec:
-  reportDataStore: "pod-memory-usage"
+  reportDataStores:
+  - "pod-request-memory-bytes"
+  view:
+    disabled: true
   columns:
   - name: pod
     type: string
@@ -13,36 +16,43 @@ spec:
     type: string
   - name: provider_id
     type: string
-  - name: memory_usage
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_request_memory_byte_seconds
     type: double
   query: |
     WITH usage_period AS (
-        SELECT kubeUsage.labels['pod'] as pod,
-               kubeUsage.labels['namespace'] as namespace,
-               kubeUsage.labels['node'] as node,
-               kubeUsage.labels as labels,
-               kubeUsage.amount as amount,
-               split_part(split_part(element_at(kubeUsage.labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
-               kubeUsage."timestamp" as timestamp
-        FROM {{.TableName}} as kubeUsage
+        SELECT labels['pod'] as pod,
+            labels['namespace'] as namespace,
+            labels['node'] as node,
+            labels,
+            amount,
+            split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
+            "timestamp"
+        FROM {{ dataStoreTableName "pod-request-memory-bytes" }}
     ),
     computed_usage AS (
         SELECT pod,
-               namespace,
-               node,
-               provider_id,
-               "timestamp" as period_end,
-               lag("timestamp") OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC) as period_start,
-               (amount + lag(amount) OVER (PARTITION BY pod, namespace, node ORDER BY "timestamp" ASC)) / 2 as usage
+            namespace,
+            node,
+            provider_id,
+            labels,
+            avg(amount) as total_amount,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end
         FROM usage_period
+        WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+        AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+        GROUP BY pod, namespace, node, provider_id, labels
     )
-    SELECT
-        pod,
-        namespace,
-        node,
-        provider_id,
-        sum(usage * date_diff('millisecond', period_start, period_end)) as memory_usage
+    SELECT pod,
+            namespace,
+            node,
+            provider_id,
+            data_start,
+            data_end,
+            total_amount * date_diff('second', data_start, data_end) as memory_usage_byte_seconds
     FROM computed_usage
-    WHERE period_start >= timestamp '{{.StartPeriod | prestoTimestamp }}'
-    AND period_end <= timestamp '{{ .EndPeriod | prestoTimestamp }}'
-    GROUP BY pod, namespace, node, provider_id
+    ORDER BY pod, namespace, node, provider_id, data_start, data_end

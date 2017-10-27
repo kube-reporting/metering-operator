@@ -3,29 +3,40 @@ kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-by-namespace"
 spec:
-  reportDataStore: "pod-memory-usage"
+  reportDataStores:
+  - "pod-request-memory-bytes"
+  view:
+    disabled: true
   columns:
   - name: namespace
     type: string
-  - name: memory_usage
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: memory_usage_byte_seconds
     type: double
   query: |
     WITH usage_period AS (
-      SELECT kubeUsage.labels['namespace'] as namespace,
-             kubeUsage.amount as amount,
-             kubeUsage."timestamp" as timestamp
-      FROM {{.TableName}} as kubeUsage
+        SELECT labels['namespace'] as namespace,
+            amount,
+            split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
+            "timestamp"
+        FROM {{ dataStoreTableName "pod-request-memory-bytes" }}
     ),
     computed_usage AS (
-      SELECT namespace,
-            "timestamp" as period_end,
-             lag("timestamp") OVER (PARTITION BY namespace ORDER BY "timestamp" ASC) as period_start,
-            (amount + lag(amount) OVER (PARTITION BY namespace ORDER BY "timestamp" ASC)) / 2 as usage
-      FROM usage_period
+        SELECT namespace,
+            avg(amount) as total_amount,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end
+        FROM usage_period
+        WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+        AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+        GROUP BY namespace
     )
     SELECT namespace,
-           sum(usage * date_diff('millisecond', period_start, period_end)) as memory_usage
+            data_start,
+            data_end,
+            total_amount * date_diff('second', data_start, data_end) as memory_usage_byte_seconds
     FROM computed_usage
-    WHERE period_start >= timestamp '{{.StartPeriod | prestoTimestamp }}'
-    AND period_end <= timestamp '{{ .EndPeriod | prestoTimestamp }}'
-    GROUP BY namespace, period_start, period_end
+    ORDER BY namespace, data_start, data_end

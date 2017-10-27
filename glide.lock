@@ -1,5 +1,5 @@
-hash: 9875efc92029fc775109dd2a8826530ab8c049dc83a85d00485e2121ffa3349e
-updated: 2017-10-10T16:07:38.864167335-07:00
+hash: 1b89ed557660d0301360b49b264651fbe5beb807430ba4a383ac9ff773f5f674
+updated: 2017-10-26T12:31:25.105663416-07:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -49,7 +49,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-ini/ini
-  version: c787282c39ac1fc618827141a1f762240def08a3
+  version: f280b3ba517bf5fc98922624f21fb0e7a92adaec
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -110,13 +110,9 @@ imports:
   subpackages:
   - api
   - api/prometheus/v1
-  - prometheus
 - name: github.com/prometheus/common
   version: 0d0c3d572886e0f2323ed376557f9eb99b97d25b
   subpackages:
-  - expfmt
-  - internal/bitbucket.org/ww/goautoneg
-  - log
   - model
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
@@ -129,7 +125,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: golang.org/x/crypto
-  version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
+  version: 2509b142fb2b797aa7587dad548f113b2c0f20ce
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
@@ -143,13 +139,15 @@ imports:
   - idna
   - lex/httplex
   - websocket
+- name: golang.org/x/sync
+  version: 8e0aa688b654ef28caa72506fa5ec8dba9fc7690
+  subpackages:
+  - errgroup
 - name: golang.org/x/sys
   version: 7a4fde3fda8ef580a89dbae8138c26041be14299
   subpackages:
   - unix
   - windows
-  - windows/registry
-  - windows/svc/eventlog
 - name: golang.org/x/text
   version: b19bf474d317b857955b12035d2c5acb57ce8b01
   subpackages:
@@ -198,11 +196,8 @@ imports:
 - name: k8s.io/apiextensions-apiserver
   version: 2bfb07d318ed549813240d1165fcebad6250c666
   subpackages:
-  - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1
   - pkg/client/clientset/clientset
-  - pkg/client/clientset/clientset/scheme
-  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
   version: a28c9b0b532638dcfb2c8b1b6f8f1e4a21041752
   subpackages:
@@ -308,54 +303,7 @@ imports:
   subpackages:
   - pkg/common
 testImports:
-- name: github.com/beorn7/perks
-  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
-  subpackages:
-  - quantile
-- name: github.com/golang/snappy
-  version: 553a641470496b2327abcac10b36396bd98e45c9
-- name: github.com/matttproud/golang_protobuf_extensions
-  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
-  subpackages:
-  - pbutil
-- name: github.com/opentracing/opentracing-go
-  version: 1361b9cd60be79c4c3a7fa9841b3c132e40066a7
-  subpackages:
-  - log
-- name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
-  subpackages:
-  - go
-- name: github.com/prometheus/procfs
-  version: 65c1f6f8f0fc1e2185eb9863a3bc751496404259
-  subpackages:
-  - xfs
 - name: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
   subpackages:
   - promql
-  - storage
-  - storage/local
-  - storage/local/chunk
-  - storage/local/codable
-  - storage/local/index
-  - storage/metric
-  - util/flock
-  - util/stats
-  - util/strutil
-  - util/testutil
-- name: github.com/syndtr/goleveldb
-  version: b89cc31ef7977104127d34c1bd31ebd1a9db2199
-  subpackages:
-  - leveldb
-  - leveldb/cache
-  - leveldb/comparer
-  - leveldb/errors
-  - leveldb/***REMOVED***lter
-  - leveldb/iterator
-  - leveldb/journal
-  - leveldb/memdb
-  - leveldb/opt
-  - leveldb/storage
-  - leveldb/table
-  - leveldb/util
