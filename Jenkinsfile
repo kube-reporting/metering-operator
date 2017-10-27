@@ -7,6 +7,9 @@ properties([
     )),
     disableConcurrentBuilds(),
     pipelineTriggers([]),
+    parameters([
+        string(name: 'RELEASE_TAG', defaultValue: '', description: ''),
+    ])
 ])
 
 podTemplate(
@@ -55,6 +58,12 @@ podTemplate(
                         apk add git bash jq
                         """
 
+                        def branches;
+                        if (params.RELEASE_TAG) {
+                            branches = params.RELEASE_TAG
+                        } ***REMOVED*** {
+                            branches = scm.branches
+                        }
                         checkout([
                             $class: 'GitSCM',
                             branches: scm.branches,
