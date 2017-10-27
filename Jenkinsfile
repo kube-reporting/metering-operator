@@ -101,7 +101,7 @@ podTemplate(
                         stage('build') {
                             ansiColor('xterm') {
                                 sh """#!/bin/bash
-                                make docker-build-all \
+                                make docker-build-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
                                 """
@@ -110,7 +110,7 @@ podTemplate(
 
                         stage('push') {
                             sh """
-                            make docker-push-all \
+                            make docker-push-all -j 2 \
                                 USE_LATEST_TAG=${USE_LATEST_TAG} \
                                 BRANCH_TAG=${BRANCH_TAG}
                             """
