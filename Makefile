@@ -26,7 +26,7 @@ CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] 
 
 CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
 
-CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_trigger_regenerate_if_changed.sh)
+CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
 
 # TODO: Add tests
 all: fmt docker-build-all
@@ -107,7 +107,8 @@ fmt:
 
 chargeback-bin: images/chargeback/bin/chargeback
 
-images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES) $(CODEGEN_OUTPUT_GO_FILES)
+images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
+	make k8s-update-codegen
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
@@ -123,9 +124,9 @@ images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES) $(CODEGEN_OUTPUT_GO_FIL
 	chargeback-bin
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
+	./hack/update-codegen.sh
 
 $(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
-	./hack/update-codegen.sh
 
 k8s-verify-codegen:
 	./hack/verify-codegen.sh
