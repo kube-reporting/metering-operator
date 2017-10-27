@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -52,6 +54,7 @@ type Chargeback struct {
 	chargebackClient cbClientset.Interface
 
 	prestoConn  db.Queryer
+	prestoDB    *sql.DB
 	hiveQueryer *hiveQueryer
 	promConn    prom.API
 
@@ -102,7 +105,7 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 
 	op.informers = setupInformers(op.chargebackClient, cfg.Namespace, defaultResyncPeriod)
 
-	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogDMLQueries)
+	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogDDLQueries)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
@@ -172,6 +175,21 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportGenerationQueryLister := cbListers.NewReportGenerationQueryLister(reportGenerationQueryInformer.GetIndexer())
 
+	reportGenerationQueryInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				reportGenerationQueryQueue.Add(key)
+			}
+		},
+		UpdateFunc: func(old, current interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(current)
+			if err == nil {
+				reportGenerationQueryQueue.Add(key)
+			}
+		},
+	})
+
 	reportPrometheusQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportPrometheusQueryLister := cbListers.NewReportPrometheusQueryLister(reportPrometheusQueryInformer.GetIndexer())
@@ -236,23 +254,31 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	go c.informers.Run(stopCh)
 	go c.startHTTPServer()
 
-	if !c.informers.WaitForCacheSync(stopCh) {
-		return fmt.Errorf("cache for reports not synced in time")
-	}
-
 	c.logger.Infof("setting up DB connections")
-	var err error
-	prestoConn, err := c.newPrestoConn()
-	if err != nil {
-		return err
-	}
-	defer prestoConn.Close()
-	c.prestoConn = db.New(prestoConn, c.logger, c.logDDLQueries)
 
-	_, err = c.hiveQueryer.getHiveConnection()
+	// Use errgroup to setup both hive and presto connections
+	// at the sametime, waiting for both to be ready before continuing.
+	// if either errors, we return the first error
+	var g errgroup.Group
+	g.Go(func() error {
+		var err error
+		c.prestoDB, err = c.newPrestoConn()
+		if err != nil {
+			return err
+		}
+		c.prestoConn = db.New(c.prestoDB, c.logger, c.logDMLQueries)
+		return nil
+	})
+	g.Go(func() error {
+		_, err := c.hiveQueryer.getHiveConnection()
+		return err
+	})
+	err := g.Wait()
 	if err != nil {
 		return err
 	}
+
+	defer c.prestoDB.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
 	if !c.disablePromsum {
@@ -264,9 +290,16 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
-	defer c.logger.Infof("starting report worker")
+	if !c.informers.WaitForCacheSync(stopCh) {
+		return fmt.Errorf("cache for reports not synced in time")
+	}
+
+	c.logger.Infof("starting Report worker")
 	go wait.Until(c.runReportWorker, time.Second, stopCh)
+	c.logger.Infof("starting ReportDataStore worker")
 	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
+	c.logger.Infof("starting ReportGenerationQuery worker")
+	go wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
 
 	if !c.disablePromsum {
 		c.logger.Debugf("starting promsum collector")

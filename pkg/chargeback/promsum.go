@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
@@ -22,36 +24,60 @@ const (
 )
 
 func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Run collection immediately
+	done := make(chan struct{})
+	go func() {
+		c.collectPromsumData(ctx)
+		close(done)
+	}()
+	// allow for cancellation
+	select {
+	case <-stopCh:
+		return
+	case <-done:
+	}
+
+	// From now on run collection every ticker interval
 	ticker := time.NewTicker(c.promsumInterval)
 	defer ticker.Stop()
-
-	c.collectPromsumData()
-
 	for {
 		select {
 		case <-stopCh:
 			// if the stopCh is closed while we're waiting, cancel and return
 			return
 		case <-ticker.C:
-			c.collectPromsumData()
+			c.collectPromsumData(ctx)
 		}
 	}
 }
 
-func (c *Chargeback) collectPromsumData() {
+func (c *Chargeback) collectPromsumData(ctx context.Context) {
 	dataStores, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).List(labels.Everything())
 	if err != nil {
 		c.logger.Errorf("couldn't list data stores: %v", err)
 		return
 	}
 
+	g, ctx := errgroup.WithContext(ctx)
 	now := time.Now().UTC()
+
 	for _, dataStore := range dataStores {
-		logger := c.logger.WithField("datastore", dataStore.Name)
-		err := c.collectPromsumDatastoreData(logger, dataStore, now)
-		if err != nil {
-			logger.WithError(err).Errorf("error collecting promsum data for datastore")
-		}
+		dataStore := dataStore
+		g.Go(func() error {
+			logger := c.logger.WithField("datastore", dataStore.Name)
+			err := c.collectPromsumDatastoreData(logger, dataStore, now)
+			if err != nil {
+				logger.WithError(err).Errorf("error collecting promsum data for datastore")
+				return err
+			}
+			return nil
+		})
+	}
+	if err := g.Wait(); err != nil {
+		c.logger.WithError(err).Errorf("some promsum datastores had errors when collecting data")
 	}
 }
 
@@ -68,53 +94,58 @@ func (c *Chargeback) collectPromsumDatastoreData(logger logrus.FieldLogger, data
 		return nil
 	}
 
-	for _, queryName := range dataStore.Spec.DataStoreSource.Promsum.Queries {
-		timeRanges, err := c.promsumGetTimeRanges(logger, dataStore, queryName, now)
-		if err != nil {
-			return fmt.Errorf("couldn't get time ranges to for query %s: %v", queryName, err)
-		}
-		logger.Debugf("time ranges to query: %+v", timeRanges)
-
-		if len(timeRanges) == 0 {
-			logger.Info("no time ranges to query yet")
-			return nil
-		} else {
-			begin := timeRanges[0].Start
-			end := timeRanges[len(timeRanges)-1].End
-			logger.Infof("querying for data between %s and %s", begin, end)
-		}
-
-		for _, queryRng := range timeRanges {
-			query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(queryName)
-			if err != nil {
-				return fmt.Errorf("could not get prometheus query: ", err)
-			}
-
-			records, err := c.promsumQuery(query, queryRng)
-			if err != nil {
-				return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
-					query.Name, queryRng.Start, queryRng.End, err)
-			}
-
-			err = c.promsumStoreRecords(logger, dataStore, records)
-			if err != nil {
-				return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
-					query.Name, queryRng.Start, queryRng.End, err)
-			}
-		}
+	err := c.promsumCollectDataForQuery(logger, dataStore, now)
+	if err != nil {
+		return err
 	}
 	logger.Debugf("processing complete for data store %q", dataStore.Name)
 	return nil
 }
 
-func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, queryName string, now time.Time) ([]prom.Range, error) {
+func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) error {
+	timeRanges, err := c.promsumGetTimeRanges(logger, dataStore, now)
+	if err != nil {
+		return fmt.Errorf("couldn't get time ranges to query for dataStore %s: %v", dataStore.Name, err)
+	}
+	logger.Debugf("time ranges to query: %+v", timeRanges)
+
+	if len(timeRanges) == 0 {
+		logger.Info("no time ranges to query yet")
+		return nil
+	} else {
+		begin := timeRanges[0].Start
+		end := timeRanges[len(timeRanges)-1].End
+		logger.Infof("querying for data between %s and %s", begin, end)
+	}
+
+	for _, queryRng := range timeRanges {
+		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(dataStore.Spec.Promsum.Query)
+		if err != nil {
+			return fmt.Errorf("could not get prometheus query: ", err)
+		}
+
+		records, err := c.promsumQuery(query, queryRng)
+		if err != nil {
+			return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
+				query.Name, queryRng.Start, queryRng.End, err)
+		}
+
+		err = c.promsumStoreRecords(logger, dataStore, records)
+		if err != nil {
+			return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
+				query.Name, queryRng.Start, queryRng.End, err)
+		}
+	}
+	return nil
+}
+
+func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) ([]prom.Range, error) {
 	// Get the most recent timestamp in the table for this query
 	getLastTimestampQuery := fmt.Sprintf(`
 				SELECT "timestamp"
 				FROM %s
-				WHERE query = '%s'
 				ORDER BY "timestamp" DESC
-				LIMIT 1`, dataStore.TableName, resourceNameReplacer.Replace(queryName))
+				LIMIT 1`, dataStore.TableName)
 
 	results, err := presto.ExecuteSelect(c.prestoConn, getLastTimestampQuery)
 	if err != nil {
@@ -143,8 +174,8 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 		return nil, fmt.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
 	}
 
-	chunkStart := lastTimestamp
-	chunkEnd := chunkStart.Add(c.promsumChunkSize)
+	chunkStart := truncateToSecond(lastTimestamp)
+	chunkEnd := truncateToSecond(chunkStart.Add(c.promsumChunkSize))
 
 	if chunkStart.Equal(chunkEnd) {
 		return nil, fmt.Errorf("error querying for data, start and end are the same: %v", chunkStart.String())
@@ -165,8 +196,8 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the previous ranges end time in this range
-		chunkStart = chunkEnd.Add(c.promsumStepSize)
-		chunkEnd = chunkStart.Add(c.promsumChunkSize)
+		chunkStart = truncateToSecond(chunkEnd.Add(c.promsumStepSize))
+		chunkEnd = truncateToSecond(chunkStart.Add(c.promsumChunkSize))
 	}
 
 	return timeRanges, nil
@@ -226,14 +257,13 @@ func generateRecordValues(record BillingRecord) string {
 	}
 	keyString := "ARRAY[" + strings.Join(keys, ",") + "]"
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
-	return fmt.Sprintf("('%s',%f,timestamp '%s',%f,map(%s,%s))",
-		record.QueryName, record.Amount, record.Timestamp.Format(timestampFormat), record.StepSize.Seconds(), keyString, valString)
+	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
+		record.Amount, record.Timestamp.Format(timestampFormat), record.StepSize.Seconds(), keyString, valString)
 }
 
 // BillingRecord is a receipt of a usage determined by a query within a specific time range.
 type BillingRecord struct {
 	Labels    map[string]string `json:"labels"`
-	QueryName string            `json:"query"`
 	Amount    float64           `json:"amount"`
 	StepSize  time.Duration     `json:"stepSize"`
 	Timestamp time.Time         `json:"timestamp"`
@@ -261,7 +291,6 @@ func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng
 
 			record := BillingRecord{
 				Labels:    labels,
-				QueryName: resourceNameReplacer.Replace(query.Name),
 				Amount:    float64(value.Value),
 				StepSize:  c.promsumStepSize,
 				Timestamp: value.Timestamp.Time().UTC(),

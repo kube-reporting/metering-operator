@@ -40,6 +40,6 @@ type AWSBillingDataSource struct {
 }
 
 type PromsumDataSource struct {
-	Queries []string         `json:"queries"`
+	Query   string           `json:"query"`
 	Storage *StorageLocation `json:"storage"`
 }

@@ -1,5 +1,6 @@
 package: github.com/coreos-inc/kube-chargeback
 import:
+- package: golang.org/x/sync/errgroup
 - package: k8s.io/code-generator
   version: 4f9758469fda3ab9e9a17c3300f3476cc13a83b2
   subpackages:

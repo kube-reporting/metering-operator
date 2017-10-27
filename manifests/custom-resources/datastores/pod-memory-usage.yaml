@@ -1,12 +1,25 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportDataStore
 metadata:
-  name: "pod-memory-usage"
+  name: "pod-request-memory-bytes"
   labels:
     tectonic-chargeback: "true"
 spec:
   promsum:
-    queries:
-    - "get-memory-by-pod"
+    query: "pod-request-memory-bytes"
+  storage:
+    local: {}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataStore
+metadata:
+  name: "pod-limit-memory-bytes"
+  labels:
+    tectonic-chargeback: "true"
+spec:
+  promsum:
+    query: "pod-limit-memory-bytes"
   storage:
     local: {}
