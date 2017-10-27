@@ -6,5 +6,6 @@ spec:
   reportingStart: '2017-01-01T00:00:00Z'
   reportingEnd: '2017-12-30T23:59:59Z'
   generationQuery: "pod-cpu-usage-by-node"
-  storage:
+  runImmediately: false
+  output:
     local: {}

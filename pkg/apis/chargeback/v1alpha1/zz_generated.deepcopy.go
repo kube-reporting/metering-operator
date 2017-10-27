@@ -5,6 +5,7 @@
 package v1alpha1
 
 import (
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	reflect "reflect"
@@ -582,6 +583,15 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 	*out = *in
 	in.ReportingStart.DeepCopyInto(&out.ReportingStart)
 	in.ReportingEnd.DeepCopyInto(&out.ReportingEnd)
+	if in.GracePeriod != nil {
+		in, out := &in.GracePeriod, &out.GracePeriod
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(v1.Duration)
+			**out = **in
+		}
+	}
 	if in.Output != nil {
 		in, out := &in.Output, &out.Output
 		if *in == nil {
