@@ -43,11 +43,15 @@ podTemplate(
         def gitCommit;
         def isMasterBranch = env.BRANCH_NAME == "master"
 
+        // If RELEASE_TAG is speci***REMOVED***ed, tag images using it instead of the
+        // branch name
+        def branchTag = params.RELEASE_TAG ?: env.BRANCH_NAME
+
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
                 "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${env.BRANCH_NAME}"
+                "BRANCH_TAG=${branchTag}"
             ]){
                 container('docker'){
 
