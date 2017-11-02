@@ -20,6 +20,6 @@ func generationQueryViewName(queryName string) string {
 	return fmt.Sprintf("view_%s", resourceNameReplacer.Replace(queryName))
 }
 
-func truncateToSecond(t time.Time) time.Time {
-	return t.Truncate(time.Second)
+func truncateToMinute(t time.Time) time.Time {
+	return t.Truncate(time.Minute)
 }
