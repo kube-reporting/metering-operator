@@ -1,0 +1,25 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataStore
+metadata:
+  name: "node-capacity-memory-bytes"
+  labels:
+    tectonic-chargeback: "true"
+spec:
+  promsum:
+    query: "node-capacity-memory-bytes"
+  storage:
+    local: {}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataStore
+metadata:
+  name: "node-capacity-cpu-cores"
+  labels:
+    tectonic-chargeback: "true"
+spec:
+  promsum:
+    query: "node-capacity-cpu-cores"
+  storage:
+    local: {}

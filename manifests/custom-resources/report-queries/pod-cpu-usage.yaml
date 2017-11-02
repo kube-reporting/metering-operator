@@ -82,8 +82,8 @@ kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-usage-by-namespace"
 spec:
-  reportDataStores:
-  - "pod-request-cpu-cores"
+  reportQueries:
+  - "pod-request-cpu-usage"
   view:
     disabled: true
   columns:
