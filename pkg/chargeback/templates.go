@@ -16,9 +16,10 @@ const (
 )
 
 var templateFuncMap = template.FuncMap{
-	"prestoTimestamp":         prestoTimestamp,
-	"dataStoreTableName":      dataStoreTableName,
-	"generationQueryViewName": generationQueryViewName,
+	"hiveAWSPartitionTimestamp": hiveAWSPartitionTimestamp,
+	"prestoTimestamp":           prestoTimestamp,
+	"dataStoreTableName":        dataStoreTableName,
+	"generationQueryViewName":   generationQueryViewName,
 }
 
 type templateInfo struct {
