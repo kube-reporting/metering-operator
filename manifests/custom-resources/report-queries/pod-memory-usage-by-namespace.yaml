@@ -14,29 +14,31 @@ spec:
     type: timestamp
   - name: data_end
     type: timestamp
-  - name: memory_usage_byte_seconds
+  - name: pod_request_memory_byte_seconds
     type: double
   query: |
     WITH usage_period AS (
         SELECT labels['namespace'] as namespace,
+            labels,
             amount,
+            timeprecision,
             split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
             "timestamp"
         FROM {{ dataStoreTableName "pod-request-memory-bytes" }}
     ),
     computed_usage AS (
         SELECT namespace,
-            avg(amount) as total_amount,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end
+            labels,
+            amount * timeprecision as usage_amount,
+            "timestamp"
         FROM usage_period
-        WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
-        AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
-        GROUP BY namespace
     )
     SELECT namespace,
-            data_start,
-            data_end,
-            total_amount * date_diff('second', data_start, data_end) as memory_usage_byte_seconds
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(usage_amount) as memory_usage_byte_seconds
     FROM computed_usage
-    ORDER BY namespace, data_start, data_end
+    WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+    AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+    GROUP BY namespace
+    ORDER BY namespace
