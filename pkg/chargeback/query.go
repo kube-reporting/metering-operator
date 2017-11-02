@@ -85,7 +85,7 @@ func (c *Chargeback) handleReportGenerationQuery(generationQuery *cbTypes.Report
 		return err
 	}
 
-	query := fmt.Sprintf("CREATE VIEW OR REPLACE %s AS %s", viewName, renderedQuery)
+	query := fmt.Sprintf("CREATE OR REPLACE VIEW %s AS %s", viewName, renderedQuery)
 	_, err = c.prestoConn.Query(query)
 	if err != nil {
 		return err
