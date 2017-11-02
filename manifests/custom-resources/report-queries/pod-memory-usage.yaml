@@ -1,0 +1,109 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-request-memory-usage"
+spec:
+  reportDataStores:
+  - "pod-request-memory-bytes"
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: provider_id
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: pod_request_memory_bytes
+    type: double
+  - name: timeprecision
+    type: double
+  - name: pod_request_memory_byte_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          labels['node'] as node,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
+          labels,
+          amount as pod_request_memory_bytes,
+          timeprecision,
+          amount * timeprecision as pod_request_memory_byte_seconds,
+          "timestamp"
+      FROM {{ dataStoreTableName "pod-request-memory-bytes" }}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-usage-by-node"
+spec:
+  reportQueries:
+  - "pod-request-memory-usage"
+  view:
+    disabled: true
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: provider_id
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_request_memory_byte_seconds
+    type: double
+  query: |
+    SELECT pod,
+            namespace,
+            node,
+            provider_id,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    FROM {{ generationQueryViewName "pod-request-memory-usage" }}
+    WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+    AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+    GROUP BY pod, namespace, node, provider_id
+    ORDER BY pod, namespace, node, provider_id
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-usage-by-namespace"
+spec:
+  reportDataStores:
+  - "pod-request-memory-bytes"
+  view:
+    disabled: true
+  columns:
+  - name: namespace
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_request_memory_byte_seconds
+    type: double
+  query: |
+    SELECT namespace,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    FROM {{ generationQueryViewName "pod-request-memory-usage" }}
+    WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+    AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+    GROUP BY namespace
+    ORDER BY namespace
+

@@ -1,0 +1,108 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-request-cpu-usage"
+spec:
+  reportDataStores:
+  - "pod-request-cpu-cores"
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: provider_id
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: pod_request_cpu_cores
+    type: double
+  - name: timeprecision
+    type: double
+  - name: pod_request_cpu_core_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          labels['node'] as node,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
+          labels,
+          amount as pod_request_cpu_cores,
+          timeprecision,
+          amount * timeprecision as pod_request_cpu_core_seconds,
+          "timestamp"
+      FROM {{ dataStoreTableName "pod-request-cpu-cores" }}
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-usage-by-node"
+spec:
+  reportQueries:
+  - "pod-request-cpu-usage"
+  view:
+    disabled: true
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: provider_id
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_request_cpu_core_seconds
+    type: double
+  query: |
+    SELECT pod,
+            namespace,
+            node,
+            provider_id,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+    FROM {{ generationQueryViewName "pod-request-cpu-usage" }}
+    WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+    AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+    GROUP BY pod, namespace, node, provider_id
+    ORDER BY pod, namespace, node, provider_id
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-usage-by-namespace"
+spec:
+  reportDataStores:
+  - "pod-request-cpu-cores"
+  view:
+    disabled: true
+  columns:
+  - name: namespace
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_request_cpu_core_seconds
+    type: double
+  query: |
+    SELECT namespace,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+    FROM {{ generationQueryViewName "pod-request-cpu-usage" }}
+    WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
+    AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+    GROUP BY namespace
+    ORDER BY namespace
+
