@@ -163,7 +163,7 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 		logger.Debugf("no data in data store %s yet", dataStore.Name)
 	} ***REMOVED*** {
 		lastTimestamp = results[0]["timestamp"].(time.Time)
-		// We don't want duplicate the lastTimestamp record so add
+		// We don't want to duplicate the lastTimestamp record so add
 		// the step size so that we start at the next interval no longer in
 		// our range.
 		lastTimestamp = lastTimestamp.Add(c.promsumStepSize)
@@ -171,7 +171,8 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 	}
 
 	if lastTimestamp.After(now) {
-		return nil, fmt.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
+		logger.Warnf("the last timestamp for this data store is in the future, waiting to collect more data. now: %v, lastTimestamp: %v", now.String(), lastTimestamp.String())
+		return nil, nil
 	}
 
 	chunkStart := truncateToSecond(lastTimestamp)
