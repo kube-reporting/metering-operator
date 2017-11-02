@@ -1,0 +1,17 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "node-capacity-memory-bytes"
+spec:
+  query: |
+    kube_node_status_capacity_memory_bytes
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "node-capacity-cpu-cores"
+spec:
+  query: |
+    kube_node_status_capacity_cpu_cores
