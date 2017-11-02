@@ -163,31 +163,34 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 		logger.Debugf("no data in data store %s yet", dataStore.Name)
 	} ***REMOVED*** {
 		lastTimestamp = results[0]["timestamp"].(time.Time)
-		// We don't want duplicate the lastTimestamp record so add
-		// the step size so that we start at the next interval no longer in
-		// our range.
-		lastTimestamp = lastTimestamp.Add(c.promsumStepSize)
 		logger.Debugf("last fetched data for data store %s at %s", dataStore.Name, lastTimestamp.String())
 	}
 
-	if lastTimestamp.After(now) {
-		return nil, fmt.Errorf("the last timestamp for this data store is in the future! %v", lastTimestamp.String())
-	}
-
-	chunkStart := truncateToSecond(lastTimestamp)
-	chunkEnd := truncateToSecond(chunkStart.Add(c.promsumChunkSize))
-
-	if chunkStart.Equal(chunkEnd) {
-		return nil, fmt.Errorf("error querying for data, start and end are the same: %v", chunkStart.String())
-	}
+	// We don't want to duplicate the lastTimestamp record so add
+	// the step size so that we start at the next interval no longer in
+	// our range.
+	chunkStart := truncateToMinute(lastTimestamp.Add(c.promsumStepSize))
+	chunkEnd := truncateToMinute(chunkStart.Add(c.promsumChunkSize))
 
 	var timeRanges []prom.Range
-	// Only get chunks that are a full chunk size
-	for chunkEnd.Before(now) {
-		if chunkStart.Equal(chunkEnd) {
-			logger.Warnf("skipping querying for data, start and end are the same: %v", chunkStart.String())
-			continue
+	for {
+		// Never collect data in the future, that may not have all data points
+		// collected yet
+		if !chunkEnd.Before(now) {
+			logger.Debugf("chunkEnd is after current time, skipping chunk. now: %v, chunkStart: %v, chunkEnd: %v", now, chunkStart, chunkEnd)
+			break
 		}
+
+		if chunkStart.Equal(chunkEnd) {
+			logger.Debugf("chunkStart is equal to chunkEnd, skipping chunk. chunkStart: %v, chunkEnd: %v", chunkStart, chunkEnd)
+			break
+		}
+		// Only get chunks that are a full chunk size
+		if chunkEnd.Sub(chunkStart) < c.promsumChunkSize {
+			logger.Debugf("chunk is smaller than chunkSize, skipping chunk. chunkStart: %v, chunkEnd: %v", chunkStart, chunkEnd)
+			break
+		}
+
 		timeRanges = append(timeRanges, prom.Range{
 			Start: chunkStart,
 			End:   chunkEnd,
@@ -196,8 +199,10 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the previous ranges end time in this range
-		chunkStart = truncateToSecond(chunkEnd.Add(c.promsumStepSize))
-		chunkEnd = truncateToSecond(chunkStart.Add(c.promsumChunkSize))
+		chunkStart = truncateToMinute(chunkEnd.Add(c.promsumStepSize))
+		// Add chunkSize to the end time to get our full chunk. If the end is
+		// past the current time, then this chunk is skipped.
+		chunkEnd = truncateToMinute(chunkStart.Add(c.promsumChunkSize))
 	}
 
 	return timeRanges, nil

@@ -1,0 +1,11 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Report
+metadata:
+  name: node-cpu-usage
+spec:
+  reportingStart: '2017-01-01T00:00:00Z'
+  reportingEnd: '2017-12-30T23:59:59Z'
+  generationQuery: "node-cpu-usage"
+  runImmediately: true
+  output:
+    local: {}
