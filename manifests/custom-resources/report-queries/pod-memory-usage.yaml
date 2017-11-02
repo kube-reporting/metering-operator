@@ -83,7 +83,7 @@ kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-by-namespace"
 spec:
-  reportDataStores:
+  reportQueries:
   - "pod-request-memory-bytes"
   view:
     disabled: true
