@@ -109,6 +109,4 @@ spec:
       pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds,
       1 - (pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds)
     FROM node_memory_allocatable
-    JOIN pod_memory_consumption
-      ON node_memory_allocatable.node_allocatable_data_start = pod_memory_consumption.pod_usage_data_start
-      AND node_memory_allocatable.node_allocatable_data_end = pod_memory_consumption.pod_usage_data_end
+    CROSS JOIN pod_memory_consumption
