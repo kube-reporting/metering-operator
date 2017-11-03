@@ -121,7 +121,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 		// Write headers
 		var keys []string
 		if len(results) >= 1 {
-			for key, _ := range results[0] {
+			for key := range results[0] {
 				keys = append(keys, key)
 			}
 			err := csvWriter.Write(keys)
