@@ -84,7 +84,7 @@ metadata:
   name: "pod-memory-usage-by-namespace"
 spec:
   reportQueries:
-  - "pod-request-memory-bytes"
+  - "pod-request-memory-usage"
   view:
     disabled: true
   columns:
