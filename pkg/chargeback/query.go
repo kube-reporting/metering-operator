@@ -24,6 +24,7 @@ func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
 	}
 	defer c.informers.reportGenerationQueryQueue.Done(key)
 
+	logger = logger.WithFields(newLogIdentifier())
 	err := c.syncReportGenerationQuery(logger, key.(string))
 	c.handleErr(logger, err, "ReportGenerationQuery", key, c.informers.reportGenerationQueryQueue)
 	return true
