@@ -27,6 +27,7 @@ func (c *Chargeback) processReportDataStore(logger log.FieldLogger) bool {
 	}
 	defer c.informers.reportDataStoreQueue.Done(key)
 
+	logger = logger.WithFields(newLogIdenti***REMOVED***er())
 	err := c.syncReportDataStore(logger, key.(string))
 	c.handleErr(logger, err, "ReportDataStore", key, c.informers.reportDataStoreQueue)
 	return true

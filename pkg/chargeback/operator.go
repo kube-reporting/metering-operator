@@ -252,7 +252,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	defer c.informers.ShutdownQueues()
 	go c.informers.Run(stopCh)
-	go c.startHTTPServer()
 
 	c.logger.Infof("setting up DB connections")
 
@@ -293,6 +292,10 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	if !c.informers.WaitForCacheSync(stopCh) {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
+
+	c.logger.Infof("starting HTTP server")
+	httpSrv := newServer(c, c.logger)
+	go httpSrv.start()
 
 	c.logger.Infof("starting ReportDataStore worker")
 	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)

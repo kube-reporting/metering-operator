@@ -42,6 +42,7 @@ func (c *Chargeback) processReport(logger log.FieldLogger) bool {
 	}
 	defer c.informers.reportQueue.Done(key)
 
+	logger = logger.WithFields(newLogIdenti***REMOVED***er())
 	err := c.syncReport(logger, key.(string))
 	c.handleErr(logger, err, "report", key, c.informers.reportQueue)
 	return true
