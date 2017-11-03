@@ -24,13 +24,14 @@ const (
 )
 
 func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
+	logger := c.logger.WithField("component", "promsum")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Run collection immediately
 	done := make(chan struct{})
 	go func() {
-		c.collectPromsumData(ctx)
+		c.collectPromsumData(ctx, logger)
 		close(done)
 	}()
 	// allow for cancellation
@@ -49,15 +50,15 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 			// if the stopCh is closed while we're waiting, cancel and return
 			return
 		case <-ticker.C:
-			c.collectPromsumData(ctx)
+			c.collectPromsumData(ctx, logger)
 		}
 	}
 }
 
-func (c *Chargeback) collectPromsumData(ctx context.Context) {
+func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger) {
 	dataStores, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).List(labels.Everything())
 	if err != nil {
-		c.logger.Errorf("couldn't list data stores: %v", err)
+		logger.Errorf("couldn't list data stores: %v", err)
 		return
 	}
 
@@ -67,7 +68,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context) {
 	for _, dataStore := range dataStores {
 		dataStore := dataStore
 		g.Go(func() error {
-			logger := c.logger.WithField("datastore", dataStore.Name)
+			logger := logger.WithField("datastore", dataStore.Name)
 			err := c.collectPromsumDatastoreData(logger, dataStore, now)
 			if err != nil {
 				logger.WithError(err).Errorf("error collecting promsum data for datastore")
@@ -77,7 +78,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context) {
 		})
 	}
 	if err := g.Wait(); err != nil {
-		c.logger.WithError(err).Errorf("some promsum datastores had errors when collecting data")
+		logger.WithError(err).Errorf("some promsum datastores had errors when collecting data")
 	}
 }
 
