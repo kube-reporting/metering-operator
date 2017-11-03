@@ -12,8 +12,6 @@ spec:
     type: string
   - name: node
     type: string
-  - name: provider_id
-    type: string
   - name: labels
     type: map(varchar, varchar)
   - name: pod_request_memory_bytes
@@ -28,7 +26,6 @@ spec:
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
           labels['node'] as node,
-          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as provider_id,
           labels,
           amount as pod_request_memory_bytes,
           timeprecision,
@@ -54,8 +51,6 @@ spec:
     type: string
   - name: node
     type: string
-  - name: provider_id
-    type: string
   - name: data_start
     type: timestamp
   - name: data_end
@@ -66,15 +61,14 @@ spec:
     SELECT pod,
             namespace,
             node,
-            provider_id,
             min("timestamp") as data_start,
             max("timestamp") as data_end,
             sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {{ generationQueryViewName "pod-request-memory-usage" }}
     WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
     AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
-    GROUP BY pod, namespace, node, provider_id
-    ORDER BY pod, namespace, node, provider_id
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_request_memory_byte_seconds DESC
 
 ---
 
@@ -105,5 +99,5 @@ spec:
     WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
     AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
     GROUP BY namespace
-    ORDER BY namespace
+    ORDER BY pod_request_memory_byte_seconds DESC
 

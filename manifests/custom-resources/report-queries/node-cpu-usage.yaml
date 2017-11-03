@@ -108,6 +108,4 @@ spec:
       pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds,
       1 - (pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds)
     FROM node_cpu_allocatable
-    JOIN pod_cpu_consumption
-      ON node_cpu_allocatable.node_allocatable_data_start = pod_cpu_consumption.pod_usage_data_start
-      AND node_cpu_allocatable.node_allocatable_data_end = pod_cpu_consumption.pod_usage_data_end
+    CROSS JOIN pod_cpu_consumption
