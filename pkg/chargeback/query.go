@@ -11,55 +11,54 @@ import (
 )
 
 func (c *Chargeback) runReportGenerationQueryWorker() {
-	for c.processReportGenerationQuery() {
+	logger := c.logger.WithField("component", "reportGenerationQueryWorker")
+	for c.processReportGenerationQuery(logger) {
 
 	}
 }
 
-func (c *Chargeback) processReportGenerationQuery() bool {
+func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
 	key, quit := c.informers.reportGenerationQueryQueue.Get()
 	if quit {
 		return false
 	}
 	defer c.informers.reportGenerationQueryQueue.Done(key)
 
-	err := c.syncReportGenerationQuery(key.(string))
-	c.handleErr(err, "ReportGenerationQuery", key, c.informers.reportGenerationQueryQueue)
+	logger = logger.WithFields(newLogIdenti***REMOVED***er())
+	err := c.syncReportGenerationQuery(logger, key.(string))
+	c.handleErr(logger, err, "ReportGenerationQuery", key, c.informers.reportGenerationQueryQueue)
 	return true
 }
 
-func (c *Chargeback) syncReportGenerationQuery(key string) error {
+func (c *Chargeback) syncReportGenerationQuery(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		c.logger.WithError(err).Errorf("invalid resource key :%s", key)
+		logger.WithError(err).Errorf("invalid resource key :%s", key)
 		return nil
 	}
 
+	logger = logger.WithField("generationQuery", name)
 	reportGenerationQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			c.logger.Infof("ReportGenerationQuery %s does not exist anymore", key)
+			logger.Infof("ReportGenerationQuery %s does not exist anymore", key)
 			return nil
 		}
 		return err
 	}
 
-	c.logger.Infof("syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
-	err = c.handleReportGenerationQuery(reportGenerationQuery)
+	logger.Infof("syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
+	err = c.handleReportGenerationQuery(logger, reportGenerationQuery)
 	if err != nil {
-		c.logger.WithError(err).Errorf("error syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
+		logger.WithError(err).Errorf("error syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
 		return err
 	}
-	c.logger.Infof("successfully synced reportGenerationQuery %s", reportGenerationQuery.GetName())
+	logger.Infof("successfully synced reportGenerationQuery %s", reportGenerationQuery.GetName())
 	return nil
 }
 
-func (c *Chargeback) handleReportGenerationQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
+func (c *Chargeback) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
 	generationQuery = generationQuery.DeepCopy()
-
-	logger := c.logger.WithFields(log.Fields{
-		"name": generationQuery.Name,
-	})
 
 	var viewName string
 	if generationQuery.ViewName == "" {

@@ -14,72 +14,91 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
-func (c *Chargeback) startHTTPServer() {
-	http.HandleFunc("/api/v1/reports/get", c.getReportHandler)
-	http.HandleFunc("/api/v1/reports/run", c.runReportHandler)
-	c.logger.Fatal(http.ListenAndServe(":8080", nil))
+type server struct {
+	chargeback *Chargeback
+	logger     log.FieldLogger
 }
 
-func (c *Chargeback) logRequest(r *http.Request) {
-	c.logger.WithFields(log.Fields{
-		"method": r.Method,
-		"url":    r.URL.String(),
-	}).Info("new request")
-}
-
-func (c *Chargeback) reportError(w http.ResponseWriter, status int, message string, args ...interface{}) {
-	w.WriteHeader(status)
-	_, err := w.Write([]byte(fmt.Sprintf(message, args...)))
-	if err != nil {
-		c.logger.WithError(err).Warnf("error sending client error")
+func newServer(c *Chargeback, logger log.FieldLogger) *server {
+	logger = logger.WithField("component", "api")
+	return &server{
+		chargeback: c,
+		logger:     logger,
 	}
 }
 
-func (c *Chargeback) getReportHandler(w http.ResponseWriter, r *http.Request) {
-	c.logRequest(r)
+func (srv *server) start() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	srv.logger.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+func (srv *server) newLogger(r *http.Request) log.FieldLogger {
+	return srv.logger.WithFields(log.Fields{
+		"method": r.Method,
+		"url":    r.URL.String(),
+	}).WithFields(newLogIdenti***REMOVED***er())
+}
+
+func (srv *server) logRequest(r *http.Request) {
+	srv.newLogger(r).Infof("%s %s", r.Method, r.URL.String())
+}
+
+func (srv *server) reportError(w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
+	logger := srv.newLogger(r)
+	w.WriteHeader(status)
+	_, err := w.Write([]byte(fmt.Sprintf(message, args...)))
+	if err != nil {
+		logger.WithError(err).Warnf("error sending client error")
+	}
+}
+
+func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
+	srv.logRequest(r)
 	if r.Method != "GET" {
-		c.reportError(w, http.StatusNotFound, "Not found")
+		srv.reportError(w, r, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		c.reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		srv.reportError(w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"name", "format"}, vals)
 	if err != nil {
-		c.reportError(w, http.StatusBadRequest, "%v", err)
+		srv.reportError(w, r, http.StatusBadRequest, "%v", err)
 		return
 	}
 	switch vals["format"][0] {
 	case "json", "csv":
 		break
 	default:
-		c.reportError(w, http.StatusBadRequest, "format must be one of: csv, json")
+		srv.reportError(w, r, http.StatusBadRequest, "format must be one of: csv, json")
 		return
 	}
-	c.getReport(vals["name"][0], vals["format"][0], w)
+	srv.getReport(vals["name"][0], vals["format"][0], w, r)
 }
 
-func (c *Chargeback) runReportHandler(w http.ResponseWriter, r *http.Request) {
-	c.logRequest(r)
+func (srv *server) runReportHandler(w http.ResponseWriter, r *http.Request) {
+	srv.logRequest(r)
 	if r.Method != "GET" {
-		c.reportError(w, http.StatusNotFound, "Not found")
+		srv.reportError(w, r, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		c.reportError(w, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		srv.reportError(w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"query", "start", "end"}, vals)
 	if err != nil {
-		c.reportError(w, http.StatusBadRequest, "%v", err)
+		srv.reportError(w, r, http.StatusBadRequest, "%v", err)
 		return
 	}
-	c.runReport(vals["query"][0], vals["start"][0], vals["end"][0], w)
+	srv.runReport(vals["query"][0], vals["start"][0], vals["end"][0], w)
 }
 
 func checkForFields(***REMOVED***elds []string, vals url.Values) error {
@@ -95,14 +114,13 @@ func checkForFields(***REMOVED***elds []string, vals url.Values) error {
 	return nil
 }
 
-func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
-
+func (srv *server) getReport(name, format string, w http.ResponseWriter, r *http.Request) {
 	reportTable := reportTableName(name)
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
+	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
 	if err != nil {
-		c.logger.WithError(err).Errorf("failed to perform presto query")
-		c.reportError(w, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		srv.logger.WithError(err).Errorf("failed to perform presto query")
+		srv.reportError(w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
 		return
 	}
 
@@ -111,7 +129,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 		e := json.NewEncoder(w)
 		err := e.Encode(results)
 		if err != nil {
-			c.logger.Errorf("error marshalling json: %v", err)
+			srv.logger.Errorf("error marshalling json: %v", err)
 			return
 		}
 	case "csv":
@@ -126,7 +144,7 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 			}
 			err := csvWriter.Write(keys)
 			if err != nil {
-				c.logger.WithError(err).Errorf("failed to write headers")
+				srv.logger.WithError(err).Errorf("failed to write headers")
 				return
 			}
 		}
@@ -152,21 +170,21 @@ func (c *Chargeback) getReport(name, format string, w http.ResponseWriter) {
 				case nil:
 					vals[i] = ""
 				default:
-					c.logger.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
-					c.reportError(w, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
+					srv.logger.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
+					srv.reportError(w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
 					return
 				}
 			}
 			err := csvWriter.Write(vals)
 			if err != nil {
-				c.logger.Errorf("failed to write csv row: %v", err)
+				srv.logger.Errorf("failed to write csv row: %v", err)
 				return
 			}
 		}
 	}
 }
 
-func (c *Chargeback) runReport(query, start, end string, w http.ResponseWriter) {
+func (srv *server) runReport(query, start, end string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("method not yet implemented"))
 }

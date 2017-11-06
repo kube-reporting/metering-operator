@@ -29,55 +29,55 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 }
 
 func (c *Chargeback) runReportWorker() {
-	for c.processReport() {
+	logger := c.logger.WithField("component", "reportWorker")
+	for c.processReport(logger) {
 
 	}
 }
 
-func (c *Chargeback) processReport() bool {
+func (c *Chargeback) processReport(logger log.FieldLogger) bool {
 	key, quit := c.informers.reportQueue.Get()
 	if quit {
 		return false
 	}
 	defer c.informers.reportQueue.Done(key)
 
-	err := c.syncReport(key.(string))
-	c.handleErr(err, "report", key, c.informers.reportQueue)
+	logger = logger.WithFields(newLogIdenti***REMOVED***er())
+	err := c.syncReport(logger, key.(string))
+	c.handleErr(logger, err, "report", key, c.informers.reportQueue)
 	return true
 }
 
-func (c *Chargeback) syncReport(key string) error {
+func (c *Chargeback) syncReport(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		c.logger.WithError(err).Errorf("invalid resource key :%s", key)
+		logger.WithError(err).Errorf("invalid resource key :%s", key)
 		return nil
 	}
 
+	logger = logger.WithField("report", name)
 	report, err := c.informers.reportLister.Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			c.logger.Infof("Report %s does not exist anymore", key)
+			logger.Infof("Report %s does not exist anymore", key)
 			return nil
 		}
 		return err
 	}
 
-	c.logger.Infof("syncing report %s", report.GetName())
-	err = c.handleReport(report)
+	logger.Infof("syncing report %s", report.GetName())
+	err = c.handleReport(logger, report)
 	if err != nil {
-		c.logger.WithError(err).Errorf("error syncing report %s", report.GetName())
+		logger.WithError(err).Errorf("error syncing report %s", report.GetName())
 		return err
 	}
-	c.logger.Infof("successfully synced report %s", report.GetName())
+	logger.Infof("successfully synced report %s", report.GetName())
 	return nil
 }
 
-func (c *Chargeback) handleReport(report *cbTypes.Report) error {
+func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
-	logger := c.logger.WithFields(log.Fields{
-		"name": report.Name,
-	})
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
 		// If it's started, query the API to get the most up to date resource,
@@ -161,9 +161,8 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 
 	results, err := c.generateReport(logger, report, genQuery)
 	if err != nil {
-		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")
-		return nil
+		return err
 	}
 	if c.logReport {
 		resultsJSON, err := json.MarshalIndent(results, "", " ")
@@ -185,8 +184,8 @@ func (c *Chargeback) handleReport(report *cbTypes.Report) error {
 	return nil
 }
 
-func (c *Chargeback) setReportError(logger *log.Entry, report *cbTypes.Report, err error, errMsg string) {
-	logger.WithError(err).Errorf(errMsg)
+func (c *Chargeback) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
+	logger.WithField("report", report.Name).WithError(err).Errorf(errMsg)
 	report.Status.Phase = cbTypes.ReportPhaseError
 	report.Status.Output = err.Error()
 	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
@@ -195,7 +194,7 @@ func (c *Chargeback) setReportError(logger *log.Entry, report *cbTypes.Report, e
 	}
 }
 
-func (c *Chargeback) generateReport(logger *log.Entry, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) ([]map[string]interface{}, error) {
+func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) ([]map[string]interface{}, error) {
 	logger.Infof("generating usage report")
 	query, err := renderReportGenerationQuery(report, genQuery)
 	if err != nil {

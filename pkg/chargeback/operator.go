@@ -252,7 +252,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	defer c.informers.ShutdownQueues()
 	go c.informers.Run(stopCh)
-	go c.startHTTPServer()
 
 	c.logger.Infof("setting up DB connections")
 
@@ -294,12 +293,16 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
 
-	c.logger.Infof("starting Report worker")
-	go wait.Until(c.runReportWorker, time.Second, stopCh)
+	c.logger.Infof("starting HTTP server")
+	httpSrv := newServer(c, c.logger)
+	go httpSrv.start()
+
 	c.logger.Infof("starting ReportDataStore worker")
 	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
 	c.logger.Infof("starting ReportGenerationQuery worker")
 	go wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
+	c.logger.Infof("starting Report worker")
+	go wait.Until(c.runReportWorker, time.Second, stopCh)
 
 	if !c.disablePromsum {
 		c.logger.Debugf("starting promsum collector")
@@ -315,22 +318,23 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *Chargeback) handleErr(err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
+func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
 	if err == nil {
 		queue.Forget(key)
 		return
 	}
 
+	logger = logger.WithField(objType, key)
+
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if queue.NumRequeues(key) < 5 {
-		c.logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
-
+		logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
 		queue.AddRateLimited(key)
 		return
 	}
 
 	queue.Forget(key)
-	c.logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
+	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
 }
 
 func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
