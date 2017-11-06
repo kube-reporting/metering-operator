@@ -19,8 +19,8 @@ if [[ "${setupAWS}" == "y" ]]; then
       > manifests/chargeback/chargeback-secrets.yaml
 else
   sed \
-      -e 's/aws-access-key-id: "REPLACEME"/aws-access-key-id: /g' \
-      -e 's/aws-secret-access-key: "REPLACEME"/aws-secret-access-key: /g' \
+      -e 's/aws-access-key-id: "REPLACEME"/aws-access-key-id: ""/g' \
+      -e 's/aws-secret-access-key: "REPLACEME"/aws-secret-access-key: ""/g' \
       manifests/chargeback/chargeback-secrets.yaml.dist \
       > manifests/chargeback/chargeback-secrets.yaml
 fi
