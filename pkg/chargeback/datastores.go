@@ -14,56 +14,54 @@ import (
 )
 
 func (c *Chargeback) runReportDataStoreWorker() {
-	for c.processReportDataStore() {
+	logger := c.logger.WithField("component", "reportDataStoreWorker")
+	for c.processReportDataStore(logger) {
 
 	}
 }
 
-func (c *Chargeback) processReportDataStore() bool {
+func (c *Chargeback) processReportDataStore(logger log.FieldLogger) bool {
 	key, quit := c.informers.reportDataStoreQueue.Get()
 	if quit {
 		return false
 	}
 	defer c.informers.reportDataStoreQueue.Done(key)
 
-	err := c.syncReportDataStore(key.(string))
-	c.handleErr(err, "ReportDataStore", key, c.informers.reportDataStoreQueue)
+	logger = logger.WithFields(newLogIdentifier())
+	err := c.syncReportDataStore(logger, key.(string))
+	c.handleErr(logger, err, "ReportDataStore", key, c.informers.reportDataStoreQueue)
 	return true
 }
 
-func (c *Chargeback) syncReportDataStore(key string) error {
+func (c *Chargeback) syncReportDataStore(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		c.logger.WithError(err).Errorf("invalid resource key :%s", key)
+		logger.WithError(err).Errorf("invalid resource key :%s", key)
 		return nil
 	}
 
+	logger = logger.WithField("datastore", name)
 	reportDataStore, err := c.informers.reportDataStoreLister.ReportDataStores(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			c.logger.Infof("ReportDataStore %s does not exist anymore", key)
+			logger.Infof("ReportDataStore %s does not exist anymore", key)
 			return nil
 		}
 		return err
 	}
 
-	c.logger.Infof("syncing reportDataStore %s", reportDataStore.GetName())
-	err = c.handleReportDataStore(reportDataStore)
+	logger.Infof("syncing reportDataStore %s", reportDataStore.GetName())
+	err = c.handleReportDataStore(logger, reportDataStore)
 	if err != nil {
-		c.logger.WithError(err).Errorf("error syncing reportDataStore %s", reportDataStore.GetName())
+		logger.WithError(err).Errorf("error syncing reportDataStore %s", reportDataStore.GetName())
 		return err
 	}
-	c.logger.Infof("successfully synced reportDataStore %s", reportDataStore.GetName())
+	logger.Infof("successfully synced reportDataStore %s", reportDataStore.GetName())
 	return nil
 }
 
-func (c *Chargeback) handleReportDataStore(dataStore *cbTypes.ReportDataStore) error {
+func (c *Chargeback) handleReportDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
 	dataStore = dataStore.DeepCopy()
-
-	logger := c.logger.WithFields(log.Fields{
-		"name": dataStore.Name,
-	})
-
 	if dataStore.TableName == "" {
 		logger.Infof("new dataStore discovered")
 	} else {
