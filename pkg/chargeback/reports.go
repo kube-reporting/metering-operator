@@ -161,9 +161,8 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	results, err := c.generateReport(logger, report, genQuery)
 	if err != nil {
-		// TODO(chance): return the error and handle retrying
 		c.setReportError(logger, report, err, "report execution failed")
-		return nil
+		return err
 	}
 	if c.logReport {
 		resultsJSON, err := json.MarshalIndent(results, "", " ")
