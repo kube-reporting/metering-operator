@@ -178,17 +178,14 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 		// Never collect data in the future, that may not have all data points
 		// collected yet
 		if !chunkEnd.Before(now) {
-			logger.Debugf("chunkEnd is after current time, skipping chunk. now: %v, chunkStart: %v, chunkEnd: %v", now, chunkStart, chunkEnd)
 			break
 		}
 
 		if chunkStart.Equal(chunkEnd) {
-			logger.Debugf("chunkStart is equal to chunkEnd, skipping chunk. chunkStart: %v, chunkEnd: %v", chunkStart, chunkEnd)
 			break
 		}
 		// Only get chunks that are a full chunk size
 		if chunkEnd.Sub(chunkStart) < c.promsumChunkSize {
-			logger.Debugf("chunk is smaller than chunkSize, skipping chunk. chunkStart: %v, chunkEnd: %v", chunkStart, chunkEnd)
 			break
 		}
 
