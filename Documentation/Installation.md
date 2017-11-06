@@ -27,7 +27,49 @@ kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spec"
 Once the operator changes the version of the `kube-state-metrics` pod to 1.0.1,
 chargeback installation may proceed.
 
-## Modifying default values
+## Installing via ALM
+
+If ALM is installed on the cluster it can be used to deploy chargeback. At this
+point ALM will not handle upgrading or uninstalling chargeback, but these
+features should become available in the future.
+
+ALM will install chargeback into the `tectonic-system` namespace, and thus
+access to this namespace is required to interact with chargeback.
+
+### Creating CRDs
+
+ALM expects the requisite CRDs for an application to be created before it will
+install the app. Currently this should be done manually, with the following
+command:
+
+```
+kubectl create -f manifests/custom-resource-de***REMOVED***nitons
+```
+
+### Installing chargeback
+
+With the CRDs created, the cluster service version ***REMOVED***le can now be created to
+instruct ALM to install chargeback:
+
+```
+kubectl -n tectonic-system create -f manifests/alm/chargeback.clusterserviceversion.yaml
+```
+
+To be able to follow along with the rest of the installation document, set
+`CHARGEBACK_NAMESPACE` to `tectonic-system`:
+
+```
+export CHARGEBACK_NAMESPACE=tectonic-system
+```
+
+And proceed to [Verifying operation](#Verifying operation)
+
+## Installing manually
+
+If ALM is unavailable or chargeback is to be installed into a namespace other
+than `tectonic-system` it can be installed by hand.
+
+### Modifying default values
 
 Chargeback will install into an existing namespace. Without con***REMOVED***guration, the
 default is currently `team-chargeback`.
@@ -45,7 +87,7 @@ export PULL_SECRET_NAMESPACE=tectonic-system
 export PULL_SECRET=coreos-pull-secret
 ```
 
-## Prometheus location
+### Prometheus location
 
 If Prometheus was setup by Tectonic and is running within the tectonic-system
 namespace, then you can skip this section.
@@ -55,16 +97,25 @@ then you need to con***REMOVED***gure the `prometheus-url` in
 `manifests/chargeback/chargeback-con***REMOVED***g.yaml` to match the service created by
 your Prometheus operator.
 
-## Storing data in S3
+### Storing data in S3
 
 By default the data that chargeback collects and generates is ephemeral, and
 will not survive restarts of the hive pod it deploys. To make this data
 persistent by storing it in S3, follow the instructions in the [storing data in
 S3 document][Storing-Data-In-S3.md] before proceeding with these instructions.
 
-## Run the install script
+### Run the install script
 
 Run `./hack/install.sh` to install Chargeback on the cluster.
+
+### Uninstall
+
+If chargeback has been installed manually, it can be uninstalled at any point by
+running the following command:
+
+```
+./hack/uninstall.sh
+```
 
 ## Verifying operation
 
@@ -124,14 +175,7 @@ curl "localhost:8080/api/v1/reports/get?name=pod-memory-usage-by-node&format=csv
 The `name` parameter in the URL can be any report that is in the ***REMOVED***nished state,
 and the `format` parameter can be either `csv` or `json`.
 
-## Uninstall
-
-To uninstall chargeback run:
-```
-./hack/uninstall.sh
-```
-
-## AWS Billing data setup
+### AWS Billing data setup
 
 **AWS billing reports were temporarily removed from chargeback due to a
 refactor, the following documentation is left in for when this functionality is
