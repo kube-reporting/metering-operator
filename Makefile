@@ -7,6 +7,7 @@ CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 DOCKER_BUILD_ARGS := --no-cache
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
+CHARGEBACK_ALM_INSTALL_IMAGE := quay.io/coreos/chargeback-alm-install
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
@@ -17,6 +18,7 @@ GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 GIT_TAG := $(shell git -C $(ROOT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
 
 USE_LATEST_TAG ?= false
+DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 
 # Hive Git repository for Thrift definitions
 HIVE_REPO := "git://git.apache.org/hive.git"
@@ -31,15 +33,15 @@ CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_files.sh)
 # TODO: Add tests
 all: fmt docker-build-all
 
-docker-build-all: chargeback-docker-build presto-docker-build hive-docker-build
+docker-build-all: chargeback-docker-build presto-docker-build hive-docker-build chargeback-alm-install-build
 
-docker-push-all: chargeback-docker-push presto-docker-push hive-docker-push
+docker-push-all: chargeback-docker-push presto-docker-push hive-docker-push chargeback-alm-install-docker-push
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(dir $(DOCKERFILE))
+	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifeq ($(USE_LATEST_TAG), true)
 	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
 endif
@@ -77,6 +79,12 @@ chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/char
 
 chargeback-docker-push:
 	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
+
+chargeback-alm-install-build: images/chargeback-alm-install/Dockerfile
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE) DOCKER_BUILD_CONTEXT=.
+
+chargeback-alm-install-docker-push:
+	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE)
 
 presto-docker-build: images/presto/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
