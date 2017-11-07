@@ -1,6 +1,7 @@
 package chargeback
 
 import (
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
@@ -115,6 +117,29 @@ func checkForFields(fields []string, vals url.Values) error {
 }
 
 func (srv *server) getReport(name, format string, w http.ResponseWriter, r *http.Request) {
+	// Get the current report to make sure it's in a finished state
+	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.namespace).Get(name)
+	if err != nil {
+		srv.logger.WithError(err).Errorf("error getting report: %v", err)
+		srv.reportError(w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		return
+	}
+	switch report.Status.Phase {
+	case api.ReportPhaseError:
+		err := fmt.Errorf(report.Status.Output)
+		srv.logger.WithError(err).Errorf("the report encountered an error")
+		srv.reportError(w, r, http.StatusInternalServerError, "the report encountered an error: %v", err)
+		return
+	case api.ReportPhaseFinished:
+		// continue with returning the report if the report is finished
+	case api.ReportPhaseWaiting, api.ReportPhaseStarted:
+		fallthrough
+	default:
+		srv.logger.Errorf("the report is still running")
+		srv.reportError(w, r, http.StatusBadRequest, "the report is still running")
+		return
+	}
+
 	reportTable := reportTableName(name)
 	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
 	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
@@ -133,14 +158,28 @@ func (srv *server) getReport(name, format string, w http.ResponseWriter, r *http
 			return
 		}
 	case "csv":
-		csvWriter := csv.NewWriter(w)
-		defer csvWriter.Flush()
+		// Get generation query to get the list of columns
+		genQuery, err := srv.chargeback.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+		if err != nil {
+			srv.logger.WithError(err).Errorf("error getting report generation query: %v", err)
+			srv.reportError(w, r, http.StatusInternalServerError, "error getting report generation query: %v", err)
+			return
+		}
+
+		if len(results) > 0 && len(genQuery.Spec.Columns) != len(results[0]) {
+			srv.logger.WithError(err).Errorf("report results schema doesn't match expected schema")
+			srv.reportError(w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
+			return
+		}
+
+		buf := &bytes.Buffer{}
+		csvWriter := csv.NewWriter(buf)
 
 		// Write headers
 		var keys []string
 		if len(results) >= 1 {
-			for key := range results[0] {
-				keys = append(keys, key)
+			for _, column := range genQuery.Spec.Columns {
+				keys = append(keys, column.Name)
 			}
 			err := csvWriter.Write(keys)
 			if err != nil {
@@ -153,7 +192,12 @@ func (srv *server) getReport(name, format string, w http.ResponseWriter, r *http
 		for _, row := range results {
 			vals := make([]string, len(keys))
 			for i, key := range keys {
-				val := row[key]
+				val, ok := row[key]
+				if !ok {
+					srv.logger.WithError(err).Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
+					srv.reportError(w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
+					return
+				}
 				switch v := val.(type) {
 				case string:
 					vals[i] = v
@@ -181,6 +225,9 @@ func (srv *server) getReport(name, format string, w http.ResponseWriter, r *http
 				return
 			}
 		}
+
+		csvWriter.Flush()
+		w.Write(buf.Bytes())
 	}
 }
 
