@@ -21,7 +21,7 @@ To alter the version of the Tectonic Prometheus operator to be 1.6.0, run the
 following command:
 
 ```
-kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spec":{"template":{"spec":{"containers":[{"name":"tectonic-prometheus-operator","image":"quay.io/coreos/tectonic-prometheus-operator:v1.6.0"}]}}}}'
+$ kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spec":{"template":{"spec":{"containers":[{"name":"tectonic-prometheus-operator","image":"quay.io/coreos/tectonic-prometheus-operator:v1.6.0"}]}}}}'
 ```
 
 Once the operator changes the version of the `kube-state-metrics` pod to 1.0.1,
@@ -43,7 +43,7 @@ install the app. Currently this should be done manually, with the following
 command:
 
 ```
-kubectl create -f manifests/custom-resource-de***REMOVED***nitons
+$ kubectl create -f manifests/custom-resource-de***REMOVED***nitions
 ```
 
 ### Installing chargeback
@@ -52,14 +52,14 @@ With the CRDs created, the cluster service version ***REMOVED***le can now be cr
 instruct ALM to install chargeback:
 
 ```
-kubectl -n tectonic-system create -f manifests/alm/chargeback.clusterserviceversion.yaml
+$ kubectl -n tectonic-system create -f manifests/alm/chargeback.clusterserviceversion.yaml
 ```
 
 To be able to follow along with the rest of the installation document, set
 `CHARGEBACK_NAMESPACE` to `tectonic-system`:
 
 ```
-export CHARGEBACK_NAMESPACE=tectonic-system
+$ export CHARGEBACK_NAMESPACE=tectonic-system
 ```
 
 And proceed to [Verifying operation](#Verifying operation)
@@ -82,9 +82,9 @@ To change either of these, override the following environment variables
 (defaults are used in the example):
 
 ```
-export CHARGEBACK_NAMESPACE=team-chargeback
-export PULL_SECRET_NAMESPACE=tectonic-system
-export PULL_SECRET=coreos-pull-secret
+$ export CHARGEBACK_NAMESPACE=team-chargeback
+$ export PULL_SECRET_NAMESPACE=tectonic-system
+$ export PULL_SECRET=coreos-pull-secret
 ```
 
 ### Prometheus location
@@ -106,7 +106,11 @@ S3 document][Storing-Data-In-S3.md] before proceeding with these instructions.
 
 ### Run the install script
 
-Run `./hack/install.sh` to install Chargeback on the cluster.
+Chargeback can now be installed with the following command:
+
+```
+$ ./hack/install.sh
+```
 
 ### Uninstall
 
@@ -114,7 +118,7 @@ If chargeback has been installed manually, it can be uninstalled at any point by
 running the following command:
 
 ```
-./hack/uninstall.sh
+$ ./hack/uninstall.sh
 ```
 
 ## Verifying operation
@@ -122,58 +126,13 @@ running the following command:
 Check the logs of the "chargeback" deployment, there should be no errors:
 
 ```
-kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE logs {} -f
+$ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE logs {} -f
 ```
 
-## Generating reports
+## Using chargeback
 
-With Chargeback now successfully installed, reports may be generated. Note that
-with the default con***REMOVED***guration, chargeback will need to run for some time for
-enough usage data to be built up to generate a report. Reports can be generated
-by creating report objects in Kubernetes in the same namespace as Chargeback.
-Some examples of report objects exist in the
-`manifests/custom-resources/reports` directory.
-
-To deploy an example pod usage by memory report, create the report in
-Kubernetes:
-
-```
-kubectl -n $CHARGEBACK_NAMESPACE create -f manifests/custom-resources/reports/pod-memory-usage-by-node.yaml
-```
-
-Existing reports can be viewed in Kubernetes with the following command:
-
-```
-kubectl -n $CHARGEBACK_NAMESPACE get reports
-```
-
-A report's status can be inspected by viewing the object with the `-o json`
-flag:
-
-```
-kubectl -n $CHARGEBACK_NAMESPACE get report pod-memory-usage -o json
-```
-
-## Viewing reports
-
-Once a report is ***REMOVED***nished the results can be fetched using an HTTP API available
-via the chargeback pod.
-
-First, set up a port forward via `kubectl` to the pod:
-
-```
-kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE port-forward {} 8080
-```
-
-And then `curl` can be used (or a web browser) to access ***REMOVED***nished reports by
-name:
-
-```
-curl "localhost:8080/api/v1/reports/get?name=pod-memory-usage-by-node&format=csv"
-```
-
-The `name` parameter in the URL can be any report that is in the ***REMOVED***nished state,
-and the `format` parameter can be either `csv` or `json`.
+For instructions on using chargeback, please read the documentation on [using
+chargeback](Using-chargeback.md)
 
 ### AWS Billing data setup
 
