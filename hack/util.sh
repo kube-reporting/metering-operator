@@ -32,7 +32,7 @@ function msg() {
 }
 
 function copy-tectonic-pull() {
-  local pullSecret=$(kubectl --namespace=${PULL_SECRET_NAMESPACE} get secrets ${PULL_SECRET} -o json)
+  local pullSecret=$(kubectl --namespace=${PULL_SECRET_NAMESPACE} get secrets ${PULL_SECRET} -o json --export)
   pullSecret="${pullSecret/${PULL_SECRET_NAMESPACE}/${CHARGEBACK_NAMESPACE}}"
   echo ${pullSecret} | kube-install -
 }
