@@ -3,20 +3,19 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    presto: coordinator
     app: presto
-  name: presto-coordinator
+  name: presto
 spec:
   replicas: 1
   selector:
   template:
     metadata:
       labels:
-       presto: coordinator
        app: presto
+       presto: coordinator
     spec:
       containers:
-      - name: coordinator
+      - name: presto
         image: quay.io/coreos/chargeback-presto:0.4.4
         imagePullPolicy: Always
         env:
@@ -30,27 +29,55 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
-        - name: "PRESTO_CONF_coordinator"
-          value: "true"
-        - name: "PRESTO_CONF_node___scheduler_include___coordinator"
-          value: "false"
-        - name: "PRESTO_CONF_discovery___server_enabled"
-          value: "true"
-        # For some reason doesn't like service
-        - name: "PRESTO_CONF_discovery_uri"
-          value: "http://localhost:8080"
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_CPU_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: presto
+              resource: requests.cpu
+        - name: MY_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: presto
+              resource: limits.cpu
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: presto
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: presto
+              resource: limits.memory
         ports:
         - name: http
           containerPort: 8080
           protocol: TCP
-        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+        - name: presto-data
+          mountPath: /var/presto/data
         resources:
           requests:
-            memory: "750Mi"
-            cpu: "100m"
+            memory: "1024Mi"
+            cpu: "300m"
           limits:
-            memory: "1500Mi"
-            cpu: "500m"
+            memory: "2048Mi"
+            cpu: "1000m"
+      volumes:
+      - name: presto-data
+        emptyDir: {}
       imagePullSecrets:
       - name: coreos-pull-secret
       dnsPolicy: ClusterFirst
