@@ -33,7 +33,7 @@ CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***
 # TODO: Add tests
 all: fmt docker-build-all
 
-docker-build-all: chargeback-docker-build presto-docker-build hive-docker-build chargeback-alm-install-build
+docker-build-all: chargeback-docker-build presto-docker-build hive-docker-build chargeback-alm-install-docker-build
 
 docker-push-all: chargeback-docker-push presto-docker-push hive-docker-push chargeback-alm-install-docker-push
 
@@ -80,7 +80,7 @@ chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeba
 chargeback-docker-push:
 	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-alm-install-build: images/chargeback-alm-install/Docker***REMOVED***le
+chargeback-alm-install-docker-build: images/chargeback-alm-install/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE) DOCKER_BUILD_CONTEXT=.
 
 chargeback-alm-install-docker-push:
