@@ -43,6 +43,28 @@ function configure() {
     done
 }
 
+max_memory() {
+    local memory_limit=$1
+    local ratio=${JAVA_MAX_MEM_RATIO:-80}
+    echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
+}
+
+if [ -n "$MY_MEM_LIMIT" ]; then
+    export MAX_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
+elif [ -n "$MY_MEM_REQUEST" ]; then
+    export MAX_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
+fi
+
+if [ -z "$MAX_HEAPSIZE" ]; then
+    echo "Unable to automatically set Presto JVM Max Heap Size based on pod request/limits"
+    export MAX_HEAPSIZE=1024
+    echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
+else
+    echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
+fi
+
+echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.config"
+
 # Presto
 configure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 configure "${PRESTO_HOME}/etc/config.properties" presto-conf PRESTO_CONF
