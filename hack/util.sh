@@ -1,5 +1,7 @@
 # This should not be invoked directly. It provides functions and data for other scripts.
 
+set -x
+
 : "${CHARGEBACK_NAMESPACE:=team-chargeback}"
 : "${PULL_SECRET_NAMESPACE:=tectonic-system}"
 : "${PULL_SECRET:=coreos-pull-secret}"

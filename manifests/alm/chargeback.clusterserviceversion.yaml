@@ -1,0 +1,74 @@
+#! validate-crd: clusterserviceversion.crd.yaml
+#! parse-kind: ClusterServiceVersion
+apiVersion: app.coreos.com/v1alpha1
+kind: ClusterServiceVersion-v1
+metadata:
+  name: chargeback-alm-install.v0.4.4
+spec:
+  displayName: Chargeback-alm-install
+  description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
+  keywords: ['chargeback', 'metrics', 'reporting', 'coreos']
+  version: 0.4.4
+  maturity: alpha
+  maintainers:
+  - name: Chance Zibolski
+    email: chance.zibolski@coreos.com
+  - name: Derek Gonyeo
+    email: derek.gonyeo@coreos.com
+  provider:
+    name: CoreOS, Inc
+  labels:
+    alm-status-descriptors: chargeback-alm-install.v0.4.4
+    alm-owner-chargeback: chargeback-alm-install
+  selector:
+    matchLabels:
+      alm-owner-chargeback: chargeback-alm-install
+  install:
+    strategy: deployment
+    spec:
+      permissions:
+      - serviceAccountName: chargeback-alm-install
+        rules:
+        - apiGroups:
+          - "*"
+          resources:
+          - "*"
+          verbs:
+          - "*"
+      deployments:
+      - replicas: 1
+        template:
+          metadata:
+            labels:
+              app: chargeback-alm-install
+          spec:
+            restartPolicy: Always
+            serviceAccount: chargeback-alm-install
+            imagePullSecrets:
+            - name: coreos-pull-secret
+            containers:
+            - name: chargeback-alm-install
+              image: quay.io/coreos/chargeback-alm-install:latest
+              imagePullPolicy: Always
+  customresourcedefinitions:
+    owned:
+    - name: reportprometheusqueries.chargeback.coreos.com
+      version: v1beta1
+      kind: ReportPrometheusQuery
+      displayName: Chargeback prometheus query
+      description: Represents a prometheus query used by chargeback
+    - name: reportdatastores.chargeback.coreos.com
+      version: v1beta1
+      kind: ReportDataStore
+      displayName: Chargeback data store
+      description: Represents a location for chargeback to store data
+    - name: reportgenerationqueries.chargeback.coreos.com
+      version: v1beta1
+      kind: ReportGenerationQuery
+      displayName: Chargeback report generation query
+      description: A SQL query used by chargeback to generate reports
+    - name: reports.chargeback.coreos.com
+      version: v1beta1
+      kind: Report
+      displayName: A chargeback report
+      description: A chargeback report
