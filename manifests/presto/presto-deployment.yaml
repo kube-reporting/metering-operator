@@ -29,6 +29,8 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
+        - name: PRESTO_CONF_discovery_uri
+          value: "http://presto:8080"
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

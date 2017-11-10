@@ -38,7 +38,7 @@ spec:
         args: ["datanode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-0.hdfs-namenode.chargeback.svc.cluster.local:8020
+          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
