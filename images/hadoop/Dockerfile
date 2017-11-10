@@ -52,6 +52,8 @@ RUN mkdir /opt/hadoop-$HADOOP_VERSION/logs
 
 RUN mkdir /hadoop-data
 ADD entrypoint.sh /usr/local/bin
+ADD datanode-entrypoint.sh /usr/local/bin
+ADD namenode-entrypoint.sh /usr/local/bin
 ADD start-name.sh /usr/local/bin
 ADD etc /etc/hadoop
 
