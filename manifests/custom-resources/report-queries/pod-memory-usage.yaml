@@ -25,13 +25,14 @@ spec:
   query: |
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
-          labels['node'] as node,
+          element_at(labels, 'node') as node,
           labels,
           amount as pod_request_memory_bytes,
           timeprecision,
           amount * timeprecision as pod_request_memory_byte_seconds,
           "timestamp"
       FROM {{ dataStoreTableName "pod-request-memory-bytes" }}
+      WHERE element_at(labels, 'node') IS NOT NULL
 
 ---
 
