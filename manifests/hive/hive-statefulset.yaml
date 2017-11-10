@@ -25,7 +25,7 @@ spec:
           protocol: TCP
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-0.hdfs-namenode.chargeback.svc.cluster.local:8020
+          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
         - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
@@ -92,7 +92,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-0.hdfs-namenode.chargeback.svc.cluster.local:8020
+          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
         - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
