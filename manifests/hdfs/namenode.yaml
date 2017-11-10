@@ -1,0 +1,102 @@
+# A headless service to create DNS records.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-namenode
+  labels:
+    app: hdfs-namenode
+spec:
+  ports:
+  - port: 8020
+    name: fs
+  clusterIP: None
+  selector:
+    app: hdfs-namenode
+
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: hdfs-namenode
+  labels:
+    app: hdfs-namenode
+spec:
+  serviceName: "hdfs-namenode"
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hdfs-namenode
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: hdfs-namenode
+        image: quay.io/coreos/chargeback-hadoop:0.4.4
+        imagePullPolicy: Always
+        args: ["namenode-entrypoint.sh"]
+        env:
+        - name: CORE_CONF_fs_defaultFS
+          value: hdfs://hdfs-namenode-0.hdfs-namenode.chargeback.svc.cluster.local:8020
+        - name: CLUSTER_NAME
+          value: hdfs-k8s
+        - name: MY_NODE_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.namespace
+        - name: MY_CPU_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: requests.cpu
+        - name: MY_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: limits.cpu
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: limits.memory
+        ports:
+        - containerPort: 8020
+          name: fs
+        volumeMounts:
+        - name: hdfs-namenode-data
+          mountPath: /hadoop/dfs/name
+          subPath: hadoop/dfs/name
+        resources:
+          requests:
+            memory: "350Mi"
+            cpu: "250m"
+          limits:
+            memory: "350Mi"
+            cpu: "250m"
+      imagePullSecrets:
+      - name: coreos-pull-secret
+  volumeClaimTemplates:
+  - metadata:
+      name: "hdfs-namenode-data"
+      labels:
+        app: hdfs-namenode
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
