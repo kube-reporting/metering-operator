@@ -8,7 +8,7 @@ properties([
     disableConcurrentBuilds(),
     pipelineTriggers([]),
     parameters([
-        string(name: 'RELEASE_TAG', defaultValue: '', description: ''),
+        booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
     ])
 ])
 
@@ -40,18 +40,15 @@ podTemplate(
     name: 'kube-chargeback-build',
 ) {
     node ('kube-chargeback-build') {
-        def gitCommit;
+        def gitCommit
+        def gitTag
         def isMasterBranch = env.BRANCH_NAME == "master"
-
-        // If RELEASE_TAG is speci***REMOVED***ed, tag images using it instead of the
-        // branch name
-        def branchTag = params.RELEASE_TAG ?: env.BRANCH_NAME
 
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
                 "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${branchTag}"
+                "BRANCH_TAG=${env.BRANCH_NAME}"
             ]){
                 container('docker'){
 
@@ -76,7 +73,11 @@ podTemplate(
                         ])
 
                         gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
+                        gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
                         echo "Git Commit: ${gitCommit}"
+                        if (gitTag) {
+                            echo "This commit has a matching git Tag: ${gitTag}"
+                        }
                     }
 
                     withCredentials([
@@ -102,22 +103,43 @@ podTemplate(
                             make k8s-verify-codegen
                             """
                         }
-                        stage('build') {
-                            ansiColor('xterm') {
-                                sh """#!/bin/bash
-                                make docker-build-all -j 2 \
+                        if (params.BUILD_RELEASE) {
+                            if (!gitTag) {
+                                error "Unable to detect git tag"
+                            }
+                            stage('tag') {
+                                ansiColor('xterm') {
+                                    sh """#!/bin/bash
+                                    make docker-tag-all \
+                                        IMAGE_TAG=${gitTag}
+                                    """
+                                }
+                            }
+                            stage('push') {
+                                sh """
+                                make docker-push-all -j 2 \
+                                    USE_LATEST_TAG=false \
+                                    IMAGE_TAG=${gitTag}
+                                """
+                            }
+                        } ***REMOVED*** {
+                            stage('build') {
+                                ansiColor('xterm') {
+                                    sh """#!/bin/bash
+                                    make docker-build-all -j 2 \
+                                        USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                        BRANCH_TAG=${BRANCH_TAG}
+                                    """
+                                }
+                            }
+
+                            stage('push') {
+                                sh """
+                                make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
                                 """
                             }
-                        }
-
-                        stage('push') {
-                            sh """
-                            make docker-push-all -j 2 \
-                                USE_LATEST_TAG=${USE_LATEST_TAG} \
-                                BRANCH_TAG=${BRANCH_TAG}
-                            """
                         }
                     }
                 }

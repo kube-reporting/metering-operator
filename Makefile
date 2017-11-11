@@ -14,11 +14,16 @@ HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 
+TARGETS := chargeback hadoop hive presto chargeback-alm-install
+DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
+DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
+DOCKER_IMAGE_TARGETS := $(CHARGEBACK_IMAGE) $(HADOOP_IMAGE) $(HIVE_IMAGE) $(PRESTO_IMAGE) $(CHARGEBACK_ALM_INSTALL_IMAGE)
+
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
-GIT_TAG := $(shell git -C $(ROOT_DIR) describe --tags --exact-match HEAD 2>/dev/null)
 
 USE_LATEST_TAG ?= false
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
+IMAGE_TAG = $(GIT_SHA)
 
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
@@ -33,39 +38,47 @@ CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***
 # TODO: Add tests
 all: fmt docker-build-all
 
-docker-build-all: chargeback-docker-build hadoop-docker-build presto-docker-build hive-docker-build chargeback-alm-install-docker-build
-
-docker-push-all: chargeback-docker-push hadoop-docker-push presto-docker-push hive-docker-push chargeback-alm-install-docker-push
-
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifeq ($(USE_LATEST_TAG), true)
-	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):latest
+	$(MAKE) docker-tag IMAGE_TAG=latest
 endif
 ifdef BRANCH_TAG
-	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(BRANCH_TAG)
-endif
-ifdef GIT_TAG
-	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(GIT_TAG)
+	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
 endif
 
 # Usage:
-#	make docker-push IMAGE_NAME=
+#	make docker-tag IMAGE_NAME= IMAGE_TAG=
+
+docker-tag:
+	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(IMAGE_TAG)
+
+# Usage:
+#	make docker-push IMAGE_NAME= IMAGE_TAG=
 
 docker-push:
-	docker push $(IMAGE_NAME):$(GIT_SHA)
+	docker push $(IMAGE_NAME):$(IMAGE_TAG)
 ifeq ($(USE_LATEST_TAG), true)
 	docker push $(IMAGE_NAME):latest
 endif
 ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
-ifdef GIT_TAG
-	docker push $(IMAGE_NAME):$(GIT_TAG)
-endif
+
+docker-build-all: $(DOCKER_BUILD_TARGETS)
+
+docker-push-all:
+	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
+		$(MAKE) docker-push IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
+	))
+
+docker-tag-all:
+	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
+		$(MAKE) docker-tag IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
+	))
 
 dist: Documentation manifests examples hack/*.sh
 	mkdir -p $@
@@ -77,32 +90,17 @@ dist.zip: dist
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-docker-push:
-	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_IMAGE)
-
 chargeback-alm-install-docker-build: images/chargeback-alm-install/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE) DOCKER_BUILD_CONTEXT=.
-
-chargeback-alm-install-docker-push:
-	$(MAKE) docker-push IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE)
 
 presto-docker-build: images/presto/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
 
-presto-docker-push:
-	$(MAKE) docker-push IMAGE_NAME=$(PRESTO_IMAGE)
-
 hadoop-docker-build: images/hadoop/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
 
-hadoop-docker-push:
-	$(MAKE) docker-push IMAGE_NAME=$(HADOOP_IMAGE)
-
 hive-docker-build: images/hive/Docker***REMOVED***le hadoop-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
-
-hive-docker-push:
-	$(MAKE) docker-push IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
 vendor: glide.yaml
@@ -123,12 +121,10 @@ images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
 	k8s-update-codegen k8s-verify-codegen \
-	chargeback-docker-build \
-	presto-docker-build hive-docker-build hadoop-docker-build \
-	chargeback-docker-push presto-docker-push \
-	hive-docker-push hadoop-docker-push \
-	docker-build docker-push \
-	docker-build-all docker-push-all \
+	chargeback-docker-build chargeback-alm-install-docker-build  \
+	hadoop-docker-build presto-docker-build hive-docker-build \
+	docker-build docker-tag docker-push \
+	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
