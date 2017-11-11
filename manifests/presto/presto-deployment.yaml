@@ -31,6 +31,8 @@ spec:
               key: aws-secret-access-key
         - name: PRESTO_CONF_discovery_uri
           value: "http://presto:8080"
+        - name: JAVA_MAX_MEM_RATIO
+          value: "60"
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -72,7 +74,7 @@ spec:
           mountPath: /var/presto/data
         resources:
           requests:
-            memory: "1024Mi"
+            memory: "1536Mi"
             cpu: "300m"
           limits:
             memory: "2048Mi"
