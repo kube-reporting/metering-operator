@@ -20,5 +20,5 @@ kube-remove \
 
 msg "Removing Custom Resource De***REMOVED***nitions"
 kube-remove \
-    manifests/custom-resource-de***REMOVED***nitons
+    manifests/custom-resource-de***REMOVED***nitions
 
