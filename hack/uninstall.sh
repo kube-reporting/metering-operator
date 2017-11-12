@@ -20,5 +20,5 @@ kube-remove \
 
 msg "Removing Custom Resource Definitions"
 kube-remove \
-    manifests/custom-resource-definitons
+    manifests/custom-resource-definitions
 
