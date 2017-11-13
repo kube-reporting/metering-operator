@@ -34,7 +34,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: hdfs-namenode
-        image: quay.io/coreos/chargeback-hadoop:0.4.5-rc2
+        image: quay.io/coreos/chargeback-hadoop:0.4.5-rc3
         imagePullPolicy: Always
         args: ["namenode-entrypoint.sh"]
         env:
