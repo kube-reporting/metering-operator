@@ -71,6 +71,7 @@ spec:
         - name: "http"
           containerPort: 8080
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
       serviceAccount: chargeback
       imagePullSecrets:
       - name: coreos-pull-secret
