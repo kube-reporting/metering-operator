@@ -7,9 +7,10 @@ kube-remove-non-file secret coreos-pull-secret
 
 msg "Removing query and collection layer"
 kube-remove \
-    manifests/hive \
-    manifests/presto \
     manifests/chargeback
+    manifests/presto \
+    manifests/hive \
+    manifests/hdfs \
 
 msg "Removing Custom Resources"
 kube-remove \
@@ -19,5 +20,5 @@ kube-remove \
 
 msg "Removing Custom Resource Definitions"
 kube-remove \
-    manifests/custom-resource-definitons
+    manifests/custom-resource-definitions
 

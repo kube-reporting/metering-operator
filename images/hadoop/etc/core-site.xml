@@ -19,10 +19,6 @@
     <value>*</value>
   </property>
   <property>
-    <name>fs.defaultFS</name>
-    <value>file://user/hive/warehouse</value>
-  </property>
-  <property>
     <name>hadoop.proxyuser.hue.groups</name>
     <value>*</value>
   </property>

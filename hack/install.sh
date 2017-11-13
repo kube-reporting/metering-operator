@@ -45,6 +45,7 @@ fi
 
 msg "Installing query and collection layer"
 kube-install \
+    manifests/hdfs \
     manifests/hive \
     manifests/presto \
     manifests/chargeback

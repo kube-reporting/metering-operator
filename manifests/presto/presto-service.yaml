@@ -11,4 +11,5 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
+    app: presto
     presto: coordinator
