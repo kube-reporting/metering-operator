@@ -250,7 +250,6 @@ func (inf informers) ShutdownQueues() {
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("starting Chargeback operator")
 
-	defer c.informers.ShutdownQueues()
 	go c.informers.Run(stopCh)
 
 	c.logger.Infof("setting up DB connections")
@@ -297,23 +296,49 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	httpSrv := newServer(c, c.logger)
 	go httpSrv.start()
 
-	c.logger.Infof("starting ReportDataStore worker")
-	go wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
-	c.logger.Infof("starting ReportGenerationQuery worker")
-	go wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
-	c.logger.Infof("starting Report worker")
-	go wait.Until(c.runReportWorker, time.Second, stopCh)
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		c.logger.Infof("starting ReportDataStore worker")
+		wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
+		wg.Done()
+		c.logger.Infof("ReportDataStore worker stopped")
+	}()
+	wg.Add(1)
+	go func() {
+		c.logger.Infof("starting ReportGenerationQuery worker")
+		wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
+		wg.Done()
+		c.logger.Infof("ReportGenerationQuery worker stopped")
+	}()
+	wg.Add(1)
+	go func() {
+		c.logger.Infof("starting Report worker")
+		wait.Until(c.runReportWorker, time.Second, stopCh)
+		wg.Done()
+		c.logger.Infof("Report worker stopped")
+	}()
 
 	if !c.disablePromsum {
-		c.logger.Debugf("starting promsum collector")
-		go c.runPromsumWorker(stopCh)
+		wg.Add(1)
+		go func() {
+			c.logger.Debugf("starting promsum collector")
+			c.runPromsumWorker(stopCh)
+			wg.Done()
+			c.logger.Debugf("promsum collector stopped")
+		}()
 	}
 
 	c.logger.Infof("chargeback successfully initialized, waiting for reports...")
 
 	<-stopCh
+	c.logger.Info("got stop signal, shutting down Chargeback operator")
+	httpSrv.stop()
+	go c.informers.ShutdownQueues()
+	wg.Wait()
+	c.logger.Info("Chargeback workers and collectors stopped")
 
-	c.logger.Info("stopping Chargeback operator")
 	return nil
 }
 
