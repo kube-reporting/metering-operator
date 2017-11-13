@@ -3,7 +3,9 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -123,8 +125,17 @@ func main() {
 		logger.WithError(err).Fatal("unable to setup Chargeback operator")
 	}
 
-	stopCh := make(<-chan struct{})
+	sigs := make(chan os.Signal, 1)
+	stopCh := make(chan struct{})
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		logger.Infof("got signal %s, performing shutdown", sig)
+		close(stopCh)
+	}()
+
 	if err = op.Run(stopCh); err != nil {
-		logger.WithError(err).Fatalf("error occurred while the Chargeback operator was running")
+		logger.WithError(err).Errorf("error occurred while the Chargeback operator was running")
 	}
 }
