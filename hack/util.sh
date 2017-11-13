@@ -1,6 +1,6 @@
 # This should not be invoked directly. It provides functions and data for other scripts.
 
-: "${CHARGEBACK_NAMESPACE:=team-chargeback}"
+: "${CHARGEBACK_NAMESPACE:=chargeback}"
 : "${PULL_SECRET_NAMESPACE:=tectonic-system}"
 : "${PULL_SECRET:=coreos-pull-secret}"
 

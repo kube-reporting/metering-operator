@@ -95,9 +95,22 @@ docker-pull-all:
 		$(MAKE) docker-pull IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
 	))
 
-dist: Documentation manifests examples hack/*.sh
-	mkdir -p $@
-	cp -r $? $@
+dist: Documentation manifests hack
+	@mkdir -p $@
+	@rsync -am \
+		--include hack/install.sh \
+		--include hack/uninstall.sh \
+		--include hack/util.sh \
+		--include Documentation/Installation.md \
+		--include Documentation/Report.md \
+		--include Documentation/Using-chargeback.md \
+		--exclude 'hack/*' \
+		--exclude 'Documentation/*' \
+		--exclude 'manifests/alm' \
+		--exclude 'manifests/installer' \
+		--exclude 'manifests/custom-resources/datastores/aws-billing.yaml' \
+		--exclude manifests/chargeback/chargeback-secrets.yaml \
+		$? $@
 
 dist.zip: dist
 	zip -r $@ $?
