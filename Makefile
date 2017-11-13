@@ -21,9 +21,11 @@ DOCKER_IMAGE_TARGETS := $(CHARGEBACK_IMAGE) $(HADOOP_IMAGE) $(HIVE_IMAGE) $(PRES
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
+PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 IMAGE_TAG = $(GIT_SHA)
+TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 
 # Hive Git repository for Thrift definitions
 HIVE_REPO := "git://git.apache.org/hive.git"
@@ -51,10 +53,18 @@ ifdef BRANCH_TAG
 endif
 
 # Usage:
-#	make docker-tag IMAGE_NAME= IMAGE_TAG=
-
+#	make docker-tag SOURCE_IMAGE=$(IMAGE_NAME):$(GIT_SHA) IMAGE_NAME= IMAGE_TAG=
 docker-tag:
-	docker tag $(IMAGE_NAME):$(GIT_SHA) $(IMAGE_NAME):$(IMAGE_TAG)
+ifeq ($(PULL_TAG_IMAGE_SOURCE), true)
+	$(MAKE) docker-pull IMAGE=$(TAG_IMAGE_SOURCE)
+endif
+	docker tag $(TAG_IMAGE_SOURCE) $(IMAGE_NAME):$(IMAGE_TAG)
+
+# Usage:
+#	make docker-pull IMAGE=
+
+docker-pull:
+	docker pull $(IMAGE)
 
 # Usage:
 #	make docker-push IMAGE_NAME= IMAGE_TAG=
@@ -78,6 +88,11 @@ docker-push-all:
 docker-tag-all:
 	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
 		$(MAKE) docker-tag IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
+	))
+
+docker-pull-all:
+	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
+		$(MAKE) docker-pull IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
 	))
 
 dist: Documentation manifests examples hack/*.sh
