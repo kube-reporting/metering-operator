@@ -27,52 +27,17 @@ $ kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spe
 Once the operator changes the version of the `kube-state-metrics` pod to 1.0.1,
 chargeback installation may proceed.
 
-## Installing via ALM
+## Installation
 
-If ALM is installed on the cluster it can be used to deploy chargeback. At this
-point ALM will not handle upgrading or uninstalling chargeback, but these
-features should become available in the future.
-
-ALM will install chargeback into the `tectonic-system` namespace, and thus
-access to this namespace is required to interact with chargeback.
-
-### Creating CRDs
-
-ALM expects the requisite CRDs for an application to be created before it will
-install the app. Currently this should be done manually, with the following
-command:
-
-```
-$ kubectl create -f manifests/custom-resource-de***REMOVED***nitions
-```
-
-### Installing chargeback
-
-With the CRDs created, the cluster service version ***REMOVED***le can now be created to
-instruct ALM to install chargeback:
-
-```
-$ kubectl -n tectonic-system create -f manifests/alm/chargeback.clusterserviceversion.yaml
-```
-
-To be able to follow along with the rest of the installation document, set
-`CHARGEBACK_NAMESPACE` to `tectonic-system`:
-
-```
-$ export CHARGEBACK_NAMESPACE=tectonic-system
-```
-
-And proceed to [Verifying operation](#Verifying operation)
-
-## Installing manually
-
-If ALM is unavailable or chargeback is to be installed into a namespace other
-than `tectonic-system` it can be installed by hand.
+To install Chargeback you can run our installation script.
+Before running the script, you can customize the installation if you want to
+customize where Chargeback is installed, or if you want to change where it
+stores data, etc.
 
 ### Modifying default values
 
 Chargeback will install into an existing namespace. Without con***REMOVED***guration, the
-default is currently `team-chargeback`.
+default is currently `chargeback`.
 
 Chargeback also assumes it needs a docker pull secret to pull images, which
 defaults to a secret named `coreos-pull-secret` in the `tectonic-system`
@@ -82,7 +47,7 @@ To change either of these, override the following environment variables
 (defaults are used in the example):
 
 ```
-$ export CHARGEBACK_NAMESPACE=team-chargeback
+$ export CHARGEBACK_NAMESPACE=chargeback
 $ export PULL_SECRET_NAMESPACE=tectonic-system
 $ export PULL_SECRET=coreos-pull-secret
 ```
