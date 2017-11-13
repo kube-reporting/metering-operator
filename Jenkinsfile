@@ -111,6 +111,7 @@ podTemplate(
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash
                                     make docker-tag-all \
+                                        PULL_TAG_IMAGE_SOURCE=true \
                                         IMAGE_TAG=${gitTag}
                                     """
                                 }
