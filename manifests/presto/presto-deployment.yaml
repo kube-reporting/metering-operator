@@ -63,6 +63,8 @@ spec:
             resourceFieldRef:
               containerName: presto
               resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
         ports:
         - name: http
           containerPort: 8080
@@ -72,7 +74,7 @@ spec:
           mountPath: /var/presto/data
         resources:
           requests:
-            memory: "1024Mi"
+            memory: "1536Mi"
             cpu: "300m"
           limits:
             memory: "2048Mi"

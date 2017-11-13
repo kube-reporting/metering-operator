@@ -71,6 +71,8 @@ spec:
             resourceFieldRef:
               containerName: hdfs-datanode
               resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
         ports:
         - containerPort: 50010
           name: fs
@@ -96,4 +98,4 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 10Gi
+          storage: 5Gi
