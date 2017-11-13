@@ -23,6 +23,10 @@
     <value>true</value>
   </property>
   <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>***REMOVED***le:///hadoop/dfs/name</value>
+  </property>
+  <property>
     <name>dfs.namenode.rpc-bind-host</name>
     <value>0.0.0.0</value>
   </property>
@@ -45,5 +49,9 @@
   <property>
     <name>dfs.datanode.use.datanode.hostname</name>
     <value>true</value>
+  </property>
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>***REMOVED***le:///hadoop/dfs/data</value>
   </property>
 </con***REMOVED***guration>

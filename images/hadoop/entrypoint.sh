@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function addProperty() {
+function addXMLProperty() {
   local path=$1
   local name=$2
   local value=$3
@@ -23,18 +23,38 @@ function con***REMOVED***gure() {
         name=`echo ${c} | perl -pe 's/___/-/g; s/__/@/g; s/_/./g; s/@/_/g;'`
         var="${envPre***REMOVED***x}_${c}"
         value=${!var}
+
         echo " - Setting $name=$value"
-        addProperty $path $name "$value"
+        addXMLProperty $path $name "$value"
     done
 }
 
-export HADOOP_CLASSPATH="/opt/hive/hcatalog/share/hcatalog/*:$HADOOP_CLASSPATH"
-export HIVE_AUX_JARS_PATH=/usr/hdp/current/hive-server2/auxlib
+# Hadoop (common to both Presto and Hive)
+con***REMOVED***gure "${HADOOP_CONF_DIR}/core-site.xml" core CORE_CONF
+con***REMOVED***gure "${HADOOP_CONF_DIR}/hdfs-site.xml" hdfs HDFS_CONF
+con***REMOVED***gure "${HADOOP_CONF_DIR}/httpfs-site.xml" httpfs HTTPFS_CONF
+con***REMOVED***gure "${HADOOP_CONF_DIR}/kms-site.xml" kms KMS_CONF
 
-con***REMOVED***gure /opt/hive/conf/hive-site.xml hive HIVE_SITE_CONF
-con***REMOVED***gure /etc/hadoop/core-site.xml core CORE_CONF
-con***REMOVED***gure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF
-con***REMOVED***gure /etc/hadoop/httpfs-site.xml httpfs HTTPFS_CONF
-con***REMOVED***gure /etc/hadoop/kms-site.xml kms KMS_CONF
+# Hive
+con***REMOVED***gure "${HIVE_HOME}/conf/hive-site.xml" hive HIVE_SITE_CONF
+
+max_memory() {
+    local memory_limit=$1
+    local ratio=${JAVA_MAX_MEM_RATIO:-80}
+    echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
+}
+
+if [ -n "$MY_MEM_LIMIT" ]; then
+    export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
+elif [ -n "$MY_MEM_REQUEST" ]; then
+    export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
+***REMOVED***
+
+if [ -z "$HADOOP_HEAPSIZE" ]; then
+    echo "Unable to automatically set HADOOP_HEAPSIZE"
+***REMOVED***
+    echo "Setting HADOOP_HEAPSIZE to ${HADOOP_HEAPSIZE}M"
+***REMOVED***
 
 exec $@
+

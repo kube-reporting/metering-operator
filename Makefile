@@ -33,9 +33,9 @@ CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***
 # TODO: Add tests
 all: fmt docker-build-all
 
-docker-build-all: chargeback-docker-build presto-docker-build hive-docker-build chargeback-alm-install-docker-build
+docker-build-all: chargeback-docker-build hadoop-docker-build presto-docker-build hive-docker-build chargeback-alm-install-docker-build
 
-docker-push-all: chargeback-docker-push presto-docker-push hive-docker-push chargeback-alm-install-docker-push
+docker-push-all: chargeback-docker-push hadoop-docker-push presto-docker-push hive-docker-push chargeback-alm-install-docker-push
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
