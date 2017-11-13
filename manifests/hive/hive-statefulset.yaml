@@ -17,7 +17,7 @@ spec:
       containers:
       - name: metastore
         args: ["/opt/hive/bin/hive", "--service", "metastore"]
-        image: quay.io/coreos/chargeback-hive:0.4.5-rc2
+        image: quay.io/coreos/chargeback-hive:0.4.5-rc3
         imagePullPolicy: Always
         ports:
         - name: meta
@@ -82,7 +82,7 @@ spec:
             cpu: "500m"
       - name: hive
         args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
-        image: quay.io/coreos/chargeback-hive:0.4.5-rc2
+        image: quay.io/coreos/chargeback-hive:0.4.5-rc3
         imagePullPolicy: Always
         ports:
         - name: thrift

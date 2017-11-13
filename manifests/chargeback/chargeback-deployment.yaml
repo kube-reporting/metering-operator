@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: chargeback
-        image: quay.io/coreos/chargeback:0.4.5-rc2
+        image: quay.io/coreos/chargeback:0.4.5-rc3
         imagePullPolicy: Always
         env:
         - name: AWS_ACCESS_KEY_ID
