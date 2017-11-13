@@ -7,10 +7,10 @@ kube-remove-non-***REMOVED***le secret coreos-pull-secret
 
 msg "Removing query and collection layer"
 kube-remove \
-    manifests/chargeback
+    manifests/chargeback \
     manifests/presto \
     manifests/hive \
-    manifests/hdfs \
+    manifests/hdfs
 
 msg "Removing Custom Resources"
 kube-remove \
