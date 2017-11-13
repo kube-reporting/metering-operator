@@ -2,6 +2,7 @@ package chargeback
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -19,21 +20,32 @@ import (
 type server struct {
 	chargeback *Chargeback
 	logger     log.FieldLogger
+	httpServer *http.Server
 }
 
 func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	logger = logger.WithField("component", "api")
-	return &server{
+	mux := http.NewServeMux()
+	httpServer := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+	srv := &server{
 		chargeback: c,
 		logger:     logger,
+		httpServer: httpServer,
 	}
+	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	return srv
 }
 
 func (srv *server) start() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
-	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
-	srv.logger.Fatal(http.ListenAndServe(":8080", mux))
+	srv.logger.WithError(srv.httpServer.ListenAndServe()).Info("HTTP server exited")
+}
+
+func (srv *server) stop() error {
+	return srv.httpServer.Shutdown(context.TODO())
 }
 
 func (srv *server) newLogger(r *http.Request) log.FieldLogger {
