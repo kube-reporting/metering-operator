@@ -69,7 +69,7 @@ spec:
               containerName: metastore
               resource: limits.memory
         - name: JAVA_MAX_MEM_RATIO
-          value: "60"
+          value: "50"
         volumeMounts:
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
@@ -137,6 +137,8 @@ spec:
             resourceFieldRef:
               containerName: hive
               resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
         resources:
           requests:
             memory: "400Mi"

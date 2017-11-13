@@ -45,10 +45,12 @@ function configure() {
 
 max_memory() {
     local memory_limit=$1
-    local ratio=${JAVA_MAX_MEM_RATIO:-80}
+    local ratio=${JAVA_MAX_MEM_RATIO:-50}
     echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
 }
 
+# Check for container memory limits/request and use it to set JVM Heap size.
+# Defaults to 50% of the limit/request value.
 if [ -n "$MY_MEM_LIMIT" ]; then
     export MAX_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
 elif [ -n "$MY_MEM_REQUEST" ]; then

@@ -31,8 +31,6 @@ spec:
               key: aws-secret-access-key
         - name: PRESTO_CONF_discovery_uri
           value: "http://presto:8080"
-        - name: JAVA_MAX_MEM_RATIO
-          value: "60"
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -65,6 +63,8 @@ spec:
             resourceFieldRef:
               containerName: presto
               resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
         ports:
         - name: http
           containerPort: 8080

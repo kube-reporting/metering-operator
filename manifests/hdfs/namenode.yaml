@@ -74,6 +74,8 @@ spec:
             resourceFieldRef:
               containerName: hdfs-namenode
               resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
         ports:
         - containerPort: 8020
           name: fs
