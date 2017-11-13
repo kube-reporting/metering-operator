@@ -36,6 +36,9 @@ ADD json-serde-1.3.8-jar-with-dependencies.jar ${PRESTO_HOME}/plugin/hive-hadoop
 COPY etc/ $PRESTO_HOME/etc/
 COPY entrypoint.sh /usr/local/bin
 
+# Default to using localhost for discovery
+ENV PRESTO_CONF_discovery_uri http://localhost:8080
+
 EXPOSE 8080
 VOLUME /var/presto/data
 

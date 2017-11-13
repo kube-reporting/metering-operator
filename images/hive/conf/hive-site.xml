@@ -49,4 +49,12 @@
     <name>hive.metastore.schema.verification</name>
     <value>false</value>
   </property>
+  <property>
+    <name>hive.default.fileformat</name>
+    <value>orc</value>
+  </property>
+  <property>
+    <name>orc.compress</name>
+    <value>SNAPPY</value>
+  </property>
 </configuration>
