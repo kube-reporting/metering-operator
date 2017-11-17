@@ -30,6 +30,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 
 func (c *Chargeback) runReportWorker() {
 	logger := c.logger.WithField("component", "reportWorker")
+	logger.Infof("Report worker started")
 	for c.processReport(logger) {
 
 	}

@@ -41,6 +41,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 }
 
 func (srv *server) start() {
+	srv.logger.Infof("HTTP server started")
 	srv.logger.WithError(srv.httpServer.ListenAndServe()).Info("HTTP server exited")
 }
 

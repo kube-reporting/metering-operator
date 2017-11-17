@@ -15,6 +15,7 @@ import (
 
 func (c *Chargeback) runReportDataStoreWorker() {
 	logger := c.logger.WithField("component", "reportDataStoreWorker")
+	logger.Infof("ReportDataStore worker started")
 	for c.processReportDataStore(logger) {
 
 	}

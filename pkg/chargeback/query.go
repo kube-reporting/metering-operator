@@ -12,6 +12,7 @@ import (
 
 func (c *Chargeback) runReportGenerationQueryWorker() {
 	logger := c.logger.WithField("component", "reportGenerationQueryWorker")
+	logger.Infof("ReportGenerationQuery worker started")
 	for c.processReportGenerationQuery(logger) {
 
 	}

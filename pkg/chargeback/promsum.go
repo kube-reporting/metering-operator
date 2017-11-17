@@ -25,6 +25,7 @@ const (
 
 func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 	logger := c.logger.WithField("component", "promsum")
+	logger.Infof("Promsum collector worker started")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
