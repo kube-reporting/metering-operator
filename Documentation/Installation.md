@@ -12,9 +12,11 @@ Chargeback consists of a few components:
 In order to install and use chargeback the following components will be
 necessary:
 
-- A tectonic installed Kubernetes cluster, of version 1.8.0 or greater, or with
-  a Tectonic Prometheus Operator to be of version 1.6.0 or greater (Prometheus
-  operator v0.13).
+- A Tectonic installed Kubernetes cluster, with the following components
+  (Tectonic 1.8.0 meets these requirements):
+  - Tectonic Prometheus Operator of version 1.6.0 or greater (Prometheus
+    Operator v0.13)
+  - ALM installed
 - A properly configured kubectl to access the Kubernetes cluster.
 
 To alter the version of the Tectonic Prometheus operator to be 1.6.0, run the
@@ -29,61 +31,24 @@ chargeback installation may proceed.
 
 ## Installation
 
-To install Chargeback you can run our installation script.
-Before running the script, you can customize the installation if you want to
-customize where Chargeback is installed, or if you want to change where it
-stores data, etc.
-
-### Modifying default values
-
-Chargeback will install into an existing namespace. Without configuration, the
-default is currently `chargeback`.
-
-Chargeback also assumes it needs a docker pull secret to pull images, which
-defaults to a secret named `coreos-pull-secret` in the `tectonic-system`
-namespace.
-
-To change either of these, override the following environment variables
-(defaults are used in the example):
+Chargeback can be installed via the Tectonic console, but a couple commands must
+be run first to make it available via the web UI.
 
 ```
-$ export CHARGEBACK_NAMESPACE=chargeback
-$ export PULL_SECRET_NAMESPACE=tectonic-system
-$ export PULL_SECRET=coreos-pull-secret
+$ kubectl -n tectonic-system create -f manifests/alm/chargeback-alm-install-resources.configmap.yaml
+$ kubectl -n tectonic-system patch deploy catalog-operator -p '{"spec":{"template":{"spec":{"containers":[{"name":"catalog-operator","volumeMounts":[{"name":"chargeback-alm-install-resources","mountPath":"/var/catalog_resources/chargeback"}]}],"volumes":[{"name":"chargeback-alm-install-resources","configMap":{"name":"chargeback-alm-install-resources"}}]}}}}'
 ```
 
-### Prometheus location
+Once these commands are run the `catalog-operator` pod should restart, after
+which chargeback can be enabled via the Tectonic console.
 
-If Prometheus was setup by Tectonic and is running within the tectonic-system
-namespace, then you can skip this section.
-
-If you're running the Prometheus operator yourself (not using the Tectonic one),
-then you need to configure the `prometheus-url` in
-`manifests/chargeback/chargeback-config.yaml` to match the service created by
-your Prometheus operator.
-
-### Storing data in S3
-
-By default the data that chargeback collects and generates is ephemeral, and
-will not survive restarts of the hive pod it deploys. To make this data
-persistent by storing it in S3, follow the instructions in the [storing data in
-S3 document][Storing-Data-In-S3.md] before proceeding with these instructions.
-
-### Run the install script
-
-Chargeback can now be installed with the following command:
+Chargeback will only function in a namespace that has the `coreos-pull-secret`
+installed, which by default is only `tectonic-system`. There is a script
+available to help with copying the `coreos-pull-secret` into any other
+namespace, which can be run with the following command:
 
 ```
-$ ./hack/install.sh
-```
-
-### Uninstall
-
-If chargeback has been installed manually, it can be uninstalled at any point by
-running the following command:
-
-```
-$ ./hack/uninstall.sh
+./hack/copy-pull-secret.sh
 ```
 
 ## Verifying operation
@@ -99,25 +64,9 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 For instructions on using chargeback, please read the documentation on [using
 chargeback](Using-chargeback.md)
 
-### AWS Billing data setup
+## Storing data in S3
 
-**AWS billing reports were temporarily removed from chargeback due to a
-refactor, the following documentation is left in for when this functionality is
-restored**
-
-* Setup hourly billing reports in the AWS console by following [these](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html) instructions. Be sure to note the bucket, report prefix, and report name specified here.
-
-* Create AWS access key with permissions for the bucket given above. The required permissions are:
-```
-s3:DeleteObject
-s3:GetObject
-s3:GetObjectAcl1
-s3:PutObject
-s3:PutObjectAcl
-s3:GetBucketAcl
-s3:ListBucket
-s3:GetBucketLocation
-```
-
-Once you have an `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` refer to
-[Set AWS Credentials](set-aws-credentials) and [Set AWS region](set-aws-region) for configuring.
+By default the data that chargeback collects and generates is ephemeral, and
+will not survive restarts of the HDFS pod it deploys. To make this data
+persistent by storing it in S3, follow the instructions in the [storing data in
+S3 document](Storing-Data-In-S3.md) before proceeding with these instructions.

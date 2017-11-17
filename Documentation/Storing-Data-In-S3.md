@@ -5,19 +5,45 @@ S3. Data stored locally in the cluster (which is the default) will not survive
 restarts of the hive pod. By configuring chargeback to store data in S3, this
 data will become persistent.
 
+Some resources in Kubernetes must be edited to use S3. These edits can be done
+with the Tectonic console, but this document will assume all edits are being
+done via `kubectl`.
+
 ## Set AWS Credentials
 
-The install script will detect if AWS credentials are stored in the environment
-variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, and ask if these
-credentials should be used to create a secret in Kubernetes for Chargeback to
-use. This is required to access S3 buckets.
+There is a secret named `chargeback-secrets` in chargeback's namespace that must
+be populated with AWS credentials. Chargeback will use these credentials to
+store data in S3.
+
+There is a script available to help with setting these credentials. Make sure
+`CHARGEBACK_NAMESPACE` is set to the right namespace, and then set the
+environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to the
+desired credentials and run:
+
+```
+./hack/update-aws-credentials.sh
+```
+
+After the secret has been updated, delete the relevant chargeback pods so they
+can be recreated with the new secret:
+
+```
+kubectl -n CHARGEBACK_NAMESPACE delete pod -l app=presto
+kubectl -n CHARGEBACK_NAMESPACE delete pod -l app=hive
+kubectl -n $CHARGEBACK_NAMESPACE delete pod -l app=chargeback
+```
 
 ## Set AWS region
 
-Chargeback currently need to be configured to use a specific AWS region. This is
-only temporary, and this requirement should be removed in the future. Until
-then, change the `aws-region` value in
-`manifests/chargeback/chargeback-config.yaml`.
+Chargeback currently needs to be configured to use a specific AWS region. Edit
+chargeback's config with the following command, and change the `aws-region`
+value to match the region of the S3 bucket that is to be used. Then, delete the
+chargeback pod so it can be recreated with the new config.
+
+```
+kubectl -n $CHARGEBACK_NAMESPACE edit configmap chargeback-config
+kubectl -n $CHARGEBACK_NAMESPACE delete pod -l app=chargeback
+```
 
 ## Modify Chargeback data stores
 
@@ -27,26 +53,39 @@ Chargeback's CRD model][crd-model], but in summary the data store CRDs describe
 where data for a given Prometheus query should be stored. These data stores can
 be modified to point to a S3 bucket instead of local storage.
 
-The default data stores shipped with chargeback are located in
-`manifests/custom-resources/datastores`. For each data store with a `promsum`
-section, replace:
+For each data store with a `promsum` section, replace:
 
 ```
 storage:
   local: {}
+  s3: null
 ```
 
 with:
 
 ```
 storage:
+  local: null
   s3:
     bucket: MY-BUCKET-NAME
     prefix: MY-PREFIX
 ```
 
-As an example, here's the `pod-cpu-usage.yaml` file after being modified to
-store data in the `chargeback` bucket under the `promsum/cpu_by_pod` prefix:
+Existing data stores can be viewed with the command:
+
+```
+kubectl -n $CHARGEBACK_NAMESPACE get reportdatastores
+```
+
+And a given data store can be modified with the command:
+
+```
+kubectl -n $CHARGEBACK_NAMESPACE edit reportdatastore [NAME]
+```
+
+As an example, here's the `pod-request-cpu-cores` data store after being
+modified to store data in the `chargeback` bucket under the `promsum/cpu_by_pod`
+prefix:
 
 ```
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -58,10 +97,11 @@ metadata:
 spec:
   promsum:
     query: "pod-request-cpu-cores"
-  storage:
-    s3:
-      bucket: chargeback
-      prefix: promsum/pod_request_cpu_cores
+    storage:
+      local: null
+      s3:
+        bucket: chargeback
+        prefix: promsum/pod_request_cpu_cores
 ```
 
 ## Set an output location on reports
