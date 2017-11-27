@@ -144,7 +144,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
 
-	if valid, err := c.validateGenerationQuery(logger, genQuery); err != nil {
+	if valid, err := c.validateGenerationQuery(logger, genQuery, true); err != nil {
 		c.setReportError(logger, report, err, "report is invalid")
 		return nil
 	} ***REMOVED*** if !valid {

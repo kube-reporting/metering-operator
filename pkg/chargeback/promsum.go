@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
@@ -92,7 +93,12 @@ func (c *Chargeback) collectPromsumDatastoreData(logger logrus.FieldLogger, data
 	if dataStore.TableName == "" {
 		// This data store doesn't have a table yet, let's skip it and
 		// hope it'll have one next time.
-		logger.Debugf("no table set, skipping data store %q", dataStore.Name)
+		logger.Debugf("no table set, skipping collection for data store %q", dataStore.Name)
+		key, err := cache.MetaNamespaceKeyFunc(dataStore)
+		if err == nil {
+			logger.Debugf("no table set, queueing %q", dataStore.Name)
+			c.informers.reportDataStoreQueue.Add(key)
+		}
 		return nil
 	}
 
