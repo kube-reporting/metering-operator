@@ -51,7 +51,7 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, mani
 		}
 	}
 
-	query := createTable(tableName, location, awsUsageSerde, awsUsageSerdeProps, columns, awsPartitions, true, true)
+	query := createTable(tableName, location, awsUsageSerde, "textfile", awsUsageSerdeProps, columns, awsPartitions, true, true)
 	return queryer.Query(query)
 }
 

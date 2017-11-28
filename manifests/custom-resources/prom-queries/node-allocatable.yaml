@@ -4,7 +4,7 @@ metadata:
   name: "node-allocatable-memory-bytes"
 spec:
   query: |
-    kube_node_status_allocatable_memory_bytes
+    kube_node_status_allocatable_memory_bytes * on(node) group_left(provider_id) kube_node_info
 
 ---
 
@@ -14,4 +14,4 @@ metadata:
   name: "node-allocatable-cpu-cores"
 spec:
   query: |
-    kube_node_status_allocatable_cpu_cores
+    kube_node_status_allocatable_cpu_cores * on(node) group_left(provider_id) kube_node_info
