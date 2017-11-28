@@ -1,19 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
-set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${DIR}/util.sh
 
-export CHARGEBACK_NAMESPACE="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
-export PRIVILEGED_INSTALL="false"
+msg "Configuring pull secrets"
+copy-tectonic-pull
 
-CHARGEBACK_DEPLOY="$(kubectl get deploy -n $CHARGEBACK_NAMESPACE -l app=chargeback -o json | jq '.items[]')"
+msg "Installing Custom Resource Definitions"
+kube-install \
+    manifests/custom-resource-definitions
 
-if [[ $CHARGEBACK_DEPLOY == "" ]]; then
-    /opt/hack/install.sh
-else
-    echo "chargeback deployment exists, skipping installation"
-fi
-
-while true; do
-    # we don't want this to exit once things are installed
-    sleep 600
-done
+msg "Installing Chargeback Cluster Service Version"
+kube-install \
+    manifests/alm/chargeback-clusterserviceversion.yaml
