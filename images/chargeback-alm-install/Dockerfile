@@ -1,14 +1,6 @@
-FROM alpine:3.6
+FROM quay.io/coreos/helm-operator:latest
 
-RUN apk add --no-cache curl bash jq
-RUN curl -L -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
- && chmod +x /bin/kubectl
+COPY tectonic-chargeback-0.1.0.tgz /
+ENV HELM_CHART_PATH /tectonic-chargeback-0.1.0.tgz
+ENV HELM_RELEASE_NAME tectonic-chargeback
 
-COPY ./hack /opt/hack
-COPY ./manifests /opt/manifests
-
-ENV PRIVILEGED_INSTALL false
-
-WORKDIR /opt
-
-ENTRYPOINT /opt/hack/alm-install.sh
