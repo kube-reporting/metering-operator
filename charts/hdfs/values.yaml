@@ -1,0 +1,34 @@
+image:
+  repository: quay.io/coreos/chargeback-hadoop
+  tag: latest
+  pullPolicy: Always
+
+datanode:
+  replicas: 1
+  resources:
+    requests:
+      memory: "250Mi"
+      cpu: "250m"
+    limits:
+      memory: "250Mi"
+      cpu: "250m"
+
+  storage:
+    # Default to null, which means using the default storage class if the
+    # defaultStorageClass admission plugin is turned on (is by default on
+    # Tectonic).
+    class: null
+    size: "5Gi"
+
+namenode:
+  resources:
+    requests:
+      memory: "350Mi"
+      cpu: "250m"
+    limits:
+      memory: "350Mi"
+      cpu: "250m"
+
+  storage:
+    size: "5Gi"
+    class: null

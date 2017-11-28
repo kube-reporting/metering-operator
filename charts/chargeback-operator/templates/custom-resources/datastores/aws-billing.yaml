@@ -1,0 +1,15 @@
+{{- if .Values.config.awsBillingDataSource.enabled -}}
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataStore
+metadata:
+  name: "aws-billing"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  awsBilling:
+    source:
+      bucket: {{ .Values.config.awsBillingDataSource.bucket | quote }}
+      path: {{ .Values.config.awsBillingDataSource.path | quote }}
+{{- end -}}

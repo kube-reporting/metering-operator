@@ -1,0 +1,11 @@
+---
+dependencies:
+- name: chargeback-operator
+  version: 0.1.0
+  repository: "file://../chargeback-operator"
+- name: presto
+  version: 0.1.0
+  repository: "file://../presto"
+- name: hdfs
+  version: 0.1.0
+  repository: "file://../hdfs"
