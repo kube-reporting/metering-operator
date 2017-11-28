@@ -9,12 +9,13 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
 CHARGEBACK_ALM_INSTALL_IMAGE := quay.io/coreos/chargeback-alm-install
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
+HELM_OPERATOR_IMAGE := quay.io/coreos/helm-operator
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 
-TARGETS := chargeback hadoop hive presto chargeback-alm-install
+TARGETS := chargeback hadoop hive presto helm-operator chargeback-alm-install
 DOCKER_BUILD_TARGETS := $(addsuffix -docker-build, $(TARGETS))
 DOCKER_PUSH_TARGETS := $(addsuffix -docker-push, $(TARGETS))
 DOCKER_IMAGE_TARGETS := $(CHARGEBACK_IMAGE) $(HADOOP_IMAGE) $(HIVE_IMAGE) $(PRESTO_IMAGE) $(CHARGEBACK_ALM_INSTALL_IMAGE)
@@ -118,8 +119,11 @@ dist.zip: dist
 chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-alm-install-docker-build: images/chargeback-alm-install/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE) DOCKER_BUILD_CONTEXT=.
+chargeback-alm-install-docker-build: images/chargeback-alm-install/Dockerfile tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE)
+
+helm-operator-docker-build: images/helm-operator/Dockerfile
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
 
 presto-docker-build: images/presto/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
@@ -146,14 +150,21 @@ images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
+tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
+
+tectonic-chargeback-0.1.0.tgz: $(shell find charts -type f)
+	helm dep update --skip-refresh charts/tectonic-chargeback
+	helm package --save=false -d images/chargeback-alm-install charts/tectonic-chargeback
+
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
 	k8s-update-codegen k8s-verify-codegen \
-	chargeback-docker-build chargeback-alm-install-docker-build  \
+	chargeback-docker-build \
+	helm-operator-docker-build chargeback-alm-install-docker-build  \
 	hadoop-docker-build presto-docker-build hive-docker-build \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin
+	chargeback-bin tectonic-chargeback-chart
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh

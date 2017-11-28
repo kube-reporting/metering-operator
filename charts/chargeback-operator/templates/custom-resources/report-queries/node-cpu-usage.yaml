@@ -1,0 +1,123 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-capacity-cpu"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataStores:
+  - "node-capacity-cpu-cores"
+  columns:
+  - name: node
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: node_capacity_cpu_cores
+    type: double
+  - name: timeprecision
+    type: double
+  - name: node_capacity_cpu_core_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['node'] as node,
+          labels,
+          amount as node_capacity_cpu_cores,
+          timeprecision,
+          amount * timeprecision as node_capacity_cpu_core_seconds,
+          "timestamp"
+      FROM {| dataStoreTableName "node-capacity-cpu-cores" |}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-allocatable-cpu"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataStores:
+  - "node-allocatable-cpu-cores"
+  columns:
+  - name: node
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: node_allocatable_cpu_cores
+    type: double
+  - name: timeprecision
+    type: double
+  - name: node_allocatable_cpu_core_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['node'] as node,
+          labels,
+          amount as node_allocatable_cpu_cores,
+          timeprecision,
+          amount * timeprecision as node_allocatable_cpu_core_seconds,
+          "timestamp"
+      FROM {| dataStoreTableName "node-allocatable-cpu-cores" |}
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-cpu-usage"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "node-allocatable-cpu"
+  - "pod-request-cpu-usage"
+  view:
+    disabled: true
+  columns:
+  - name: node_allocatable_data_start
+    type: timestamp
+  - name: node_allocatable_data_end
+    type: timestamp
+  - name: node_allocatable_cpu_core_seconds
+    type: double
+  - name: pod_usage_data_start
+    type: timestamp
+  - name: pod_usage_data_end
+    type: timestamp
+  - name: pod_request_cpu_core_seconds
+    type: double
+  - name: cpu_used_percent
+    type: double
+  - name: cpu_unused_percent
+    type: double
+  query: |
+    WITH node_cpu_allocatable AS (
+      SELECT min("timestamp") as node_allocatable_data_start,
+        max("timestamp") as node_allocatable_data_end,
+        sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
+      FROM {| generationQueryViewName "node-allocatable-cpu" |}
+        WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+        AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    ), pod_cpu_consumption AS (
+      SELECT min("timestamp") as pod_usage_data_start,
+        max("timestamp") as pod_usage_data_end,
+        sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+      FROM {| generationQueryViewName "pod-request-cpu-usage" |}
+      WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+      AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    )
+    SELECT
+      node_cpu_allocatable.*,
+      pod_cpu_consumption.*,
+      pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds,
+      1 - (pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds)
+    FROM node_cpu_allocatable
+    CROSS JOIN pod_cpu_consumption
