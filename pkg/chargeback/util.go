@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,6 +28,10 @@ func reportTableName(reportName string) string {
 
 func generationQueryViewName(queryName string) string {
 	return fmt.Sprintf("view_%s", resourceNameReplacer.Replace(queryName))
+}
+
+func billingPeriodFormat(date time.Time) string {
+	return date.Format(hive.HiveDateStringLayout)
 }
 
 func truncateToMinute(t time.Time) time.Time {

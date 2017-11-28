@@ -51,7 +51,7 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 		}
 	}
 
-	query := createTable(tableName, location, awsUsageSerde, awsUsageSerdeProps, columns, awsPartitions, true, true)
+	query := createTable(tableName, location, awsUsageSerde, "text***REMOVED***le", awsUsageSerdeProps, columns, awsPartitions, true, true)
 	return queryer.Query(query)
 }
 
