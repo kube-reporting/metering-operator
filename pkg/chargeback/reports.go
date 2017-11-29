@@ -30,6 +30,7 @@ func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerat
 
 func (c *Chargeback) runReportWorker() {
 	logger := c.logger.WithField("component", "reportWorker")
+	logger.Infof("Report worker started")
 	for c.processReport(logger) {
 
 	}
@@ -143,10 +144,11 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
 
-	if valid, err := c.validateGenerationQuery(logger, genQuery); err != nil {
+	if valid, err := c.validateGenerationQuery(logger, genQuery, true); err != nil {
 		c.setReportError(logger, report, err, "report is invalid")
 		return nil
 	} else if !valid {
+		logger.Warnf("cannot start report, it has uninitialized dependencies")
 		return nil
 	}
 
