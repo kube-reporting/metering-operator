@@ -323,10 +323,10 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	if !c.disablePromsum {
 		wg.Add(1)
 		go func() {
-			c.logger.Debugf("starting promsum collector")
+			c.logger.Debugf("starting Promsum collector")
 			c.runPromsumWorker(stopCh)
 			wg.Done()
-			c.logger.Debugf("promsum collector stopped")
+			c.logger.Debugf("Promsum collector stopped")
 		}()
 	}
 

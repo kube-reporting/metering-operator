@@ -12,6 +12,7 @@ import (
 
 func (c *Chargeback) runReportGenerationQueryWorker() {
 	logger := c.logger.WithField("component", "reportGenerationQueryWorker")
+	logger.Infof("ReportGenerationQuery worker started")
 	for c.processReportGenerationQuery(logger) {
 
 	}
@@ -62,20 +63,21 @@ func (c *Chargeback) handleReportGenerationQuery(logger log.FieldLogger, generat
 
 	var viewName string
 	if generationQuery.ViewName == "" {
-		logger.Infof("new generationQuery discovered")
+		logger.Infof("new reportGenerationQuery discovered")
 		if generationQuery.Spec.View.Disabled {
-			logger.Infof("generationQuery has spec.view.disabled=true, skipping processing")
+			logger.Infof("reportGenerationQuery has spec.view.disabled=true, skipping processing")
 			return nil
 		}
 		viewName = generationQueryViewName(generationQuery.Name)
 	} ***REMOVED*** {
-		logger.Infof("existing generationQuery discovered, viewName: %s", generationQuery.ViewName)
+		logger.Infof("existing reportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
 		viewName = generationQuery.ViewName
 	}
 
-	if valid, err := c.validateGenerationQuery(logger, generationQuery); err != nil {
+	if valid, err := c.validateGenerationQuery(logger, generationQuery, true); err != nil {
 		return err
 	} ***REMOVED*** if !valid {
+		logger.Warnf("cannot create view for reportGenerationQuery, it has uninitialized dependencies")
 		return nil
 	}
 
@@ -108,7 +110,8 @@ func (c *Chargeback) updateReportQueryViewName(logger log.FieldLogger, generatio
 // on another generationQuery with spec.view.disabled, the validation will
 // return an error. Returns true if there are no invalid dependencies and all
 // dependencies have a viewName or tableName set in the custom resource.
-func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) (bool, error) {
+// Returns false if there is a dependency that is uninitialized.
+func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, queueUninitialized bool) (bool, error) {
 	generationQueries, err := c.getDependentGenerationQueries(generationQuery)
 	if err != nil {
 		return false, err
@@ -120,25 +123,45 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 	if uninitializedQueries, err := c.getUninitializedReportGenerationQueries(generationQueries); err != nil {
 		return false, err
 	} ***REMOVED*** if len(uninitializedQueries) > 0 {
-		logger.Warnf("the following ReportGenerationQueries for the query do not have their views created %s", strings.Join(uninitializedQueries, ", "))
+		queriesStr := strings.Join(uninitializedQueries, ", ")
+		logger.Warnf("the following ReportGenerationQueries for the query do not have their views created %s", queriesStr)
+		if queueUninitialized {
+			logger.Debugf("queueing uninitializedQueries: %s", queriesStr)
+			for _, query := range uninitializedQueries {
+				key, err := cache.MetaNamespaceKeyFunc(query)
+				if err == nil {
+					c.informers.reportGenerationQueryQueue.Add(key)
+				}
+			}
+		}
 		return false, nil
 	}
 
-	if unitilaizedDataStores := c.getUnitilizedDatastores(dataStores); len(unitilaizedDataStores) > 0 {
-		logger.Warnf("the following datastores for the query do not have their tables created %s", strings.Join(unitilaizedDataStores, ", "))
+	if uninitializedDataStores := c.getUnitilizedDatastores(dataStores); len(uninitializedDataStores) > 0 {
+		dataStoresStr := strings.Join(uninitializedDataStores, ", ")
+		logger.Warnf("the following datastores for the query do not have their tables created %s", dataStoresStr)
+		if queueUninitialized {
+			logger.Debugf("queueing uninitializedDataStores: %s", dataStoresStr)
+			for _, dataStore := range uninitializedDataStores {
+				key, err := cache.MetaNamespaceKeyFunc(dataStore)
+				if err == nil {
+					c.informers.reportDataStoreQueue.Add(key)
+				}
+			}
+		}
 		return false, nil
 	}
 	return true, nil
 }
 
 func (c *Chargeback) getUnitilizedDatastores(dataStores []*cbTypes.ReportDataStore) []string {
-	var unitilaizedDataStores []string
+	var uninitializedDataStores []string
 	for _, dataStore := range dataStores {
 		if dataStore.TableName == "" {
-			unitilaizedDataStores = append(unitilaizedDataStores, dataStore.Name)
+			uninitializedDataStores = append(uninitializedDataStores, dataStore.Name)
 		}
 	}
-	return unitilaizedDataStores
+	return uninitializedDataStores
 }
 
 func (c *Chargeback) getUninitializedReportGenerationQueries(generationQueries []*cbTypes.ReportGenerationQuery) ([]string, error) {
