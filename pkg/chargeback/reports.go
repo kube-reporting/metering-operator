@@ -148,6 +148,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		c.setReportError(logger, report, err, "report is invalid")
 		return nil
 	} else if !valid {
+		logger.Warnf("cannot start report, it has uninitialized dependencies")
 		return nil
 	}
 

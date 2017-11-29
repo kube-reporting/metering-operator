@@ -63,20 +63,21 @@ func (c *Chargeback) handleReportGenerationQuery(logger log.FieldLogger, generat
 
 	var viewName string
 	if generationQuery.ViewName == "" {
-		logger.Infof("new generationQuery discovered")
+		logger.Infof("new reportGenerationQuery discovered")
 		if generationQuery.Spec.View.Disabled {
-			logger.Infof("generationQuery has spec.view.disabled=true, skipping processing")
+			logger.Infof("reportGenerationQuery has spec.view.disabled=true, skipping processing")
 			return nil
 		}
 		viewName = generationQueryViewName(generationQuery.Name)
 	} else {
-		logger.Infof("existing generationQuery discovered, viewName: %s", generationQuery.ViewName)
+		logger.Infof("existing reportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
 		viewName = generationQuery.ViewName
 	}
 
 	if valid, err := c.validateGenerationQuery(logger, generationQuery, true); err != nil {
 		return err
 	} else if !valid {
+		logger.Warnf("cannot create view for reportGenerationQuery, it has uninitialized dependencies")
 		return nil
 	}
 
@@ -109,6 +110,7 @@ func (c *Chargeback) updateReportQueryViewName(logger log.FieldLogger, generatio
 // on another generationQuery with spec.view.disabled, the validation will
 // return an error. Returns true if there are no invalid dependencies and all
 // dependencies have a viewName or tableName set in the custom resource.
+// Returns false if there is a dependency that is uninitialized.
 func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, queueUninitialized bool) (bool, error) {
 	generationQueries, err := c.getDependentGenerationQueries(generationQuery)
 	if err != nil {
