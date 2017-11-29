@@ -136,6 +136,6 @@ func main() {
 	}()
 
 	if err = op.Run(stopCh); err != nil {
-		logger.WithError(err).Errorf("error occurred while the Chargeback operator was running")
+		logger.WithError(err).Fatal("error occurred while the Chargeback operator was running")
 	}
 }
