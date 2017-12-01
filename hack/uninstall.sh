@@ -5,7 +5,7 @@ source ${DIR}/util.sh
 msg "Removing pull secrets"
 kube-remove-non-file secret coreos-pull-secret
 
-msg "Removing alm-install-operator"
+msg "Removing chargeback-helm-operator"
 kube-remove \
     manifests/installer
 
