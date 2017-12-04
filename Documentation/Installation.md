@@ -12,20 +12,12 @@ Chargeback consists of a few components:
 In order to install and use chargeback the following components will be
 necessary:
 
-- A tectonic installed Kubernetes cluster, of version 1.8.0 or greater, or with
-  a Tectonic Prometheus Operator to be of version 1.6.0 or greater (Prometheus
-  operator v0.13).
+- A Tectonic installed Kubernetes cluster, with the following components
+  (Tectonic 1.7.9 meets these requirements):
+  - Tectonic Prometheus Operator of version 1.6.0 or greater (Prometheus
+    Operator v0.13)
+  - ALM installed
 - A properly configured kubectl to access the Kubernetes cluster.
-
-To alter the version of the Tectonic Prometheus operator to be 1.6.0, run the
-following command:
-
-```
-$ kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spec":{"template":{"spec":{"containers":[{"name":"tectonic-prometheus-operator","image":"quay.io/coreos/tectonic-prometheus-operator:v1.6.0"}]}}}}'
-```
-
-Once the operator changes the version of the `kube-state-metrics` pod to 1.0.1,
-chargeback installation may proceed.
 
 ## Installation
 
@@ -52,38 +44,27 @@ $ export PULL_SECRET_NAMESPACE=tectonic-system
 $ export PULL_SECRET=coreos-pull-secret
 ```
 
-### Prometheus location
-
-If Prometheus was setup by Tectonic and is running within the tectonic-system
-namespace, then you can skip this section.
-
-If you're running the Prometheus operator yourself (not using the Tectonic one),
-then you need to configure the `prometheus-url` in
-`manifests/chargeback/chargeback-config.yaml` to match the service created by
-your Prometheus operator.
-
 ### Storing data in S3
 
-By default the data that chargeback collects and generates is ephemeral, and
-will not survive restarts of the hive pod it deploys. To make this data
-persistent by storing it in S3, follow the instructions in the [storing data in
-S3 document][Storing-Data-In-S3.md] before proceeding with these instructions.
+By default the data that chargeback collects and generates is stored in a
+single node HDFS cluster which is backed by a persistent volume. If you would
+instead prefer to store the data in a location outside of the cluster, you can
+configure Chargeback to [store data in S3][Storing-Data-In-S3.md].
 
 ### Run the install script
 
 Chargeback can now be installed with the following command:
 
 ```
-$ ./hack/install.sh
+$ ./hack/alm-install.sh
 ```
 
 ### Uninstall
 
-If chargeback has been installed manually, it can be uninstalled at any point by
-running the following command:
+To uninstall chargeback, and it's related resources:
 
 ```
-$ ./hack/uninstall.sh
+$ ./hack/alm-uninstall.sh
 ```
 
 ## Verifying operation
@@ -96,28 +77,4 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 
 ## Using chargeback
 
-For instructions on using chargeback, please read the documentation on [using
-chargeback](Using-chargeback.md)
-
-### AWS Billing data setup
-
-**AWS billing reports were temporarily removed from chargeback due to a
-refactor, the following documentation is left in for when this functionality is
-restored**
-
-* Setup hourly billing reports in the AWS console by following [these](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html) instructions. Be sure to note the bucket, report prefix, and report name specified here.
-
-* Create AWS access key with permissions for the bucket given above. The required permissions are:
-```
-s3:DeleteObject
-s3:GetObject
-s3:GetObjectAcl1
-s3:PutObject
-s3:PutObjectAcl
-s3:GetBucketAcl
-s3:ListBucket
-s3:GetBucketLocation
-```
-
-Once you have an `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` refer to
-[Set AWS Credentials](set-aws-credentials) and [Set AWS region](set-aws-region) for configuring.
+For instructions on using chargeback, please read the documentation on [using chargeback](Using-chargeback.md).
