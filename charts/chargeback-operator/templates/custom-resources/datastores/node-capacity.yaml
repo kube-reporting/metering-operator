@@ -9,8 +9,8 @@ metadata:
 spec:
   promsum:
     query: "node-capacity-memory-bytes"
-  storage:
-    local: {}
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
 
 ---
 
@@ -25,5 +25,5 @@ metadata:
 spec:
   promsum:
     query: "node-capacity-cpu-cores"
-  storage:
-    local: {}
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
