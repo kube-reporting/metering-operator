@@ -8,6 +8,15 @@ config:
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
 
+  storageLocationName: null
+
+  defaultStorage:
+    create: true
+    name: "local"
+    isDefault: true
+    spec:
+      local: {}
+
   awsBillingDataSource:
     enabled: false
     bucket: ""
