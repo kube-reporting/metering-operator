@@ -1,0 +1,25 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-request-memory-bytes"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node) keep_common
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-limit-memory-bytes"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node) keep_common

@@ -5,20 +5,10 @@ source ${DIR}/util.sh
 msg "Removing pull secrets"
 kube-remove-non-file secret coreos-pull-secret
 
-msg "Removing query and collection layer"
+msg "Removing chargeback-helm-operator"
 kube-remove \
-    manifests/chargeback \
-    manifests/presto \
-    manifests/hive \
-    manifests/hdfs
-
-msg "Removing Custom Resources"
-kube-remove \
-    manifests/custom-resources/prom-queries \
-    manifests/custom-resources/datastores \
-    manifests/custom-resources/report-queries
+    manifests/installer
 
 msg "Removing Custom Resource Definitions"
 kube-remove \
     manifests/custom-resource-definitions
-

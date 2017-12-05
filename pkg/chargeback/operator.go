@@ -130,6 +130,10 @@ type informers struct {
 	reportPrometheusQueryQueue    workqueue.RateLimitingInterface
 	reportPrometheusQueryInformer cache.SharedIndexInformer
 	reportPrometheusQueryLister   cbListers.ReportPrometheusQueryLister
+
+	storageLocationQueue    workqueue.RateLimitingInterface
+	storageLocationInformer cache.SharedIndexInformer
+	storageLocationLister   cbListers.StorageLocationLister
 }
 
 func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
@@ -194,14 +198,20 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportPrometheusQueryLister := cbListers.NewReportPrometheusQueryLister(reportPrometheusQueryInformer.GetIndexer())
 
+	storageLocationQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	storageLocationInformer := cbInformers.NewStorageLocationInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	storageLocationLister := cbListers.NewStorageLocationLister(storageLocationInformer.GetIndexer())
+
 	return informers{
 		informerList: []cache.SharedIndexInformer{
+			storageLocationInformer,
 			reportPrometheusQueryInformer,
 			reportGenerationQueryInformer,
 			reportDataStoreInformer,
 			reportInformer,
 		},
 		queueList: []workqueue.RateLimitingInterface{
+			storageLocationQueue,
 			reportPrometheusQueryQueue,
 			reportGenerationQueryQueue,
 			reportDataStoreQueue,
@@ -223,6 +233,10 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		reportPrometheusQueryQueue:    reportPrometheusQueryQueue,
 		reportPrometheusQueryInformer: reportPrometheusQueryInformer,
 		reportPrometheusQueryLister:   reportPrometheusQueryLister,
+
+		storageLocationQueue:    storageLocationQueue,
+		storageLocationInformer: storageLocationInformer,
+		storageLocationLister:   storageLocationLister,
 	}
 }
 

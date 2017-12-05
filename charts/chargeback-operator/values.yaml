@@ -1,0 +1,41 @@
+image:
+  repository: quay.io/coreos/chargeback
+  tag: latest
+  pullPolicy: Always
+
+config:
+  awsRegion: ""
+  awsAccessKeyID: ""
+  awsSecretAccessKey: ""
+
+  storageLocationName: null
+
+  defaultStorage:
+    create: true
+    name: "local"
+    isDefault: true
+    spec:
+      local: {}
+
+  awsBillingDataSource:
+    enabled: false
+    bucket: ""
+    path: ""
+
+  prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
+
+  promsumPollInterval: "5m"
+  promsumChunkSize: "5m"
+  promsumStepSize: "60s"
+
+  logReports: "false"
+  logDDLQueries: "false"
+  logDMLQueries: "false"
+  disablePromsum: "false"
+
+resources:
+  requests:
+    memory: "50Mi"
+    cpu: "50m"
+
+

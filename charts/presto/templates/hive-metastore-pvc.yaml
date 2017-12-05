@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hive-metastore-db-data
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.hive.metastore.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.hive.metastore.storage.size }}
+
