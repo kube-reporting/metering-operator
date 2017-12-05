@@ -20,6 +20,7 @@ fi
 : ${TILLER_READY_ENDPOINT:="127.0.0.1:44135/readiness"}
 
 export HELM_HOST
+export RELEASE_HISTORY_LIMIT
 
 NEEDS_EXIT=false
 
@@ -37,10 +38,58 @@ checkExit() {
     fi
 }
 
+getReleaseConfigmaps() {
+    kubectl \
+        --namespace "$MY_POD_NAMESPACE" \
+        get configmap \
+        -l "OWNER=TILLER,NAME=$HELM_RELEASE_NAME" \
+        -o json | jq '.' -r
+}
+
+setOwnerOnReleaseConfigmaps(){
+    if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
+        echo "Setting ownerReferences for Helm release configmaps"
+
+        RELEASE_CM_NAMES=$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r $1)
+        if [ -z "$RELEASE_CM_NAMES" ]; then
+            echo "No release configmaps to patch ownership of yet"
+        else
+            echo -n "$RELEASE_CM_NAMES" | while read -r cm; do
+                echo "Setting owner of $cm to deployment $MY_DEPLOYMENT_NAME - $MY_DEPLOYMENT_UID"
+                kubectl \
+                    --namespace "$MY_POD_NAMESPACE" \
+                    patch configmap $cm \
+                    -p "$(cat /tmp/owner-patch.json)"
+            done
+        fi
+    fi
+}
+
+cleanupOldReleaseConfigmaps() {
+    if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
+        echo "Getting list of helm release configmaps to delete"
+        DELETE_RELEASE_CM_NAMES=$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc $1)
+        if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
+            echo "No release configmaps to delete yet"
+        else
+            echo -n "$DELETE_RELEASE_CM_NAMES" | while read -r cm; do
+                echo "Deleting helm release configmap $cm"
+                kubectl \
+                    --namespace "$MY_POD_NAMESPACE" \
+                    delete configmap $cm
+            done
+        fi
+    fi
+}
+
 until curl -s $TILLER_READY_ENDPOINT; do
     echo "Waiting for Tiller to become ready"
     sleep 1
 done
+
+getReleaseConfigmaps > /tmp/release-configmaps.json
+cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
+checkExit
 
 EXTRA_ARGS=()
 if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
@@ -77,7 +126,12 @@ EOF
     echo "Owner references: "
     echo "$(cat /tmp/owner-values.yaml)"
     EXTRA_ARGS+=(-f /tmp/owner-values.yaml)
+
+    getReleaseConfigmaps > /tmp/release-configmaps.json
+    setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
+    checkExit
 fi
+
 
 while true; do
     checkExit
@@ -120,40 +174,9 @@ while true; do
     fi
     set -e
 
-    RELEASE_CMS=$(kubectl \
-        --namespace "$MY_POD_NAMESPACE" \
-        get configmap \
-        -l "OWNER=TILLER,NAME=$HELM_RELEASE_NAME" \
-        -o json | jq '.' -cr)
-
-    if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
-        echo "Setting ownerReferences for Helm release configmaps"
-
-        RELEASE_CM_NAMES=$(echo $RELEASE_CMS | jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r)
-        for cm in $RELEASE_CM_NAMES; do
-            kubectl \
-                --namespace "$MY_POD_NAMESPACE" \
-                patch configmap $cm \
-                -p "$(cat /tmp/owner-patch.json)"
-
-        done
-    fi
-
-    if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
-        echo "Getting list of helm release configmaps to delete"
-        DELETE_RELEASE_CM_NAMES=$(echo $RELEASE_CMS | jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -r)
-        if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
-            echo "No release configmaps to delete yet"
-        else
-            for cm in $DELETE_RELEASE_CM_NAMES; do
-                    echo "Deleting helm release configmap $cm"
-                    kubectl \
-                        --namespace "$MY_POD_NAMESPACE" \
-                        delete configmap $cm
-            done
-        fi
-    fi
-
+    getReleaseConfigmaps > /tmp/release-configmaps.json
+    setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
+    cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
     checkExit
 
     echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
