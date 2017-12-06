@@ -115,7 +115,7 @@ that the report should be in. The URL scheme is
 
 Since we're using `kubectl proxy`, we need to access our URL via a prefix that
 points to our Kubernetes service (see the upstream documentation on
-[Accessing Services Running on Clusters][https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-services/#manually-constructing-apiserver-proxy-urls]
+[Accessing Services Running on Clusters](https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-services/#manually-constructing-apiserver-proxy-urls)
 for more details). This assumes you've deployed chargeback in the `chargeback`
 namespace.
 
