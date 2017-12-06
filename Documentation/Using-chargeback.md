@@ -131,4 +131,3 @@ $ curl "http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/p
 ```
 
 The `format` parameter can be either `csv` or `json`.
-
