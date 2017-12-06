@@ -5,3 +5,12 @@ Chargeback records historical cluster usage, and can generate usage reports show
 ## Getting Started
 
 For installation instructions, please see the [installation](Documentation/Installation.md) portion of the documentation.
+
+### Development Dependencies
+
+- Go 1.8 or higher
+- Helm 2.6.2
+- Make
+- Docker
+- Glide
+
