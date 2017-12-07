@@ -35,6 +35,9 @@ spec:
         - apiGroups: ["chargeback.coreos.com"]
           resources: ["*"]
           verbs: ["*"]
+        # The rules below are based on the upstream Admin ClusterRole but
+        # have various things removed that the chargeback-helm-operator
+        # doesn't need. This is still overly permissive, but not by much.
         - apiGroups:
           - ""
           resources:
