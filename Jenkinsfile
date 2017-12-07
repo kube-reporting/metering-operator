@@ -91,10 +91,20 @@ podTemplate(
 
                     stage('install dependencies') {
                         // Build & install thrift
-                        sh """#!/bin/bash
+                        sh '''#!/bin/bash
                         set -e
-                        apk add make go libc-dev
-                        """
+                        apk add make go libc-dev curl
+                        export HELM_VERSION=2.6.2
+                        curl \
+                            --silent \
+                            --show-error \
+                            --location \
+                            "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+                            | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
+                            && chmod +x /usr/local/bin/helm
+                        helm init --client-only --skip-refresh
+                        helm repo remove stable
+                        '''
                     }
 
                     dir(kubeChargebackDir) {
