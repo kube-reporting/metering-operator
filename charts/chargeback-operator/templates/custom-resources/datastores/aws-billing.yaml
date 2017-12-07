@@ -11,5 +11,5 @@ spec:
   awsBilling:
     source:
       bucket: {{ .Values.config.awsBillingDataSource.bucket | quote }}
-      path: {{ .Values.config.awsBillingDataSource.path | quote }}
+      prefix: {{ .Values.config.awsBillingDataSource.prefix | quote }}
 {{- end -}}

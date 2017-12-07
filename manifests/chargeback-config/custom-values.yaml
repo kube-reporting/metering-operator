@@ -6,7 +6,7 @@ chargeback-operator:
       enabled: false
       # Replace these values with your own
       bucket: "your-aws-cost-report-bucket"
-      path: "path/to/report"
+      prefix: "path/to/report"
     # Replace these with your own AWS credentials
     awsAccessKeyID: "REPLACEME"
     awsSecretAccessKey: "REPLACEME"
