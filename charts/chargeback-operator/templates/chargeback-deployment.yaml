@@ -1,0 +1,82 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: chargeback
+  labels:
+    app: chargeback
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: chargeback
+      annotations:
+        chargeback-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/chargeback-con***REMOVED***g.yaml") . | sha256sum }}
+        chargeback-secrets-hash: {{ include (print $.Template.BasePath "/chargeback-secrets.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: chargeback
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: chargeback-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: chargeback-secrets
+              key: aws-secret-access-key
+        - name: LOG_DML_QUERIES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: log-dml-queries
+        - name: LOG_DDL_QUERIES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: log-ddl-queries
+        - name: LOG_REPORT
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: log-reports
+        - name: PROMETHEUS_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: prometheus-url
+        - name: PROMSUM_INTERVAL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: promsum-poll-interval
+        - name: PROMSUM_CHUNK_SIZE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: promsum-chunk-size
+        - name: PROMSUM_STEP_SIZE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: promsum-step-size
+        - name: DISABLE_PROMSUM
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: disable-promsum
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+        - name: "http"
+          containerPort: 8080
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: chargeback
+      imagePullSecrets:
+      - name: coreos-pull-secret

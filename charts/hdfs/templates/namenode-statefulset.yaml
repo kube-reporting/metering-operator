@@ -1,0 +1,111 @@
+# A headless service to create DNS records.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-namenode
+  labels:
+    app: hdfs-namenode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - port: 8020
+    name: fs
+  clusterIP: None
+  selector:
+    app: hdfs-namenode
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-namenode-proxy
+  labels:
+    app: hdfs-namenode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - port: 8020
+    name: fs
+  selector:
+    app: hdfs-namenode
+
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: hdfs-namenode
+  labels:
+    app: hdfs-namenode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  serviceName: "hdfs-namenode"
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hdfs-namenode
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: hdfs-namenode
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args: ["namenode-entrypoint.sh"]
+        env:
+        - name: CORE_CONF_fs_defaultFS
+          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
+        - name: CLUSTER_NAME
+          value: hdfs-k8s
+        - name: MY_NODE_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.namespace
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-namenode
+              resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
+        ports:
+        - containerPort: 8020
+          name: fs
+        volumeMounts:
+        - name: hdfs-namenode-data
+          mountPath: /hadoop/dfs/name
+          subPath: hadoop/dfs/name
+        resources:
+{{ toYaml .Values.namenode.resources | indent 10 }}
+      imagePullSecrets:
+      - name: coreos-pull-secret
+  volumeClaimTemplates:
+  - metadata:
+      name: "hdfs-namenode-data"
+      labels:
+        app: hdfs-namenode
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: {{ .Values.namenode.storage.class }}
+      resources:
+        requests:
+          storage: {{ .Values.namenode.storage.size }}

@@ -1,0 +1,93 @@
+# A headless service to create DNS records.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-datanode
+  labels:
+    app: hdfs-datanode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - port: 50010
+    name: fs
+  clusterIP: None
+  selector:
+    app: hdfs-datanode
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: hdfs-datanode
+  labels:
+    app: hdfs-datanode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  serviceName: "hdfs-datanode"
+  replicas: {{ .Values.datanode.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hdfs-datanode
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: hdfs-datanode
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args: ["datanode-entrypoint.sh"]
+        env:
+        - name: CORE_CONF_fs_defaultFS
+          value: hdfs://hdfs-namenode-proxy:8020
+        - name: MY_NODE_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.namespace
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-datanode
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: hdfs-datanode
+              resource: limits.memory
+        - name: JAVA_MAX_MEM_RATIO
+          value: "50"
+        ports:
+        - containerPort: 50010
+          name: fs
+        - containerPort: 50075
+          name: http
+        volumeMounts:
+        - name: hdfs-datanode-data
+          mountPath: /hadoop/dfs/data
+          subPath: hadoop/dfs/data
+        resources:
+{{ toYaml .Values.datanode.resources | indent 10 }}
+      imagePullSecrets:
+      - name: coreos-pull-secret
+  volumeClaimTemplates:
+  - metadata:
+      name: "hdfs-datanode-data"
+      labels:
+        app: hdfs-datanode
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: {{ .Values.datanode.storage.class }}
+      resources:
+        requests:
+          storage: {{ .Values.datanode.storage.size }}

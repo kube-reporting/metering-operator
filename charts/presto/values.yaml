@@ -1,0 +1,48 @@
+presto:
+  image:
+    repository: quay.io/coreos/chargeback-presto
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: "1536Mi"
+      cpu: "300m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1000m"
+
+hive:
+  image:
+    repository: quay.io/coreos/chargeback-hive
+    tag: 0.4.5
+    pullPolicy: Always
+
+  metastore:
+    resources:
+      requests:
+        memory: "650Mi"
+        cpu: "100m"
+      limits:
+        memory: "650Mi"
+        cpu: "500m"
+    storage:
+      # Default to null, which means using the default storage class if the
+      # defaultStorageClass admission plugin is turned on (is by default on
+      # Tectonic).
+      class: null
+      size: "5Gi"
+
+  server:
+    resources:
+      requests:
+        memory: "400Mi"
+        cpu: "100m"
+      limits:
+        memory: "400Mi"
+        cpu: "100m"
+
+con***REMOVED***g:
+  awsRegion: ""
+  awsAccessKeyID: ""
+  awsSecretAccessKey: ""
+
