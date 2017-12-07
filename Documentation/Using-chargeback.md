@@ -13,8 +13,7 @@ A report can be created for chargeback to run via kubectl. A report is a custom
 resource in Kubernetes, and thus is typically written as a YAML file. The report
 should be created in the same namespace as chargeback is installed in.
 
-Example reports ready to be created exist in
-`manifests/custom-resources/reports`. 
+Example reports ready to be created exist in `manifests/custom-resources/reports`.
 
 As an example, here's a report that will contain information on every pod's
 memory requests over the month of September:
@@ -28,6 +27,7 @@ spec:
   reportingStart: '2017-09-01T00:00:00Z'
   reportingEnd: '2017-09-30T23:59:59Z'
   generationQuery: "pod-cpu-usage-by-node"
+  gracePeriod: "5m"
   runImmediately: true
   output:
     local: {}
@@ -56,8 +56,11 @@ the same format as `reportingStart`.
 ### `gracePeriod`
 
 By default, a report is not run until the `reportingEnd` plus the `gracePeriod`
-has been reached. The grace period is a duration of time, which by default is
-`5m`.
+has been reached. The grace period is not used when aggregating over the
+reporting period.  This is primarily useful when you have an AWS Billing Report
+which may get it's latest information up to 24 hours after the billing period
+has ended.  The grace period is a duration of time, which by default is `5m`.
+Has no effect if `runImmediately` is true.
 
 ### `runImmediately`
 
@@ -69,8 +72,7 @@ the end of the reporting period has been reached (plus the grace period),
 
 The output section controls where the results of the report will be stored. The
 value of this does not impact how report results are fetched. For more
-information on this, please read the documentation on [storing data in
-S3](Storing-Data-In-S3.md).
+information on this, please read the documentation on [storing data in S3](Storing-Data-In-S3.md).
 
 ## Creating a report
 
@@ -98,25 +100,34 @@ $ kubectl -n $CHARGEBACK_NAMESPACE get report pod-cpu-usage -o json
 Once a report's status has changed to `Finished`, the report is ready to be
 downloaded. The chargeback pod exposes an HTTP API for this.
 
-First, set up a port forward via `kubectl` to the pod:
+First, use kubectl to setup a proxy for accessing Kubernetes services:
 
 ```
-$ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE port-forward {} 8080
+$ kubectl proxy
 ```
 
 The URL used to fetch a report changes based on the report's name and the format
-that the report should be in. Fill in the report name and format into the
-following template:
+that the report should be in. The URL scheme is
 
 ```
-localhost:8080/api/v1/reports/get?name=[Report Name]&format=[Format]
+/api/v1/reports/get?name=[Report Name]&format=[Format]
+```
+
+Since we're using `kubectl proxy`, we need to access our URL via a prefix that
+points to our Kubernetes service (see the upstream documentation on
+[Accessing Services Running on Clusters](https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-services/#manually-constructing-apiserver-proxy-urls)
+for more details). This assumes you've deployed chargeback in the `chargeback`
+namespace.
+
+```
+http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/proxy/api/v1/reports/get?name=[Report Name]&format=[Format]
 ```
 
 For example, the results of the `pod-cpu-usage-by-node` report can be fetched in
 CSV, with the following command:
 
 ```
-$ curl "localhost:8080/api/v1/reports/get?name=pod-cpu-usage-by-node&format=csv"
+$ curl "http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/proxy/api/v1/reports/get?name=pod-cpu-usage-by-node&format=csv"
 ```
 
 The `format` parameter can be either `csv` or `json`.

@@ -11,6 +11,19 @@ chargeback-operator:
     awsAccessKeyID: "REPLACEME"
     awsSecretAccessKey: "REPLACEME"
 
+
+    # If you want to use S3 for storage of reports, and collected metrics,
+    # uncomment the section below, and set awsAccessKeyID and awsSecretAccessKey
+    # for the chargeback-operator, and presto config sections (above and below).
+    # defaultStorage:
+    #   create: true
+    #   name: "s3"
+    #   isDefault: true
+    #   spec:
+    #     s3:
+    #       bucket: "REPLACEME"
+    #       prefix: "REPLACEME"
+
 presto:
   config:
     # Replace these with your own AWS credentials
