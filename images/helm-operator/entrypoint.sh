@@ -146,13 +146,13 @@ while true; do
 
     if [ -s "${HELM_VALUES_SECRET_NAME}.json" ]; then
         echo "Got secret ${HELM_VALUES_SECRET_NAME}"
-        jq '.data["values.yaml"]' ${HELM_VALUES_SECRET_NAME}.json -r > /tmp/values.json
-        if [ "$(cat /tmp/values.json)" != "null" ]; then
-            base64 -d /tmp/values.json > /tmp/values.yaml
+        jq '.data["values.yaml"]' ${HELM_VALUES_SECRET_NAME}.json -r > /tmp/values.b64enc
+        if [ "$(cat /tmp/values.b64enc)" != "null" ]; then
+            base64 -d /tmp/values.b64enc > /tmp/values.yaml
         else
             echo "No values.yaml found in ${HELM_VALUES_SECRET_NAME}"
         fi
-        rm -f /tmp/values.json
+        rm -f /tmp/values.b64enc
     else
         echo "Secret ${HELM_VALUES_SECRET_NAME} does not exist, default values will be used"
     fi
