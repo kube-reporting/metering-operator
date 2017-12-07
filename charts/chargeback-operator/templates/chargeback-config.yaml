@@ -7,7 +7,6 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  aws-region: {{ .Values.config.awsRegion | quote}}
   log-reports: {{ .Values.config.logReports | quote}}
   log-ddl-queries: {{ .Values.config.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.config.logDMLQueries | quote}}
