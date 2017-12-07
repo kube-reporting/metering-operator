@@ -103,7 +103,7 @@ podTemplate(
                             | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
                             && chmod +x /usr/local/bin/helm
                         helm init --client-only --skip-refresh
-                        helm repo remove stable
+                        helm repo remove stable || true
                         '''
                     }
 
