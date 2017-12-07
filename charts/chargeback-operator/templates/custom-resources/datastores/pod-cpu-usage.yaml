@@ -10,7 +10,7 @@ spec:
   promsum:
     query: "pod-request-cpu-cores"
     storage:
-      local: {}
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
 
 ---
 
@@ -26,5 +26,5 @@ spec:
   promsum:
     query: "pod-limit-cpu-cores"
     storage:
-      local: {}
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
 
