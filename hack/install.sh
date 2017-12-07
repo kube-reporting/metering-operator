@@ -20,12 +20,12 @@ msg "Installing Custom Resource De***REMOVED***nitions"
 kube-install \
     manifests/custom-resource-de***REMOVED***nitions
 
-msg "Installing chargeback-alm-install service account and RBAC resources"
+msg "Installing chargeback-helm-operator service account and RBAC resources"
 kube-install \
-    manifests/installer/chargeback-alm-install-service-account.yaml \
-    manifests/installer/chargeback-alm-install-rbac.yaml
+    manifests/installer/chargeback-helm-operator-service-account.yaml \
+    manifests/installer/chargeback-helm-operator-rbac.yaml
 
-msg "Installing alm-install-operator"
+msg "Installing chargeback-helm-operator"
 kube-install \
-    manifests/installer/chargeback-alm-install-deployment.yaml
+    manifests/installer/chargeback-helm-operator-deployment.yaml
 

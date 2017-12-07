@@ -1,21 +1,21 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: chargeback-alm-install
+  name: chargeback-helm-operator
   labels:
-    app: chargeback-alm-install
+    app: chargeback-helm-operator
 spec:
+- replicas: 1
   strategy:
     type: Recreate
-  replicas: 1
   template:
     metadata:
       labels:
-        app: chargeback-alm-install
+        app: chargeback-helm-operator
     spec:
       containers:
-      - name: chargeback-alm-install
-        image: quay.io/coreos/chargeback-alm-install:latest
+      - name: chargeback-helm-operator
+        image: quay.io/coreos/chargeback-helm-operator:latest
         imagePullPolicy: Always
         env:
         - name: HELM_VALUES_SECRET_NAME
@@ -84,6 +84,6 @@ spec:
           timeoutSeconds: 1
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      serviceAccount: chargeback-alm-install
+      serviceAccount: chargeback-helm-operator
       imagePullSecrets:
       - name: coreos-pull-secret

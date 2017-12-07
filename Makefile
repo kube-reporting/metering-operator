@@ -7,7 +7,7 @@ CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 DOCKER_BUILD_ARGS := --no-cache
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
-CHARGEBACK_ALM_INSTALL_IMAGE := quay.io/coreos/chargeback-alm-install
+CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
 HELM_OPERATOR_IMAGE := quay.io/coreos/helm-operator
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
@@ -21,7 +21,7 @@ DOCKER_IMAGE_TARGETS := \
 	$(HIVE_IMAGE) \
 	$(PRESTO_IMAGE) \
 	$(HELM_OPERATOR_IMAGE) \
-	$(CHARGEBACK_ALM_INSTALL_IMAGE)
+	$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
@@ -82,8 +82,8 @@ ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 
-TARGETS := chargeback hadoop hive presto helm-operator chargeback-alm-install
-# These generate new make targets like chargeback-alm-install-docker-build
+TARGETS := chargeback hadoop hive presto helm-operator chargeback-helm-operator
+# These generate new make targets like chargeback-helm-operator-docker-build
 # which can be invoked.
 DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
 DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
@@ -92,17 +92,17 @@ DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(TARGETS))
 
 # The steps below run for each value of $(TARGET) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
-# The example will be using the chargeback-alm-install targets as it's example.
+# The example will be using the chargeback-helm-operator targets as it's example.
 #
 # The pattern/string manipulation below does the following (starting from the inner most expression):
 # 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suf***REMOVED***xed value from $(TARGETS)
-# ex: chargeback-alm-install-docker-build -> chargeback-alm-install
+# ex: chargeback-helm-operator-docker-build -> chargeback-helm-operator
 # 2) Replaces - with _
-# ex: chargeback-alm-install -> chargeback_alm_install
+# ex: chargeback-helm-operator -> chargeback_helm_operator
 # 3) Uppercases letters
-# ex: chargeback_alm_install -> CHARGEBACK_ALM_INSTALL
+# ex: chargeback_helm_operator -> CHARGEBACK_HELM_OPERATOR
 # 4) Appends _IMAGE
-# ex: CHARGEBACK_ALM_INSTALL -> CHARGEBACK_ALM_INSTALL_IMAGE
+# ex: CHARGEBACK_HELM_OPERATOR -> CHARGEBACK_HELM_OPERATOR_IMAGE
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
@@ -143,8 +143,8 @@ dist.zip: dist
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-alm-install-docker-build: images/chargeback-alm-install/Docker***REMOVED***le tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE)
+chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -178,7 +178,7 @@ tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
 
 tectonic-chargeback-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
-	helm package --save=false -d images/chargeback-alm-install charts/tectonic-chargeback
+	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
 
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
