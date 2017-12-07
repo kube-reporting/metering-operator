@@ -44,6 +44,12 @@ $ export PULL_SECRET_NAMESPACE=tectonic-system
 $ export PULL_SECRET=coreos-pull-secret
 ```
 
+### Con***REMOVED***guration
+
+Before installing, please read about [con***REMOVED***guring chargeback](con***REMOVED***guration.md).
+Some options do not support being changed post-install, so you may wish to
+adjust some con***REMOVED***guration options, before continuing with the install.
+
 ### Run the install script
 
 Chargeback can now be installed with the following command:
@@ -71,5 +77,3 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 ## Using chargeback
 
 For instructions on using chargeback, please read the documentation on [using chargeback](Using-chargeback.md).
-
-For details on common con***REMOVED***guration options please read the documentation on [con***REMOVED***guring chargeback](con***REMOVED***guration.md).
