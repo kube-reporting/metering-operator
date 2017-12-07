@@ -9,6 +9,11 @@ msg "Removing chargeback-helm-operator"
 kube-remove \
     manifests/installer
 
-msg "Removing Custom Resource De***REMOVED***nitions"
-kube-remove \
-    manifests/custom-resource-de***REMOVED***nitions
+
+if [ "$SKIP_DELETE_CRDS" == "true" ]; then
+    echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
+***REMOVED***
+    msg "Removing Custom Resource De***REMOVED***nitions"
+    kube-remove \
+        manifests/custom-resource-de***REMOVED***nitions
+***REMOVED***
