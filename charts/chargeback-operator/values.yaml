@@ -4,7 +4,6 @@ image:
   pullPolicy: Always
 
 con***REMOVED***g:
-  awsRegion: ""
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
 
