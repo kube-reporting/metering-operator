@@ -9,8 +9,8 @@ metadata:
 spec:
   promsum:
     query: "pod-request-memory-bytes"
-  storage:
-    local: {}
+    storage:
+      storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}
 
 ---
 
@@ -25,5 +25,5 @@ metadata:
 spec:
   promsum:
     query: "pod-limit-memory-bytes"
-  storage:
-    local: {}
+    storage:
+      storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}

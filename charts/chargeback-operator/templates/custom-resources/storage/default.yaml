@@ -1,0 +1,16 @@
+{{- if .Values.con***REMOVED***g.defaultStorage.create -}}
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: StorageLocation
+metadata:
+  name: {{ .Values.con***REMOVED***g.defaultStorage.name }}
+  labels:
+    tectonic-chargeback: "true"
+{{- if .Values.con***REMOVED***g.defaultStorage.isDefault }}
+  annotations:
+    storagelocation.chargeback.coreos.com/is-default: "true"
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+{{ .Values.con***REMOVED***g.defaultStorage.spec | toYaml | indent 2 }}
+{{- end -}}
