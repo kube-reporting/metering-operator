@@ -12,6 +12,10 @@ kube-remove \
 msg "Removing chargeback-helm-operator"
 kube-remove-non-file deployment -l alm-owner-name=chargeback-helm-operator.v0.5.0
 
-msg "Removing Custom Resource Definitions"
-kube-remove \
-    manifests/custom-resource-definitions
+if [ "$SKIP_DELETE_CRDS" == "true" ]; then
+    echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
+else
+    msg "Removing Custom Resource Definitions"
+    kube-remove \
+        manifests/custom-resource-definitions
+fi
