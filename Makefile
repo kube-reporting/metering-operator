@@ -15,10 +15,13 @@ HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 
-TARGETS := chargeback hadoop hive presto helm-operator chargeback-alm-install
-DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
-DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
-DOCKER_IMAGE_TARGETS := $(CHARGEBACK_IMAGE) $(HADOOP_IMAGE) $(HIVE_IMAGE) $(PRESTO_IMAGE) $(CHARGEBACK_ALM_INSTALL_IMAGE)
+DOCKER_IMAGE_TARGETS := \
+	$(CHARGEBACK_IMAGE) \
+	$(HADOOP_IMAGE) \
+	$(HIVE_IMAGE) \
+	$(PRESTO_IMAGE) \
+	$(HELM_OPERATOR_IMAGE) \
+	$(CHARGEBACK_ALM_INSTALL_IMAGE)
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
@@ -79,22 +82,45 @@ ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 
+TARGETS := chargeback hadoop hive presto helm-operator chargeback-alm-install
+# These generate new make targets like chargeback-alm-install-docker-build
+# which can be invoked.
+DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
+DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
+DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(TARGETS))
+DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(TARGETS))
+
+# The steps below run for each value of $(TARGET) effectively, generating multiple Make targets.
+# To make it easier to follow, each step will include an example after the evaluation.
+# The example will be using the chargeback-alm-install targets as it's example.
+#
+# The pattern/string manipulation below does the following (starting from the inner most expression):
+# 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suf***REMOVED***xed value from $(TARGETS)
+# ex: chargeback-alm-install-docker-build -> chargeback-alm-install
+# 2) Replaces - with _
+# ex: chargeback-alm-install -> chargeback_alm_install
+# 3) Uppercases letters
+# ex: chargeback_alm_install -> CHARGEBACK_ALM_INSTALL
+# 4) Appends _IMAGE
+# ex: CHARGEBACK_ALM_INSTALL -> CHARGEBACK_ALM_INSTALL_IMAGE
+# That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
+
+$(DOCKER_PUSH_TARGETS)::
+	$(MAKE) docker-push IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
+
+$(DOCKER_TAG_TARGETS)::
+	$(MAKE) docker-tag IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
+
+$(DOCKER_PULL_TARGETS)::
+	$(MAKE) docker-pull IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
+
 docker-build-all: $(DOCKER_BUILD_TARGETS)
 
-docker-push-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-push IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-push-all: $(DOCKER_PUSH_TARGETS)
 
-docker-tag-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-tag IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-tag-all: $(DOCKER_TAG_TARGETS)
 
-docker-pull-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-pull IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-pull-all: $(DOCKER_PULL_TARGETS)
 
 dist: Documentation manifests hack
 	@mkdir -p $@
@@ -108,9 +134,7 @@ dist: Documentation manifests hack
 		--exclude 'hack/*' \
 		--exclude 'Documentation/*' \
 		--exclude 'manifests/alm' \
-		--exclude 'manifests/installer' \
-		--exclude 'manifests/custom-resources/datastores/aws-billing.yaml' \
-		--exclude manifests/chargeback/chargeback-secrets.yaml \
+		--exclude 'manifests/installer'
 		$? $@
 
 dist.zip: dist
@@ -159,9 +183,8 @@ tectonic-chargeback-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
 	k8s-update-codegen k8s-verify-codegen \
-	chargeback-docker-build \
-	helm-operator-docker-build chargeback-alm-install-docker-build  \
-	hadoop-docker-build presto-docker-build hive-docker-build \
+	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
+	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart
