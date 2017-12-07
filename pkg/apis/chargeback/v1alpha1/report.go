@@ -25,6 +25,11 @@ type Report struct {
 	Status ReportStatus `json:"status"`
 }
 
+type ReportStorageLocation struct {
+	StorageLocationName string               `json:"storageLocationName,omitempty"`
+	StorageSpec         *StorageLocationSpec `json:"spec,omitempty"`
+}
+
 type ReportSpec struct {
 	// ReportingStart is the beginning period of time that the report will be based on.
 	ReportingStart meta.Time `json:"reportingStart"`
@@ -42,8 +47,8 @@ type ReportSpec struct {
 	// the report
 	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`
 
-	// Output is the S3 bucket where results are sent.
-	Output *StorageLocation `json:"output"`
+	// Output is the storage location where results are sent.
+	Output *ReportStorageLocation `json:"output,omitempty"`
 }
 
 type ReportTemplateSpec struct {
