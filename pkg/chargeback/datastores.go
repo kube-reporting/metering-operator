@@ -5,10 +5,12 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
+	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -82,27 +84,78 @@ func (c *Chargeback) handleReportDataStore(logger log.FieldLogger, dataStore *cb
 func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
 	storage := dataStore.Spec.Promsum.Storage
 	tableName := dataStoreTableName(dataStore.Name)
-	switch {
-	case storage == nil || storage.Local != nil:
+
+	var storageSpec cbTypes.StorageLocationSpec
+	// Nothing speci***REMOVED***ed, try to use default storage location
+	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
+		logger.Info("reportDataStore does not have a storageSpec or storageLocationName set, using default storage location")
+		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
+		if err != nil {
+			return err
+		}
+		if storageLocation == nil {
+			return fmt.Errorf("invalid promsum DataStore, no storageSpec or storageLocationName and cluster has no default StorageLocation")
+		}
+
+		storageSpec = storageLocation.Spec
+	} ***REMOVED*** if storage.StorageLocationName != "" { // Speci***REMOVED***c storage location speci***REMOVED***ed
+		logger.Infof("reportDataStore con***REMOVED***gured to use StorageLocation %s", storage.StorageLocationName)
+		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.namespace).Get(storage.StorageLocationName)
+		if err != nil {
+			return err
+		}
+		storageSpec = storageLocation.Spec
+	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datastore
+		storageSpec = *storage.StorageSpec
+	}
+
+	if storageSpec.Local != nil {
 		logger.Debugf("creating local table %s", tableName)
-		// store the data locally
 		err := hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
 		if err != nil {
 			return err
 		}
-	case storage.S3 != nil:
-		// store the data in S3
-		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storage.S3.Bucket, storage.S3.Pre***REMOVED***x)
-		err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storage.S3.Bucket, storage.S3.Pre***REMOVED***x)
+	} ***REMOVED*** if storageSpec.S3 != nil {
+		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
+		err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
 		if err != nil {
 			return err
 		}
-	default:
+		return nil
+	} ***REMOVED*** {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datastore %s", dataStore.Name)
 	}
+
 	logger.Debugf("successfully created table %s", tableName)
 
 	return c.updateDataStoreTableName(logger, dataStore, tableName)
+}
+
+func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
+	storageLocations, err := c.informers.storageLocationLister.StorageLocations(c.namespace).List(labels.Everything())
+	if err != nil {
+		return nil, err
+	}
+
+	var defaultStorageLocations []*cbTypes.StorageLocation
+
+	for _, storageLocation := range storageLocations {
+		if storageLocation.Annotations[cbTypes.IsDefaultStorageLocationAnnotation] == "true" {
+			defaultStorageLocations = append(defaultStorageLocations, storageLocation)
+		}
+	}
+
+	if len(defaultStorageLocations) == 0 {
+		return nil, nil
+	}
+
+	if len(defaultStorageLocations) > 1 {
+		c.logger.Infof("getDefaultStorageLocation %s default storageLocations found", len(defaultStorageLocations))
+		return nil, fmt.Errorf("%d defaultStorageLocations were found", len(defaultStorageLocations))
+	}
+
+	return defaultStorageLocations[0], nil
+
 }
 
 func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
