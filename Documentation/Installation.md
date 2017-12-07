@@ -67,7 +67,20 @@ your Prometheus operator.
 By default the data that chargeback collects and generates is ephemeral, and
 will not survive restarts of the hive pod it deploys. To make this data
 persistent by storing it in S3, follow the instructions in the [storing data in
-S3 document][Storing-Data-In-S3.md] before proceeding with these instructions.
+S3 document](Storing-Data-In-S3.md) before proceeding with these instructions.
+
+### AWS Billing Correlation
+
+Chargeback is able to correlate cluster usage information with [AWS detailed
+billing information][AWS-billing], attaching a dollar amount to resource usage.
+For clusters running in EC2, this can be enabled by setting the bucket and
+pre***REMOVED***x in `manifests/custom-resources/datastores/aws-billing.yaml` to match the
+location billing reports are con***REMOVED***gured to be stored, and having the
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables set with
+credentials capable of accessing the bucket when the install command is run.
+
+If the AWS Cost and Usage Reports are not enabled on your account, instructions
+to enable them can be found [here][enable-aws-billing].
 
 ### Run the install script
 
@@ -99,25 +112,5 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 For instructions on using chargeback, please read the documentation on [using
 chargeback](Using-chargeback.md)
 
-### AWS Billing data setup
-
-**AWS billing reports were temporarily removed from chargeback due to a
-refactor, the following documentation is left in for when this functionality is
-restored**
-
-* Setup hourly billing reports in the AWS console by following [these](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html) instructions. Be sure to note the bucket, report pre***REMOVED***x, and report name speci***REMOVED***ed here.
-
-* Create AWS access key with permissions for the bucket given above. The required permissions are:
-```
-s3:DeleteObject
-s3:GetObject
-s3:GetObjectAcl1
-s3:PutObject
-s3:PutObjectAcl
-s3:GetBucketAcl
-s3:ListBucket
-s3:GetBucketLocation
-```
-
-Once you have an `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` refer to
-[Set AWS Credentials](set-aws-credentials) and [Set AWS region](set-aws-region) for con***REMOVED***guring.
+[AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
+[enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html

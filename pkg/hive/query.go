@@ -22,7 +22,7 @@ func dropTable(name string, ignoreNotExists, purge bool) string {
 
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
-func createTable(name, location, serdeFmt string, serdeProps map[string]string, columns, partitions []Column, external, ignoreExists bool) string {
+func createTable(name, location, serdeFmt, format string, serdeProps map[string]string, columns, partitions []Column, external, ignoreExists bool) string {
 	columnsStr := fmtColumnText(columns)
 
 	tableType := ""
@@ -47,13 +47,16 @@ func createTable(name, location, serdeFmt string, serdeProps map[string]string, 
 	if location != "" {
 		location = fmt.Sprintf(`LOCATION "%s"`, location)
 	}
+	if format != "" {
+		format = fmt.Sprintf("STORED AS %s", format)
+	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
 %s (%s) %s
-%s %s`,
+%s %s %s`,
 		tableType, ifNotExists,
 		name, columnsStr, partitionedBy,
-		serdeFormatStr, location,
+		serdeFormatStr, format, location,
 	)
 }
 
