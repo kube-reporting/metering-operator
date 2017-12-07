@@ -12,6 +12,8 @@ spec:
     type: map(varchar, varchar)
   - name: node_capacity_memory_bytes
     type: double
+  - name: resource_id
+    type: string
   - name: timeprecision
     type: double
   - name: node_capacity_memory_byte_seconds
@@ -22,6 +24,7 @@ spec:
       SELECT labels['node'] as node,
           labels,
           amount as node_capacity_memory_bytes,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
           amount * timeprecision as node_capacity_memory_byte_seconds,
           "timestamp"
@@ -43,6 +46,8 @@ spec:
     type: map(varchar, varchar)
   - name: node_allocatable_memory_bytes
     type: double
+  - name: resource_id
+    type: string
   - name: timeprecision
     type: double
   - name: node_allocatable_memory_byte_seconds
@@ -53,6 +58,7 @@ spec:
       SELECT labels['node'] as node,
           labels,
           amount as node_allocatable_memory_bytes,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
           amount * timeprecision as node_allocatable_memory_byte_seconds,
           "timestamp"
