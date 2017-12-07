@@ -1,7 +1,12 @@
+{{- if .Values.con***REMOVED***g.awsBillingDataSource.enabled -}}
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-aws-billing"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
 spec:
   reportQueries:
   - "pod-request-memory-usage"
@@ -28,7 +33,7 @@ spec:
     type: double
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-        {{ ***REMOVED***lterAWSData .Report "aws-ec2-billing-data"}}
+        {| ***REMOVED***lterAWSData .Report "aws-ec2-billing-data"|}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
@@ -38,9 +43,9 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {{ generationQueryViewName "node-allocatable-memory" }}
-        WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
-        AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+      FROM {| generationQueryViewName "node-allocatable-memory" |}
+        WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+        AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     ),
     pod_memory_consumption AS (
       SELECT pod,
@@ -49,9 +54,9 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-      FROM {{ generationQueryViewName "pod-request-memory-usage" }}
-      WHERE "timestamp" >= timestamp '{{.Report.StartPeriod | prestoTimestamp }}'
-      AND "timestamp" <= timestamp '{{ .Report.EndPeriod | prestoTimestamp }}'
+      FROM {| generationQueryViewName "pod-request-memory-usage" |}
+      WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+      AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
       GROUP BY pod, namespace, node
     ),
     cluster_usage AS (
@@ -65,3 +70,4 @@ spec:
            aws_billing_sum.cluster_cost * cluster_usage.pod_memory_usage_percent as pod_cost
     FROM cluster_usage
     CROSS JOIN aws_billing_sum
+{{- end -}}
