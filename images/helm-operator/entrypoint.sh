@@ -180,5 +180,8 @@ while true; do
     checkExit
 
     echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
-    sleep $HELM_RECONCILE_INTERVAL_SECONDS
+    for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
+        sleep 1
+        checkExit
+    done
 done
