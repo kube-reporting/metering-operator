@@ -11,5 +11,5 @@ spec:
   awsBilling:
     source:
       bucket: {{ .Values.con***REMOVED***g.awsBillingDataSource.bucket | quote }}
-      path: {{ .Values.con***REMOVED***g.awsBillingDataSource.path | quote }}
+      pre***REMOVED***x: {{ .Values.con***REMOVED***g.awsBillingDataSource.pre***REMOVED***x | quote }}
 {{- end -}}
