@@ -122,7 +122,7 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 	}
 
 	if len(manifests) == 0 {
-		logger.Infof("datastore %q has no report manifests in it's bucket, the first report has likely not been generated yet", dataStore.Name)
+		logger.Warnf("datastore %q has no report manifests in it's bucket, the first report has likely not been generated yet", dataStore.Name)
 		return nil
 	}
 
