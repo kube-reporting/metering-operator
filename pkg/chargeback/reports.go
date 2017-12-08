@@ -237,7 +237,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Repo
 	} else if storageSpec.S3 != nil {
 		bucket, prefix := storageSpec.S3.Bucket, storageSpec.S3.Prefix
 		logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
-		err = hive.CreateReportTable(c.hiveQueryer, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
+		err = hive.CreateS3ReportTable(c.hiveQueryer, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
 	} else {
 		return nil, fmt.Errorf("storage incorrectly configured on report: %s", report.Name)
 	}

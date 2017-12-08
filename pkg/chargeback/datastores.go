@@ -117,7 +117,7 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		}
 	} else if storageSpec.S3 != nil {
 		logger.Debugf("creating table %s backed by s3 bucket %s at prefix %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Prefix)
-		err := hive.CreatePromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Prefix)
+		err := hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Prefix)
 		if err != nil {
 			return err
 		}
