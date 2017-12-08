@@ -1,9 +1,12 @@
 package hive
 
+import "path"
+
 // CreateReportTable creates a new table backed by the given bucket/prefix with
 // the specified columns
 func CreateReportTable(queryer Queryer, tableName, bucket, prefix string, columns []Column) error {
-	location, err := s3Location(bucket, prefix)
+	path := path.Join(prefix, tableName)
+	location, err := s3Location(bucket, path)
 	if err != nil {
 		return err
 	}
