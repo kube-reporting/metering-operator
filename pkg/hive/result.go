@@ -4,7 +4,7 @@ import "path"
 
 // CreateReportTable creates a new table backed by the given bucket/pre***REMOVED***x with
 // the speci***REMOVED***ed columns
-func CreateReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column) error {
+func CreateS3ReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column) error {
 	path := path.Join(pre***REMOVED***x, tableName)
 	location, err := s3Location(bucket, path)
 	if err != nil {
