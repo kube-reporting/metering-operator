@@ -8,8 +8,7 @@ metadata:
 {{- end }}
 spec:
   query: |
-    kube_node_status_capacity_memory_bytes * on(node) group_left(provider_id) kube_node_info
-
+    kube_node_status_capacity_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -22,4 +21,4 @@ metadata:
 {{- end }}
 spec:
   query: |
-    kube_node_status_capacity_cpu_cores * on(node) group_left(provider_id) kube_node_info
+    kube_node_status_capacity_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
