@@ -13,6 +13,7 @@ type ChargebackV1alpha1Interface interface {
 	ReportDataStoresGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
+	StorageLocationsGetter
 }
 
 // ChargebackV1alpha1Client is used to interact with features provided by the chargeback.coreos.com group.
@@ -34,6 +35,10 @@ func (c *ChargebackV1alpha1Client) ReportGenerationQueries(namespace string) Rep
 
 func (c *ChargebackV1alpha1Client) ReportPrometheusQueries(namespace string) ReportPrometheusQueryInterface {
 	return newReportPrometheusQueries(c, namespace)
+}
+
+func (c *ChargebackV1alpha1Client) StorageLocations(namespace string) StorageLocationInterface {
+	return newStorageLocations(c, namespace)
 }
 
 // NewForCon***REMOVED***g creates a new ChargebackV1alpha1Client for the given con***REMOVED***g.

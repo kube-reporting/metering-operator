@@ -1,0 +1,25 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "node-allocatable-memory-bytes"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    kube_node_status_allocatable_memory_bytes * on(node) group_left(provider_id) kube_node_info
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "node-allocatable-cpu-cores"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    kube_node_status_allocatable_cpu_cores * on(node) group_left(provider_id) kube_node_info

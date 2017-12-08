@@ -7,5 +7,3 @@ spec:
   reportingEnd: '2017-12-30T23:59:59Z'
   generationQuery: "aws-cluster-cost"
   runImmediately: true
-  output:
-    local: {}

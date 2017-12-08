@@ -16,6 +16,8 @@ type Interface interface {
 	ReportGenerationQueries() ReportGenerationQueryInformer
 	// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 	ReportPrometheusQueries() ReportPrometheusQueryInformer
+	// StorageLocations returns a StorageLocationInformer.
+	StorageLocations() StorageLocationInformer
 }
 
 type version struct {
@@ -45,4 +47,9 @@ func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
 // ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 func (v *version) ReportPrometheusQueries() ReportPrometheusQueryInformer {
 	return &reportPrometheusQueryInformer{factory: v.SharedInformerFactory}
+}
+
+// StorageLocations returns a StorageLocationInformer.
+func (v *version) StorageLocations() StorageLocationInformer {
+	return &storageLocationInformer{factory: v.SharedInformerFactory}
 }

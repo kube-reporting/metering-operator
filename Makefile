@@ -7,17 +7,21 @@ CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 DOCKER_BUILD_ARGS := --no-cache
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
-CHARGEBACK_ALM_INSTALL_IMAGE := quay.io/coreos/chargeback-alm-install
+CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
+HELM_OPERATOR_IMAGE := quay.io/coreos/helm-operator
 HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 
-TARGETS := chargeback hadoop hive presto chargeback-alm-install
-DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
-DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
-DOCKER_IMAGE_TARGETS := $(CHARGEBACK_IMAGE) $(HADOOP_IMAGE) $(HIVE_IMAGE) $(PRESTO_IMAGE) $(CHARGEBACK_ALM_INSTALL_IMAGE)
+DOCKER_IMAGE_TARGETS := \
+	$(CHARGEBACK_IMAGE) \
+	$(HADOOP_IMAGE) \
+	$(HIVE_IMAGE) \
+	$(PRESTO_IMAGE) \
+	$(HELM_OPERATOR_IMAGE) \
+	$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
@@ -78,22 +82,45 @@ ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 
+TARGETS := chargeback hadoop hive presto helm-operator chargeback-helm-operator
+# These generate new make targets like chargeback-helm-operator-docker-build
+# which can be invoked.
+DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
+DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
+DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(TARGETS))
+DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(TARGETS))
+
+# The steps below run for each value of $(TARGET) effectively, generating multiple Make targets.
+# To make it easier to follow, each step will include an example after the evaluation.
+# The example will be using the chargeback-helm-operator targets as it's example.
+#
+# The pattern/string manipulation below does the following (starting from the inner most expression):
+# 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suf***REMOVED***xed value from $(TARGETS)
+# ex: chargeback-helm-operator-docker-build -> chargeback-helm-operator
+# 2) Replaces - with _
+# ex: chargeback-helm-operator -> chargeback_helm_operator
+# 3) Uppercases letters
+# ex: chargeback_helm_operator -> CHARGEBACK_HELM_OPERATOR
+# 4) Appends _IMAGE
+# ex: CHARGEBACK_HELM_OPERATOR -> CHARGEBACK_HELM_OPERATOR_IMAGE
+# That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
+
+$(DOCKER_PUSH_TARGETS)::
+	$(MAKE) docker-push IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
+
+$(DOCKER_TAG_TARGETS)::
+	$(MAKE) docker-tag IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
+
+$(DOCKER_PULL_TARGETS)::
+	$(MAKE) docker-pull IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
+
 docker-build-all: $(DOCKER_BUILD_TARGETS)
 
-docker-push-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-push IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-push-all: $(DOCKER_PUSH_TARGETS)
 
-docker-tag-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-tag IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-tag-all: $(DOCKER_TAG_TARGETS)
 
-docker-pull-all:
-	(set -e ; $(foreach image, $(DOCKER_IMAGE_TARGETS), \
-		$(MAKE) docker-pull IMAGE_NAME=$(image) IMAGE_TAG=$(IMAGE_TAG); \
-	))
+docker-pull-all: $(DOCKER_PULL_TARGETS)
 
 dist: Documentation manifests hack
 	@mkdir -p $@
@@ -107,9 +134,7 @@ dist: Documentation manifests hack
 		--exclude 'hack/*' \
 		--exclude 'Documentation/*' \
 		--exclude 'manifests/alm' \
-		--exclude 'manifests/installer' \
-		--exclude 'manifests/custom-resources/datastores/aws-billing.yaml' \
-		--exclude manifests/chargeback/chargeback-secrets.yaml \
+		--exclude 'manifests/installer'
 		$? $@
 
 dist.zip: dist
@@ -118,8 +143,11 @@ dist.zip: dist
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-alm-install-docker-build: images/chargeback-alm-install/Docker***REMOVED***le
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_ALM_INSTALL_IMAGE) DOCKER_BUILD_CONTEXT=.
+chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
+
+helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
 
 presto-docker-build: images/presto/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
@@ -146,14 +174,20 @@ images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
+tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
+
+tectonic-chargeback-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
+	helm dep update --skip-refresh charts/tectonic-chargeback
+	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
+
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
 	k8s-update-codegen k8s-verify-codegen \
-	chargeback-docker-build chargeback-alm-install-docker-build  \
-	hadoop-docker-build presto-docker-build hive-docker-build \
+	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
+	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin
+	chargeback-bin tectonic-chargeback-chart
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh

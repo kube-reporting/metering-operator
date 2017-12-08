@@ -1,0 +1,76 @@
+{{- if .Values.con***REMOVED***g.awsBillingDataSource.enabled -}}
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "aws-ec2-billing-data"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataStores:
+  - "aws-billing"
+  reportQueries:
+  - "node-allocatable-memory"
+  columns:
+  - name: resource_id
+    type: string
+  - name: period_start
+    type: timestamp
+  - name: period_stop
+    type: timestamp
+  - name: partition_start
+    type: timestamp
+  - name: partition_stop
+    type: timestamp
+  - name: period_cost
+    type: double
+  query: |
+    WITH resource_id_list AS (
+      SELECT resource_id
+      FROM {| generationQueryViewName "node-allocatable-memory" |}
+      GROUP BY resource_id
+    )
+    SELECT lineItem_resourceId as resource_id,
+           lineItem_UsageStartDate as period_start,
+           lineItem_UsageEndDate as period_stop,
+           lineItem_BlendedCost as period_cost,
+           billing_period_start as partition_start,
+           billing_period_end as partition_stop
+    FROM {| dataStoreTableName "aws-billing" |} as aws_billing
+    INNER JOIN resource_id_list
+    ON aws_billing.lineItem_resourceId = resource_id_list.resource_id
+    WHERE position('.csv' IN aws_billing."$path") != 0 -- This prevents JSON manifest ***REMOVED***les from being loaded.
+    AND lineitem_productcode = 'AmazonEC2'
+    AND lineItem_operation = 'RunInstances'
+    AND lineItem_UsageStartDate IS NOT NULL
+    AND lineItem_UsageEndDate IS NOT NULL
+---
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "aws-cluster-cost"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "aws-ec2-billing-data"
+  view:
+    disabled: true
+  columns:
+  - name: data_start
+    type: timestamp
+  - name: data_stop
+    type: timestamp
+  - name: cluster_cost
+    type: double
+  query: |
+    WITH aws_billing_***REMOVED***ltered AS ( {| ***REMOVED***lterAWSData .Report "aws-ec2-billing-data" |} )
+    SELECT
+        min(period_start) as data_start,
+        max(period_stop) as data_stop,
+        sum(period_cost * period_percent) as cluster_cost
+    from aws_billing_***REMOVED***ltered
+{{- end -}}
