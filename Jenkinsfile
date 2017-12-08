@@ -104,6 +104,15 @@ podTemplate(
                             && chmod +x /usr/local/bin/helm
                         helm init --client-only --skip-refresh
                         helm repo remove stable || true
+
+                        export KUBERNETES_VERSION=1.8.3
+                        curl \
+                            --silent \
+                            --show-error \
+                            --location \
+                            "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" \
+                            -o /usr/local/bin/kubectl \
+                             && chmod +x /usr/local/bin/kubectl
                         '''
                     }
 
@@ -127,7 +136,7 @@ podTemplate(
                                 }
                             }
                             stage('push') {
-                                sh """
+                                sh """#!/bin/bash
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=false \
                                     IMAGE_TAG=${gitTag}
@@ -147,7 +156,7 @@ podTemplate(
                             }
 
                             stage('push') {
-                                sh """
+                                sh """#!/bin/bash
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
@@ -159,7 +168,28 @@ podTemplate(
                                     BRANCH_TAG=
                                 """
                             }
+
+                            stage('deploy') {
+                                if (isMasterBranch) {
+                                    withCredentials([
+                                        [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                                    ]) {
+                                        echo "Deploying chargeback"
+
+                                        ansiColor('xterm') {
+                                            sh """#!/bin/bash
+                                            export KUBECONFIG=${KUBECONFIG}
+                                            ./hack/deploy.sh
+                                            """
+                                        }
+                                        echo "Successfully deployed chargeback-helm-operator"
+                                    }
+                                } else {
+                                    echo "Non-master branch, skipping deploy"
+                                }
+                            }
                         }
+
                     }
                 }
             }
