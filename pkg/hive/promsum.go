@@ -15,7 +15,7 @@ var (
 
 // CreatePromsumTable instantiates a new Hive table for Prometheus observation
 // data stored in S3.
-func CreatePromsumTable(queryer Queryer, tableName, bucket, prefix string) error {
+func CreateS3PromsumTable(queryer Queryer, tableName, bucket, prefix string) error {
 	path := path.Join(prefix, tableName)
 	location, err := s3Location(bucket, path)
 	if err != nil {
