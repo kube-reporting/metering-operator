@@ -1,5 +1,9 @@
 package hive
 
+import (
+	"path"
+)
+
 var (
 	promsumColumns = []Column{
 		{Name: "amount", Type: "double"},
@@ -11,8 +15,9 @@ var (
 
 // CreatePromsumTable instantiates a new Hive table for Prometheus observation
 // data stored in S3.
-func CreatePromsumTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string) error {
-	location, err := s3Location(bucket, pre***REMOVED***x)
+func CreateS3PromsumTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string) error {
+	path := path.Join(pre***REMOVED***x, tableName)
+	location, err := s3Location(bucket, path)
 	if err != nil {
 		return err
 	}

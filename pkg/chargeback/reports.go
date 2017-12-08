@@ -237,7 +237,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Repo
 	} ***REMOVED*** if storageSpec.S3 != nil {
 		bucket, pre***REMOVED***x := storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x
 		logger.Debugf("Creating table %s pointing to s3 bucket %s at pre***REMOVED***x %s", reportTable, bucket, pre***REMOVED***x)
-		err = hive.CreateReportTable(c.hiveQueryer, reportTable, bucket, pre***REMOVED***x, generateHiveColumns(report, genQuery))
+		err = hive.CreateS3ReportTable(c.hiveQueryer, reportTable, bucket, pre***REMOVED***x, generateHiveColumns(report, genQuery))
 	} ***REMOVED*** {
 		return nil, fmt.Errorf("storage incorrectly con***REMOVED***gured on report: %s", report.Name)
 	}
