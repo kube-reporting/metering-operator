@@ -13,8 +13,7 @@ config:
     create: true
     name: "local"
     isDefault: true
-    spec:
-      local: {}
+    type: "local"
 
   awsBillingDataSource:
     enabled: false

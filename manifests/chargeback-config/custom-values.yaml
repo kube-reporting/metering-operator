@@ -19,10 +19,10 @@ chargeback-operator:
     #   create: true
     #   name: "s3"
     #   isDefault: true
-    #   spec:
-    #     s3:
-    #       bucket: "REPLACEME"
-    #       prefix: "REPLACEME"
+    #   type: "s3"
+    #   s3:
+    #     bucket: "REPLACEME"
+    #     prefix: "REPLACEME"
 
 presto:
   config:
