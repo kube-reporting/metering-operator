@@ -106,13 +106,13 @@ DOCKER_PULL_TARGETS := $(addsuffix -docker-pull, $(TARGETS))
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
-	$(MAKE) docker-push IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-push IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
 
 $(DOCKER_TAG_TARGETS)::
-	$(MAKE) docker-tag IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-tag IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
 
 $(DOCKER_PULL_TARGETS)::
-	$(MAKE) docker-pull IMAGE_TAG=$(IMAGE_TAG) IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-pull IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
 
 docker-build-all: $(DOCKER_BUILD_TARGETS)
 

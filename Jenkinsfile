@@ -140,6 +140,8 @@ podTemplate(
                                     make docker-build-all -j 2 \
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
+                                    make docker-tag-all -j 2 \
+                                        IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
                                     """
                                 }
                             }
@@ -149,6 +151,12 @@ podTemplate(
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
+                                # Unset BRANCH_TAG so we don't push the same
+                                # image twice
+                                unset BRANCH_TAG
+                                make docker-push-all -j 2 \
+                                    IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
+                                    BRANCH_TAG=
                                 """
                             }
                         }
