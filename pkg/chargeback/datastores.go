@@ -121,7 +121,6 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		if err != nil {
 			return err
 		}
-		return nil
 	} ***REMOVED*** {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datastore %s", dataStore.Name)
 	}
