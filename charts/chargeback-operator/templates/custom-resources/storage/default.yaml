@@ -12,5 +12,10 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-{{ .Values.con***REMOVED***g.defaultStorage.spec | toYaml | indent 2 }}
+{{- if eq .Values.con***REMOVED***g.defaultStorage.type "local" }}
+  local: {}
+{{- ***REMOVED*** if eq .Values.con***REMOVED***g.defaultStorage.type "s3" }}
+  s3:
+{{ .Values.con***REMOVED***g.defaultStorage.s3 | toYaml | indent 4 }}
+{{- end -}}
 {{- end -}}
