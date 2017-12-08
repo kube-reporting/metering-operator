@@ -12,20 +12,12 @@ Chargeback consists of a few components:
 In order to install and use chargeback the following components will be
 necessary:
 
-- A tectonic installed Kubernetes cluster, of version 1.8.0 or greater, or with
-  a Tectonic Prometheus Operator to be of version 1.6.0 or greater (Prometheus
-  operator v0.13).
+- A Tectonic installed Kubernetes cluster, with the following components
+  (Tectonic 1.7.9 meets these requirements):
+  - Tectonic Prometheus Operator of version 1.6.0 or greater (Prometheus
+    Operator v0.13)
+  - ALM installed
 - A properly configured kubectl to access the Kubernetes cluster.
-
-To alter the version of the Tectonic Prometheus operator to be 1.6.0, run the
-following command:
-
-```
-$ kubectl -n tectonic-system patch deploy tectonic-prometheus-operator -p '{"spec":{"template":{"spec":{"containers":[{"name":"tectonic-prometheus-operator","image":"quay.io/coreos/tectonic-prometheus-operator:v1.6.0"}]}}}}'
-```
-
-Once the operator changes the version of the `kube-state-metrics` pod to 1.0.1,
-chargeback installation may proceed.
 
 ## Installation
 
@@ -52,51 +44,26 @@ $ export PULL_SECRET_NAMESPACE=tectonic-system
 $ export PULL_SECRET=coreos-pull-secret
 ```
 
-### Prometheus location
+### Configuration
 
-If Prometheus was setup by Tectonic and is running within the tectonic-system
-namespace, then you can skip this section.
-
-If you're running the Prometheus operator yourself (not using the Tectonic one),
-then you need to configure the `prometheus-url` in
-`manifests/chargeback/chargeback-config.yaml` to match the service created by
-your Prometheus operator.
-
-### Storing data in S3
-
-By default the data that chargeback collects and generates is ephemeral, and
-will not survive restarts of the hive pod it deploys. To make this data
-persistent by storing it in S3, follow the instructions in the [storing data in
-S3 document](Storing-Data-In-S3.md) before proceeding with these instructions.
-
-### AWS Billing Correlation
-
-Chargeback is able to correlate cluster usage information with [AWS detailed
-billing information][AWS-billing], attaching a dollar amount to resource usage.
-For clusters running in EC2, this can be enabled by setting the bucket and
-prefix in `manifests/custom-resources/datastores/aws-billing.yaml` to match the
-location billing reports are configured to be stored, and having the
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables set with
-credentials capable of accessing the bucket when the install command is run.
-
-If the AWS Cost and Usage Reports are not enabled on your account, instructions
-to enable them can be found [here][enable-aws-billing].
+Before installing, please read about [configuring chargeback](configuration.md).
+Some options do not support being changed post-install, so you may wish to
+adjust some configuration options, before continuing with the install.
 
 ### Run the install script
 
 Chargeback can now be installed with the following command:
 
 ```
-$ ./hack/install.sh
+$ ./hack/alm-install.sh
 ```
 
 ### Uninstall
 
-If chargeback has been installed manually, it can be uninstalled at any point by
-running the following command:
+To uninstall chargeback, and it's related resources:
 
 ```
-$ ./hack/uninstall.sh
+$ ./hack/alm-uninstall.sh
 ```
 
 ## Verifying operation
@@ -109,8 +76,4 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 
 ## Using chargeback
 
-For instructions on using chargeback, please read the documentation on [using
-chargeback](Using-chargeback.md)
-
-[AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
-[enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
+For instructions on using chargeback, please read the documentation on [using chargeback](Using-chargeback.md).

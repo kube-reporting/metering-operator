@@ -34,7 +34,7 @@ type reportTemplateInfo struct {
 }
 
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
-	tmpl, err := template.New("report-generation-query").Funcs(templateFuncMap).Parse(queryTemplate)
+	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Parse(queryTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}

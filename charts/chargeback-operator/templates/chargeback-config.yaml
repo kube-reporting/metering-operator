@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chargeback-config
+  labels:
+    app: chargeback
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log-reports: {{ .Values.config.logReports | quote}}
+  log-ddl-queries: {{ .Values.config.logDDLQueries | quote}}
+  log-dml-queries: {{ .Values.config.logDMLQueries | quote}}
+  disable-promsum: {{ .Values.config.disablePromsum | quote}}
+  prometheus-url: {{ .Values.config.prometheusURL | quote}}
+  promsum-poll-interval: {{ .Values.config.promsumPollInterval | quote}}
+  promsum-chunk-size: {{ .Values.config.promsumChunkSize | quote}}
+  promsum-step-size: {{ .Values.config.promsumStepSize | quote}}

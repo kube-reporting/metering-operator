@@ -206,17 +206,42 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Repo
 	// Create a table to write to
 	reportTable := reportTableName(report.Name)
 	storage := report.Spec.Output
-	switch {
-	case storage == nil || storage.Local != nil:
+
+	var storageSpec cbTypes.StorageLocationSpec
+	// Nothing specified, try to use default storage location
+	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
+		logger.Info("report does not have a output.spec or output.storageLocationName set, using default storage location")
+		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
+		if err != nil {
+			return nil, err
+		}
+		if storageLocation == nil {
+			return nil, fmt.Errorf("invalid report output, output.spec or output.storageLocationName set and cluster has no default StorageLocation")
+		}
+
+		storageSpec = storageLocation.Spec
+	} else if storage.StorageLocationName != "" { // Specific storage location specified
+		logger.Infof("report configured to use StorageLocation %s", storage.StorageLocationName)
+		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.namespace).Get(storage.StorageLocationName)
+		if err != nil {
+			return nil, err
+		}
+		storageSpec = storageLocation.Spec
+	} else if storage.StorageSpec != nil { // Storage location is inlined in the datastore
+		storageSpec = *storage.StorageSpec
+	}
+
+	if storageSpec.Local != nil {
 		logger.Debugf("Creating table %s backed by local storage", reportTable)
 		err = hive.CreateLocalReportTable(c.hiveQueryer, reportTable, generateHiveColumns(report, genQuery))
-	case storage.S3 != nil:
-		bucket, prefix := storage.S3.Bucket, storage.S3.Prefix
+	} else if storageSpec.S3 != nil {
+		bucket, prefix := storageSpec.S3.Bucket, storageSpec.S3.Prefix
 		logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
 		err = hive.CreateReportTable(c.hiveQueryer, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
-	default:
-		return nil, fmt.Errorf("storage incorrectly configured on report %s", report.Name)
+	} else {
+		return nil, fmt.Errorf("storage incorrectly configured on report: %s", report.Name)
 	}
+
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
 	}

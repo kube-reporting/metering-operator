@@ -1,0 +1,130 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-capacity-memory"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataStores:
+  - "node-capacity-memory-bytes"
+  columns:
+  - name: node
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: node_capacity_memory_bytes
+    type: double
+  - name: resource_id
+    type: string
+  - name: timeprecision
+    type: double
+  - name: node_capacity_memory_byte_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['node'] as node,
+          labels,
+          amount as node_capacity_memory_bytes,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
+          timeprecision,
+          amount * timeprecision as node_capacity_memory_byte_seconds,
+          "timestamp"
+      FROM {| dataStoreTableName "node-capacity-memory-bytes" |}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-allocatable-memory"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataStores:
+  - "node-allocatable-memory-bytes"
+  columns:
+  - name: node
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: node_allocatable_memory_bytes
+    type: double
+  - name: resource_id
+    type: string
+  - name: timeprecision
+    type: double
+  - name: node_allocatable_memory_byte_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['node'] as node,
+          labels,
+          amount as node_allocatable_memory_bytes,
+          split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
+          timeprecision,
+          amount * timeprecision as node_allocatable_memory_byte_seconds,
+          "timestamp"
+      FROM {| dataStoreTableName "node-allocatable-memory-bytes" |}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "node-memory-usage"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "node-allocatable-memory"
+  - "pod-request-memory-usage"
+  view:
+    disabled: true
+  columns:
+  - name: node_allocatable_data_start
+    type: timestamp
+  - name: node_allocatable_data_end
+    type: timestamp
+  - name: node_allocatable_memory_byte_seconds
+    type: double
+  - name: pod_usage_data_start
+    type: timestamp
+  - name: pod_usage_data_end
+    type: timestamp
+  - name: pod_request_memory_byte_seconds
+    type: double
+  - name: memory_used_percent
+    type: double
+  - name: memory_unused_percent
+    type: double
+  query: |
+    WITH node_memory_allocatable AS (
+      SELECT min("timestamp") as node_allocatable_data_start,
+        max("timestamp") as node_allocatable_data_end,
+        sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
+      FROM {| generationQueryViewName "node-allocatable-memory" |}
+        WHERE "timestamp" >= timestamp '{| .Report.StartPeriod | prestoTimestamp |}'
+        AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    ), pod_memory_consumption AS (
+      SELECT min("timestamp") as pod_usage_data_start,
+        max("timestamp") as pod_usage_data_end,
+        sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+      FROM {| generationQueryViewName "pod-request-memory-usage" |}
+      WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+      AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    )
+    SELECT
+      node_memory_allocatable.*,
+      pod_memory_consumption.*,
+      pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds,
+      1 - (pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds)
+    FROM node_memory_allocatable
+    CROSS JOIN pod_memory_consumption
