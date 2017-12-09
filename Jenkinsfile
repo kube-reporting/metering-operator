@@ -179,6 +179,7 @@ podTemplate(
                                         ansiColor('xterm') {
                                             sh """#!/bin/bash
                                             export KUBECONFIG=${KUBECONFIG}
+                                            export CUSTOM_CHARGEBACK_SETTINGS_FILE=manifests/chargeback-con***REMOVED***g/latest-versions.yaml
                                             ./hack/deploy.sh
                                             """
                                         }
