@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${DIR}/util.sh
+
 export CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE:-chargeback-ci}
 export SKIP_DELETE_CRDS=true
 
+: "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
 : "${UNINSTALL_CHARGEBACK:=true}"
 : "${INSTALL_CHARGEBACK:=true}"
 
@@ -23,6 +27,19 @@ until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods -o json | jq '.items | leng
     echo 'waiting for chargeback pods to be deleted'
     sleep 5
 done
+
+if [ -n "$CUSTOM_CHARGEBACK_SETTINGS_FILE" ]; then
+    msg "Installing custom chargeback settings from $CUSTOM_CHARGEBACK_SETTINGS_FILE"
+    kubectl \
+        -n $CHARGEBACK_NAMESPACE \
+        create secret generic \
+        chargeback-settings \
+        --from-file "values.yaml=$CUSTOM_CHARGEBACK_SETTINGS_FILE" \
+        -o yaml \
+        --dry-run \
+        > /tmp/custom-settings-secret.yaml
+    kube-install /tmp/custom-settings-secret.yaml
+fi
 
 if [ "$INSTALL_CHARGEBACK" == "true" ]; then
     echo "Installing chargeback"
