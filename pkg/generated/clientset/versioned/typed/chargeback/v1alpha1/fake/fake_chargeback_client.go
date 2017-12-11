@@ -10,6 +10,10 @@ type FakeChargebackV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeChargebackV1alpha1) PrestoTables(namespace string) v1alpha1.PrestoTableInterface {
+	return &FakePrestoTables{c, namespace}
+}
+
 func (c *FakeChargebackV1alpha1) Reports(namespace string) v1alpha1.ReportInterface {
 	return &FakeReports{c, namespace}
 }

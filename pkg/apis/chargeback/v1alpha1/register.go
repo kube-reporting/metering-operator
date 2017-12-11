@@ -37,6 +37,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ReportPrometheusQueryList{},
 		&StorageLocation{},
 		&StorageLocationList{},
+		&PrestoTable{},
+		&PrestoTableList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
