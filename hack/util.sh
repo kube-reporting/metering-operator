@@ -1,9 +1,5 @@
 # This should not be invoked directly. It provides functions and data for other scripts.
 
-: "${CHARGEBACK_NAMESPACE:=chargeback}"
-: "${PULL_SECRET_NAMESPACE:=tectonic-system}"
-: "${PULL_SECRET:=coreos-pull-secret}"
-
 function kubectl_cmd() {
     echo "kubectl --namespace=${CHARGEBACK_NAMESPACE}"
 }
