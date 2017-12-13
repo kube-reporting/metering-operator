@@ -312,27 +312,34 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		c.logger.Infof("starting ReportDataStore worker")
-		wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
-		wg.Done()
-		c.logger.Infof("ReportDataStore worker stopped")
-	}()
-	wg.Add(1)
-	go func() {
-		c.logger.Infof("starting ReportGenerationQuery worker")
-		wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
-		wg.Done()
-		c.logger.Infof("ReportGenerationQuery worker stopped")
-	}()
-	wg.Add(1)
-	go func() {
-		c.logger.Infof("starting Report worker")
-		wait.Until(c.runReportWorker, time.Second, stopCh)
-		wg.Done()
-		c.logger.Infof("Report worker stopped")
-	}()
+	threadiness := 2
+
+	for i := 0; i < threadiness; i++ {
+		i := i
+		wg.Add(1)
+		go func() {
+			c.logger.Infof("starting ReportDataStore worker #%d", i)
+			wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
+			wg.Done()
+			c.logger.Infof("ReportDataStore worker #%d stopped", i)
+		}()
+
+		wg.Add(1)
+		go func() {
+			c.logger.Infof("starting ReportGenerationQuery worker #%d", i)
+			wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
+			wg.Done()
+			c.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
+		}()
+
+		wg.Add(1)
+		go func() {
+			c.logger.Infof("starting Report worker #%d", i)
+			wait.Until(c.runReportWorker, time.Second, stopCh)
+			wg.Done()
+			c.logger.Infof("Report worker #%d stopped", i)
+		}()
+	}
 
 	if !c.disablePromsum {
 		wg.Add(1)
