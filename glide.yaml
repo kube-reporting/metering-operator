@@ -2,7 +2,7 @@ package: github.com/coreos-inc/kube-chargeback
 import:
 - package: golang.org/x/sync/errgroup
 - package: k8s.io/code-generator
-  version: 4f9758469fda3ab9e9a17c3300f3476cc13a83b2
+  version: fc1982ddabb163d4c9fd88cd1a8f8935ec652507
   subpackages:
   - cmd/client-gen
   - cmd/client-gen/args
@@ -19,7 +19,7 @@ import:
   - cmd/deepcopy-gen
   - third_party/forked/golang/reflect
 - package: k8s.io/gengo
-  version: 75356185a9af8f0464efa792e2e9508d5b4be83c
+  version: b6c426f7730e6d66e6e476a85d1c3eb7633880e0
   subpackages:
   - examples
   - examples/deepcopy-gen/generators
@@ -57,13 +57,8 @@ import:
   - model
 - package: k8s.io/api
   version: 926789af7ddda62752e08bc9b93f1d1ebbc7b2de
-- package: k8s.io/apiextensions-apiserver
-  version: 2bfb07d318ed549813240d1165fcebad6250c666
-  subpackages:
-  - pkg/apis/apiextensions/v1beta1
-  - pkg/client/clientset/clientset
 - package: k8s.io/apimachinery
-  version: a28c9b0b532638dcfb2c8b1b6f8f1e4a21041752
+  version: 5134afd2c0c91158afac0d8a28bd2177185a3bcc
   subpackages:
   - pkg/api/errors
   - pkg/apis/meta/v1
@@ -75,7 +70,7 @@ import:
   - pkg/watch
   - pkg/apimachinery/registered
 - package: k8s.io/client-go
-  version: c6f8cf2c47d21d55fa0df928291b2580544886c8
+  version: release-5.0
   subpackages:
   - dynamic
   - kubernetes
