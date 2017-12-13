@@ -114,6 +114,11 @@ import:
   version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
   subpackages:
   - ssh/terminal
+- package: golang.org/x/tools
+  version: 64890f4e2b733655fee5077a5435a8812404c3a3
+  subpackages:
+  - imports
+  - go/ast/astutil
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
