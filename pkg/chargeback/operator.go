@@ -60,6 +60,9 @@ type Chargeback struct {
 
 	logger log.FieldLogger
 
+	initializedMu sync.Mutex
+	initialized   bool
+
 	namespace      string
 	hiveHost       string
 	prestoHost     string
@@ -255,6 +258,16 @@ func (inf informers) WaitForCacheSync(stopCh <-chan struct{}) bool {
 	return true
 }
 
+func (inf informers) HasSynced() bool {
+	for _, informer := range inf.informerList {
+		if informer.HasSynced() {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
 func (inf informers) ShutdownQueues() {
 	for _, queue := range inf.queueList {
 		queue.ShutDown()
@@ -265,6 +278,10 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("starting Chargeback operator")
 
 	go c.informers.Run(stopCh)
+
+	c.logger.Infof("starting HTTP server")
+	httpSrv := newServer(c, c.logger)
+	go httpSrv.start()
 
 	c.logger.Infof("setting up DB connections")
 
@@ -305,10 +322,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	if !c.informers.WaitForCacheSync(stopCh) {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
-
-	c.logger.Infof("starting HTTP server")
-	httpSrv := newServer(c, c.logger)
-	go httpSrv.start()
 
 	var wg sync.WaitGroup
 
@@ -352,6 +365,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 
 	c.logger.Infof("chargeback successfully initialized, waiting for reports...")
+	c.setInitialized()
 
 	<-stopCh
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
@@ -361,6 +375,19 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("Chargeback workers and collectors stopped")
 
 	return nil
+}
+
+func (c *Chargeback) setInitialized() {
+	c.initializedMu.Lock()
+	c.initialized = true
+	c.initializedMu.Unlock()
+}
+
+func (c *Chargeback) isInitialized() bool {
+	c.initializedMu.Lock()
+	initialized := c.initialized
+	c.initializedMu.Unlock()
+	return initialized
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
