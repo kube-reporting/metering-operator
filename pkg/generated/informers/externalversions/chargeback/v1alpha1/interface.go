@@ -12,8 +12,8 @@ type Interface interface {
 	PrestoTables() PrestoTableInformer
 	// Reports returns a ReportInformer.
 	Reports() ReportInformer
-	// ReportDataStores returns a ReportDataStoreInformer.
-	ReportDataStores() ReportDataStoreInformer
+	// ReportDataSources returns a ReportDataSourceInformer.
+	ReportDataSources() ReportDataSourceInformer
 	// ReportGenerationQueries returns a ReportGenerationQueryInformer.
 	ReportGenerationQueries() ReportGenerationQueryInformer
 	// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
@@ -43,9 +43,9 @@ func (v *version) Reports() ReportInformer {
 	return &reportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ReportDataStores returns a ReportDataStoreInformer.
-func (v *version) ReportDataStores() ReportDataStoreInformer {
-	return &reportDataStoreInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// ReportDataSources returns a ReportDataSourceInformer.
+func (v *version) ReportDataSources() ReportDataSourceInformer {
+	return &reportDataSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReportGenerationQueries returns a ReportGenerationQueryInformer.

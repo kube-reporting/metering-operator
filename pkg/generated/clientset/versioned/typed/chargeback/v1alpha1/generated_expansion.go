@@ -4,7 +4,7 @@ type PrestoTableExpansion interface{}
 
 type ReportExpansion interface{}
 
-type ReportDataStoreExpansion interface{}
+type ReportDataSourceExpansion interface{}
 
 type ReportGenerationQueryExpansion interface{}
 
