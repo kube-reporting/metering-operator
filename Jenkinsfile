@@ -190,7 +190,7 @@ podTemplate(
                                     }
                                 }
                                 stage('integration tests') {
-                                    if (isMasterBranch) {
+                                    if (isMasterBranch || true) {
                                         echo "Running chargeback integration tests"
 
                                         ansiColor('xterm') {
