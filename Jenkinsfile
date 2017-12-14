@@ -129,7 +129,7 @@ podTemplate(
                             }
                             stage('tag') {
                                 ansiColor('xterm') {
-                                    sh """#!/bin/bash
+                                    sh """#!/bin/bash -ex
                                     make docker-tag-all \
                                         PULL_TAG_IMAGE_SOURCE=true \
                                         IMAGE_TAG=${gitTag}
@@ -137,7 +137,7 @@ podTemplate(
                                 }
                             }
                             stage('push') {
-                                sh """#!/bin/bash
+                                sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=false \
                                     IMAGE_TAG=${gitTag}
@@ -146,7 +146,7 @@ podTemplate(
                         } ***REMOVED*** {
                             stage('build') {
                                 ansiColor('xterm') {
-                                    sh """#!/bin/bash
+                                    sh """#!/bin/bash -ex
                                     make docker-build-all -j 2 \
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
@@ -157,7 +157,7 @@ podTemplate(
                             }
 
                             stage('push') {
-                                sh """#!/bin/bash
+                                sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
