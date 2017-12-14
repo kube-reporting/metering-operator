@@ -3,6 +3,7 @@ package hive
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +22,7 @@ type Connection struct {
 	session    *hive.TSessionHandle
 	logger     log.FieldLogger
 	logQueries bool
+	queryLock  sync.Mutex
 }
 
 type Queryer interface {
@@ -63,6 +65,10 @@ func Connect(host string) (*Connection, error) {
 
 // Query a Hive server.
 func (c *Connection) Query(query string) error {
+	// Only perform one query at a time
+	c.queryLock.Lock()
+	defer c.queryLock.Unlock()
+
 	req := hive.NewTExecuteStatementReq()
 	req.SessionHandle = c.session
 	req.Statement = query
@@ -86,6 +92,9 @@ func (c *Connection) Query(query string) error {
 
 // Close connection to Hive server.
 func (c *Connection) Close() error {
+	// Wait for any current queries to finish
+	c.queryLock.Lock()
+	defer c.queryLock.Unlock()
 	if c.session != nil {
 		req := hive.NewTCloseSessionReq()
 		req.SessionHandle = c.session
