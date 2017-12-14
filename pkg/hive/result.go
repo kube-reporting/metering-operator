@@ -17,7 +17,7 @@ func CreateS3ReportTable(queryer Queryer, tableName, bucket, prefix string, colu
 		return err
 	}
 
-	query = createTable(tableName, location, "", "", nil, columns, nil, false, false)
+	query = createTable(CreateTableParameters{tableName, location, "", "", nil, columns, nil, false, false})
 	return queryer.Query(query)
 }
 
@@ -28,6 +28,6 @@ func CreateLocalReportTable(queryer Queryer, tableName string, columns []Column)
 		return err
 	}
 
-	query = createTable(tableName, "", "", "", nil, columns, nil, false, true)
+	query = createTable(CreateTableParameters{tableName, "", "", "", nil, columns, nil, false, true})
 	return queryer.Query(query)
 }

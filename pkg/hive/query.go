@@ -20,42 +20,56 @@ func dropTable(name string, ignoreNotExists, purge bool) string {
 	return fmt.Sprintf("DROP TABLE %s %s %s", ifExists, name, purgeStr)
 }
 
+type CreateTableParameters struct {
+	Name         string
+	Location     string
+	SerdeFmt     string
+	Format       string
+	SerdeProps   map[string]string
+	Columns      []Column
+	Partitions   []Column
+	External     bool
+	IgnoreExists bool
+}
+
 // createTable returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
-func createTable(name, location, serdeFmt, format string, serdeProps map[string]string, columns, partitions []Column, external, ignoreExists bool) string {
-	columnsStr := fmtColumnText(columns)
+func createTable(params CreateTableParameters) string {
+	columnsStr := fmtColumnText(params.Columns)
 
 	tableType := ""
-	if external {
+	if params.External {
 		tableType = "EXTERNAL"
 	}
 
 	ifNotExists := ""
-	if ignoreExists {
+	if params.IgnoreExists {
 		ifNotExists = "IF NOT EXISTS"
 	}
 
 	partitionedBy := ""
-	if partitions != nil {
-		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtColumnText(partitions))
+	if len(params.Partitions) != 0 {
+		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtColumnText(params.Partitions))
 	}
 
 	serdeFormatStr := ""
-	if serdeFmt != "" && serdeProps != nil {
-		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", serdeFmt, fmtSerdeProps(serdeProps))
+	if params.SerdeFmt != "" && params.SerdeProps != nil {
+		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", params.SerdeFmt, fmtSerdeProps(params.SerdeProps))
 	}
-	if location != "" {
-		location = fmt.Sprintf(`LOCATION "%s"`, location)
+	location := ""
+	if params.Location != "" {
+		location = fmt.Sprintf(`LOCATION "%s"`, params.Location)
 	}
-	if format != "" {
-		format = fmt.Sprintf("STORED AS %s", format)
+	format := ""
+	if params.Format != "" {
+		format = fmt.Sprintf("STORED AS %s", params.Format)
 	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
 %s (%s) %s
 %s %s %s`,
 		tableType, ifNotExists,
-		name, columnsStr, partitionedBy,
+		params.Name, columnsStr, partitionedBy,
 		serdeFormatStr, format, location,
 	)
 }
