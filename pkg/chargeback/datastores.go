@@ -2,7 +2,6 @@ package chargeback
 
 import (
 	"fmt"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -205,7 +204,13 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 
 	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 
-	return c.updateDataStoreTableName(logger, dataStore, tableName)
+	err = c.updateDataStoreTableName(logger, dataStore, tableName)
+	if err != nil {
+		return err
+	}
+
+	c.prestoTablePartitionQueue <- dataStore
+	return nil
 }
 
 func (c *Chargeback) createPrestoTableCR(dataStore *cbTypes.ReportDataStore, params hive.CreateTableParameters) error {
@@ -215,7 +220,7 @@ func (c *Chargeback) createPrestoTableCR(dataStore *cbTypes.ReportDataStore, par
 			APIVersion: dataStore.APIVersion,
 		},
 		ObjectMeta: meta.ObjectMeta{
-			Name:      strings.Replace(name, "_", "-", -1),
+			Name:      dataStoreNameToPrestoTableName(dataStore.Name),
 			Namespace: dataStore.Namespace,
 			Labels:    dataStore.Labels,
 			OwnerReferences: []meta.OwnerReference{

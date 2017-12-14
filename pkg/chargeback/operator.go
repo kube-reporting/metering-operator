@@ -20,6 +20,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
+	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
 	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
@@ -70,6 +71,8 @@ type Chargeback struct {
 	disablePromsum bool
 	logReport      bool
 
+	prestoTablePartitionQueue chan *cbTypes.ReportDataStore
+
 	logDMLQueries bool
 	logDDLQueries bool
 
@@ -80,18 +83,19 @@ type Chargeback struct {
 
 func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
-		namespace:        cfg.Namespace,
-		hiveHost:         cfg.HiveHost,
-		prestoHost:       cfg.PrestoHost,
-		promHost:         cfg.PromHost,
-		disablePromsum:   cfg.DisablePromsum,
-		logReport:        cfg.LogReport,
-		logDDLQueries:    cfg.LogDDLQueries,
-		logDMLQueries:    cfg.LogDMLQueries,
-		promsumInterval:  cfg.PromsumInterval,
-		promsumStepSize:  cfg.PromsumStepSize,
-		promsumChunkSize: cfg.PromsumChunkSize,
-		logger:           logger,
+		namespace:                 cfg.Namespace,
+		hiveHost:                  cfg.HiveHost,
+		prestoHost:                cfg.PrestoHost,
+		promHost:                  cfg.PromHost,
+		disablePromsum:            cfg.DisablePromsum,
+		logReport:                 cfg.LogReport,
+		logDDLQueries:             cfg.LogDDLQueries,
+		logDMLQueries:             cfg.LogDMLQueries,
+		promsumInterval:           cfg.PromsumInterval,
+		promsumStepSize:           cfg.PromsumStepSize,
+		promsumChunkSize:          cfg.PromsumChunkSize,
+		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataStore, 1),
+		logger: logger,
 	}
 	logger.Debugf("Config: %+v", cfg)
 
@@ -137,6 +141,10 @@ type informers struct {
 	storageLocationQueue    workqueue.RateLimitingInterface
 	storageLocationInformer cache.SharedIndexInformer
 	storageLocationLister   cbListers.StorageLocationLister
+
+	prestoTableQueue    workqueue.RateLimitingInterface
+	prestoTableInformer cache.SharedIndexInformer
+	prestoTableLister   cbListers.PrestoTableLister
 }
 
 func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
@@ -205,12 +213,17 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	storageLocationInformer := cbInformers.NewStorageLocationInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	storageLocationLister := cbListers.NewStorageLocationLister(storageLocationInformer.GetIndexer())
 
+	prestoTableQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	prestoTableInformer := cbInformers.NewPrestoTableInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	prestoTableLister := cbListers.NewPrestoTableLister(prestoTableInformer.GetIndexer())
+
 	return informers{
 		informerList: []cache.SharedIndexInformer{
 			storageLocationInformer,
 			reportPrometheusQueryInformer,
 			reportGenerationQueryInformer,
 			reportDataStoreInformer,
+			prestoTableInformer,
 			reportInformer,
 		},
 		queueList: []workqueue.RateLimitingInterface{
@@ -218,6 +231,7 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 			reportPrometheusQueryQueue,
 			reportGenerationQueryQueue,
 			reportDataStoreQueue,
+			prestoTableQueue,
 			reportQueue,
 		},
 
@@ -240,6 +254,10 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		storageLocationQueue:    storageLocationQueue,
 		storageLocationInformer: storageLocationInformer,
 		storageLocationLister:   storageLocationLister,
+
+		prestoTableQueue:    prestoTableQueue,
+		prestoTableInformer: prestoTableInformer,
+		prestoTableLister:   prestoTableLister,
 	}
 }
 
@@ -352,9 +370,17 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 }
 
 func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
+	wg.Add(1)
+	go func() {
+		c.logger.Infof("starting PrestoTable worker")
+		c.runPrestoTableWorker(stopCh)
+		wg.Done()
+	}()
+
 	threadiness := 2
 	for i := 0; i < threadiness; i++ {
 		i := i
+
 		wg.Add(1)
 		go func() {
 			c.logger.Infof("starting ReportDataStore worker #%d", i)

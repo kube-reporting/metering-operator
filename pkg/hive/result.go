@@ -6,7 +6,7 @@ import "path"
 // the specified columns
 func CreateS3ReportTable(queryer Queryer, tableName, bucket, prefix string, columns []Column) error {
 	path := path.Join(prefix, tableName)
-	location, err := s3Location(bucket, path)
+	location, err := S3Location(bucket, path)
 	if err != nil {
 		return err
 	}
