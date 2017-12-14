@@ -27,7 +27,7 @@ type ReportGenerationQuery struct {
 
 type ReportGenerationQuerySpec struct {
 	ReportQueries []string         `json:"reportQueries"`
-	DataStores    []string         `json:"reportDataStores"`
+	DataSources    []string         `json:"reportDataSources"`
 	Query         string           `json:"query"`
 	Columns       []GenQueryColumn `json:"columns"`
 	View          GenQueryView     `json:"view"`

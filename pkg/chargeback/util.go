@@ -18,8 +18,8 @@ func init() {
 
 var resourceNameReplacer = strings.NewReplacer("-", "_", ".", "_")
 
-func dataStoreTableName(dataStoreName string) string {
-	return fmt.Sprintf("datastore_%s", resourceNameReplacer.Replace(dataStoreName))
+func dataSourceTableName(dataSourceName string) string {
+	return fmt.Sprintf("datasource_%s", resourceNameReplacer.Replace(dataSourceName))
 }
 
 func reportTableName(reportName string) string {

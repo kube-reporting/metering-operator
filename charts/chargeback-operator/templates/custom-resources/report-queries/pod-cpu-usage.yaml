@@ -7,7 +7,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataStores:
+  reportDataSources:
   - "pod-request-cpu-cores"
   columns:
   - name: pod
@@ -35,7 +35,7 @@ spec:
           timeprecision,
           amount * timeprecision as pod_request_cpu_core_seconds,
           "timestamp"
-      FROM {| dataStoreTableName "pod-request-cpu-cores" |}
+      FROM {| dataSourceTableName "pod-request-cpu-cores" |}
       WHERE element_at(labels, 'node') IS NOT NULL
 
 ---

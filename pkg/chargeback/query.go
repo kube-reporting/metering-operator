@@ -116,7 +116,7 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 	if err != nil {
 		return false, err
 	}
-	dataStores, err := c.getDependentDatastores(generationQuery)
+	dataSources, err := c.getDependentDataSources(generationQuery)
 	if err != nil {
 		return false, err
 	}
@@ -137,15 +137,15 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 		return false, nil
 	}
 
-	if uninitializedDataStores := c.getUnitilizedDatastores(dataStores); len(uninitializedDataStores) > 0 {
-		dataStoresStr := strings.Join(uninitializedDataStores, ", ")
-		logger.Warnf("the following datastores for the query do not have their tables created %s", dataStoresStr)
+	if uninitializedDataSources := c.getUnitilizedDataSources(dataSources); len(uninitializedDataSources) > 0 {
+		dataSourcesStr := strings.Join(uninitializedDataSources, ", ")
+		logger.Warnf("the following datasources for the query do not have their tables created %s", dataSourcesStr)
 		if queueUninitialized {
-			logger.Debugf("queueing uninitializedDataStores: %s", dataStoresStr)
-			for _, dataStore := range uninitializedDataStores {
-				key, err := cache.MetaNamespaceKeyFunc(dataStore)
+			logger.Debugf("queueing uninitializedDataSources: %s", dataSourcesStr)
+			for _, dataSource := range uninitializedDataSources {
+				key, err := cache.MetaNamespaceKeyFunc(dataSource)
 				if err == nil {
-					c.informers.reportDataStoreQueue.Add(key)
+					c.informers.reportDataSourceQueue.Add(key)
 				}
 			}
 		}
@@ -154,14 +154,14 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 	return true, nil
 }
 
-func (c *Chargeback) getUnitilizedDatastores(dataStores []*cbTypes.ReportDataStore) []string {
-	var uninitializedDataStores []string
-	for _, dataStore := range dataStores {
-		if dataStore.TableName == "" {
-			uninitializedDataStores = append(uninitializedDataStores, dataStore.Name)
+func (c *Chargeback) getUnitilizedDataSources(dataSources []*cbTypes.ReportDataSource) []string {
+	var uninitializedDataSources []string
+	for _, dataSource := range dataSources {
+		if dataSource.TableName == "" {
+			uninitializedDataSources = append(uninitializedDataSources, dataSource.Name)
 		}
 	}
-	return uninitializedDataStores
+	return uninitializedDataSources
 }
 
 func (c *Chargeback) getUninitializedReportGenerationQueries(generationQueries []*cbTypes.ReportGenerationQuery) ([]string, error) {
@@ -212,14 +212,14 @@ func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTy
 	return nil
 }
 
-func (c *Chargeback) getDependentDatastores(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportDataStore, error) {
-	dataStores := make([]*cbTypes.ReportDataStore, len(generationQuery.Spec.DataStores))
-	for i, dataStoreName := range generationQuery.Spec.DataStores {
-		dataStore, err := c.informers.reportDataStoreLister.ReportDataStores(generationQuery.Namespace).Get(dataStoreName)
+func (c *Chargeback) getDependentDataSources(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportDataSource, error) {
+	dataSources := make([]*cbTypes.ReportDataSource, len(generationQuery.Spec.DataSources))
+	for i, dataSourceName := range generationQuery.Spec.DataSources {
+		dataSource, err := c.informers.reportDataSourceLister.ReportDataSources(generationQuery.Namespace).Get(dataSourceName)
 		if err != nil {
 			return nil, err
 		}
-		dataStores[i] = dataStore
+		dataSources[i] = dataSource
 	}
-	return dataStores, nil
+	return dataSources, nil
 }

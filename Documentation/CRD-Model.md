@@ -10,15 +10,15 @@ The `ReportPrometheusQuery` object simply holds a Prometheus query and a name.
 
 Example File: [manifests/custom-resources/prom-queries/pod-memory-usage.yaml](../manifests/custom-resources/prom-queries/pod-memory-usage.yaml)
 
-## `ReportDataStore`
+## `ReportDataSource`
 
-The `ReportDataStore` object lists `ReportPrometheusQuery`s, and lists a
+The `ReportDataSource` object lists `ReportPrometheusQuery`s, and lists a
 location and for the results of these queries to be stored. When `chargeback`
-runs, it lists all `ReportDataStore`s, runs all Prometheus queries listed by
+runs, it lists all `ReportDataSource`s, runs all Prometheus queries listed by
 each store, and saves the results into each location. This means that Prometheus
-queries which are not pointed to by a `ReportDataStore` will not be run.
+queries which are not pointed to by a `ReportDataSource` will not be run.
 
-Example File: [manifests/custom-resources/datastores/pod-memory-usage.yaml](../manifests/custom-resources/datastores/pod-memory-usage.yaml)
+Example File: [manifests/custom-resources/datasources/pod-memory-usage.yaml](../manifests/custom-resources/datasources/pod-memory-usage.yaml)
 
 S3 storage is also supported. An example of using it can be found in the [storing data in s3](Storing-Data-In-S3.md) document.
 

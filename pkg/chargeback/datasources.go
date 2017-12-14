@@ -15,98 +15,98 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
-func (c *Chargeback) runReportDataStoreWorker() {
-	logger := c.logger.WithField("component", "reportDataStoreWorker")
-	logger.Infof("ReportDataStore worker started")
-	for c.processReportDataStore(logger) {
+func (c *Chargeback) runReportDataSourceWorker() {
+	logger := c.logger.WithField("component", "reportDataSourceWorker")
+	logger.Infof("ReportDataSource worker started")
+	for c.processReportDataSource(logger) {
 
 	}
 }
 
-func (c *Chargeback) processReportDataStore(logger log.FieldLogger) bool {
-	key, quit := c.informers.reportDataStoreQueue.Get()
+func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
+	key, quit := c.informers.reportDataSourceQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.informers.reportDataStoreQueue.Done(key)
+	defer c.informers.reportDataSourceQueue.Done(key)
 
 	logger = logger.WithFields(newLogIdenti***REMOVED***er())
-	err := c.syncReportDataStore(logger, key.(string))
-	c.handleErr(logger, err, "ReportDataStore", key, c.informers.reportDataStoreQueue)
+	err := c.syncReportDataSource(logger, key.(string))
+	c.handleErr(logger, err, "ReportDataSource", key, c.informers.reportDataSourceQueue)
 	return true
 }
 
-func (c *Chargeback) syncReportDataStore(logger log.FieldLogger, key string) error {
+func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
 		return nil
 	}
 
-	logger = logger.WithField("datastore", name)
-	reportDataStore, err := c.informers.reportDataStoreLister.ReportDataStores(namespace).Get(name)
+	logger = logger.WithField("datasource", name)
+	reportDataSource, err := c.informers.reportDataSourceLister.ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataStore %s does not exist anymore", key)
+			logger.Infof("ReportDataSource %s does not exist anymore", key)
 			return nil
 		}
 		return err
 	}
 
-	logger.Infof("syncing reportDataStore %s", reportDataStore.GetName())
-	err = c.handleReportDataStore(logger, reportDataStore)
+	logger.Infof("syncing reportDataSource %s", reportDataSource.GetName())
+	err = c.handleReportDataSource(logger, reportDataSource)
 	if err != nil {
-		logger.WithError(err).Errorf("error syncing reportDataStore %s", reportDataStore.GetName())
+		logger.WithError(err).Errorf("error syncing reportDataSource %s", reportDataSource.GetName())
 		return err
 	}
-	logger.Infof("successfully synced reportDataStore %s", reportDataStore.GetName())
+	logger.Infof("successfully synced reportDataSource %s", reportDataSource.GetName())
 	return nil
 }
 
-func (c *Chargeback) handleReportDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
-	dataStore = dataStore.DeepCopy()
-	if dataStore.TableName == "" {
-		logger.Infof("new dataStore discovered")
+func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	dataSource = dataSource.DeepCopy()
+	if dataSource.TableName == "" {
+		logger.Infof("new dataSource discovered")
 	} ***REMOVED*** {
-		logger.Infof("existing dataStore discovered, tableName: %s", dataStore.TableName)
+		logger.Infof("existing dataSource discovered, tableName: %s", dataSource.TableName)
 		return nil
 	}
 
 	switch {
-	case dataStore.Spec.Promsum != nil:
-		return c.handlePromsumDataStore(logger, dataStore)
-	case dataStore.Spec.AWSBilling != nil:
-		return c.handleAWSBillingDataStore(logger, dataStore)
+	case dataSource.Spec.Promsum != nil:
+		return c.handlePromsumDataSource(logger, dataSource)
+	case dataSource.Spec.AWSBilling != nil:
+		return c.handleAWSBillingDataSource(logger, dataSource)
 	default:
-		return fmt.Errorf("datastore %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataStore.Name)
+		return fmt.Errorf("datasource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
 	}
 }
 
-func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
-	storage := dataStore.Spec.Promsum.Storage
-	tableName := dataStoreTableName(dataStore.Name)
+func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	storage := dataSource.Spec.Promsum.Storage
+	tableName := dataSourceTableName(dataSource.Name)
 
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing speci***REMOVED***ed, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Info("reportDataStore does not have a storageSpec or storageLocationName set, using default storage location")
+		logger.Info("reportDataSource does not have a storageSpec or storageLocationName set, using default storage location")
 		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
 		if err != nil {
 			return err
 		}
 		if storageLocation == nil {
-			return fmt.Errorf("invalid promsum DataStore, no storageSpec or storageLocationName and cluster has no default StorageLocation")
+			return fmt.Errorf("invalid promsum DataSource, no storageSpec or storageLocationName and cluster has no default StorageLocation")
 		}
 
 		storageSpec = storageLocation.Spec
 	} ***REMOVED*** if storage.StorageLocationName != "" { // Speci***REMOVED***c storage location speci***REMOVED***ed
-		logger.Infof("reportDataStore con***REMOVED***gured to use StorageLocation %s", storage.StorageLocationName)
+		logger.Infof("reportDataSource con***REMOVED***gured to use StorageLocation %s", storage.StorageLocationName)
 		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.namespace).Get(storage.StorageLocationName)
 		if err != nil {
 			return err
 		}
 		storageSpec = storageLocation.Spec
-	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datastore
+	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datasource
 		storageSpec = *storage.StorageSpec
 	}
 
@@ -125,11 +125,11 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 			return err
 		}
 	} ***REMOVED*** {
-		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datastore %s", dataStore.Name)
+		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datasource %s", dataSource.Name)
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataStore, createTableParams)
+	err = c.createPrestoTableCR(dataSource, createTableParams)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
@@ -137,7 +137,7 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 
 	logger.Debugf("successfully created table %s", tableName)
 
-	return c.updateDataStoreTableName(logger, dataStore, tableName)
+	return c.updateDataSourceTableName(logger, dataSource, tableName)
 }
 
 func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
@@ -167,10 +167,10 @@ func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationL
 
 }
 
-func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore) error {
-	source := dataStore.Spec.AWSBilling.Source
+func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
-		return fmt.Errorf("datastore %q: improperly con***REMOVED***gured datastore, source is empty", dataStore.Name)
+		return fmt.Errorf("datasource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
 	}
 
 	manifestRetriever, err := aws.NewManifestRetriever(source.Bucket, source.Pre***REMOVED***x)
@@ -184,11 +184,11 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 	}
 
 	if len(manifests) == 0 {
-		logger.Warnf("datastore %q has no report manifests in it's bucket, the ***REMOVED***rst report has likely not been generated yet", dataStore.Name)
+		logger.Warnf("datasource %q has no report manifests in it's bucket, the ***REMOVED***rst report has likely not been generated yet", dataSource.Name)
 		return nil
 	}
 
-	tableName := dataStoreTableName(dataStore.Name)
+	tableName := dataSourceTableName(dataSource.Name)
 	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
 	createTableParams, err := hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
 	if err != nil {
@@ -196,7 +196,7 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataStore, createTableParams)
+	err = c.createPrestoTableCR(dataSource, createTableParams)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
@@ -204,31 +204,31 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 
 	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
 
-	err = c.updateDataStoreTableName(logger, dataStore, tableName)
+	err = c.updateDataSourceTableName(logger, dataSource, tableName)
 	if err != nil {
 		return err
 	}
 
-	c.prestoTablePartitionQueue <- dataStore
+	c.prestoTablePartitionQueue <- dataSource
 	return nil
 }
 
-func (c *Chargeback) createPrestoTableCR(dataStore *cbTypes.ReportDataStore, params hive.CreateTableParameters) error {
+func (c *Chargeback) createPrestoTableCR(dataSource *cbTypes.ReportDataSource, params hive.CreateTableParameters) error {
 	prestoTableCR := cbTypes.PrestoTable{
 		TypeMeta: meta.TypeMeta{
 			Kind:       "PrestoTable",
-			APIVersion: dataStore.APIVersion,
+			APIVersion: dataSource.APIVersion,
 		},
 		ObjectMeta: meta.ObjectMeta{
-			Name:      dataStoreNameToPrestoTableName(dataStore.Name),
-			Namespace: dataStore.Namespace,
-			Labels:    dataStore.Labels,
+			Name:      dataSourceNameToPrestoTableName(dataSource.Name),
+			Namespace: dataSource.Namespace,
+			Labels:    dataSource.Labels,
 			OwnerReferences: []meta.OwnerReference{
 				{
-					APIVersion: dataStore.APIVersion,
-					Kind:       dataStore.Kind,
-					Name:       dataStore.Name,
-					UID:        dataStore.UID,
+					APIVersion: dataSource.APIVersion,
+					Kind:       dataSource.Kind,
+					Name:       dataSource.Name,
+					UID:        dataSource.UID,
 				},
 			},
 		},
@@ -257,18 +257,18 @@ func (c *Chargeback) createPrestoTableCR(dataStore *cbTypes.ReportDataStore, par
 		})
 	}
 
-	_, err := c.chargebackClient.ChargebackV1alpha1().PrestoTables(dataStore.Namespace).Create(&prestoTableCR)
+	_, err := c.chargebackClient.ChargebackV1alpha1().PrestoTables(dataSource.Namespace).Create(&prestoTableCR)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *Chargeback) updateDataStoreTableName(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore, tableName string) error {
-	dataStore.TableName = tableName
-	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataStores(dataStore.Namespace).Update(dataStore)
+func (c *Chargeback) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) error {
+	dataSource.TableName = tableName
+	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to update ReportDataStore table name for %q", dataStore.Name)
+		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)
 		return err
 	}
 	return nil

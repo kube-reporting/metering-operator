@@ -8,7 +8,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataStores:
+  reportDataSources:
   - "aws-billing"
   reportQueries:
   - "node-allocatable-memory"
@@ -37,7 +37,7 @@ spec:
            lineItem_BlendedCost as period_cost,
            billing_period_start as partition_start,
            billing_period_end as partition_stop
-    FROM {| dataStoreTableName "aws-billing" |} as aws_billing
+    FROM {| dataSourceTableName "aws-billing" |} as aws_billing
     INNER JOIN resource_id_list
     ON aws_billing.lineItem_resourceId = resource_id_list.resource_id
     WHERE position('.csv' IN aws_billing."$path") != 0 -- This prevents JSON manifest ***REMOVED***les from being loaded.
