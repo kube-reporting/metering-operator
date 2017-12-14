@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -16,6 +17,8 @@ import (
 	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
+
+var ErrReportIsRunning = errors.New("the report is still running")
 
 type server struct {
 	chargeback *Chargeback
@@ -166,8 +169,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 	case api.ReportPhaseWaiting, api.ReportPhaseStarted:
 		fallthrough
 	default:
-		logger.Errorf("the report is still running")
-		srv.reportError(logger, w, r, http.StatusBadRequest, "the report is still running")
+		logger.Errorf(ErrReportIsRunning.Error())
+		srv.reportError(logger, w, r, http.StatusAccepted, ErrReportIsRunning.Error())
 		return
 	}
 
