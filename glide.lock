@@ -1,5 +1,5 @@
-hash: 48e770b5e7b1e17cf9f5a4dccecb7809fcc967bf71b71cee8ff4a4c4461301a1
-updated: 2017-12-14T13:21:10.278036893-08:00
+hash: bc29496d4a0618fd109f74c17ae62932441950e7477e84bb751c7e4c974ca0c0
+updated: 2017-12-18T10:28:30.295312759-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -166,6 +166,11 @@ imports:
   - unicode/bidi
   - unicode/norm
   - width
+- name: golang.org/x/tools
+  version: 64890f4e2b733655fee5077a5435a8812404c3a3
+  subpackages:
+  - go/ast/astutil
+  - imports
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
@@ -197,13 +202,8 @@ imports:
   - settings/v1alpha1
   - storage/v1
   - storage/v1beta1
-- name: k8s.io/apiextensions-apiserver
-  version: 2bfb07d318ed549813240d1165fcebad6250c666
-  subpackages:
-  - pkg/apis/apiextensions/v1beta1
-  - pkg/client/clientset/clientset
 - name: k8s.io/apimachinery
-  version: a28c9b0b532638dcfb2c8b1b6f8f1e4a21041752
+  version: 5134afd2c0c91158afac0d8a28bd2177185a3bcc
   subpackages:
   - pkg/api/equality
   - pkg/api/errors
@@ -247,7 +247,7 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: c6f8cf2c47d21d55fa0df928291b2580544886c8
+  version: 1b75876d45719a84085528ee621939b0c68a4b85
   subpackages:
   - discovery
   - discovery/fake
@@ -303,7 +303,7 @@ imports:
   - util/integer
   - util/workqueue
 - name: k8s.io/code-generator
-  version: 4f9758469fda3ab9e9a17c3300f3476cc13a83b2
+  version: fc1982ddabb163d4c9fd88cd1a8f8935ec652507
   subpackages:
   - cmd/client-gen
   - cmd/client-gen/args
@@ -320,7 +320,7 @@ imports:
   - cmd/lister-gen/generators
   - third_party/forked/golang/reflect
 - name: k8s.io/gengo
-  version: 75356185a9af8f0464efa792e2e9508d5b4be83c
+  version: b6c426f7730e6d66e6e476a85d1c3eb7633880e0
   subpackages:
   - args
   - boilerplate
@@ -335,7 +335,7 @@ imports:
   - parser
   - types
 - name: k8s.io/kube-openapi
-  version: 80f07ef71bb4f781233c65aa8d0369e4ecafab87
+  version: 868f2f29720b192240e18284659231b440f9cda5
   subpackages:
   - pkg/common
 testImports:
