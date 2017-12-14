@@ -97,7 +97,7 @@ func TestExampleReportsProduceData(t *testing.T) {
 				"format": "json",
 			}
 
-			err = wait.Poll(time.Second*5, time.Minute*2, func() (bool, error) {
+			err = wait.Poll(time.Second*5, time.Minute*3, func() (bool, error) {
 				req := testFramework.NewChargebackSVCRequest(testFramework.Namespace, "chargeback", "/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
