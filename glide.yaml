@@ -79,6 +79,28 @@ import:
   subpackages:
   - dynamic
   - kubernetes
+  - kubernetes/typed/admissionregistration/v1alpha1
+  - kubernetes/typed/apps/v1beta1
+  - kubernetes/typed/apps/v1beta2
+  - kubernetes/typed/authentication/v1
+  - kubernetes/typed/authentication/v1beta1
+  - kubernetes/typed/authorization/v1
+  - kubernetes/typed/authorization/v1beta1
+  - kubernetes/typed/autoscaling/v1
+  - kubernetes/typed/autoscaling/v2beta1
+  - kubernetes/typed/batch/v1
+  - kubernetes/typed/certificates/v1beta1
+  - kubernetes/typed/core/v1
+  - kubernetes/typed/extensions/v1beta1
+  - kubernetes/typed/networking/v1
+  - kubernetes/typed/policy/v1beta1
+  - kubernetes/typed/rbac/v1
+  - kubernetes/typed/rbac/v1/alpha1
+  - kubernetes/typed/rbac/v1/v1beta1
+  - kubernetes/typed/scheduling/v1alpha1
+  - kubernetes/typed/settings/v1alpha1
+  - kubernetes/typed/storage/v1
+  - kubernetes/typed/storage/v1beta1
   - pkg/api
   - pkg/apis/extensions/v1beta1
   - rest
@@ -88,6 +110,15 @@ import:
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
 - package: github.com/sirupsen/logrus
   version: v1.0.3
+- package: golang.org/x/sys
+  version: 53aa286056ef226755cd898109dbcdaba8ac0b81
+  subpackages:
+  - unix
+  - windows
+- package: golang.org/x/crypto
+  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  subpackages:
+  - ssh/terminal
 testImport:
 - package: github.com/prometheus/prometheus
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
