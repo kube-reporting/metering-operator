@@ -108,7 +108,7 @@ func fmtSerdeProps(props map[string]string) (propsTxt string) {
 
 // fmtColumnText returns a Hive CREATE column string from a slice of name/type pairs. For example, "columnName string".
 // s3Location returns the HDFS path based on an S3 bucket and pre***REMOVED***x.
-func s3Location(bucket, pre***REMOVED***x string) (string, error) {
+func S3Location(bucket, pre***REMOVED***x string) (string, error) {
 	bucket = path.Join(bucket, pre***REMOVED***x)
 	// Ensure the bucket URL has a trailing slash
 	if bucket[len(bucket)-1] != '/' {

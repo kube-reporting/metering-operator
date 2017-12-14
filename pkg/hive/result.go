@@ -6,7 +6,7 @@ import "path"
 // the speci***REMOVED***ed columns
 func CreateS3ReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column) error {
 	path := path.Join(pre***REMOVED***x, tableName)
-	location, err := s3Location(bucket, path)
+	location, err := S3Location(bucket, path)
 	if err != nil {
 		return err
 	}
