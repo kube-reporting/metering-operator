@@ -4,6 +4,7 @@ package externalversions
 
 import (
 	"fmt"
+
 	v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -35,7 +36,7 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=Chargeback, Version=V1alpha1
+	// Group=chargeback.coreos.com, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("reports"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().Reports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportdatastores"):
