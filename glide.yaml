@@ -93,3 +93,9 @@ testImport:
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
   subpackages:
   - promql
+- package: github.com/stretchr/testify
+  version: 2aa2c176b9dab406a6970f6a55f513e8a8c8b18f
+  subpackages:
+  - assert
+  - require
+  - mock
