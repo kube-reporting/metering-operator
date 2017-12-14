@@ -96,5 +96,6 @@ func (c *Con***REMOVED***g) TransportCon***REMOVED***g() (*transport.Con***REMOV
 			Groups:   c.Impersonate.Groups,
 			Extra:    c.Impersonate.Extra,
 		},
+		Dial: c.Dial,
 	}, nil
 }

@@ -16,7 +16,10 @@ limitations under the License.
 
 package transport
 
-import "net/http"
+import (
+	"net"
+	"net/http"
+)
 
 // Con***REMOVED***g holds various options for establishing a transport.
 type Con***REMOVED***g struct {
@@ -52,6 +55,9 @@ type Con***REMOVED***g struct {
 	// con***REMOVED***g may layer other RoundTrippers on top of the returned
 	// RoundTripper.
 	WrapTransport func(rt http.RoundTripper) http.RoundTripper
+
+	// Dial speci***REMOVED***es the dial function for creating unencrypted TCP connections.
+	Dial func(network, addr string) (net.Conn, error)
 }
 
 // ImpersonationCon***REMOVED***g has all the available impersonation options
