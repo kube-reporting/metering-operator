@@ -122,6 +122,7 @@ podTemplate(
                             make k8s-verify-codegen
                             """
                         }
+
                         if (params.BUILD_RELEASE) {
                             if (!gitTag) {
                                 error "Unable to detect git tag"
@@ -169,11 +170,11 @@ podTemplate(
                                 """
                             }
 
-                            stage('deploy') {
-                                if (isMasterBranch) {
-                                    withCredentials([
-                                        [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
-                                    ]) {
+                            withCredentials([
+                                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                            ]) {
+                                stage('deploy') {
+                                    if (isMasterBranch) {
                                         echo "Deploying chargeback"
 
                                         ansiColor('xterm') {
@@ -184,9 +185,24 @@ podTemplate(
                                             """
                                         }
                                         echo "Successfully deployed chargeback-helm-operator"
+                                    } else {
+                                        echo "Non-master branch, skipping deploy"
                                     }
-                                } else {
-                                    echo "Non-master branch, skipping deploy"
+                                }
+                                stage('integration tests') {
+                                    if (isMasterBranch) {
+                                        echo "Running chargeback integration tests"
+
+                                        ansiColor('xterm') {
+                                            sh """#!/bin/bash
+                                            export KUBECONFIG=${KUBECONFIG}
+                                            make integration-tests
+                                            """
+                                        }
+                                    } else {
+                                        echo "Non-master branch, skipping chargeback integration test"
+                                    }
+
                                 }
                             }
                         }
