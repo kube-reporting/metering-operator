@@ -18,7 +18,7 @@ const (
 var templateFuncMap = template.FuncMap{
 	"hiveAWSPartitionTimestamp": hiveAWSPartitionTimestamp,
 	"prestoTimestamp":           prestoTimestamp,
-	"dataStoreTableName":        dataStoreTableName,
+	"dataSourceTableName":        dataSourceTableName,
 	"generationQueryViewName":   generationQueryViewName,
 	"billingPeriodFormat":       billingPeriodFormat,
 	"filterAWSData":             filterAWSData,
@@ -80,7 +80,7 @@ func prestoTimestamp(date time.Time) string {
 	return date.Format(PrestoTimestampFormat)
 }
 
-func filterAWSData(r *reportTemplateInfo, awsBillingDatastoreName string) string {
+func filterAWSData(r *reportTemplateInfo, awsBillingDataSourceName string) string {
 	start := prestoTimestamp(r.StartPeriod)
 	stop := prestoTimestamp(r.EndPeriod)
 	partitionStart := hiveAWSPartitionTimestamp(r.StartPeriod)
@@ -109,5 +109,5 @@ func filterAWSData(r *reportTemplateInfo, awsBillingDatastoreName string) string
 
         -- make sure lineItem entries overlap with our range
         AND (period_stop >= timestamp '%s' AND period_start <= timestamp '%s')
-`, start, stop, start, stop, start, start, stop, stop, generationQueryViewName(awsBillingDatastoreName), partitionStart, partitionStop, start, stop)
+`, start, stop, start, stop, start, start, stop, stop, generationQueryViewName(awsBillingDataSourceName), partitionStart, partitionStop, start, stop)
 }

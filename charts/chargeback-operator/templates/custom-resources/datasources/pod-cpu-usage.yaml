@@ -1,5 +1,5 @@
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: ReportDataStore
+kind: ReportDataSource
 metadata:
   name: "pod-request-cpu-cores"
   labels:
@@ -15,7 +15,7 @@ spec:
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: ReportDataStore
+kind: ReportDataSource
 metadata:
   name: "pod-limit-cpu-cores"
   labels:

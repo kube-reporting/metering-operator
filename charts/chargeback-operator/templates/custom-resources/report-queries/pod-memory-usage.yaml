@@ -7,7 +7,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataStores:
+  reportDataSources:
   - "pod-request-memory-bytes"
   columns:
   - name: pod
@@ -35,7 +35,7 @@ spec:
           timeprecision,
           amount * timeprecision as pod_request_memory_byte_seconds,
           "timestamp"
-      FROM {| dataStoreTableName "pod-request-memory-bytes" |}
+      FROM {| dataSourceTableName "pod-request-memory-bytes" |}
       WHERE element_at(labels, 'node') IS NOT NULL
 
 ---
