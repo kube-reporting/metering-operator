@@ -76,11 +76,7 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 		}
 		return intr.fCall.CallFunction(node.value.(string), resolvedArgs, intr)
 	case ASTField:
-		if m, ok := value.(map[string]interface{}); ok {
-			key := node.value.(string)
-			return m[key], nil
-		}
-		return intr.***REMOVED***eldFromStruct(node.value.(string), value)
+		return intr.***REMOVED***eldFromStructOrMap(node.value.(string), value)
 	case ASTFilterProjection:
 		left, err := intr.Execute(node.children[0], value)
 		if err != nil {
@@ -314,8 +310,14 @@ func (intr *treeInterpreter) Execute(node ASTNode, value interface{}) (interface
 	return nil, errors.New("Unknown AST node: " + node.nodeType.String())
 }
 
-func (intr *treeInterpreter) ***REMOVED***eldFromStruct(key string, value interface{}) (interface{}, error) {
+func (intr *treeInterpreter) ***REMOVED***eldFromStructOrMap(key string, value interface{}) (interface{}, error) {
+	var err error
 	rv := reflect.ValueOf(value)
+	rv, err = stripPtrs(rv)
+	if err != nil {
+		return nil, nil
+	}
+
 	***REMOVED***rst, n := utf8.DecodeRuneInString(key)
 	***REMOVED***eldName := string(unicode.ToUpper(***REMOVED***rst)) + key[n:]
 	if rv.Kind() == reflect.Struct {
@@ -323,19 +325,24 @@ func (intr *treeInterpreter) ***REMOVED***eldFromStruct(key string, value interf
 		if !v.IsValid() {
 			return nil, nil
 		}
-		return v.Interface(), nil
-	} ***REMOVED*** if rv.Kind() == reflect.Ptr {
-		// Handle multiple levels of indirection?
-		if rv.IsNil() {
-			return nil, nil
-		}
-		rv = rv.Elem()
-		v := rv.FieldByName(***REMOVED***eldName)
-		if !v.IsValid() {
+		v, err = stripPtrs(v)
+		if err != nil {
 			return nil, nil
 		}
 		return v.Interface(), nil
+	} ***REMOVED*** if rv.Kind() == reflect.Map {
+		***REMOVED***eld := rv.MapIndex(reflect.ValueOf(key))
+		***REMOVED***eld, err = stripPtrs(***REMOVED***eld)
+		if err != nil {
+			return nil, nil
+		}
+		if ***REMOVED***eld.IsValid() {
+			return ***REMOVED***eld.Interface(), nil
+		} ***REMOVED*** {
+			return nil, nil
+		}
 	}
+
 	return nil, nil
 }
 
