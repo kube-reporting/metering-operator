@@ -40,6 +40,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	}
 	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
 	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	mux.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
 
@@ -69,12 +70,12 @@ type reportErrorResponse struct {
 
 func (srv *server) reportError(logger log.FieldLogger, w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
 	msg := fmt.Sprintf(message, args...)
-	srv.writeResponseWithBody(logger, w, r, status, reportErrorResponse{Error: msg})
+	srv.writeResponseWithBody(logger, w, status, reportErrorResponse{Error: msg})
 }
 
 // writeResponseWithBody attempts to marshal an arbitrary thing to JSON then write
 // it to the http.ResponseWriter
-func (srv *server) writeResponseWithBody(logger log.FieldLogger, w http.ResponseWriter, r *http.Request, code int, resp interface{}) {
+func (srv *server) writeResponseWithBody(logger log.FieldLogger, w http.ResponseWriter, code int, resp interface{}) {
 	enc, err := json.Marshal(resp)
 	if err != nil {
 		logger.WithError(err).Error("failed JSON-encoding HTTP response")
