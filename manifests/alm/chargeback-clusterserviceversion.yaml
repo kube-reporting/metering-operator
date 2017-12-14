@@ -273,3 +273,8 @@ spec:
       kind: Report
       displayName: Chargeback Report
       description: A chargeback report
+    - name: scheduledreports.chargeback.coreos.com
+      version: v1alpha1
+      kind: ScheduledReport
+      displayName: Chargeback Scheduled Report
+      description: A scheduled chargeback report
