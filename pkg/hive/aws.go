@@ -28,10 +28,10 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
-	location, err := s3Location(bucket, pre***REMOVED***x)
+func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) (CreateTableParameters, error) {
+	location, err := S3Location(bucket, pre***REMOVED***x)
 	if err != nil {
-		return err
+		return CreateTableParameters{}, err
 	}
 
 	// Since the billing data likely exists already, we need to enumerate all
@@ -51,8 +51,19 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 		}
 	}
 
-	query := createTable(tableName, location, awsUsageSerde, "text***REMOVED***le", awsUsageSerdeProps, columns, awsPartitions, true, true)
-	return queryer.Query(query)
+	params := CreateTableParameters{
+		Name:         tableName,
+		Location:     location,
+		SerdeFmt:     awsUsageSerde,
+		Format:       "text***REMOVED***le",
+		SerdeProps:   awsUsageSerdeProps,
+		Columns:      columns,
+		Partitions:   awsPartitions,
+		External:     true,
+		IgnoreExists: true,
+	}
+	query := createTable(params)
+	return params, queryer.Query(query)
 }
 
 const HiveDateStringLayout = "20060102"

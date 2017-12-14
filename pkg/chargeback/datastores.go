@@ -109,15 +109,16 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		storageSpec = *storage.StorageSpec
 	}
 
+	var err error
 	if storageSpec.Local != nil {
 		logger.Debugf("creating local table %s", tableName)
-		err := hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
+		_, err = hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
 		if err != nil {
 			return err
 		}
 	} ***REMOVED*** if storageSpec.S3 != nil {
 		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
-		err := hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
+		_, err = hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
 		if err != nil {
 			return err
 		}
