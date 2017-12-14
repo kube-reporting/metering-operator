@@ -1,5 +1,5 @@
-hash: 1b89ed557660d0301360b49b264651fbe5beb807430ba4a383ac9ff773f5f674
-updated: 2017-10-26T12:31:25.105663416-07:00
+hash: 80d1213cfc4a6ea7aa63d36c45c838542a0c3a9b98060d70ee0f7c16e0f5a42e
+updated: 2017-12-14T13:14:41.830262647-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -49,7 +49,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-ini/ini
-  version: f280b3ba517bf5fc98922624f21fb0e7a92adaec
+  version: 32e4c1e6bc4e7d0d8451aa6b75200d19e37a536a
 - name: github.com/go-openapi/jsonpointer
   version: 46af16f9f7b149af66e5d1bd010e3574dc06de98
 - name: github.com/go-openapi/jsonreference
@@ -92,7 +92,7 @@ imports:
   subpackages:
   - simplelru
 - name: github.com/jmespath/go-jmespath
-  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+  version: dd801d4f4ce7ac746e7e7b4489d2fa600b3b096b
 - name: github.com/json-iterator/go
   version: 36b14963da70d11297d313183d7e6388c8510e1e
 - name: github.com/juju/ratelimit
@@ -125,7 +125,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: golang.org/x/crypto
-  version: 2509b142fb2b797aa7587dad548f113b2c0f20ce
+  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
@@ -140,7 +140,7 @@ imports:
   - lex/httplex
   - websocket
 - name: golang.org/x/sync
-  version: 8e0aa688b654ef28caa72506fa5ec8dba9fc7690
+  version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
   subpackages:
   - errgroup
 - name: golang.org/x/sys
@@ -307,3 +307,9 @@ testImports:
   version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
   subpackages:
   - promql
+- name: github.com/stretchr/testify
+  version: 2aa2c176b9dab406a6970f6a55f513e8a8c8b18f
+  subpackages:
+  - assert
+  - mock
+  - require
