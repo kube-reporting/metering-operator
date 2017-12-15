@@ -61,7 +61,7 @@ until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods -o json | jq '.items | leng
 done
 echo "all of the chargeback pods have been started"
 
-until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods  -o json | jq '.items | map(.status.containerStatuses[] | .ready) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods  -o json | jq '.items | map(.status.containerStatuses | if . == null then [{ready: false}] ***REMOVED*** . end | .[].ready) | all' -r)" == "true" ]; do
     echo 'waiting for all pods to be ready'
     sleep 10
 done

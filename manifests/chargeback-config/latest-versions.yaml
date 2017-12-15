@@ -1,16 +1,16 @@
 chargeback-operator:
   image:
-    tag: latest
+    tag: PR-135
 
 presto:
   presto:
     image:
-      tag: latest
+      tag: PR-135
   hive:
     image:
-      tag: latest
+      tag: PR-135
 
 hdfs:
   image:
-    tag: latest
+    tag: PR-135
 

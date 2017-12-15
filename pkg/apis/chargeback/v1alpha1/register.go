@@ -35,6 +35,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ReportGenerationQueryList{},
 		&ReportPrometheusQuery{},
 		&ReportPrometheusQueryList{},
+		&StorageLocation{},
+		&StorageLocationList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
