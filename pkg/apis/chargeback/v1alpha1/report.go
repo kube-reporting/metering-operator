@@ -51,12 +51,6 @@ type ReportSpec struct {
 	Output *ReportStorageLocation `json:"output,omitempty"`
 }
 
-type ReportTemplateSpec struct {
-	meta.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec ReportSpec `json:"spec"`
-}
-
 type ReportStatus struct {
 	Phase  ReportPhase `json:"phase,omitempty"`
 	Output string      `json:"output,omitempty"`
