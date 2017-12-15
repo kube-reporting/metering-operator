@@ -10,4 +10,6 @@ type ReportGenerationQueryExpansion interface{}
 
 type ReportPrometheusQueryExpansion interface{}
 
+type ScheduledReportExpansion interface{}
+
 type StorageLocationExpansion interface{}
