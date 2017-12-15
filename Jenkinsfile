@@ -174,7 +174,7 @@ podTemplate(
                                 [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
                             ]) {
                                 stage('deploy') {
-                                    if (isMasterBranch|| true) {
+                                    if (isMasterBranch) {
                                         echo "Deploying chargeback"
 
                                         ansiColor('xterm') {
