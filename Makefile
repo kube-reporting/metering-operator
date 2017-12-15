@@ -164,6 +164,9 @@ install:
 uninstall:
 	./hack/uninstall.sh
 
+integration-tests:
+	./hack/integration-tests.sh
+
 # Update dependencies
 vendor: glide.yaml
 	glide up --strip-vendor

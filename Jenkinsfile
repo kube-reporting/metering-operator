@@ -122,13 +122,14 @@ podTemplate(
                             make k8s-verify-codegen
                             """
                         }
+
                         if (params.BUILD_RELEASE) {
                             if (!gitTag) {
                                 error "Unable to detect git tag"
                             }
                             stage('tag') {
                                 ansiColor('xterm') {
-                                    sh """#!/bin/bash
+                                    sh """#!/bin/bash -ex
                                     make docker-tag-all \
                                         PULL_TAG_IMAGE_SOURCE=true \
                                         IMAGE_TAG=${gitTag}
@@ -136,7 +137,7 @@ podTemplate(
                                 }
                             }
                             stage('push') {
-                                sh """#!/bin/bash
+                                sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=false \
                                     IMAGE_TAG=${gitTag}
@@ -145,7 +146,7 @@ podTemplate(
                         } else {
                             stage('build') {
                                 ansiColor('xterm') {
-                                    sh """#!/bin/bash
+                                    sh """#!/bin/bash -ex
                                     make docker-build-all -j 2 \
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
@@ -156,7 +157,7 @@ podTemplate(
                             }
 
                             stage('push') {
-                                sh """#!/bin/bash
+                                sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
                                     BRANCH_TAG=${BRANCH_TAG}
@@ -169,11 +170,11 @@ podTemplate(
                                 """
                             }
 
-                            stage('deploy') {
-                                if (isMasterBranch) {
-                                    withCredentials([
-                                        [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
-                                    ]) {
+                            withCredentials([
+                                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                            ]) {
+                                stage('deploy') {
+                                    if (isMasterBranch|| true) {
                                         echo "Deploying chargeback"
 
                                         ansiColor('xterm') {
@@ -184,9 +185,24 @@ podTemplate(
                                             """
                                         }
                                         echo "Successfully deployed chargeback-helm-operator"
+                                    } else {
+                                        echo "Non-master branch, skipping deploy"
                                     }
-                                } else {
-                                    echo "Non-master branch, skipping deploy"
+                                }
+                                stage('integration tests') {
+                                    if (isMasterBranch || true) {
+                                        echo "Running chargeback integration tests"
+
+                                        ansiColor('xterm') {
+                                            sh """#!/bin/bash
+                                            export KUBECONFIG=${KUBECONFIG}
+                                            make integration-tests
+                                            """
+                                        }
+                                    } else {
+                                        echo "Non-master branch, skipping chargeback integration test"
+                                    }
+
                                 }
                             }
                         }
