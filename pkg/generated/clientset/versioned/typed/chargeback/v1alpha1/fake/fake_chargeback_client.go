@@ -30,6 +30,10 @@ func (c *FakeChargebackV1alpha1) ReportPrometheusQueries(namespace string) v1alp
 	return &FakeReportPrometheusQueries{c, namespace}
 }
 
+func (c *FakeChargebackV1alpha1) ScheduledReports(namespace string) v1alpha1.ScheduledReportInterface {
+	return &FakeScheduledReports{c, namespace}
+}
+
 func (c *FakeChargebackV1alpha1) StorageLocations(namespace string) v1alpha1.StorageLocationInterface {
 	return &FakeStorageLocations{c, namespace}
 }

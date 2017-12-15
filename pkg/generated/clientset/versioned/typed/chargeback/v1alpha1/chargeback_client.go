@@ -14,6 +14,7 @@ type ChargebackV1alpha1Interface interface {
 	ReportDataSourcesGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
+	ScheduledReportsGetter
 	StorageLocationsGetter
 }
 
@@ -40,6 +41,10 @@ func (c *ChargebackV1alpha1Client) ReportGenerationQueries(namespace string) Rep
 
 func (c *ChargebackV1alpha1Client) ReportPrometheusQueries(namespace string) ReportPrometheusQueryInterface {
 	return newReportPrometheusQueries(c, namespace)
+}
+
+func (c *ChargebackV1alpha1Client) ScheduledReports(namespace string) ScheduledReportInterface {
+	return newScheduledReports(c, namespace)
 }
 
 func (c *ChargebackV1alpha1Client) StorageLocations(namespace string) StorageLocationInterface {
