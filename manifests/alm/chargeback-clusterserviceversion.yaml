@@ -249,27 +249,32 @@ spec:
   customresourcede***REMOVED***nitions:
     owned:
     - name: reportprometheusqueries.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: ReportPrometheusQuery
       displayName: Chargeback prometheus query
       description: Represents a prometheus query used by chargeback
     - name: storagelocations.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: StorageLocation
       displayName: Chargeback storage location
       description: Represents a location for chargeback to store data
     - name: reportdatastores.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: ReportDataStore
-      displayName: Chargeback data store
+      displayName: Chargeback Report Datastore
       description: Represents a data source.
     - name: reportgenerationqueries.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: ReportGenerationQuery
       displayName: Chargeback report generation query
       description: A SQL query used by chargeback to generate reports
     - name: reports.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: Report
-      displayName: A chargeback report
+      displayName: Chargeback Report
       description: A chargeback report
+    - name: scheduledreports.chargeback.coreos.com
+      version: v1alpha1
+      kind: ScheduledReport
+      displayName: Chargeback Scheduled Report
+      description: A scheduled chargeback report
