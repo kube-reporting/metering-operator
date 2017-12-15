@@ -1,0 +1,15 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: pod-memory-usage-by-node-monthly
+spec:
+  generationQuery: "pod-memory-usage-by-node"
+  gracePeriod: "1d"
+  schedule:
+    period: "monthly"
+    monthly:
+      dayOfMonth: 1
+      hour: 0
+      minute: 0
+      second: 0
+
