@@ -4,30 +4,58 @@ import "path"
 
 // CreateReportTable creates a new table backed by the given bucket/pre***REMOVED***x with
 // the speci***REMOVED***ed columns
-func CreateS3ReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column) error {
+func CreateS3ReportTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column, drop bool) (CreateTableParameters, error) {
 	path := path.Join(pre***REMOVED***x, tableName)
 	location, err := S3Location(bucket, path)
 	if err != nil {
-		return err
+		return CreateTableParameters{}, err
 	}
 
-	query := dropTable(tableName, true, true)
-	err = queryer.Query(query)
-	if err != nil {
-		return err
+	if drop {
+		err := DropTable(queryer, tableName, true)
+		if err != nil {
+			return CreateTableParameters{}, err
+		}
 	}
-
-	query = createTable(CreateTableParameters{tableName, location, "", "", nil, columns, nil, false, false})
-	return queryer.Query(query)
+	params := CreateTableParameters{
+		Name:         tableName,
+		Location:     location,
+		SerdeFmt:     "",
+		Format:       "",
+		SerdeProps:   nil,
+		Columns:      columns,
+		Partitions:   nil,
+		External:     false,
+		IgnoreExists: false,
+	}
+	query := createTable(params)
+	return params, queryer.Query(query)
 }
 
-func CreateLocalReportTable(queryer Queryer, tableName string, columns []Column) error {
-	query := dropTable(tableName, true, true)
-	err := queryer.Query(query)
-	if err != nil {
-		return err
+func CreateLocalReportTable(queryer Queryer, tableName string, columns []Column, drop bool) (CreateTableParameters, error) {
+	if drop {
+		err := DropTable(queryer, tableName, true)
+		if err != nil {
+			return CreateTableParameters{}, err
+		}
 	}
 
-	query = createTable(CreateTableParameters{tableName, "", "", "", nil, columns, nil, false, true})
+	params := CreateTableParameters{
+		Name:         tableName,
+		Location:     "",
+		SerdeFmt:     "",
+		Format:       "",
+		SerdeProps:   nil,
+		Columns:      columns,
+		Partitions:   nil,
+		External:     false,
+		IgnoreExists: true,
+	}
+	query := createTable(params)
+	return params, queryer.Query(query)
+}
+
+func DropTable(queryer Queryer, tableName string, ignoreNotExists bool) error {
+	query := dropTable(tableName, ignoreNotExists, true)
 	return queryer.Query(query)
 }

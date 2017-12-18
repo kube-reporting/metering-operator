@@ -41,15 +41,15 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	return tmpl, nil
 }
 
-func renderReportGenerationQuery(report *cbTypes.Report, generationQuery *cbTypes.ReportGenerationQuery) (string, error) {
-	tmpl, err := newQueryTemplate(generationQuery.Spec.Query)
+func renderReportGenerationQuery(startPeriod, endPeriod time.Time, queryStr string) (string, error) {
+	tmpl, err := newQueryTemplate(queryStr)
 	if err != nil {
 		return "", err
 	}
 	info := &templateInfo{
 		Report: &reportTemplateInfo{
-			StartPeriod: report.Spec.ReportingStart.Time,
-			EndPeriod:   report.Spec.ReportingEnd.Time,
+			StartPeriod: startPeriod,
+			EndPeriod:   endPeriod,
 		},
 	}
 	return renderTemplateInfo(tmpl, info)

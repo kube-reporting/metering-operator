@@ -5,7 +5,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
@@ -30,7 +29,7 @@ func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
 	}
 	defer c.informers.reportDataSourceQueue.Done(key)
 
-	logger = logger.WithFields(newLogIdenti***REMOVED***er())
+	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
 	err := c.syncReportDataSource(logger, key.(string))
 	c.handleErr(logger, err, "ReportDataSource", key, c.informers.reportDataSourceQueue)
 	return true
@@ -129,7 +128,7 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, createTableParams)
+	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", createTableParams)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
@@ -196,7 +195,7 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, createTableParams)
+	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", createTableParams)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
@@ -210,57 +209,6 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	c.prestoTablePartitionQueue <- dataSource
-	return nil
-}
-
-func (c *Chargeback) createPrestoTableCR(dataSource *cbTypes.ReportDataSource, params hive.CreateTableParameters) error {
-	prestoTableCR := cbTypes.PrestoTable{
-		TypeMeta: meta.TypeMeta{
-			Kind:       "PrestoTable",
-			APIVersion: dataSource.APIVersion,
-		},
-		ObjectMeta: meta.ObjectMeta{
-			Name:      dataSourceNameToPrestoTableName(dataSource.Name),
-			Namespace: dataSource.Namespace,
-			Labels:    dataSource.Labels,
-			OwnerReferences: []meta.OwnerReference{
-				{
-					APIVersion: dataSource.APIVersion,
-					Kind:       dataSource.Kind,
-					Name:       dataSource.Name,
-					UID:        dataSource.UID,
-				},
-			},
-		},
-		State: cbTypes.PrestoTableState{
-			CreationParameters: cbTypes.PrestoTableCreationParameters{
-				TableName:    params.Name,
-				Location:     params.Location,
-				SerdeFmt:     params.SerdeFmt,
-				Format:       params.Format,
-				SerdeProps:   params.SerdeProps,
-				External:     params.External,
-				IgnoreExists: params.IgnoreExists,
-			},
-		},
-	}
-	for _, col := range params.Columns {
-		prestoTableCR.State.CreationParameters.Columns = append(prestoTableCR.State.CreationParameters.Columns, cbTypes.PrestoTableColumn{
-			Name: col.Name,
-			Type: col.Type,
-		})
-	}
-	for _, par := range params.Partitions {
-		prestoTableCR.State.CreationParameters.Partitions = append(prestoTableCR.State.CreationParameters.Partitions, cbTypes.PrestoTableColumn{
-			Name: par.Name,
-			Type: par.Type,
-		})
-	}
-
-	_, err := c.chargebackClient.ChargebackV1alpha1().PrestoTables(dataSource.Namespace).Create(&prestoTableCR)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 

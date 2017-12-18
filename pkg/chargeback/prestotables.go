@@ -7,13 +7,17 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	meta "k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
+
+const prestoTableReconcileInterval = time.Minute
 
 func dataSourceNameToPrestoTableName(name string) string {
 	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
@@ -23,13 +27,12 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 	logger := c.logger.WithField("component", "prestoTableWorker")
 	logger.Infof("PrestoTable worker started")
 
-	ticker := time.NewTicker(time.Minute)
 	for {
 		select {
 		case <-stopCh:
 			logger.Infof("PrestoTableWorker exiting")
 			return
-		case <-ticker.C:
+		case <-c.clock.Tick(prestoTableReconcileInterval):
 			datasources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 			if err != nil {
 				logger.WithError(err).Errorf("unable to list datasources")
@@ -57,13 +60,11 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 }
 
 func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
-	prestoTableName := dataSourceNameToPrestoTableName(datasource.Name)
-	prestoTable, err := c.informers.prestoTableLister.PrestoTables(c.cfg.Namespace).Get(prestoTableName)
+	prestoTable, err := c.informers.prestoTableLister.PrestoTables(c.cfg.Namespace).Get(datasource.Name)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
 	if k8serrors.IsNotFound(err) {
-		getOpts := meta.GetOptions{}
-		prestoTable, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(c.cfg.Namespace).Get(prestoTableName, getOpts)
+		prestoTable, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(c.cfg.Namespace).Get(datasource.Name, metav1.GetOptions{})
 	}
 	if err != nil {
 		return err
@@ -223,4 +224,70 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTa
 		toAddPartitions:    toAddPartitions,
 		toUpdatePartitions: toUpdatePartitions,
 	}
+}
+
+func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.CreateTableParameters) error {
+	accessor := meta.NewAccessor()
+	name, err := accessor.Name(obj)
+	if err != nil {
+		return err
+	}
+	uid, err := accessor.UID(obj)
+	if err != nil {
+		return err
+	}
+	namespace, err := accessor.Namespace(obj)
+	if err != nil {
+		return err
+	}
+	labels, err := accessor.Labels(obj)
+	if err != nil {
+		return err
+	}
+
+	prestoTableCR := cbTypes.PrestoTable{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "PrestoTable",
+			APIVersion: apiVersion,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      prestoTableResourceNameFromKind(kind, name),
+			Namespace: namespace,
+			Labels:    labels,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion: apiVersion,
+					Kind:       kind,
+					Name:       name,
+					UID:        uid,
+				},
+			},
+		},
+		State: cbTypes.PrestoTableState{
+			CreationParameters: cbTypes.PrestoTableCreationParameters{
+				TableName:    params.Name,
+				Location:     params.Location,
+				SerdeFmt:     params.SerdeFmt,
+				Format:       params.Format,
+				SerdeProps:   params.SerdeProps,
+				External:     params.External,
+				IgnoreExists: params.IgnoreExists,
+			},
+		},
+	}
+	for _, col := range params.Columns {
+		prestoTableCR.State.CreationParameters.Columns = append(prestoTableCR.State.CreationParameters.Columns, cbTypes.PrestoTableColumn{
+			Name: col.Name,
+			Type: col.Type,
+		})
+	}
+	for _, par := range params.Partitions {
+		prestoTableCR.State.CreationParameters.Partitions = append(prestoTableCR.State.CreationParameters.Partitions, cbTypes.PrestoTableColumn{
+			Name: par.Name,
+			Type: par.Type,
+		})
+	}
+
+	_, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
+	return err
 }
