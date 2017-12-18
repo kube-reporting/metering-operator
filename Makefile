@@ -122,43 +122,6 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-tectonic-chargeback-%: Documentation manifests hack
-	@mkdir -p $@
-	@mkdir -p $@/hack
-	@cp \
-		hack/install.sh \
-		hack/alm-install.sh \
-		hack/install.sh \
-		hack/uninstall.sh \
-		hack/util.sh \
-		$@/hack/
-	@mkdir -p $@/Documentation
-	@cp \
-		Documentation/Installation.md \
-		Documentation/Report.md \
-		Documentation/Using-chargeback.md \
-		$@/Documentation/
-	@mkdir -p $@/manifests
-	@cp -r \
-		manifests/custom-resources \
-		$@/manifests/
-# Remove scheduled reports folder since we currently do not support them
-	@rm -r $@/manifests/custom-resources/scheduled-reports
-	@cp -r \
-		manifests/installer \
-		$@/manifests/
-	@cp -r \
-		manifests/alm \
-		$@/manifests/
-	@mkdir -p $@/manifests/chargeback-con***REMOVED***g
-	@cp \
-		manifests/chargeback-con***REMOVED***g/custom-values.yaml \
-		$@/manifests/chargeback-con***REMOVED***g
-	@echo "Start with Documentation/Installation.md" > $@/README
-
-tectonic-chargeback-%.zip: tectonic-chargeback-%
-	zip -r $@ $?
-
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
@@ -207,6 +170,9 @@ tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
 tectonic-chargeback-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
+
+tectonic-chargeback-%.zip: Documentation manifests hack
+	@./hack/create-release.sh $@
 
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
