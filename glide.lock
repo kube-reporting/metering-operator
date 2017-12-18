@@ -1,5 +1,5 @@
-hash: 3992a1a40815a57e2f2a180539ede4d94cfcc70d511e5a721ca53eb0554b3f3a
-updated: 2018-02-05T09:52:15.158492773-08:00
+hash: 9b1bf93db6370068e04a57182bba92f07ee7dd6c827cce1172d8089bbe6edf73
+updated: 2018-02-05T10:03:54.544325852-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -122,6 +122,8 @@ imports:
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
+- name: github.com/rob***REMOVED***g/cron
+  version: 2315d5715e36303a941d907f038da7f7c44c773b
 - name: github.com/segmentio/ksuid
   version: e3c9952840557adbb3538b1039e783d44c21ae4a
 - name: github.com/sirupsen/logrus
