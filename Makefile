@@ -122,22 +122,41 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-dist: Documentation manifests hack
+tectonic-chargeback-%: Documentation manifests hack
 	@mkdir -p $@
-	@rsync -am \
-		--include hack/install.sh \
-		--include hack/uninstall.sh \
-		--include hack/util.sh \
-		--include Documentation/Installation.md \
-		--include Documentation/Report.md \
-		--include Documentation/Using-chargeback.md \
-		--exclude 'hack/*' \
-		--exclude 'Documentation/*' \
-		--exclude 'manifests/alm' \
-		--exclude 'manifests/installer'
-		$? $@
+	@mkdir -p $@/hack
+	@cp \
+		hack/install.sh \
+		hack/alm-install.sh \
+		hack/install.sh \
+		hack/uninstall.sh \
+		hack/util.sh \
+		$@/hack/
+	@mkdir -p $@/Documentation
+	@cp \
+		Documentation/Installation.md \
+		Documentation/Report.md \
+		Documentation/Using-chargeback.md \
+		$@/Documentation/
+	@mkdir -p $@/manifests
+	@cp -r \
+		manifests/custom-resources \
+		$@/manifests/
+# Remove scheduled reports folder since we currently do not support them
+	@rm -r $@/manifests/custom-resources/scheduled-reports
+	@cp -r \
+		manifests/installer \
+		$@/manifests/
+	@cp -r \
+		manifests/alm \
+		$@/manifests/
+	@mkdir -p $@/manifests/chargeback-config
+	@cp \
+		manifests/chargeback-config/custom-values.yaml \
+		$@/manifests/chargeback-config
+	@echo "Start with Documentation/Installation.md" > $@/README
 
-dist.zip: dist
+tectonic-chargeback-%.zip: tectonic-chargeback-%
 	zip -r $@ $?
 
 chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/chargeback
