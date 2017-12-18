@@ -11,22 +11,11 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/hive"
-	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
 var (
-	defaultRunImmediately = true
-	defaultGracePeriod    = metav1.Duration{Duration: time.Minute * 5}
+	defaultGracePeriod = metav1.Duration{Duration: time.Minute * 5}
 )
-
-func generateHiveColumns(report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
-	columns := make([]hive.Column, 0)
-	for _, c := range genQuery.Spec.Columns {
-		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
-	}
-	return columns
-}
 
 func (c *Chargeback) runReportWorker() {
 	logger := c.logger.WithField("component", "reportWorker")
@@ -43,7 +32,7 @@ func (c *Chargeback) processReport(logger log.FieldLogger) bool {
 	}
 	defer c.informers.reportQueue.Done(key)
 
-	logger = logger.WithFields(newLogIdentifier())
+	logger = logger.WithFields(c.newLogIdentifier())
 	err := c.syncReport(logger, key.(string))
 	c.handleErr(logger, err, "report", key, c.informers.reportQueue)
 	return true
@@ -93,7 +82,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 			return nil
 		}
 
-		c.informers.reportInformer.GetIndexer().Update(newReport)
+		err = c.informers.reportInformer.GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
 			// if we cannot update it, don't re queue it
@@ -127,7 +116,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	// If we're waiting until the end and we're not past the end time + grace
 	// period, ignore this report
-	if !report.Spec.RunImmediately && report.Spec.ReportingEnd.Add(report.Spec.GracePeriod.Duration).After(time.Now()) {
+	if !report.Spec.RunImmediately && report.Spec.ReportingEnd.Add(report.Spec.GracePeriod.Duration).After(c.clock.Now()) {
 		logger.Infof("report %s not past grace period yet, ignoring for now", report.Name)
 		return nil
 	}
@@ -152,6 +141,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return nil
 	}
 
+	logger.Debug("updating report status to started")
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
 	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
@@ -159,9 +149,24 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
 		return err
 	}
-	report = newReport
 
-	results, err := c.generateReport(logger, report, genQuery)
+	report = newReport
+	columns := generateHiveColumns(genQuery)
+	tableName := reportTableName(report.Name)
+
+	results, err := c.generateReport(
+		logger,
+		report,
+		"report",
+		report.Name,
+		tableName,
+		report.Spec.ReportingStart.Time,
+		report.Spec.ReportingEnd.Time,
+		report.Spec.Output,
+		columns,
+		genQuery.Spec.Query,
+		true,
+	)
 	if err != nil {
 		c.setReportError(logger, report, err, "report execution failed")
 		return err
@@ -194,77 +199,4 @@ func (c *Chargeback) setReportError(logger log.FieldLogger, report *cbTypes.Repo
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}
-}
-
-func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Report, genQuery *cbTypes.ReportGenerationQuery) ([]map[string]interface{}, error) {
-	logger.Infof("generating usage report")
-	query, err := renderReportGenerationQuery(report, genQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a table to write to
-	reportTable := reportTableName(report.Name)
-	storage := report.Spec.Output
-
-	var storageSpec cbTypes.StorageLocationSpec
-	// Nothing specified, try to use default storage location
-	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Info("report does not have a output.spec or output.storageLocationName set, using default storage location")
-		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
-		if err != nil {
-			return nil, err
-		}
-		if storageLocation == nil {
-			return nil, fmt.Errorf("invalid report output, output.spec or output.storageLocationName set and cluster has no default StorageLocation")
-		}
-
-		storageSpec = storageLocation.Spec
-	} else if storage.StorageLocationName != "" { // Specific storage location specified
-		logger.Infof("report configured to use StorageLocation %s", storage.StorageLocationName)
-		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
-		if err != nil {
-			return nil, err
-		}
-		storageSpec = storageLocation.Spec
-	} else if storage.StorageSpec != nil { // Storage location is inlined in the datasource
-		storageSpec = *storage.StorageSpec
-	}
-
-	if storageSpec.Local != nil {
-		logger.Debugf("Creating table %s backed by local storage", reportTable)
-		err = hive.CreateLocalReportTable(c.hiveQueryer, reportTable, generateHiveColumns(report, genQuery))
-	} else if storageSpec.S3 != nil {
-		bucket, prefix := storageSpec.S3.Bucket, storageSpec.S3.Prefix
-		logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", reportTable, bucket, prefix)
-		err = hive.CreateS3ReportTable(c.hiveQueryer, reportTable, bucket, prefix, generateHiveColumns(report, genQuery))
-	} else {
-		return nil, fmt.Errorf("storage incorrectly configured on report: %s", report.Name)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't create table for output report: %v", err)
-	}
-
-	logger.Debugf("deleting any preexisting rows in %s", reportTable)
-	_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("DELETE FROM %s", reportTable))
-	if err != nil {
-		return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", reportTable, err)
-	}
-
-	// Run the report
-	logger.Debugf("running report generation query")
-	err = presto.ExecuteInsertQuery(c.prestoConn, reportTable, query)
-	if err != nil {
-		logger.WithError(err).Errorf("creating usage report FAILED!")
-		return nil, fmt.Errorf("Failed to execute %s usage report: %v", genQuery.Name, err)
-	}
-
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
-	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
-	if err != nil {
-		logger.WithError(err).Errorf("getting usage report FAILED!")
-		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
-	}
-	return results, nil
 }

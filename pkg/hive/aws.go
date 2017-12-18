@@ -73,11 +73,7 @@ const HiveDateStringLayout = "20060102"
 func AddPartition(queryer Queryer, tableName, start, end, location string) error {
 	partitionStr := "ALTER TABLE %s ADD IF NOT EXISTS PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
 	stmt := fmt.Sprintf(partitionStr, tableName, start, end, location)
-	err := queryer.Query(stmt)
-	if err != nil {
-		return err
-	}
-	return nil
+	return queryer.Query(stmt)
 }
 
 // DropPartition will delete a partition from the given tableName for the time
@@ -86,10 +82,7 @@ func DropPartition(queryer Queryer, tableName, start, end string) error {
 	partitionStr := "ALTER TABLE %s DROP IF EXISTS PARTITION (`billing_period_start`='%s',`billing_period_end`='%s')"
 	stmt := fmt.Sprintf(partitionStr, tableName, start, end)
 	err := queryer.Query(stmt)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // hiveName is the identifier used for Hive columns.

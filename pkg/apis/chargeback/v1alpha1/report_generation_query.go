@@ -26,20 +26,15 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	ReportQueries []string         `json:"reportQueries"`
-	DataSources    []string         `json:"reportDataSources"`
-	Query         string           `json:"query"`
-	Columns       []GenQueryColumn `json:"columns"`
-	View          GenQueryView     `json:"view"`
+	ReportQueries []string            `json:"reportQueries"`
+	DataSources   []string            `json:"reportDataSources"`
+	Query         string              `json:"query"`
+	Columns       []PrestoTableColumn `json:"columns"`
+	View          GenQueryView        `json:"view"`
 }
 
 type GenQueryView struct {
 	// Disabled controls whether or not to create a view in presto for this
 	// ReportGenerationQuery
 	Disabled bool `json:"disabled"`
-}
-
-type GenQueryColumn struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
 }
