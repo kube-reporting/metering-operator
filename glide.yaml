@@ -124,6 +124,8 @@ import:
   subpackages:
   - imports
   - go/ast/astutil
+- package: github.com/rob***REMOVED***g/cron
+  version: 2315d5715e36303a941d907f038da7f7c44c773b
 testImport:
 - package: github.com/prometheus/prometheus
   version: v2.0.0
