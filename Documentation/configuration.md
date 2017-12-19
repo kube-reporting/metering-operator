@@ -174,7 +174,7 @@ post-install can cause errors in the chargeback-operator.
 
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
-[example-con***REMOVED***g]: manifests/chargeback-con***REMOVED***g/custom-values.yaml
-[example-storage-con***REMOVED***g]: manifests/chargeback-con***REMOVED***g/custom-storageclass-values.yaml
+[example-con***REMOVED***g]: ../manifests/chargeback-con***REMOVED***g/custom-values.yaml
+[example-storage-con***REMOVED***g]: ../manifests/chargeback-con***REMOVED***g/custom-storageclass-values.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 
