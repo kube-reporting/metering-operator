@@ -3,8 +3,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
-msg "Removing pull secrets"
-kube-remove-non-***REMOVED***le secret coreos-pull-secret
+if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
+    msg "Removing pull secrets"
+    kube-remove-non-***REMOVED***le secret coreos-pull-secret
+***REMOVED***
 
 msg "Removing Chargeback Cluster Service Version"
 kube-remove \
