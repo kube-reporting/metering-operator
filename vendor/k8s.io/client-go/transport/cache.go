@@ -63,16 +63,20 @@ func (c *tlsTransportCache) get(con***REMOVED***g *Con***REMOVED***g) (http.Roun
 		return http.DefaultTransport, nil
 	}
 
+	dial := con***REMOVED***g.Dial
+	if dial == nil {
+		dial = (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial
+	}
 	// Cache a single transport for these options
 	c.transports[key] = utilnet.SetTransportDefaults(&http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
 		TLSHandshakeTimeout: 10 * time.Second,
 		TLSClientCon***REMOVED***g:     tlsCon***REMOVED***g,
 		MaxIdleConnsPerHost: idleConnsPerHost,
-		Dial: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).Dial,
+		Dial:                dial,
 	})
 	return c.transports[key], nil
 }
@@ -84,5 +88,5 @@ func tlsCon***REMOVED***gKey(c *Con***REMOVED***g) (string, error) {
 		return "", err
 	}
 	// Only include the things that actually affect the tls.Con***REMOVED***g
-	return fmt.Sprintf("%v/%x/%x/%x", c.TLS.Insecure, c.TLS.CAData, c.TLS.CertData, c.TLS.KeyData), nil
+	return fmt.Sprintf("%v/%x/%x/%x/%v", c.TLS.Insecure, c.TLS.CAData, c.TLS.CertData, c.TLS.KeyData, c.TLS.ServerName), nil
 }

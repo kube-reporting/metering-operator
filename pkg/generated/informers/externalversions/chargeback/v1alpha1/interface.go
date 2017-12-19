@@ -21,35 +21,37 @@ type Interface interface {
 }
 
 type version struct {
-	internalinterfaces.SharedInformerFactory
+	factory          internalinterfaces.SharedInformerFactory
+	namespace        string
+	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
 // New returns a new Interface.
-func New(f internalinterfaces.SharedInformerFactory) Interface {
-	return &version{f}
+func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
+	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
 // Reports returns a ReportInformer.
 func (v *version) Reports() ReportInformer {
-	return &reportInformer{factory: v.SharedInformerFactory}
+	return &reportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReportDataStores returns a ReportDataStoreInformer.
 func (v *version) ReportDataStores() ReportDataStoreInformer {
-	return &reportDataStoreInformer{factory: v.SharedInformerFactory}
+	return &reportDataStoreInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReportGenerationQueries returns a ReportGenerationQueryInformer.
 func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
-	return &reportGenerationQueryInformer{factory: v.SharedInformerFactory}
+	return &reportGenerationQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 func (v *version) ReportPrometheusQueries() ReportPrometheusQueryInformer {
-	return &reportPrometheusQueryInformer{factory: v.SharedInformerFactory}
+	return &reportPrometheusQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // StorageLocations returns a StorageLocationInformer.
 func (v *version) StorageLocations() StorageLocationInformer {
-	return &storageLocationInformer{factory: v.SharedInformerFactory}
+	return &storageLocationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

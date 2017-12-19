@@ -3,6 +3,8 @@
 package v1alpha1
 
 import (
+	time "time"
+
 	chargeback_v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	versioned "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	internalinterfaces "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/internalinterfaces"
@@ -11,7 +13,6 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	time "time"
 )
 
 // ReportInformer provides access to a shared informer and lister for
@@ -22,19 +23,34 @@ type ReportInformer interface {
 }
 
 type reportInformer struct {
-	factory internalinterfaces.SharedInformerFactory
+	factory          internalinterfaces.SharedInformerFactory
+	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	namespace        string
 }
 
 // NewReportInformer constructs a new informer for Report type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
 func NewReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, namespace, resyncPeriod, indexers, nil)
+}
+
+// NewFilteredReportInformer constructs a new informer for Report type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewFilteredReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
 				return client.ChargebackV1alpha1().Reports(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
 				return client.ChargebackV1alpha1().Reports(namespace).Watch(options)
 			},
 		},
@@ -44,12 +60,12 @@ func NewReportInformer(client versioned.Interface, namespace string, resyncPerio
 	)
 }
 
-func defaultReportInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewReportInformer(client, v1.NamespaceAll, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+func (f *reportInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
 func (f *reportInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&chargeback_v1alpha1.Report{}, defaultReportInformer)
+	return f.factory.InformerFor(&chargeback_v1alpha1.Report{}, f.defaultInformer)
 }
 
 func (f *reportInformer) Lister() v1alpha1.ReportLister {

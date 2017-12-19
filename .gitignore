@@ -27,8 +27,8 @@ private
 .idea
 _tmp
 
-deepcopy-gen
-client-gen
-lister-gen
-informer-gen
+./deepcopy-gen
+./client-gen
+./lister-gen
+./informer-gen
 tectonic-chargeback-0.1.0.tgz
