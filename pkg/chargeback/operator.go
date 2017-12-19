@@ -319,14 +319,40 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
+	c.logger.Info("waiting for caches to sync")
 	if !c.informers.WaitForCacheSync(stopCh) {
 		return fmt.Errorf("cache for reports not synced in time")
 	}
 
+	// Poll until we can write to presto
+	c.logger.Info("testing ability to write to Presto")
+	wait.PollUntil(time.Second*5, func() (bool, error) {
+		if c.testWriteToPresto(c.logger) {
+			return true, nil
+		}
+		return false, nil
+	}, stopCh)
+	c.logger.Info("writes to Presto are succeeding")
+
 	var wg sync.WaitGroup
+	c.logger.Info("starting Chargeback workers")
+	c.startWorkers(wg, stopCh)
 
+	c.logger.Infof("Chargeback successfully initialized, waiting for reports...")
+	c.setInitialized()
+
+	<-stopCh
+	c.logger.Info("got stop signal, shutting down Chargeback operator")
+	httpSrv.stop()
+	go c.informers.ShutdownQueues()
+	wg.Wait()
+	c.logger.Info("Chargeback workers and collectors stopped")
+
+	return nil
+}
+
+func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 	threadiness := 2
-
 	for i := 0; i < threadiness; i++ {
 		i := i
 		wg.Add(1)
@@ -363,18 +389,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 			c.logger.Debugf("Promsum collector stopped")
 		}()
 	}
-
-	c.logger.Infof("chargeback successfully initialized, waiting for reports...")
-	c.setInitialized()
-
-	<-stopCh
-	c.logger.Info("got stop signal, shutting down Chargeback operator")
-	httpSrv.stop()
-	go c.informers.ShutdownQueues()
-	wg.Wait()
-	c.logger.Info("Chargeback workers and collectors stopped")
-
-	return nil
 }
 
 func (c *Chargeback) setInitialized() {
