@@ -14,6 +14,7 @@ cp \
     hack/install.sh \
     hack/uninstall.sh \
     hack/util.sh \
+    hack/default-env.sh \
     "$OUTPUT_DIR/hack/"
 
 mkdir -p "$OUTPUT_DIR/Documentation"
