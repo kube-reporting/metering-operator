@@ -56,7 +56,7 @@ podTemplate(
                     stage('checkout') {
                         sh """
                         apk update
-                        apk add git bash jq
+                        apk add git bash jq zip
                         """
 
                         def branches;
@@ -143,6 +143,12 @@ podTemplate(
                                     IMAGE_TAG=${gitTag}
                                 """
                             }
+                            stage('release') {
+                                sh """#!/bin/bash -ex
+                                make tectonic-chargeback-${BRANCH_TAG}.zip
+                                """
+                                archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
+                            }
                         } ***REMOVED*** {
                             stage('build') {
                                 ansiColor('xterm') {
@@ -202,7 +208,6 @@ podTemplate(
                                     } ***REMOVED*** {
                                         echo "Non-master branch, skipping chargeback integration test"
                                     }
-
                                 }
                             }
                         }
