@@ -6,7 +6,7 @@ creating a secret named `chargeback-settings` with a key of `values.yaml`.
 An example configuration file can be found in
 [manifests/chargeback-config/custom-values.yaml][example-config]
 For details on customizing this file, read the
-[common-configuration-options](common-configuration-options) section below.
+[common-configuration-options](#common-configuration-options) section below.
 
 ### Documentation Conventions
 
