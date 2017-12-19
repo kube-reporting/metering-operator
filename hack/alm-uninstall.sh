@@ -13,7 +13,7 @@ kube-remove \
     manifests/alm/chargeback-clusterserviceversion.yaml
 
 msg "Removing chargeback-helm-operator"
-kube-remove-non-***REMOVED***le deployment -l alm-owner-name=chargeback-helm-operator.v0.5.0
+kube-remove-non-***REMOVED***le deployment chargeback-helm-operator
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
