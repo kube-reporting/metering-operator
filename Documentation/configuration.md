@@ -6,7 +6,7 @@ creating a secret named `chargeback-settings` with a key of `values.yaml`.
 An example con***REMOVED***guration ***REMOVED***le can be found in
 [manifests/chargeback-con***REMOVED***g/custom-values.yaml][example-con***REMOVED***g]
 For details on customizing this ***REMOVED***le, read the
-[common-con***REMOVED***guration-options](common-con***REMOVED***guration-options) section below.
+[common-con***REMOVED***guration-options](#common-con***REMOVED***guration-options) section below.
 
 ### Documentation Conventions
 
