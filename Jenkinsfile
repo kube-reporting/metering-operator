@@ -9,6 +9,7 @@ properties([
     pipelineTriggers([]),
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
+        booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
     ])
 ])
 
@@ -124,7 +125,9 @@ podTemplate(
                         }
 
                         if (params.BUILD_RELEASE) {
-                            if (!gitTag) {
+                            if (params.USE_BRANCH_AS_TAG) {
+                                gitTag = BRANCH_TAG
+                            } else if (!gitTag) {
                                 error "Unable to detect git tag"
                             }
                             stage('tag') {
