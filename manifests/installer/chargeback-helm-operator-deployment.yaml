@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: chargeback-helm-operator
-        image: quay.io/coreos/chargeback-helm-operator:0.5.0-rc2
+        image: quay.io/coreos/chargeback-helm-operator:0.5.0-rc3
         imagePullPolicy: Always
         env:
         - name: HELM_VALUES_SECRET_NAME
