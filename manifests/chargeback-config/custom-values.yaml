@@ -68,6 +68,7 @@ presto:
 # requests. These examples use the defaults.
 
 # hdfs:
+#   enabled: true
 #   datanode:
 #     resources:
 #       requests:
@@ -78,7 +79,7 @@ presto:
 #         cpu: "250m"
 
 #     storage:
-#         # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
+#       # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
 #       class: null
 #       size: "5Gi"
 
