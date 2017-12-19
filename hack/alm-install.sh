@@ -4,8 +4,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
-msg "Configuring pull secrets"
-copy-tectonic-pull
+if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
+    msg "Configuring pull secrets"
+    copy-tectonic-pull
+fi
 
 msg "Installing Custom Resource Definitions"
 kube-install \

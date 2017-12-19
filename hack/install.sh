@@ -14,8 +14,10 @@ elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
     exit 1
 fi
 
-msg "Configuring pull secrets"
-copy-tectonic-pull
+if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
+    msg "Configuring pull secrets"
+    copy-tectonic-pull
+fi
 
 msg "Installing Custom Resource Definitions"
 kube-install \
