@@ -17,6 +17,7 @@ necessary:
   - Tectonic Prometheus Operator of version 1.6.0 or greater (Prometheus
     Operator v0.13)
   - ALM installed
+- A StorageClass for dynamic volume provisioning ([see configuring chargeback](configuration.md) for details.)
 - A properly configured kubectl to access the Kubernetes cluster.
 
 ## Installation
