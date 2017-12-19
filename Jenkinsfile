@@ -9,6 +9,7 @@ properties([
     pipelineTriggers([]),
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
+        booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
     ])
 ])
 
@@ -56,7 +57,7 @@ podTemplate(
                     stage('checkout') {
                         sh """
                         apk update
-                        apk add git bash jq
+                        apk add git bash jq zip
                         """
 
                         def branches;
@@ -124,7 +125,9 @@ podTemplate(
                         }
 
                         if (params.BUILD_RELEASE) {
-                            if (!gitTag) {
+                            if (params.USE_BRANCH_AS_TAG) {
+                                gitTag = BRANCH_TAG
+                            } ***REMOVED*** if (!gitTag) {
                                 error "Unable to detect git tag"
                             }
                             stage('tag') {
@@ -142,6 +145,12 @@ podTemplate(
                                     USE_LATEST_TAG=false \
                                     IMAGE_TAG=${gitTag}
                                 """
+                            }
+                            stage('release') {
+                                sh """#!/bin/bash -ex
+                                make tectonic-chargeback-${BRANCH_TAG}.zip
+                                """
+                                archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
                             }
                         } ***REMOVED*** {
                             stage('build') {
@@ -202,7 +211,6 @@ podTemplate(
                                     } ***REMOVED*** {
                                         echo "Non-master branch, skipping chargeback integration test"
                                     }
-
                                 }
                             }
                         }
