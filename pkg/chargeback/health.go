@@ -1,6 +1,10 @@
 package chargeback
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/sirupsen/logrus"
+)
 
 type statusResponse struct {
 	Status  string      `json:"status"`
@@ -17,28 +21,30 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		return
 	}
-	_, err := srv.chargeback.prestoConn.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
-	if err != nil {
-		logger.WithError(err).Debugf("cannot create Presto table chargeback_health_check")
+	if !srv.chargeback.testWriteToPresto(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
-				Details: "cannot query PrestoDB",
-			})
-		return
-	}
-	// Hive does not support timezones, and now() returns a
-	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
-	_, err = srv.chargeback.prestoConn.Query("INSERT INTO chargeback_health_check VALUES (cast(now() AS TIMESTAMP))")
-	if err != nil {
-		logger.WithError(err).Debugf("cannot insert into Presto table chargeback_health_check")
-		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
-			statusResponse{
-				Status:  "not ready",
-				Details: "cannot query PrestoDB",
+				Details: "cannot write to PrestoDB",
 			})
 		return
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+}
+
+func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
+	_, err := c.prestoConn.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
+	if err != nil {
+		logger.WithError(err).Debugf("cannot create Presto table chargeback_health_check")
+		return false
+	}
+	// Hive does not support timezones, and now() returns a
+	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
+	_, err = c.prestoConn.Query("INSERT INTO chargeback_health_check VALUES (cast(now() AS TIMESTAMP))")
+	if err != nil {
+		logger.WithError(err).Debugf("cannot insert into Presto table chargeback_health_check")
+		return false
+	}
+	return true
 }
