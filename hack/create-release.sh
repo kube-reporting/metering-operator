@@ -28,6 +28,9 @@ mkdir -p "$OUTPUT_DIR/manifests"
 cp -r \
     manifests/custom-resources \
     "$OUTPUT_DIR/manifests/"
+cp -r \
+    manifests/custom-resource-de***REMOVED***nitions \
+    "$OUTPUT_DIR/manifests/"
 
 # Remove scheduled reports folder since we currently do not support them
 rm -r "$OUTPUT_DIR/manifests/custom-resources/scheduled-reports"
