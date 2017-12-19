@@ -1,16 +1,16 @@
 chargeback-operator:
   image:
-    tag: release-0.5.0
+    tag: 0.5.0-rc2
 
 presto:
   presto:
     image:
-      tag: release-0.5.0
+      tag: 0.5.0-rc2
   hive:
     image:
-      tag: release-0.5.0
+      tag: 0.5.0-rc2
 
 hdfs:
   image:
-    tag: release-0.5.0
+    tag: 0.5.0-rc2
 
