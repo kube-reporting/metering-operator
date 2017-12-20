@@ -10,6 +10,7 @@ properties([
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
+        booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: false, description: 'If true, run integration tests even if branch is not master'),
     ])
 ])
 
@@ -44,6 +45,7 @@ podTemplate(
         def gitCommit
         def gitTag
         def isMasterBranch = env.BRANCH_NAME == "master"
+        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || pullRequest.labels.contains("run-integration-tests")
 
         try {
             withEnv([
@@ -183,14 +185,15 @@ podTemplate(
                                 [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
                             ]) {
                                 stage('deploy') {
-                                    if (isMasterBranch) {
+                                    if (runIntegrationTests ) {
                                         echo "Deploying chargeback"
 
                                         ansiColor('xterm') {
                                             sh """#!/bin/bash
                                             export KUBECONFIG=${KUBECONFIG}
-                                            export CUSTOM_CHARGEBACK_SETTINGS_FILE=manifests/chargeback-config/latest-versions.yaml
-                                            ./hack/deploy.sh
+                                            export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
+                                            export DEPLOY_TAG=${BRANCH_TAG}
+                                            ./hack/deploy-ci.sh
                                             """
                                         }
                                         echo "Successfully deployed chargeback-helm-operator"
@@ -199,12 +202,13 @@ podTemplate(
                                     }
                                 }
                                 stage('integration tests') {
-                                    if (isMasterBranch) {
+                                    if (runIntegrationTests) {
                                         echo "Running chargeback integration tests"
 
                                         ansiColor('xterm') {
                                             sh """#!/bin/bash
                                             export KUBECONFIG=${KUBECONFIG}
+                                            export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
                                             make integration-tests
                                             """
                                         }
