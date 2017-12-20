@@ -8,5 +8,5 @@ dependencies:
 - name: hdfs
   repository: file://../hdfs
   version: 0.1.0
-digest: sha256:079de5349297d3e192a250b133b05c1e61521b9292c2057dd8cbc3353172dec3
-generated: 2017-11-14T11:32:54.505065885-08:00
+digest: sha256:14fb0eb05d0b8ace2fd3f2f759058fd03c85db0d0669f24e5cde541cd108f8d4
+generated: 2017-12-19T18:32:24.386546119-08:00
