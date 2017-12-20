@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -81,6 +82,11 @@ func TestExampleReportsProduceData(t *testing.T) {
 
 			report := obj.(*chargebackv1alpha1.Report)
 			require.NotNil(t, report, "report should not be nil")
+
+			err = testFramework.ChargebackClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			assert.Condition(t, func() bool {
+				return err == nil || errors.IsNotFound(err)
+			}, "failed to ensure report doesn't exist before creating report")
 
 			t.Logf("creating report %s", report.Name)
 			err = testFramework.CreateChargebackReport(testFramework.Namespace, report)
