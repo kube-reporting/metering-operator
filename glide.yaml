@@ -47,12 +47,12 @@ import:
   - service/s3
   - service/s3/s3iface
 - package: github.com/prometheus/client_golang
-  version: de4d4ffe63b9eff7f27484fdef6e421597e6abb4
+  version: 661e31bf844dfca9aeba15f27ea8aa0d485ad212
   subpackages:
   - api
   - api/prometheus/v1
 - package: github.com/prometheus/common
-  version: 0d0c3d572886e0f2323ed376557f9eb99b97d25
+  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
   subpackages:
   - model
 - package: k8s.io/api
@@ -121,7 +121,7 @@ import:
   - go/ast/astutil
 testImport:
 - package: github.com/prometheus/prometheus
-  version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
+  version: v2.0.0
   subpackages:
   - promql
 - package: github.com/stretchr/testify
