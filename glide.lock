@@ -1,5 +1,5 @@
-hash: bc29496d4a0618fd109f74c17ae62932441950e7477e84bb751c7e4c974ca0c0
-updated: 2017-12-18T10:28:30.295312759-08:00
+hash: 894752a64a4a8eac595625b9966c06099b9742f0f7e2a15d639094e06c38bc9e
+updated: 2017-12-20T12:31:37.76355281-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -110,12 +110,12 @@ imports:
 - name: github.com/peterbourgon/diskv
   version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/prometheus/client_golang
-  version: de4d4ffe63b9eff7f27484fdef6e421597e6abb4
+  version: 661e31bf844dfca9aeba15f27ea8aa0d485ad212
   subpackages:
   - api
   - api/prometheus/v1
 - name: github.com/prometheus/common
-  version: 0d0c3d572886e0f2323ed376557f9eb99b97d25b
+  version: 2e54d0b93cba2fd133edc32211dcc32c06ef72ca
   subpackages:
   - model
 - name: github.com/PuerkitoBio/purell
@@ -344,7 +344,7 @@ testImports:
   subpackages:
   - difflib
 - name: github.com/prometheus/prometheus
-  version: 3afb3fffa3a29c3de865e1172fb740442e9d0133
+  version: 0a74f98628a0463dddc90528220c94de5032d1a0
   subpackages:
   - promql
 - name: github.com/stretchr/testify

@@ -8,7 +8,7 @@ metadata:
 {{- end }}
 spec:
   query: |
-    sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node) keep_common
+    sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
 
 ---
 
@@ -22,4 +22,4 @@ metadata:
 {{- end }}
 spec:
   query: |
-    sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node) keep_common
+    sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node)
