@@ -9,4 +9,4 @@ dependencies:
 - name: hdfs
   version: 0.1.0
   repository: "file://../hdfs"
-  conditions: hdfs.enabled
+  condition: hdfs.enabled
