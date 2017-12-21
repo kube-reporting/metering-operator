@@ -40,6 +40,13 @@ podTemplate(
     label: 'kube-chargeback-build',
     name: 'kube-chargeback-build',
 ) {
+    echo "pull-request labels:"
+    pullRequest.labels.each {
+        echo "label: ${it}"
+    }
+
+    return
+
     node ('kube-chargeback-build') {
         def gitCommit
         def gitTag
@@ -80,7 +87,6 @@ podTemplate(
                             echo "This commit has a matching git Tag: ${gitTag}"
                         }
 
-                        echo "pull-request labels: ${pullRequest.labels}"
                     }
 
                     withCredentials([
