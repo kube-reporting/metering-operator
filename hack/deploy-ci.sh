@@ -11,6 +11,9 @@ chargeback-operator:
   image:
     tag: ${DEPLOY_TAG}
 
+    con***REMOVED***g:
+      disablePromsum: true
+
 presto:
   presto:
     image:

@@ -269,7 +269,7 @@ func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w
 	w.Write([]byte("method not yet implemented"))
 }
 
-type collectPromsumDataRequest struct {
+type CollectPromsumDataRequest struct {
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }
@@ -279,7 +279,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	srv.logRequest(logger, r)
 
 	decoder := json.NewDecoder(r.Body)
-	var req collectPromsumDataRequest
+	var req CollectPromsumDataRequest
 	err := decoder.Decode(&req)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
