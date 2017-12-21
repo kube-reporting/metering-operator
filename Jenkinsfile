@@ -79,6 +79,8 @@ podTemplate(
                         if (gitTag) {
                             echo "This commit has a matching git Tag: ${gitTag}"
                         }
+
+                        echo "pull-request labels: ${pullRequest.labels}"
                     }
 
                     withCredentials([
