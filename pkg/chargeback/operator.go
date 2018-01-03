@@ -71,7 +71,7 @@ type Chargeback struct {
 	disablePromsum bool
 	logReport      bool
 
-	prestoTablePartitionQueue chan *cbTypes.ReportDataStore
+	prestoTablePartitionQueue chan *cbTypes.ReportDataSource
 
 	logDMLQueries bool
 	logDDLQueries bool
@@ -94,7 +94,7 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Chargeback, error) {
 		promsumInterval:           cfg.PromsumInterval,
 		promsumStepSize:           cfg.PromsumStepSize,
 		promsumChunkSize:          cfg.PromsumChunkSize,
-		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataStore, 1),
+		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataSource, 1),
 		logger: logger,
 	}
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
@@ -126,9 +126,9 @@ type informers struct {
 	reportInformer cache.SharedIndexInformer
 	reportLister   cbListers.ReportLister
 
-	reportDataStoreQueue    workqueue.RateLimitingInterface
-	reportDataStoreInformer cache.SharedIndexInformer
-	reportDataStoreLister   cbListers.ReportDataStoreLister
+	reportDataSourceQueue    workqueue.RateLimitingInterface
+	reportDataSourceInformer cache.SharedIndexInformer
+	reportDataSourceLister   cbListers.ReportDataSourceLister
 
 	reportGenerationQueryQueue    workqueue.RateLimitingInterface
 	reportGenerationQueryInformer cache.SharedIndexInformer
@@ -167,21 +167,21 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		},
 	})
 
-	reportDataStoreQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportDataStoreInformer := cbInformers.NewReportDataStoreInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	reportDataStoreLister := cbListers.NewReportDataStoreLister(reportDataStoreInformer.GetIndexer())
+	reportDataSourceQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	reportDataSourceInformer := cbInformers.NewReportDataSourceInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportDataSourceLister := cbListers.NewReportDataSourceLister(reportDataSourceInformer.GetIndexer())
 
-	reportDataStoreInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	reportDataSourceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
-				reportDataStoreQueue.Add(key)
+				reportDataSourceQueue.Add(key)
 			}
 		},
 		UpdateFunc: func(old, current interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(current)
 			if err == nil {
-				reportDataStoreQueue.Add(key)
+				reportDataSourceQueue.Add(key)
 			}
 		},
 	})
@@ -222,7 +222,7 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 			storageLocationInformer,
 			reportPrometheusQueryInformer,
 			reportGenerationQueryInformer,
-			reportDataStoreInformer,
+			reportDataSourceInformer,
 			prestoTableInformer,
 			reportInformer,
 		},
@@ -230,7 +230,7 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 			storageLocationQueue,
 			reportPrometheusQueryQueue,
 			reportGenerationQueryQueue,
-			reportDataStoreQueue,
+			reportDataSourceQueue,
 			prestoTableQueue,
 			reportQueue,
 		},
@@ -239,9 +239,9 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		reportInformer: reportInformer,
 		reportLister:   reportLister,
 
-		reportDataStoreQueue:    reportDataStoreQueue,
-		reportDataStoreInformer: reportDataStoreInformer,
-		reportDataStoreLister:   reportDataStoreLister,
+		reportDataSourceQueue:    reportDataSourceQueue,
+		reportDataSourceInformer: reportDataSourceInformer,
+		reportDataSourceLister:   reportDataSourceLister,
 
 		reportGenerationQueryQueue:    reportGenerationQueryQueue,
 		reportGenerationQueryInformer: reportGenerationQueryInformer,
@@ -383,10 +383,10 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 
 		wg.Add(1)
 		go func() {
-			c.logger.Infof("starting ReportDataStore worker #%d", i)
-			wait.Until(c.runReportDataStoreWorker, time.Second, stopCh)
+			c.logger.Infof("starting ReportDataSource worker #%d", i)
+			wait.Until(c.runReportDataSourceWorker, time.Second, stopCh)
 			wg.Done()
-			c.logger.Infof("ReportDataStore worker #%d stopped", i)
+			c.logger.Infof("ReportDataSource worker #%d stopped", i)
 		}()
 
 		wg.Add(1)

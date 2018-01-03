@@ -11,7 +11,7 @@ type ChargebackV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	PrestoTablesGetter
 	ReportsGetter
-	ReportDataStoresGetter
+	ReportDataSourcesGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
 	StorageLocationsGetter
@@ -30,8 +30,8 @@ func (c *ChargebackV1alpha1Client) Reports(namespace string) ReportInterface {
 	return newReports(c, namespace)
 }
 
-func (c *ChargebackV1alpha1Client) ReportDataStores(namespace string) ReportDataStoreInterface {
-	return newReportDataStores(c, namespace)
+func (c *ChargebackV1alpha1Client) ReportDataSources(namespace string) ReportDataSourceInterface {
+	return newReportDataSources(c, namespace)
 }
 
 func (c *ChargebackV1alpha1Client) ReportGenerationQueries(namespace string) ReportGenerationQueryInterface {

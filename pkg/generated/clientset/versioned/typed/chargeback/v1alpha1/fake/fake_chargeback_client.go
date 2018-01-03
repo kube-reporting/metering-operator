@@ -18,8 +18,8 @@ func (c *FakeChargebackV1alpha1) Reports(namespace string) v1alpha1.ReportInterf
 	return &FakeReports{c, namespace}
 }
 
-func (c *FakeChargebackV1alpha1) ReportDataStores(namespace string) v1alpha1.ReportDataStoreInterface {
-	return &FakeReportDataStores{c, namespace}
+func (c *FakeChargebackV1alpha1) ReportDataSources(namespace string) v1alpha1.ReportDataSourceInterface {
+	return &FakeReportDataSources{c, namespace}
 }
 
 func (c *FakeChargebackV1alpha1) ReportGenerationQueries(namespace string) v1alpha1.ReportGenerationQueryInterface {

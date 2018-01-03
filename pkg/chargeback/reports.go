@@ -227,7 +227,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Repo
 			return nil, err
 		}
 		storageSpec = storageLocation.Spec
-	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datastore
+	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datasource
 		storageSpec = *storage.StorageSpec
 	}
 

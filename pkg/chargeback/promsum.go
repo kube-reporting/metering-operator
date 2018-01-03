@@ -58,7 +58,7 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 }
 
 func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger) {
-	dataStores, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).List(labels.Everything())
+	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.namespace).List(labels.Everything())
 	if err != nil {
 		logger.Errorf("couldn't list data stores: %v", err)
 		return
@@ -67,53 +67,53 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 	g, ctx := errgroup.WithContext(ctx)
 	now := time.Now().UTC()
 
-	for _, dataStore := range dataStores {
-		dataStore := dataStore
+	for _, dataSource := range dataSources {
+		dataSource := dataSource
 		g.Go(func() error {
-			logger := logger.WithField("datastore", dataStore.Name)
-			err := c.collectPromsumDatastoreData(logger, dataStore, now)
+			logger := logger.WithField("datasource", dataSource.Name)
+			err := c.collectPromsumDataSourceData(logger, dataSource, now)
 			if err != nil {
-				logger.WithError(err).Errorf("error collecting promsum data for datastore")
+				logger.WithError(err).Errorf("error collecting promsum data for datasource")
 				return err
 			}
 			return nil
 		})
 	}
 	if err := g.Wait(); err != nil {
-		logger.WithError(err).Errorf("some promsum datastores had errors when collecting data")
+		logger.WithError(err).Errorf("some promsum datasources had errors when collecting data")
 	}
 }
 
-func (c *Chargeback) collectPromsumDatastoreData(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) error {
-	logger.Debugf("processing data store %q", dataStore.Name)
-	if dataStore.Spec.DataStoreSource.Promsum == nil {
-		logger.Debugf("not a promsum store, skipping %q", dataStore.Name)
+func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, now time.Time) error {
+	logger.Debugf("processing data store %q", dataSource.Name)
+	if dataSource.Spec.Promsum == nil {
+		logger.Debugf("not a promsum store, skipping %q", dataSource.Name)
 		return nil
 	}
-	if dataStore.TableName == "" {
+	if dataSource.TableName == "" {
 		// This data store doesn't have a table yet, let's skip it and
 		// hope it'll have one next time.
-		logger.Debugf("no table set, skipping collection for data store %q", dataStore.Name)
-		key, err := cache.MetaNamespaceKeyFunc(dataStore)
+		logger.Debugf("no table set, skipping collection for data store %q", dataSource.Name)
+		key, err := cache.MetaNamespaceKeyFunc(dataSource)
 		if err == nil {
-			logger.Debugf("no table set, queueing %q", dataStore.Name)
-			c.informers.reportDataStoreQueue.Add(key)
+			logger.Debugf("no table set, queueing %q", dataSource.Name)
+			c.informers.reportDataSourceQueue.Add(key)
 		}
 		return nil
 	}
 
-	err := c.promsumCollectDataForQuery(logger, dataStore, now)
+	err := c.promsumCollectDataForQuery(logger, dataSource, now)
 	if err != nil {
 		return err
 	}
-	logger.Debugf("processing complete for data store %q", dataStore.Name)
+	logger.Debugf("processing complete for data store %q", dataSource.Name)
 	return nil
 }
 
-func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) error {
-	timeRanges, err := c.promsumGetTimeRanges(logger, dataStore, now)
+func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, now time.Time) error {
+	timeRanges, err := c.promsumGetTimeRanges(logger, dataSource, now)
 	if err != nil {
-		return fmt.Errorf("couldn't get time ranges to query for dataStore %s: %v", dataStore.Name, err)
+		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
 	}
 	logger.Debugf("time ranges to query: %+v", timeRanges)
 
@@ -127,7 +127,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	}
 
 	for _, queryRng := range timeRanges {
-		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(dataStore.Spec.Promsum.Query)
+		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(dataSource.Spec.Promsum.Query)
 		if err != nil {
 			return fmt.Errorf("could not get prometheus query: ", err)
 		}
@@ -138,7 +138,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 				query.Name, queryRng.Start, queryRng.End, err)
 		}
 
-		err = c.promsumStoreRecords(logger, dataStore, records)
+		err = c.promsumStoreRecords(logger, dataSource, records)
 		if err != nil {
 			return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
 				query.Name, queryRng.Start, queryRng.End, err)
@@ -147,13 +147,13 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	return nil
 }
 
-func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, now time.Time) ([]prom.Range, error) {
+func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, now time.Time) ([]prom.Range, error) {
 	// Get the most recent timestamp in the table for this query
 	getLastTimestampQuery := fmt.Sprintf(`
 				SELECT "timestamp"
 				FROM %s
 				ORDER BY "timestamp" DESC
-				LIMIT 1`, dataStore.TableName)
+				LIMIT 1`, dataSource.TableName)
 
 	results, err := presto.ExecuteSelect(c.prestoConn, getLastTimestampQuery)
 	if err != nil {
@@ -168,10 +168,10 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 		// chunkEnd == now, so it won't be queried, so this gets the chunk
 		// before the latest
 		lastTimestamp = now.Add(-2 * c.promsumChunkSize)
-		logger.Debugf("no data in data store %s yet", dataStore.Name)
+		logger.Debugf("no data in data store %s yet", dataSource.Name)
 	} ***REMOVED*** {
 		lastTimestamp = results[0]["timestamp"].(time.Time)
-		logger.Debugf("last fetched data for data store %s at %s", dataStore.Name, lastTimestamp.String())
+		logger.Debugf("last fetched data for data store %s at %s", dataSource.Name, lastTimestamp.String())
 	}
 
 	// We don't want to duplicate the lastTimestamp record so add
@@ -213,7 +213,7 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataStore *
 	return timeRanges, nil
 }
 
-func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataStore *cbTypes.ReportDataStore, records []BillingRecord) error {
+func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, records []BillingRecord) error {
 	var queryValues [][]string
 
 	for _, record := range records {
@@ -231,12 +231,12 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataStore *c
 
 		currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
 
-		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(dataStore.TableName, ""))
+		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(dataSource.TableName, ""))
 
 		// There's a character limit of prestoQueryCap on insert
 		// queries, so let's chunk them at that limit.
 		if len(currValue)+queryBuf.Len() > queryCap {
-			err := presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
+			err := presto.ExecuteInsertQuery(c.prestoConn, dataSource.TableName, queryBuf.String())
 			if err != nil {
 				return fmt.Errorf("failed to store metrics into presto: %v", err)
 			}
@@ -250,7 +250,7 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataStore *c
 		}
 	}
 	if !queryBufIsEmpty {
-		err := presto.ExecuteInsertQuery(c.prestoConn, dataStore.TableName, queryBuf.String())
+		err := presto.ExecuteInsertQuery(c.prestoConn, dataSource.TableName, queryBuf.String())
 		if err != nil {
 			return fmt.Errorf("failed to store metrics into presto: %v", err)
 		}
