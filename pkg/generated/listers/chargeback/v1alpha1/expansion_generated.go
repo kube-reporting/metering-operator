@@ -2,6 +2,14 @@
 
 package v1alpha1
 
+// PrestoTableListerExpansion allows custom methods to be added to
+// PrestoTableLister.
+type PrestoTableListerExpansion interface{}
+
+// PrestoTableNamespaceListerExpansion allows custom methods to be added to
+// PrestoTableNamespaceLister.
+type PrestoTableNamespaceListerExpansion interface{}
+
 // ReportListerExpansion allows custom methods to be added to
 // ReportLister.
 type ReportListerExpansion interface{}

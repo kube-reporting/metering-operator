@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
@@ -109,20 +110,29 @@ func (c *Chargeback) handlePromsumDataStore(logger log.FieldLogger, dataStore *c
 		storageSpec = *storage.StorageSpec
 	}
 
+	var createTableParams hive.CreateTableParameters
+	var err error
 	if storageSpec.Local != nil {
 		logger.Debugf("creating local table %s", tableName)
-		err := hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
+		createTableParams, err = hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
 		if err != nil {
 			return err
 		}
 	} ***REMOVED*** if storageSpec.S3 != nil {
 		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
-		err := hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
+		createTableParams, err = hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
 		if err != nil {
 			return err
 		}
 	} ***REMOVED*** {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datastore %s", dataStore.Name)
+	}
+
+	logger.Debugf("creating presto table CR for table %q", tableName)
+	err = c.createPrestoTableCR(dataStore, createTableParams)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
+		return err
 	}
 
 	logger.Debugf("successfully created table %s", tableName)
@@ -180,20 +190,78 @@ func (c *Chargeback) handleAWSBillingDataStore(logger log.FieldLogger, dataStore
 
 	tableName := dataStoreTableName(dataStore.Name)
 	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-	err = hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+	createTableParams, err := hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
 	if err != nil {
 		return err
 	}
+
+	logger.Debugf("creating presto table CR for table %q", tableName)
+	err = c.createPrestoTableCR(dataStore, createTableParams)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
+		return err
+	}
+
 	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
 
-	logger.Debugf("updating table %s partitions", tableName)
-	err = hive.UpdateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+	err = c.updateDataStoreTableName(logger, dataStore, tableName)
 	if err != nil {
 		return err
 	}
-	logger.Debugf("successfully updated table %s partitions", tableName)
 
-	return c.updateDataStoreTableName(logger, dataStore, tableName)
+	c.prestoTablePartitionQueue <- dataStore
+	return nil
+}
+
+func (c *Chargeback) createPrestoTableCR(dataStore *cbTypes.ReportDataStore, params hive.CreateTableParameters) error {
+	prestoTableCR := cbTypes.PrestoTable{
+		TypeMeta: meta.TypeMeta{
+			Kind:       "PrestoTable",
+			APIVersion: dataStore.APIVersion,
+		},
+		ObjectMeta: meta.ObjectMeta{
+			Name:      dataStoreNameToPrestoTableName(dataStore.Name),
+			Namespace: dataStore.Namespace,
+			Labels:    dataStore.Labels,
+			OwnerReferences: []meta.OwnerReference{
+				{
+					APIVersion: dataStore.APIVersion,
+					Kind:       dataStore.Kind,
+					Name:       dataStore.Name,
+					UID:        dataStore.UID,
+				},
+			},
+		},
+		State: cbTypes.PrestoTableState{
+			CreationParameters: cbTypes.PrestoTableCreationParameters{
+				TableName:    params.Name,
+				Location:     params.Location,
+				SerdeFmt:     params.SerdeFmt,
+				Format:       params.Format,
+				SerdeProps:   params.SerdeProps,
+				External:     params.External,
+				IgnoreExists: params.IgnoreExists,
+			},
+		},
+	}
+	for _, col := range params.Columns {
+		prestoTableCR.State.CreationParameters.Columns = append(prestoTableCR.State.CreationParameters.Columns, cbTypes.PrestoTableColumn{
+			Name: col.Name,
+			Type: col.Type,
+		})
+	}
+	for _, par := range params.Partitions {
+		prestoTableCR.State.CreationParameters.Partitions = append(prestoTableCR.State.CreationParameters.Partitions, cbTypes.PrestoTableColumn{
+			Name: par.Name,
+			Type: par.Type,
+		})
+	}
+
+	_, err := c.chargebackClient.ChargebackV1alpha1().PrestoTables(dataStore.Namespace).Create(&prestoTableCR)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Chargeback) updateDataStoreTableName(logger log.FieldLogger, dataStore *cbTypes.ReportDataStore, tableName string) error {

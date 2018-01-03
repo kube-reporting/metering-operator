@@ -9,6 +9,7 @@ import (
 
 type ChargebackV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	PrestoTablesGetter
 	ReportsGetter
 	ReportDataStoresGetter
 	ReportGenerationQueriesGetter
@@ -19,6 +20,10 @@ type ChargebackV1alpha1Interface interface {
 // ChargebackV1alpha1Client is used to interact with features provided by the chargeback.coreos.com group.
 type ChargebackV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *ChargebackV1alpha1Client) PrestoTables(namespace string) PrestoTableInterface {
+	return newPrestoTables(c, namespace)
 }
 
 func (c *ChargebackV1alpha1Client) Reports(namespace string) ReportInterface {

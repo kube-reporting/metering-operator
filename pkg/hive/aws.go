@@ -28,10 +28,10 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
-	location, err := s3Location(bucket, pre***REMOVED***x)
+func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) (CreateTableParameters, error) {
+	location, err := S3Location(bucket, pre***REMOVED***x)
 	if err != nil {
-		return err
+		return CreateTableParameters{}, err
 	}
 
 	// Since the billing data likely exists already, we need to enumerate all
@@ -51,44 +51,44 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x s
 		}
 	}
 
-	query := createTable(tableName, location, awsUsageSerde, "text***REMOVED***le", awsUsageSerdeProps, columns, awsPartitions, true, true)
-	return queryer.Query(query)
+	params := CreateTableParameters{
+		Name:         tableName,
+		Location:     location,
+		SerdeFmt:     awsUsageSerde,
+		Format:       "text***REMOVED***le",
+		SerdeProps:   awsUsageSerdeProps,
+		Columns:      columns,
+		Partitions:   awsPartitions,
+		External:     true,
+		IgnoreExists: true,
+	}
+	query := createTable(params)
+	return params, queryer.Query(query)
 }
 
 const HiveDateStringLayout = "20060102"
 
-func UpdateAWSUsageTable(queryer Queryer, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
-	partitionStr := "PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
-	var stmts []string
-	for _, manifest := range manifests {
-		manifestPath := manifest.DataDirectory()
-		location, err := s3Location(bucket, manifestPath)
-		if err != nil {
-			return err
-		}
-		stmt := fmt.Sprintf(partitionStr,
-			manifest.BillingPeriod.Start.Format(HiveDateStringLayout),
-			manifest.BillingPeriod.End.Format(HiveDateStringLayout),
-			location,
-		)
-		stmts = append(stmts, stmt)
-
-	}
-	if len(stmts) == 0 {
-		return nil
-	}
-
-	query := fmt.Sprintf("ALTER TABLE %s DROP IF EXISTS PARTITION (`billing_period_start`!='',`billing_period_end`!='')", tableName)
-	err := queryer.Query(query)
+// AddPartition will add a new partition to the given tableName for the time
+// range, pointing at the location
+func AddPartition(queryer Queryer, tableName, start, end, location string) error {
+	partitionStr := "ALTER TABLE %s ADD IF NOT EXISTS PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
+	stmt := fmt.Sprintf(partitionStr, tableName, start, end, location)
+	err := queryer.Query(stmt)
 	if err != nil {
 		return err
 	}
-	query = fmt.Sprintf("ALTER TABLE %s ADD %s", tableName, strings.Join(stmts, " "))
-	err = queryer.Query(query)
+	return nil
+}
+
+// DropPartition will delete a partition from the given tableName for the time
+// range, pointing at the location
+func DropPartition(queryer Queryer, tableName, start, end, location string) error {
+	partitionStr := "ALTER TABLE %s DROP IF EXISTS PARTITION (`billing_period_start`='%s',`billing_period_end`='%s') LOCATION '%s'"
+	stmt := fmt.Sprintf(partitionStr, tableName, start, end, location)
+	err := queryer.Query(stmt)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
