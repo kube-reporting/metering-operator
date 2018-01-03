@@ -37,6 +37,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=chargeback.coreos.com, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("prestotables"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().PrestoTables().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reports"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().Reports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportdatastores"):
