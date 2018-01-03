@@ -40,6 +40,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	}
 	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
 	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	mux.HandleFunc("/api/v1/collect/prometheus", srv.collectPromsumDataHandler)
 	mux.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
@@ -64,13 +65,13 @@ func (srv *server) logRequest(logger log.FieldLogger, r *http.Request) {
 	logger.Infof("%s %s", r.Method, r.URL.String())
 }
 
-type reportErrorResponse struct {
+type errorResponse struct {
 	Error string `json:"error"`
 }
 
-func (srv *server) reportError(logger log.FieldLogger, w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
+func (srv *server) writeErrorResponse(logger log.FieldLogger, w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
 	msg := fmt.Sprintf(message, args...)
-	srv.writeResponseWithBody(logger, w, status, reportErrorResponse{Error: msg})
+	srv.writeResponseWithBody(logger, w, status, errorResponse{Error: msg})
 }
 
 // writeResponseWithBody attempts to marshal an arbitrary thing to JSON then write
@@ -93,25 +94,25 @@ func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	srv.logRequest(logger, r)
 	if r.Method != "GET" {
-		srv.reportError(logger, w, r, http.StatusNotFound, "Not found")
+		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		srv.reportError(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"name", "format"}, vals)
 	if err != nil {
-		srv.reportError(logger, w, r, http.StatusBadRequest, "%v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "%v", err)
 		return
 	}
 	switch vals["format"][0] {
 	case "json", "csv":
 		break
 	default:
-		srv.reportError(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json")
+		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json")
 		return
 	}
 	srv.getReport(logger, vals["name"][0], vals["format"][0], w, r)
@@ -121,18 +122,18 @@ func (srv *server) runReportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	srv.logRequest(logger, r)
 	if r.Method != "GET" {
-		srv.reportError(logger, w, r, http.StatusNotFound, "Not found")
+		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
 		return
 	}
 	err := r.ParseForm()
 	if err != nil {
-		srv.reportError(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return
 	}
 	vals := r.Form
 	err = checkForFields([]string{"query", "start", "end"}, vals)
 	if err != nil {
-		srv.reportError(logger, w, r, http.StatusBadRequest, "%v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "%v", err)
 		return
 	}
 	srv.runReport(logger, vals["query"][0], vals["start"][0], vals["end"][0], w)
@@ -156,14 +157,14 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
-		srv.reportError(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
 		return
 	}
 	switch report.Status.Phase {
 	case api.ReportPhaseError:
 		err := fmt.Errorf(report.Status.Output)
 		logger.WithError(err).Errorf("the report encountered an error")
-		srv.reportError(logger, w, r, http.StatusInternalServerError, "the report encountered an error: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "the report encountered an error: %v", err)
 		return
 	case api.ReportPhaseFinished:
 		// continue with returning the report if the report is ***REMOVED***nished
@@ -171,7 +172,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		fallthrough
 	default:
 		logger.Errorf(ErrReportIsRunning.Error())
-		srv.reportError(logger, w, r, http.StatusAccepted, ErrReportIsRunning.Error())
+		srv.writeErrorResponse(logger, w, r, http.StatusAccepted, ErrReportIsRunning.Error())
 		return
 	}
 
@@ -180,7 +181,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
-		srv.reportError(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
 		return
 	}
 
@@ -193,13 +194,13 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		genQuery, err := srv.chargeback.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 		if err != nil {
 			logger.WithError(err).Errorf("error getting report generation query: %v", err)
-			srv.reportError(logger, w, r, http.StatusInternalServerError, "error getting report generation query: %v", err)
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report generation query: %v", err)
 			return
 		}
 
 		if len(results) > 0 && len(genQuery.Spec.Columns) != len(results[0]) {
 			logger.WithError(err).Errorf("report results schema doesn't match expected schema")
-			srv.reportError(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 			return
 		}
 
@@ -226,7 +227,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 				val, ok := row[key]
 				if !ok {
 					logger.WithError(err).Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
-					srv.reportError(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
+					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
 					return
 				}
 				switch v := val.(type) {
@@ -246,7 +247,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 					vals[i] = ""
 				default:
 					logger.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
-					srv.reportError(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
+					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
 					return
 				}
 			}
@@ -266,4 +267,30 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("method not yet implemented"))
+}
+
+type collectPromsumDataRequest struct {
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+}
+
+func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	srv.logRequest(logger, r)
+
+	decoder := json.NewDecoder(r.Body)
+	var req collectPromsumDataRequest
+	err := decoder.Decode(&req)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		return
+	}
+
+	timeBoundsGetter := promsumDataSourceTimeBoundsGetter(func(dataSource *api.ReportDataSource) (startTime, endTime time.Time, err error) {
+		return req.StartTime, req.EndTime, nil
+	})
+
+	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter)
+
+	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
