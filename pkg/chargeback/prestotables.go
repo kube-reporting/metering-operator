@@ -14,8 +14,8 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
-func dataStoreNameToPrestoTableName(name string) string {
-	return strings.Replace(dataStoreTableName(name), "_", "-", -1)
+func dataSourceNameToPrestoTableName(name string) string {
+	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
 }
 
 func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
@@ -29,34 +29,34 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 			logger.Infof("PrestoTableWorker exiting")
 			return
 		case <-ticker.C:
-			datastores, err := c.informers.reportDataStoreLister.ReportDataStores(c.namespace).List(labels.Everything())
+			datasources, err := c.informers.reportDataSourceLister.ReportDataSources(c.namespace).List(labels.Everything())
 			if err != nil {
-				logger.WithError(err).Errorf("unable to list datastores")
+				logger.WithError(err).Errorf("unable to list datasources")
 				continue
 			}
-			for _, d := range datastores {
-				if d.Spec.DataStoreSource.AWSBilling != nil {
+			for _, d := range datasources {
+				if d.Spec.AWSBilling != nil {
 					err := c.updateAWSBillingPartitions(logger, d)
 					if err != nil {
-						logger.WithError(err).Errorf("unable to update partitions for datastore %q", d.Name)
+						logger.WithError(err).Errorf("unable to update partitions for datasource %q", d.Name)
 					}
 				}
 			}
-		case datastore := <-c.prestoTablePartitionQueue:
-			if datastore.Spec.DataStoreSource.AWSBilling == nil {
-				logger.Errorf("incorrectly configured datastore sent to the presto table worker: %q", datastore.Name)
+		case datasource := <-c.prestoTablePartitionQueue:
+			if datasource.Spec.AWSBilling == nil {
+				logger.Errorf("incorrectly configured datasource sent to the presto table worker: %q", datasource.Name)
 				continue
 			}
-			err := c.updateAWSBillingPartitions(logger, datastore)
+			err := c.updateAWSBillingPartitions(logger, datasource)
 			if err != nil {
-				logger.WithError(err).Errorf("unable to update partitions for datastore %q", datastore.Name)
+				logger.WithError(err).Errorf("unable to update partitions for datasource %q", datasource.Name)
 			}
 		}
 	}
 }
 
-func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datastore *cbTypes.ReportDataStore) error {
-	prestoTableName := dataStoreNameToPrestoTableName(datastore.Name)
+func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
+	prestoTableName := dataSourceNameToPrestoTableName(datasource.Name)
 	prestoTable, err := c.informers.prestoTableLister.PrestoTables(c.namespace).Get(prestoTableName)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
@@ -72,7 +72,7 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datastor
 	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
 
 	// Fetch the billing manifests
-	manifestRetriever, err := aws.NewManifestRetriever(datastore.Spec.DataStoreSource.AWSBilling.Source.Bucket, datastore.Spec.DataStoreSource.AWSBilling.Source.Prefix)
+	manifestRetriever, err := aws.NewManifestRetriever(datasource.Spec.AWSBilling.Source.Bucket, datasource.Spec.AWSBilling.Source.Prefix)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datastor
 	// Manifests have a one-to-one correlation with hive partitions
 	for _, manifest := range manifests {
 		manifestPath := manifest.DataDirectory()
-		location, err := hive.S3Location(datastore.Spec.DataStoreSource.AWSBilling.Source.Bucket, manifestPath)
+		location, err := hive.S3Location(datasource.Spec.AWSBilling.Source.Bucket, manifestPath)
 		if err != nil {
 			return err
 		}

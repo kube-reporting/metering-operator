@@ -1,30 +1,29 @@
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: ReportDataStore
+kind: ReportDataSource
 metadata:
-  name: "pod-request-cpu-cores"
+  name: "pod-request-memory-bytes"
   labels:
     tectonic-chargeback: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   promsum:
-    query: "pod-request-cpu-cores"
+    query: "pod-request-memory-bytes"
     storage:
       storageLocationName: {{ .Values.config.storageLocationName | quote }}
 
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: ReportDataStore
+kind: ReportDataSource
 metadata:
-  name: "pod-limit-cpu-cores"
+  name: "pod-limit-memory-bytes"
   labels:
     tectonic-chargeback: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   promsum:
-    query: "pod-limit-cpu-cores"
+    query: "pod-limit-memory-bytes"
     storage:
       storageLocationName: {{ .Values.config.storageLocationName | quote }}
-

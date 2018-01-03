@@ -257,10 +257,10 @@ spec:
       kind: StorageLocation
       displayName: Chargeback storage location
       description: Represents a location for chargeback to store data
-    - name: reportdatastores.chargeback.coreos.com
-      version: v1alpha1
-      kind: ReportDataStore
-      displayName: Chargeback Report Datastore
+    - name: reportdatasources.chargeback.coreos.com
+      version: v1beta1
+      kind: ReportDataSource
+      displayName: Chargeback data source
       description: Represents a data source.
     - name: reportgenerationqueries.chargeback.coreos.com
       version: v1alpha1

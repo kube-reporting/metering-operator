@@ -1,6 +1,6 @@
 {{- if .Values.config.awsBillingDataSource.enabled -}}
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: ReportDataStore
+kind: ReportDataSource
 metadata:
   name: "aws-billing"
   labels:
