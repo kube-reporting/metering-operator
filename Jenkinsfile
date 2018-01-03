@@ -43,6 +43,7 @@ podTemplate(
     name: 'kube-chargeback-build',
 ) {
     node ('kube-chargeback-build') {
+    timestamps {
         def gitCommit
         def gitTag
         def isMasterBranch = env.BRANCH_NAME == "master"
@@ -236,4 +237,5 @@ podTemplate(
             // notifyBuild(currentBuild.result)
         }
     }
-}
+} // timestamps end
+} // podTemplate end
