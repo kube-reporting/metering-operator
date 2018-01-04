@@ -186,12 +186,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 
 	switch format {
 	case "json":
-		e := json.NewEncoder(w)
-		err := e.Encode(results)
-		if err != nil {
-			logger.Errorf("error marshalling json: %v", err)
-			return
-		}
+		srv.writeResponseWithBody(logger, w, http.StatusOK, results)
+		return
 	case "csv":
 		// Get generation query to get the list of columns
 		genQuery, err := srv.chargeback.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
@@ -262,6 +258,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		}
 
 		csvWriter.Flush()
+		w.Header().Set("Content-Type", "text/csv")
 		w.Write(buf.Bytes())
 	}
 }
