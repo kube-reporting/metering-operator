@@ -7,9 +7,15 @@ source ${DIR}/util.sh
 export CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE:-chargeback-ci}
 export SKIP_DELETE_CRDS=true
 
+# lowercase the value, since namespaces must be lowercase values
+CHARGEBACK_NAMESPACE=$(echo -n "$CHARGEBACK_NAMESPACE" | tr '[:upper:]' '[:lower:]')
+
 : "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
 : "${UNINSTALL_CHARGEBACK:=true}"
 : "${INSTALL_CHARGEBACK:=true}"
+
+echo "Creating namespace $CHARGEBACK_NAMESPACE"
+kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
 if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
     echo "Uninstalling chargeback"

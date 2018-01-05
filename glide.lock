@@ -1,5 +1,5 @@
-hash: 894752a64a4a8eac595625b9966c06099b9742f0f7e2a15d639094e06c38bc9e
-updated: 2017-12-20T12:31:37.76355281-08:00
+hash: 29f1062ce4f7de4a54b10ac3e5901b1f484b2ac1145efb14f68082b0b1e8069a
+updated: 2018-01-03T10:49:52.234120323-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -143,6 +143,13 @@ imports:
   - idna
   - lex/httplex
   - websocket
+- name: golang.org/x/oauth2
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
 - name: golang.org/x/sync
   version: fd80eb99c8f653c847d294a001bdf2a3a6f768f5
   subpackages:
@@ -171,6 +178,16 @@ imports:
   subpackages:
   - go/ast/astutil
   - imports
+- name: google.golang.org/appengine
+  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
@@ -247,7 +264,7 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: 1b75876d45719a84085528ee621939b0c68a4b85
+  version: 3a46b5de730a74e064197a157c96c2d29724a677
   subpackages:
   - discovery
   - discovery/fake
@@ -283,6 +300,7 @@ imports:
   - pkg/api
   - pkg/apis/extensions/v1beta1
   - pkg/version
+  - plugin/pkg/client/auth/oidc
   - rest
   - rest/watch
   - testing

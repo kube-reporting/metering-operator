@@ -98,6 +98,7 @@ import:
   - kubernetes/typed/storage/v1beta1
   - pkg/api
   - pkg/apis/extensions/v1beta1
+  - plugin/pkg/client/auth/oidc
   - rest
   - tools/cache
   - util
