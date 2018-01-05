@@ -29,8 +29,7 @@ spec:
 
 ### reportingStart
 
-The timestamp of the beginning of the time period the report will cover. The format of this ***REMOVED***eld is: `[Year]-[Month]-[Day]T[Hour]-[Minute]-[Second]Z`,
-where all ***REMOVED***elds are numbers with leading zeroes where appropriate.
+The timestamp of the beginning of the time period the report will cover. The format of this ***REMOVED***eld is: `[Year]-[Month]-[Day]T[Hour]-[Minute]-[Second]Z`, where all components are numbers with leading zeroes where appropriate.
 
 Timestamps should be [RFC3339][rfc3339] encoded. Times with local offsets will be converted to UTC.
 
@@ -60,23 +59,6 @@ has ended.
 ### runImmediately
 
 Set `runImmediately` to true to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
-
-### output
-
-De***REMOVED***nes the location for storage of the report's result. This value does not impact how report results are fetched.
-
-When working with AWS, the result of a report is stored in the S3 bucket de***REMOVED***ned by this `output` ***REMOVED***eld. For more information, please see [storing data in S3][storing-data].
-
-### S3 bucket
-
-Chargeback uses S3 buckets to collect data and write reports after the data has been analyzed. The location is given as the `bucket` and the `pre***REMOVED***x` of keys where data is stored.
-
-Example:
-
-```yaml
-bucket: east-region-clusters
-pre***REMOVED***x: july-data
-```
 
 ## Execution
 
