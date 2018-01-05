@@ -79,4 +79,3 @@ A report can have the following states:
 
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
-[storing-data]: Storing-Data-In-S3.md

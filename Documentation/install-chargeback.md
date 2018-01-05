@@ -111,4 +111,4 @@ For instructions on using Chargeback, please see [Using Chargeback][using-charge
 
 
 [using-chargeback]: using-chargeback.md
-[con***REMOVED***guring-chargeback]: con***REMOVED***guration.md
+[con***REMOVED***guring-chargeback]: chargeback-con***REMOVED***g.md
