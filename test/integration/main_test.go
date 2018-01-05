@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	"github.com/coreos-inc/kube-chargeback/test/framework"
 )
