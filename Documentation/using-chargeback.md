@@ -31,7 +31,7 @@ A report's status can be inspected by viewing the object with the `-o json`
 flag:
 
 ```
-$ kubectl -n $CHARGEBACK_NAMESPACE get report pod-cpu-usage -o json
+$ kubectl -n $CHARGEBACK_NAMESPACE get report pod-cpu-usage-by-node -o json
 ```
 
 ## Viewing reports
