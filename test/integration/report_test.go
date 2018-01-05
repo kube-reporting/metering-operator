@@ -52,8 +52,8 @@ func TestReportsProduceData(t *testing.T) {
 	// reportEnd is 1 minute ago because Prometheus may not have collected
 	// the most recent 1 minute of data yet
 	reportEnd := time.Now().Add(-time.Minute)
-	// To make things faster, let's limit the window to 5 minutes
-	reportStart := reportEnd.Add(-5 * time.Minute)
+	// To make things faster, let's limit the window to 10 minutes
+	reportStart := reportEnd.Add(-10 * time.Minute)
 
 	tests := []struct {
 		// name is the name of the sub test but also the name of the report.
