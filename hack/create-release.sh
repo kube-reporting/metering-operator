@@ -9,9 +9,7 @@ mkdir -p "$OUTPUT_DIR"
 
 mkdir -p "$OUTPUT_DIR/hack"
 cp \
-    hack/install.sh \
     hack/alm-install.sh \
-    hack/uninstall.sh \
     hack/alm-uninstall.sh \
     hack/util.sh \
     hack/default-env.sh \
