@@ -23,8 +23,6 @@ spec:
   generationQuery: "pod-cpu-usage-by-node"
   gracePeriod: "5m"
   runImmediately: true
-  output:
-    local: {}
 ```
 
 ### reportingStart
