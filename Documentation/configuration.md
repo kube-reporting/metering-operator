@@ -1,25 +1,18 @@
-## Configuration
+# Chargeback Configuration
 
-Chargeback supports a few configuration options which can currently be set by
-creating a secret named `chargeback-settings` with a key of `values.yaml`.
+Chargeback supports a few configuration options which can be set by creating a secret named `chargeback-settings` with a key of `values.yaml`.
 
-An example configuration file can be found in
-[manifests/chargeback-config/custom-values.yaml][example-config]
-For details on customizing this file, read the
-[common-configuration-options](#common-configuration-options) section below.
+An example configuration file can be found in [manifests/chargeback-config/custom-values.yaml][example-config] For details on customizing this file, read the [common-configuration-options](#common-configuration-options) section below.
 
-### Documentation Conventions
+## Documentation conventions
 
-A common way of describing nested fields in `custom-values.yaml` in this
-documentation will refer to setting configuration sections or values, by using
-the following notation where dots are separators:
+This document follows the convention of describing nested fields in configuration settings using dots as separators. For example,
 
 ```
 chargeback-operator.config.awsAccessKeyID
 ```
 
-This is just a convention for referring to nested fields in the yaml, where the
-above example is referring to the following yaml structure and value:
+refers to the following YAML structure and value:
 
 ```
 chargeback-operator:
@@ -27,20 +20,17 @@ chargeback-operator:
     awsAccessKeyID: "REPLACEME"
 ```
 
-If you ever see a reference to a setting using this dotted notation, just know
-that it's referring to a nested field in a yaml structure.
+## Using a custom configuration
 
-### Using a custom configuration
-
-To install the custom configuration file, you can run the following command:
+To install the custom configuration file, run the following command:
 
 ```
 kubectl -n $CHARGEBACK_NAMESPACE create secret generic chargeback-settings --from-file 'values.yaml=manifests/chargeback-config/custom-values.yaml'
 ```
 
-However, this doesn't make it very easy to make changes without deleting and
-re-creating the secret, so you can also use this one-liner which will do the
-same thing, but will use `kubectl apply`
+This command requires that the secret be deleted and recreated for each installation.
+
+Use `kubectl apply` to avoid this requirement:
 
 ```
 kubectl -n $CHARGEBACK_NAMESPACE create secret generic chargeback-settings --from-file 'values.yaml=manifests/chargeback-config/custom-values.yaml' -o yaml --dry-run > /tmp/chargeback-settings-secret.yaml && kubectl apply -n $CHARGEBACK_NAMESPACE -f /tmp/chargeback-settings-secret.yaml
@@ -48,77 +38,50 @@ kubectl -n $CHARGEBACK_NAMESPACE create secret generic chargeback-settings --fro
 
 ## Common configuration options
 
-The example manifest
-[manifests/chargeback-config/custom-values.yaml][example-config]
-contains has the most common configuration values a user might want to modify
-included in it already, the options are commented out and can be uncommented
-and adjusted as needed. The values are the defaults, and should work for most
-users, but if you run into resource issues, you can increase the limits as
-needed.
+The example manifest [manifests/chargeback-config/custom-values.yaml][example-config] contains the most common user configuration values, including resource limits. The values listed are the defaults, which may be uncommented and adjusted as needed.
 
-### StorageClasses and Volumes
+### Persistent Volumes
 
-Chargeback currently requires at minimum 1 (or 3, if using the defaults)
-persistent volume(s) to operate. The PersistentVolumeClaims (PVC's) are listed below:
+Chargeback requires at least 1 Persistent Volume to operate. (The example manifest includes 3 by default.) The Persistent Volume Claims (PVCs) are listed below:
 
 - `hive-metastore-db-data` is the only _required_ volume. It is used by
-  hive metastore to retain information about where data for Presto is located.
+  hive metastore to retain information about the location of Presto data.
 - `hdfs-namenode-data-hdfs-namenode-0` and `hdfs-datanode-data-hdfs-datanode-$i`
    are used by the single node HDFS cluster which is deployed by default for
-   storing data within the cluster. If your [storing data in s3](#storing-data-in-s3)
-   then these aren't required.
+   storing data within the cluster. These two PVCs are not required to [store data in s3](#storing-data-in-s3).
 
-Each of these PersistentVolumeClaims is created dynamically by a StatefulSet,
-meaning you must have dynamic volume provisioning enabled via a StorageClass,
-or you will need to manually pre-create persistent volumes of the correct size.
+Each of these Persistent Volume Claims is created dynamically by a Stateful Set. Enabling this requires that dynamic volume provisioning be enabled via a Storage Class, or persistent volumes of the correct size must be manually pre-created.
 
-#### Using StorageClasses
+### Dynamically provisioning Persistent Volumes using Storage Classes
 
-As of Tectonic 1.8.4, Tectonic doesn't install cloud provider specific
-StorageClasses by default, however it is possible an admin has created
-StorageClasses in the cluster for your use. To check what StorageClasses are
-available, run:
+Storage Classes may be used when dynamically provisioning Persistent Volume Claims using a Stateful Set. Use `kubectl get` to determine if Storage Classes have been created in your cluster. (By default, Tectonic does not install cloud provider specific
+Storage Classes.)
 
 ```
 $ kubectl get storageclasses
 ```
 
-If the output includes `(default)` next to the name of any StorageClasses, then
-that StorageClass is the default for your cluster. The default is used when
-StorageClass is unspecified or set to `null` in a PersistentVolumeClaim spec.
+If the output includes `(default)` next to the `name` of any `StorageClass`, then that `StorageClass` is the default for the cluster. The default is used when `StorageClass` is unspecified or set to `null` in a `PersistentVolumeClaim` spec.
 
-If you've got a default StorageClass installed, then you're ready to go and do
-not need to do anything extra. However, if you wish to use the non-default
-StorageClass, please continue reading. If you need to install a StorageClass,
-please read the [official documentation on StorageClasses][storage-classes].
+If no `StorageClass` is listed, or if you wish to use a non-default `StorageClass`, see [Configuring the StorageClass for Chargeback](#configuring-the-storageclass-for-chargeback) below.
 
-##### Configuring the StorageClass for Chargeback
+For more information, see [Storage Classes][storage-classes] in the Kubernetes documentation.
 
-You can configure and specify a StorageClass to use in chargeback by specifying
-the StorageClass in your `custom-values.yaml`.
-A trimmed down version of this file with just the relevant storage section is located in
-[manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config].
+#### Configuring the Storage Class for Chargeback
 
-Uncomment the sections and replace the `null` in `class: null` value
-with the name of the StorageClass you want to use. If the value is null, that
-will use the default StorageClass for your cluster. You will need to make this
-change to the following sections:
+To configure and specify a `StorageClass` for use in Chargeback, specify the `StorageClass` in `custom-values.yaml`. A example `StorageClass` section is included in [manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config].
+
+Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Chargeback to use the default StorageClass for the cluster.
 
 - `presto.hive.metastore.storage.class`
 - `hdfs.datanode.storage.class`
 - `hdfs.namenode.storage.class`
 
-#### Manually creating PersistentVolumes
+### Manually creating Persistent Volumes
 
-If you do not have a StorageClass you can use that supports dynamic volume
-provisioning then it is possible to manually create a PersistentVolume with
-the correct capacity manually. By default the PVCs listed above each request
-5Gi of storage. This can be adjusted in the same section as adjusting the
-StorageClass.
+If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity. By default the PVCs listed above each request 5Gi of storage. This can be adjusted in the same section as adjusting the Storage Class.
 
-Using [manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config]
-as a starting point, adjust the `size: "5Gi"` value to the capacity you want
-for the following sections:
+Use [manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
 
 - `presto.hive.metastore.storage.size`
 - `hdfs.datanode.storage.size`
@@ -126,55 +89,39 @@ for the following sections:
 
 ### Storing data in S3
 
-By default the data that chargeback collects and generates is stored in a
-single node HDFS cluster which is backed by a persistent volume. If you would
-instead prefer to store the data in a location outside of the cluster, you can
-configure Chargeback to store data in s3.
+By default the data that Chargeback collects and generates is stored in a single node HDFS cluster which is backed by a Persistent Volume. To store the data in a location outside of the cluster, configure Chargeback to store data in S3.
 
-To use S3, for storage, uncomment the `defaultStorage:` section in the example
+To use S3 for storage, uncomment the `defaultStorage:` section in the example
 [manifests/chargeback-config/custom-values.yaml][example-config] configuration.
-Once it's uncommented, you also need to set `awsAccessKeyID` and
-`awsSecretAccessKey` in the `chargeback-operator.config` and `presto.config`
-sections.
+Once uncommented, set `awsAccessKeyID` and `awsSecretAccessKey` in the `chargeback-operator.config` and `presto.config` sections.
 
-Please note that this must be done before installation, and if it is changed
-post-install you may see unexpected behavior.
+Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
 
-At this point, you can also disable the deployed HDFS cluster as it's not going
-to be used for storing data any longer. To disable the HDFS cluster uncomment
-the `hdfs.enabled: true` setting in your `custom-values.yaml`, and set the
-value to `false`:
-
+Because the deployed HDFS cluster will not be used to store data, it may also be disabled. Uncomment the `hdfs.enabled: true` setting in `custom-values.yaml`, and set the
+value to `false`.
 
 ```
 hdfs:
   enabled: false
 ```
 
-### AWS Billing Correlation
+### AWS billing correlation
 
-Chargeback is able to correlate cluster usage information with [AWS detailed
-billing information][AWS-billing], attaching a dollar amount to resource usage.
-For clusters running in EC2, this can be enabled by modifying the example
-[manifests/chargeback-config/custom-values.yaml][example-config] configuration.
+Chargeback is able to correlate cluster usage information with [AWS detailed billing information][AWS-billing], attaching a dollar amount to resource usage. For clusters running in EC2, this can be enabled by modifying the example [manifests/chargeback-config/custom-values.yaml][example-config] configuration.
 
-To enable AWS Billing correlation, please ensure the AWS Cost and Usage Reports
-are enabled on your account, instructions to enable them can be found
-[here][enable-aws-billing].
+To enable AWS billing correlation, first ensure the AWS Cost and Usage Reports
+are enabled. For more information, see [Turning on the AWS Cost and Usage report][enable-aws-billing] in the AWS documentation.
 
-Next, in the example configuration manifest, you need to update the
-`awsBillingDataSource:` section. Change the `enabled` value to `true`, and then
-update the `bucket` and `prefix` to the location of your AWS Detailed billing
-report.  Once it's uncommented, you also need to set `awsAccessKeyID` and
-`awsSecretAccessKey` in the `chargeback-operator.config` and `presto.config`
-sections.
+Next, update the `awsBillingDataSource` section in the [custom-values.yaml][example-config] example configuration manifest.
 
-This can be done either pre-install or post-install. Note that disabling it
-post-install can cause errors in the chargeback-operator.
+Change the `enabled` value to `true`, and update the `bucket` and `prefix` to the location of your AWS Detailed billing report.  
+
+Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `chargeback-operator.config` and `presto.config` sections.
+
+This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the chargeback-operator.
 
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
 [example-config]: ../manifests/chargeback-config/custom-values.yaml
 [example-storage-config]: ../manifests/chargeback-config/custom-storageclass-values.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
-
