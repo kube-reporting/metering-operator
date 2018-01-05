@@ -47,8 +47,9 @@ podTemplate(
         def gitCommit
         def gitTag
         def isMasterBranch = env.BRANCH_NAME == "master"
-        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || pullRequest.labels.contains("run-integration-tests")
-        def shortTests = params.SHORT_TESTS || pullRequest.labels.contains("run-short-tests")
+        def isPR = env.BRANCH_NAME.startsWith('PR-')
+        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPR && pullRequest.labels.contains("run-integration-tests"))
+        def shortTests = params.SHORT_TESTS || (isPR && pullRequest.labels.contains("run-short-tests"))
 
         try {
             withEnv([
