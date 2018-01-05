@@ -62,16 +62,6 @@ func TestReportsProduceData(t *testing.T) {
 		timeout   time.Duration
 	}{
 		{
-			name:      "node-cpu-usage",
-			queryName: "node-cpu-usage",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "node-memory-usage",
-			queryName: "node-memory-usage",
-			timeout:   reportTestTimeout,
-		},
-		{
 			name:      "pod-cpu-usage-by-namespace",
 			queryName: "pod-cpu-usage-by-namespace",
 			timeout:   reportTestTimeout,
@@ -95,6 +85,16 @@ func TestReportsProduceData(t *testing.T) {
 			name:      "pod-memory-usage-by-node-with-usage-percent",
 			queryName: "pod-memory-usage-by-node-with-usage-percent",
 			timeout:   reportTestTimeout + time.Minute,
+		},
+		{
+			name:      "node-cpu-usage",
+			queryName: "node-cpu-usage",
+			timeout:   reportTestTimeout,
+		},
+		{
+			name:      "node-memory-usage",
+			queryName: "node-memory-usage",
+			timeout:   reportTestTimeout,
 		},
 		// TODO(chancez): Add AWS Reports
 	}
