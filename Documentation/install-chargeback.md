@@ -59,7 +59,47 @@ $ ./hack/alm-uninstall.sh
 
 ## Verifying operation
 
-Check the logs of the `chargeback` deployment for errors:
+First, wait until the Chargeback Helm operator deploys all of the Chargeback components:
+
+```
+kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback-helm-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE logs -f {} -c chargeback-helm-operator
+```
+
+Once you see output like the following, the rest of the pods should be initializing:
+
+```
+Waiting for Tiller to become ready
+Waiting for Tiller to become ready
+Waiting for Tiller to become ready
+Getting list of helm release con***REMOVED***gmaps to delete
+No release con***REMOVED***gmaps to delete yet
+Getting pod chargeback-helm-operator-7c4cf9849c-846g5 owner information
+Owner references:
+global:
+  ownerReferences:
+  - apiVersion: "apps/v1beta1"
+    blockOwnerDeletion: false
+    controller: true
+    kind: "Deployment"
+    name: chargeback-helm-operator
+    uid: b2b9e446-f263-11e7-bdc3-06a45d7816a8
+Setting ownerReferences for Helm release con***REMOVED***gmaps
+No release con***REMOVED***gmaps to patch ownership of yet
+Fetching helm values from secret chargeback-settings
+Secret chargeback-settings does not exist, default values will be used
+Running helm upgrade
+Release "tectonic-chargeback" does not exist. Installing it now.
+NAME:   tectonic-chargeback
+LAST DEPLOYED: Fri Jan  5 22:00:01 2018
+NAMESPACE: chargeback
+STATUS: DEPLOYED
+
+RESOURCES:
+
+... the rest is omitted for brevity ...
+```
+
+Next check the logs of the `chargeback` deployment for errors:
 
 ```
 $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE logs {} -f
