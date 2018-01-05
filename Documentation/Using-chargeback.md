@@ -15,7 +15,7 @@ For more information on Report YAML con***REMOVED***guration options see [Report
 
 ## Creating a report
 
-Once the report YAML is written, it can be deployed via `kubectl`:
+Once the report YAML is written, use `kubectl` to create the report:
 
 ```
 $ kubectl -n $CHARGEBACK_NAMESPACE create -f manifests/custom-resources/reports/pod-cpu-usage-by-node.yaml
