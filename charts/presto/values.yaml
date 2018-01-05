@@ -14,7 +14,7 @@ presto:
 hive:
   image:
     repository: quay.io/coreos/chargeback-hive
-    tag: 0.4.5
+    tag: latest
     pullPolicy: Always
 
   metastore:
