@@ -70,5 +70,5 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 For instructions on using Chargeback, please see [Using Chargeback][using-chargeback].
 
 
-[using-chargeback]: Using-chargeback.md
+[using-chargeback]: using-chargeback.md
 [con***REMOVED***guring-chargeback]: con***REMOVED***guration.md

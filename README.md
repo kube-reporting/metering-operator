@@ -4,7 +4,7 @@ Chargeback records historical cluster usage, and can generate usage reports show
 
 ## Getting Started
 
-For installation instructions, please see the [installation](Documentation/Installation.md) portion of the documentation.
+For installation instructions, please see the [installation](Documentation/installation.md) portion of the documentation.
 
 ### Dev installation
 
