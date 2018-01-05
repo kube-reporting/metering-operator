@@ -19,7 +19,7 @@ cp \
 
 mkdir -p "$OUTPUT_DIR/Documentation"
 cp \
-    Documentation/chargeback-install.md \
+    Documentation/install-chargeback.md \
     Documentation/report.md \
     Documentation/using-chargeback.md \
     Documentation/chargeback-con***REMOVED***g.md \
@@ -48,7 +48,7 @@ mkdir -p $OUTPUT_DIR/manifests/chargeback-con***REMOVED***g
 cp \
     manifests/chargeback-con***REMOVED***g/custom-values.yaml \
     "$OUTPUT_DIR/manifests/chargeback-con***REMOVED***g"
-echo "Start with Documentation/chargeback-install.md" > "$OUTPUT_DIR/README"
+echo "Start with Documentation/install-chargeback.md" > "$OUTPUT_DIR/README"
 
 
 pushd "$TMPDIR"
