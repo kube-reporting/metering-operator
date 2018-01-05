@@ -111,4 +111,4 @@ For instructions on using Chargeback, please see [Using Chargeback][using-charge
 
 
 [using-chargeback]: using-chargeback.md
-[configuring-chargeback]: configuration.md
+[configuring-chargeback]: chargeback-config.md
