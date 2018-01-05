@@ -3,12 +3,12 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: chargeback-helm-operator.v0.5.0
+  name: chargeback-helm-operator.v0.5.1
 spec:
   displayName: Chargeback
   description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: ['chargeback', 'metrics', 'reporting', 'coreos']
-  version: 0.5.0
+  version: 0.5.1
   maturity: alpha
   maintainers:
   - name: Chance Zibolski
@@ -18,7 +18,7 @@ spec:
   provider:
     name: CoreOS, Inc
   labels:
-    alm-status-descriptors: chargeback-helm-operator.v0.5.0
+    alm-status-descriptors: chargeback-helm-operator.v0.5.1
     alm-owner-chargeback: chargeback-helm-operator
   selector:
     matchLabels:
