@@ -262,6 +262,11 @@ spec:
       kind: ReportDataSource
       displayName: Chargeback data source
       description: Represents a data source.
+    - name: prestotables.chargeback.coreos.com
+      version: v1beta1
+      kind: PrestoTable
+      displayName: Chargeback Presto table
+      description: Represents a table within PrestoDB.
     - name: reportgenerationqueries.chargeback.coreos.com
       version: v1alpha1
       kind: ReportGenerationQuery
