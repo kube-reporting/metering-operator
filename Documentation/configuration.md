@@ -52,17 +52,7 @@ Chargeback requires at least 1 Persistent Volume to operate. (The example manife
 
 Each of these Persistent Volume Claims is created dynamically by a Stateful Set. Enabling this requires that dynamic volume provisioning be enabled via a Storage Class, or persistent volumes of the correct size must be manually pre-created.
 
-#### Manually creating Persistent Volumes
-
-If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity. By default the PVCs listed above each request 5Gi of storage. This can be adjusted in the same section as adjusting the Storage Class.
-
-Use [manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
-
-- `presto.hive.metastore.storage.size`
-- `hdfs.datanode.storage.size`
-- `hdfs.namenode.storage.size`
-
-### Storage Classes
+### Dynamically provisioning Persistent Volumes using Storage Classes
 
 Storage Classes may be used when dynamically provisioning Persistent Volume Claims using a Stateful Set. Use `kubectl get` to determine if Storage Classes have been created in your cluster. (By default, Tectonic does not install cloud provider specific
 Storage Classes.)
@@ -86,6 +76,16 @@ Uncomment the following sections and replace the `null` in `class: null` value w
 - `presto.hive.metastore.storage.class`
 - `hdfs.datanode.storage.class`
 - `hdfs.namenode.storage.class`
+
+### Manually creating Persistent Volumes
+
+If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity. By default the PVCs listed above each request 5Gi of storage. This can be adjusted in the same section as adjusting the Storage Class.
+
+Use [manifests/chargeback-config/custom-storageclass-values.yaml][example-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
+
+- `presto.hive.metastore.storage.size`
+- `hdfs.datanode.storage.size`
+- `hdfs.namenode.storage.size`
 
 ### Storing data in S3
 
