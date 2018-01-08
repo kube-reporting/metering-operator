@@ -11,10 +11,8 @@ spec:
   version: 0.5.1
   maturity: alpha
   maintainers:
-  - name: Chance Zibolski
-    email: chance.zibolski@coreos.com
-  - name: Derek Gonyeo
-    email: derek.gonyeo@coreos.com
+  - name: CoreOS, Inc
+    email: support@coreos.com
   provider:
     name: CoreOS, Inc
   labels:
