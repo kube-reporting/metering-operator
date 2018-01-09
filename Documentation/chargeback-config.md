@@ -63,7 +63,7 @@ $ kubectl get storageclasses
 
 If the output includes `(default)` next to the `name` of any `StorageClass`, then that `StorageClass` is the default for the cluster. The default is used when `StorageClass` is unspeci***REMOVED***ed or set to `null` in a `PersistentVolumeClaim` spec.
 
-If no `StorageClass` is listed, or if you wish to use a non-default `StorageClass`, see [Con***REMOVED***guring the StorageClass for Chargeback](#con***REMOVED***guring-the-storageclass-for-chargeback) below.
+If no `StorageClass` is listed, or if you wish to use a non-default `StorageClass`, see [Con***REMOVED***guring the StorageClass for Chargeback](#con***REMOVED***guring-the-storage-class-for-chargeback) below.
 
 For more information, see [Storage Classes][storage-classes] in the Kubernetes documentation.
 
