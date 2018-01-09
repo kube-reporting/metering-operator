@@ -1,3 +1,8 @@
+<br>
+<div class="alert alert-info" role="alert">
+    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email [tectonic-alpha-feedback@coreos.com](mailto:tectonic-alpha-feedback@coreos.com).
+</div>
+
 # Reports
 
 The `Report` custom Kubernetes resource is used to manage the execution and status of reports. Chargeback produces reports derived from usage data sources which can be used in further analysis and ***REMOVED***ltering.
