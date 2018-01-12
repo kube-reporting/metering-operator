@@ -171,6 +171,7 @@ while true; do
             echo -E "$release" > /tmp/current-release.json
             RELEASE_NAME="$(jq -Mcr '.metadata.name' /tmp/current-release.json)"
             RELEASE_UID="$(jq -Mcr '.metadata.uid' /tmp/current-release.json)"
+            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' /tmp/current-release.json)"
             RELEASE_VALUES="$(jq -Mcr '.spec.values // empty' /tmp/current-release.json)"
 
             if [ -z "$RELEASE_VALUES" ]; then
@@ -182,15 +183,23 @@ while true; do
                 HELM_ARGS=("-f" "$VALUES_FILE")
             fi
 
-            writeReleaseOwnerValuesFile "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-            EXTRA_ARGS=("-f" /tmp/owner-values.yaml)
+            # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
+            if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
+                echo "Nothing has changed for release $RELEASE_NAME"
+            else
+                echo $RELEASE_RESOURCE_VERSION > "/tmp/$RELEASE_NAME.resourceVersion"
 
-            echo "Running helm upgrade for release $RELEASE_NAME"
-            helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
+                writeReleaseOwnerValuesFile "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+                EXTRA_ARGS=("-f" /tmp/owner-values.yaml)
 
-            getReleaseConfigmaps > /tmp/release-configmaps.json
-            setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
-            cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
+                echo "Running helm upgrade for release $RELEASE_NAME"
+                helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
+
+                getReleaseConfigmaps > /tmp/release-configmaps.json
+                setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
+                cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
+            fi
+
             checkExit
         done < <(jq '.items[]' -Mcr /tmp/helm-releases.json)
 
