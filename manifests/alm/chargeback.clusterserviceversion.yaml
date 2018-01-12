@@ -4,6 +4,10 @@ apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
   name: chargeback-helm-operator.v0.5.1
+  annotations:
+    tectonic-visibility: tectonic-feature
+  labels:
+    alm-catalog: tectonic-feature
 spec:
   displayName: Chargeback
   description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
@@ -174,8 +178,10 @@ spec:
                 image: quay.io/coreos/chargeback-helm-operator:latest
                 imagePullPolicy: Always
                 env:
-                - name: HELM_VALUES_SECRET_NAME
-                  value: chargeback-settings
+                - name: HELM_RELEASE_CRD_NAME
+                  value: chargeback
+                - name: HELM_RELEASE_CRD_API_GROUP
+                  value: chargeback.coreos.com
                 - name: MY_POD_NAME
                   valueFrom:
                     ***REMOVED***eldRef:
@@ -245,6 +251,11 @@ spec:
               - name: coreos-pull-secret
   customresourcede***REMOVED***nitions:
     owned:
+    - name: scheduledreports.chargeback.coreos.com
+      version: v1alpha1
+      kind: ScheduledReport
+      displayName: Chargeback Scheduled Report
+      description: A scheduled chargeback report
     - name: reportprometheusqueries.chargeback.coreos.com
       version: v1alpha1
       kind: ReportPrometheusQuery
@@ -256,12 +267,12 @@ spec:
       displayName: Chargeback storage location
       description: Represents a location for chargeback to store data
     - name: reportdatasources.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: ReportDataSource
       displayName: Chargeback data source
       description: Represents a data source.
     - name: prestotables.chargeback.coreos.com
-      version: v1beta1
+      version: v1alpha1
       kind: PrestoTable
       displayName: Chargeback Presto table
       description: Represents a table within PrestoDB.
