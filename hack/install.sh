@@ -23,6 +23,10 @@ msg "Installing Custom Resource Definitions"
 kube-install \
     manifests/custom-resource-definitions
 
+msg "Installing Chargeback CRD"
+kube-install \
+    manifests/installer/chargeback-crd.yaml
+
 msg "Installing chargeback-helm-operator service account and RBAC resources"
 kube-install \
     manifests/installer/chargeback-helm-operator-service-account.yaml \
@@ -32,3 +36,6 @@ msg "Installing chargeback-helm-operator"
 kube-install \
     manifests/installer/chargeback-helm-operator-deployment.yaml
 
+msg "Installing Chargeback"
+kube-install \
+    manifests/installer/chargeback.yaml

@@ -1,0 +1,4 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "tectonic-chargeback"
