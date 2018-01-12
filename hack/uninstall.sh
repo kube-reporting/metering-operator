@@ -3,6 +3,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
+: "${CHARGEBACK_CR_FILE:=manifests/installer/chargeback-crd.yaml}"
+
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     msg "Removing pull secrets"
     kube-remove-non-file secret coreos-pull-secret
@@ -10,7 +12,7 @@ fi
 
 msg "Removing Chargeback"
 kube-remove \
-    manifests/installer/chargeback.yaml
+    "$CHARGEBACK_CR_FILE"
 
 msg "Removing chargeback-helm-operator"
 kube-remove \

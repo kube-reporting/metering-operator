@@ -6,6 +6,8 @@ source ${DIR}/util.sh
 
 : "${CREATE_NAMESPACE:=false}"
 
+: "${CHARGEBACK_CR_FILE:=manifests/installer/chargeback-crd.yaml}"
+
 if [ "$CREATE_NAMESPACE" == "true" ]; then
     echo "Creating namespace ${CHARGEBACK_NAMESPACE}"
     kubectl create namespace "${CHARGEBACK_NAMESPACE}" || true
@@ -38,4 +40,4 @@ kube-install \
 
 msg "Installing Chargeback"
 kube-install \
-    manifests/installer/chargeback.yaml
+    "$CHARGEBACK_CR_FILE"
