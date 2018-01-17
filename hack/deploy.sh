@@ -19,7 +19,7 @@ kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
 if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
     echo "Uninstalling chargeback"
-    make uninstall
+    ./hack/uninstall.sh
 else
     echo "Skipping uninstall"
 fi
@@ -36,7 +36,7 @@ done
 
 if [ "$INSTALL_CHARGEBACK" == "true" ]; then
     echo "Installing chargeback"
-    make install
+    ./hack/install.sh
 else
     echo "Skipping install"
 fi
