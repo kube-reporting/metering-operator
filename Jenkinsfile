@@ -105,7 +105,7 @@ podTemplate(
                         sh '''#!/bin/bash
                         set -e
                         apk add make go libc-dev curl
-                        export HELM_VERSION=2.6.2
+                        export HELM_VERSION=2.8.0-rc.1
                         curl \
                             --silent \
                             --show-error \
