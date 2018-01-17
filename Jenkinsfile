@@ -55,7 +55,7 @@ podTemplate(
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
                 "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${env.BRANCH_NAME}"
+                "BRANCH_TAG=${env.BRANCH_NAME.toLowerCase()}"
             ]){
                 container('docker'){
 
