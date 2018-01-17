@@ -1,3 +1,5 @@
+---
+# Source: helm-operator/templates/deployment.yaml
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -15,11 +17,11 @@ spec:
     spec:
       containers:
       - name: chargeback-helm-operator
-        image: quay.io/coreos/chargeback-helm-operator:latest
+        image: "quay.io/coreos/chargeback-helm-operator:latest"
         imagePullPolicy: Always
         env:
         - name: HELM_RELEASE_CRD_NAME
-          value: chargeback
+          value: Chargeback
         - name: HELM_RELEASE_CRD_API_GROUP
           value: chargeback.coreos.com
         - name: MY_POD_NAME
@@ -48,7 +50,7 @@ spec:
             memory: "25Mi"
             cpu: "50m"
       - name: tiller
-        image: gcr.io/kubernetes-helm/tiller:v2.6.2
+        image: "gcr.io/kubernetes-helm/tiller:v2.6.2"
         imagePullPolicy: Always
         env:
         - name: TILLER_NAMESPACE
@@ -88,4 +90,6 @@ spec:
       terminationGracePeriodSeconds: 30
       serviceAccount: chargeback-helm-operator
       imagePullSecrets:
-      - name: coreos-pull-secret
+        - name: coreos-pull-secret
+        
+
