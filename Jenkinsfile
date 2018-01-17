@@ -15,6 +15,12 @@ properties([
     ])
 ])
 
+def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
+def isMasterBranch = env.BRANCH_NAME == "master"
+
+def instanceCap = isMasterBranch ? 1 : 5
+def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
+
 podTemplate(
     cloud: 'kubernetes',
     containers: [
@@ -39,17 +45,15 @@ podTemplate(
     ],
     idleMinutes: 5,
     instanceCap: 5,
-    label: 'kube-chargeback-build',
-    name: 'kube-chargeback-build',
+    label: podLabel,
+    name: podLabel,
 ) {
-    node ('kube-chargeback-build') {
+    node (podLabel) {
     timestamps {
         def gitCommit
         def gitTag
-        def isMasterBranch = env.BRANCH_NAME == "master"
-        def isPR = env.BRANCH_NAME.startsWith('PR-')
-        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPR && pullRequest.labels.contains("run-integration-tests"))
-        def shortTests = params.SHORT_TESTS || (isPR && pullRequest.labels.contains("run-short-tests"))
+        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
+        def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
         try {
             withEnv([
