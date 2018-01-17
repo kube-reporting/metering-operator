@@ -214,7 +214,7 @@ podTemplate(
                                             export KUBECONFIG=${KUBECONFIG}
                                             export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
                                             export CHARGEBACK_SHORT_TESTS=${shortTests}
-                                            make integration-tests
+                                            ./hack/integration-tests.sh
                                             """
                                         }
                                     } ***REMOVED*** {
