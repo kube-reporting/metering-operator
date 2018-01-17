@@ -3,7 +3,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
-: "${CHARGEBACK_CR_FILE:=manifests/installer/chargeback-crd.yaml}"
+: "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
+: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml}"
 
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     msg "Removing pull secrets"
@@ -16,12 +17,12 @@ kube-remove \
 
 msg "Removing chargeback-helm-operator"
 kube-remove \
-    manifests/installer/chargeback-helm-operator-deployment.yaml
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
 
 msg "Removing chargeback-helm-operator service account and RBAC resources"
 kube-remove \
-    manifests/installer/chargeback-helm-operator-service-account.yaml \
-    manifests/installer/chargeback-helm-operator-rbac.yaml
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml" \
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rbac.yaml"
 
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
@@ -29,7 +30,7 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
 else
     msg "Removing Chargeback CRD"
     kube-remove \
-        manifests/installer/chargeback-crd.yaml
+        "$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml"
 
     msg "Removing Custom Resource Definitions"
     kube-remove \
