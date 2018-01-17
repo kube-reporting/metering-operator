@@ -1,0 +1,159 @@
+name: chargeback-helm-operator
+
+crd:
+  create: true
+  apiGroup: chargeback.coreos.com
+  apiVersion: v1alpha1
+
+  plural: chargebacks
+  singular: chargeback
+  kind: Chargeback
+  listKind: ChargebackList
+
+operator:
+  image:
+    repository: quay.io/coreos/chargeback-helm-operator
+    tag: latest
+    pullPolicy: Always
+
+tiller:
+  image:
+    repository: gcr.io/kubernetes-helm/tiller
+    tag: v2.6.2
+    pullPolicy: Always
+
+serviceAccountName: chargeback-helm-operator
+imagePullSecrets:
+- name: coreos-pull-secret
+
+rbac:
+  roleName: chargeback-helm-operator
+  rules:
+  - apiGroups: ["chargeback.coreos.com"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - pods/attach
+    - pods/exec
+    - pods/portforward
+    - pods/proxy
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    - endpoints
+    - persistentvolumeclaims
+    - replicationcontrollers
+    - replicationcontrollers/scale
+    - secrets
+    - serviceaccounts
+    - services
+    - services/proxy
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - bindings
+    - events
+    - limitranges
+    - namespaces/status
+    - pods/log
+    - pods/status
+    - replicationcontrollers/status
+    - resourcequotas
+    - resourcequotas/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    - deployments/rollback
+    - deployments/scale
+    - statefulsets
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - batch
+    resources:
+    - cronjobs
+    - jobs
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - extensions
+    resources:
+    - daemonsets
+    - deployments
+    - deployments/rollback
+    - deployments/scale
+    - replicasets
+    - replicasets/scale
+    - replicationcontrollers/scale
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - rolebindings
+    - roles
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
