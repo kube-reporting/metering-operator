@@ -18,6 +18,9 @@ Chargeback requires the following components:
 
 - A Tectonic 1.8 cluster.
 - A StorageClass for dynamic volume provisioning. ([See con***REMOVED***guring chargeback][con***REMOVED***guring-chargeback] for more information.)
+- 3.5GB Memory and 1.15 CPU Cores (1150 Millicores).
+- At least 1 node with 1.5GB available memory (the highest memory request for a single Chargeback pod)
+    - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly con***REMOVED***gured kubectl to access the Kubernetes cluster.
 
 ## Installation
