@@ -84,13 +84,25 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 
 	g, ctx := errgroup.WithContext(ctx)
 	for _, dataSource := range dataSources {
+		dataSource := dataSource
+		logger := logger.WithField("datasource", dataSource.Name)
+
 		if dataSource.Spec.Promsum == nil {
 			continue
 		}
-		dataSource := dataSource
-		g.Go(func() error {
-			logger := logger.WithField("datasource", dataSource.Name)
+		if dataSource.TableName == "" {
+			// This data store doesn't have a table yet, let's skip it and
+			// hope it'll have one next time.
+			logger.Debugf("no table set, skipping collection for data store %q", dataSource.Name)
+			key, err := cache.MetaNamespaceKeyFunc(dataSource)
+			if err == nil {
+				logger.Debugf("no table set, queueing %q", dataSource.Name)
+				c.informers.reportDataSourceQueue.Add(key)
+			}
+			continue
+		}
 
+		g.Go(func() error {
 			startTime, endTime, err := timeBoundsGetter(dataSource)
 			if err != nil {
 				logger.WithError(err).Errorf("error getting collection time boundries for datasource")
@@ -116,18 +128,6 @@ func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dat
 		logger.Debugf("not a promsum store, skipping %q", dataSource.Name)
 		return nil
 	}
-	if dataSource.TableName == "" {
-		// This data store doesn't have a table yet, let's skip it and
-		// hope it'll have one next time.
-		logger.Debugf("no table set, skipping collection for data store %q", dataSource.Name)
-		key, err := cache.MetaNamespaceKeyFunc(dataSource)
-		if err == nil {
-			logger.Debugf("no table set, queueing %q", dataSource.Name)
-			c.informers.reportDataSourceQueue.Add(key)
-		}
-		return nil
-	}
-
 	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime)
 	if err != nil {
 		return err
@@ -174,6 +174,9 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 }
 
 func (c *Chargeback) promsumGetLastTimestamp(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource) (time.Time, error) {
+	if dataSource.TableName == "" {
+		return time.Time{}, fmt.Errorf("unable to get last timestamp for, dataSource %s no tableName is set", dataSource.Name)
+	}
 	// Get the most recent timestamp in the table for this query
 	getLastTimestampQuery := fmt.Sprintf(`
 				SELECT "timestamp"
@@ -183,7 +186,7 @@ func (c *Chargeback) promsumGetLastTimestamp(logger logrus.FieldLogger, dataSour
 
 	results, err := presto.ExecuteSelect(c.prestoConn, getLastTimestampQuery)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("error getting last timestamp for table, maybe table doesn't exist yet? %v", err)
+		return time.Time{}, fmt.Errorf("error getting last timestamp for dataSource %s, maybe table doesn't exist yet? %v", dataSource.Name, err)
 	}
 
 	var lastTimestamp time.Time
