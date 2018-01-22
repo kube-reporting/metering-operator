@@ -15,6 +15,12 @@ properties([
     ])
 ])
 
+def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
+def isMasterBranch = env.BRANCH_NAME == "master"
+
+def instanceCap = isMasterBranch ? 1 : 5
+def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
+
 podTemplate(
     cloud: 'kubernetes',
     containers: [
@@ -39,23 +45,25 @@ podTemplate(
     ],
     idleMinutes: 5,
     instanceCap: 5,
-    label: 'kube-chargeback-build',
-    name: 'kube-chargeback-build',
+    label: podLabel,
+    name: podLabel,
 ) {
-    node ('kube-chargeback-build') {
+    node (podLabel) {
     timestamps {
         def gitCommit
         def gitTag
-        def isMasterBranch = env.BRANCH_NAME == "master"
-        def isPR = env.BRANCH_NAME.startsWith('PR-')
-        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPR && pullRequest.labels.contains("run-integration-tests"))
-        def shortTests = params.SHORT_TESTS || (isPR && pullRequest.labels.contains("run-short-tests"))
+        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
+        def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
+
+        def branchTag = env.BRANCH_NAME.toLowerCase()
+        def deployTag = "${branchTag}-${currentBuild.number}"
 
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
                 "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${env.BRANCH_NAME}"
+                "BRANCH_TAG=${branchTag}",
+                "DEPLOY_TAG=${deployTag}"
             ]){
                 container('docker'){
 
@@ -101,7 +109,7 @@ podTemplate(
                         sh '''#!/bin/bash
                         set -e
                         apk add make go libc-dev curl
-                        export HELM_VERSION=2.6.2
+                        export HELM_VERSION=2.8.0-rc.1
                         curl \
                             --silent \
                             --show-error \
@@ -166,7 +174,7 @@ podTemplate(
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
                                     make docker-tag-all -j 2 \
-                                        IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
+                                        IMAGE_TAG=${DEPLOY_TAG}
                                     """
                                 }
                             }
@@ -180,7 +188,7 @@ podTemplate(
                                 # image twice
                                 unset BRANCH_TAG
                                 make docker-push-all -j 2 \
-                                    IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
+                                    IMAGE_TAG=${DEPLOY_TAG}
                                     BRANCH_TAG=
                                 """
                             }
@@ -196,7 +204,7 @@ podTemplate(
                                             sh """#!/bin/bash
                                             export KUBECONFIG=${KUBECONFIG}
                                             export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                            export DEPLOY_TAG=${BRANCH_TAG}
+                                            export DEPLOY_TAG=${DEPLOY_TAG}
                                             ./hack/deploy-ci.sh
                                             """
                                         }
@@ -214,7 +222,7 @@ podTemplate(
                                             export KUBECONFIG=${KUBECONFIG}
                                             export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
                                             export CHARGEBACK_SHORT_TESTS=${shortTests}
-                                            make integration-tests
+                                            ./hack/integration-tests.sh
                                             """
                                         }
                                     } ***REMOVED*** {

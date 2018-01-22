@@ -7,8 +7,9 @@ if [ "$ENABLE_DEBUG" == "true" ]; then
 ***REMOVED***
 
 : ${HELM_CHART_PATH:?}
-: ${HELM_RELEASE_NAME:?}
-: ${HELM_VALUES_SECRET_NAME:?}
+: ${HELM_RELEASE_CRD_NAME:?}
+: ${HELM_RELEASE_CRD_API_GROUP:?}
+
 : ${HELM_WAIT:=false}
 : ${HELM_WAIT_TIMEOUT:=120}
 
@@ -39,6 +40,7 @@ checkExit() {
 }
 
 getReleaseCon***REMOVED***gmaps() {
+    HELM_RELEASE_NAME=$1
     kubectl \
         --namespace "$MY_POD_NAMESPACE" \
         get con***REMOVED***gmap \
@@ -82,6 +84,58 @@ cleanupOldReleaseCon***REMOVED***gmaps() {
     ***REMOVED***
 }
 
+writeReleaseCon***REMOVED***gMapOwnerPatchFile() {
+    OWNER_KIND=$1
+    OWNER_NAME=$2
+    OWNER_UID=$3
+    cat <<EOF > /tmp/owner-patch.json
+{
+  "metadata": {
+    "ownerReferences": [{
+      "apiVersion": "apps/v1beta1",
+      "blockOwnerDeletion": false,
+      "controller": true,
+      "kind": "$OWNER_KIND",
+      "name": "$OWNER_NAME",
+      "uid": "$OWNER_UID"
+    }]
+  }
+}
+EOF
+}
+
+writeReleaseOwnerValuesFile() {
+    OWNER_KIND=$1
+    OWNER_NAME=$2
+    OWNER_UID=$3
+    cat <<EOF > /tmp/owner-values.yaml
+global:
+  ownerReferences:
+  - apiVersion: "apps/v1beta1"
+    blockOwnerDeletion: false
+    controller: true
+    kind: "$OWNER_KIND"
+    name: "$OWNER_NAME"
+    uid: "$OWNER_UID"
+EOF
+}
+
+helmUpgrade() {
+    RELEASE_NAME=$1
+    helm upgrade \
+        --install \
+        --namespace "$MY_POD_NAMESPACE" \
+        --wait="$HELM_WAIT" \
+        --timeout="$HELM_WAIT_TIMEOUT" \
+        "$RELEASE_NAME"\
+        "$HELM_CHART_PATH" \
+        "${@:2}"
+    HELM_EXIT_CODE=$?
+    if [ $HELM_EXIT_CODE != 0 ]; then
+        echo "helm upgrade failed, exit code: $HELM_EXIT_CODE"
+    ***REMOVED***
+}
+
 until curl -s $TILLER_READY_ENDPOINT; do
     echo "Waiting for Tiller to become ready"
     sleep 1
@@ -91,41 +145,10 @@ getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
 cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
 checkExit
 
-EXTRA_ARGS=()
 if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
     echo "Getting pod $MY_POD_NAME owner information"
     source get_owner.sh
-
-    cat <<EOF > /tmp/owner-values.yaml
-global:
-  ownerReferences:
-  - apiVersion: "apps/v1beta1"
-    blockOwnerDeletion: false
-    controller: true
-    kind: "Deployment"
-    name: $MY_DEPLOYMENT_NAME
-    uid: $MY_DEPLOYMENT_UID
-EOF
-
-
-    cat <<EOF > /tmp/owner-patch.json
-{
-  "metadata": {
-    "ownerReferences": [{
-      "apiVersion": "apps/v1beta1",
-      "blockOwnerDeletion": false,
-      "controller": true,
-      "kind": "Deployment",
-      "name": "$MY_DEPLOYMENT_NAME",
-      "uid": "$MY_DEPLOYMENT_UID"
-    }]
-  }
-}
-EOF
-
-    echo "Owner references: "
-    echo "$(cat /tmp/owner-values.yaml)"
-    EXTRA_ARGS+=(-f /tmp/owner-values.yaml)
+    writeReleaseCon***REMOVED***gMapOwnerPatchFile "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
 
     getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
     setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
@@ -136,52 +159,56 @@ EOF
 while true; do
     checkExit
 
-    echo "Fetching helm values from secret $HELM_VALUES_SECRET_NAME"
-    touch /tmp/values.yaml
+    CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
     kubectl \
         --namespace "$MY_POD_NAMESPACE" \
-        get secrets "$HELM_VALUES_SECRET_NAME" \
+        get "$CRD" \
         --ignore-not-found \
-        -o json > "${HELM_VALUES_SECRET_NAME}.json"
+        -o json > /tmp/helm-releases.json
 
-    if [ -s "${HELM_VALUES_SECRET_NAME}.json" ]; then
-        echo "Got secret ${HELM_VALUES_SECRET_NAME}"
-        jq '.data["values.yaml"]' ${HELM_VALUES_SECRET_NAME}.json -r > /tmp/values.b64enc
-        if [ "$(cat /tmp/values.b64enc)" != "null" ]; then
-            base64 -d /tmp/values.b64enc > /tmp/values.yaml
-        ***REMOVED***
-            echo "No values.yaml found in ${HELM_VALUES_SECRET_NAME}"
-        ***REMOVED***
-        rm -f /tmp/values.b64enc
+    if [ -s /tmp/helm-releases.json ]; then
+        while read -r release; do
+            echo -E "$release" > /tmp/current-release.json
+            RELEASE_NAME="$(jq -Mcr '.metadata.name' /tmp/current-release.json)"
+            RELEASE_UID="$(jq -Mcr '.metadata.uid' /tmp/current-release.json)"
+            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' /tmp/current-release.json)"
+            RELEASE_VALUES="$(jq -Mcr '.spec.values // empty' /tmp/current-release.json)"
+
+            if [ -z "$RELEASE_VALUES" ]; then
+                echo "No values, using default values"
+            ***REMOVED***
+                VALUES_FILE="/tmp/${RELEASE_NAME}-values.yaml"
+                echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
+
+                HELM_ARGS=("-f" "$VALUES_FILE")
+            ***REMOVED***
+
+            # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
+            if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
+                echo "Nothing has changed for release $RELEASE_NAME"
+            ***REMOVED***
+                echo $RELEASE_RESOURCE_VERSION > "/tmp/$RELEASE_NAME.resourceVersion"
+
+                writeReleaseOwnerValuesFile "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+                EXTRA_ARGS=("-f" /tmp/owner-values.yaml)
+
+                echo "Running helm upgrade for release $RELEASE_NAME"
+                helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
+
+                getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
+                setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
+                cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
+            ***REMOVED***
+
+            checkExit
+        done < <(jq '.items[]' -Mcr /tmp/helm-releases.json)
+
+        echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
+        for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
+            sleep 1
+            checkExit
+        done
     ***REMOVED***
-        echo "Secret ${HELM_VALUES_SECRET_NAME} does not exist, default values will be used"
+        echo "No resources with kind $HELM_RELEASE_CRD_NAME and group $HELM_RELEASE_CRD_API_GROUP"
     ***REMOVED***
-
-    echo "Running helm upgrade"
-    set +e
-    helm upgrade \
-        --install \
-        --namespace "$MY_POD_NAMESPACE" \
-        --wait="$HELM_WAIT" \
-        --timeout="$HELM_WAIT_TIMEOUT" \
-        "$HELM_RELEASE_NAME"\
-        "$HELM_CHART_PATH" \
-        -f "/tmp/values.yaml" \
-        "${EXTRA_ARGS[@]}" "$@"
-    HELM_EXIT_CODE=$?
-    if [ $HELM_EXIT_CODE != 0 ]; then
-        echo "helm upgrade failed, exit code: $HELM_EXIT_CODE"
-    ***REMOVED***
-    set -e
-
-    getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
-    setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
-    cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
-    checkExit
-
-    echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
-    for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
-        sleep 1
-        checkExit
-    done
 done

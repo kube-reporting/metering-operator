@@ -140,15 +140,6 @@ hadoop-docker-build: images/hadoop/Docker***REMOVED***le
 hive-docker-build: images/hive/Docker***REMOVED***le hadoop-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
-install:
-	./hack/install.sh
-
-uninstall:
-	./hack/uninstall.sh
-
-integration-tests:
-	./hack/integration-tests.sh
-
 # Update dependencies
 vendor: glide.yaml
 	glide up --strip-vendor
