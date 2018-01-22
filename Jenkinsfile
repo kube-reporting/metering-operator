@@ -55,11 +55,15 @@ podTemplate(
         def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
         def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
+        def branchTag = env.BRANCH_NAME.toLowerCase()
+        def deployTag = "${branchTag}-${currentBuild.number}"
+
         try {
             withEnv([
                 "GOPATH=${env.WORKSPACE}/go",
                 "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${env.BRANCH_NAME.toLowerCase()}"
+                "BRANCH_TAG=${branchTag}",
+                "DEPLOY_TAG=${deployTag}"
             ]){
                 container('docker'){
 
@@ -170,7 +174,7 @@ podTemplate(
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
                                     make docker-tag-all -j 2 \
-                                        IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
+                                        IMAGE_TAG=${DEPLOY_TAG}
                                     """
                                 }
                             }
@@ -184,7 +188,7 @@ podTemplate(
                                 # image twice
                                 unset BRANCH_TAG
                                 make docker-push-all -j 2 \
-                                    IMAGE_TAG=${BRANCH_TAG}-${currentBuild.number}
+                                    IMAGE_TAG=${DEPLOY_TAG}
                                     BRANCH_TAG=
                                 """
                             }
@@ -200,7 +204,7 @@ podTemplate(
                                             sh """#!/bin/bash
                                             export KUBECONFIG=${KUBECONFIG}
                                             export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                            export DEPLOY_TAG=${BRANCH_TAG}
+                                            export DEPLOY_TAG=${DEPLOY_TAG}
                                             ./hack/deploy-ci.sh
                                             """
                                         }
