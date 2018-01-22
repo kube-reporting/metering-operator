@@ -19,7 +19,7 @@ kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
 if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
     echo "Uninstalling chargeback"
-    make uninstall
+    ./hack/uninstall.sh
 else
     echo "Skipping uninstall"
 fi
@@ -34,22 +34,9 @@ until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods -o json | jq '.items | leng
     sleep 5
 done
 
-if [ -n "$CUSTOM_CHARGEBACK_SETTINGS_FILE" ]; then
-    msg "Installing custom chargeback settings from $CUSTOM_CHARGEBACK_SETTINGS_FILE"
-    kubectl \
-        -n $CHARGEBACK_NAMESPACE \
-        create secret generic \
-        chargeback-settings \
-        --from-file "values.yaml=$CUSTOM_CHARGEBACK_SETTINGS_FILE" \
-        -o yaml \
-        --dry-run \
-        > /tmp/custom-settings-secret.yaml
-    kube-install /tmp/custom-settings-secret.yaml
-fi
-
 if [ "$INSTALL_CHARGEBACK" == "true" ]; then
     echo "Installing chargeback"
-    make install
+    ./hack/install.sh
 else
     echo "Skipping install"
 fi

@@ -1,29 +1,37 @@
----
-# Source: helm-operator/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: chargeback-helm-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: chargeback-helm-operator
-subjects:
-- kind: ServiceAccount
-  name: chargeback-helm-operator
+name: chargeback-helm-operator
 
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: Role
-metadata:
-  name: chargeback-helm-operator
-rules:
-  - apiGroups:
-    - chargeback.coreos.com
-    resources:
-    - '*'
-    verbs:
-    - '*'
+crd:
+  create: true
+  apiGroup: chargeback.coreos.com
+  apiVersion: v1alpha1
+
+  plural: chargebacks
+  singular: chargeback
+  kind: Chargeback
+  listKind: ChargebackList
+
+operator:
+  image:
+    repository: quay.io/coreos/chargeback-helm-operator
+    tag: latest
+    pullPolicy: Always
+
+tiller:
+  image:
+    repository: gcr.io/kubernetes-helm/tiller
+    tag: v2.6.2
+    pullPolicy: Always
+
+serviceAccountName: chargeback-helm-operator
+imagePullSecrets:
+- name: coreos-pull-secret
+
+rbac:
+  roleName: chargeback-helm-operator
+  rules:
+  - apiGroups: ["chargeback.coreos.com"]
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups:
     - ""
     resources:
@@ -149,5 +157,3 @@ rules:
     - patch
     - update
     - watch
-  
-
