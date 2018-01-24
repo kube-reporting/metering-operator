@@ -5,6 +5,7 @@ source ${DIR}/util.sh
 
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml}"
+: "${DELETE_PVCS:=false}"
 
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     msg "Removing pull secrets"
@@ -35,4 +36,9 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     msg "Removing Custom Resource De***REMOVED***nitions"
     kube-remove \
         manifests/custom-resource-de***REMOVED***nitions
+***REMOVED***
+
+if [ "$DELETE_PVCS" == "true" ]; then
+    echo "Deleting PVCs"
+    kube-remove-non-***REMOVED***le pvc -l "app in (hive-metastore, hdfs-namenode, hdfs-datanode)"
 ***REMOVED***
