@@ -5,24 +5,26 @@
 
 # Chargeback Configuration
 
-Chargeback supports a few configuration options which can be set by creating a secret named `chargeback-settings` with a key of `values.yaml`.
+Chargeback supports a configuration options which can be set in the `spec` section of the `Chargeback` resource.
 
-An example configuration file can be found in [manifests/chargeback-config/custom-values.yaml][example-config] For details on customizing this file, read the [common-configuration-options](#common-configuration-options) section below.
+An example configuration file can be found in [manifests/chargeback-config/custom-values.yaml][example-config].
+For details on customizing this file, read the [common-configuration-options](#common-configuration-options) section below.
 
 ## Documentation conventions
 
 This document follows the convention of describing nested fields in configuration settings using dots as separators. For example,
 
 ```
-chargeback-operator.config.awsAccessKeyID
+spec.chargeback-operator.config.awsAccessKeyID
 ```
 
 refers to the following YAML structure and value:
 
 ```
-chargeback-operator:
-  config:
-    awsAccessKeyID: "REPLACEME"
+spec:
+  chargeback-operator:
+    config:
+      awsAccessKeyID: "REPLACEME"
 ```
 
 ## Using a custom configuration
@@ -30,15 +32,7 @@ chargeback-operator:
 To install the custom configuration file, run the following command:
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE create secret generic chargeback-settings --from-file 'values.yaml=manifests/chargeback-config/custom-values.yaml'
-```
-
-This command requires that the secret be deleted and recreated for each installation.
-
-Use `kubectl apply` to avoid this requirement:
-
-```
-kubectl -n $CHARGEBACK_NAMESPACE create secret generic chargeback-settings --from-file 'values.yaml=manifests/chargeback-config/custom-values.yaml' -o yaml --dry-run > /tmp/chargeback-settings-secret.yaml && kubectl apply -n $CHARGEBACK_NAMESPACE -f /tmp/chargeback-settings-secret.yaml
+kubectl -n $CHARGEBACK_NAMESPACE apply -f manifests/chargeback-config/custom-values.yaml
 ```
 
 ## Common configuration options
@@ -78,9 +72,9 @@ To configure and specify a `StorageClass` for use in Chargeback, specify the `St
 
 Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Chargeback to use the default StorageClass for the cluster.
 
-- `presto.hive.metastore.storage.class`
-- `hdfs.datanode.storage.class`
-- `hdfs.namenode.storage.class`
+- `spec.presto.hive.metastore.storage.class`
+- `spec.hdfs.datanode.storage.class`
+- `spec.hdfs.namenode.storage.class`
 
 ### Manually creating Persistent Volumes
 
@@ -106,8 +100,9 @@ Because the deployed HDFS cluster will not be used to store data, it may also be
 value to `false`.
 
 ```
-hdfs:
-  enabled: false
+spec:
+  hdfs:
+    enabled: false
 ```
 
 ### AWS billing correlation
@@ -119,9 +114,9 @@ are enabled. For more information, see [Turning on the AWS Cost and Usage report
 
 Next, update the `awsBillingDataSource` section in the [custom-values.yaml][example-config] example configuration manifest.
 
-Change the `enabled` value to `true`, and update the `bucket` and `prefix` to the location of your AWS Detailed billing report.  
+Change the `enabled` value to `true`, and update the `bucket` and `prefix` to the location of your AWS Detailed billing report.
 
-Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `chargeback-operator.config` and `presto.config` sections.
+Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.chargeback-operator.config` and `spec.presto.config` sections.
 
 This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the chargeback-operator.
 

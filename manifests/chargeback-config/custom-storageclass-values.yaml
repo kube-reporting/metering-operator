@@ -1,22 +1,27 @@
-presto:
-  # Uncomment the section below if you wish to adjust the StorageClass
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "tectonic-chargeback"
+spec:
+  presto:
+    # Uncomment the section below if you wish to adjust the StorageClass
 
-  # hive:
-  #   metastore:
-  #     storage:
-  #       # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
-  #       class: null
-  #       size: "5Gi"
+    # hive:
+    #   metastore:
+    #     storage:
+    #       # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
+    #       class: null
+    #       size: "5Gi"
 
-# Uncomment the section below if you wish to adjust the StorageClass
+    # Uncomment the section below if you wish to adjust the StorageClass
 
-# hdfs:
-#   datanode:
-#     storage:
-#       # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
-#       class: null
-#       size: "5Gi"
-#   namenode:
-#     storage:
-#       size: "5Gi"
-#       class: null
+    # hdfs:
+    #   datanode:
+    #     storage:
+    #       # Default is null, which means using the default storage class if it exists. If you wish to use a different storage class, specify it here
+    #       class: null
+    #       size: "5Gi"
+    #   namenode:
+    #     storage:
+    #       size: "5Gi"
+    #       class: null
