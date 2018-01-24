@@ -4,9 +4,12 @@
 - [Chargeback configuration options][chargeback-config]
 - [Using Chargeback][using-chargeback]
 - [Reports][report]
+- [Troubleshooting][troubleshooting-chargeback]
 
 
 [chargeback-config]: chargeback-config.md
 [install-chargeback]: install-chargeback.md
 [report]: report.md
 [using-chargeback]: using-chargeback.md
+[troubleshooting-chargeback]: troubleshooting-chargeback.md
+
