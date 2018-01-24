@@ -21,6 +21,8 @@ cp \
     Documentation/report.md \
     Documentation/using-chargeback.md \
     Documentation/chargeback-con***REMOVED***g.md \
+    Documentation/troubleshooting-chargeback.md \
+    Documentation/index.md \
     "$OUTPUT_DIR/Documentation/"
 
 mkdir -p "$OUTPUT_DIR/manifests"
@@ -42,12 +44,13 @@ cp -r \
     manifests/alm \
     "$OUTPUT_DIR/manifests/"
 
-mkdir -p $OUTPUT_DIR/manifests/chargeback-con***REMOVED***g
-cp \
-    manifests/chargeback-con***REMOVED***g/custom-values.yaml \
-    "$OUTPUT_DIR/manifests/chargeback-con***REMOVED***g"
-echo "Start with Documentation/install-chargeback.md" > "$OUTPUT_DIR/README"
+cp -r \
+    manifests/chargeback-con***REMOVED***g \
+    "$OUTPUT_DIR/manifests/"
+# Remove minikube values, we don't want users to use this.
+rm "$OUTPUT_DIR/tectonic-chargeback-minikube-values.yaml"
 
+echo "Start with Documentation/install-chargeback.md" > "$OUTPUT_DIR/README"
 
 pushd "$TMPDIR"
 zip -r "$OUTFILE" "$OUTPUT_DIR_NAME"
