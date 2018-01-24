@@ -1,67 +1,72 @@
-chargeback-operator:
-  image:
-    tag: test-image
-    pullPolicy: IfNotPresent
-  con***REMOVED***g:
-    prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
-    promsumPollInterval: "30s"
-    promsumChunkSize: "1m"
-    promsumStepSize: "60s"
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "tectonic-chargeback"
+spec:
+  chargeback-operator:
+    image:
+      tag: test-image
+      pullPolicy: IfNotPresent
+    con***REMOVED***g:
+      prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
+      promsumPollInterval: "30s"
+      promsumChunkSize: "1m"
+      promsumStepSize: "60s"
 
-presto:
   presto:
+    presto:
+      image:
+        tag: test-image
+        pullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: "1Gi"
+          # cpu: null
+        limits:
+          memory: "1.5Gi"
+          # cpu: null
+
+    hive:
+      image:
+        tag: test-image
+        pullPolicy: IfNotPresent
+
+      metastore:
+        resources:
+          requests:
+            memory: "450Mi"
+            # cpu: null
+          limits:
+            memory: "450Mi"
+            # cpu: null
+
+      server:
+        resources:
+          requests:
+            memory: "350Mi"
+            # cpu: null
+          limits:
+            memory: "350Mi"
+            # cpu: null
+
+  hdfs:
     image:
       tag: test-image
       pullPolicy: IfNotPresent
-    resources:
-      requests:
-        memory: "1Gi"
-        # cpu: null
-      limits:
-        memory: "1.5Gi"
-        # cpu: null
-
-  hive:
-    image:
-      tag: test-image
-      pullPolicy: IfNotPresent
-
-    metastore:
+    datanode:
+      replicas: 1
       resources:
         requests:
-          memory: "450Mi"
+          memory: "250Mi"
           # cpu: null
         limits:
-          memory: "450Mi"
+          memory: "250Mi"
           # cpu: null
-
-    server:
+    namenode:
       resources:
         requests:
-          memory: "350Mi"
+          memory: "300Mi"
           # cpu: null
         limits:
-          memory: "350Mi"
+          memory: "300Mi"
           # cpu: null
-
-hdfs:
-  image:
-    tag: test-image
-    pullPolicy: IfNotPresent
-  datanode:
-    replicas: 1
-    resources:
-      requests:
-        memory: "250Mi"
-        # cpu: null
-      limits:
-        memory: "250Mi"
-        # cpu: null
-  namenode:
-    resources:
-      requests:
-        memory: "300Mi"
-        # cpu: null
-      limits:
-        memory: "300Mi"
-        # cpu: null

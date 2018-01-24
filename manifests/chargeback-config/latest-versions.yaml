@@ -1,16 +1,21 @@
-chargeback-operator:
-  image:
-    tag: latest
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "tectonic-chargeback"
+spec:
+  chargeback-operator:
+    image:
+      tag: latest
 
-presto:
   presto:
-    image:
-      tag: latest
-  hive:
-    image:
-      tag: latest
+    presto:
+      image:
+        tag: latest
+    hive:
+      image:
+        tag: latest
 
-hdfs:
-  image:
-    tag: latest
+  hdfs:
+    image:
+      tag: latest
 
