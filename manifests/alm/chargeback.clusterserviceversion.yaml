@@ -1,5 +1,5 @@
-#! validate-crd: clusterserviceversion.crd.yaml
-#! parse-kind: ClusterServiceVersion
+---
+# Source: chargeback-alm/templates/clusterserviceversion-v1.yaml
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
@@ -11,17 +11,17 @@ metadata:
 spec:
   displayName: Chargeback
   description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
-  keywords: ['chargeback', 'metrics', 'reporting', 'coreos']
+  keywords: [chargeback metrics reporting coreos]
   version: 0.5.1
   maturity: alpha
   maintainers:
-  - name: CoreOS, Inc
-    email: support@coreos.com
+    - email: support@coreos.com
+      name: CoreOS, Inc
   provider:
     name: CoreOS, Inc
   labels:
-    alm-status-descriptors: chargeback-helm-operator.v0.5.1
     alm-owner-chargeback: chargeback-helm-operator
+    alm-status-descriptors: chargeback-helm-operator.v0.5.1
   selector:
     matchLabels:
       alm-owner-chargeback: chargeback-helm-operator
@@ -29,265 +29,267 @@ spec:
     strategy: deployment
     spec:
       permissions:
-      - serviceAccountName: chargeback-helm-operator
-        rules:
-        - apiGroups: ["chargeback.coreos.com"]
-          resources: ["*"]
-          verbs: ["*"]
-        # The rules below are based on the upstream Admin ClusterRole but
-        # have various things removed that the chargeback-helm-operator
-        # doesn't need. This is still overly permissive, but not by much.
-        - apiGroups:
-          - ""
-          resources:
-          - pods
-          - pods/attach
-          - pods/exec
-          - pods/portforward
-          - pods/proxy
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - configmaps
-          - endpoints
-          - persistentvolumeclaims
-          - replicationcontrollers
-          - replicationcontrollers/scale
-          - secrets
-          - serviceaccounts
-          - services
-          - services/proxy
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - bindings
-          - events
-          - limitranges
-          - namespaces/status
-          - pods/log
-          - pods/status
-          - replicationcontrollers/status
-          - resourcequotas
-          - resourcequotas/status
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - namespaces
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - apps
-          resources:
-          - deployments
-          - deployments/rollback
-          - deployments/scale
-          - statefulsets
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - batch
-          resources:
-          - cronjobs
-          - jobs
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - extensions
-          resources:
-          - daemonsets
-          - deployments
-          - deployments/rollback
-          - deployments/scale
-          - replicasets
-          - replicasets/scale
-          - replicationcontrollers/scale
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - rbac.authorization.k8s.io
-          resources:
-          - rolebindings
-          - roles
-          verbs:
-          - create
-          - delete
-          - deletecollection
-          - get
-          - list
-          - patch
-          - update
-          - watch
+        - rules:
+          - apiGroups:
+            - chargeback.coreos.com
+            resources:
+            - '*'
+            verbs:
+            - '*'
+          - apiGroups:
+            - ""
+            resources:
+            - pods
+            - pods/attach
+            - pods/exec
+            - pods/portforward
+            - pods/proxy
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - ""
+            resources:
+            - configmaps
+            - endpoints
+            - persistentvolumeclaims
+            - replicationcontrollers
+            - replicationcontrollers/scale
+            - secrets
+            - serviceaccounts
+            - services
+            - services/proxy
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - ""
+            resources:
+            - bindings
+            - events
+            - limitranges
+            - namespaces/status
+            - pods/log
+            - pods/status
+            - replicationcontrollers/status
+            - resourcequotas
+            - resourcequotas/status
+            verbs:
+            - get
+            - list
+            - watch
+          - apiGroups:
+            - ""
+            resources:
+            - namespaces
+            verbs:
+            - get
+            - list
+            - watch
+          - apiGroups:
+            - apps
+            resources:
+            - deployments
+            - deployments/rollback
+            - deployments/scale
+            - statefulsets
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - batch
+            resources:
+            - cronjobs
+            - jobs
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - extensions
+            resources:
+            - daemonsets
+            - deployments
+            - deployments/rollback
+            - deployments/scale
+            - replicasets
+            - replicasets/scale
+            - replicationcontrollers/scale
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - rbac.authorization.k8s.io
+            resources:
+            - rolebindings
+            - roles
+            verbs:
+            - create
+            - delete
+            - deletecollection
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          serviceAccountName: chargeback-helm-operator
       deployments:
-      - name: chargeback-helm-operator
-        spec:
-          replicas: 1
-          strategy:
-            type: Recreate
-          template:
-            metadata:
-              labels:
-                app: chargeback-helm-operator
-            spec:
-              containers:
-              - name: chargeback-helm-operator
-                image: quay.io/coreos/chargeback-helm-operator:latest
-                imagePullPolicy: Always
-                env:
-                - name: HELM_RELEASE_CRD_NAME
-                  value: chargeback
-                - name: HELM_RELEASE_CRD_API_GROUP
-                  value: chargeback.coreos.com
-                - name: MY_POD_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.name
-                - name: MY_POD_NAMESPACE
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.namespace
-                - name: HELM_HOST
-                  value: "127.0.0.1:44134"
-                - name: SET_OWNER_REFERENCE_VALUE
-                  value: "true"
-                - name: HELM_WAIT
-                  value: "false"
-                - name: HELM_RECONCILE_INTERVAL_SECONDS
-                  value: "120"
-                - name: RELEASE_HISTORY_LIMIT
-                  value: "3"
-                resources:
-                  requests:
-                    memory: "25Mi"
-                    cpu: "50m"
-                  limits:
-                    memory: "25Mi"
-                    cpu: "50m"
-              - name: tiller
-                image: gcr.io/kubernetes-helm/tiller:v2.6.2
-                imagePullPolicy: Always
-                env:
-                - name: TILLER_NAMESPACE
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.namespace
-                - name: TILLER_HISTORY_MAX
-                  value: "3"
-                resources:
-                  requests:
-                    memory: "50Mi"
-                    cpu: "50m"
-                  limits:
-                    memory: "100Mi"
-                    cpu: "50m"
-                livenessProbe:
-                  failureThreshold: 3
-                  httpGet:
-                    path: /liveness
-                    port: 44135
-                    scheme: HTTP
-                  initialDelaySeconds: 1
-                  periodSeconds: 10
-                  successThreshold: 1
-                  timeoutSeconds: 1
-                readinessProbe:
-                  failureThreshold: 3
-                  httpGet:
-                    path: /readiness
-                    port: 44135
-                    scheme: HTTP
-                  initialDelaySeconds: 1
-                  periodSeconds: 10
-                  successThreshold: 1
-                  timeoutSeconds: 1
-              restartPolicy: Always
-              terminationGracePeriodSeconds: 30
-              serviceAccount: chargeback-helm-operator
-              imagePullSecrets:
-              - name: coreos-pull-secret
+        - name: chargeback-helm-operator
+          spec:
+            replicas: 1
+            strategy:
+              type: Recreate
+            template:
+              metadata:
+                labels:
+                  app: chargeback-helm-operator
+              spec:
+                containers:
+                - env:
+                  - name: HELM_RELEASE_CRD_NAME
+                    value: Chargeback
+                  - name: HELM_RELEASE_CRD_API_GROUP
+                    value: chargeback.coreos.com
+                  - name: MY_POD_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.name
+                  - name: MY_POD_NAMESPACE
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.namespace
+                  - name: HELM_HOST
+                    value: 127.0.0.1:44134
+                  - name: SET_OWNER_REFERENCE_VALUE
+                    value: "true"
+                  - name: HELM_WAIT
+                    value: "false"
+                  - name: HELM_RECONCILE_INTERVAL_SECONDS
+                    value: "120"
+                  - name: RELEASE_HISTORY_LIMIT
+                    value: "3"
+                  image: quay.io/coreos/chargeback-helm-operator:latest
+                  imagePullPolicy: Always
+                  name: chargeback-helm-operator
+                  resources:
+                    limits:
+                      cpu: 50m
+                      memory: 25Mi
+                    requests:
+                      cpu: 50m
+                      memory: 25Mi
+                - env:
+                  - name: TILLER_NAMESPACE
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.namespace
+                  - name: TILLER_HISTORY_MAX
+                    value: "3"
+                  image: gcr.io/kubernetes-helm/tiller:v2.6.2
+                  imagePullPolicy: Always
+                  livenessProbe:
+                    failureThreshold: 3
+                    httpGet:
+                      path: /liveness
+                      port: 44135
+                      scheme: HTTP
+                    initialDelaySeconds: 1
+                    periodSeconds: 10
+                    successThreshold: 1
+                    timeoutSeconds: 1
+                  name: tiller
+                  readinessProbe:
+                    failureThreshold: 3
+                    httpGet:
+                      path: /readiness
+                      port: 44135
+                      scheme: HTTP
+                    initialDelaySeconds: 1
+                    periodSeconds: 10
+                    successThreshold: 1
+                    timeoutSeconds: 1
+                  resources:
+                    limits:
+                      cpu: 50m
+                      memory: 100Mi
+                    requests:
+                      cpu: 50m
+                      memory: 50Mi
+                imagePullSecrets:
+                - name: coreos-pull-secret
+                restartPolicy: Always
+                serviceAccount: chargeback-helm-operator
+                terminationGracePeriodSeconds: 30
   customresourcedefinitions:
     owned:
-    - name: scheduledreports.chargeback.coreos.com
+    - description: An instance of Chargeback
+      displayName: Chargeback
+      kind: Chargeback
+      name: chargebacks.chargeback.coreos.com
       version: v1alpha1
-      kind: ScheduledReport
-      displayName: Chargeback Scheduled Report
-      description: A scheduled chargeback report
-    - name: reportprometheusqueries.chargeback.coreos.com
-      version: v1alpha1
-      kind: ReportPrometheusQuery
-      displayName: Chargeback prometheus query
-      description: Represents a prometheus query used by chargeback
-    - name: storagelocations.chargeback.coreos.com
-      version: v1alpha1
-      kind: StorageLocation
-      displayName: Chargeback storage location
-      description: Represents a location for chargeback to store data
-    - name: reportdatasources.chargeback.coreos.com
-      version: v1alpha1
-      kind: ReportDataSource
-      displayName: Chargeback data source
-      description: Represents a data source.
-    - name: prestotables.chargeback.coreos.com
-      version: v1alpha1
+    - description: A table within PrestoDB
+      displayName: Chargeback Presto Table
       kind: PrestoTable
-      displayName: Chargeback Presto table
-      description: Represents a table within PrestoDB.
-    - name: reportgenerationqueries.chargeback.coreos.com
+      name: prestotables.chargeback.coreos.com
       version: v1alpha1
-      kind: ReportGenerationQuery
-      displayName: Chargeback report generation query
-      description: A SQL query used by chargeback to generate reports
-    - name: reports.chargeback.coreos.com
-      version: v1alpha1
-      kind: Report
+    - description: A chargeback report for a specific time interval
       displayName: Chargeback Report
-      description: A chargeback report
-    - name: scheduledreports.chargeback.coreos.com
+      kind: Report
+      name: reports.chargeback.coreos.com
       version: v1alpha1
-      kind: ScheduledReport
+    - description: A resource describing a source of data for usage by Report Generation
+        Queries
+      displayName: Chargeback data source
+      kind: ReportDataSource
+      name: reportdatasources.chargeback.coreos.com
+      version: v1alpha1
+    - description: A SQL query used by Chargeback to generate reports
+      displayName: Chargeback generation query
+      kind: ReportGenerationQuery
+      name: reportgenerationqueries.chargeback.coreos.com
+      version: v1alpha1
+    - description: A Prometheus query by Chargeback to do metering
+      displayName: Chargeback prometheus query
+      kind: ReportPrometheusQuery
+      name: reportprometheusqueries.chargeback.coreos.com
+      version: v1alpha1
+    - description: A chargeback report that runs on a scheduled interval
       displayName: Chargeback Scheduled Report
-      description: A scheduled chargeback report
+      kind: ScheduledReport
+      name: scheduledreports.chargeback.coreos.com
+      version: v1alpha1
+    - description: Represents a configurable storage location for Chargeback to store
+        metering and report data
+      displayName: Chargeback storage location
+      kind: StorageLocation
+      name: storagelocations.chargeback.coreos.com
+      version: v1alpha1

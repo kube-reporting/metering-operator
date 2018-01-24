@@ -1,54 +1,58 @@
 #!/bin/bash -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPO_DIR="$DIR/.."
 
 OUTFILE=$1
+BASE_DIR="${2:-$REPO_DIR}"
 OUTPUT_DIR_NAME="${OUTFILE%%.zip}"
 TMPDIR="$(mktemp -d)"
 OUTPUT_DIR="$TMPDIR/$OUTPUT_DIR_NAME"
 
 mkdir -p "$OUTPUT_DIR"
+trap "rm -rf $TMPDIR" EXIT
 
 mkdir -p "$OUTPUT_DIR/hack"
 cp \
-    hack/alm-install.sh \
-    hack/alm-uninstall.sh \
-    hack/util.sh \
-    hack/default-env.sh \
+    $BASE_DIR/hack/alm-install.sh \
+    $BASE_DIR/hack/alm-uninstall.sh \
+    $BASE_DIR/hack/util.sh \
+    $BASE_DIR/hack/default-env.sh \
     "$OUTPUT_DIR/hack/"
 
 mkdir -p "$OUTPUT_DIR/Documentation"
 cp \
-    Documentation/install-chargeback.md \
-    Documentation/report.md \
-    Documentation/using-chargeback.md \
-    Documentation/chargeback-config.md \
-    Documentation/troubleshooting-chargeback.md \
-    Documentation/index.md \
+    $BASE_DIR/Documentation/install-chargeback.md \
+    $BASE_DIR/Documentation/report.md \
+    $BASE_DIR/Documentation/using-chargeback.md \
+    $BASE_DIR/Documentation/chargeback-config.md \
+    $BASE_DIR/Documentation/troubleshooting-chargeback.md \
+    $BASE_DIR/Documentation/index.md \
     "$OUTPUT_DIR/Documentation/"
 
 mkdir -p "$OUTPUT_DIR/manifests"
 cp -r \
-    manifests/custom-resources \
+    $BASE_DIR/manifests/custom-resources \
     "$OUTPUT_DIR/manifests/"
 cp -r \
-    manifests/custom-resource-definitions \
+    $BASE_DIR/manifests/custom-resource-definitions \
     "$OUTPUT_DIR/manifests/"
 
 # Remove scheduled reports folder since we currently do not support them
 rm -r "$OUTPUT_DIR/manifests/custom-resources/scheduled-reports"
 
 cp -r \
-    manifests/installer \
+    $BASE_DIR/manifests/installer \
     "$OUTPUT_DIR/manifests/"
 
 cp -r \
-    manifests/alm \
+    $BASE_DIR/manifests/alm \
     "$OUTPUT_DIR/manifests/"
 
 cp -r \
-    manifests/chargeback-config \
+    $BASE_DIR/manifests/chargeback-config \
     "$OUTPUT_DIR/manifests/"
 # Remove minikube values, we don't want users to use this.
-rm "$OUTPUT_DIR/tectonic-chargeback-minikube-values.yaml"
+rm "$OUTPUT_DIR/manifests/chargeback-config/tectonic-chargeback-values-minikube.yaml"
 
 echo "Start with Documentation/install-chargeback.md" > "$OUTPUT_DIR/README"
 
