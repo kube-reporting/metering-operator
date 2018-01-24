@@ -6,7 +6,7 @@ source ${DIR}/util.sh
 
 : "${CREATE_NAMESPACE:=false}"
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml}"
+: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
     echo "Creating namespace ${CHARGEBACK_NAMESPACE}"
@@ -24,10 +24,6 @@ fi
 msg "Installing Custom Resource Definitions"
 kube-install \
     manifests/custom-resource-definitions
-
-msg "Installing Chargeback CRD"
-kube-install \
-    "$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml"
 
 msg "Installing chargeback-helm-operator service account and RBAC resources"
 kube-install \

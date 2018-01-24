@@ -4,7 +4,7 @@ source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml}"
+: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 : "${DELETE_PVCS:=false}"
 
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
@@ -29,10 +29,6 @@ kube-remove \
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
 else
-    msg "Removing Chargeback CRD"
-    kube-remove \
-        "$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml"
-
     msg "Removing Custom Resource Definitions"
     kube-remove \
         manifests/custom-resource-definitions

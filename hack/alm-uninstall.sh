@@ -8,12 +8,13 @@ if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     kube-remove-non-file secret coreos-pull-secret
 fi
 
+msg "Removing Chargeback Resource"
+kube-remove \
+    manifests/installer/chargeback.yaml
+
 msg "Removing Chargeback Cluster Service Version"
 kube-remove \
-    manifests/alm/chargeback-clusterserviceversion.yaml
-
-msg "Removing chargeback-helm-operator"
-kube-remove-non-file deployment chargeback-helm-operator
+    manifests/alm/chargeback.clusterserviceversion.yaml
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
