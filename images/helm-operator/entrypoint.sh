@@ -172,7 +172,7 @@ while true; do
             RELEASE_NAME="$(jq -Mcr '.metadata.name' /tmp/current-release.json)"
             RELEASE_UID="$(jq -Mcr '.metadata.uid' /tmp/current-release.json)"
             RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' /tmp/current-release.json)"
-            RELEASE_VALUES="$(jq -Mcr '.spec.values // empty' /tmp/current-release.json)"
+            RELEASE_VALUES="$(jq -Mcr '.spec // empty' /tmp/current-release.json)"
 
             if [ -z "$RELEASE_VALUES" ]; then
                 echo "No values, using default values"

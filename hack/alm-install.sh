@@ -17,4 +17,10 @@ kube-install \
 
 msg "Installing Chargeback Cluster Service Version"
 kube-install \
-    manifests/alm/chargeback-clusterserviceversion.yaml
+    manifests/alm/chargeback.clusterserviceversion.yaml
+
+msg "Installing Chargeback Resource"
+kube-install \
+    manifests/installer/chargeback.yaml
+
+

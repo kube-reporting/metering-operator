@@ -17,8 +17,10 @@ else
 fi
 
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
+: "${CRD_DIR:=$DIR/../manifests/custom-resource-definitions}"
 
 echo "Installer manifest directory: $INSTALLER_MANIFEST_DIR"
+echo "CRD manifest directory: $CRD_DIR"
 
 mkdir -p "${INSTALLER_MANIFEST_DIR}"
 
@@ -26,8 +28,8 @@ helm template "$CHART" "${VALUES_ARGS[@]}" -x "templates/rbac.yaml" > \
     "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rbac.yaml"
 helm template "$CHART" "${VALUES_ARGS[@]}" -x "templates/deployment.yaml" > \
     "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
-helm template "$CHART" "${VALUES_ARGS[@]}" -x "templates/crd.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback-crd.yaml"
 helm template "$CHART" "${VALUES_ARGS[@]}" -x "templates/service-account.yaml" > \
     "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml"
+helm template "$CHART" "${VALUES_ARGS[@]}" -x "templates/crd.yaml" > \
+    "$CRD_DIR/chargeback.crd.yaml"
 
