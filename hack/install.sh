@@ -34,6 +34,6 @@ msg "Installing chargeback-helm-operator"
 kube-install \
     "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
 
-msg "Installing Chargeback"
+msg "Installing Chargeback Resource"
 kube-install \
     "$CHARGEBACK_CR_FILE"
