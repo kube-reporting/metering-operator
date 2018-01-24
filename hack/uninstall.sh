@@ -12,7 +12,7 @@ if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     kube-remove-non-***REMOVED***le secret coreos-pull-secret
 ***REMOVED***
 
-msg "Removing Chargeback"
+msg "Removing Chargeback Resource"
 kube-remove \
     "$CHARGEBACK_CR_FILE"
 
