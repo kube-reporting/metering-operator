@@ -6,6 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export CHARGEBACK_CR_FILE="/tmp/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
 export INSTALLER_MANIFEST_DIR="/tmp/installer_manifests-${DEPLOY_TAG}"
+export DELETE_PVCS=true
 
 cat <<EOF > "$CHARGEBACK_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
