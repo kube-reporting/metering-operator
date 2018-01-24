@@ -1,0 +1,32 @@
+apiVersion: app.coreos.com/v1alpha1
+kind: ClusterServiceVersion-v1
+metadata:
+  name: {{ .Values.name }}
+  annotations:
+{{ toYaml .Values.annotations | indent 4 }}
+  labels:
+{{ toYaml .Values.labels | indent 4 }}
+spec:
+  displayName: {{ .Values.spec.displayName }}
+  description: {{ .Values.spec.description }}
+  keywords: {{ .Values.spec.keywords }}
+  version: {{ .Values.spec.version }}
+  maturity: {{ .Values.spec.maturity }}
+  maintainers:
+{{ toYaml .Values.spec.maintainers | indent 4 }}
+  provider:
+{{ toYaml .Values.spec.provider | indent 4 }}
+  labels:
+{{ toYaml .Values.spec.labels | indent 4 }}
+  selector:
+    matchLabels:
+{{ toYaml .Values.spec.matchLabels | indent 6 }}
+  install:
+    strategy: deployment
+    spec:
+      permissions:
+{{ toYaml .Values.spec.permissions | indent 8 }}
+      deployments:
+{{ toYaml .Values.spec.deployments | indent 8 }}
+  customresourcede***REMOVED***nitions:
+{{ toYaml .Values.spec.customresourcede***REMOVED***nitions | indent 4 }}

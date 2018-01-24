@@ -1,0 +1,18 @@
+{{- if and .Values.crd.create .Values.cr.create -}}
+apiVersion: {{ printf "%s/%s" .Values.crd.apiGroup .Values.crd.apiVersion }}
+kind: {{ .Values.crd.kind }}
+metadata:
+  name: {{ .Values.cr.name }}
+{{- if .Values.cr.annotations }}
+  annotations:
+{{ toYaml .Values.cr.annotations | indent 4 }}
+{{- end }}
+{{- if .Values.cr.labels }}
+  labels:
+{{ toYaml .Values.cr.labels | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.cr.spec }}
+{{ toYaml .Values.cr.spec | indent 2 }}
+{{- end }}
+{{- end -}}

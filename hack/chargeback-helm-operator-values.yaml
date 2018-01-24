@@ -1,5 +1,9 @@
 name: chargeback-helm-operator
 
+cr:
+  create: true
+  name: "tectonic-chargeback"
+
 crd:
   create: true
   apiGroup: chargeback.coreos.com
@@ -9,6 +13,10 @@ crd:
   singular: chargeback
   kind: Chargeback
   listKind: ChargebackList
+
+  annotations:
+    catalog.app.coreos.com/displayName: "Chargeback"
+    catalog.app.coreos.com/description: "An instance of Chargeback"
 
 operator:
   image:

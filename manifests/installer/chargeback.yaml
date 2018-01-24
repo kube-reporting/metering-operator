@@ -1,4 +1,7 @@
+---
+# Source: helm-operator/templates/cr.yaml
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Chargeback
 metadata:
-  name: "tectonic-chargeback"
+  name: tectonic-chargeback
+spec:
