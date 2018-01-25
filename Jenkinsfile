@@ -50,11 +50,11 @@ podTemplate(
 ) {
     node (podLabel) {
     timestamps {
-        def gitCommit
-        def gitTag
         def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
         def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
+        def gitCommit
+        def gitTag
         def branchTag = env.BRANCH_NAME.toLowerCase()
         def deployTag = "${branchTag}-${currentBuild.number}"
 
@@ -92,6 +92,14 @@ podTemplate(
                         echo "Git Commit: ${gitCommit}"
                         if (gitTag) {
                             echo "This commit has a matching git Tag: ${gitTag}"
+                        }
+
+                        if (params.BUILD_RELEASE) {
+                            if (params.USE_BRANCH_AS_TAG) {
+                                gitTag = branchTag
+                            } ***REMOVED*** if (!gitTag) {
+                                error "Unable to detect git tag"
+                            }
                         }
                     }
 
@@ -138,13 +146,32 @@ podTemplate(
                             """
                         }
 
-                        if (params.BUILD_RELEASE) {
-                            if (params.USE_BRANCH_AS_TAG) {
-                                gitTag = BRANCH_TAG
-                            } ***REMOVED*** if (!gitTag) {
-                                error "Unable to detect git tag"
+                        stage('build') {
+                            if (!params.BUILD_RELEASE) {
+                                ansiColor('xterm') {
+                                    sh """#!/bin/bash -ex
+                                    make docker-build-all -j 2 \
+                                        USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                        BRANCH_TAG=${BRANCH_TAG}
+                                    """
+                                }
+                            } ***REMOVED*** {
+                                // Images should already have been built if
+                                // we're doing a release build. In the tag
+                                // stage we will pull and tag these images
+                                echo "Release build, skipping building of images."
                             }
-                            stage('tag') {
+                        }
+
+                        stage('tag') {
+                            if (!params.BUILD_RELEASE) {
+                                ansiColor('xterm') {
+                                    sh """#!/bin/bash -ex
+                                    make docker-tag-all -j 2 \
+                                        IMAGE_TAG=${DEPLOY_TAG}
+                                    """
+                                }
+                            } ***REMOVED*** {
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash -ex
                                     make docker-tag-all \
@@ -153,33 +180,10 @@ podTemplate(
                                     """
                                 }
                             }
-                            stage('push') {
-                                sh """#!/bin/bash -ex
-                                make docker-push-all -j 2 \
-                                    USE_LATEST_TAG=false \
-                                    IMAGE_TAG=${gitTag}
-                                """
-                            }
-                            stage('release') {
-                                sh """#!/bin/bash -ex
-                                make release RELEASE_VERSION=${BRANCH_TAG}
-                                """
-                                archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
-                            }
-                        } ***REMOVED*** {
-                            stage('build') {
-                                ansiColor('xterm') {
-                                    sh """#!/bin/bash -ex
-                                    make docker-build-all -j 2 \
-                                        USE_LATEST_TAG=${USE_LATEST_TAG} \
-                                        BRANCH_TAG=${BRANCH_TAG}
-                                    make docker-tag-all -j 2 \
-                                        IMAGE_TAG=${DEPLOY_TAG}
-                                    """
-                                }
-                            }
+                        }
 
-                            stage('push') {
+                        stage('push') {
+                            if (!params.BUILD_RELEASE) {
                                 sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
@@ -191,43 +195,60 @@ podTemplate(
                                     IMAGE_TAG=${DEPLOY_TAG}
                                     BRANCH_TAG=
                                 """
+                            } ***REMOVED*** {
+                                sh """#!/bin/bash -ex
+                                make docker-push-all -j 2 \
+                                    USE_LATEST_TAG=false \
+                                    IMAGE_TAG=${gitTag}
+                                """
                             }
+                        }
 
-                            withCredentials([
-                                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
-                            ]) {
-                                stage('deploy') {
-                                    if (runIntegrationTests ) {
-                                        echo "Deploying chargeback"
+                        stage('release') {
+                            if (params.BUILD_RELEASE) {
+                                sh """#!/bin/bash -ex
+                                make release RELEASE_VERSION=${BRANCH_TAG}
+                                """
+                                archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
+                            } ***REMOVED*** {
+                                echo "Skipping release step, not a release"
+                            }
+                        }
 
-                                        ansiColor('xterm') {
-                                            sh """#!/bin/bash
-                                            export KUBECONFIG=${KUBECONFIG}
-                                            export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                            export DEPLOY_TAG=${DEPLOY_TAG}
-                                            ./hack/deploy-ci.sh
-                                            """
-                                        }
-                                        echo "Successfully deployed chargeback-helm-operator"
-                                    } ***REMOVED*** {
-                                        echo "Non-master branch, skipping deploy"
+                        withCredentials([
+                            [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
+                        ]) {
+                            stage('deploy') {
+                                if (runIntegrationTests ) {
+                                    echo "Deploying chargeback"
+
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash
+                                        export KUBECONFIG=${KUBECONFIG}
+                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
+                                        export DEPLOY_TAG=${DEPLOY_TAG}
+                                        ./hack/deploy-ci.sh
+                                        """
                                     }
+                                    echo "Successfully deployed chargeback-helm-operator"
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping deploy"
                                 }
-                                stage('integration tests') {
-                                    if (runIntegrationTests) {
-                                        echo "Running chargeback integration tests"
+                            }
+                            stage('integration tests') {
+                                if (runIntegrationTests) {
+                                    echo "Running chargeback integration tests"
 
-                                        ansiColor('xterm') {
-                                            sh """#!/bin/bash
-                                            export KUBECONFIG=${KUBECONFIG}
-                                            export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                            export CHARGEBACK_SHORT_TESTS=${shortTests}
-                                            ./hack/integration-tests.sh
-                                            """
-                                        }
-                                    } ***REMOVED*** {
-                                        echo "Non-master branch, skipping chargeback integration test"
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash
+                                        export KUBECONFIG=${KUBECONFIG}
+                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
+                                        export CHARGEBACK_SHORT_TESTS=${shortTests}
+                                        ./hack/integration-tests.sh
+                                        """
                                     }
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping chargeback integration test"
                                 }
                             }
                         }
