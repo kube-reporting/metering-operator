@@ -162,7 +162,7 @@ podTemplate(
                             }
                             stage('release') {
                                 sh """#!/bin/bash -ex
-                                make tectonic-chargeback-${BRANCH_TAG}.zip
+                                make release RELEASE_VERSION=${BRANCH_TAG}
                                 """
                                 archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
                             }
