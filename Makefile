@@ -162,8 +162,10 @@ tectonic-chargeback-0.1.0.tgz: $(shell find charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
 
-tectonic-chargeback-%.zip: Documentation manifests hack
-	@./hack/create-release.sh $@
+release:
+	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
+	@./hack/create-release.sh tectonic-chargeback-$(RELEASE_VERSION).zip
+
 
 .PHONY: \
 	vendor fmt regenerate-hive-thrift \
