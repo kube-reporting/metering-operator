@@ -85,14 +85,15 @@ cleanupOldReleaseConfigmaps() {
 }
 
 writeReleaseConfigMapOwnerPatchFile() {
-    OWNER_KIND=$1
-    OWNER_NAME=$2
-    OWNER_UID=$3
+    OWNER_API_VERSION=$1
+    OWNER_KIND=$2
+    OWNER_NAME=$3
+    OWNER_UID=$4
     cat <<EOF > /tmp/owner-patch.json
 {
   "metadata": {
     "ownerReferences": [{
-      "apiVersion": "apps/v1beta1",
+      "apiVersion": "$OWNER_API_VERSION",
       "blockOwnerDeletion": false,
       "controller": true,
       "kind": "$OWNER_KIND",
@@ -105,13 +106,14 @@ EOF
 }
 
 writeReleaseOwnerValuesFile() {
-    OWNER_KIND=$1
-    OWNER_NAME=$2
-    OWNER_UID=$3
+    OWNER_API_VERSION=$1
+    OWNER_KIND=$2
+    OWNER_NAME=$3
+    OWNER_UID=$4
     cat <<EOF > /tmp/owner-values.yaml
 global:
   ownerReferences:
-  - apiVersion: "apps/v1beta1"
+  - apiVersion: "$OWNER_API_VERSION"
     blockOwnerDeletion: false
     controller: true
     kind: "$OWNER_KIND"
@@ -148,7 +150,16 @@ checkExit
 if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
     echo "Getting pod $MY_POD_NAME owner information"
     source get_owner.sh
-    writeReleaseConfigMapOwnerPatchFile "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
+
+    echo "Querying for Deployment $MY_DEPLOYMENT_NAME"
+    kubectl \
+        --namespace "$MY_POD_NAMESPACE" \
+        get deployment \
+        "$MY_DEPLOYMENT_NAME" \
+        -o json > /tmp/my_deployment.json
+    MY_DEPLOYMENT_API_VERSION="$(jq -Mcr '.apiVersion' /tmp/my_deployment.json)"
+
+    writeReleaseConfigMapOwnerPatchFile "$MY_DEPLOYMENT_API_VERSION" "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
 
     getReleaseConfigmaps > /tmp/release-configmaps.json
     setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
@@ -171,6 +182,7 @@ while true; do
             echo -E "$release" > /tmp/current-release.json
             RELEASE_NAME="$(jq -Mcr '.metadata.name' /tmp/current-release.json)"
             RELEASE_UID="$(jq -Mcr '.metadata.uid' /tmp/current-release.json)"
+            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' /tmp/current-release.json)"
             RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' /tmp/current-release.json)"
             RELEASE_VALUES="$(jq -Mcr '.spec // empty' /tmp/current-release.json)"
 
@@ -187,9 +199,9 @@ while true; do
             if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
                 echo "Nothing has changed for release $RELEASE_NAME"
             else
-                echo $RELEASE_RESOURCE_VERSION > "/tmp/$RELEASE_NAME.resourceVersion"
+                echo "$RELEASE_RESOURCE_VERSION" > "/tmp/$RELEASE_NAME.resourceVersion"
 
-                writeReleaseOwnerValuesFile "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+                writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
                 EXTRA_ARGS=("-f" /tmp/owner-values.yaml)
 
                 echo "Running helm upgrade for release $RELEASE_NAME"
