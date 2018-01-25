@@ -8,7 +8,7 @@ export CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE:-chargeback-ci}
 export SKIP_DELETE_CRDS=true
 
 # lowercase the value, since namespaces must be lowercase values
-CHARGEBACK_NAMESPACE=$(echo -n "$CHARGEBACK_NAMESPACE" | tr '[:upper:]' '[:lower:]')
+CHARGEBACK_NAMESPACE=$(echo -n "$CHARGEBACK_NAMESPACE" | tr '[:upper:]' '[:lower:]' | tr '.' '-' | sed 's/[._]/-/g')
 
 : "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
 : "${UNINSTALL_CHARGEBACK:=true}"
