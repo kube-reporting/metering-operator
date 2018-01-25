@@ -197,7 +197,7 @@ spec:
                     value: "120"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:latest
+                  image: quay.io/coreos/chargeback-helm-operator:0.5.1-rc3
                   imagePullPolicy: Always
                   name: chargeback-helm-operator
                   resources:
