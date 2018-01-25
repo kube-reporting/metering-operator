@@ -22,8 +22,9 @@ kube-remove \
 
 msg "Removing chargeback-helm-operator service account and RBAC resources"
 kube-remove \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml" \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rbac.yaml"
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rolebinding.yaml" \
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml" \
+    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml"
 
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
