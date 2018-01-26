@@ -53,57 +53,54 @@ podTemplate(
         def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
         def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
+        def gopath = "${env.WORKSPACE}/go"
+        def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
+
         def gitCommit
         def gitTag
         def branchTag = env.BRANCH_NAME.toLowerCase()
         def deployTag = "${branchTag}-${currentBuild.number}"
 
         try {
+            container('docker'){
+                stage('checkout') {
+                    sh """
+                    apk update
+                    apk add git bash jq zip
+                    """
+
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: scm.branches,
+                        extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: kubeChargebackDir]],
+                        userRemoteCon***REMOVED***gs: scm.userRemoteCon***REMOVED***gs
+                    ])
+
+                    gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
+                    gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
+                    echo "Git Commit: ${gitCommit}"
+                    if (gitTag) {
+                        echo "This commit has a matching git Tag: ${gitTag}"
+                    }
+
+                    if (params.BUILD_RELEASE) {
+                        if (params.USE_BRANCH_AS_TAG) {
+                            gitTag = branchTag
+                        } ***REMOVED*** if (!gitTag) {
+                            error "Unable to detect git tag"
+                        }
+                        deployTag = gitTag
+                    }
+                }
+            }
+
             withEnv([
-                "GOPATH=${env.WORKSPACE}/go",
+                "GOPATH=${gopath}",
                 "USE_LATEST_TAG=${isMasterBranch}",
                 "BRANCH_TAG=${branchTag}",
                 "DEPLOY_TAG=${deployTag}"
             ]){
                 container('docker'){
-
-                    def kubeChargebackDir = "${env.WORKSPACE}/go/src/github.com/coreos-inc/kube-chargeback"
-                    stage('checkout') {
-                        sh """
-                        apk update
-                        apk add git bash jq zip
-                        """
-
-                        def branches;
-                        if (params.RELEASE_TAG) {
-                            branches = params.RELEASE_TAG
-                        } ***REMOVED*** {
-                            branches = scm.branches
-                        }
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: scm.branches,
-                            extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: kubeChargebackDir]],
-                            userRemoteCon***REMOVED***gs: scm.userRemoteCon***REMOVED***gs
-                        ])
-
-                        gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
-                        gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
-                        echo "Git Commit: ${gitCommit}"
-                        if (gitTag) {
-                            echo "This commit has a matching git Tag: ${gitTag}"
-                        }
-
-                        if (params.BUILD_RELEASE) {
-                            if (params.USE_BRANCH_AS_TAG) {
-                                gitTag = branchTag
-                                env.DEPLOY_TAG = branchTag
-                            } ***REMOVED*** if (!gitTag) {
-                                error "Unable to detect git tag"
-                            }
-                        }
-                    }
-
                     withCredentials([
                         usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
                     ]) {
@@ -253,7 +250,6 @@ podTemplate(
                                 }
                             }
                         }
-
                     }
                 }
             }
