@@ -107,5 +107,5 @@ jq -s '.[0] * .[1] * .[2]' \
 helm template "$CHART" \
     -f "$ALM_VALUES_FILE" \
     -f /tmp/alm-values.yaml \
-    | sed 's/ *$//; /^$/d; /^\s*$/d' \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
     > "$CSV_MANIFEST_DESTINATION"
