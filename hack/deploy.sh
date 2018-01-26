@@ -13,6 +13,17 @@ CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 : "${UNINSTALL_CHARGEBACK:=true}"
 : "${INSTALL_CHARGEBACK:=true}"
 
+while true; do
+    NS="$(kubectl get ns "$CHARGEBACK_NAMESPACE" -o json --ignore-not-found)"
+    if [ "$NS" == "" ]; then
+        break
+    ***REMOVED***
+    if [ "$(echo "$NS" | jq -r '.status.phase')" == "Terminating" ]; then
+        echo "Waiting for namespace $CHARGEBACK_NAMESPACE termination to complete before continuing"
+    ***REMOVED***
+    sleep 2
+done
+
 echo "Creating namespace $CHARGEBACK_NAMESPACE"
 kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
