@@ -10,7 +10,7 @@ properties([
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
-        booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: false, description: 'If true, run integration tests even if branch is not master'),
+        booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: true, description: 'If true, run integration tests even if branch is not master'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
         booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
     ])
@@ -284,7 +284,7 @@ podTemplate(
                                 source hack/util.sh
                                 export KUBECONFIG=${KUBECONFIG}
                                 CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
-                                kubectl delete ns $CHARGEBACK_NAMESPACE
+                                kubectl delete ns --now $CHARGEBACK_NAMESPACE
                                 '''
                             }
                         }
