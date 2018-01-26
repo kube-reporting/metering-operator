@@ -52,7 +52,7 @@ setOwnerOnReleaseCon***REMOVED***gmaps(){
     if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
         echo "Setting ownerReferences for Helm release con***REMOVED***gmaps"
 
-        RELEASE_CM_NAMES=$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r $1)
+        RELEASE_CM_NAMES="$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r "$1")"
         if [ -z "$RELEASE_CM_NAMES" ]; then
             echo "No release con***REMOVED***gmaps to patch ownership of yet"
         ***REMOVED***
@@ -60,7 +60,7 @@ setOwnerOnReleaseCon***REMOVED***gmaps(){
                 echo "Setting owner of $cm to deployment $MY_DEPLOYMENT_NAME - $MY_DEPLOYMENT_UID"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
-                    patch con***REMOVED***gmap $cm \
+                    patch con***REMOVED***gmap "$cm" \
                     -p "$(cat /tmp/owner-patch.json)"
             done
         ***REMOVED***
@@ -70,7 +70,7 @@ setOwnerOnReleaseCon***REMOVED***gmaps(){
 cleanupOldReleaseCon***REMOVED***gmaps() {
     if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
         echo "Getting list of helm release con***REMOVED***gmaps to delete"
-        DELETE_RELEASE_CM_NAMES=$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 ***REMOVED*** $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc $1)
+        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 ***REMOVED*** $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$1")"
         if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
             echo "No release con***REMOVED***gmaps to delete yet"
         ***REMOVED***
@@ -78,7 +78,7 @@ cleanupOldReleaseCon***REMOVED***gmaps() {
                 echo "Deleting helm release con***REMOVED***gmap $cm"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
-                    delete con***REMOVED***gmap $cm
+                    delete con***REMOVED***gmap "$cm"
             done
         ***REMOVED***
     ***REMOVED***
@@ -143,8 +143,6 @@ until curl -s $TILLER_READY_ENDPOINT; do
     sleep 1
 done
 
-getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
-cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
 checkExit
 
 if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
@@ -161,8 +159,6 @@ if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
 
     writeReleaseCon***REMOVED***gMapOwnerPatchFile "$MY_DEPLOYMENT_API_VERSION" "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
 
-    getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
-    setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
     checkExit
 ***REMOVED***
 
@@ -207,7 +203,7 @@ while true; do
                 echo "Running helm upgrade for release $RELEASE_NAME"
                 helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
 
-                getReleaseCon***REMOVED***gmaps > /tmp/release-con***REMOVED***gmaps.json
+                getReleaseCon***REMOVED***gmaps "$RELEASE_NAME" > /tmp/release-con***REMOVED***gmaps.json
                 setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
                 cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
             ***REMOVED***
