@@ -97,6 +97,7 @@ podTemplate(
                         if (params.BUILD_RELEASE) {
                             if (params.USE_BRANCH_AS_TAG) {
                                 gitTag = branchTag
+                                env.DEPLOY_TAG = branchTag
                             } ***REMOVED*** if (!gitTag) {
                                 error "Unable to detect git tag"
                             }
