@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: chargeback-helm-operator
-        image: "quay.io/coreos/chargeback-helm-operator:0.5.1-rc3"
+        image: "quay.io/coreos/chargeback-helm-operator:0.5.1"
         imagePullPolicy: Always
         env:
         - name: HELM_RELEASE_CRD_NAME

@@ -1,17 +1,17 @@
 chargeback-operator:
   image:
-    tag: 0.5.1-rc3
+    tag: 0.5.1
 
 presto:
   presto:
     image:
-      tag: 0.5.1-rc3
+      tag: 0.5.1
   hive:
     image:
-      tag: 0.5.1-rc3
+      tag: 0.5.1
 
 hdfs:
   enabled: true
   image:
-    tag: 0.5.1-rc3
+    tag: 0.5.1
 
