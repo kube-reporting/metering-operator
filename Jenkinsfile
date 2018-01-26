@@ -13,6 +13,7 @@ properties([
         booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: true, description: 'If true, run integration tests even if branch is not master'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
         booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
+        booleanParam(name: 'SKIP_NAMESPACE_CLEANUP', defaultValue: false, description: 'If true, skips deleting the Kubernetes namespace at the end of the job'),
     ])
 ])
 
@@ -271,7 +272,7 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } finally {
-            if (runIntegrationTests) {
+            if (runIntegrationTests && !params.SKIP_NAMESPACE_CLEANUP) {
                 withCredentials([
                     [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
                 ]) {
