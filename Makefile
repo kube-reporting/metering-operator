@@ -14,14 +14,7 @@ HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
 HIVE_IMAGE := quay.io/coreos/chargeback-hive
 PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
-
-DOCKER_IMAGE_TARGETS := \
-	$(CHARGEBACK_IMAGE) \
-	$(HADOOP_IMAGE) \
-	$(HIVE_IMAGE) \
-	$(PRESTO_IMAGE) \
-	$(HELM_OPERATOR_IMAGE) \
-	$(CHARGEBACK_HELM_OPERATOR_IMAGE)
+CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-tests
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
@@ -82,15 +75,22 @@ ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 
-TARGETS := chargeback hadoop hive presto helm-operator chargeback-helm-operator
+DOCKER_TARGETS := \
+	chargeback \
+	chargeback-integration-tests \
+	hadoop \
+	hive \
+	presto \
+	helm-operator \
+	chargeback-helm-operator
 # These generate new make targets like chargeback-helm-operator-docker-build
 # which can be invoked.
-DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(TARGETS))
-DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(TARGETS))
-DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(TARGETS))
-DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(TARGETS))
+DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(DOCKER_TARGETS))
+DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(DOCKER_TARGETS))
+DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(DOCKER_TARGETS))
+DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(DOCKER_TARGETS))
 
-# The steps below run for each value of $(TARGET) effectively, generating multiple Make targets.
+# The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
 # The example will be using the chargeback-helm-operator targets as it's example.
 #
@@ -124,6 +124,9 @@ docker-pull-all: $(DOCKER_PULL_TARGETS)
 
 chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
+
+chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
