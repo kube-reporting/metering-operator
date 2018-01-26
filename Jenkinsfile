@@ -12,6 +12,7 @@ properties([
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
         booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: false, description: 'If true, run integration tests even if branch is not master'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
+        booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
     ])
 ])
 
@@ -53,56 +54,57 @@ podTemplate(
         def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
         def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
+        def gopath = "${env.WORKSPACE}/go"
+        def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
+
         def gitCommit
         def gitTag
         def branchTag = env.BRANCH_NAME.toLowerCase()
         def deployTag = "${branchTag}-${currentBuild.number}"
+        def chargebackNamespace = "chargeback-ci-${branchTag}"
 
         try {
-            withEnv([
-                "GOPATH=${env.WORKSPACE}/go",
-                "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${branchTag}",
-                "DEPLOY_TAG=${deployTag}"
-            ]){
-                container('docker'){
+            container('docker'){
+                stage('checkout') {
+                    sh """
+                    apk update
+                    apk add git bash jq zip
+                    """
 
-                    def kubeChargebackDir = "${env.WORKSPACE}/go/src/github.com/coreos-inc/kube-chargeback"
-                    stage('checkout') {
-                        sh """
-                        apk update
-                        apk add git bash jq zip
-                        """
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: scm.branches,
+                        extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: kubeChargebackDir]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ])
 
-                        def branches;
-                        if (params.RELEASE_TAG) {
-                            branches = params.RELEASE_TAG
-                        } else {
-                            branches = scm.branches
-                        }
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: scm.branches,
-                            extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: kubeChargebackDir]],
-                            userRemoteConfigs: scm.userRemoteConfigs
-                        ])
-
-                        gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
-                        gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
-                        echo "Git Commit: ${gitCommit}"
-                        if (gitTag) {
-                            echo "This commit has a matching git Tag: ${gitTag}"
-                        }
-
-                        if (params.BUILD_RELEASE) {
-                            if (params.USE_BRANCH_AS_TAG) {
-                                gitTag = branchTag
-                            } else if (!gitTag) {
-                                error "Unable to detect git tag"
-                            }
-                        }
+                    gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
+                    gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
+                    echo "Git Commit: ${gitCommit}"
+                    if (gitTag) {
+                        echo "This commit has a matching git Tag: ${gitTag}"
                     }
 
+                    if (params.BUILD_RELEASE) {
+                        if (params.USE_BRANCH_AS_TAG) {
+                            gitTag = branchTag
+                        } else if (!gitTag) {
+                            error "Unable to detect git tag"
+                        }
+                        deployTag = gitTag
+                    }
+                }
+            }
+
+            withEnv([
+                "GOPATH=${gopath}",
+                "USE_LATEST_TAG=${isMasterBranch}",
+                "BRANCH_TAG=${branchTag}",
+                "DEPLOY_TAG=${deployTag}",
+                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                "CHARGEBACK_SHORT_TESTS=${shortTests}"
+            ]){
+                container('docker'){
                     withCredentials([
                         usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
                     ]) {
@@ -147,7 +149,9 @@ podTemplate(
                         }
 
                         stage('build') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker build"
+                            } else if (!params.BUILD_RELEASE) {
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash -ex
                                     make docker-build-all -j 2 \
@@ -164,7 +168,9 @@ podTemplate(
                         }
 
                         stage('tag') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker tag"
+                            } else if (!params.BUILD_RELEASE) {
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash -ex
                                     make docker-tag-all -j 2 \
@@ -183,7 +189,9 @@ podTemplate(
                         }
 
                         stage('push') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker push"
+                            } else if (!params.BUILD_RELEASE) {
                                 sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
@@ -218,51 +226,71 @@ podTemplate(
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
                         ]) {
-                            stage('deploy') {
-                                if (runIntegrationTests ) {
-                                    echo "Deploying chargeback"
+                            withEnv([
+                                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                            ]){
+                                stage('deploy') {
+                                    if (runIntegrationTests ) {
+                                        echo "Deploying chargeback"
 
-                                    ansiColor('xterm') {
-                                        sh """#!/bin/bash
-                                        export KUBECONFIG=${KUBECONFIG}
-                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                        export DEPLOY_TAG=${DEPLOY_TAG}
-                                        ./hack/deploy-ci.sh
-                                        """
+                                        ansiColor('xterm') {
+                                            timeout(10) {
+                                                sh """#!/bin/bash
+                                                export KUBECONFIG=${KUBECONFIG}
+                                                ./hack/deploy-ci.sh
+                                                """
+                                            }
+                                        }
+                                        echo "Successfully deployed chargeback-helm-operator"
+                                    } else {
+                                        echo "Non-master branch, skipping deploy"
                                     }
-                                    echo "Successfully deployed chargeback-helm-operator"
-                                } else {
-                                    echo "Non-master branch, skipping deploy"
                                 }
-                            }
-                            stage('integration tests') {
-                                if (runIntegrationTests) {
-                                    echo "Running chargeback integration tests"
+                                stage('integration tests') {
+                                    if (runIntegrationTests) {
+                                        echo "Running chargeback integration tests"
 
-                                    ansiColor('xterm') {
-                                        sh """#!/bin/bash
-                                        export KUBECONFIG=${KUBECONFIG}
-                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                        export CHARGEBACK_SHORT_TESTS=${shortTests}
-                                        ./hack/integration-tests.sh
-                                        """
+                                        ansiColor('xterm') {
+                                            sh """#!/bin/bash
+                                            export KUBECONFIG=${KUBECONFIG}
+                                            ./hack/integration-tests.sh
+                                            """
+                                        }
+                                    } else {
+                                        echo "Non-master branch, skipping chargeback integration test"
                                     }
-                                } else {
-                                    echo "Non-master branch, skipping chargeback integration test"
                                 }
                             }
                         }
-
                     }
                 }
             }
-
         } catch (e) {
             // If there was an exception thrown, the build failed
             echo "Build failed"
             currentBuild.result = "FAILED"
             throw e
         } finally {
+            if (runIntegrationTests) {
+                withCredentials([
+                    [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                ]) {
+                    withEnv([
+                        "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                    ]){
+                        container("docker") {
+                            dir(kubeChargebackDir) {
+                                sh '''#!/bin/bash
+                                source hack/util.sh
+                                export KUBECONFIG=${KUBECONFIG}
+                                CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
+                                kubectl delete ns $CHARGEBACK_NAMESPACE
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
             cleanWs notFailBuild: true
             // notifyBuild(currentBuild.result)
         }

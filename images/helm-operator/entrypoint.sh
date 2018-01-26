@@ -52,7 +52,7 @@ setOwnerOnReleaseConfigmaps(){
     if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
         echo "Setting ownerReferences for Helm release configmaps"
 
-        RELEASE_CM_NAMES=$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r $1)
+        RELEASE_CM_NAMES="$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r "$1")"
         if [ -z "$RELEASE_CM_NAMES" ]; then
             echo "No release configmaps to patch ownership of yet"
         else
@@ -60,7 +60,7 @@ setOwnerOnReleaseConfigmaps(){
                 echo "Setting owner of $cm to deployment $MY_DEPLOYMENT_NAME - $MY_DEPLOYMENT_UID"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
-                    patch configmap $cm \
+                    patch configmap "$cm" \
                     -p "$(cat /tmp/owner-patch.json)"
             done
         fi
@@ -70,7 +70,7 @@ setOwnerOnReleaseConfigmaps(){
 cleanupOldReleaseConfigmaps() {
     if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
         echo "Getting list of helm release configmaps to delete"
-        DELETE_RELEASE_CM_NAMES=$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc $1)
+        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$1")"
         if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
             echo "No release configmaps to delete yet"
         else
@@ -78,7 +78,7 @@ cleanupOldReleaseConfigmaps() {
                 echo "Deleting helm release configmap $cm"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
-                    delete configmap $cm
+                    delete configmap "$cm"
             done
         fi
     fi
@@ -143,8 +143,6 @@ until curl -s $TILLER_READY_ENDPOINT; do
     sleep 1
 done
 
-getReleaseConfigmaps > /tmp/release-configmaps.json
-cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
 checkExit
 
 if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
@@ -161,8 +159,6 @@ if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
 
     writeReleaseConfigMapOwnerPatchFile "$MY_DEPLOYMENT_API_VERSION" "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
 
-    getReleaseConfigmaps > /tmp/release-configmaps.json
-    setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
     checkExit
 fi
 
@@ -207,7 +203,7 @@ while true; do
                 echo "Running helm upgrade for release $RELEASE_NAME"
                 helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
 
-                getReleaseConfigmaps > /tmp/release-configmaps.json
+                getReleaseConfigmaps "$RELEASE_NAME" > /tmp/release-configmaps.json
                 setOwnerOnReleaseConfigmaps /tmp/release-configmaps.json
                 cleanupOldReleaseConfigmaps /tmp/release-configmaps.json
             fi
