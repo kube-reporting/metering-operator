@@ -1,7 +1,10 @@
 name: helm-operator
 
+cr:
+  create: false
+
 crd:
-  create: true
+  create: false
   apiGroup: app.coreos.com
   apiVersion: v1alpha1
 

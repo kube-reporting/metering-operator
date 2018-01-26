@@ -1,5 +1,3 @@
----
-# Source: helm-operator/templates/rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
@@ -11,5 +9,3 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: chargeback-helm-operator
-
-

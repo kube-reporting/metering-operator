@@ -1,5 +1,7 @@
 ---
 # Source: chargeback-alm/templates/clusterserviceversion-v1.yaml
+#! validate-crd: ../../deploy/chart/kube-1.8/templates/03-clusterserviceversion.crd.yaml
+#! parse-kind: ClusterServiceVersion
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
