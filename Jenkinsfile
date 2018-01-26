@@ -228,7 +228,6 @@ podTemplate(
                         ]) {
                             withEnv([
                                 "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
-                                "KUBECONFIG=${env.KUBECONFIG}"
                             ]){
                                 stage('deploy') {
                                     if (runIntegrationTests ) {
@@ -237,6 +236,7 @@ podTemplate(
                                         ansiColor('xterm') {
                                             timeout(10) {
                                                 sh """#!/bin/bash
+                                                export KUBECONFIG=${KUBECONFIG}
                                                 ./hack/deploy-ci.sh
                                                 """
                                             }
@@ -252,6 +252,7 @@ podTemplate(
 
                                         ansiColor('xterm') {
                                             sh """#!/bin/bash
+                                            export KUBECONFIG=${KUBECONFIG}
                                             ./hack/integration-tests.sh
                                             """
                                         }
@@ -276,12 +277,12 @@ podTemplate(
                 ]) {
                     withEnv([
                         "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
-                        "KUBECONFIG=${env.KUBECONFIG}"
                     ]){
                         container("docker") {
                             dir(kubeChargebackDir) {
                                 sh '''#!/bin/bash
                                 source hack/util.sh
+                                export KUBECONFIG=${KUBECONFIG}
                                 CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
                                 kubectl delete ns $CHARGEBACK_NAMESPACE
                                 '''
