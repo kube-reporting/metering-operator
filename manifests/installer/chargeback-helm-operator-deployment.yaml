@@ -1,5 +1,3 @@
----
-# Source: helm-operator/templates/deployment.yaml
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -91,5 +89,3 @@ spec:
       serviceAccount: chargeback-helm-operator
       imagePullSecrets:
         - name: coreos-pull-secret
-        
-

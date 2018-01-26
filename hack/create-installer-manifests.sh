@@ -7,9 +7,9 @@ CHART="$DIR/../charts/helm-operator"
 OUTPUT_DIR="$(cd "${OUTPUT_DIR:=$DIR/..}" && pwd)"
 : "${MANIFESTS_DIR:=$OUTPUT_DIR/manifests}"
 : "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/installer}"
-: "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
 
 : "${HELM_OPERATOR_VALUES_FILE:=$DIR/chargeback-helm-operator-values.yaml}"
+: "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
 
 echo "helm-operator values file: $HELM_OPERATOR_VALUES_FILE"
 echo "Output directory: ${OUTPUT_DIR}"
@@ -20,27 +20,36 @@ mkdir -p "${INSTALLER_MANIFEST_DIR}" "${CRD_DIR}"
 
 helm template "$CHART" \
     -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/role.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml"
-helm template "$CHART" \
-    -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/rolebinding.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rolebinding.yaml"
-helm template "$CHART" \
-    -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/deployment.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
-helm template "$CHART" \
-    -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/service-account.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml"
-helm template "$CHART" \
-    -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/crd.yaml" > \
-    "$CRD_DIR/chargeback.crd.yaml"
-helm template "$CHART" \
-    -f "$HELM_OPERATOR_VALUES_FILE" \
-    -x "templates/cr.yaml" > \
-    "$INSTALLER_MANIFEST_DIR/chargeback.yaml"
+    -x "templates/role.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml"
 
+helm template "$CHART" \
+    -f "$HELM_OPERATOR_VALUES_FILE" \
+    -x "templates/rolebinding.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rolebinding.yaml"
 
+helm template "$CHART" \
+    -f "$HELM_OPERATOR_VALUES_FILE" \
+    -x "templates/deployment.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
+
+helm template "$CHART" \
+    -f "$HELM_OPERATOR_VALUES_FILE" \
+    -x "templates/service-account.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml"
+
+helm template "$CHART" \
+    -f "$HELM_OPERATOR_VALUES_FILE" \
+    -x "templates/crd.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$CRD_DIR/chargeback.crd.yaml"
+
+helm template "$CHART" \
+    -f "$HELM_OPERATOR_VALUES_FILE" \
+    -x "templates/cr.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$INSTALLER_MANIFEST_DIR/chargeback.yaml"

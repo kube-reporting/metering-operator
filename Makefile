@@ -162,6 +162,10 @@ tectonic-chargeback-0.1.0.tgz: $(shell find charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
 
+chargeback-manifests: hack/chargeback-helm-operator-values.yaml hack/chargeback-alm-values.yaml
+	./hack/create-installer-manifests.sh
+	./hack/create-alm-csv-manifests.sh
+
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
 	@./hack/create-release.sh tectonic-chargeback-$(RELEASE_VERSION).zip
@@ -174,7 +178,8 @@ release:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin tectonic-chargeback-chart
+	chargeback-bin tectonic-chargeback-chart \
+	chargeback-manifests release
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
