@@ -9,7 +9,7 @@ export CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE:-chargeback-ci}
 export CHARGEBACK_SHORT_TESTS=${CHARGEBACK_SHORT_TESTS:-false}
 
 # lowercase the value, since namespaces must be lowercase values
-CHARGEBACK_NAMESPACE=$(echo -n "$CHARGEBACK_NAMESPACE" | tr '[:upper:]' '[:lower:]')
+CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 
 set -x
 go test \
