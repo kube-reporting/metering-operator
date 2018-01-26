@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# lowercase the value, and characters we use in branches with dashes
+function sanetize_namespace() {
+    echo -n "$1" | tr '[:upper:]' '[:lower:]' | tr '.' '-' | sed 's/[._]/-/g'
+}
+
 function kubectl_cmd() {
     kubectl --namespace="${CHARGEBACK_NAMESPACE}" "$@"
 }
