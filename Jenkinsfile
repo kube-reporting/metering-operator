@@ -60,6 +60,7 @@ podTemplate(
         def gitTag
         def branchTag = env.BRANCH_NAME.toLowerCase()
         def deployTag = "${branchTag}-${currentBuild.number}"
+        def chargebackNamespace = "chargeback-ci-${branchTag}"
 
         try {
             container('docker'){
@@ -98,7 +99,9 @@ podTemplate(
                 "GOPATH=${gopath}",
                 "USE_LATEST_TAG=${isMasterBranch}",
                 "BRANCH_TAG=${branchTag}",
-                "DEPLOY_TAG=${deployTag}"
+                "DEPLOY_TAG=${deployTag}",
+                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                "CHARGEBACK_SHORT_TESTS=${shortTests}"
             ]){
                 container('docker'){
                     withCredentials([
@@ -216,50 +219,70 @@ podTemplate(
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
                         ]) {
-                            stage('deploy') {
-                                if (runIntegrationTests ) {
-                                    echo "Deploying chargeback"
+                            withEnv([
+                                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                                "KUBECONFIG=${env.KUBECONFIG}"
+                            ]){
+                                stage('deploy') {
+                                    if (runIntegrationTests ) {
+                                        echo "Deploying chargeback"
 
-                                    ansiColor('xterm') {
-                                        sh """#!/bin/bash
-                                        export KUBECONFIG=${KUBECONFIG}
-                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                        export DEPLOY_TAG=${DEPLOY_TAG}
-                                        ./hack/deploy-ci.sh
-                                        """
+                                        ansiColor('xterm') {
+                                            timeout(10) {
+                                                sh """#!/bin/bash
+                                                ./hack/deploy-ci.sh
+                                                """
+                                            }
+                                        }
+                                        echo "Successfully deployed chargeback-helm-operator"
+                                    } else {
+                                        echo "Non-master branch, skipping deploy"
                                     }
-                                    echo "Successfully deployed chargeback-helm-operator"
-                                } else {
-                                    echo "Non-master branch, skipping deploy"
                                 }
-                            }
-                            stage('integration tests') {
-                                if (runIntegrationTests) {
-                                    echo "Running chargeback integration tests"
+                                stage('integration tests') {
+                                    if (runIntegrationTests) {
+                                        echo "Running chargeback integration tests"
 
-                                    ansiColor('xterm') {
-                                        sh """#!/bin/bash
-                                        export KUBECONFIG=${KUBECONFIG}
-                                        export CHARGEBACK_NAMESPACE=chargeback-ci-${BRANCH_TAG}
-                                        export CHARGEBACK_SHORT_TESTS=${shortTests}
-                                        ./hack/integration-tests.sh
-                                        """
+                                        ansiColor('xterm') {
+                                            sh """#!/bin/bash
+                                            ./hack/integration-tests.sh
+                                            """
+                                        }
+                                    } else {
+                                        echo "Non-master branch, skipping chargeback integration test"
                                     }
-                                } else {
-                                    echo "Non-master branch, skipping chargeback integration test"
                                 }
                             }
                         }
                     }
                 }
             }
-
         } catch (e) {
             // If there was an exception thrown, the build failed
             echo "Build failed"
             currentBuild.result = "FAILED"
             throw e
         } finally {
+            if (runIntegrationTests) {
+                withCredentials([
+                    [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                ]) {
+                    withEnv([
+                        "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                        "KUBECONFIG=${env.KUBECONFIG}"
+                    ]){
+                        container("docker") {
+                            dir(kubeChargebackDir) {
+                                sh '''#!/bin/bash
+                                source hack/util.sh
+                                CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
+                                kubectl delete ns $CHARGEBACK_NAMESPACE
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
             cleanWs notFailBuild: true
             // notifyBuild(currentBuild.result)
         }
