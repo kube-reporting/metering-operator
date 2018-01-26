@@ -21,7 +21,7 @@ crd:
 operator:
   image:
     repository: quay.io/coreos/chargeback-helm-operator
-    tag: 0.5.1-rc3
+    tag: 0.5.1
     pullPolicy: Always
 
 tiller:
