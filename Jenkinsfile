@@ -12,6 +12,7 @@ properties([
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
         booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: false, description: 'If true, run integration tests even if branch is not master'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
+        booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
     ])
 ])
 
@@ -148,7 +149,9 @@ podTemplate(
                         }
 
                         stage('build') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker build"
+                            } else if (!params.BUILD_RELEASE) {
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash -ex
                                     make docker-build-all -j 2 \
@@ -165,7 +168,9 @@ podTemplate(
                         }
 
                         stage('tag') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker tag"
+                            } else if (!params.BUILD_RELEASE) {
                                 ansiColor('xterm') {
                                     sh """#!/bin/bash -ex
                                     make docker-tag-all -j 2 \
@@ -184,7 +189,9 @@ podTemplate(
                         }
 
                         stage('push') {
-                            if (!params.BUILD_RELEASE) {
+                            if (params.SKIP_DOCKER_STAGES) {
+                                echo "Skipping docker push"
+                            } else if (!params.BUILD_RELEASE) {
                                 sh """#!/bin/bash -ex
                                 make docker-push-all -j 2 \
                                     USE_LATEST_TAG=${USE_LATEST_TAG} \
