@@ -3,24 +3,27 @@
     <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
 </div>
 
-# Troubleshooting
+# Troubleshooting Chargeback
 
 The most likely issue to occur with Chargeback is that it's not starting all the pods.
-Pods not starting is typically due to lack of resources, but it can also be caused when the pods have a dependency on another resource that doesn't exist, such as a StorageClass or Secret.
-The sections below provide some references for determining if this is the cause.
+Pods may fail to start due to lack of resources, or if they have a dependency on a resource that does not exist, such as a StorageClass or Secret.
+
+This guide will help determine the cause.
 
 ## Not enough compute resources
 
-The most common issue when installing or running Chargeback is often lack of compute resources.
-Chargeback's minimum resource requirements are described in the [installation prerequisites][prerequisites].
+The most common issue when installing or running Chargeback is lack of compute resources. Ensure that
+Chargeback has been allocated the minimum resource requirements described in the [installation prerequisites][prerequisites].
 
-To determine if you're running into issues with resources or scheduling, follow the instructions from the Kubernetes upstream documentation on [troubleshooting for compute resources][resource-troubleshooting].
-The key diagnostic steps are to check if a container's status is `pending` then it's likely a issue with scheduling.
+To determine if the issue is with resources or scheduling, follow the troubleshooting instructions included in the Kubernetes document [Managing Compute Resources for Containers][resource-troubleshooting].
 
-## Storage Class Not Con***REMOVED***gured
+If a container's status is `pending`, the issue is most likely with scheduling.
 
-Another common issue is not having a default StorageClass con***REMOVED***gured, which is used for dynamic provisioning.
-[See con***REMOVED***guring chargeback][con***REMOVED***guring-chargeback-storage] for information on how to check if you've got any StorageClasses con***REMOVED***gured for your cluster, as well as how to set the default, or con***REMOVED***gure Chargeback to use a StorageClass other than the default.
+## Storage Class not con***REMOVED***gured
+
+Chargeback requires that a default Storage Class be con***REMOVED***gured for dynamic provisioning. 
+
+See [con***REMOVED***guring chargeback][con***REMOVED***guring-chargeback-storage] for information on how to check if there are any StorageClasses con***REMOVED***gured for the cluster, how to set the default, and how to con***REMOVED***gure Chargeback to use a StorageClass other than the default.
 
 
 [resource-troubleshooting]: https://kubernetes.io/docs/concepts/con***REMOVED***guration/manage-compute-resources-container/#troubleshooting
