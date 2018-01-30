@@ -2,15 +2,15 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-memory-usage-aws-billing"
+  name: "pod-memory-request-aws"
   labels:
     tectonic-chargeback: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "pod-request-memory-usage"
-  - "node-allocatable-memory"
+  - "pod-memory-request"
+  - "node-memory-allocatable"
   - "aws-ec2-billing-data"
   view:
     disabled: true
@@ -43,7 +43,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| generationQueryViewName "node-allocatable-memory" |}
+      FROM {| generationQueryViewName "node-memory-allocatable" |}
         WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
         AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     ),
@@ -54,7 +54,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-      FROM {| generationQueryViewName "pod-request-memory-usage" |}
+      FROM {| generationQueryViewName "pod-memory-request" |}
       WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
       GROUP BY pod, namespace, node

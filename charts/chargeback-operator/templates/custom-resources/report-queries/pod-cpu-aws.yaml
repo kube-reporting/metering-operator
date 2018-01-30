@@ -2,15 +2,15 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-usage-aws-billing"
+  name: "pod-cpu-request-aws"
   labels:
     tectonic-chargeback: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "pod-request-cpu-usage"
-  - "node-allocatable-cpu"
+  - "pod-cpu-request"
+  - "node-cpu-allocatable"
   - "aws-ec2-billing-data"
   view:
     disabled: true
@@ -43,7 +43,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
-      FROM {| generationQueryViewName "node-allocatable-cpu" |}
+      FROM {| generationQueryViewName "node-cpu-allocatable" |}
         WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
         AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     ),
@@ -54,7 +54,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
-      FROM {| generationQueryViewName "pod-request-cpu-usage" |}
+      FROM {| generationQueryViewName "pod-cpu-request" |}
       WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
       GROUP BY pod, namespace, node

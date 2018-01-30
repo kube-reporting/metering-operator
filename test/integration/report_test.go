@@ -62,38 +62,38 @@ func TestReportsProduceData(t *testing.T) {
 		timeout   time.Duration
 	}{
 		{
-			name:      "pod-cpu-usage-by-namespace",
-			queryName: "pod-cpu-usage-by-namespace",
+			name:      "namespace-cpu-request",
+			queryName: "namespace-cpu-request",
 			timeout:   reportTestTimeout,
 		},
 		{
-			name:      "pod-memory-usage-by-namespace",
-			queryName: "pod-memory-usage-by-namespace",
+			name:      "namespace-memory-request",
+			queryName: "namespace-memory-request",
 			timeout:   reportTestTimeout + time.Minute,
 		},
 		{
-			name:      "pod-cpu-usage-by-node",
-			queryName: "pod-cpu-usage-by-node",
+			name:      "pod-cpu-request",
+			queryName: "pod-cpu-request",
 			timeout:   reportTestTimeout,
 		},
 		{
-			name:      "pod-memory-usage-by-node",
-			queryName: "pod-memory-usage-by-node",
+			name:      "pod-memory-request",
+			queryName: "pod-memory-request",
 			timeout:   reportTestTimeout,
 		},
 		{
-			name:      "pod-memory-usage-by-node-with-usage-percent",
-			queryName: "pod-memory-usage-by-node-with-usage-percent",
+			name:      "pod-memory-request-vs-node-memory-allocatable",
+			queryName: "pod-memory-request-vs-node-memory-allocatable",
 			timeout:   reportTestTimeout + time.Minute,
 		},
 		{
-			name:      "node-cpu-usage",
-			queryName: "node-cpu-usage",
+			name:      "node-cpu-utilization",
+			queryName: "node-cpu-utilization",
 			timeout:   reportTestTimeout,
 		},
 		{
-			name:      "node-memory-usage",
-			queryName: "node-memory-usage",
+			name:      "node-memory-utilization",
+			queryName: "node-memory-utilization",
 			timeout:   reportTestTimeout,
 		},
 		// TODO(chancez): Add AWS Reports
