@@ -43,8 +43,6 @@ operator:
     tag: ${DEPLOY_TAG}
 EOF
 
-./hack/create-installer-manifests.sh \
-    "$DIR/chargeback-helm-operator-values.yaml" \
-    "$CUSTOM_VALUES_FILE"
+./hack/create-installer-manifests.sh "$CUSTOM_VALUES_FILE"
 
 ./hack/deploy.sh
