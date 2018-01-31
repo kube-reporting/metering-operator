@@ -100,174 +100,166 @@ podTemplate(
                 }
             }
 
-            withEnv([
-                "GOPATH=${gopath}",
-                "USE_LATEST_TAG=${isMasterBranch}",
-                "BRANCH_TAG=${branchTag}",
-                "DEPLOY_TAG=${deployTag}",
-                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
-                "CHARGEBACK_SHORT_TESTS=${shortTests}"
-            ]){
-                container('docker'){
-                    withCredentials([
-                        usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
-                    ]) {
-
+            withCredentials([
+                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
+                [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'kube-chargeback-s3', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'],
+                usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
+            ]) {
+                withEnv([
+                    "GOPATH=${gopath}",
+                    "USE_LATEST_TAG=${isMasterBranch}",
+                    "BRANCH_TAG=${branchTag}",
+                    "DEPLOY_TAG=${deployTag}",
+                    "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                    "CHARGEBACK_SHORT_TESTS=${shortTests}",
+                    "KUBECONFIG=${KUBECONFIG}",
+                    "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                    "ENABLE_AWS_BILLING=true",
+                    "AWS_BILLING_BUCKET=${awsBillingBucket}",
+                    "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
+                    "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
+                    "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
+                ]){
+                    container('docker'){
                         echo "Authenticating to docker registry"
-                        // Run separately so variables are interpolated by groovy, note the double quotes
-                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD quay.io"
-                    }
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD quay.io'
 
-                    stage('install dependencies') {
-                        // Build & install thrift
-                        sh '''#!/bin/bash
-                        set -e
-                        apk add make go libc-dev curl
-                        export HELM_VERSION=2.8.0
-                        curl \
-                            --silent \
-                            --show-error \
-                            --location \
-                            "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
-                            | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
-                            && chmod +x /usr/local/bin/helm
-                        helm init --client-only --skip-refresh
-                        helm repo remove stable || true
+                        stage('install dependencies') {
+                            // Build & install thrift
+                            sh '''#!/bin/bash
+                            set -e
+                            apk add make go libc-dev curl
+                            export HELM_VERSION=2.8.0
+                            curl \
+                                --silent \
+                                --show-error \
+                                --location \
+                                "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+                                | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
+                                && chmod +x /usr/local/bin/helm
+                            helm init --client-only --skip-refresh
+                            helm repo remove stable || true
 
-                        export KUBERNETES_VERSION=1.8.3
-                        curl \
-                            --silent \
-                            --show-error \
-                            --location \
-                            "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" \
-                            -o /usr/local/bin/kubectl \
-                             && chmod +x /usr/local/bin/kubectl
-                        '''
-                    }
-
-                    dir(kubeChargebackDir) {
-                        stage('test') {
-                            sh """#!/bin/bash
-                            make k8s-verify-codegen
-                            """
+                            export KUBERNETES_VERSION=1.8.3
+                            curl \
+                                --silent \
+                                --show-error \
+                                --location \
+                                "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" \
+                                -o /usr/local/bin/kubectl \
+                                 && chmod +x /usr/local/bin/kubectl
+                            '''
                         }
 
-                        stage('build') {
-                            if (params.SKIP_DOCKER_STAGES) {
-                                echo "Skipping docker build"
-                            } ***REMOVED*** if (!params.BUILD_RELEASE) {
-                                ansiColor('xterm') {
+                        dir(kubeChargebackDir) {
+                            stage('test') {
+                                sh """#!/bin/bash
+                                make k8s-verify-codegen
+                                """
+                            }
+
+                            stage('build') {
+                                if (params.SKIP_DOCKER_STAGES) {
+                                    echo "Skipping docker build"
+                                } ***REMOVED*** if (!params.BUILD_RELEASE) {
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash -ex
+                                        make docker-build-all -j 2 \
+                                            USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                            BRANCH_TAG=${BRANCH_TAG}
+                                        """
+                                    }
+                                } ***REMOVED*** {
+                                    // Images should already have been built if
+                                    // we're doing a release build. In the tag
+                                    // stage we will pull and tag these images
+                                    echo "Release build, skipping building of images."
+                                }
+                            }
+
+                            stage('tag') {
+                                if (params.SKIP_DOCKER_STAGES) {
+                                    echo "Skipping docker tag"
+                                } ***REMOVED*** if (!params.BUILD_RELEASE) {
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash -ex
+                                        make docker-tag-all -j 2 \
+                                            IMAGE_TAG=${DEPLOY_TAG}
+                                        """
+                                    }
+                                } ***REMOVED*** {
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash -ex
+                                        make docker-tag-all \
+                                            PULL_TAG_IMAGE_SOURCE=true \
+                                            IMAGE_TAG=${gitTag}
+                                        """
+                                    }
+                                }
+                            }
+
+                            stage('push') {
+                                if (params.SKIP_DOCKER_STAGES) {
+                                    echo "Skipping docker push"
+                                } ***REMOVED*** if (!params.BUILD_RELEASE) {
                                     sh """#!/bin/bash -ex
-                                    make docker-build-all -j 2 \
+                                    make docker-push-all -j 2 \
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
-                                    """
-                                }
-                            } ***REMOVED*** {
-                                // Images should already have been built if
-                                // we're doing a release build. In the tag
-                                // stage we will pull and tag these images
-                                echo "Release build, skipping building of images."
-                            }
-                        }
-
-                        stage('tag') {
-                            if (params.SKIP_DOCKER_STAGES) {
-                                echo "Skipping docker tag"
-                            } ***REMOVED*** if (!params.BUILD_RELEASE) {
-                                ansiColor('xterm') {
-                                    sh """#!/bin/bash -ex
-                                    make docker-tag-all -j 2 \
+                                    # Unset BRANCH_TAG so we don't push the same
+                                    # image twice
+                                    unset BRANCH_TAG
+                                    make docker-push-all -j 2 \
                                         IMAGE_TAG=${DEPLOY_TAG}
+                                        BRANCH_TAG=
                                     """
-                                }
-                            } ***REMOVED*** {
-                                ansiColor('xterm') {
+                                } ***REMOVED*** {
                                     sh """#!/bin/bash -ex
-                                    make docker-tag-all \
-                                        PULL_TAG_IMAGE_SOURCE=true \
+                                    make docker-push-all -j 2 \
+                                        USE_LATEST_TAG=false \
                                         IMAGE_TAG=${gitTag}
                                     """
                                 }
                             }
-                        }
 
-                        stage('push') {
-                            if (params.SKIP_DOCKER_STAGES) {
-                                echo "Skipping docker push"
-                            } ***REMOVED*** if (!params.BUILD_RELEASE) {
-                                sh """#!/bin/bash -ex
-                                make docker-push-all -j 2 \
-                                    USE_LATEST_TAG=${USE_LATEST_TAG} \
-                                    BRANCH_TAG=${BRANCH_TAG}
-                                # Unset BRANCH_TAG so we don't push the same
-                                # image twice
-                                unset BRANCH_TAG
-                                make docker-push-all -j 2 \
-                                    IMAGE_TAG=${DEPLOY_TAG}
-                                    BRANCH_TAG=
-                                """
-                            } ***REMOVED*** {
-                                sh """#!/bin/bash -ex
-                                make docker-push-all -j 2 \
-                                    USE_LATEST_TAG=false \
-                                    IMAGE_TAG=${gitTag}
-                                """
-                            }
-                        }
-
-                        stage('release') {
-                            if (params.BUILD_RELEASE) {
-                                sh """#!/bin/bash -ex
-                                make release RELEASE_VERSION=${BRANCH_TAG}
-                                """
-                                archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
-                            } ***REMOVED*** {
-                                echo "Skipping release step, not a release"
-                            }
-                        }
-
-                        withCredentials([
-                            [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
-                            [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'kube-chargeback-s3', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'],
-                        ]) {
-                            withEnv([
-                                "KUBECONFIG=${KUBECONFIG"},
-                                "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
-                                "ENABLE_AWS_BILLING=true",
-                                "AWS_BILLING_BUCKET=${awsBillingBucket}",
-                                "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
-                                "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
-                                "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
-                            ]){
-                                stage('deploy') {
-                                    if (runIntegrationTests ) {
-                                        echo "Deploying chargeback"
-
-                                        ansiColor('xterm') {
-                                            timeout(10) {
-                                                sh """#!/bin/bash
-                                                ./hack/deploy-ci.sh
-                                                """
-                                            }
-                                        }
-                                        echo "Successfully deployed chargeback-helm-operator"
-                                    } ***REMOVED*** {
-                                        echo "Non-master branch, skipping deploy"
-                                    }
+                            stage('release') {
+                                if (params.BUILD_RELEASE) {
+                                    sh """#!/bin/bash -ex
+                                    make release RELEASE_VERSION=${BRANCH_TAG}
+                                    """
+                                    archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
+                                } ***REMOVED*** {
+                                    echo "Skipping release step, not a release"
                                 }
-                                stage('integration tests') {
-                                    if (runIntegrationTests) {
-                                        echo "Running chargeback integration tests"
+                            }
 
-                                        ansiColor('xterm') {
+                            stage('deploy') {
+                                if (runIntegrationTests ) {
+                                    echo "Deploying chargeback"
+
+                                    ansiColor('xterm') {
+                                        timeout(10) {
                                             sh """#!/bin/bash
-                                            ./hack/integration-tests.sh
+                                            ./hack/deploy-ci.sh
                                             """
                                         }
-                                    } ***REMOVED*** {
-                                        echo "Non-master branch, skipping chargeback integration test"
                                     }
+                                    echo "Successfully deployed chargeback-helm-operator"
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping deploy"
+                                }
+                            }
+                            stage('integration tests') {
+                                if (runIntegrationTests) {
+                                    echo "Running chargeback integration tests"
+
+                                    ansiColor('xterm') {
+                                        sh """#!/bin/bash
+                                        ./hack/integration-tests.sh
+                                        """
+                                    }
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping chargeback integration test"
                                 }
                             }
                         }
