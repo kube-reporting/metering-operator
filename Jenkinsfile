@@ -23,6 +23,9 @@ def isMasterBranch = env.BRANCH_NAME == "master"
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
 
+def awsBillingBucket = "team-chargeback"
+def awsBillingBucketPre***REMOVED***x = "cost-usage-report/team-chargeback-chancez/"
+
 podTemplate(
     cloud: 'kubernetes',
     containers: [
@@ -226,9 +229,16 @@ podTemplate(
 
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
+                            [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'kube-chargeback-s3', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'],
                         ]) {
                             withEnv([
+                                "KUBECONFIG=${KUBECONFIG"},
                                 "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                                "ENABLE_AWS_BILLING=true",
+                                "AWS_BILLING_BUCKET=${awsBillingBucket}",
+                                "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
+                                "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
+                                "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
                             ]){
                                 stage('deploy') {
                                     if (runIntegrationTests ) {
@@ -237,7 +247,6 @@ podTemplate(
                                         ansiColor('xterm') {
                                             timeout(10) {
                                                 sh """#!/bin/bash
-                                                export KUBECONFIG=${KUBECONFIG}
                                                 ./hack/deploy-ci.sh
                                                 """
                                             }
@@ -253,7 +262,6 @@ podTemplate(
 
                                         ansiColor('xterm') {
                                             sh """#!/bin/bash
-                                            export KUBECONFIG=${KUBECONFIG}
                                             ./hack/integration-tests.sh
                                             """
                                         }
