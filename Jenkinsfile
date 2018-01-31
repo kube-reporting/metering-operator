@@ -278,14 +278,12 @@ podTemplate(
                 ]) {
                     withEnv([
                         "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                        "KUBECONFIG=${KUBECONFIG}",
                     ]){
                         container("docker") {
                             dir(kubeChargebackDir) {
                                 sh '''#!/bin/bash
-                                source hack/util.sh
-                                export KUBECONFIG=${KUBECONFIG}
-                                CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
-                                kubectl delete ns --now $CHARGEBACK_NAMESPACE
+                                ./hack/delete-ns.sh
                                 '''
                             }
                         }
