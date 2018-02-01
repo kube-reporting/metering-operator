@@ -258,6 +258,7 @@ podTemplate(
                                                 docker run \
                                                     -i --rm \
                                                     -e INSTALL_METHOD=direct \
+                                                    -e DEPLOY_SCRIPT=deploy-ci.sh \
                                                     --env-file <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
                                                     -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                                                     -v "${KUBECONFIG}:${KUBECONFIG}" \
