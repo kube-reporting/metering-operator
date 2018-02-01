@@ -13,6 +13,7 @@ if [[ -z "$NAMESPACE" && -z "$CHARGEBACK_NAMESPACE" ]]; then
 
 : "${DEPLOY_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=alm}"
+: "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh
 export INSTALL_METHOD
 export CHARGEBACK_NAMESPACE="${CHARGEBACK_NAMESPACE:-NAMESPACE}"
 
@@ -41,7 +42,7 @@ function cleanup() {
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
     trap cleanup EXIT SIGINT
     echo "Deploying Chargeback"
-    "$DIR/deploy.sh" >> /out/deploy.log 2>&1
+    "${DIR}/${DEPLOY_SCRIPT}" >> /out/deploy.log 2>&1
 ***REMOVED***
 
 echo "Running integration tests"
