@@ -13,9 +13,7 @@ A single `Report` resource corresponds to a speci***REMOVED***c run of a report.
 
 ## Example
 
-Example reports ready to be created exist in `manifests/custom-resources/reports`.
-
-The following example report will contain information on every pod's memory requests over the month of September:
+The following example report will contain information on every pod's cpu requests over the month of September:
 
 ```
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -23,10 +21,9 @@ kind: Report
 metadata:
   name: pod-cpu-usage-by-node
 spec:
-  reportingStart: '2017-09-01T00:00:00Z'
-  reportingEnd: '2017-09-30T23:59:59Z'
+  reportingStart: '2018-09-01T00:00:00Z'
+  reportingEnd: '2018-09-30T23:59:59Z'
   generationQuery: "pod-cpu-usage-by-node"
-  gracePeriod: "5m"
   runImmediately: true
 ```
 
@@ -45,7 +42,73 @@ Timestamps should be [RFC3339][rfc3339] encoded. Times with local offsets will b
 
 ### generationQuery
 
-Names the generation query used to generate the report. The generation query controls the format of the report as well as the information contained within it.
+Names the `ReportGenerationQuery` used to generate the report. The generation query controls the format of the report as well as the information contained within it.
+
+You can obtain a list of available `ReportGenerationQuery` objects by using `kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE`.
+
+Here is a list of the ReportGenerationQueries available:
+
+- aws-ec2-billing-data
+- aws-ec2-cluster-cost
+- namespace-cpu-request
+- namespace-memory-request
+- node-cpu-allocatable
+- node-cpu-capacity
+- node-cpu-utilization
+- node-memory-allocatable
+- node-memory-capacity
+- node-memory-utilization
+- pod-cpu-request
+- pod-cpu-request-aws
+- pod-cpu-request-raw
+- pod-cpu-request-vs-node-cpu-allocatable
+- pod-memory-request
+- pod-memory-request-aws
+- pod-memory-request-raw
+- pod-memory-request-vs-node-memory-allocatable
+
+The ReportGenerationQueries with the `-raw` suf***REMOVED***x shouldn't generally be used directly for reports, they're currently used by other ReportGenerationQueries as a building block to more complex queries.
+
+The `namespace-` pre***REMOVED***xed queries are aggregating pod cpu/memory requests by namespace, giving you a list of namespaces and their overall usage based on resource requests.
+The queries with a `pod-` pre***REMOVED***x are basically the same, but have it broken down by pod, which includes the pods namespace, and node.
+The report queries pre***REMOVED***xed `node-` contain information about each node's total available resources.
+Report queries pre***REMOVED***xed with `aws-` are queries speci***REMOVED***cally about AWS information, while queries suf***REMOVED***xed with `-aws` are effectively the same as queries of the same name without the suf***REMOVED***x, but correlate usage with the EC2 billing data.
+The `aws-ec2-billing-data` report shouldn't generally be used directly, it is used by other queries. The `aws-ec2-cluster-cost` report provides a total cost based entirely on what nodes are in the cluster, and what the sum of their costs are for the time period being reported on.
+
+For a complete list of ***REMOVED***elds each report query produces, use the kubectl to get the object as JSON, and check the `columns` ***REMOVED***eld:
+
+```
+kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
+
+{
+    "apiVersion": "chargeback.coreos.com/v1alpha1",
+    "kind": "ReportGenerationQuery",
+    "metadata": {
+        "name": "namespace-memory-request",
+        "namespace": "chargeback"
+    },
+    "spec": {
+        "columns": [
+            {
+                "name": "namespace",
+                "type": "string"
+            },
+            {
+                "name": "data_start",
+                "type": "timestamp"
+            },
+            {
+                "name": "data_end",
+                "type": "timestamp"
+            },
+            {
+                "name": "pod_request_memory_byte_seconds",
+                "type": "double"
+            }
+        ]
+    }
+}
+```
 
 ### gracePeriod
 

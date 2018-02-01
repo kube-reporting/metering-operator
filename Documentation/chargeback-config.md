@@ -8,6 +8,7 @@
 Chargeback supports a con***REMOVED***guration options which can be set in the `spec` section of the `Chargeback` resource.
 
 An example con***REMOVED***guration ***REMOVED***le can be found in [manifests/chargeback-con***REMOVED***g/custom-values.yaml][example-con***REMOVED***g].
+A minimal con***REMOVED***guration example that doesn't override anything can be found in [manifests/chargeback-con***REMOVED***g/default.yaml][default-con***REMOVED***g].
 For details on customizing this ***REMOVED***le, read the [common-con***REMOVED***guration-options](#common-con***REMOVED***guration-options) section below.
 
 ## Documentation conventions
@@ -123,5 +124,6 @@ This can be done either pre-install or post-install. Note that disabling it post
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
 [example-con***REMOVED***g]: ../manifests/chargeback-con***REMOVED***g/custom-values.yaml
+[default-con***REMOVED***g]: ../manifests/chargeback-con***REMOVED***g/default.yaml
 [example-storage-con***REMOVED***g]: ../manifests/chargeback-con***REMOVED***g/custom-storageclass-values.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
