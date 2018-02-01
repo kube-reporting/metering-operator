@@ -107,6 +107,7 @@ podTemplate(
                 usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
             ]) {
                 withEnv([
+                    "JENKINS_WORKSPACE=${env.WORKSPACE}",
                     "GOPATH=${gopath}",
                     "USE_LATEST_TAG=${isMasterBranch}",
                     "BRANCH_TAG=${branchTag}",
@@ -256,7 +257,9 @@ podTemplate(
                                                 trap 'cleanup' EXIT
                                                 docker run \
                                                     -i --rm \
+                                                    -e INSTALL_METHOD=direct \
                                                     --env-file <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                    -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                                                     -v "${KUBECONFIG}:${KUBECONFIG}" \
                                                     -v "${TEST_OUTPUT_DIR}:/out" \
                                                     quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
