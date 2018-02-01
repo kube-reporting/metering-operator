@@ -31,14 +31,8 @@ cp \
 
 mkdir -p "$OUTPUT_DIR/manifests"
 cp -r \
-    $BASE_DIR/manifests/custom-resources \
-    "$OUTPUT_DIR/manifests/"
-cp -r \
     $BASE_DIR/manifests/custom-resource-definitions \
     "$OUTPUT_DIR/manifests/"
-
-# Remove scheduled reports folder since we currently do not support them
-rm -r "$OUTPUT_DIR/manifests/custom-resources/scheduled-reports"
 
 cp -r \
     $BASE_DIR/manifests/installer \
