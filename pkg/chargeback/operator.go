@@ -328,13 +328,11 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	defer c.prestoDB.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
-	if !c.disablePromsum {
-		c.promConn, err = c.newPrometheusConn(promapi.Config{
-			Address: c.promHost,
-		})
-		if err != nil {
-			return err
-		}
+	c.promConn, err = c.newPrometheusConn(promapi.Config{
+		Address: c.promHost,
+	})
+	if err != nil {
+		return err
 	}
 
 	c.logger.Info("waiting for caches to sync")

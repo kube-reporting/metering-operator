@@ -1,9 +1,0 @@
-apiVersion: chargeback.coreos.com/v1alpha1
-kind: Report
-metadata:
-  name: pod-cpu-usage-by-namespace
-spec:
-  reportingStart: '2018-01-01T00:00:00Z'
-  reportingEnd: '2018-12-30T23:59:59Z'
-  generationQuery: "pod-cpu-usage-by-namespace"
-  runImmediately: true

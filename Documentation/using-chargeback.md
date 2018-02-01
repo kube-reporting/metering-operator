@@ -9,21 +9,43 @@ Use Chargeback to create reports and fetch their results.
 
 *Note: Wait at least 15 minutes after installing Chargeback before generating reports to enable Chargeback to reach a consistent state and fetch some data from Prometheus*
 
-## Running Chargeback reports
+## Writing a report
 
-A report can be created for Chargeback to run using `kubectl`. The report
-should be created in the same namespace as Chargeback is installed.
+Start by reading the [options available to set on a report][report-md].
 
-Example reports ready to be created exist in `manifests/custom-resources/reports`.
+Once you know what `ReportGenerationQuery` you want to use, and the `reportingStart` and `reportingEnd`, you are ready to start.
+To get a list of `ReportGenerationQueries`, you can query your Chargeback namespace using kubectl:
 
-For more information on Report YAML configuration options see [Reports][report-md].
+```
+kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE
+```
+
+Each ReportGenerationQuery is typically designed to report on a specific resource typically a `pod`, `namespace` or `node` and on a specific metric like, `cpu` or `memory`, on a specific resource, though some reports correlate many of these together.
+Details on what information each report query provides can be found in the [report documentation][report-md].
+
+Let's start with an example, save the following into a file called `report.yaml`:
+
+```
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Report
+metadata:
+  name: namespace-cpu-request
+spec:
+  reportingStart: '2018-01-01T00:00:00Z'
+  reportingEnd: '2018-12-30T23:59:59Z'
+  generationQuery: "namespace-cpu-request"
+  runImmediately: true
+```
 
 ## Creating a report
+
+A report can be created for Chargeback to run using `kubectl`.
+The report should be created in the same namespace as Chargeback is installed.
 
 Once the report YAML is written, use `kubectl` to create the report:
 
 ```
-$ kubectl -n $CHARGEBACK_NAMESPACE create -f manifests/custom-resources/reports/pod-cpu-usage-by-node.yaml
+$ kubectl -n $CHARGEBACK_NAMESPACE create -f report.yaml
 ```
 
 Existing reports can be viewed in Kubernetes with the following command:
@@ -36,7 +58,7 @@ A report's status can be inspected by viewing the object with the `-o json`
 flag:
 
 ```
-$ kubectl -n $CHARGEBACK_NAMESPACE get report pod-cpu-usage-by-node -o json
+$ kubectl -n $CHARGEBACK_NAMESPACE get report namespace-cpu-request -o json
 ```
 
 ## Viewing reports
@@ -65,11 +87,11 @@ points to the Kubernetes service. (See the upstream documentation on
 http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/proxy/api/v1/reports/get?name=[Report Name]&format=[Format]
 ```
 
-For example, the results of the `pod-cpu-usage-by-node` report can be fetched in
+For example, the results of a report with the name `namespace-cpu-request` report can be fetched in
 CSV, with the following command:
 
 ```
-$ curl "http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/proxy/api/v1/reports/get?name=pod-cpu-usage-by-node&format=csv"
+$ curl "http://127.0.0.1:8001/api/v1/namespaces/chargeback/services/chargeback/proxy/api/v1/reports/get?name=namespace-cpu-request&format=csv"
 ```
 
 

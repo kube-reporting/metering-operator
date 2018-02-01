@@ -8,6 +8,7 @@
 Chargeback supports a configuration options which can be set in the `spec` section of the `Chargeback` resource.
 
 An example configuration file can be found in [manifests/chargeback-config/custom-values.yaml][example-config].
+A minimal configuration example that doesn't override anything can be found in [manifests/chargeback-config/default.yaml][default-config].
 For details on customizing this file, read the [common-configuration-options](#common-configuration-options) section below.
 
 ## Documentation conventions
@@ -123,5 +124,6 @@ This can be done either pre-install or post-install. Note that disabling it post
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
 [example-config]: ../manifests/chargeback-config/custom-values.yaml
+[default-config]: ../manifests/chargeback-config/default.yaml
 [example-storage-config]: ../manifests/chargeback-config/custom-storageclass-values.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/

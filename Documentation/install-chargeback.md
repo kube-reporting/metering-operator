@@ -25,44 +25,39 @@ Chargeback requires the following components:
 
 ## Installation
 
-Use the installation script to install Chargeback. Before running the script, customize the installation to define installation or data storage location.
-
-### Modifying default values
-
-Chargeback will install into an existing namespace. Without configuration, the
-default is `chargeback`.
-
-Chargeback also assumes it needs a docker pull secret to pull images, which
-defaults to a secret named `coreos-pull-secret` in the `tectonic-system`
-namespace.
-
-To change either of these, override the following environment variables:
+First, let's setup our namespace by creating it and copying the coreos-pull-secret into it:
 
 ```
-$ export CHARGEBACK_NAMESPACE=chargeback
-$ export PULL_SECRET_NAMESPACE=tectonic-system
-$ export PULL_SECRET=coreos-pull-secret
+export CHARGEBACK_NAMESPACE=chargeback
+kubectl create ns $CHARGEBACK_NAMESPACE
+kubectl get secret -n tectonic-system coreos-pull-secret --export -o json | kubectl create -n $CHARGEBACK_NAMESPACE -f -
 ```
 
 ### Configuration
 
-Before installing, please read [Configuring Chargeback][configuring-chargeback].
+Before continuing with the installation, please read [Configuring Chargeback][configuring-chargeback].
 Some options may not be changed post-install. Be certain to configure these options, if desired, before installation.
 
-### Run the install script
+If you do not wish to modify the Chargeback configuration, a minimal configuration example that doesn't override anything can be found in [manifests/chargeback-config/default.yaml][default-config].
 
-Chargeback can be installed with the following command:
+### Install Chargeback with Configuration
+
+Installation is done in two parts, the first installs the Chargeback Helm operator, and the second which installs the `Chargeback` resource that defines your configuration.
+
+To start, download the [Chargeback install plan][chargeback-installplan] and save it as `chargeback.installplan.yaml`, and if you haven't already, download your `Chargeback` resource and save it as `chargeback.yaml`.
+
+The install plan is used by the Tectonic ALM and Catalog operators to install CRDs and the Chargeback Helm operator.
+
+Install the install plan into your cluster:
 
 ```
-$ ./hack/alm-install.sh
+kubect create -n $CHARGEBACK_NAMESPACE -f chargeback.installplan.yaml
 ```
 
-### Uninstall
-
-To uninstall Chargeback and its related resources:
+Finally, we will install our `Chargeback` resource, which causes the Chargeback Helm operator to install and configure Chargeback and it's dependencies.
 
 ```
-$ ./hack/alm-uninstall.sh
+kubectl create -n $CHARGEBACK_NAMESPACE -f chargeback.yaml
 ```
 
 ## Verifying operation
@@ -78,27 +73,12 @@ Once you see output like the following, the rest of the pods should be initializ
 ```
 Waiting for Tiller to become ready
 Waiting for Tiller to become ready
-Waiting for Tiller to become ready
-Getting list of helm release configmaps to delete
-No release configmaps to delete yet
-Getting pod chargeback-helm-operator-7c4cf9849c-846g5 owner information
-Owner references:
-global:
-  ownerReferences:
-  - apiVersion: "apps/v1beta1"
-    blockOwnerDeletion: false
-    controller: true
-    kind: "Deployment"
-    name: chargeback-helm-operator
-    uid: b2b9e446-f263-11e7-bdc3-06a45d7816a8
-Setting ownerReferences for Helm release configmaps
-No release configmaps to patch ownership of yet
-Fetching helm values from secret chargeback-settings
-Secret chargeback-settings does not exist, default values will be used
-Running helm upgrade
-Release "tectonic-chargeback" does not exist. Installing it now.
-NAME:   tectonic-chargeback
-LAST DEPLOYED: Fri Jan  5 22:00:01 2018
+Getting pod chargeback-helm-operator-b5f86788c-ks4zq owner information
+Querying for Deployment chargeback-helm-operator
+No values, using default values
+Running helm upgrade for release tectonic-chargeback
+Release "tectonic-chargeback" has been upgraded. Happy Helming!
+LAST DEPLOYED: Fri Jan 26 19:18:34 2018
 NAMESPACE: chargeback
 STATUS: DEPLOYED
 
@@ -117,6 +97,7 @@ $ kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=chargeback -o name | cut -d/ 
 
 For instructions on using Chargeback, please see [Using Chargeback][using-chargeback].
 
-
+[chargeback-installplan]: ../manifests/alm/chargeback.installplan.yaml
+[default-config]: ../manifests/chargeback-config/default.yaml
 [using-chargeback]: using-chargeback.md
 [configuring-chargeback]: chargeback-config.md

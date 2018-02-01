@@ -11,7 +11,7 @@ spec:
   reportDataSources:
   - "aws-billing"
   reportQueries:
-  - "node-allocatable-memory"
+  - "node-memory-allocatable"
   columns:
   - name: resource_id
     type: string
@@ -28,7 +28,7 @@ spec:
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
-      FROM {| generationQueryViewName "node-allocatable-memory" |}
+      FROM {| generationQueryViewName "node-memory-allocatable" |}
       GROUP BY resource_id
     )
     SELECT lineItem_resourceId as resource_id,
@@ -49,7 +49,7 @@ spec:
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "aws-cluster-cost"
+  name: "aws-ec2-cluster-cost"
   labels:
     tectonic-chargeback: "true"
 {{- block "extraMetadata" . }}
@@ -72,5 +72,5 @@ spec:
         min(period_start) as data_start,
         max(period_stop) as data_stop,
         sum(period_cost * period_percent) as cluster_cost
-    from aws_billing_filtered
+    FROM aws_billing_filtered
 {{- end -}}
