@@ -20,8 +20,15 @@ while true; do
         echo "Namespace ${NAMESPACE} does not exist"
         break
     fi
-    if [ "$(echo "$NS" | jq -r '.status.phase')" == "Terminating" ]; then
+    PHASE="$(echo "$NS" | jq -r '.status.phase')"
+    if [ "$PHASE" == "Active" ]; then
+        echo "Namespace is active"
+        break
+    elif [ "$PHASE" == "Terminating" ]; then
         echo "Waiting for namespace $CHARGEBACK_NAMESPACE termination to complete before continuing"
+    else
+        echo "Namespace phase is $PHASE, unsure how to handle, exiting"
+        exit 2
     fi
     sleep 2
 done
