@@ -14,8 +14,10 @@ CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 : "${INSTALL_CHARGEBACK:=true}"
 
 while true; do
+    echo "Checking namespace status"
     NS="$(kubectl get ns "$CHARGEBACK_NAMESPACE" -o json --ignore-not-found)"
     if [ "$NS" == "" ]; then
+        echo "Namespace ${NAMESPACE} does not exist"
         break
     fi
     if [ "$(echo "$NS" | jq -r '.status.phase')" == "Terminating" ]; then
