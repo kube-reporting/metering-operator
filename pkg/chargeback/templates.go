@@ -18,7 +18,7 @@ const (
 var templateFuncMap = template.FuncMap{
 	"hiveAWSPartitionTimestamp": hiveAWSPartitionTimestamp,
 	"prestoTimestamp":           prestoTimestamp,
-	"dataSourceTableName":        dataSourceTableName,
+	"dataSourceTableName":       dataSourceTableName,
 	"generationQueryViewName":   generationQueryViewName,
 	"billingPeriodFormat":       billingPeriodFormat,
 	"filterAWSData":             filterAWSData,

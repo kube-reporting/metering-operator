@@ -352,7 +352,6 @@ func (srv *server) getReportTable(logger log.FieldLogger, name, format string, w
 		return
 	}
 
-	// TODO(cgag): this is just testing for the filtering in getReportTable/getReportGraph, don't need these values here(?)
 	genQuery, err := srv.
 		chargeback.
 		informers.
@@ -364,15 +363,7 @@ func (srv *server) getReportTable(logger log.FieldLogger, name, format string, w
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting ReportGenerationQuery: %v", err)
 		return
 	}
-
-	var hiddenColumns []string
-	for _, col := range genQuery.Spec.Columns {
-		if col.TableHidden {
-			logger.Debugf("FOUND TABLE HIDDEN COLUMN: %s", col.Name)
-			hiddenColumns = append(hiddenColumns, col.Name)
-		}
-	}
-	logger.Debugf("FOUND TABLE HIDDEN COLUMNS: %s", hiddenColumns)
+	columns := genQuery.Spec.Columns
 
 	switch report.Status.Phase {
 	case api.ReportPhaseError:
@@ -405,7 +396,7 @@ func (srv *server) getReportTable(logger log.FieldLogger, name, format string, w
 		return
 	// TODO(cgag): could we even get an empty format?
 	case "json", "":
-		formatted := format(results, "table")
+		formatted := newFormat(results, columns, "table")
 		srv.writeResponseWithBody(logger, w, http.StatusOK, formatted)
 		return
 	}
@@ -440,16 +431,7 @@ func (srv *server) getReportDefault(logger log.FieldLogger, name, format string,
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting ReportGenerationQuery: %v", err)
 		return
 	}
-	// TODO(cgag): just leave hiddenColumns blank in default handler
-	var hiddenColumns []string
-	for _, col := range genQuery.Spec.Columns {
-		if col.TableHidden {
-			logger.Debugf("FOUND TABLE HIDDEN COLUMN: %s", col.Name)
-			hiddenColumns = append(hiddenColumns, col.Name)
-		}
-	}
-	logger.Debugf("FOUND TABLE HIDDEN COLUMNS: %s", hiddenColumns)
-	// TODO(cgag): then go delete those keys from the map from before writing response
+	columns := genQuery.Spec.Columns
 
 	// report.Spec.GenerationQueryName
 	switch report.Status.Phase {
@@ -479,11 +461,13 @@ func (srv *server) getReportDefault(logger log.FieldLogger, name, format string,
 	switch format {
 	case "csv":
 		// TODO(cgag): what should really happen here
-		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "CSV not supported", fmt.Errorf("CSV not supported"))
+		srv.writeErrorResponse(
+			logger, w, r, http.StatusBadRequest, "CSV not supported", fmt.Errorf("CSV not supported"),
+		)
 		return
 	// TODO(cgag): could we even get an empty format?
 	case "json", "":
-		formatted := format(results, hiddenColumns)
+		formatted := newFormat(results, columns, "default")
 		srv.writeResponseWithBody(logger, w, http.StatusOK, formatted)
 		return
 	}
@@ -498,7 +482,11 @@ type Result struct {
 }
 
 // data is an array of maps of column names to values
-func format(data []map[string]interface{}, format string) map[string][]map[string][]Result {
+func newFormat(
+	data []map[string]interface{},
+	columns []api.GenQueryColumn,
+	format string,
+) map[string][]map[string][]Result {
 	//	{
 	//    "results": [
 	//      {
@@ -512,23 +500,23 @@ func format(data []map[string]interface{}, format string) map[string][]map[strin
 	//			}
 	//	}
 	results := map[string][]map[string][]Result{
-		"results": []map[string][]Result{},
+		"results": {},
 	}
 
 	for _, m := range data {
 		var tmp []Result
 		for colName, val := range m {
-			tableHidden := colName == "table_hidden" && val == true
-			graphHidden := colName == "graph_hidden" && val == true
 
-			if !(format == "table" && tableHidden) && !(format == "graph" && graphHidden) {
-				// TODO(cgag): unit ??
-				r := Result{
-					Name:  colName,
-					Value: val,
-				}
-				tmp = append(tmp, r)
+			col := getGenQueryCol(columns, colName)
+			if (format == "table" && col.TableHidden) || (format == "graph" && col.GraphHidden) {
+				continue
 			}
+			r := Result{
+				Name:  colName,
+				Value: val,
+				Unit:  col.Unit,
+			}
+			tmp = append(tmp, r)
 		}
 		results["results"] = append(results["results"], map[string][]Result{
 			"values": tmp,
@@ -536,6 +524,16 @@ func format(data []map[string]interface{}, format string) map[string][]map[strin
 	}
 
 	return results
+}
+
+// TODO(cgag): use a map?
+func getGenQueryCol(cols []api.GenQueryColumn, name string) *api.GenQueryColumn {
+	for _, col := range cols {
+		if col.Name == name {
+			return &col
+		}
+	}
+	return nil
 }
 
 func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w http.ResponseWriter) {
