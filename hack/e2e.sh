@@ -52,7 +52,7 @@ echo "Running integration tests"
     | go tool test2json \
     | tee -a /out/test.json \
     | jq -r -f "$DIR/tap-output.jq" \
-    >> /out/test-log.tap
+    | tee -a /out/test-log.tap
 
 if grep -q '^not' < /out/test.log; then
   exit 1
