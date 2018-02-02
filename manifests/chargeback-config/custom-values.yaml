@@ -4,6 +4,8 @@ metadata:
   name: "tectonic-chargeback"
 spec:
   chargeback-operator:
+    image:
+      tag: cgag
     config:
       awsBillingDataSource:
         # Change to false if you wish to enable the AWS Billing Report
@@ -15,7 +17,6 @@ spec:
       # Replace these with your own AWS credentials
       awsAccessKeyID: "REPLACEME"
       awsSecretAccessKey: "REPLACEME"
-
 
       # If you want to use S3 for storage of reports, and collected metrics,
       # uncomment the section below, and set awsAccessKeyID and awsSecretAccessKey

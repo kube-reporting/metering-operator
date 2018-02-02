@@ -1,6 +1,6 @@
 chargeback-operator:
   image:
-    tag: 0.5.1
+    tag: cgag
 
 presto:
   presto:

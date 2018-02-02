@@ -27,7 +27,7 @@ type ReportGenerationQuery struct {
 
 type ReportGenerationQuerySpec struct {
 	ReportQueries []string         `json:"reportQueries"`
-	DataSources    []string         `json:"reportDataSources"`
+	DataSources   []string         `json:"reportDataSources"`
 	Query         string           `json:"query"`
 	Columns       []GenQueryColumn `json:"columns"`
 	View          GenQueryView     `json:"view"`
@@ -42,4 +42,9 @@ type GenQueryView struct {
 type GenQueryColumn struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
+	Unit string `json:"unit"`
+
+	// TODO(cgag): should these have json or is it purely backend?
+	TableHidden bool
+	GraphHidden bool
 }

@@ -6,6 +6,7 @@ source ${DIR}/util.sh
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 : "${DELETE_PVCS:=false}"
+# TODO(cgag): don't actually commit these things
 
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     msg "Removing pull secrets"
@@ -30,9 +31,9 @@ kube-remove \
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
 else
-    msg "Removing Custom Resource Definitions"
-    kube-remove \
-        manifests/custom-resource-definitions
+    msg "!!! Removing Custom Resource Definitions !!!"
+    # kube-remove \
+    #     manifests/custom-resource-definitions
 fi
 
 if [ "$DELETE_PVCS" == "true" ]; then
