@@ -20,6 +20,10 @@ properties([
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
+def branchTag = env.BRANCH_NAME.toLowerCase()
+def deployTag = "${branchTag}-${currentBuild.number}"
+def chargebackNamespace = "chargeback-ci-${branchTag}"
+
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
 
@@ -36,8 +40,6 @@ podTemplate(
             args: '--storage-driver=overlay',
             image: 'docker:dind',
             name: 'docker',
-            // resourceRequestCpu: '1750m',
-            // resourceRequestMemory: '1500Mi',
             privileged: true,
             ttyEnabled: true,
         ),
@@ -60,20 +62,19 @@ podTemplate(
 
         def gopath = "${env.WORKSPACE}/go"
         def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
+        def testOutputDir = "${env.WORKSPACE}/test_output"
 
         def gitCommit
         def gitTag
-        def branchTag = env.BRANCH_NAME.toLowerCase()
-        def deployTag = "${branchTag}-${currentBuild.number}"
-        def chargebackNamespace = "chargeback-ci-${branchTag}"
 
         try {
             container('docker'){
+
                 stage('checkout') {
-                    sh """
+                    sh '''
                     apk update
                     apk add git bash jq zip
-                    """
+                    '''
 
                     checkout([
                         $class: 'GitSCM',
@@ -106,19 +107,21 @@ podTemplate(
                 usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
             ]) {
                 withEnv([
+                    "JENKINS_WORKSPACE=${env.WORKSPACE}",
                     "GOPATH=${gopath}",
                     "USE_LATEST_TAG=${isMasterBranch}",
                     "BRANCH_TAG=${branchTag}",
                     "DEPLOY_TAG=${deployTag}",
+                    "GIT_TAG=${gitTag}",
                     "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "KUBECONFIG=${KUBECONFIG}",
-                    "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
                     "ENABLE_AWS_BILLING=true",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
+                    "TEST_OUTPUT_DIR=${testOutputDir}",
                 ]){
                     container('docker'){
                         echo "Authenticating to docker registry"
@@ -153,9 +156,9 @@ podTemplate(
 
                         dir(kubeChargebackDir) {
                             stage('test') {
-                                sh """#!/bin/bash
+                                sh '''#!/bin/bash
                                 make k8s-verify-codegen
-                                """
+                                '''
                             }
 
                             stage('build') {
@@ -163,11 +166,11 @@ podTemplate(
                                     echo "Skipping docker build"
                                 } ***REMOVED*** if (!params.BUILD_RELEASE) {
                                     ansiColor('xterm') {
-                                        sh """#!/bin/bash -ex
+                                        sh '''#!/bin/bash -ex
                                         make docker-build-all -j 2 \
                                             USE_LATEST_TAG=${USE_LATEST_TAG} \
                                             BRANCH_TAG=${BRANCH_TAG}
-                                        """
+                                        '''
                                     }
                                 } ***REMOVED*** {
                                     // Images should already have been built if
@@ -182,18 +185,18 @@ podTemplate(
                                     echo "Skipping docker tag"
                                 } ***REMOVED*** if (!params.BUILD_RELEASE) {
                                     ansiColor('xterm') {
-                                        sh """#!/bin/bash -ex
+                                        sh '''#!/bin/bash -ex
                                         make docker-tag-all -j 2 \
                                             IMAGE_TAG=${DEPLOY_TAG}
-                                        """
+                                        '''
                                     }
                                 } ***REMOVED*** {
                                     ansiColor('xterm') {
-                                        sh """#!/bin/bash -ex
+                                        sh '''#!/bin/bash -ex
                                         make docker-tag-all \
                                             PULL_TAG_IMAGE_SOURCE=true \
-                                            IMAGE_TAG=${gitTag}
-                                        """
+                                            IMAGE_TAG=${GIT_TAG}
+                                        '''
                                     }
                                 }
                             }
@@ -202,7 +205,7 @@ podTemplate(
                                 if (params.SKIP_DOCKER_STAGES) {
                                     echo "Skipping docker push"
                                 } ***REMOVED*** if (!params.BUILD_RELEASE) {
-                                    sh """#!/bin/bash -ex
+                                    sh '''#!/bin/bash -ex
                                     make docker-push-all -j 2 \
                                         USE_LATEST_TAG=${USE_LATEST_TAG} \
                                         BRANCH_TAG=${BRANCH_TAG}
@@ -212,51 +215,66 @@ podTemplate(
                                     make docker-push-all -j 2 \
                                         IMAGE_TAG=${DEPLOY_TAG}
                                         BRANCH_TAG=
-                                    """
+                                    '''
                                 } ***REMOVED*** {
-                                    sh """#!/bin/bash -ex
+                                    sh '''#!/bin/bash -ex
                                     make docker-push-all -j 2 \
                                         USE_LATEST_TAG=false \
-                                        IMAGE_TAG=${gitTag}
-                                    """
+                                        IMAGE_TAG=${GIT_TAG}
+                                    '''
                                 }
                             }
 
                             stage('release') {
                                 if (params.BUILD_RELEASE) {
-                                    sh """#!/bin/bash -ex
+                                    sh '''#!/bin/bash -ex
                                     make release RELEASE_VERSION=${BRANCH_TAG}
-                                    """
+                                    '''
                                     archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
                                 } ***REMOVED*** {
                                     echo "Skipping release step, not a release"
                                 }
                             }
 
-                            stage('deploy') {
-                                if (runIntegrationTests ) {
-                                    echo "Deploying chargeback"
-
-                                    ansiColor('xterm') {
-                                        timeout(10) {
-                                            sh """#!/bin/bash
-                                            ./hack/deploy-ci.sh
-                                            """
-                                        }
-                                    }
-                                    echo "Successfully deployed chargeback-helm-operator"
-                                } ***REMOVED*** {
-                                    echo "Non-master branch, skipping deploy"
-                                }
-                            }
                             stage('integration tests') {
                                 if (runIntegrationTests) {
                                     echo "Running chargeback integration tests"
 
-                                    ansiColor('xterm') {
-                                        sh """#!/bin/bash
-                                        ./hack/integration-tests.sh
-                                        """
+                                    try {
+                                        ansiColor('xterm') {
+                                            timeout(15) {
+                                                sh '''#!/bin/bash -e
+                                                rm -rf ${TEST_OUTPUT_DIR}
+                                                mkdir -p ${TEST_OUTPUT_DIR}
+                                                touch ${TEST_OUTPUT_DIR}/deploy.log
+                                                touch ${TEST_OUTPUT_DIR}/test.log
+                                                tail -f ${TEST_OUTPUT_DIR}/deploy.log &
+                                                tail -f ${TEST_OUTPUT_DIR}/test.log &
+                                                function cleanup() {
+                                                    kill "$(jobs -p)" || true
+                                                    (docker ps -q | xargs docker kill) || true
+                                                }
+                                                trap 'cleanup' EXIT
+                                                docker run \
+                                                    -i --rm \
+                                                    -e INSTALL_METHOD=direct \
+                                                    -e DEPLOY_SCRIPT=deploy-ci.sh \
+                                                    --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                    -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
+                                                    -v "${KUBECONFIG}:${KUBECONFIG}" \
+                                                    -v "${TEST_OUTPUT_DIR}:/out" \
+                                                    quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
+                                                '''
+                                            }
+                                        }
+                                    } catch (e) {
+                                        throw e
+                                    } ***REMOVED***nally {
+                                        if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                            sh '''#!/bin/bash -e
+                                            ./hack/delete-ns.sh
+                                            '''
+                                        }
                                     }
                                 } ***REMOVED*** {
                                     echo "Non-master branch, skipping chargeback integration test"
@@ -272,26 +290,8 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } ***REMOVED***nally {
-            if (runIntegrationTests && !params.SKIP_NAMESPACE_CLEANUP) {
-                withCredentials([
-                    [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
-                ]) {
-                    withEnv([
-                        "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
-                        "KUBECONFIG=${KUBECONFIG}",
-                    ]){
-                        container("docker") {
-                            dir(kubeChargebackDir) {
-                                sh '''#!/bin/bash
-                                ./hack/delete-ns.sh
-                                '''
-                            }
-                        }
-                    }
-                }
-            }
+            archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
             cleanWs notFailBuild: true
-            // notifyBuild(currentBuild.result)
         }
     }
 } // timestamps end

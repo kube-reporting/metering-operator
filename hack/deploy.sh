@@ -12,6 +12,7 @@ CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 : "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
 : "${UNINSTALL_CHARGEBACK:=true}"
 : "${INSTALL_CHARGEBACK:=true}"
+: "${INSTALL_METHOD:=direct}"
 
 while true; do
     echo "Checking namespace status"
@@ -38,7 +39,7 @@ kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
 if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
     echo "Uninstalling chargeback"
-    ./hack/uninstall.sh
+    uninstall_chargeback "${INSTALL_METHOD}"
 ***REMOVED***
     echo "Skipping uninstall"
 ***REMOVED***
@@ -55,7 +56,7 @@ done
 
 if [ "$INSTALL_CHARGEBACK" == "true" ]; then
     echo "Installing chargeback"
-    ./hack/install.sh
+    install_chargeback "${INSTALL_METHOD}"
 ***REMOVED***
     echo "Skipping install"
 ***REMOVED***
