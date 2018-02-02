@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
@@ -11,12 +10,12 @@ export CHARGEBACK_SHORT_TESTS=${CHARGEBACK_SHORT_TESTS:-false}
 # lowercase the value, since namespaces must be lowercase values
 CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 
-set -x
 go test \
-    -test.short=${CHARGEBACK_SHORT_TESTS} \
-    -v \
+    -test.short="${CHARGEBACK_SHORT_TESTS}" \
+    -test.v \
     -timeout 20m \
     "./test/integration" \
     -namespace "${CHARGEBACK_NAMESPACE}" \
-    -kubeconfig "${KUBECONFIG}"
+    -kubeconfig "${KUBECONFIG}" "$@"
+
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # lowercase the value, and characters we use in branches with dashes
 function sanetize_namespace() {
@@ -41,4 +42,30 @@ function kubectl_files() {
       files+=(-f "$f")
   done
   echo "${files[@]}"
+}
+
+function install_chargeback() {
+    INSTALL_METHOD=$1
+    echo "Installing chargeback"
+    if [ "$INSTALL_METHOD" == "direct" ]; then
+        "$DIR/install.sh"
+    elif [ "$INSTALL_METHOD" == "alm" ]; then
+        "$DIR/alm-install.sh"
+    else
+        echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
+        exit 1
+    fi
+}
+
+function uninstall_chargeback() {
+    INSTALL_METHOD=$1
+    echo "Uninstalling chargeback"
+    if [ "$INSTALL_METHOD" == "direct" ]; then
+        "$DIR/uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "alm" ]; then
+        "$DIR/alm-uninstall.sh"
+    else
+        echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
+        exit 1
+    fi
 }

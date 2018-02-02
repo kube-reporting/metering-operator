@@ -18,10 +18,13 @@ spec:
     type: string
   - name: labels
     type: map(varchar, varchar)
+    table_hidden: true
   - name: pod_request_cpu_cores
     type: double
   - name: timeprecision
     type: double
+    table_hidden: true
+  - name: pod_request_cpu_cores
   - name: pod_request_cpu_core_seconds
     type: double
   - name: timestamp
@@ -56,16 +59,25 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: "k8s_pod"
   - name: namespace
     type: string
+    unit: "k8s_namespace"
   - name: node
     type: string
+    unit: "k8s_node"
   - name: data_start
     type: timestamp
+    unit: "timestamp"
+    # these 2 table_hidens are for testing
+    table_hidden: true
   - name: data_end
     type: timestamp
+    unit: "timestamp"
+    table_hidden: true
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: "core_seconds"
   query: |
     SELECT pod,
             namespace,

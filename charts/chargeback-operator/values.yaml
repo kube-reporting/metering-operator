@@ -1,6 +1,6 @@
 image:
   repository: quay.io/coreos/chargeback
-  tag: latest
+  tag: cgag
   pullPolicy: Always
 
 config:
