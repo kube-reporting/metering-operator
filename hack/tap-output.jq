@@ -12,7 +12,7 @@
         elif $item.Action == "pass" then
           [.[0] + 1,  "ok \(.[0]) - \($item.Test)" ]
         elif $item.Action == "skip" then
-          [.[0] + 1, "ok \(.[0]) \($item.Test) # skip"]
+          [.[0] + 1, "ok \(.[0]) \($item.Test) # SKIP"]
         elif $item.Action == "output" then
           [.[0], ("# \($item.Output)" | rtrimstr("\n"))]
         ***REMOVED***
