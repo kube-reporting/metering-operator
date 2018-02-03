@@ -1,19 +1,22 @@
-if .Test !=null then
-  .
-***REMOVED***
-  empty
-end
+(
+    "1.." + (. | map(select(.Test != null and .Action == "run")) | length | tostring)
+),
 
-|
+(
+    map(select(.Test != null))
+    |
 
-if .Action == "fail" then
-  "not ok # \(.Test)"
-elif .Action == "pass" then
-  "ok # \(.Test)"
-elif .Action == "skip" then
-  "ok # skip \(.Test)"
-elif .Action == "output" then
-  "# \(.Output)" | rtrimstr("\n")
-***REMOVED***
-  empty
-end
+    foreach .[] as $item ([1, empty];
+        if $item.Action == "fail" then
+          [.[0] + 1, "not ok \(.[0]) - \($item.Test)"]
+        elif $item.Action == "pass" then
+          [.[0] + 1,  "ok \(.[0]) - \($item.Test)" ]
+        elif $item.Action == "skip" then
+          [.[0] + 1, "ok \(.[0]) \($item.Test) # SKIP"]
+        elif $item.Action == "output" then
+          [.[0], ("# \($item.Output)" | rtrimstr("\n"))]
+        ***REMOVED***
+          [.[0], empty]
+        end;
+    .[1]) | strings
+)
