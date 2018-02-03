@@ -44,7 +44,7 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 	}
 
 	// From now on run collection every ticker interval
-	ticker := time.NewTicker(c.promsumInterval)
+	ticker := time.NewTicker(c.cfg.PromsumInterval)
 	defer ticker.Stop()
 	for {
 		select {
@@ -76,7 +76,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 type promsumDataSourceTimeBoundsGetter func(dataSource *cbTypes.ReportDataSource) (startTime, endTime time.Time, err error)
 
 func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter) {
-	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.namespace).List(labels.Everything())
+	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		logger.Errorf("couldn't list data stores: %v", err)
 		return
@@ -153,7 +153,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	}
 
 	for _, queryRng := range timeRanges {
-		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.namespace).Get(dataSource.Spec.Promsum.Query)
+		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
 		if err != nil {
 			return fmt.Errorf("could not get prometheus query: ", err)
 		}
@@ -212,7 +212,7 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 		// we multiple by 2 because the most recent chunk will have a
 		// chunkEnd == endTime, so it won't be queried, so this gets the chunk
 		// before the latest
-		lastTimestamp = endTime.Add(-2 * c.promsumChunkSize)
+		lastTimestamp = endTime.Add(-2 * c.cfg.PromsumChunkSize)
 		logger.Debugf("no data in data store %s yet", dataSource.Name)
 	}
 	startTime = lastTimestamp
@@ -232,8 +232,8 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataSource 
 	// We don't want to duplicate the lastTimestamp record so add
 	// the step size so that we start at the next interval no longer in
 	// our range.
-	chunkStart := truncateToMinute(beginTime.Add(c.promsumStepSize))
-	chunkEnd := truncateToMinute(chunkStart.Add(c.promsumChunkSize))
+	chunkStart := truncateToMinute(beginTime.Add(c.cfg.PromsumStepSize))
+	chunkEnd := truncateToMinute(chunkStart.Add(c.cfg.PromsumChunkSize))
 
 	// Keep a cap on the number of time ranges we query per reconciliation.
 	// If we get to 2000, it means we're very backlogged, or we have a small
@@ -253,22 +253,22 @@ func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataSource 
 			break
 		}
 		// Only get chunks that are a full chunk size
-		if chunkEnd.Sub(chunkStart) < c.promsumChunkSize {
+		if chunkEnd.Sub(chunkStart) < c.cfg.PromsumChunkSize {
 			break
 		}
 
 		timeRanges = append(timeRanges, prom.Range{
 			Start: chunkStart,
 			End:   chunkEnd,
-			Step:  c.promsumStepSize,
+			Step:  c.cfg.PromsumStepSize,
 		})
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the previous ranges end time in this range
-		chunkStart = truncateToMinute(chunkEnd.Add(c.promsumStepSize))
+		chunkStart = truncateToMinute(chunkEnd.Add(c.cfg.PromsumStepSize))
 		// Add chunkSize to the end time to get our full chunk. If the end is
 		// past the current time, then this chunk is skipped.
-		chunkEnd = truncateToMinute(chunkStart.Add(c.promsumChunkSize))
+		chunkEnd = truncateToMinute(chunkStart.Add(c.cfg.PromsumChunkSize))
 	}
 
 	return timeRanges, nil
@@ -363,7 +363,7 @@ func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng
 			record := BillingRecord{
 				Labels:    labels,
 				Amount:    float64(value.Value),
-				StepSize:  c.promsumStepSize,
+				StepSize:  c.cfg.PromsumStepSize,
 				Timestamp: value.Timestamp.Time().UTC(),
 			}
 			records = append(records, record)
