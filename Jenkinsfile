@@ -129,6 +129,7 @@ podTemplate(
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
                     "TEST_OUTPUT_DIR=${testOutputDir}",
+                    "CLEANUP_CHARGEBACK=${!params.SKIP_NAMESPACE_CLEANUP}",
                 ]){
                     container('docker'){
                         echo "Authenticating to docker registry"
