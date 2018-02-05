@@ -166,7 +166,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		c.setReportError(logger, report, err, "report execution failed")
 		return err
 	}
-	if c.logReport {
+	if c.cfg.LogReport {
 		resultsJSON, err := json.MarshalIndent(results, "", " ")
 		if err != nil {
 			logger.WithError(err).Errorf("unable to marshal report into JSON")
@@ -222,7 +222,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report *cbTypes.Repo
 		storageSpec = storageLocation.Spec
 	} ***REMOVED*** if storage.StorageLocationName != "" { // Speci***REMOVED***c storage location speci***REMOVED***ed
 		logger.Infof("report con***REMOVED***gured to use StorageLocation %s", storage.StorageLocationName)
-		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.namespace).Get(storage.StorageLocationName)
+		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
 		if err != nil {
 			return nil, err
 		}
