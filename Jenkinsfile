@@ -158,6 +158,7 @@ podTemplate(
                             stage('test') {
                                 sh '''#!/bin/bash
                                 make k8s-verify-codegen
+                                make test
                                 '''
                             }
 

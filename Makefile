@@ -35,7 +35,7 @@ CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***
 CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
 
 # TODO: Add tests
-all: fmt docker-build-all
+all: fmt test docker-build-all
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
@@ -148,6 +148,9 @@ vendor: glide.yaml
 	glide up --strip-vendor
 	glide-vc --use-lock-***REMOVED***le --no-tests --only-code --keep k8s.io/gengo/boilerplate/*txt
 
+test:
+	go test ./pkg/...
+
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
@@ -175,7 +178,7 @@ release:
 
 
 .PHONY: \
-	vendor fmt regenerate-hive-thrift \
+	test vendor fmt regenerate-hive-thrift \
 	k8s-update-codegen k8s-verify-codegen \
 	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
