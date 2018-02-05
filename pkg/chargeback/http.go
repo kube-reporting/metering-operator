@@ -154,7 +154,7 @@ func checkForFields(fields []string, vals url.Values) error {
 
 func (srv *server) getReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
-	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.namespace).Get(name)
+	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.cfg.Namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)

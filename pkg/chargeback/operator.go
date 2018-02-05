@@ -51,6 +51,7 @@ type Config struct {
 }
 
 type Chargeback struct {
+	cfg              Config
 	informers        informers
 	chargebackClient cbClientset.Interface
 
@@ -64,36 +65,12 @@ type Chargeback struct {
 	initializedMu sync.Mutex
 	initialized   bool
 
-	namespace      string
-	hiveHost       string
-	prestoHost     string
-	promHost       string
-	disablePromsum bool
-	logReport      bool
-
 	prestoTablePartitionQueue chan *cbTypes.ReportDataSource
-
-	logDMLQueries bool
-	logDDLQueries bool
-
-	promsumInterval  time.Duration
-	promsumStepSize  time.Duration
-	promsumChunkSize time.Duration
 }
 
 func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 	op := &Chargeback{
-		namespace:                 cfg.Namespace,
-		hiveHost:                  cfg.HiveHost,
-		prestoHost:                cfg.PrestoHost,
-		promHost:                  cfg.PromHost,
-		disablePromsum:            cfg.DisablePromsum,
-		logReport:                 cfg.LogReport,
-		logDDLQueries:             cfg.LogDDLQueries,
-		logDMLQueries:             cfg.LogDMLQueries,
-		promsumInterval:           cfg.PromsumInterval,
-		promsumStepSize:           cfg.PromsumStepSize,
-		promsumChunkSize:          cfg.PromsumChunkSize,
+		cfg: cfg,
 		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataSource, 1),
 		logger: logger,
 	}
@@ -313,7 +290,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		if err != nil {
 			return err
 		}
-		c.prestoConn = db.New(c.prestoDB, c.logger, c.logDMLQueries)
+		c.prestoConn = db.New(c.prestoDB, c.logger, c.cfg.LogDMLQueries)
 		return nil
 	})
 	g.Go(func() error {
@@ -329,7 +306,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	defer c.hiveQueryer.closeHiveConnection()
 
 	c.promConn, err = c.newPrometheusConn(promapi.Config{
-		Address: c.promHost,
+		Address: c.cfg.PromHost,
 	})
 	if err != nil {
 		return err
@@ -404,7 +381,7 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		}()
 	}
 
-	if !c.disablePromsum {
+	if !c.cfg.DisablePromsum {
 		wg.Add(1)
 		go func() {
 			c.logger.Debugf("starting Promsum collector")
@@ -452,7 +429,7 @@ func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
 	// up.
-	connStr := fmt.Sprintf("presto://%s/hive/default", c.prestoHost)
+	connStr := fmt.Sprintf("presto://%s/hive/default", c.cfg.PrestoHost)
 	startTime := time.Now()
 	c.logger.Debugf("getting presto connection")
 	for {

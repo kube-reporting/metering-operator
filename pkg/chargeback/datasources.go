@@ -101,7 +101,7 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 		storageSpec = storageLocation.Spec
 	} else if storage.StorageLocationName != "" { // Specific storage location specified
 		logger.Infof("reportDataSource configured to use StorageLocation %s", storage.StorageLocationName)
-		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.namespace).Get(storage.StorageLocationName)
+		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
 		if err != nil {
 			return err
 		}
@@ -141,7 +141,7 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 }
 
 func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
-	storageLocations, err := c.informers.storageLocationLister.StorageLocations(c.namespace).List(labels.Everything())
+	storageLocations, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
