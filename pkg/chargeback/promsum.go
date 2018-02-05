@@ -155,7 +155,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	for _, queryRng := range timeRanges {
 		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
 		if err != nil {
-			return fmt.Errorf("could not get prometheus query: ", err)
+			return fmt.Errorf("could not get prometheus query: %s", err)
 		}
 
 		records, err := c.promsumQuery(query, queryRng)
