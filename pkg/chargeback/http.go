@@ -246,7 +246,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 				case nil:
 					vals[i] = ""
 				default:
-					logger.Errorf("error marshalling csv: unknown type %#T for value %v", val, val)
+					logger.Errorf("error marshalling csv: unknown type %t for value %v", val, val)
 					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
 					return
 				}
