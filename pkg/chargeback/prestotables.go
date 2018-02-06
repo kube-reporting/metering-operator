@@ -134,7 +134,7 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	// find in the manifests, and are thus stale. Delete them.
 	for p, _ := range partitions {
 		logger.Warnf("Deleting partition from presto table %q with range %s-%s, this is unexpected", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
-		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
+		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s at location %s", prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
 			return err
