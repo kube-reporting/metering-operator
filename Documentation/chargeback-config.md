@@ -1,15 +1,15 @@
 <br>
-<div class="alert alert-info" role="alert">
-    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
+<div class=“alert alert-info” role=“alert”>
+<i class=“fa fa-exclamation-triangle”></i><b> Note:</b> This documentation is for an alpha feature. For questions and feedback on the Metering and Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
 </div>
 
 # Chargeback Configuration
 
-Chargeback supports a configuration options which can be set in the `spec` section of the `Chargeback` resource.
+Chargeback supports configuration options which may be set in the `spec` section of the `Chargeback` resource.
 
 An example configuration file can be found in [manifests/chargeback-config/custom-values.yaml][example-config].
 A minimal configuration example that doesn't override anything can be found in [manifests/chargeback-config/default.yaml][default-config].
-For details on customizing this file, read the [common-configuration-options](#common-configuration-options) section below.
+For details on customizing these files, read the [common-configuration-options](#common-configuration-options) section below.
 
 ## Documentation conventions
 
