@@ -1,6 +1,6 @@
 <br>
-<div class="alert alert-info" role="alert">
-    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
+<div class=“alert alert-info” role=“alert”>
+<i class=“fa fa-exclamation-triangle”></i><b> Note:</b> This documentation is for an alpha feature. For questions and feedback on the Metering and Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
 </div>
 
 # Using Chargeback
@@ -11,19 +11,23 @@ Use Chargeback to create reports and fetch their results.
 
 ## Writing a report
 
-Start by reading the [options available to set on a report][report-md].
+First, read the [Reports][report-md] guide for a list of available options.
 
-Once you know what `ReportGenerationQuery` you want to use, and the `reportingStart` and `reportingEnd`, you are ready to start.
-To get a list of `ReportGenerationQueries`, you can query your Chargeback namespace using kubectl:
+Select a `ReportGenerationQuery` and a `reportingStart` and `reportingEnd`.
+Use 'kubectl' to query the Chargeback namespace for a list of available  `ReportGenerationQueries`:
 
 ```
 kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE
 ```
 
-Each ReportGenerationQuery is typically designed to report on a specific resource typically a `pod`, `namespace` or `node` and on a specific metric like, `cpu` or `memory`, on a specific resource, though some reports correlate many of these together.
-Details on what information each report query provides can be found in the [report documentation][report-md].
+Each ReportGenerationQuery is designed to report on a specific resource, usually a `pod`, `namespace` or `node`, and on a specific metric, like `cpu` or `memory`, on a specific resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
 
-Let's start with an example, save the following into a file called `report.yaml`:
+## Creating a report
+
+A report can be created for Chargeback to run using `kubectl`.
+The report should be created in the same namespace as Chargeback is installed.
+
+First, create an example report. Save the following into a file called `report.yaml`:
 
 ```
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -36,11 +40,6 @@ spec:
   generationQuery: "namespace-cpu-request"
   runImmediately: true
 ```
-
-## Creating a report
-
-A report can be created for Chargeback to run using `kubectl`.
-The report should be created in the same namespace as Chargeback is installed.
 
 Once the report YAML is written, use `kubectl` to create the report:
 
@@ -64,7 +63,7 @@ $ kubectl -n $CHARGEBACK_NAMESPACE get report namespace-cpu-request -o json
 ## Viewing reports
 
 Once a report's status has changed to `Finished`, the report is ready to be
-downloaded. The Chargeback pod exposes an HTTP API for this.
+downloaded. The Chargeback Pod exposes an HTTP API for this.
 
 First, use `kubectl` to set up a proxy for accessing Kubernetes services:
 

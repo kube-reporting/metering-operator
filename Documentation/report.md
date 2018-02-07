@@ -1,6 +1,6 @@
 <br>
-<div class="alert alert-info" role="alert">
-    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
+<div class=“alert alert-info” role=“alert”>
+<i class=“fa fa-exclamation-triangle”></i><b> Note:</b> This documentation is for an alpha feature. For questions and feedback on the Metering and Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
 </div>
 
 # Reports
@@ -11,9 +11,9 @@ The `Report` custom Kubernetes resource is used to manage the execution and stat
 
 A single `Report` resource corresponds to a specific run of a report. Once the object is created, Chargeback starts analyzing the data required to perform the report. A report cannot be updated after its creation and must run to completion.
 
-## Example
+## Example Report
 
-The following example report will contain information on every pod's cpu requests over the month of September:
+The following example report will contain information on every Pod's CPU requests over the month of September:
 
 ```
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -40,42 +40,64 @@ the same format as `reportingStart`.
 
 Timestamps should be [RFC3339][rfc3339] encoded. Times with local offsets will be converted to UTC.
 
+### gracePeriod
+
+Sets the period of time after `reportingEnd` that the report will be run. This value is `5m` by default.
+
+By default, a report is not run until `reportingEnd` plus the `gracePeriod`
+has been reached. The grace period is not used when aggregating over the
+reporting period, or if `runImmediately` is true.
+
+This field is particularly useful with AWS Billing Reports,
+which may get their latest information up to 24 hours after the billing period
+has ended.
+
+### runImmediately
+
+Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
+
 ### generationQuery
 
 Names the `ReportGenerationQuery` used to generate the report. The generation query controls the format of the report as well as the information contained within it.
 
-You can obtain a list of available `ReportGenerationQuery` objects by using `kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE`.
+Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
-Here is a list of the ReportGenerationQueries available:
+ ```
+ kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries
+ NAME                                            AGE
+ aws-ec2-billing-data                            11m
+ aws-ec2-cluster-cost                            11m
+ namespace-cpu-request                           11m
+ namespace-memory-request                        11m
+ node-cpu-allocatable                            11m
+ node-cpu-capacity                               11m
+ node-cpu-utilization                            11m
+ node-memory-allocatable                         11m
+ node-memory-capacity                            11m
+ node-memory-utilization                         11m
+ pod-cpu-request                                 11m
+ pod-cpu-request-aws                             11m
+ pod-cpu-request-raw                             11m
+ pod-cpu-request-vs-node-cpu-allocatable         11m
+ pod-memory-request                              11m
+ pod-memory-request-aws                          11m
+ pod-memory-request-raw                          11m
+ pod-memory-request-vs-node-memory-allocatable   11m
+```
 
-- aws-ec2-billing-data
-- aws-ec2-cluster-cost
-- namespace-cpu-request
-- namespace-memory-request
-- node-cpu-allocatable
-- node-cpu-capacity
-- node-cpu-utilization
-- node-memory-allocatable
-- node-memory-capacity
-- node-memory-utilization
-- pod-cpu-request
-- pod-cpu-request-aws
-- pod-cpu-request-raw
-- pod-cpu-request-vs-node-cpu-allocatable
-- pod-memory-request
-- pod-memory-request-aws
-- pod-memory-request-raw
-- pod-memory-request-vs-node-memory-allocatable
+ReportGenerationQueries with the `-raw` suffix are used by other ReportGenerationQueries to build more complex queries, and should not be should not be used directly for reports.
 
-The ReportGenerationQueries with the `-raw` suffix shouldn't generally be used directly for reports, they're currently used by other ReportGenerationQueries as a building block to more complex queries.
+`namespace-` prefixed queries aggregate Pod CPU/memory requests by namespace, providing a list of namespaces and their overall usage based on resource requests.
 
-The `namespace-` prefixed queries are aggregating pod cpu/memory requests by namespace, giving you a list of namespaces and their overall usage based on resource requests.
-The queries with a `pod-` prefix are basically the same, but have it broken down by pod, which includes the pods namespace, and node.
-The report queries prefixed `node-` contain information about each node's total available resources.
-Report queries prefixed with `aws-` are queries specifically about AWS information, while queries suffixed with `-aws` are effectively the same as queries of the same name without the suffix, but correlate usage with the EC2 billing data.
-The `aws-ec2-billing-data` report shouldn't generally be used directly, it is used by other queries. The `aws-ec2-cluster-cost` report provides a total cost based entirely on what nodes are in the cluster, and what the sum of their costs are for the time period being reported on.
+`pod-` prefixed queries are similar to 'namespace-' prefixed, but aggregate information by Pod, rather than namespace. These queries include the Pod's namespace and node.
 
-For a complete list of fields each report query produces, use the kubectl to get the object as JSON, and check the `columns` field:
+`node-` prefixed queries return information about each node's total available resources.
+
+`aws-` prefixed queries are specific to AWS. Queries suffixed with `-aws` return the same data as queries of the same name without the suffix, and correlate usage with the EC2 billing data.
+
+The `aws-ec2-billing-data` report is used by other queries, and should not be used as a standalone report. The `aws-ec2-cluster-cost` report provides a total cost based on the nodes included in the cluster, and the sum of their costs for the time period being reported on.
+
+For a complete list of fields each report query produces, use `kubectl` to get the object as JSON, and check the `columns` field:
 
 ```
 kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
@@ -110,22 +132,6 @@ kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries namespace-memory-re
 }
 ```
 
-### gracePeriod
-
-Sets the period of time after `reportingEnd` that the report will be run. This value is `5m` by default.
-
-By default, a report is not run until `reportingEnd` plus the `gracePeriod`
-has been reached. The grace period is not used when aggregating over the
-reporting period, or if `runImmediately` is true.
-
-This field particularly useful with AWS Billing Reports,
-which may get their latest information up to 24 hours after the billing period
-has ended.
-
-### runImmediately
-
-Set `runImmediately` to true to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
-
 ## Execution
 
 Reports take a variable amount of time to complete and may run for very long periods.
@@ -138,7 +144,7 @@ The amount of time required is determined by:
 
 ## Status
 
-The execution of a `Report` can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
+The execution of a report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
 
 A report can have the following states:
 * `Started`: Chargeback has started executing the report. No modifications can be made at this point.
