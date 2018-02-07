@@ -63,26 +63,26 @@ Names the `ReportGenerationQuery` used to generate the report. The generation qu
 Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
  ```
-kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE`
-
-  aws-ec2-billing-data
-  aws-ec2-cluster-cost
-  namespace-cpu-request
-  namespace-memory-request
-  node-cpu-allocatable
-  node-cpu-capacity
-  node-cpu-utilization
-  node-memory-allocatable
-  node-memory-capacity
-  node-memory-utilization
-  pod-cpu-request
-  pod-cpu-request-aws
-  pod-cpu-request-raw
-  pod-cpu-request-vs-node-cpu-allocatable
-  pod-memory-request
-  pod-memory-request-aws
-  pod-memory-request-raw
-  pod-memory-request-vs-node-memory-allocatable
+ kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries
+ NAME                                            AGE
+ aws-ec2-billing-data                            11m
+ aws-ec2-cluster-cost                            11m
+ namespace-cpu-request                           11m
+ namespace-memory-request                        11m
+ node-cpu-allocatable                            11m
+ node-cpu-capacity                               11m
+ node-cpu-utilization                            11m
+ node-memory-allocatable                         11m
+ node-memory-capacity                            11m
+ node-memory-utilization                         11m
+ pod-cpu-request                                 11m
+ pod-cpu-request-aws                             11m
+ pod-cpu-request-raw                             11m
+ pod-cpu-request-vs-node-cpu-allocatable         11m
+ pod-memory-request                              11m
+ pod-memory-request-aws                          11m
+ pod-memory-request-raw                          11m
+ pod-memory-request-vs-node-memory-allocatable   11m
 ```
 
 ReportGenerationQueries with the `-raw` suffix are used by other ReportGenerationQueries to build more complex queries, and should not be should not be used directly for reports.
