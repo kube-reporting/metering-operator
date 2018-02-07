@@ -1,15 +1,15 @@
 <br>
-<div class="alert alert-info" role="alert">
-    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for a pre-alpha feature. To register for the Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
+<div class=“alert alert-info” role=“alert”>
+<i class=“fa fa-exclamation-triangle”></i><b> Note:</b> This documentation is for an alpha feature. For questions and feedback on the Metering and Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
 </div>
 
 # Chargeback Con***REMOVED***guration
 
-Chargeback supports a con***REMOVED***guration options which can be set in the `spec` section of the `Chargeback` resource.
+Chargeback supports con***REMOVED***guration options which may be set in the `spec` section of the `Chargeback` resource.
 
 An example con***REMOVED***guration ***REMOVED***le can be found in [manifests/chargeback-con***REMOVED***g/custom-values.yaml][example-con***REMOVED***g].
 A minimal con***REMOVED***guration example that doesn't override anything can be found in [manifests/chargeback-con***REMOVED***g/default.yaml][default-con***REMOVED***g].
-For details on customizing this ***REMOVED***le, read the [common-con***REMOVED***guration-options](#common-con***REMOVED***guration-options) section below.
+For details on customizing these ***REMOVED***les, read the [common-con***REMOVED***guration-options](#common-con***REMOVED***guration-options) section below.
 
 ## Documentation conventions
 
