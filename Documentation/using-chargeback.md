@@ -11,7 +11,7 @@ Use Chargeback to create reports and fetch their results.
 
 ## Writing a report
 
-First, read [Reports][report-md] for a list of available options.
+First, read the [Reports][report-md] guide for a list of available options.
 
 Select a `ReportGenerationQuery` and a `reportingStart` and `reportingEnd`.
 Use 'kubectl' to query the Chargeback namespace for a list of available  `ReportGenerationQueries`:
@@ -20,7 +20,7 @@ Use 'kubectl' to query the Chargeback namespace for a list of available  `Report
 kubectl get reportgenerationqueries -n $CHARGEBACK_NAMESPACE
 ```
 
-Each ReportGenerationQuery is designed to report on a speci***REMOVED***c resource, usually a `pod`, `namespace` or `node`, and on a speci***REMOVED***c metric, like `cpu` or `memory`, on a speci***REMOVED***c resource. Some reports correlate several of these metrics in a single report. See [Reports][report-md] for more information on the returns provided by each report query.
+Each ReportGenerationQuery is designed to report on a speci***REMOVED***c resource, usually a `pod`, `namespace` or `node`, and on a speci***REMOVED***c metric, like `cpu` or `memory`, on a speci***REMOVED***c resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
 
 ## Creating a report
 
