@@ -15,6 +15,7 @@ func TestGetPartitionChanges(t *testing.T) {
 		desired          []cbTypes.PrestoTablePartition
 		expectedToRemove []cbTypes.PrestoTablePartition
 		expectedToAdd    []cbTypes.PrestoTablePartition
+		expectedToUpdate []cbTypes.PrestoTablePartition
 	}{
 		{
 			name: "current and desired are same",
@@ -83,16 +84,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "fizbuzz",
 				},
 			},
-			// Remove the old one because start and end match the new desired
-			// one
-			expectedToRemove: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
-					Location: "foobar",
-				},
-			},
-			expectedToAdd: []cbTypes.PrestoTablePartition{
+			expectedToUpdate: []cbTypes.PrestoTablePartition{
 				cbTypes.PrestoTablePartition{
 					Start:    "20170101",
 					End:      "20170201",

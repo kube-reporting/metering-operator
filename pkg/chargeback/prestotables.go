@@ -102,6 +102,7 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	desiredPartitionsList := make([]string, len(desiredPartitions))
 	toRemovePartitionsList := make([]string, len(changes.toRemovePartitions))
 	toAddPartitionsList := make([]string, len(changes.toAddPartitions))
+	toUpdatePartitionsList := make([]string, len(changes.toUpdatePartitions))
 
 	for i, p := range currentPartitions {
 		currentPartitionsList[i] = fmt.Sprintf("%#v", p)
@@ -115,24 +116,30 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	for i, p := range changes.toAddPartitions {
 		toAddPartitionsList[i] = fmt.Sprintf("%#v", p)
 	}
+	for i, p := range changes.toUpdatePartitions {
+		toUpdatePartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
 
 	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
 	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
 	logger.Debugf("partitions to remove: %s", strings.Join(toRemovePartitionsList, ", "))
 	logger.Debugf("partitions to add: %s", strings.Join(toAddPartitionsList, ", "))
+	logger.Debugf("partitions to update: %s", strings.Join(toUpdatePartitionsList, ", "))
 
+	toRemove := append(changes.toRemovePartitions, changes.toUpdatePartitions...)
+	toAdd := append(changes.toAddPartitions, changes.toUpdatePartitions...)
 	// We do removals then additions so that updates are supported as a combination of remove + add partition
-	for _, p := range changes.toRemovePartitions {
-		logger.Warnf("Deleting partition from presto table %q with range %s-%s, this is unexpected", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+	for _, p := range toRemove {
+		logger.Warnf("Deleting partition from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s at location %s", prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
+			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 			return err
 		}
 		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 	}
 
-	for _, p := range changes.toAddPartitions {
+	for _, p := range toAdd {
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		err = hive.AddPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
@@ -178,6 +185,7 @@ func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.
 type partitionChanges struct {
 	toRemovePartitions []cbTypes.PrestoTablePartition
 	toAddPartitions    []cbTypes.PrestoTablePartition
+	toUpdatePartitions []cbTypes.PrestoTablePartition
 }
 
 func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTablePartition) partitionChanges {
@@ -191,21 +199,28 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTa
 		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.Start, p.End)] = p
 	}
 
-	var toRemovePartitions, toAddPartitions []cbTypes.PrestoTablePartition
+	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.PrestoTablePartition
 
 	for key, partition := range currentPartitionsSet {
-		if newPartition, exists := desiredPartitionsSet[key]; !exists || (newPartition.Location != partition.Location) {
+		if _, exists := desiredPartitionsSet[key]; !exists {
 			toRemovePartitions = append(toRemovePartitions, partition)
 		}
 	}
 	for key, partition := range desiredPartitionsSet {
-		if newPartition, exists := currentPartitionsSet[key]; !exists || (newPartition.Location != partition.Location) {
+		if _, exists := currentPartitionsSet[key]; !exists {
 			toAddPartitions = append(toAddPartitions, partition)
+		}
+	}
+	for key, existingPartition := range currentPartitionsSet {
+		if newPartition, exists := desiredPartitionsSet[key]; exists && (newPartition.Location != existingPartition.Location) {
+			// use newPartition so toUpdatePartitions contains the desired partition state
+			toUpdatePartitions = append(toUpdatePartitions, newPartition)
 		}
 	}
 
 	return partitionChanges{
 		toRemovePartitions: toRemovePartitions,
 		toAddPartitions:    toAddPartitions,
+		toUpdatePartitions: toUpdatePartitions,
 	}
 }
