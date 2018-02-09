@@ -51,7 +51,7 @@ The install plan is used by the Tectonic Application Lifecycle Management and Ca
 Install the install plan into the cluster:
 
 ```
-kubect create -n $CHARGEBACK_NAMESPACE -f chargeback.installplan.yaml
+kubectl create -n $CHARGEBACK_NAMESPACE -f chargeback.installplan.yaml
 ```
 
 Finally, install the `Chargeback` resource, which causes the Chargeback Helm operator to install and configure Chargeback and its dependencies.
