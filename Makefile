@@ -21,6 +21,7 @@ CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-test
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
+
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
@@ -44,12 +45,12 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
+ifdef BRANCH_TAG
+	docker pull $(IMAGE_NAME):$(BRANCH_TAG) || true
+endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifeq ($(USE_LATEST_TAG), true)
 	$(MAKE) docker-tag IMAGE_TAG=latest
-endif
-ifdef BRANCH_TAG
-	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
 endif
 
 # Usage:
