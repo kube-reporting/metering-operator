@@ -4,7 +4,10 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 GO_PKG := github.com/coreos-inc/kube-chargeback
 CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 
-DOCKER_BUILD_ARGS =
+DOCKER_BUILD_ARGS ?=
+ifdef BRANCH_TAG
+	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG) -t $(IMAGE_NAME):$(BRANCH_TAG)
+endif
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
 CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
