@@ -50,7 +50,7 @@ podTemplate(
             memory: false,
         ),
     ],
-    idleMinutes: 5,
+    idleMinutes: 15,
     instanceCap: 5,
     label: podLabel,
     name: podLabel,
