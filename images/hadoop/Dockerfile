@@ -7,7 +7,7 @@ RUN \
     && apt-get install -y --no-install-recommends \
         curl \
         less  \
-        gpg \
+        perl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -15,8 +15,9 @@ RUN \
 
 ENV HADOOP_VERSION 2.8.3
 ENV HADOOP_URL http://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-ENV HADOOP_SIGNATURE_URL https://dist.apache.org/repos/dist/release/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz.asc
-ENV HADOOP_GPG_KEYS_URL https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
+# The upstream .mds checksum ***REMOVED***les aren't supported by sha256sum or shasum so
+# this checksum is taken from that ***REMOVED***le and put here manually.
+ENV HADOOP_SHA256_CHECKSUM e8bf9a53337b1dca3b152b0a5b5e277dc734e76520543e525c301a050bb27eae
 
 ENV HADOOP_CLASSPATH=/opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/*
 ENV HADOOP_PREFIX=/opt/hadoop-$HADOOP_VERSION
@@ -26,10 +27,7 @@ ENV PATH=$HADOOP_PREFIX/bin/:$PATH
 
 RUN set -x \
     && curl -fSLs "$HADOOP_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz \
-    && curl -fSLs "$HADOOP_SIGNATURE_URL" -o /tmp/hadoop-$HADOOP_VERSION.tar.gz.asc \
-    && curl -fSLs "$HADOOP_GPG_KEYS_URL" -o /tmp/hadoop-gpg-keys \
-    && gpg --import /tmp/hadoop-gpg-keys \
-    && gpg --verify /tmp/hadoop-$HADOOP_VERSION.tar.gz.asc \
+    && echo $HADOOP_SHA256_CHECKSUM /tmp/hadoop-$HADOOP_VERSION.tar.gz | sha256sum -c \
     && tar \
         -xzf \
         /tmp/hadoop-$HADOOP_VERSION.tar.gz \
