@@ -116,7 +116,7 @@ podTemplate(
                     "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "KUBECONFIG=${KUBECONFIG}",
-                    "ENABLE_AWS_BILLING=true",
+                    "ENABLE_AWS_BILLING=false",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
