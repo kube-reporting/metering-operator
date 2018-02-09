@@ -13,7 +13,7 @@ RUN \
 
 # ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
-ENV HADOOP_VERSION 2.8.1
+ENV HADOOP_VERSION 2.8.3
 ENV HADOOP_URL http://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 ENV HADOOP_SIGNATURE_URL https://dist.apache.org/repos/dist/release/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz.asc
 ENV HADOOP_GPG_KEYS_URL https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
