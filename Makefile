@@ -4,7 +4,10 @@ ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 GO_PKG := github.com/coreos-inc/kube-chargeback
 CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 
-DOCKER_BUILD_ARGS := --no-cache
+DOCKER_BUILD_ARGS ?=
+ifdef BRANCH_TAG
+	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG) -t $(IMAGE_NAME):$(BRANCH_TAG)
+endif
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
 CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
@@ -17,6 +20,7 @@ CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-tests
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
+
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
@@ -41,12 +45,12 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
+ifdef BRANCH_TAG
+	docker pull $(IMAGE_NAME):$(BRANCH_TAG) || true
+endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifeq ($(USE_LATEST_TAG), true)
 	$(MAKE) docker-tag IMAGE_TAG=latest
-endif
-ifdef BRANCH_TAG
-	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
 endif
 
 # Usage:
