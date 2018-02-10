@@ -5,6 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
 : "${KUBECONFIG?}"
+: "${CHARGEBACK_NAMESPACE:=chargeback-e2e}"
 
 if [[ -z "$NAMESPACE" && -z "$CHARGEBACK_NAMESPACE" ]]; then
     echo "One of \$NAMESPACE or \$CHARGEBACK_NAMESPACE must be set"
