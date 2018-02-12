@@ -141,7 +141,6 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	if err != nil {
 		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
 	}
-	logger.Debugf("time ranges to query: %+v", timeRanges)
 
 	if len(timeRanges) == 0 {
 		logger.Info("no time ranges to query yet")
