@@ -1,6 +1,7 @@
 package chargeback
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -89,35 +90,56 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 
 	// Compare the manifests list and existing partitions, deleting stale
 	// partitions and creating missing partitions
-	partitions := make(map[cbTypes.PrestoTablePartition]struct{})
-	//TODO: look into using the k8s.io/apimachinery/util/sets with the
-	//k8s.io/code-generator's set-gen generator? Sets would give us typical set
-	//operations which might make it easier to read in the future as we can just
-	//compute the sets up front
-	// https://github.com/coreos-inc/kube-chargeback/pull/141#discussion_r157099880
-
-	for _, p := range prestoTable.State.Partitions {
-		partitions[p] = struct{}{}
+	currentPartitions := prestoTable.State.Partitions
+	desiredPartitions, err := getDesiredPartitions(prestoTable, datasource, manifests)
+	if err != nil {
+		return err
 	}
 
-	// Manifests have a one-to-one correlation with hive partitions
-	for _, manifest := range manifests {
-		manifestPath := manifest.DataDirectory()
-		location, err := hive.S3Location(datasource.Spec.AWSBilling.Source.Bucket, manifestPath)
+	changes := getPartitionChanges(currentPartitions, desiredPartitions)
+
+	currentPartitionsList := make([]string, len(currentPartitions))
+	desiredPartitionsList := make([]string, len(desiredPartitions))
+	toRemovePartitionsList := make([]string, len(changes.toRemovePartitions))
+	toAddPartitionsList := make([]string, len(changes.toAddPartitions))
+	toUpdatePartitionsList := make([]string, len(changes.toUpdatePartitions))
+
+	for i, p := range currentPartitions {
+		currentPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range desiredPartitions {
+		desiredPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toRemovePartitions {
+		toRemovePartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toAddPartitions {
+		toAddPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toUpdatePartitions {
+		toUpdatePartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+
+	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
+	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
+	logger.Debugf("partitions to remove: %s", strings.Join(toRemovePartitionsList, ", "))
+	logger.Debugf("partitions to add: %s", strings.Join(toAddPartitionsList, ", "))
+	logger.Debugf("partitions to update: %s", strings.Join(toUpdatePartitionsList, ", "))
+
+	toRemove := append(changes.toRemovePartitions, changes.toUpdatePartitions...)
+	toAdd := append(changes.toAddPartitions, changes.toUpdatePartitions...)
+	// We do removals then additions so that updates are supported as a combination of remove + add partition
+	for _, p := range toRemove {
+		logger.Warnf("Deleting partition from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		if err != nil {
+			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 			return err
 		}
-		p := cbTypes.PrestoTablePartition{
-			Start:    manifest.BillingPeriod.Start.Format(hive.HiveDateStringLayout),
-			End:      manifest.BillingPeriod.End.Format(hive.HiveDateStringLayout),
-			Location: location,
-		}
-		if _, ok := partitions[p]; ok {
-			// This partition exists in hive. Remove it from the map and proceed
-			// on to the next manifest.
-			delete(partitions, p)
-			continue
-		}
+		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+	}
+
+	for _, p := range toAdd {
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 		err = hive.AddPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
@@ -125,25 +147,10 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
 			return err
 		}
-		// Update the CR with the new partition, so we remember it next time.
-		prestoTable.State.Partitions = append(prestoTable.State.Partitions, p)
 		logger.Debugf("partition successfully added to presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
 	}
 
-	// Any remaining entries in the map are existing partitions which we didn't
-	// ***REMOVED***nd in the manifests, and are thus stale. Delete them.
-	for p, _ := range partitions {
-		logger.Warnf("Deleting partition from presto table %q with range %s-%s, this is unexpected", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
-		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
-		if err != nil {
-			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s at location %s", prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
-			return err
-		}
-
-		// Remove the deleted partition from the CT
-		removePartition(p, prestoTable)
-		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
-	}
+	prestoTable.State.Partitions = desiredPartitions
 
 	_, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	if err != nil {
@@ -156,12 +163,64 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	return nil
 }
 
-func removePartition(p cbTypes.PrestoTablePartition, table *cbTypes.PrestoTable) {
-	for i := len(table.State.Partitions) - 1; i >= 0; i-- {
-		if table.State.Partitions[i] == p {
-			table.State.Partitions = append(
-				table.State.Partitions[:i],
-				table.State.Partitions[i+1:]...)
+func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.ReportDataSource, manifests []*aws.Manifest) ([]cbTypes.PrestoTablePartition, error) {
+	desiredPartitions := make([]cbTypes.PrestoTablePartition, 0)
+	// Manifests have a one-to-one correlation with hive currentPartitions
+	for _, manifest := range manifests {
+		manifestPath := manifest.DataDirectory()
+		location, err := hive.S3Location(datasource.Spec.AWSBilling.Source.Bucket, manifestPath)
+		if err != nil {
+			return nil, err
 		}
+		p := cbTypes.PrestoTablePartition{
+			Start:    manifest.BillingPeriod.Start.Format(hive.HiveDateStringLayout),
+			End:      manifest.BillingPeriod.End.Format(hive.HiveDateStringLayout),
+			Location: location,
+		}
+		desiredPartitions = append(desiredPartitions, p)
+	}
+	return desiredPartitions, nil
+}
+
+type partitionChanges struct {
+	toRemovePartitions []cbTypes.PrestoTablePartition
+	toAddPartitions    []cbTypes.PrestoTablePartition
+	toUpdatePartitions []cbTypes.PrestoTablePartition
+}
+
+func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTablePartition) partitionChanges {
+	currentPartitionsSet := make(map[string]cbTypes.PrestoTablePartition)
+	desiredPartitionsSet := make(map[string]cbTypes.PrestoTablePartition)
+
+	for _, p := range currentPartitions {
+		currentPartitionsSet[fmt.Sprintf("%s_%s", p.Start, p.End)] = p
+	}
+	for _, p := range desiredPartitions {
+		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.Start, p.End)] = p
+	}
+
+	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.PrestoTablePartition
+
+	for key, partition := range currentPartitionsSet {
+		if _, exists := desiredPartitionsSet[key]; !exists {
+			toRemovePartitions = append(toRemovePartitions, partition)
+		}
+	}
+	for key, partition := range desiredPartitionsSet {
+		if _, exists := currentPartitionsSet[key]; !exists {
+			toAddPartitions = append(toAddPartitions, partition)
+		}
+	}
+	for key, existingPartition := range currentPartitionsSet {
+		if newPartition, exists := desiredPartitionsSet[key]; exists && (newPartition.Location != existingPartition.Location) {
+			// use newPartition so toUpdatePartitions contains the desired partition state
+			toUpdatePartitions = append(toUpdatePartitions, newPartition)
+		}
+	}
+
+	return partitionChanges{
+		toRemovePartitions: toRemovePartitions,
+		toAddPartitions:    toAddPartitions,
+		toUpdatePartitions: toUpdatePartitions,
 	}
 }
