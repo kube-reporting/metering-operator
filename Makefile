@@ -5,8 +5,14 @@ GO_PKG := github.com/coreos-inc/kube-chargeback
 CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 
 DOCKER_BUILD_ARGS ?=
+DOCKER_CACHE_FROM_ENABLED =
 ifdef BRANCH_TAG
-	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG) -t $(IMAGE_NAME):$(BRANCH_TAG)
+ifeq ($(BRANCH_TAG_CACHE), true)
+	DOCKER_CACHE_FROM_ENABLED=true
+endif
+ifdef DOCKER_CACHE_FROM_ENABLED
+	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG)
+endif
 endif
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 
@@ -45,10 +51,13 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-ifdef BRANCH_TAG
+ifdef DOCKER_CACHE_FROM_ENABLED
 	docker pull $(IMAGE_NAME):$(BRANCH_TAG) || true
 endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
+ifdef BRANCH_TAG
+	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
+endif
 ifeq ($(USE_LATEST_TAG), true)
 	$(MAKE) docker-tag IMAGE_TAG=latest
 endif
