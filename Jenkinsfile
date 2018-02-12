@@ -64,6 +64,11 @@ podTemplate(
         def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
         def testOutputDir = "${env.WORKSPACE}/test_output"
 
+        def dockerBuildArgs = ''
+        if (isMasterBranch) {
+            dockerBuildArgs = '--no-cache'
+        }
+
         def gitCommit
         def gitTag
 
@@ -111,8 +116,10 @@ podTemplate(
                     "GOPATH=${gopath}",
                     "USE_LATEST_TAG=${isMasterBranch}",
                     "BRANCH_TAG=${branchTag}",
+                    "BRANCH_TAG_CACHE=${isMasterBranch}",
                     "DEPLOY_TAG=${deployTag}",
                     "GIT_TAG=${gitTag}",
+                    "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
                     "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "KUBECONFIG=${KUBECONFIG}",
@@ -169,6 +176,7 @@ podTemplate(
                                     ansiColor('xterm') {
                                         sh '''#!/bin/bash -ex
                                         make docker-build-all -j 2 \
+                                            BRANCH_TAG_CACHE=${BRANCH_TAG_CACHE} \
                                             USE_LATEST_TAG=${USE_LATEST_TAG} \
                                             BRANCH_TAG=${BRANCH_TAG}
                                         '''
