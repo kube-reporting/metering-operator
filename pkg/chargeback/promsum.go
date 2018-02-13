@@ -151,12 +151,12 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 		logger.Infof("querying for data between %s and %s", begin, end)
 	}
 
-	for _, queryRng := range timeRanges {
-		query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
-		if err != nil {
-			return fmt.Errorf("could not get prometheus query: %s", err)
-		}
+	query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
+	if err != nil {
+		return fmt.Errorf("could not get prometheus query: %s", err)
+	}
 
+	for _, queryRng := range timeRanges {
 		records, err := c.promsumQuery(query, queryRng)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
