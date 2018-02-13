@@ -38,7 +38,7 @@ kubectl get secret -n tectonic-system coreos-pull-secret --export -o json | kube
 Before continuing with the installation, please read [Configuring Chargeback][configuring-chargeback].
 Some options may not be changed post-install. Be certain to configure these options, if desired, before installation.
 
-If you do not wish to modify the Chargeback configuration, a minimal configuration example that doesn't override anything can be found in [manifests/chargeback-config/default.yaml][default-config].
+If you do not wish to modify the Chargeback configuration, a minimal configuration example that doesn't override anything can be found in [default.yaml][default-config].
 
 ### Install Chargeback with Configuration
 
