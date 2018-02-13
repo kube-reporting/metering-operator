@@ -38,7 +38,7 @@ kubectl get secret -n tectonic-system coreos-pull-secret --export -o json | kube
 Before continuing with the installation, please read [Con***REMOVED***guring Chargeback][con***REMOVED***guring-chargeback].
 Some options may not be changed post-install. Be certain to con***REMOVED***gure these options, if desired, before installation.
 
-If you do not wish to modify the Chargeback con***REMOVED***guration, a minimal con***REMOVED***guration example that doesn't override anything can be found in [manifests/chargeback-con***REMOVED***g/default.yaml][default-con***REMOVED***g].
+If you do not wish to modify the Chargeback con***REMOVED***guration, a minimal con***REMOVED***guration example that doesn't override anything can be found in [default.yaml][default-con***REMOVED***g].
 
 ### Install Chargeback with Con***REMOVED***guration
 
