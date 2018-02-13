@@ -109,6 +109,10 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 				return err
 			}
 
+			logger := logger.WithFields(logrus.Fields{
+				"startTime": startTime,
+				"endTime":   endTime,
+			})
 			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime)
 			if err != nil {
 				logger.WithError(err).Errorf("error collecting promsum data for datasource")
