@@ -75,7 +75,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 		return startTime, endTime, nil
 	})
 
-	c.collectPromsumData(ctx, logger, timeBoundsGetter, defaultMaxPromTimeRanges)
+	c.collectPromsumData(ctx, logger, timeBoundsGetter, defaultMaxPromTimeRanges, false)
 }
 
 // promsumDataSourceTimeBoundsGetter takes a dataSource and returns the time
@@ -83,7 +83,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 // until.
 type promsumDataSourceTimeBoundsGetter func(dataSource *cbTypes.ReportDataSource) (startTime, endTime time.Time, err error)
 
-func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64) {
+func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64, allowIncompleteChunks bool) {
 	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		logger.Errorf("couldn't list data stores: %v", err)
@@ -121,7 +121,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 				"startTime": startTime,
 				"endTime":   endTime,
 			})
-			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime, maxPromTimeRanges)
+			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
 			if err != nil {
 				logger.WithError(err).Errorf("error collecting promsum data for datasource")
 				return err
@@ -134,13 +134,13 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 	}
 }
 
-func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64) error {
+func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
 	logger.Debugf("processing data store %q", dataSource.Name)
 	if dataSource.Spec.Promsum == nil {
 		logger.Debugf("not a promsum store, skipping %q", dataSource.Name)
 		return nil
 	}
-	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime, maxPromTimeRanges)
+	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
 	if err != nil {
 		return err
 	}
@@ -148,8 +148,8 @@ func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dat
 	return nil
 }
 
-func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64) error {
-	timeRanges, err := promsumGetTimeRanges(startTime, endTime, c.cfg.PromsumChunkSize, c.cfg.PromsumStepSize, maxPromTimeRanges)
+func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
+	timeRanges, err := promsumGetTimeRanges(startTime, endTime, c.cfg.PromsumChunkSize, c.cfg.PromsumStepSize, maxPromTimeRanges, allowIncompleteChunks)
 	if err != nil {
 		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
 	}
@@ -242,7 +242,7 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 	return startTime, endTime, nil
 }
 
-func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxPromTimeRanges int64) ([]prom.Range, error) {
+func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxPromTimeRanges int64, allowIncompleteChunks bool) ([]prom.Range, error) {
 	chunkStart := truncateToMinute(beginTime)
 	chunkEnd := truncateToMinute(chunkStart.Add(chunkSize))
 
@@ -251,21 +251,33 @@ func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time
 
 	var timeRanges []prom.Range
 	for i := int64(0); disableMax || (i < maxPromTimeRanges); i++ {
-		// Do not collect data after endTime
-		if chunkEnd.After(endTime) {
-			break
-		}
+		if allowIncompleteChunks {
+			if chunkEnd.After(endTime) {
+				chunkEnd = truncateToMinute(endTime)
+			}
+			if chunkEnd.Equal(chunkStart) {
+				break
+			}
+		} ***REMOVED*** {
+			// Do not collect data after endTime
+			if chunkEnd.After(endTime) {
+				break
+			}
 
-		// Only get chunks that are a full chunk size
-		if chunkEnd.Sub(chunkStart) < chunkSize {
-			break
+			// Only get chunks that are a full chunk size
+			if chunkEnd.Sub(chunkStart) < chunkSize {
+				break
+			}
 		}
-
 		timeRanges = append(timeRanges, prom.Range{
 			Start: chunkStart,
 			End:   chunkEnd,
 			Step:  stepSize,
 		})
+
+		if allowIncompleteChunks && chunkEnd.Equal(truncateToMinute(endTime)) {
+			break
+		}
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the previous ranges end time in this range

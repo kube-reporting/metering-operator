@@ -290,7 +290,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return req.StartTime, req.EndTime, nil
 	})
 
-	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1)
+	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }

@@ -12,12 +12,13 @@ import (
 func TestPromsumGetTimeRanges(t *testing.T) {
 	janOne := time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 	tests := map[string]struct {
-		startTime         time.Time
-		endTime           time.Time
-		chunkSize         time.Duration
-		stepSize          time.Duration
-		maxPromTimeRanges int64
-		expectedRanges    []prom.Range
+		startTime             time.Time
+		endTime               time.Time
+		chunkSize             time.Duration
+		stepSize              time.Duration
+		maxPromTimeRanges     int64
+		expectedRanges        []prom.Range
+		allowIncompleteChunks bool
 	}{
 		"start and end are zero": {
 			chunkSize:      time.Minute * 5,
@@ -59,7 +60,26 @@ func TestPromsumGetTimeRanges(t *testing.T) {
 				},
 				{
 					Start: janOne.Add(time.Hour + time.Minute),
-					End:   janOne.Add(time.Hour + time.Minute).Add(time.Hour),
+					End:   janOne.Add(2*time.Hour + time.Minute),
+					Step:  time.Minute,
+				},
+			},
+		},
+		"period is exactly divisible by chunkSize with allowIncompleteChunks": {
+			startTime:             janOne,
+			endTime:               janOne.Add(2 * time.Hour),
+			chunkSize:             time.Hour,
+			stepSize:              time.Minute,
+			allowIncompleteChunks: true,
+			expectedRanges: []prom.Range{
+				{
+					Start: janOne,
+					End:   janOne.Add(time.Hour),
+					Step:  time.Minute,
+				},
+				{
+					Start: janOne.Add(time.Hour + time.Minute),
+					End:   janOne.Add(2 * time.Hour),
 					Step:  time.Minute,
 				},
 			},
@@ -70,7 +90,7 @@ func TestPromsumGetTimeRanges(t *testing.T) {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
-			timeRanges, err := promsumGetTimeRanges(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxPromTimeRanges)
+			timeRanges, err := promsumGetTimeRanges(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxPromTimeRanges, test.allowIncompleteChunks)
 			require.NoError(t, err)
 			assert.Equal(t, timeRanges, test.expectedRanges)
 		})
