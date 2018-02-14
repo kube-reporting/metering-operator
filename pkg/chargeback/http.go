@@ -286,11 +286,13 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	logger.Debugf("collecting promsum data between %s and %s", req.StartTime.Format(time.RFC3339), req.EndTime.Format(time.RFC3339))
+
 	timeBoundsGetter := promsumDataSourceTimeBoundsGetter(func(dataSource *api.ReportDataSource) (startTime, endTime time.Time, err error) {
 		return req.StartTime, req.EndTime, nil
 	})
 
-	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter)
+	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
