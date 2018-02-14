@@ -1,5 +1,5 @@
-hash: 29f1062ce4f7de4a54b10ac3e5901b1f484b2ac1145efb14f68082b0b1e8069a
-updated: 2018-01-03T10:49:52.234120323-08:00
+hash: 3992a1a40815a57e2f2a180539ede4d94cfcc70d511e5a721ca53eb0554b3f3a
+updated: 2018-02-05T09:52:15.158492773-08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 0dd823580c78a79ae9696eb9b3650e400fff140f
@@ -331,11 +331,15 @@ imports:
   - cmd/client-gen/generators/util
   - cmd/client-gen/path
   - cmd/client-gen/types
+  - cmd/conversion-gen
+  - cmd/conversion-gen/generators
   - cmd/deepcopy-gen
+  - cmd/defaulter-gen
   - cmd/informer-gen
   - cmd/informer-gen/generators
   - cmd/lister-gen
   - cmd/lister-gen/generators
+  - cmd/set-gen
   - third_party/forked/golang/reflect
 - name: k8s.io/gengo
   version: b6c426f7730e6d66e6e476a85d1c3eb7633880e0
