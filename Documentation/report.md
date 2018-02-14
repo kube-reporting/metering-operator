@@ -19,11 +19,11 @@ The following example report will contain information on every Pod's CPU request
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Report
 metadata:
-  name: pod-cpu-usage-by-node
+  name: pod-cpu-request
 spec:
   reportingStart: '2018-09-01T00:00:00Z'
   reportingEnd: '2018-09-30T23:59:59Z'
-  generationQuery: "pod-cpu-usage-by-node"
+  generationQuery: "pod-cpu-request"
   runImmediately: true
 ```
 
