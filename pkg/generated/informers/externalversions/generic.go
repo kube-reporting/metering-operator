@@ -47,6 +47,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().ReportGenerationQueries().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportprometheusqueries"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().ReportPrometheusQueries().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("scheduledreports"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().ScheduledReports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("storagelocations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Chargeback().V1alpha1().StorageLocations().Informer()}, nil
 

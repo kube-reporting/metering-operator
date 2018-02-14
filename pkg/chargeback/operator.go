@@ -4,23 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"sync"
 	"syscall"
 	"time"
 
-	"golang.org/x/sync/errgroup"
-
-	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
+	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
 	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
 	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
@@ -60,6 +61,11 @@ type Chargeback struct {
 	hiveQueryer *hiveQueryer
 	promConn    prom.API
 
+	scheduledReportRunner *scheduledReportRunner
+
+	clock clock.Clock
+	rand  *rand.Rand
+
 	logger log.FieldLogger
 
 	initializedMu sync.Mutex
@@ -68,12 +74,15 @@ type Chargeback struct {
 	prestoTablePartitionQueue chan *cbTypes.ReportDataSource
 }
 
-func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
+func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
 	op := &Chargeback{
 		cfg: cfg,
 		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataSource, 1),
 		logger: logger,
+		clock:  clock,
 	}
+
+	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 	logger.Debugf("Config: %+v", cfg)
 
 	config, err := rest.InClusterConfig()
@@ -87,9 +96,8 @@ func New(logger log.FieldLogger, cfg Config) (*Chargeback, error) {
 		logger.Fatal(err)
 	}
 
-	op.informers = setupInformers(op.chargebackClient, cfg.Namespace, defaultResyncPeriod)
-
-	op.hiveQueryer = newHiveQueryer(cfg.HiveHost, logger, cfg.LogDDLQueries)
+	op.informers = setupInformers(op, defaultResyncPeriod)
+	op.scheduledReportRunner = newScheduledReportRunner(op)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
@@ -102,6 +110,10 @@ type informers struct {
 	reportQueue    workqueue.RateLimitingInterface
 	reportInformer cache.SharedIndexInformer
 	reportLister   cbListers.ReportLister
+
+	scheduledReportQueue    workqueue.RateLimitingInterface
+	scheduledReportInformer cache.SharedIndexInformer
+	scheduledReportLister   cbListers.ScheduledReportLister
 
 	reportDataSourceQueue    workqueue.RateLimitingInterface
 	reportDataSourceInformer cache.SharedIndexInformer
@@ -124,9 +136,9 @@ type informers struct {
 	prestoTableLister   cbListers.PrestoTableLister
 }
 
-func setupInformers(chargebackClient cbClientset.Interface, namespace string, resyncPeriod time.Duration) informers {
+func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
 	reportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportInformer := cbInformers.NewReportInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportInformer := cbInformers.NewReportInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportLister := cbListers.NewReportLister(reportInformer.GetIndexer())
 
 	reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -144,8 +156,28 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 		},
 	})
 
+	scheduledReportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	scheduledReportInformer := cbInformers.NewScheduledReportInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	scheduledReportLister := cbListers.NewScheduledReportLister(scheduledReportInformer.GetIndexer())
+
+	scheduledReportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(obj)
+			if err == nil {
+				scheduledReportQueue.Add(key)
+			}
+		},
+		UpdateFunc: func(old, current interface{}) {
+			key, err := cache.MetaNamespaceKeyFunc(current)
+			if err == nil {
+				scheduledReportQueue.Add(key)
+			}
+		},
+		DeleteFunc: c.handleScheduledReportDeleted,
+	})
+
 	reportDataSourceQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportDataSourceInformer := cbInformers.NewReportDataSourceInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportDataSourceInformer := cbInformers.NewReportDataSourceInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportDataSourceLister := cbListers.NewReportDataSourceLister(reportDataSourceInformer.GetIndexer())
 
 	reportDataSourceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -164,7 +196,7 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	})
 
 	reportGenerationQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportGenerationQueryLister := cbListers.NewReportGenerationQueryLister(reportGenerationQueryInformer.GetIndexer())
 
 	reportGenerationQueryInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -183,15 +215,15 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 	})
 
 	reportPrometheusQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	reportPrometheusQueryLister := cbListers.NewReportPrometheusQueryLister(reportPrometheusQueryInformer.GetIndexer())
 
 	storageLocationQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	storageLocationInformer := cbInformers.NewStorageLocationInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	storageLocationInformer := cbInformers.NewStorageLocationInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	storageLocationLister := cbListers.NewStorageLocationLister(storageLocationInformer.GetIndexer())
 
 	prestoTableQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	prestoTableInformer := cbInformers.NewPrestoTableInformer(chargebackClient, namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	prestoTableInformer := cbInformers.NewPrestoTableInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	prestoTableLister := cbListers.NewPrestoTableLister(prestoTableInformer.GetIndexer())
 
 	return informers{
@@ -201,6 +233,7 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 			reportGenerationQueryInformer,
 			reportDataSourceInformer,
 			prestoTableInformer,
+			scheduledReportInformer,
 			reportInformer,
 		},
 		queueList: []workqueue.RateLimitingInterface{
@@ -209,12 +242,17 @@ func setupInformers(chargebackClient cbClientset.Interface, namespace string, re
 			reportGenerationQueryQueue,
 			reportDataSourceQueue,
 			prestoTableQueue,
+			scheduledReportQueue,
 			reportQueue,
 		},
 
 		reportQueue:    reportQueue,
 		reportInformer: reportInformer,
 		reportLister:   reportLister,
+
+		scheduledReportQueue:    scheduledReportQueue,
+		scheduledReportInformer: scheduledReportInformer,
+		scheduledReportLister:   scheduledReportLister,
 
 		reportDataSourceQueue:    reportDataSourceQueue,
 		reportDataSourceInformer: reportDataSourceInformer,
@@ -286,7 +324,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		c.prestoDB, err = c.newPrestoConn()
+		c.prestoDB, err = c.newPrestoConn(stopCh)
 		if err != nil {
 			return err
 		}
@@ -294,6 +332,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return nil
 	})
 	g.Go(func() error {
+		c.hiveQueryer = newHiveQueryer(c.logger, c.clock, c.cfg.HiveHost, c.cfg.LogDDLQueries, stopCh)
 		_, err := c.hiveQueryer.getHiveConnection()
 		return err
 	})
@@ -379,7 +418,23 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			wg.Done()
 			c.logger.Infof("Report worker #%d stopped", i)
 		}()
+
+		wg.Add(1)
+		go func() {
+			c.logger.Infof("starting ScheduledReport worker #%d", i)
+			wait.Until(c.runScheduledReportWorker, time.Second, stopCh)
+			wg.Done()
+			c.logger.Infof("ScheduledReport worker #%d stopped", i)
+		}()
 	}
+
+	wg.Add(1)
+	go func() {
+		c.logger.Debugf("starting ScheduledReportRunner")
+		c.scheduledReportRunner.Run(stopCh)
+		wg.Done()
+		c.logger.Debugf("ScheduledReportRunner stopped")
+	}()
 
 	if !c.cfg.DisablePromsum {
 		wg.Add(1)
@@ -425,23 +480,27 @@ func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string
 	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
 }
 
-func (c *Chargeback) newPrestoConn() (*sql.DB, error) {
+func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
 	// up.
 	connStr := fmt.Sprintf("presto://%s/hive/default", c.cfg.PrestoHost)
-	startTime := time.Now()
-	c.logger.Debugf("getting presto connection")
+	startTime := c.clock.Now()
+	c.logger.Debugf("getting Presto connection")
 	for {
 		db, err := sql.Open("prestgo", connStr)
 		if err == nil {
 			return db, nil
-		} else if time.Since(startTime) > maxConnWaitTime {
-			c.logger.Debugf("attempts timed out, failed to get presto connection")
+		} else if c.clock.Since(startTime) > maxConnWaitTime {
+			c.logger.Debugf("attempts timed out, failed to get Presto connection")
 			return nil, fmt.Errorf("failed to connect to presto: %v", err)
 		}
 		c.logger.Debugf("error encountered, backing off and trying again: %v", err)
-		time.Sleep(connBackoff)
+		select {
+		case <-c.clock.Tick(connBackoff):
+		case <-stopCh:
+			return nil, fmt.Errorf("got shutdown signal, closing Presto connection")
+		}
 	}
 }
 
@@ -458,12 +517,15 @@ type hiveQueryer struct {
 	logger     log.FieldLogger
 	logQueries bool
 
+	clock    clock.Clock
 	mu       sync.Mutex
 	hiveConn *hive.Connection
+	stopCh   <-chan struct{}
 }
 
-func newHiveQueryer(hiveHost string, logger log.FieldLogger, logQueries bool) *hiveQueryer {
+func newHiveQueryer(logger log.FieldLogger, clock clock.Clock, hiveHost string, logQueries bool, stopCh <-chan struct{}) *hiveQueryer {
 	return &hiveQueryer{
+		clock:      clock,
 		hiveHost:   hiveHost,
 		logger:     logger,
 		logQueries: logQueries,
@@ -528,19 +590,23 @@ func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
 	// Hive may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and hive is still coming
 	// up.
-	startTime := time.Now()
+	startTime := q.clock.Now()
 	q.logger.Debugf("getting hive connection")
 	for {
 		hive, err := hive.Connect(q.hiveHost)
 		if err == nil {
 			hive.SetLogQueries(q.logQueries)
 			return hive, nil
-		} else if time.Since(startTime) > maxConnWaitTime {
+		} else if q.clock.Since(startTime) > maxConnWaitTime {
 			q.logger.WithError(err).Error("attempts timed out, failed to get hive connection")
 			return nil, err
 		}
 		q.logger.WithError(err).Debugf("error encountered when connecting to hive, backing off and trying again")
-		time.Sleep(connBackoff)
+		select {
+		case <-q.clock.Tick(connBackoff):
+		case <-q.stopCh:
+			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
+		}
 	}
 }
 

@@ -8,6 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/clock"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
@@ -120,7 +122,8 @@ func main() {
 		PromsumChunkSize: promsumChunkSize,
 	}
 
-	op, err := chargeback.New(logger, cfg)
+	clock := clock.RealClock{}
+	op, err := chargeback.New(logger, cfg, clock)
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup Chargeback operator")
 	}

@@ -52,14 +52,12 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 	}
 
 	// From now on run collection every ticker interval
-	ticker := time.NewTicker(c.cfg.PromsumInterval)
-	defer ticker.Stop()
 	for {
 		select {
 		case <-stopCh:
 			// if the stopCh is closed while we're waiting, cancel and return
 			return
-		case <-ticker.C:
+		case <-c.clock.Tick(c.cfg.PromsumInterval):
 			c.collectPromsumDataWithDefaultTimeBounds(ctx, logger)
 		}
 	}
@@ -213,7 +211,7 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 		return startTime, endTime, err
 	}
 
-	endTime = time.Now()
+	endTime = c.clock.Now()
 
 	if !lastTimestamp.IsZero() {
 		logger.Debugf("last fetched data for data store %s at %s", dataSource.Name, lastTimestamp.String())
