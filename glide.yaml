@@ -7,16 +7,20 @@ import:
   - cmd/client-gen
   - cmd/client-gen/args
   - cmd/client-gen/generators
+  - cmd/client-gen/generators/fake
   - cmd/client-gen/generators/scheme
   - cmd/client-gen/generators/util
-  - cmd/client-gen/generators/fake
   - cmd/client-gen/path
   - cmd/client-gen/types
+  - cmd/conversion-gen
+  - cmd/conversion-gen/generators
+  - cmd/deepcopy-gen
+  - cmd/defaulter-gen
   - cmd/informer-gen
   - cmd/informer-gen/generators
   - cmd/lister-gen
   - cmd/lister-gen/generators
-  - cmd/deepcopy-gen
+  - cmd/set-gen
   - third_party/forked/golang/reflect
 - package: k8s.io/gengo
   version: b6c426f7730e6d66e6e476a85d1c3eb7633880e0
