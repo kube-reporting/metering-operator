@@ -22,6 +22,14 @@ import (
 const (
 	prestoQueryCap  = 1000000
 	timestampFormat = "2006-01-02 15:04:05.000"
+
+	// Keep a cap on the number of time ranges we query per reconciliation.
+	// If we get to 2000, it means we're very backlogged, or we have a small
+	// chunkSize and making tons of small queries all one after another will
+	// cause undesired resource spikes, or both.
+	// This will make it take longer to catch up, but should help prevent
+	// memory from exploding when we end up with a ton of time ranges.
+	defaultMaxPromTimeRanges = 2000
 )
 
 func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
@@ -67,7 +75,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 		return startTime, endTime, nil
 	})
 
-	c.collectPromsumData(ctx, logger, timeBoundsGetter)
+	c.collectPromsumData(ctx, logger, timeBoundsGetter, defaultMaxPromTimeRanges)
 }
 
 // promsumDataSourceTimeBoundsGetter takes a dataSource and returns the time
@@ -75,7 +83,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 // until.
 type promsumDataSourceTimeBoundsGetter func(dataSource *cbTypes.ReportDataSource) (startTime, endTime time.Time, err error)
 
-func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter) {
+func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64) {
 	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		logger.Errorf("couldn't list data stores: %v", err)
@@ -113,7 +121,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 				"startTime": startTime,
 				"endTime":   endTime,
 			})
-			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime)
+			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime, maxPromTimeRanges)
 			if err != nil {
 				logger.WithError(err).Errorf("error collecting promsum data for datasource")
 				return err
@@ -126,13 +134,13 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 	}
 }
 
-func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time) error {
+func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64) error {
 	logger.Debugf("processing data store %q", dataSource.Name)
 	if dataSource.Spec.Promsum == nil {
 		logger.Debugf("not a promsum store, skipping %q", dataSource.Name)
 		return nil
 	}
-	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime)
+	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime, maxPromTimeRanges)
 	if err != nil {
 		return err
 	}
@@ -140,8 +148,8 @@ func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dat
 	return nil
 }
 
-func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time) error {
-	timeRanges, err := c.promsumGetTimeRanges(logger, dataSource, startTime, endTime)
+func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64) error {
+	timeRanges, err := promsumGetTimeRanges(startTime, endTime, c.cfg.PromsumChunkSize, c.cfg.PromsumStepSize, maxPromTimeRanges)
 	if err != nil {
 		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
 	}
@@ -218,7 +226,10 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 		lastTimestamp = endTime.Add(-2 * c.cfg.PromsumChunkSize)
 		logger.Debugf("no data in data store %s yet", dataSource.Name)
 	}
-	startTime = lastTimestamp
+	// We don't want to duplicate the lastTimestamp record so add
+	// the step size so that we start at the next interval no longer in
+	// our range.
+	startTime = lastTimestamp.Add(c.cfg.PromsumStepSize)
 
 	const maxChunkDuration = 24 * time.Hour
 	// If the lastTimestamp is too far back, we should limit this run to
@@ -231,47 +242,37 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 	return startTime, endTime, nil
 }
 
-func (c *Chargeback) promsumGetTimeRanges(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, beginTime, endTime time.Time) ([]prom.Range, error) {
-	// We don't want to duplicate the lastTimestamp record so add
-	// the step size so that we start at the next interval no longer in
-	// our range.
-	chunkStart := truncateToMinute(beginTime.Add(c.cfg.PromsumStepSize))
-	chunkEnd := truncateToMinute(chunkStart.Add(c.cfg.PromsumChunkSize))
+func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxPromTimeRanges int64) ([]prom.Range, error) {
+	chunkStart := truncateToMinute(beginTime)
+	chunkEnd := truncateToMinute(chunkStart.Add(chunkSize))
 
-	// Keep a cap on the number of time ranges we query per reconciliation.
-	// If we get to 2000, it means we're very backlogged, or we have a small
-	// chunkSize and making tons of small queries all one after another will
-	// cause undesired resource spikes, or both.
-	// This will make it take longer to catch up, but should help prevent
-	// memory from exploding when we end up with a ton of time ranges.
-	const maxPromTimeRanges = 2000
+	// don't set a limit if negative or zero
+	disableMax := maxPromTimeRanges <= 0
 
 	var timeRanges []prom.Range
-	for i := 0; i < maxPromTimeRanges; i++ {
-		if !chunkEnd.Before(endTime) {
+	for i := int64(0); disableMax || (i < maxPromTimeRanges); i++ {
+		// Do not collect data after endTime
+		if chunkEnd.After(endTime) {
 			break
 		}
 
-		if chunkStart.Equal(chunkEnd) {
-			break
-		}
 		// Only get chunks that are a full chunk size
-		if chunkEnd.Sub(chunkStart) < c.cfg.PromsumChunkSize {
+		if chunkEnd.Sub(chunkStart) < chunkSize {
 			break
 		}
 
 		timeRanges = append(timeRanges, prom.Range{
 			Start: chunkStart,
 			End:   chunkEnd,
-			Step:  c.cfg.PromsumStepSize,
+			Step:  stepSize,
 		})
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the previous ranges end time in this range
-		chunkStart = truncateToMinute(chunkEnd.Add(c.cfg.PromsumStepSize))
-		// Add chunkSize to the end time to get our full chunk. If the end is
-		// past the current time, then this chunk is skipped.
-		chunkEnd = truncateToMinute(chunkStart.Add(c.cfg.PromsumChunkSize))
+		chunkStart = truncateToMinute(chunkEnd.Add(stepSize))
+		// Add chunkSize to the end time to get our full chunk. If the chunkEnd
+		// is past the endTime, then this chunk is skipped.
+		chunkEnd = truncateToMinute(chunkStart.Add(chunkSize))
 	}
 
 	return timeRanges, nil
