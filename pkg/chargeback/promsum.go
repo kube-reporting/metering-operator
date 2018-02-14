@@ -152,7 +152,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	} ***REMOVED*** {
 		begin := timeRanges[0].Start
 		end := timeRanges[len(timeRanges)-1].End
-		logger.Infof("querying for data between %s and %s", begin, end)
+		logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
 	}
 
 	query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
