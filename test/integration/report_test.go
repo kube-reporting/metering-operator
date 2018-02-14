@@ -14,7 +14,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -49,12 +48,6 @@ func newSimpleReport(name, namespace, queryName string, start, end time.Time) *c
 }
 
 func TestReportsProduceData(t *testing.T) {
-	// reportEnd is 1 minute ago because Prometheus may not have collected
-	// the most recent 1 minute of data yet
-	reportEnd := time.Now().Add(-time.Minute)
-	// To make things faster, let's limit the window to 10 minutes
-	reportStart := reportEnd.Add(-10 * time.Minute)
-
 	tests := []struct {
 		// name is the name of the sub test but also the name of the report.
 		name      string
@@ -99,16 +92,8 @@ func TestReportsProduceData(t *testing.T) {
 		// TODO(chancez): Add AWS Reports
 	}
 
-	reqParams := chargeback.CollectPromsumDataRequest{
-		StartTime: reportStart,
-		EndTime:   reportEnd,
-	}
-	body, err := json.Marshal(reqParams)
-	require.NoError(t, err, "should be able to json encode request parameters")
-	req := testFramework.NewChargebackSVCPOSTRequest(testFramework.Namespace, "chargeback", "/api/v1/collect/prometheus", body)
-	result := req.Do()
-	resp, err := result.Raw()
-	require.NoErrorf(t, err, "expected no errors triggering data collection, body: %v", string(resp))
+	reportStart, reportEnd := collectMetricsOnce(t, testFramework.Namespace)
+	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
 	for i, test := range tests {
 		// Fix closure captures
@@ -157,15 +142,15 @@ func TestReportsProduceData(t *testing.T) {
 					return false, fmt.Errorf("error querying chargeback service got error: %v, body: %v", err, string(resp))
 				}
 
-				statusCode := new(int)
-				result.StatusCode(statusCode)
+				var statusCode int
+				result.StatusCode(&statusCode)
 
-				if *statusCode == http.StatusAccepted {
+				if statusCode == http.StatusAccepted {
 					t.Logf("report is still running")
 					return false, nil
 				}
 
-				require.Equal(t, http.StatusOK, *statusCode, "http response status code should be ok")
+				require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
 
 				err = json.Unmarshal(resp, &reportResults)
 				require.NoError(t, err, "expected to unmarshal response")

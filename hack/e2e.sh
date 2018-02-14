@@ -13,6 +13,7 @@ if [[ -z "$NAMESPACE" && -z "$CHARGEBACK_NAMESPACE" ]]; then
 ***REMOVED***
 
 : "${DEPLOY_CHARGEBACK:=true}"
+: "${CLEANUP_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=alm}"
 : "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh
 export INSTALL_METHOD
@@ -41,7 +42,9 @@ function cleanup() {
 }
 
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
-    trap cleanup EXIT SIGINT
+    if [ "$CLEANUP_CHARGEBACK" == "true" ]; then
+        trap cleanup EXIT SIGINT
+    ***REMOVED***
     echo "Deploying Chargeback"
     "${DIR}/${DEPLOY_SCRIPT}" >> /out/deploy.log 2>&1
 ***REMOVED***

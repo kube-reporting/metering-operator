@@ -13,8 +13,10 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"k8s.io/api/core/v1"
 
 	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
@@ -39,6 +41,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 		httpServer: httpServer,
 	}
 	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	mux.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	mux.HandleFunc("/api/v1/collect/prometheus", srv.collectPromsumDataHandler)
 	mux.HandleFunc("/ready", srv.readinessHandler)
@@ -58,7 +61,7 @@ func (srv *server) newLogger(r *http.Request) log.FieldLogger {
 	return srv.logger.WithFields(log.Fields{
 		"method": r.Method,
 		"url":    r.URL.String(),
-	}).WithFields(newLogIdenti***REMOVED***er())
+	}).WithFields(srv.chargeback.newLogIdenti***REMOVED***er())
 }
 
 func (srv *server) logRequest(logger log.FieldLogger, r *http.Request) {
@@ -90,32 +93,44 @@ func (srv *server) writeResponseWithBody(logger log.FieldLogger, w http.Response
 	}
 }
 
-func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
-	logger := srv.newLogger(r)
+func (srv *server) validateGetReportReq(logger log.FieldLogger, w http.ResponseWriter, r *http.Request) bool {
 	srv.logRequest(logger, r)
 	if r.Method != "GET" {
 		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
-		return
+		return false
 	}
 	err := r.ParseForm()
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
-		return
+		return false
 	}
-	vals := r.Form
-	err = checkForFields([]string{"name", "format"}, vals)
+	err = checkForFields([]string{"name", "format"}, r.Form)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "%v", err)
+		return false
+	}
+	format := r.Form["format"][0]
+	if format == "json" || format == "csv" {
+		return true
+	}
+	srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json")
+	return false
+}
+
+func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	if !srv.validateGetReportReq(logger, w, r) {
 		return
 	}
-	switch vals["format"][0] {
-	case "json", "csv":
-		break
-	default:
-		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json")
+	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], w, r)
+}
+
+func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	if !srv.validateGetReportReq(logger, w, r) {
 		return
 	}
-	srv.getReport(logger, vals["name"][0], vals["format"][0], w, r)
+	srv.getScheduledReport(logger, r.Form["name"][0], r.Form["format"][0], w, r)
 }
 
 func (srv *server) runReportHandler(w http.ResponseWriter, r *http.Request) {
@@ -152,6 +167,50 @@ func checkForFields(***REMOVED***elds []string, vals url.Values) error {
 	return nil
 }
 
+func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
+	// Get the scheduledReport to make sure it's isn't failed
+	report, err := srv.chargeback.informers.scheduledReportLister.ScheduledReports(srv.chargeback.cfg.Namespace).Get(name)
+	if err != nil {
+		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting scheduledReport: %v", err)
+		return
+	}
+
+	if r.FormValue("ignore_failed") != "true" {
+		if cond := cbutil.GetScheduledReportCondition(report.Status, api.ScheduledReportFailure); cond != nil && cond.Status == v1.ConditionTrue {
+			logger.Errorf("scheduledReport is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "scheduledReport is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
+			return
+		}
+	}
+
+	reportTable := scheduledReportTableName(name)
+	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY period_start, period_end ASC", reportTable)
+	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to perform presto query")
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		return
+	}
+
+	// Get the presto table to get actual columns in table
+	prestoTable, err := srv.chargeback.informers.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
+	if err != nil {
+		logger.WithError(err).Errorf("error getting presto table: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
+		return
+	}
+
+	columns := prestoTable.State.CreationParameters.Columns
+	if len(results) > 0 && len(columns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.CreationParameters.Columns))
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
+		return
+	}
+
+	srv.writeResults(logger, format, columns, results, w, r)
+}
+
 func (srv *server) getReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a ***REMOVED***nished state
 	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.cfg.Namespace).Get(name)
@@ -177,7 +236,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 	}
 
 	reportTable := reportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s", reportTable)
+	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY period_start, period_end ASC", reportTable)
 	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
@@ -185,32 +244,37 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		return
 	}
 
+	// Get the presto table to get actual columns in table
+	prestoTable, err := srv.chargeback.informers.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("report", report.Name))
+	if err != nil {
+		logger.WithError(err).Errorf("error getting presto table: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
+		return
+	}
+
+	columns := prestoTable.State.CreationParameters.Columns
+	if len(results) > 0 && len(columns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.CreationParameters.Columns))
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
+		return
+	}
+
+	srv.writeResults(logger, format, columns, results, w, r)
+}
+
+func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 		return
 	case "csv":
-		// Get generation query to get the list of columns
-		genQuery, err := srv.chargeback.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
-		if err != nil {
-			logger.WithError(err).Errorf("error getting report generation query: %v", err)
-			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report generation query: %v", err)
-			return
-		}
-
-		if len(results) > 0 && len(genQuery.Spec.Columns) != len(results[0]) {
-			logger.WithError(err).Errorf("report results schema doesn't match expected schema")
-			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
-			return
-		}
-
 		buf := &bytes.Buffer{}
 		csvWriter := csv.NewWriter(buf)
 
 		// Write headers
 		var keys []string
 		if len(results) >= 1 {
-			for _, column := range genQuery.Spec.Columns {
+			for _, column := range columns {
 				keys = append(keys, column.Name)
 			}
 			err := csvWriter.Write(keys)
@@ -226,7 +290,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 			for i, key := range keys {
 				val, ok := row[key]
 				if !ok {
-					logger.WithError(err).Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
+					logger.Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
 					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
 					return
 				}
@@ -247,7 +311,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 					vals[i] = ""
 				default:
 					logger.Errorf("error marshalling csv: unknown type %t for value %v", val, val)
-					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)", err)
+					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)")
 					return
 				}
 			}
