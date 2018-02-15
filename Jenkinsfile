@@ -10,7 +10,7 @@ properties([
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
-        booleanParam(name: 'RUN_INTEGRATION_TESTS', defaultValue: true, description: 'If true, run integration tests even if branch is not master'),
+        booleanParam(name: 'RUN_E2E_TESTS', defaultValue: true, description: 'If true, run e2e tests even if branch is not master'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
         booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
         booleanParam(name: 'SKIP_NAMESPACE_CLEANUP', defaultValue: false, description: 'If true, skips deleting the Kubernetes namespace at the end of the job'),
@@ -22,7 +22,7 @@ def isMasterBranch = env.BRANCH_NAME == "master"
 
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
-def chargebackNamespace = "chargeback-ci-${branchTag}"
+def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}-"
 
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
@@ -57,7 +57,7 @@ podTemplate(
 ) {
     node (podLabel) {
     timestamps {
-        def runIntegrationTests = isMasterBranch || params.RUN_INTEGRATION_TESTS || (isPullRequest && pullRequest.labels.contains("run-integration-tests"))
+        def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
         def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 
         def gopath = "${env.WORKSPACE}/go"
@@ -120,7 +120,7 @@ podTemplate(
                     "DEPLOY_TAG=${deployTag}",
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
-                    "CHARGEBACK_NAMESPACE=${chargebackNamespace}",
+                    "CHARGEBACK_NAMESPACE_PREFIX=${chargebackNamespacePre***REMOVED***x}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "KUBECONFIG=${KUBECONFIG}",
                     "ENABLE_AWS_BILLING=false",
@@ -246,48 +246,51 @@ podTemplate(
                                 }
                             }
 
-                            stage('integration tests') {
-                                if (runIntegrationTests) {
-                                    echo "Running chargeback integration tests"
-
-                                    try {
-                                        ansiColor('xterm') {
-                                            timeout(10) {
-                                                sh '''#!/bin/bash -e
-                                                rm -rf ${TEST_OUTPUT_DIR}
-                                                mkdir -p ${TEST_OUTPUT_DIR}
-                                                touch ${TEST_OUTPUT_DIR}/deploy.log
-                                                touch ${TEST_OUTPUT_DIR}/test.log
-                                                tail -f ${TEST_OUTPUT_DIR}/deploy.log &
-                                                tail -f ${TEST_OUTPUT_DIR}/test.log &
-                                                function cleanup() {
-                                                    kill "$(jobs -p)" || true
-                                                    (docker ps -q | xargs docker kill) || true
+                            stage('e2e tests') {
+                                if (runE2ETests) {
+                                    echo "Running chargeback e2e tests"
+                                    withEnv([
+                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE_PREFIX}-e2e",
+                                    ]) {
+                                        try {
+                                            ansiColor('xterm') {
+                                                timeout(10) {
+                                                    sh '''#!/bin/bash -e
+                                                    rm -rf ${TEST_OUTPUT_DIR}
+                                                    mkdir -p ${TEST_OUTPUT_DIR}
+                                                    touch ${TEST_OUTPUT_DIR}/deploy.log
+                                                    touch ${TEST_OUTPUT_DIR}/test.log
+                                                    tail -f ${TEST_OUTPUT_DIR}/deploy.log &
+                                                    tail -f ${TEST_OUTPUT_DIR}/test.log &
+                                                    function cleanup() {
+                                                        kill "$(jobs -p)" || true
+                                                        (docker ps -q | xargs docker kill) || true
+                                                    }
+                                                    trap 'cleanup' EXIT
+                                                    docker run \
+                                                        -i --rm \
+                                                        -e INSTALL_METHOD=direct \
+                                                        -e DEPLOY_SCRIPT=deploy-ci.sh \
+                                                        --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                        -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
+                                                        -v "${KUBECONFIG}:${KUBECONFIG}" \
+                                                        -v "${TEST_OUTPUT_DIR}:/out" \
+                                                        quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
+                                                    '''
                                                 }
-                                                trap 'cleanup' EXIT
-                                                docker run \
-                                                    -i --rm \
-                                                    -e INSTALL_METHOD=direct \
-                                                    -e DEPLOY_SCRIPT=deploy-ci.sh \
-                                                    --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
-                                                    -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
-                                                    -v "${KUBECONFIG}:${KUBECONFIG}" \
-                                                    -v "${TEST_OUTPUT_DIR}:/out" \
-                                                    quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
+                                            }
+                                        } catch (e) {
+                                            throw e
+                                        } ***REMOVED***nally {
+                                            if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                                sh '''#!/bin/bash -e
+                                                ./hack/delete-ns.sh
                                                 '''
                                             }
                                         }
-                                    } catch (e) {
-                                        throw e
-                                    } ***REMOVED***nally {
-                                        if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                            sh '''#!/bin/bash -e
-                                            ./hack/delete-ns.sh
-                                            '''
-                                        }
                                     }
                                 } ***REMOVED*** {
-                                    echo "Non-master branch, skipping chargeback integration test"
+                                    echo "Non-master branch, skipping chargeback e2e tests"
                                 }
                             }
                         }
