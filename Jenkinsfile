@@ -252,7 +252,7 @@ podTemplate(
 
                                     try {
                                         ansiColor('xterm') {
-                                            timeout(15) {
+                                            timeout(10) {
                                                 sh '''#!/bin/bash -e
                                                 rm -rf ${TEST_OUTPUT_DIR}
                                                 mkdir -p ${TEST_OUTPUT_DIR}
