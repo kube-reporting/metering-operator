@@ -27,15 +27,15 @@ func (c *Chargeback) runScheduledReportWorker() {
 }
 
 func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
-	key, quit := c.informers.scheduledReportQueue.Get()
+	key, quit := c.queues.scheduledReportQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.informers.scheduledReportQueue.Done(key)
+	defer c.queues.scheduledReportQueue.Done(key)
 
 	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
 	err := c.syncScheduledReport(logger, key.(string))
-	c.handleErr(logger, err, "scheduledReport", key, c.informers.scheduledReportQueue)
+	c.handleErr(logger, err, "scheduledReport", key, c.queues.scheduledReportQueue)
 	return true
 }
 
@@ -47,7 +47,7 @@ func (c *Chargeback) syncScheduledReport(logger log.FieldLogger, key string) err
 	}
 
 	logger = logger.WithField("scheduledReport", name)
-	scheduledReport, err := c.informers.scheduledReportLister.ScheduledReports(namespace).Get(name)
+	scheduledReport, err := c.informers.Chargeback().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
@@ -89,7 +89,7 @@ func (c *Chargeback) handleScheduledReportDeleted(obj interface{}) {
 		c.logger.WithField("scheduledReport", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	c.informers.scheduledReportQueue.Add(key)
+	c.queues.scheduledReportQueue.Add(key)
 }
 
 type reportSchedule interface {
@@ -260,7 +260,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
-		genQuery, err := job.chargeback.informers.reportGenerationQueryLister.ReportGenerationQueries(job.report.Namespace).Get(job.report.Spec.GenerationQueryName)
+		genQuery, err := job.chargeback.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(job.report.Namespace).Get(job.report.Spec.GenerationQueryName)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to get report generation query")
 			return
@@ -276,7 +276,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 		tableName := scheduledReportTableName(job.report.Name)
 		columns := generateHiveColumns(genQuery)
-		storageSpec, err := job.chargeback.getReportStorageSpec(logger, job.report.Spec.Output)
+		storageSpec, err := job.chargeback.getStorageSpec(logger, job.report.Spec.Output, "ScheduledReport")
 		if err != nil {
 			logger.WithError(err).Error("unable to get report storage location")
 			return

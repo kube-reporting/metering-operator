@@ -82,7 +82,7 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 type promsumDataSourceTimeBoundsGetter func(dataSource *cbTypes.ReportDataSource) (startTime, endTime time.Time, err error)
 
 func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64, allowIncompleteChunks bool) {
-	dataSources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
+	dataSources, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		logger.Errorf("couldn't list data stores: %v", err)
 		return
@@ -103,7 +103,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 			key, err := cache.MetaNamespaceKeyFunc(dataSource)
 			if err == nil {
 				logger.Debugf("no table set, queueing %q", dataSource.Name)
-				c.informers.reportDataSourceQueue.Add(key)
+				c.queues.reportDataSourceQueue.Add(key)
 			}
 			continue
 		}
@@ -161,7 +161,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 		logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
 	}
 
-	query, err := c.informers.reportPrometheusQueryLister.ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
+	query, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
 	if err != nil {
 		return fmt.Errorf("could not get prometheus query: %s", err)
 	}

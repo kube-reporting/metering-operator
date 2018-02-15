@@ -5,12 +5,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
-	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -23,15 +21,15 @@ func (c *Chargeback) runReportDataSourceWorker() {
 }
 
 func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
-	key, quit := c.informers.reportDataSourceQueue.Get()
+	key, quit := c.queues.reportDataSourceQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.informers.reportDataSourceQueue.Done(key)
+	defer c.queues.reportDataSourceQueue.Done(key)
 
 	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
 	err := c.syncReportDataSource(logger, key.(string))
-	c.handleErr(logger, err, "ReportDataSource", key, c.informers.reportDataSourceQueue)
+	c.handleErr(logger, err, "ReportDataSource", key, c.queues.reportDataSourceQueue)
 	return true
 }
 
@@ -43,7 +41,7 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	}
 
 	logger = logger.WithField("datasource", name)
-	reportDataSource, err := c.informers.reportDataSourceLister.ReportDataSources(namespace).Get(name)
+	reportDataSource, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportDataSource %s does not exist anymore", key)
@@ -85,32 +83,12 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 	storage := dataSource.Spec.Promsum.Storage
 	tableName := dataSourceTableName(dataSource.Name)
 
-	var storageSpec cbTypes.StorageLocationSpec
-	// Nothing speci***REMOVED***ed, try to use default storage location
-	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Info("reportDataSource does not have a storageSpec or storageLocationName set, using default storage location")
-		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
-		if err != nil {
-			return err
-		}
-		if storageLocation == nil {
-			return fmt.Errorf("invalid promsum DataSource, no storageSpec or storageLocationName and cluster has no default StorageLocation")
-		}
-
-		storageSpec = storageLocation.Spec
-	} ***REMOVED*** if storage.StorageLocationName != "" { // Speci***REMOVED***c storage location speci***REMOVED***ed
-		logger.Infof("reportDataSource con***REMOVED***gured to use StorageLocation %s", storage.StorageLocationName)
-		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
-		if err != nil {
-			return err
-		}
-		storageSpec = storageLocation.Spec
-	} ***REMOVED*** if storage.StorageSpec != nil { // Storage location is inlined in the datasource
-		storageSpec = *storage.StorageSpec
+	storageSpec, err := c.getStorageSpec(logger, storage, "datasource")
+	if err != nil {
+		return err
 	}
 
 	var createTableParams hive.CreateTableParameters
-	var err error
 	if storageSpec.Local != nil {
 		logger.Debugf("creating local table %s", tableName)
 		createTableParams, err = hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
@@ -137,33 +115,6 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 	logger.Debugf("successfully created table %s", tableName)
 
 	return c.updateDataSourceTableName(logger, dataSource, tableName)
-}
-
-func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
-	storageLocations, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).List(labels.Everything())
-	if err != nil {
-		return nil, err
-	}
-
-	var defaultStorageLocations []*cbTypes.StorageLocation
-
-	for _, storageLocation := range storageLocations {
-		if storageLocation.Annotations[cbTypes.IsDefaultStorageLocationAnnotation] == "true" {
-			defaultStorageLocations = append(defaultStorageLocations, storageLocation)
-		}
-	}
-
-	if len(defaultStorageLocations) == 0 {
-		return nil, nil
-	}
-
-	if len(defaultStorageLocations) > 1 {
-		c.logger.Infof("getDefaultStorageLocation %s default storageLocations found", len(defaultStorageLocations))
-		return nil, fmt.Errorf("%d defaultStorageLocations were found", len(defaultStorageLocations))
-	}
-
-	return defaultStorageLocations[0], nil
-
 }
 
 func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {

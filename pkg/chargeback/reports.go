@@ -26,15 +26,15 @@ func (c *Chargeback) runReportWorker() {
 }
 
 func (c *Chargeback) processReport(logger log.FieldLogger) bool {
-	key, quit := c.informers.reportQueue.Get()
+	key, quit := c.queues.reportQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.informers.reportQueue.Done(key)
+	defer c.queues.reportQueue.Done(key)
 
 	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
 	err := c.syncReport(logger, key.(string))
-	c.handleErr(logger, err, "report", key, c.informers.reportQueue)
+	c.handleErr(logger, err, "report", key, c.queues.reportQueue)
 	return true
 }
 
@@ -46,7 +46,7 @@ func (c *Chargeback) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger = logger.WithField("report", name)
-	report, err := c.informers.reportLister.Reports(namespace).Get(name)
+	report, err := c.informers.Chargeback().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("Report %s does not exist anymore", key)
@@ -82,7 +82,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 			return nil
 		}
 
-		err = c.informers.reportInformer.GetIndexer().Update(newReport)
+		err = c.informers.Chargeback().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
 			// if we cannot update it, don't re queue it
@@ -93,7 +93,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
 			key, err := cache.MetaNamespaceKeyFunc(newReport)
 			if err == nil {
-				c.informers.reportQueue.AddRateLimited(key)
+				c.queues.reportQueue.AddRateLimited(key)
 			}
 			return nil
 		}
@@ -122,7 +122,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
