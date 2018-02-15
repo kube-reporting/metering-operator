@@ -106,11 +106,26 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 		if sched == nil {
 			sched = &cbTypes.ScheduledReportScheduleHourly{}
 		}
+		if err := validateMinute(sched.Minute); err != nil {
+			return nil, err
+		}
+		if err := validateSecond(sched.Second); err != nil {
+			return nil, err
+		}
 		cronSpec = fmt.Sprintf("%d %d * * * *", sched.Second, sched.Minute)
 	case cbTypes.ScheduledReportPeriodDaily:
 		sched := reportSched.Daily
 		if sched == nil {
 			sched = &cbTypes.ScheduledReportScheduleDaily{}
+		}
+		if err := validateHour(sched.Hour); err != nil {
+			return nil, err
+		}
+		if err := validateMinute(sched.Minute); err != nil {
+			return nil, err
+		}
+		if err := validateSecond(sched.Second); err != nil {
+			return nil, err
 		}
 		cronSpec = fmt.Sprintf("%d %d %d * * *", sched.Second, sched.Minute, sched.Hour)
 	case cbTypes.ScheduledReportPeriodWeekly:
@@ -126,15 +141,36 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 				return nil, err
 			}
 		}
+		if err := validateHour(sched.Hour); err != nil {
+			return nil, err
+		}
+		if err := validateMinute(sched.Minute); err != nil {
+			return nil, err
+		}
+		if err := validateSecond(sched.Second); err != nil {
+			return nil, err
+		}
 		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Second, dow)
 	case cbTypes.ScheduledReportPeriodMonthly:
 		sched := reportSched.Monthly
 		if sched == nil {
 			sched = &cbTypes.ScheduledReportScheduleMonthly{}
 		}
-		dom := 1
+		dom := int64(1)
 		if sched.DayOfMonth != nil {
-			dom = int(*sched.DayOfMonth)
+			dom = *sched.DayOfMonth
+		}
+		if err := validateDayOfMonth(dom); err != nil {
+			return nil, err
+		}
+		if err := validateHour(sched.Hour); err != nil {
+			return nil, err
+		}
+		if err := validateMinute(sched.Minute); err != nil {
+			return nil, err
+		}
+		if err := validateSecond(sched.Second); err != nil {
+			return nil, err
 		}
 		cronSpec = fmt.Sprintf("%d %d %d %d * *", sched.Second, sched.Minute, sched.Second, dom)
 	default:

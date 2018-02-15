@@ -68,3 +68,31 @@ func (c *Chargeback) newLogIdenti***REMOVED***er() logrus.Fields {
 		"logID": randomString(c.rand, logIdenti***REMOVED***erLength),
 	}
 }
+
+func validateHour(hour int64) error {
+	if hour >= 0 && hour <= 23 {
+		return nil
+	}
+	return fmt.Errorf("invalid hour: %d, must be between 0 and 23", hour)
+}
+
+func validateMinute(minute int64) error {
+	if minute >= 0 && minute <= 59 {
+		return nil
+	}
+	return fmt.Errorf("invalid minute: %d, must be between 0 and 59", minute)
+}
+
+func validateSecond(second int64) error {
+	if second >= 0 && second <= 59 {
+		return nil
+	}
+	return fmt.Errorf("invalid second: %d, must be between 0 and 59", second)
+}
+
+func validateDayOfMonth(dom int64) error {
+	if dom >= 1 && dom <= 31 {
+		return nil
+	}
+	return fmt.Errorf("invalid day of month: %s, must be between 1 and 31", dom)
+}
