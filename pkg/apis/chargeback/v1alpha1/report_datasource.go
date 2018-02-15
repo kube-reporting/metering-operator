@@ -36,11 +36,6 @@ type AWSBillingDataSource struct {
 }
 
 type PromsumDataSource struct {
-	Query   string                            `json:"query"`
-	Storage *PromsumDataSourceStorageLocation `json:"storage"`
-}
-
-type PromsumDataSourceStorageLocation struct {
-	StorageLocationName string               `json:"storageLocationName,omitempty"`
-	StorageSpec         *StorageLocationSpec `json:"spec,omitempty"`
+	Query   string              `json:"query"`
+	Storage *StorageLocationRef `json:"storage"`
 }

@@ -169,7 +169,7 @@ func checkForFields(fields []string, vals url.Values) error {
 
 func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the scheduledReport to make sure it's isn't failed
-	report, err := srv.chargeback.informers.scheduledReportLister.ScheduledReports(srv.chargeback.cfg.Namespace).Get(name)
+	report, err := srv.chargeback.informers.Chargeback().V1alpha1().ScheduledReports().Lister().ScheduledReports(srv.chargeback.cfg.Namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting scheduledReport: %v", err)
@@ -194,7 +194,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.chargeback.informers.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
+	prestoTable, err := srv.chargeback.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
 	if err != nil {
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
@@ -213,7 +213,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 
 func (srv *server) getReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
-	report, err := srv.chargeback.informers.reportLister.Reports(srv.chargeback.cfg.Namespace).Get(name)
+	report, err := srv.chargeback.informers.Chargeback().V1alpha1().Reports().Lister().Reports(srv.chargeback.cfg.Namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -245,7 +245,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.chargeback.informers.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("report", report.Name))
+	prestoTable, err := srv.chargeback.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)

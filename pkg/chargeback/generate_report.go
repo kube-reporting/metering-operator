@@ -14,7 +14,7 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
-func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.ReportStorageLocation, columns []hive.Column, query string, deleteExistingData bool) ([]map[string]interface{}, error) {
+func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, columns []hive.Column, query string, deleteExistingData bool) ([]map[string]interface{}, error) {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
@@ -32,7 +32,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("invalid report kind: %s", reportKind)
 	}
 
-	storageSpec, err := c.getReportStorageSpec(logger, storage)
+	storageSpec, err := c.getStorageSpec(logger, storage, reportKind)
 	if err != nil {
 		return nil, err
 	}
@@ -98,31 +98,4 @@ func (c *Chargeback) createReportTable(logger log.FieldLogger, report runtime.Ob
 		}
 	}
 	return nil
-}
-
-func (c *Chargeback) getReportStorageSpec(logger log.FieldLogger, storage *cbTypes.ReportStorageLocation) (cbTypes.StorageLocationSpec, error) {
-	var storageSpec cbTypes.StorageLocationSpec
-	// Nothing specified, try to use default storage location
-	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Info("report does not have a output.spec or output.storageLocationName set, using default storage location")
-		storageLocation, err := c.getDefaultStorageLocation(c.informers.storageLocationLister)
-		if err != nil {
-			return storageSpec, err
-		}
-		if storageLocation == nil {
-			return storageSpec, fmt.Errorf("invalid report output, output.spec or output.storageLocationName set and cluster has no default StorageLocation")
-		}
-
-		storageSpec = storageLocation.Spec
-	} else if storage.StorageLocationName != "" { // Specific storage location specified
-		logger.Infof("report configured to use StorageLocation %s", storage.StorageLocationName)
-		storageLocation, err := c.informers.storageLocationLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
-		if err != nil {
-			return storageSpec, err
-		}
-		storageSpec = storageLocation.Spec
-	} else if storage.StorageSpec != nil { // Storage location is inlined in the datastore
-		storageSpec = *storage.StorageSpec
-	}
-	return storageSpec, nil
 }

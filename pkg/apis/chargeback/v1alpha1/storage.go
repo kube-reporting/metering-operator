@@ -22,11 +22,6 @@ type StorageLocation struct {
 	Spec StorageLocationSpec `json:"spec"`
 }
 
-type ReportStorageLocation struct {
-	StorageLocationName string               `json:"storageLocationName,omitempty"`
-	StorageSpec         *StorageLocationSpec `json:"spec,omitempty"`
-}
-
 type StorageLocationSpec struct {
 	S3    *S3Bucket     `json:"s3,omitempty"`
 	Local *LocalStorage `json:"local,omitempty"`
@@ -38,3 +33,8 @@ type S3Bucket struct {
 }
 
 type LocalStorage struct{}
+
+type StorageLocationRef struct {
+	StorageLocationName string               `json:"storageLocationName,omitempty"`
+	StorageSpec         *StorageLocationSpec `json:"spec,omitempty"`
+}

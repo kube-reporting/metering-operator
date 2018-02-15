@@ -19,15 +19,15 @@ func (c *Chargeback) runReportGenerationQueryWorker() {
 }
 
 func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
-	key, quit := c.informers.reportGenerationQueryQueue.Get()
+	key, quit := c.queues.reportGenerationQueryQueue.Get()
 	if quit {
 		return false
 	}
-	defer c.informers.reportGenerationQueryQueue.Done(key)
+	defer c.queues.reportGenerationQueryQueue.Done(key)
 
 	logger = logger.WithFields(c.newLogIdentifier())
 	err := c.syncReportGenerationQuery(logger, key.(string))
-	c.handleErr(logger, err, "ReportGenerationQuery", key, c.informers.reportGenerationQueryQueue)
+	c.handleErr(logger, err, "ReportGenerationQuery", key, c.queues.reportGenerationQueryQueue)
 	return true
 }
 
@@ -39,7 +39,8 @@ func (c *Chargeback) syncReportGenerationQuery(logger log.FieldLogger, key strin
 	}
 
 	logger = logger.WithField("generationQuery", name)
-	reportGenerationQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
+
+	reportGenerationQuery, err := c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportGenerationQuery %s does not exist anymore", key)
@@ -130,7 +131,7 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 			for _, query := range uninitializedQueries {
 				key, err := cache.MetaNamespaceKeyFunc(query)
 				if err == nil {
-					c.informers.reportGenerationQueryQueue.Add(key)
+					c.queues.reportGenerationQueryQueue.Add(key)
 				}
 			}
 		}
@@ -145,7 +146,7 @@ func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQ
 			for _, dataSource := range uninitializedDataSources {
 				key, err := cache.MetaNamespaceKeyFunc(dataSource)
 				if err == nil {
-					c.informers.reportDataSourceQueue.Add(key)
+					c.queues.reportDataSourceQueue.Add(key)
 				}
 			}
 		}
@@ -200,7 +201,7 @@ func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTy
 		if _, exists := queriesAccumulator[queryName]; exists {
 			continue
 		}
-		genQuery, err := c.informers.reportGenerationQueryLister.ReportGenerationQueries(generationQuery.Namespace).Get(queryName)
+		genQuery, err := c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace).Get(queryName)
 		if err != nil {
 			return err
 		}
@@ -215,7 +216,7 @@ func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTy
 func (c *Chargeback) getDependentDataSources(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportDataSource, error) {
 	dataSources := make([]*cbTypes.ReportDataSource, len(generationQuery.Spec.DataSources))
 	for i, dataSourceName := range generationQuery.Spec.DataSources {
-		dataSource, err := c.informers.reportDataSourceLister.ReportDataSources(generationQuery.Namespace).Get(dataSourceName)
+		dataSource, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).Get(dataSourceName)
 		if err != nil {
 			return nil, err
 		}
