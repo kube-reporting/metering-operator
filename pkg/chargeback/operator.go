@@ -96,8 +96,7 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, er
 		logger.Fatal(err)
 	}
 
-	informerFactory := cbInformers.NewFilteredSharedInformerFactory(op.chargebackClient, defaultResyncPeriod, cfg.Namespace, nil)
-	op.informers = informerFactory
+	op.setupInformers()
 	op.setupQueues()
 
 	op.scheduledReportRunner = newScheduledReportRunner(op)
@@ -114,6 +113,19 @@ type queues struct {
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 }
 
+func (c *Chargeback) setupInformers() {
+	c.informers = cbInformers.NewFilteredSharedInformerFactory(c.chargebackClient, defaultResyncPeriod, c.cfg.Namespace, nil)
+	inf := c.informers.Chargeback().V1alpha1()
+	// hacks to ensure these informers are created before we call
+	// c.informers.Start()
+	inf.PrestoTables().Informer()
+	inf.StorageLocations().Informer()
+	inf.ReportDataSources().Informer()
+	inf.ReportGenerationQueries().Informer()
+	inf.ReportPrometheusQueries().Informer()
+	inf.Reports().Informer()
+	inf.ScheduledReports().Informer()
+}
 func (c *Chargeback) setupQueues() {
 	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Reports")
 	c.informers.Chargeback().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
