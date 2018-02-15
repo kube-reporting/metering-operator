@@ -33,7 +33,7 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 			logger.Infof("PrestoTableWorker exiting")
 			return
 		case <-c.clock.Tick(prestoTableReconcileInterval):
-			datasources, err := c.informers.reportDataSourceLister.ReportDataSources(c.cfg.Namespace).List(labels.Everything())
+			datasources, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 			if err != nil {
 				logger.WithError(err).Errorf("unable to list datasources")
 				continue
@@ -60,7 +60,7 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 }
 
 func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
-	prestoTable, err := c.informers.prestoTableLister.PrestoTables(c.cfg.Namespace).Get(datasource.Name)
+	prestoTable, err := c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(datasource.Name)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
 	if k8serrors.IsNotFound(err) {

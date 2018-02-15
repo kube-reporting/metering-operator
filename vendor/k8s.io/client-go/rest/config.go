@@ -420,5 +420,45 @@ func AnonymousClientCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con
 		QPS:           con***REMOVED***g.QPS,
 		Burst:         con***REMOVED***g.Burst,
 		Timeout:       con***REMOVED***g.Timeout,
+		Dial:          con***REMOVED***g.Dial,
+	}
+}
+
+// CopyCon***REMOVED***g returns a copy of the given con***REMOVED***g
+func CopyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con***REMOVED***g {
+	return &Con***REMOVED***g{
+		Host:          con***REMOVED***g.Host,
+		APIPath:       con***REMOVED***g.APIPath,
+		Pre***REMOVED***x:        con***REMOVED***g.Pre***REMOVED***x,
+		ContentCon***REMOVED***g: con***REMOVED***g.ContentCon***REMOVED***g,
+		Username:      con***REMOVED***g.Username,
+		Password:      con***REMOVED***g.Password,
+		BearerToken:   con***REMOVED***g.BearerToken,
+		CacheDir:      con***REMOVED***g.CacheDir,
+		Impersonate: ImpersonationCon***REMOVED***g{
+			Groups:   con***REMOVED***g.Impersonate.Groups,
+			Extra:    con***REMOVED***g.Impersonate.Extra,
+			UserName: con***REMOVED***g.Impersonate.UserName,
+		},
+		AuthProvider:        con***REMOVED***g.AuthProvider,
+		AuthCon***REMOVED***gPersister: con***REMOVED***g.AuthCon***REMOVED***gPersister,
+		TLSClientCon***REMOVED***g: TLSClientCon***REMOVED***g{
+			Insecure:   con***REMOVED***g.TLSClientCon***REMOVED***g.Insecure,
+			ServerName: con***REMOVED***g.TLSClientCon***REMOVED***g.ServerName,
+			CertFile:   con***REMOVED***g.TLSClientCon***REMOVED***g.CertFile,
+			KeyFile:    con***REMOVED***g.TLSClientCon***REMOVED***g.KeyFile,
+			CAFile:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAFile,
+			CertData:   con***REMOVED***g.TLSClientCon***REMOVED***g.CertData,
+			KeyData:    con***REMOVED***g.TLSClientCon***REMOVED***g.KeyData,
+			CAData:     con***REMOVED***g.TLSClientCon***REMOVED***g.CAData,
+		},
+		UserAgent:     con***REMOVED***g.UserAgent,
+		Transport:     con***REMOVED***g.Transport,
+		WrapTransport: con***REMOVED***g.WrapTransport,
+		QPS:           con***REMOVED***g.QPS,
+		Burst:         con***REMOVED***g.Burst,
+		RateLimiter:   con***REMOVED***g.RateLimiter,
+		Timeout:       con***REMOVED***g.Timeout,
+		Dial:          con***REMOVED***g.Dial,
 	}
 }

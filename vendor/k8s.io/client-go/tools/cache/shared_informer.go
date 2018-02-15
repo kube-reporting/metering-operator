@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/buffer"
 
 	"github.com/golang/glog"
 )
@@ -92,8 +93,13 @@ func NewSharedIndexInformer(lw ListerWatcher, objType runtime.Object, defaultEve
 // InformerSynced is a function that can be used to determine if an informer has synced.  This is useful for determining if caches have synced.
 type InformerSynced func() bool
 
-// syncedPollPeriod controls how often you look at the status of your sync funcs
-const syncedPollPeriod = 100 * time.Millisecond
+const (
+	// syncedPollPeriod controls how often you look at the status of your sync funcs
+	syncedPollPeriod = 100 * time.Millisecond
+
+	// initialBufferSize is the initial number of event noti***REMOVED***cations that can be buffered.
+	initialBufferSize = 1024
+)
 
 // WaitForCacheSync waits for caches to populate.  It returns true if it was successful, false
 // if the controller should shutdown
@@ -313,7 +319,7 @@ func (s *sharedIndexInformer) AddEventHandlerWithResyncPeriod(handler ResourceEv
 		}
 	}
 
-	listener := newProcessListener(handler, resyncPeriod, determineResyncPeriod(resyncPeriod, s.resyncCheckPeriod), s.clock.Now())
+	listener := newProcessListener(handler, resyncPeriod, determineResyncPeriod(resyncPeriod, s.resyncCheckPeriod), s.clock.Now(), initialBufferSize)
 
 	if !s.started {
 		s.processor.addListener(listener)
@@ -328,7 +334,7 @@ func (s *sharedIndexInformer) AddEventHandlerWithResyncPeriod(handler ResourceEv
 	s.blockDeltas.Lock()
 	defer s.blockDeltas.Unlock()
 
-	s.processor.addListener(listener)
+	s.processor.addAndStartListener(listener)
 	for _, item := range s.indexer.List() {
 		listener.add(addNoti***REMOVED***cation{newObj: item})
 	}
@@ -366,7 +372,6 @@ func (s *sharedIndexInformer) HandleDeltas(obj interface{}) error {
 }
 
 type sharedProcessor struct {
-	listenersStarted bool
 	listenersLock    sync.RWMutex
 	listeners        []*processorListener
 	syncingListeners []*processorListener
@@ -374,15 +379,20 @@ type sharedProcessor struct {
 	wg               wait.Group
 }
 
+func (p *sharedProcessor) addAndStartListener(listener *processorListener) {
+	p.listenersLock.Lock()
+	defer p.listenersLock.Unlock()
+
+	p.addListenerLocked(listener)
+	p.wg.Start(listener.run)
+	p.wg.Start(listener.pop)
+}
+
 func (p *sharedProcessor) addListener(listener *processorListener) {
 	p.listenersLock.Lock()
 	defer p.listenersLock.Unlock()
 
 	p.addListenerLocked(listener)
-	if p.listenersStarted {
-		p.wg.Start(listener.run)
-		p.wg.Start(listener.pop)
-	}
 }
 
 func (p *sharedProcessor) addListenerLocked(listener *processorListener) {
@@ -413,7 +423,6 @@ func (p *sharedProcessor) run(stopCh <-chan struct{}) {
 			p.wg.Start(listener.run)
 			p.wg.Start(listener.pop)
 		}
-		p.listenersStarted = true
 	}()
 	<-stopCh
 	p.listenersLock.RLock()
@@ -462,6 +471,13 @@ type processorListener struct {
 
 	handler ResourceEventHandler
 
+	// pendingNoti***REMOVED***cations is an unbounded ring buffer that holds all noti***REMOVED***cations not yet distributed.
+	// There is one per listener, but a failing/stalled listener will have in***REMOVED***nite pendingNoti***REMOVED***cations
+	// added until we OOM.
+	// TODO: This is no worse than before, since reflectors were backed by unbounded DeltaFIFOs, but
+	// we should try to do something better.
+	pendingNoti***REMOVED***cations buffer.RingGrowing
+
 	// requestedResyncPeriod is how frequently the listener wants a full resync from the shared informer
 	requestedResyncPeriod time.Duration
 	// resyncPeriod is how frequently the listener wants a full resync from the shared informer. This
@@ -474,11 +490,12 @@ type processorListener struct {
 	resyncLock sync.Mutex
 }
 
-func newProcessListener(handler ResourceEventHandler, requestedResyncPeriod, resyncPeriod time.Duration, now time.Time) *processorListener {
+func newProcessListener(handler ResourceEventHandler, requestedResyncPeriod, resyncPeriod time.Duration, now time.Time, bufferSize int) *processorListener {
 	ret := &processorListener{
 		nextCh:                make(chan interface{}),
 		addCh:                 make(chan interface{}),
 		handler:               handler,
+		pendingNoti***REMOVED***cations:  *buffer.NewRingGrowing(bufferSize),
 		requestedResyncPeriod: requestedResyncPeriod,
 		resyncPeriod:          resyncPeriod,
 	}
@@ -496,25 +513,16 @@ func (p *processorListener) pop() {
 	defer utilruntime.HandleCrash()
 	defer close(p.nextCh) // Tell .run() to stop
 
-	// pendingNoti***REMOVED***cations is an unbounded slice that holds all noti***REMOVED***cations not yet distributed
-	// there is one per listener, but a failing/stalled listener will have in***REMOVED***nite pendingNoti***REMOVED***cations
-	// added until we OOM.
-	// TODO This is no worse than before, since reflectors were backed by unbounded DeltaFIFOs, but
-	// we should try to do something better
-	var pendingNoti***REMOVED***cations []interface{}
 	var nextCh chan<- interface{}
 	var noti***REMOVED***cation interface{}
 	for {
 		select {
 		case nextCh <- noti***REMOVED***cation:
 			// Noti***REMOVED***cation dispatched
-			if len(pendingNoti***REMOVED***cations) == 0 { // Nothing to pop
+			var ok bool
+			noti***REMOVED***cation, ok = p.pendingNoti***REMOVED***cations.ReadOne()
+			if !ok { // Nothing to pop
 				nextCh = nil // Disable this select case
-				noti***REMOVED***cation = nil
-			} ***REMOVED*** {
-				noti***REMOVED***cation = pendingNoti***REMOVED***cations[0]
-				pendingNoti***REMOVED***cations[0] = nil
-				pendingNoti***REMOVED***cations = pendingNoti***REMOVED***cations[1:]
 			}
 		case noti***REMOVED***cationToAdd, ok := <-p.addCh:
 			if !ok {
@@ -525,7 +533,7 @@ func (p *processorListener) pop() {
 				noti***REMOVED***cation = noti***REMOVED***cationToAdd
 				nextCh = p.nextCh
 			} ***REMOVED*** { // There is already a noti***REMOVED***cation waiting to be dispatched
-				pendingNoti***REMOVED***cations = append(pendingNoti***REMOVED***cations, noti***REMOVED***cationToAdd)
+				p.pendingNoti***REMOVED***cations.WriteOne(noti***REMOVED***cationToAdd)
 			}
 		}
 	}

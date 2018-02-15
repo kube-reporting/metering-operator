@@ -25,17 +25,12 @@ import (
 
 type AdmissionregistrationV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	ExternalAdmissionHookCon***REMOVED***gurationsGetter
 	InitializerCon***REMOVED***gurationsGetter
 }
 
 // AdmissionregistrationV1alpha1Client is used to interact with features provided by the admissionregistration.k8s.io group.
 type AdmissionregistrationV1alpha1Client struct {
 	restClient rest.Interface
-}
-
-func (c *AdmissionregistrationV1alpha1Client) ExternalAdmissionHookCon***REMOVED***gurations() ExternalAdmissionHookCon***REMOVED***gurationInterface {
-	return newExternalAdmissionHookCon***REMOVED***gurations(c)
 }
 
 func (c *AdmissionregistrationV1alpha1Client) InitializerCon***REMOVED***gurations() InitializerCon***REMOVED***gurationInterface {

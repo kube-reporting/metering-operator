@@ -14,12 +14,12 @@ See the License for the speci***REMOVED***c language governing permissions and
 limitations under the License.
 */
 
-// +k8s:deepcopy-gen=package,register
+// +k8s:deepcopy-gen=package
 // +k8s:openapi-gen=true
 
 // Package v1alpha1 is the v1alpha1 version of the API.
 // AdmissionCon***REMOVED***guration and AdmissionPluginCon***REMOVED***guration are legacy static admission plugin con***REMOVED***guration
-// InitializerCon***REMOVED***guration and ExternalAdmissionHookCon***REMOVED***guration is for the
+// InitializerCon***REMOVED***guration and validatingWebhookCon***REMOVED***guration is for the
 // new dynamic admission controller con***REMOVED***guration.
 // +groupName=admissionregistration.k8s.io
 package v1alpha1 // import "k8s.io/api/admissionregistration/v1alpha1"
