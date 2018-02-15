@@ -1,0 +1,50 @@
+# Force dep to vendor the code generators, which aren't imported just used at dev time.
+# Picking a subpackage with Go code won't be necessary once https://github.com/golang/dep/pull/1545 is merged.
+required = [
+  "k8s.io/code-generator/cmd/client-gen",
+  "k8s.io/code-generator/cmd/conversion-gen",
+  "k8s.io/code-generator/cmd/deepcopy-gen",
+  "k8s.io/code-generator/cmd/defaulter-gen",
+  "k8s.io/code-generator/cmd/informer-gen",
+  "k8s.io/code-generator/cmd/lister-gen",
+  "k8s.io/code-generator/cmd/set-gen",
+  # required for client-gen
+  "k8s.io/apimachinery/pkg/apimachinery/registered",
+  "k8s.io/apimachinery/pkg/labels",
+  "k8s.io/apimachinery/pkg/watch",
+  "k8s.io/apimachinery/pkg/fields",
+]
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/robfig/cron"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.3"
+
+[[constraint]]
+  name = "golang.org/x/sync"
+  branch = "master"
+
+[[constraint]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.8.3"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  branch = "release-5.0"
+
+[[constraint]]
+  name = "k8s.io/code-generator"
+  revision = "fc1982ddabb163d4c9fd88cd1a8f8935ec652507"
+
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
+
+  [[prune.project]]
+    name = "k8s.io/code-generator"
+    unused-packages = false
+    non-go = false
