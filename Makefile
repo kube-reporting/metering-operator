@@ -157,13 +157,8 @@ hive-docker-build: images/hive/Docker***REMOVED***le hadoop-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
-vendor: glide.yaml
-	glide up --strip-vendor
-	glide-vc \
-		--use-lock-***REMOVED***le \
-		--no-tests \
-		--only-code \
-		--keep "k8s.io/gengo/boilerplate/*txt","k8s.io/code-generator/generate-groups.sh"
+vendor: Gopkg.toml
+	dep ensure
 
 test:
 	go test ./pkg/...
