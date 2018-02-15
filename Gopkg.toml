@@ -28,16 +28,20 @@ required = [
   branch = "master"
 
 [[constraint]]
+  name = "k8s.io/api"
+  version = "kubernetes-1.9.3"
+
+[[constraint]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.8.3"
+  version = "kubernetes-1.9.3"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  branch = "release-5.0"
+  version = "kubernetes-1.9.3"
 
 [[constraint]]
   name = "k8s.io/code-generator"
-  revision = "fc1982ddabb163d4c9fd88cd1a8f8935ec652507"
+  version = "kubernetes-1.9.3"
 
 [prune]
   go-tests = true
