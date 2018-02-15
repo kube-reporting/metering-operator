@@ -30,5 +30,5 @@ See the above installation guide for links to configuring and using Chargeback.
 - Helm 2.6.2
 - Make
 - Docker
-- Glide
+- Dep
 
