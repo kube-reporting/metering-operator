@@ -23,8 +23,7 @@ import (
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
-	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
-	cbListers "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
+	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions"
 	"github.com/coreos-inc/kube-chargeback/pkg/hive"
 )
 
@@ -53,7 +52,8 @@ type Config struct {
 
 type Chargeback struct {
 	cfg              Config
-	informers        informers
+	informers        cbInformers.SharedInformerFactory
+	queues           queues
 	chargebackClient cbClientset.Interface
 
 	prestoConn  db.Queryer
@@ -96,52 +96,39 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, er
 		logger.Fatal(err)
 	}
 
-	op.informers = setupInformers(op, defaultResyncPeriod)
+	op.setupInformers()
+	op.setupQueues()
+
 	op.scheduledReportRunner = newScheduledReportRunner(op)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
 }
 
-type informers struct {
-	informerList []cache.SharedIndexInformer
-	queueList    []workqueue.RateLimitingInterface
-
-	reportQueue    workqueue.RateLimitingInterface
-	reportInformer cache.SharedIndexInformer
-	reportLister   cbListers.ReportLister
-
-	scheduledReportQueue    workqueue.RateLimitingInterface
-	scheduledReportInformer cache.SharedIndexInformer
-	scheduledReportLister   cbListers.ScheduledReportLister
-
-	reportDataSourceQueue    workqueue.RateLimitingInterface
-	reportDataSourceInformer cache.SharedIndexInformer
-	reportDataSourceLister   cbListers.ReportDataSourceLister
-
-	reportGenerationQueryQueue    workqueue.RateLimitingInterface
-	reportGenerationQueryInformer cache.SharedIndexInformer
-	reportGenerationQueryLister   cbListers.ReportGenerationQueryLister
-
-	reportPrometheusQueryQueue    workqueue.RateLimitingInterface
-	reportPrometheusQueryInformer cache.SharedIndexInformer
-	reportPrometheusQueryLister   cbListers.ReportPrometheusQueryLister
-
-	storageLocationQueue    workqueue.RateLimitingInterface
-	storageLocationInformer cache.SharedIndexInformer
-	storageLocationLister   cbListers.StorageLocationLister
-
-	prestoTableQueue    workqueue.RateLimitingInterface
-	prestoTableInformer cache.SharedIndexInformer
-	prestoTableLister   cbListers.PrestoTableLister
+type queues struct {
+	queueList                  []workqueue.RateLimitingInterface
+	reportQueue                workqueue.RateLimitingInterface
+	scheduledReportQueue       workqueue.RateLimitingInterface
+	reportDataSourceQueue      workqueue.RateLimitingInterface
+	reportGenerationQueryQueue workqueue.RateLimitingInterface
 }
 
-func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
-	reportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportInformer := cbInformers.NewReportInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	reportLister := cbListers.NewReportLister(reportInformer.GetIndexer())
-
-	reportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+func (c *Chargeback) setupInformers() {
+	c.informers = cbInformers.NewFilteredSharedInformerFactory(c.chargebackClient, defaultResyncPeriod, c.cfg.Namespace, nil)
+	inf := c.informers.Chargeback().V1alpha1()
+	// hacks to ensure these informers are created before we call
+	// c.informers.Start()
+	inf.PrestoTables().Informer()
+	inf.StorageLocations().Informer()
+	inf.ReportDataSources().Informer()
+	inf.ReportGenerationQueries().Informer()
+	inf.ReportPrometheusQueries().Informer()
+	inf.Reports().Informer()
+	inf.ScheduledReports().Informer()
+}
+func (c *Chargeback) setupQueues() {
+	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Reports")
+	c.informers.Chargeback().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -156,11 +143,8 @@ func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
 		},
 	})
 
-	scheduledReportQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	scheduledReportInformer := cbInformers.NewScheduledReportInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	scheduledReportLister := cbListers.NewScheduledReportLister(scheduledReportInformer.GetIndexer())
-
-	scheduledReportInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ScheduledReports")
+	c.informers.Chargeback().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -176,11 +160,8 @@ func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
 		DeleteFunc: c.handleScheduledReportDeleted,
 	})
 
-	reportDataSourceQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportDataSourceInformer := cbInformers.NewReportDataSourceInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	reportDataSourceLister := cbListers.NewReportDataSourceLister(reportDataSourceInformer.GetIndexer())
-
-	reportDataSourceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ReportDataSources")
+	c.informers.Chargeback().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -195,11 +176,8 @@ func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
 		},
 	})
 
-	reportGenerationQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportGenerationQueryInformer := cbInformers.NewReportGenerationQueryInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	reportGenerationQueryLister := cbListers.NewReportGenerationQueryLister(reportGenerationQueryInformer.GetIndexer())
-
-	reportGenerationQueryInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ReportGenerationQueries")
+	c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -213,96 +191,22 @@ func setupInformers(c *Chargeback, resyncPeriod time.Duration) informers {
 			}
 		},
 	})
-
-	reportPrometheusQueryQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	reportPrometheusQueryInformer := cbInformers.NewReportPrometheusQueryInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	reportPrometheusQueryLister := cbListers.NewReportPrometheusQueryLister(reportPrometheusQueryInformer.GetIndexer())
-
-	storageLocationQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	storageLocationInformer := cbInformers.NewStorageLocationInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	storageLocationLister := cbListers.NewStorageLocationLister(storageLocationInformer.GetIndexer())
-
-	prestoTableQueue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-	prestoTableInformer := cbInformers.NewPrestoTableInformer(c.chargebackClient, c.cfg.Namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	prestoTableLister := cbListers.NewPrestoTableLister(prestoTableInformer.GetIndexer())
-
-	return informers{
-		informerList: []cache.SharedIndexInformer{
-			storageLocationInformer,
-			reportPrometheusQueryInformer,
-			reportGenerationQueryInformer,
-			reportDataSourceInformer,
-			prestoTableInformer,
-			scheduledReportInformer,
-			reportInformer,
-		},
+	c.queues = queues{
 		queueList: []workqueue.RateLimitingInterface{
-			storageLocationQueue,
-			reportPrometheusQueryQueue,
-			reportGenerationQueryQueue,
-			reportDataSourceQueue,
-			prestoTableQueue,
-			scheduledReportQueue,
 			reportQueue,
+			scheduledReportQueue,
+			reportDataSourceQueue,
+			reportGenerationQueryQueue,
 		},
-
-		reportQueue:    reportQueue,
-		reportInformer: reportInformer,
-		reportLister:   reportLister,
-
-		scheduledReportQueue:    scheduledReportQueue,
-		scheduledReportInformer: scheduledReportInformer,
-		scheduledReportLister:   scheduledReportLister,
-
-		reportDataSourceQueue:    reportDataSourceQueue,
-		reportDataSourceInformer: reportDataSourceInformer,
-		reportDataSourceLister:   reportDataSourceLister,
-
-		reportGenerationQueryQueue:    reportGenerationQueryQueue,
-		reportGenerationQueryInformer: reportGenerationQueryInformer,
-		reportGenerationQueryLister:   reportGenerationQueryLister,
-
-		reportPrometheusQueryQueue:    reportPrometheusQueryQueue,
-		reportPrometheusQueryInformer: reportPrometheusQueryInformer,
-		reportPrometheusQueryLister:   reportPrometheusQueryLister,
-
-		storageLocationQueue:    storageLocationQueue,
-		storageLocationInformer: storageLocationInformer,
-		storageLocationLister:   storageLocationLister,
-
-		prestoTableQueue:    prestoTableQueue,
-		prestoTableInformer: prestoTableInformer,
-		prestoTableLister:   prestoTableLister,
+		reportQueue:                reportQueue,
+		scheduledReportQueue:       scheduledReportQueue,
+		reportDataSourceQueue:      reportDataSourceQueue,
+		reportGenerationQueryQueue: reportGenerationQueryQueue,
 	}
 }
 
-func (inf informers) Run(stopCh <-chan struct{}) {
-	for _, informer := range inf.informerList {
-		go informer.Run(stopCh)
-	}
-}
-
-func (inf informers) WaitForCacheSync(stopCh <-chan struct{}) bool {
-	for _, informer := range inf.informerList {
-		if !cache.WaitForCacheSync(stopCh, informer.HasSynced) {
-			return false
-		}
-	}
-	return true
-}
-
-func (inf informers) HasSynced() bool {
-	for _, informer := range inf.informerList {
-		if informer.HasSynced() {
-			continue
-		}
-		return false
-	}
-	return true
-}
-
-func (inf informers) ShutdownQueues() {
-	for _, queue := range inf.queueList {
+func (qs queues) ShutdownQueues() {
+	for _, queue := range qs.queueList {
 		queue.ShutDown()
 	}
 }
@@ -310,7 +214,7 @@ func (inf informers) ShutdownQueues() {
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("starting Chargeback operator")
 
-	go c.informers.Run(stopCh)
+	go c.informers.Start(stopCh)
 
 	c.logger.Infof("starting HTTP server")
 	httpSrv := newServer(c, c.logger)
@@ -352,8 +256,10 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 
 	c.logger.Info("waiting for caches to sync")
-	if !c.informers.WaitForCacheSync(stopCh) {
-		return fmt.Errorf("cache for reports not synced in time")
+	for t, synced := range c.informers.WaitForCacheSync(stopCh) {
+		if !synced {
+			return fmt.Errorf("cache for %s not synced in time", t)
+		}
 	}
 
 	// Poll until we can write to presto
@@ -376,7 +282,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	<-stopCh
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
 	httpSrv.stop()
-	go c.informers.ShutdownQueues()
+	go c.queues.ShutdownQueues()
 	wg.Wait()
 	c.logger.Info("Chargeback workers and collectors stopped")
 

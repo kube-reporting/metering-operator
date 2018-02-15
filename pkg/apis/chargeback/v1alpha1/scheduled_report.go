@@ -34,7 +34,7 @@ type ScheduledReportSpec struct {
 	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`
 
 	// Output is the storage location where results are sent.
-	Output *ReportStorageLocation `json:"output,omitempty"`
+	Output *StorageLocationRef `json:"output,omitempty"`
 }
 
 type ScheduledReportPeriod string
