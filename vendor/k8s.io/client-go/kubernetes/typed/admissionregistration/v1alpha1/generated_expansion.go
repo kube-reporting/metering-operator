@@ -16,6 +16,4 @@ limitations under the License.
 
 package v1alpha1
 
-type ExternalAdmissionHookCon***REMOVED***gurationExpansion interface{}
-
 type InitializerCon***REMOVED***gurationExpansion interface{}

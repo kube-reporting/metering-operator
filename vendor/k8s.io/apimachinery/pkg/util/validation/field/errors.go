@@ -19,6 +19,7 @@ package ***REMOVED***eld
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -175,7 +176,11 @@ func Invalid(***REMOVED***eld *Path, value interface{}, detail string) *Error {
 func NotSupported(***REMOVED***eld *Path, value interface{}, validValues []string) *Error {
 	detail := ""
 	if validValues != nil && len(validValues) > 0 {
-		detail = "supported values: " + strings.Join(validValues, ", ")
+		quotedValues := make([]string, len(validValues))
+		for i, v := range validValues {
+			quotedValues[i] = strconv.Quote(v)
+		}
+		detail = "supported values: " + strings.Join(quotedValues, ", ")
 	}
 	return &Error{ErrorTypeNotSupported, ***REMOVED***eld.String(), value, detail}
 }

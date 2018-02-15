@@ -45,8 +45,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&InitializerCon***REMOVED***guration{},
 		&InitializerCon***REMOVED***gurationList{},
-		&ExternalAdmissionHookCon***REMOVED***guration{},
-		&ExternalAdmissionHookCon***REMOVED***gurationList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
