@@ -17,6 +17,7 @@ import (
 	"path"
 	"path/***REMOVED***lepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -30,7 +31,7 @@ func mustOpen(name string) io.Reader {
 }
 
 func api(base string) string {
-	return ***REMOVED***lepath.Join(os.Getenv("GOROOT"), "api", base)
+	return ***REMOVED***lepath.Join(runtime.GOROOT(), "api", base)
 }
 
 var sym = regexp.MustCompile(`^pkg (\S+).*?, (?:var|func|type|const) ([A-Z]\w*)`)
@@ -54,6 +55,7 @@ func main() {
 		mustOpen(api("go1.7.txt")),
 		mustOpen(api("go1.8.txt")),
 		mustOpen(api("go1.9.txt")),
+		mustOpen(api("go1.10.txt")),
 	)
 	sc := bu***REMOVED***o.NewScanner(f)
 	fullImport := map[string]string{} // "zip.NewReader" => "archive/zip"

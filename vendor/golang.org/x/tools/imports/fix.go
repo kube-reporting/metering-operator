@@ -78,6 +78,10 @@ type importInfo struct {
 type packageInfo struct {
 	Globals map[string]bool       // symbol => true
 	Imports map[string]importInfo // pkg base name or alias => info
+	// refs are a set of package references currently satis***REMOVED***ed by imports.
+	// ***REMOVED***rst key: either base package (e.g. "fmt") or renamed package
+	// second key: referenced package symbol (e.g. "Println")
+	Refs map[string]map[string]bool
 }
 
 // dirPackageInfo exposes the dirPackageInfoFile function so that it can be overridden.
@@ -93,7 +97,13 @@ func dirPackageInfoFile(pkgName, srcDir, ***REMOVED***lename string) (*packageIn
 		return nil, err
 	}
 
-	info := &packageInfo{Globals: make(map[string]bool), Imports: make(map[string]importInfo)}
+	info := &packageInfo{
+		Globals: make(map[string]bool),
+		Imports: make(map[string]importInfo),
+		Refs:    make(map[string]map[string]bool),
+	}
+
+	visitor := collectReferences(info.Refs)
 	for _, ***REMOVED*** := range packageFileInfos {
 		if ***REMOVED***.Name() == ***REMOVED***leBase || !strings.HasSuf***REMOVED***x(***REMOVED***.Name(), ".go") {
 			continue
@@ -132,8 +142,43 @@ func dirPackageInfoFile(pkgName, srcDir, ***REMOVED***lename string) (*packageIn
 			}
 			info.Imports[name] = impInfo
 		}
+
+		ast.Walk(visitor, root)
 	}
 	return info, nil
+}
+
+// collectReferences returns a visitor that collects all exported package
+// references
+func collectReferences(refs map[string]map[string]bool) visitFn {
+	var visitor visitFn
+	visitor = func(node ast.Node) ast.Visitor {
+		if node == nil {
+			return visitor
+		}
+		switch v := node.(type) {
+		case *ast.SelectorExpr:
+			xident, ok := v.X.(*ast.Ident)
+			if !ok {
+				break
+			}
+			if xident.Obj != nil {
+				// if the parser can resolve it, it's not a package ref
+				break
+			}
+			pkgName := xident.Name
+			r := refs[pkgName]
+			if r == nil {
+				r = make(map[string]bool)
+				refs[pkgName] = r
+			}
+			if ast.IsExported(v.Sel.Name) {
+				r[v.Sel.Name] = true
+			}
+		}
+		return visitor
+	}
+	return visitor
 }
 
 func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename string) (added []string, err error) {
@@ -249,8 +294,13 @@ func ***REMOVED***xImports(fset *token.FileSet, f *ast.File, ***REMOVED***lename
 			if packageInfo != nil {
 				sibling := packageInfo.Imports[pkgName]
 				if sibling.Path != "" {
-					results <- result{ipath: sibling.Path, name: sibling.Alias}
-					return
+					refs := packageInfo.Refs[pkgName]
+					for symbol := range symbols {
+						if refs[symbol] {
+							results <- result{ipath: sibling.Path, name: sibling.Alias}
+							return
+						}
+					}
 				}
 			}
 			ipath, rename, err := ***REMOVED***ndImport(pkgName, symbols, ***REMOVED***lename)
@@ -750,8 +800,8 @@ func ***REMOVED***ndImportGoPath(pkgName string, symbols map[string]bool, ***REM
 	// Fast path for the standard library.
 	// In the common case we hopefully never have to scan the GOPATH, which can
 	// be slow with moving disks.
-	if pkg, rename, ok := ***REMOVED***ndImportStdlib(pkgName, symbols); ok {
-		return pkg, rename, nil
+	if pkg, ok := ***REMOVED***ndImportStdlib(pkgName, symbols); ok {
+		return pkg, false, nil
 	}
 	if pkgName == "rand" && symbols["Read"] {
 		// Special-case rand.Read.
@@ -997,7 +1047,7 @@ func (fn visitFn) Visit(node ast.Node) ast.Visitor {
 	return fn(node)
 }
 
-func ***REMOVED***ndImportStdlib(shortPkg string, symbols map[string]bool) (importPath string, rename, ok bool) {
+func ***REMOVED***ndImportStdlib(shortPkg string, symbols map[string]bool) (importPath string, ok bool) {
 	for symbol := range symbols {
 		key := shortPkg + "." + symbol
 		path := stdlib[key]
@@ -1005,18 +1055,18 @@ func ***REMOVED***ndImportStdlib(shortPkg string, symbols map[string]bool) (impo
 			if key == "rand.Read" {
 				continue
 			}
-			return "", false, false
+			return "", false
 		}
 		if importPath != "" && importPath != path {
 			// Ambiguous. Symbols pointed to different things.
-			return "", false, false
+			return "", false
 		}
 		importPath = path
 	}
 	if importPath == "" && shortPkg == "rand" && symbols["Read"] {
-		return "crypto/rand", false, true
+		return "crypto/rand", true
 	}
-	return importPath, false, importPath != ""
+	return importPath, importPath != ""
 }
 
 // ***REMOVED***leInDir reports whether the provided ***REMOVED***le path looks like
