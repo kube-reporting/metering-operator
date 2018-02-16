@@ -173,7 +173,7 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 				query.Name, queryRng.Start, queryRng.End, err)
 		}
 
-		err = c.promsumStoreRecords(logger, dataSource, records)
+		err = c.promsumStoreRecords(logger, dataSource.TableName, records)
 		if err != nil {
 			return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
 				query.Name, queryRng.Start, queryRng.End, err)
@@ -288,11 +288,43 @@ func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time
 	return timeRanges, nil
 }
 
-func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, records []BillingRecord) error {
+func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng prom.Range) ([]*PromsumRecord, error) {
+	pVal, err := c.promConn.QueryRange(context.Background(), query.Spec.Query, queryRng)
+	if err != nil {
+		return nil, fmt.Errorf("failed to perform billing query: %v", err)
+	}
+
+	matrix, ok := pVal.(model.Matrix)
+	if !ok {
+		return nil, fmt.Errorf("expected a matrix in response to query, got a %v", pVal.Type())
+	}
+
+	var records []*PromsumRecord
+	// iterate over segments of contiguous billing records
+	for _, sampleStream := range matrix {
+		for _, value := range sampleStream.Values {
+			labels := make(map[string]string, len(sampleStream.Metric))
+			for k, v := range sampleStream.Metric {
+				labels[string(k)] = string(v)
+			}
+
+			record := &PromsumRecord{
+				Labels:    labels,
+				Amount:    float64(value.Value),
+				StepSize:  c.cfg.PromsumStepSize,
+				Timestamp: value.Timestamp.Time().UTC(),
+			}
+			records = append(records, record)
+		}
+	}
+	return records, nil
+}
+
+func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, tableName string, records []*PromsumRecord) error {
 	var queryValues [][]string
 
 	for _, record := range records {
-		queryValues = append(queryValues, []string{generateRecordValues(record)})
+		queryValues = append(queryValues, []string{generateRecordSQLValues(record)})
 	}
 	// capacity prestoQueryCap, length 0
 	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
@@ -306,12 +338,12 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataSource *
 
 		currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
 
-		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(dataSource.TableName, ""))
+		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(tableName, ""))
 
 		// There's a character limit of prestoQueryCap on insert
 		// queries, so let's chunk them at that limit.
 		if len(currValue)+queryBuf.Len() > queryCap {
-			err := presto.ExecuteInsertQuery(c.prestoConn, dataSource.TableName, queryBuf.String())
+			err := presto.ExecuteInsertQuery(c.prestoConn, tableName, queryBuf.String())
 			if err != nil {
 				return fmt.Errorf("failed to store metrics into presto: %v", err)
 			}
@@ -325,7 +357,7 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataSource *
 		}
 	}
 	if !queryBufIsEmpty {
-		err := presto.ExecuteInsertQuery(c.prestoConn, dataSource.TableName, queryBuf.String())
+		err := presto.ExecuteInsertQuery(c.prestoConn, tableName, queryBuf.String())
 		if err != nil {
 			return fmt.Errorf("failed to store metrics into presto: %v", err)
 		}
@@ -333,7 +365,7 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, dataSource *
 	return nil
 }
 
-func generateRecordValues(record BillingRecord) string {
+func generateRecordSQLValues(record *PromsumRecord) string {
 	var keys []string
 	var vals []string
 	for k, v := range record.Labels {
@@ -346,42 +378,10 @@ func generateRecordValues(record BillingRecord) string {
 		record.Amount, record.Timestamp.Format(timestampFormat), record.StepSize.Seconds(), keyString, valString)
 }
 
-// BillingRecord is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
-type BillingRecord struct {
+// PromsumRecord is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
+type PromsumRecord struct {
 	Labels    map[string]string `json:"labels"`
 	Amount    float64           `json:"amount"`
 	StepSize  time.Duration     `json:"stepSize"`
 	Timestamp time.Time         `json:"timestamp"`
-}
-
-func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng prom.Range) ([]BillingRecord, error) {
-	pVal, err := c.promConn.QueryRange(context.Background(), query.Spec.Query, queryRng)
-	if err != nil {
-		return nil, fmt.Errorf("failed to perform billing query: %v", err)
-	}
-
-	matrix, ok := pVal.(model.Matrix)
-	if !ok {
-		return nil, fmt.Errorf("expected a matrix in response to query, got a %v", pVal.Type())
-	}
-
-	records := []BillingRecord{}
-	// iterate over segments of contiguous billing records
-	for _, sampleStream := range matrix {
-		for _, value := range sampleStream.Values {
-			labels := make(map[string]string, len(sampleStream.Metric))
-			for k, v := range sampleStream.Metric {
-				labels[string(k)] = string(v)
-			}
-
-			record := BillingRecord{
-				Labels:    labels,
-				Amount:    float64(value.Value),
-				StepSize:  c.cfg.PromsumStepSize,
-				Timestamp: value.Timestamp.Time().UTC(),
-			}
-			records = append(records, record)
-		}
-	}
-	return records, nil
 }
