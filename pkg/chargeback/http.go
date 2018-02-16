@@ -44,6 +44,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	mux.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	mux.HandleFunc("/api/v1/collect/prometheus", srv.collectPromsumDataHandler)
+	mux.HandleFunc("/api/v1/store/prometheus", srv.storePromsumDataHandler)
 	mux.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
@@ -357,6 +358,32 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	})
 
 	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
+
+	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+}
+
+type StorePromsumDataRequest struct {
+	DataSourceName string           `json:"dataSourceName"`
+	Records        []*PromsumRecord `json:"records"`
+}
+
+func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	srv.logRequest(logger, r)
+
+	decoder := json.NewDecoder(r.Body)
+	var req StorePromsumDataRequest
+	err := decoder.Decode(&req)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		return
+	}
+
+	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(req.DataSourceName), req.Records)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
+		return
+	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
