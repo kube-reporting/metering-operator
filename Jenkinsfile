@@ -22,7 +22,9 @@ def isMasterBranch = env.BRANCH_NAME == "master"
 
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
-def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}-"
+def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}"
+def chargebackE2ENamespace = "${chargebackNamespacePre***REMOVED***x}-e2e"
+def chargebackIntegrationNamespace = "${chargebackNamespacePre***REMOVED***x}-integration"
 
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
@@ -120,7 +122,8 @@ podTemplate(
                     "DEPLOY_TAG=${deployTag}",
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
-                    "CHARGEBACK_NAMESPACE_PREFIX=${chargebackNamespacePre***REMOVED***x}",
+                    "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
+                    "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "KUBECONFIG=${KUBECONFIG}",
                     "ENABLE_AWS_BILLING=false",
@@ -245,13 +248,17 @@ podTemplate(
                                     echo "Skipping release step, not a release"
                                 }
                             }
+                        }
+                    }
 
-                            stage('e2e tests') {
-                                if (runE2ETests) {
-                                    echo "Running chargeback e2e tests"
-                                    withEnv([
-                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE_PREFIX}-e2e",
-                                    ]) {
+                    withEnv([
+                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                    ]) {
+                        container('docker'){
+                            dir(kubeChargebackDir) {
+                                stage('e2e tests') {
+                                    if (runE2ETests) {
+                                        echo "Running chargeback e2e tests"
                                         try {
                                             ansiColor('xterm') {
                                                 timeout(10) {
@@ -288,9 +295,9 @@ podTemplate(
                                                 '''
                                             }
                                         }
+                                    } ***REMOVED*** {
+                                        echo "Non-master branch, skipping chargeback e2e tests"
                                     }
-                                } ***REMOVED*** {
-                                    echo "Non-master branch, skipping chargeback e2e tests"
                                 }
                             }
                         }
