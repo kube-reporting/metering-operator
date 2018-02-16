@@ -49,9 +49,9 @@ if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
     "${DIR}/${DEPLOY_SCRIPT}" >> /out/deploy.log 2>&1
 ***REMOVED***
 
-echo "Running integration tests"
+echo "Running e2e tests"
 
-"$DIR/run-integration-tests.sh" 2>&1 \
+"$DIR/run-e2e-tests.sh" 2>&1 \
     | tee -a /out/test.log \
     | go tool test2json \
     | tee -a /out/test.json \
