@@ -3,47 +3,42 @@ package e2e
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"testing"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	reportTestTimeout = 5 * time.Minute
+	reportTestTimeout         = 5 * time.Minute
+	reportTestOutputDirectory string
 )
 
 func init() {
-	var err error
 	if reportTestTimeoutStr := os.Getenv("REPORT_TEST_TIMEOUT"); reportTestTimeoutStr != "" {
+		var err error
 		reportTestTimeout, err = time.ParseDuration(reportTestTimeoutStr)
 		if err != nil {
 			log.Fatalf("Invalid REPORT_TEST_TIMEOUT: %v", err)
 		}
 	}
-}
+	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
+	if reportTestOutputDirectory == "" {
+		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
+	}
 
-func newSimpleReport(name, namespace, queryName string, start, end time.Time) *chargebackv1alpha1.Report {
-	return &chargebackv1alpha1.Report{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: chargebackv1alpha1.ReportSpec{
-			ReportingStart:      meta.Time{start},
-			ReportingEnd:        meta.Time{end},
-			GenerationQueryName: queryName,
-			RunImmediately:      true,
-		},
+	err := os.MkdirAll(reportTestOutputDirectory, 0777)
+	if err != nil {
+		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
 	}
 }
 
@@ -112,7 +107,7 @@ func TestReportsProduceData(t *testing.T) {
 		// TODO(chancez): Add AWS Reports
 	}
 
-	reportStart, reportEnd := collectMetricsOnce(t, testFramework.Namespace)
+	reportStart, reportEnd := collectMetricsOnce(t)
 	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
 	for i, test := range tests {
@@ -131,7 +126,7 @@ func TestReportsProduceData(t *testing.T) {
 				return
 			}
 
-			report := newSimpleReport(test.name, testFramework.Namespace, test.queryName, reportStart, reportEnd)
+			report := testFramework.NewSimpleReport(test.name, test.queryName, reportStart, reportEnd)
 
 			err := testFramework.ChargebackClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
@@ -139,7 +134,7 @@ func TestReportsProduceData(t *testing.T) {
 			}, "failed to ensure report doesn't exist before creating report")
 
 			t.Logf("creating report %s", report.Name)
-			err = testFramework.CreateChargebackReport(testFramework.Namespace, report)
+			err = testFramework.CreateChargebackReport(report)
 			require.NoError(t, err, "creating report should succeed")
 
 			defer func() {
@@ -154,8 +149,9 @@ func TestReportsProduceData(t *testing.T) {
 			}
 
 			var reportResults []map[string]interface{}
+			var reportData []byte
 			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
-				req := testFramework.NewChargebackSVCRequest(testFramework.Namespace, "chargeback", "/api/v1/reports/get", query)
+				req := testFramework.NewChargebackSVCRequest("chargeback", "/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
 				if err != nil {
@@ -174,10 +170,15 @@ func TestReportsProduceData(t *testing.T) {
 
 				err = json.Unmarshal(resp, &reportResults)
 				require.NoError(t, err, "expected to unmarshal response")
+				reportData = resp
 				return true, nil
 			})
 			require.NoError(t, err, "expected getting report result to not timeout")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
+
+			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s.json", test.name))
+			err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
+			require.NoError(t, err, "expected writing report results to disk not to error")
 		})
 	}
 }
