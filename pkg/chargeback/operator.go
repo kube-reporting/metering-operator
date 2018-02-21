@@ -175,6 +175,7 @@ func (c *Chargeback) setupQueues() {
 				reportDataSourceQueue.Add(key)
 			}
 		},
+		DeleteFunc: c.handleReportDataSourceDeleted,
 	})
 
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ReportGenerationQueries")
