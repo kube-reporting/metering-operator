@@ -60,7 +60,7 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 }
 
 func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
-	prestoTableResourceName := "datasource-" + datasource.Name
+	prestoTableResourceName := prestoTableResourceNameFromKind("datasource", datasource.Name)
 	prestoTable, err := c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
