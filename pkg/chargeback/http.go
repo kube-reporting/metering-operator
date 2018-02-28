@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 
@@ -30,22 +31,23 @@ type server struct {
 
 func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	logger = logger.WithField("component", "api")
-	mux := http.NewServeMux()
+	router := chi.NewRouter()
 	httpServer := &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: router,
 	}
 	srv := &server{
 		chargeback: c,
 		logger:     logger,
 		httpServer: httpServer,
 	}
-	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
-	mux.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
-	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
-	mux.HandleFunc("/api/v1/collect/prometheus", srv.collectPromsumDataHandler)
-	mux.HandleFunc("/api/v1/store/prometheus", srv.storePromsumDataHandler)
-	mux.HandleFunc("/ready", srv.readinessHandler)
+	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
+	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/store", srv.storePromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/{datasourceName}", srv.getPromsumDataHandler)
+	router.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
 
@@ -386,4 +388,51 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+}
+
+func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+
+	name := chi.URLParam(r, "datasourceName")
+	err := r.ParseForm()
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode body: %v", err)
+		return
+	}
+
+	datasourceTable := dataSourceTableName(name)
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+
+	whereClause := ""
+	if start != "" {
+		startTime, err := time.Parse(time.RFC3339, start)
+		if err != nil {
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid start time parameter: %v", err)
+			return
+		}
+		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(startTime))
+	}
+	if end != "" {
+		endTime, err := time.Parse(time.RFC3339, end)
+		if err != nil {
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid end time parameter: %v", err)
+			return
+		}
+		if start != "" {
+			whereClause += " AND "
+		} ***REMOVED*** {
+			whereClause += " WHERE "
+		}
+		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(endTime))
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s %s", datasourceTable, whereClause)
+	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, query)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
+		return
+	}
+
+	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 }
