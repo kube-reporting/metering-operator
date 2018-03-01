@@ -75,4 +75,5 @@ spec:
       - name: coreos-pull-secret
       dnsPolicy: ClusterFirst
       restartPolicy: Always
+      serviceAccount: presto
       terminationGracePeriodSeconds: 30
