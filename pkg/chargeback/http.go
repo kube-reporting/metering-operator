@@ -18,6 +18,7 @@ import (
 
 	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
+	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
@@ -403,36 +404,58 @@ func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request)
 	datasourceTable := dataSourceTableName(name)
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
-
-	whereClause := ""
+	var startTime, endTime time.Time
 	if start != "" {
-		startTime, err := time.Parse(time.RFC3339, start)
+		startTime, err = time.Parse(time.RFC3339, start)
 		if err != nil {
 			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid start time parameter: %v", err)
 			return
 		}
-		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(startTime))
 	}
 	if end != "" {
-		endTime, err := time.Parse(time.RFC3339, end)
+		endTime, err = time.Parse(time.RFC3339, end)
 		if err != nil {
 			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid end time parameter: %v", err)
 			return
 		}
-		if start != "" {
-			whereClause += " AND "
-		} else {
-			whereClause += " WHERE "
-		}
-		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(endTime))
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s %s", datasourceTable, whereClause)
-	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, query)
+	results, err := queryPromsumDatasource(srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
+}
+
+func queryPromsumDatasource(queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
+	whereClause := ""
+	if !start.IsZero() {
+		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
+	}
+	if !end.IsZero() {
+		if !start.IsZero() {
+			whereClause += " AND "
+		} else {
+			whereClause += " WHERE "
+		}
+		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s %s", datasourceTable, whereClause)
+	rows, err := queryer.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []*PromsumRecord
+	for rows.Next() {
+		var record PromsumRecord
+		if err := rows.Scan(&record); err != nil {
+			return nil, err
+		}
+		results = append(results, &record)
+	}
+	return results, nil
 }
