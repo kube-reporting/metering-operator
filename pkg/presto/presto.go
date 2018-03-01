@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/avct/prestgo"
+	_ "github.com/prestodb/presto-go-client/presto"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/db"
 )
