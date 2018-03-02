@@ -3,6 +3,9 @@ image:
   tag: latest
   pullPolicy: Always
 
+con***REMOVED***g:
+  logLevel: "info"
+
 datanode:
   replicas: 1
   resources:
@@ -32,3 +35,4 @@ namenode:
   storage:
     size: "5Gi"
     class: null
+
