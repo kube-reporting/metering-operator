@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: hdfs-con***REMOVED***g
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log-level: {{ upper .Values.con***REMOVED***g.logLevel | quote}}
