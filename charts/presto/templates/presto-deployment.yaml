@@ -35,6 +35,11 @@ spec:
               key: aws-secret-access-key
         - name: PRESTO_CONF_discovery_uri
           value: "http://presto:8080"
+        - name: PRESTO_LOG_com_facebook_presto
+          valueFrom:
+            configMapKeyRef:
+              name: presto-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

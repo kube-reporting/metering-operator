@@ -3,6 +3,10 @@ presto:
     repository: quay.io/coreos/chargeback-presto
     tag: latest
     pullPolicy: Always
+
+  config:
+    logLevel: info
+
   resources:
     requests:
       memory: "1536Mi"
