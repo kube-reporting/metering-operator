@@ -70,6 +70,7 @@ echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
 # Presto
 con***REMOVED***gure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 con***REMOVED***gure "${PRESTO_HOME}/etc/con***REMOVED***g.properties" presto-conf PRESTO_CONF
+con***REMOVED***gure "${PRESTO_HOME}/etc/log.properties" presto-log PRESTO_LOG
 
 exec $@
 
