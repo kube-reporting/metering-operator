@@ -43,6 +43,11 @@ spec:
         env:
         - name: CORE_CONF_fs_defaultFS
           value: hdfs://hdfs-namenode-proxy:8020
+        - name: HADOOP_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hdfs-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
