@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hdfs-config
+  name: hive-config
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.config.logLevel | quote }}
+  log-level: {{ upper .Values.hive.config.logLevel | quote}}

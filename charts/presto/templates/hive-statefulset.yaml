@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: metastore
-        args: ["/opt/hive/bin/hive", "--service", "metastore"]
+        args: ["--service", "metastore"]
         image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
         imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
         ports:
@@ -40,6 +40,11 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -70,7 +75,7 @@ spec:
         resources:
 {{ toYaml .Values.hive.metastore.resources | indent 10 }}
       - name: hiveserver2
-        args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
+        args: ["--service", "hiveserver2"]
         image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
         imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
         ports:
@@ -94,6 +99,11 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

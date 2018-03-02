@@ -17,6 +17,9 @@ hive:
     tag: latest
     pullPolicy: Always
 
+  config:
+    logLevel: info
+
   metastore:
     resources:
       requests:
