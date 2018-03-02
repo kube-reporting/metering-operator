@@ -420,7 +420,7 @@ func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	results, err := queryPromsumDatasource(srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
+	results, err := queryPromsumDatasource(logger, srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
@@ -429,7 +429,7 @@ func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request)
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 }
 
-func queryPromsumDatasource(queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
+func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
 	whereClause := ""
 	if !start.IsZero() {
 		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
@@ -443,7 +443,7 @@ func queryPromsumDatasource(queryer db.Queryer, datasourceTable string, start, e
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s %s", datasourceTable, whereClause)
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s`, datasourceTable, whereClause)
 	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
@@ -451,11 +451,32 @@ func queryPromsumDatasource(queryer db.Queryer, datasourceTable string, start, e
 
 	var results []*PromsumRecord
 	for rows.Next() {
-		var record PromsumRecord
-		if err := rows.Scan(&record); err != nil {
+		var dbRecord promsumDBRecord
+		if err := rows.Scan(&dbRecord.Labels, &dbRecord.Amount, &dbRecord.TimePrecision, &dbRecord.Timestamp); err != nil {
 			return nil, err
+		}
+		labels := make(map[string]string)
+		for key, value := range dbRecord.Labels {
+			var ok bool
+			labels[key], ok = value.(string)
+			if !ok {
+				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
+			}
+		}
+		record := PromsumRecord{
+			Labels:    labels,
+			Amount:    dbRecord.Amount,
+			StepSize:  dbRecord.TimePrecision,
+			Timestamp: dbRecord.Timestamp,
 		}
 		results = append(results, &record)
 	}
 	return results, nil
+}
+
+type promsumDBRecord struct {
+	Labels        map[string]interface{}
+	Amount        float64
+	TimePrecision time.Duration
+	Timestamp     time.Time
 }
