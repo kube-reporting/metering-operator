@@ -6,6 +6,7 @@ ENV PATH=$HIVE_HOME/bin:$PATH
 
 WORKDIR /opt
 
+USER root
 # Install Hive
 RUN set -x \
     && curl -fSLs http://apache.osuosl.org/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xz && mv apache-hive-$HIVE_VERSION-bin hive
@@ -25,7 +26,12 @@ COPY metastore.sh /opt/hive/bin/ext/metastore.sh
 COPY hive-entrypoint.sh /usr/local/bin/hive-entrypoint.sh
 COPY conf/* $HIVE_HOME/conf/
 
-VOLUME /user/hive/warehouse
-VOLUME /var/lib/hive
+RUN \
+    mkdir -p /var/lib/hive /user/hive/warehouse && \
+    chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse && \
+    chmod -R 770 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
 
+VOLUME /user/hive/warehouse /var/lib/hive
 ENTRYPOINT ["hive-entrypoint.sh"]
+
+USER 1002
