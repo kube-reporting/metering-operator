@@ -5,6 +5,7 @@ image:
 
 config:
   logLevel: "info"
+  defaultfs: hdfs://hdfs-namenode-proxy:8020
 
 datanode:
   replicas: 1

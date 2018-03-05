@@ -6,3 +6,4 @@ metadata:
 {{- end }}
 data:
   log-level: {{ upper .Values.config.logLevel | quote }}
+  default-fs: {{ .Values.config.defaultfs | quote}}
