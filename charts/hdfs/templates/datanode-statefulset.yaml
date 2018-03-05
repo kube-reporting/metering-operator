@@ -33,6 +33,8 @@ spec:
     metadata:
       labels:
         app: hdfs-datanode
+      annotations:
+        hdfs-configmap-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 30
       containers:
