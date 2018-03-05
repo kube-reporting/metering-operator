@@ -60,7 +60,10 @@ spec:
         args: ["namenode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: default-fs
         - name: CLUSTER_NAME
           value: hdfs-k8s
         - name: HADOOP_LOGLEVEL

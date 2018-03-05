@@ -6,3 +6,4 @@ metadata:
 {{- end }}
 data:
   log-level: {{ upper .Values.hive.con***REMOVED***g.logLevel | quote}}
+  default-fs: {{ .Values.hive.con***REMOVED***g.defaultfs | quote}}

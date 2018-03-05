@@ -42,7 +42,10 @@ spec:
         args: ["datanode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-proxy:8020
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: default-fs
         - name: HADOOP_LOGLEVEL
           valueFrom:
             con***REMOVED***gMapKeyRef:

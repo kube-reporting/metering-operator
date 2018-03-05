@@ -6,3 +6,4 @@ metadata:
 {{- end }}
 data:
   log-level: {{ upper .Values.con***REMOVED***g.logLevel | quote }}
+  default-fs: {{ .Values.con***REMOVED***g.defaultfs | quote}}

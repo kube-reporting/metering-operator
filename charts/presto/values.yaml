@@ -23,6 +23,7 @@ hive:
 
   con***REMOVED***g:
     logLevel: info
+    defaultfs: hdfs://hdfs-namenode-proxy:8020
 
   metastore:
     resources:
