@@ -33,6 +33,8 @@ spec:
     metadata:
       labels:
         app: hdfs-datanode
+      annotations:
+        hdfs-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/con***REMOVED***gmap.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 30
       containers:
