@@ -16,6 +16,7 @@ spec:
       labels:
         app: hive
       annotations:
+        hive-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-con***REMOVED***gmap.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
     spec:
       containers:
