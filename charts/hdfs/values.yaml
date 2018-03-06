@@ -7,6 +7,9 @@ con***REMOVED***g:
   logLevel: "info"
   defaultfs: hdfs://hdfs-namenode-proxy:8020
 
+securityContext:
+  runAsNonRoot: true
+
 datanode:
   replicas: 1
   resources:

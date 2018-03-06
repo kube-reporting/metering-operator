@@ -13,6 +13,8 @@ spec:
       labels:
         app: {{ .Values.name }}
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"

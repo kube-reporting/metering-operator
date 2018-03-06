@@ -7,6 +7,9 @@ presto:
   con***REMOVED***g:
     logLevel: info
 
+  securityContext:
+    runAsNonRoot: true
+
   resources:
     requests:
       memory: "1536Mi"
@@ -24,6 +27,9 @@ hive:
   con***REMOVED***g:
     logLevel: info
     defaultfs: hdfs://hdfs-namenode-proxy:8020
+
+  securityContext:
+    runAsNonRoot: true
 
   metastore:
     resources:
