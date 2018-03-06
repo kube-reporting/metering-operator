@@ -80,7 +80,8 @@ podTemplate(
                 stage('checkout') {
                     sh '''
                     apk update
-                    apk add git bash jq zip
+                    apk add git bash jq zip python py-pip
+                    pip install pyyaml
                     '''
 
                     checkout([
@@ -168,7 +169,9 @@ podTemplate(
                         dir(kubeChargebackDir) {
                             stage('test') {
                                 sh '''#!/bin/bash
-                                make k8s-verify-codegen
+                                set -e
+                                set -o pipefail
+                                make ci-validate
                                 make test
                                 '''
                             }
