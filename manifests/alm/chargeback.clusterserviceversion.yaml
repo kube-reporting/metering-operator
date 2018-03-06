@@ -196,7 +196,7 @@ spec:
                   - name: HELM_WAIT
                     value: "false"
                   - name: HELM_RECONCILE_INTERVAL_SECONDS
-                    value: "120"
+                    value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
                   image: quay.io/coreos/chargeback-helm-operator:latest

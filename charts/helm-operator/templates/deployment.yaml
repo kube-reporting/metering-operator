@@ -40,7 +40,7 @@ spec:
         - name: HELM_WAIT
           value: "false"
         - name: HELM_RECONCILE_INTERVAL_SECONDS
-          value: "120"
+          value: {{ .Values.reconcileIntervalSeconds | quote }}
         - name: RELEASE_HISTORY_LIMIT
           value: "3"
         resources:

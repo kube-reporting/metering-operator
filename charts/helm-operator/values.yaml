@@ -24,3 +24,5 @@ imagePullSecrets: []
 rbac:
   roleName: helm-operator
   rules: []
+
+reconcileIntervalSeconds: 30
