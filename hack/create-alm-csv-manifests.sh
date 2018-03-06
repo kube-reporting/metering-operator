@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -o pipefail
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CHART="$DIR/../charts/chargeback-alm"
 
@@ -74,11 +76,11 @@ EOF
 # which we map over in our $JQ_CRD_SCRIPT.
 ***REMOVED***nd "$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions" \
     -type f \
-    -exec sh -c 'yamltojson < $0' {} \; \
+    -exec sh -c "$DIR/yamltojson < \$0" {} \; \
     | jq -rcs "$JQ_CRD_SCRIPT" > /tmp/alm-crd.json
 
-# Extract the spec of the deployment, and it's name
-yamltojson < "$DEPLOYMENT_MANIFEST" \
+# Extract the spec of the deployment, and it's name$DIR/
+"$DIR/yamltojson" < "$DEPLOYMENT_MANIFEST" \
     | jq -r "$JQ_DEPLOYMENT_SCRIPT" > /tmp/alm-deployment.json
 
 
@@ -87,15 +89,15 @@ yamltojson < "$DEPLOYMENT_MANIFEST" \
 jq \
     -s \
     -r "$JQ_RBAC_SCRIPT" \
-    <(yamltojson < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
-    <(yamltojson < "$RBAC_ROLE_MANIFEST") > /tmp/alm-permissions.json
+    <("$DIR/yamltojson" < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
+    <("$DIR/yamltojson" < "$RBAC_ROLE_MANIFEST") > /tmp/alm-permissions.json
 
 # Merge the 3 JSON objects created above
 jq -s '.[0] * .[1] * .[2]' \
     /tmp/alm-crd.json \
     /tmp/alm-deployment.json \
     /tmp/alm-permissions.json \
-    | jsontoyaml > /tmp/alm-values.yaml
+    | "$DIR/jsontoyaml" > /tmp/alm-values.yaml
 
 # use helm template to create the csv using our chargeback-alm chart.  the
 # chargeback-alm-values is the set of values which are entirely ALM speci***REMOVED***c,
