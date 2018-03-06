@@ -53,9 +53,8 @@ CUSTOM_VALUES_FILE="/tmp/helm-operator-values-${DEPLOY_TAG}.yaml"
 
 cat <<EOF > "$CUSTOM_VALUES_FILE"
 name: chargeback-helm-operator
-operator:
-  image:
-    tag: ${DEPLOY_TAG}
+image:
+  tag: ${DEPLOY_TAG}
 EOF
 
 echo "Creating installer manifests"
