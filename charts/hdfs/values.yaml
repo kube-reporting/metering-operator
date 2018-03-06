@@ -12,6 +12,7 @@ securityContext:
 
 datanode:
   replicas: 1
+  terminationGracePeriodSeconds: 30
   resources:
     requests:
       memory: "250Mi"
@@ -28,6 +29,7 @@ datanode:
     size: "5Gi"
 
 namenode:
+  terminationGracePeriodSeconds: 10
   resources:
     requests:
       memory: "350Mi"

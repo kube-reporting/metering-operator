@@ -10,6 +10,8 @@ presto:
   securityContext:
     runAsNonRoot: true
 
+  terminationGracePeriodSeconds: 30
+
   resources:
     requests:
       memory: "1536Mi"
@@ -30,6 +32,8 @@ hive:
 
   securityContext:
     runAsNonRoot: true
+
+  terminationGracePeriodSeconds: 30
 
   metastore:
     resources:

@@ -84,4 +84,4 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: {{ .Values.presto.terminationGracePeriodSeconds }}

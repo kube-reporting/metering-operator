@@ -141,7 +141,7 @@ spec:
 {{ toYaml .Values.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: 5
+      terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
       imagePullSecrets:
       - name: coreos-pull-secret

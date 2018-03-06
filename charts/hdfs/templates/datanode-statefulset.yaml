@@ -36,7 +36,7 @@ spec:
       annotations:
         hdfs-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/con***REMOVED***gmap.yaml") . | sha256sum }}
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       containers:
