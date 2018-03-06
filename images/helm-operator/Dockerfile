@@ -26,3 +26,5 @@ COPY get_owner.sh /usr/local/bin/get_owner.sh
 ENV HELM_HOST 127.0.0.1:44134
 
 ENTRYPOINT ["entrypoint.sh"]
+
+USER 2001
