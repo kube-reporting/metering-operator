@@ -13,6 +13,8 @@ spec:
       labels:
         app: chargeback-helm-operator
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
       - name: chargeback-helm-operator
         image: "quay.io/coreos/chargeback-helm-operator:0.5.1"

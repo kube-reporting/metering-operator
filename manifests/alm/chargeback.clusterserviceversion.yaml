@@ -247,6 +247,8 @@ spec:
                 imagePullSecrets:
                 - name: coreos-pull-secret
                 restartPolicy: Always
+                securityContext:
+                  runAsNonRoot: true
                 serviceAccount: chargeback-helm-operator
                 terminationGracePeriodSeconds: 30
   customresourcedefinitions:

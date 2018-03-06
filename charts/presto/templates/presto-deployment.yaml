@@ -19,6 +19,8 @@ spec:
         presto-config-hash: {{ include (print $.Template.BasePath "/presto-config.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
     spec:
+      securityContext:
+{{ toYaml .Values.presto.securityContext | indent 8 }}
       containers:
       - name: presto
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"

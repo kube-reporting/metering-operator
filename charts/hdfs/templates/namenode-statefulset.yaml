@@ -55,6 +55,8 @@ spec:
         hdfs-configmap-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 5
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
