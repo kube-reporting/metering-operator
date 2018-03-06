@@ -36,7 +36,7 @@ spec:
       annotations:
         hdfs-configmap-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       containers:
