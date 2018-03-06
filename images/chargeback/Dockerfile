@@ -6,3 +6,5 @@ RUN apk add ca-certi***REMOVED***cates bash
 ADD ./bin/chargeback /usr/local/bin/chargeback
 
 ENTRYPOINT ["chargeback"]
+
+USER 3001
