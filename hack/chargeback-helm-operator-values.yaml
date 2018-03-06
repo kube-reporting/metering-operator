@@ -18,17 +18,10 @@ crd:
     catalog.app.coreos.com/displayName: "Chargeback"
     catalog.app.coreos.com/description: "An instance of Chargeback"
 
-operator:
-  image:
-    repository: quay.io/coreos/chargeback-helm-operator
-    tag: 0.5.1
-    pullPolicy: Always
-
-tiller:
-  image:
-    repository: gcr.io/kubernetes-helm/tiller
-    tag: v2.6.2
-    pullPolicy: Always
+image:
+  repository: quay.io/coreos/chargeback-helm-operator
+  tag: latest
+  pullPolicy: Always
 
 serviceAccountName: chargeback-helm-operator
 imagePullSecrets:

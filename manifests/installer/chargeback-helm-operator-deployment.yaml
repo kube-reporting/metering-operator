@@ -17,7 +17,8 @@ spec:
         runAsNonRoot: true
       containers:
       - name: chargeback-helm-operator
-        image: "quay.io/coreos/chargeback-helm-operator:0.5.1"
+        image: "quay.io/coreos/chargeback-helm-operator:latest"
+        args: ["run-operator.sh"]
         imagePullPolicy: Always
         env:
         - name: HELM_RELEASE_CRD_NAME
@@ -50,7 +51,8 @@ spec:
             memory: "25Mi"
             cpu: "50m"
       - name: tiller
-        image: "gcr.io/kubernetes-helm/tiller:v2.6.2"
+        image: "quay.io/coreos/chargeback-helm-operator:latest"
+        args: ["/tiller"]
         imagePullPolicy: Always
         env:
         - name: TILLER_NAMESPACE
