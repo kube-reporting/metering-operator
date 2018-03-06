@@ -38,15 +38,21 @@ spec:
       awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
     presto:
+      terminationGracePeriodSeconds: 0
       image:
         tag: ${DEPLOY_TAG}
     hive:
+      terminationGracePeriodSeconds: 0
       image:
         tag: ${DEPLOY_TAG}
 
   hdfs:
     image:
       tag: ${DEPLOY_TAG}
+    datanode:
+      terminationGracePeriodSeconds: 0
+    namenode:
+      terminationGracePeriodSeconds: 0
 EOF
 
 CUSTOM_VALUES_FILE="/tmp/helm-operator-values-${DEPLOY_TAG}.yaml"
