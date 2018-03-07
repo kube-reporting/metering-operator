@@ -6,12 +6,19 @@ presto:
   presto:
     image:
       tag: 0.5.1
+    securityContext:
+      fsGroup: 0
   hive:
     image:
       tag: 0.5.1
+    securityContext:
+      fsGroup: 0
 
 hdfs:
   enabled: true
   image:
     tag: 0.5.1
-
+  config:
+    datanodeDataDirPerms: "775"
+  securityContext:
+    fsGroup: 0
