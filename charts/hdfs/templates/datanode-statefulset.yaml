@@ -50,6 +50,11 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: hdfs-con***REMOVED***g
               key: default-fs
+        - name: HDFS_CONF_dfs_datanode_data_dir_perm
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: datanode-data-dir-perms
         - name: HADOOP_LOGLEVEL
           valueFrom:
             con***REMOVED***gMapKeyRef:

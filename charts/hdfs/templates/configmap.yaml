@@ -7,3 +7,4 @@ metadata:
 data:
   log-level: {{ upper .Values.con***REMOVED***g.logLevel | quote }}
   default-fs: {{ .Values.con***REMOVED***g.defaultfs | quote}}
+  datanode-data-dir-perms: {{ .Values.con***REMOVED***g.datanodeDataDirPerms | quote}}
