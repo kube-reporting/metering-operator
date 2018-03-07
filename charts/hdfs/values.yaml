@@ -5,7 +5,7 @@ image:
 
 config:
   logLevel: "info"
-  defaultfs: hdfs://hdfs-namenode-proxy:8020
+  defaultfs: hdfs://hdfs-namenode-0.hdfs-namenode:8020
   datanodeDataDirPerms: "770"
 
 securityContext:
