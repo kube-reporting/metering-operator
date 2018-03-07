@@ -40,11 +40,13 @@ func TestMain(m *testing.M) {
 func collectMetricsOnce(t *testing.T, namespace string) (reportStart time.Time, reportEnd time.Time) {
 	t.Helper()
 	collectOnce.Do(func() {
+		// Use UTC, Prometheus uses UTCf for timestamps
+		now := time.Now().UTC()
 		// reportEnd is an hour and 10 minutes ago because Prometheus may not
 		// have collected very recent data, and setting to hour ago ensures
 		// that a scheduledReport created with a LastReportTime of reportEnd
 		// will run immediately.
-		reportEnd = time.Now().Add(-(time.Hour + 10*time.Minute))
+		reportEnd = now.Add(-(time.Hour + 10*time.Minute))
 		// To make things faster, let's limit the window of collected data to
 		// 10 minutes
 		reportStart = reportEnd.Add(-10 * time.Minute)
