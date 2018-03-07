@@ -50,6 +50,11 @@ spec:
             configMapKeyRef:
               name: hdfs-config
               key: default-fs
+        - name: HDFS_CONF_dfs_datanode_data_dir_perm
+          valueFrom:
+            configMapKeyRef:
+              name: hdfs-config
+              key: datanode-data-dir-perms
         - name: HADOOP_LOGLEVEL
           valueFrom:
             configMapKeyRef:

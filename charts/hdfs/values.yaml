@@ -6,6 +6,7 @@ image:
 config:
   logLevel: "info"
   defaultfs: hdfs://hdfs-namenode-proxy:8020
+  datanodeDataDirPerms: "770"
 
 securityContext:
   runAsNonRoot: true

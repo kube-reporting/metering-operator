@@ -54,8 +54,4 @@
     <name>dfs.datanode.data.dir</name>
     <value>file:///hadoop/dfs/data</value>
   </property>
-  <property>
-    <name>dfs.datanode.data.dir.perm</name>
-    <value>770</value>
-  </property>
 </configuration>
