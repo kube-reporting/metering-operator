@@ -5,7 +5,8 @@ image:
 
 config:
   logLevel: "info"
-  defaultfs: hdfs://hdfs-namenode-0.hdfs-namenode:8020
+  namenodeHost: hdfs-namenode-0.hdfs-namenode
+  namenodePort: 8020
   datanodeDataDirPerms: "770"
 
 securityContext:
