@@ -39,6 +39,25 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
+      initContainers:
+      # wait-for-namenode exists because for some reason the datanode is unable
+      # to connect to the namenode if it starts before the namenode's DNS name
+      # is resolvable. We cannot use a clusterIP service for the namenode which
+      # would always be resolvable, because on Openshift, clusterIP services
+      # NAT loses sourceIPs, breaking HDFS clustering.
+      - name: wait-for-namenode
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - '/bin/bash'
+        - '-c'
+        - 'until nslookup $NAMENODE_HOST; do echo waiting for $NAMENODE_HOST; sleep 2; done;'
+        env:
+        - name: NAMENODE_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: namenode-host
       containers:
       - name: hdfs-datanode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

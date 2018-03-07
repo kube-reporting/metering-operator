@@ -6,5 +6,6 @@ metadata:
 {{- end }}
 data:
   log-level: {{ upper .Values.con***REMOVED***g.logLevel | quote }}
-  default-fs: {{ .Values.con***REMOVED***g.defaultfs | quote}}
+  default-fs: {{ printf "hdfs://%s:%d" .Values.con***REMOVED***g.namenodeHost (int .Values.con***REMOVED***g.namenodePort) | quote}}
+  namenode-host: {{ .Values.con***REMOVED***g.namenodeHost | quote}}
   datanode-data-dir-perms: {{ .Values.con***REMOVED***g.datanodeDataDirPerms | quote}}

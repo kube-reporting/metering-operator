@@ -10,6 +10,7 @@ RUN \
         perl \
         procps \
         net-tools \
+        dnsutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
