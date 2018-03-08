@@ -252,18 +252,18 @@ podTemplate(
                         }
                     }
 
-                    parallel tectonic: {
-                        withCredentials([
-                            [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
-                        ]) {
-                            withEnv([
-                                "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                                "INSTALL_METHOD=direct",
-                                "KUBECONFIG=${KUBECONFIG}",
+                    stage('e2e tests') {
+                        parallel tectonic: {
+                            withCredentials([
+                                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
                             ]) {
-                                container('docker'){
-                                    dir(kubeChargebackDir) {
-                                        stage('e2e tests') {
+                                withEnv([
+                                    "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                    "INSTALL_METHOD=direct",
+                                    "KUBECONFIG=${KUBECONFIG}",
+                                ]) {
+                                    container('docker'){
+                                        dir(kubeChargebackDir) {
                                             if (runE2ETests) {
                                                 echo "Running chargeback e2e tests"
                                                 try {
@@ -293,8 +293,6 @@ podTemplate(
                                                             '''
                                                         }
                                                     }
-                                                } catch (e) {
-                                                    throw e
                                                 } ***REMOVED***nally {
                                                     if (!params.SKIP_NAMESPACE_CLEANUP) {
                                                         sh '''#!/bin/bash -e
@@ -309,11 +307,62 @@ podTemplate(
                                     }
                                 }
                             }
-                        }
-                    }, openshift: {
-
-                    }, failFast: false
-
+                        }, openshift: {
+                            withCredentials([
+                                [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubecon***REMOVED***g', variable: 'KUBECONFIG'],
+                            ]) {
+                                withEnv([
+                                    "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                    "INSTALL_METHOD=openshift-direct",
+                                    "KUBECONFIG=${KUBECONFIG}",
+                                ]) {
+                                    container('docker'){
+                                        dir(kubeChargebackDir) {
+                                            if (runE2ETests) {
+                                                echo "Running chargeback e2e tests"
+                                                try {
+                                                    ansiColor('xterm') {
+                                                        timeout(10) {
+                                                            sh '''#!/bin/bash -e
+                                                            rm -rf ${TEST_OUTPUT_DIR}
+                                                            mkdir -p ${TEST_OUTPUT_DIR}
+                                                            touch ${TEST_OUTPUT_DIR}/deploy.log
+                                                            touch ${TEST_OUTPUT_DIR}/test.log
+                                                            tail -f ${TEST_OUTPUT_DIR}/deploy.log &
+                                                            tail -f ${TEST_OUTPUT_DIR}/test.log &
+                                                            function cleanup() {
+                                                                kill "$(jobs -p)" || true
+                                                                (docker ps -q | xargs docker kill) || true
+                                                            }
+                                                            trap 'cleanup' EXIT
+                                                            docker run \
+                                                                -i --rm \
+                                                                -e INSTALL_METHOD=${INSTALL_METHOD} \
+                                                                -e DEPLOY_SCRIPT=deploy-ci.sh \
+                                                                --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                                -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
+                                                                -v "${KUBECONFIG}:${KUBECONFIG}" \
+                                                                -v "${TEST_OUTPUT_DIR}:/out" \
+                                                                quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
+                                                            '''
+                                                        }
+                                                    }
+                                                } ***REMOVED***nally {
+                                                    if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                                        sh '''#!/bin/bash -e
+                                                        ./hack/delete-ns.sh
+                                                        '''
+                                                    }
+                                                }
+                                            } ***REMOVED*** {
+                                                echo "Non-master branch, skipping chargeback e2e tests"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, failFast: false
+                    }
                 }
             }
         } catch (e) {
