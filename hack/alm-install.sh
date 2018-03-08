@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/default-env.sh
-source ${DIR}/util.sh
+source "${DIR}/default-env.sh"
+source "${DIR}/util.sh"
 
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
