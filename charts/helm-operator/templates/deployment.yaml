@@ -35,8 +35,6 @@ spec:
               fieldPath: metadata.namespace
         - name: HELM_HOST
           value: "127.0.0.1:44134"
-        - name: SET_OWNER_REFERENCE_VALUE
-          value: "true"
         - name: HELM_WAIT
           value: "false"
         - name: HELM_RECONCILE_INTERVAL_SECONDS
