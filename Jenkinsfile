@@ -110,7 +110,6 @@ podTemplate(
             }
 
             withCredentials([
-                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
                 [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'kube-chargeback-s3', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'],
                 usernamePassword(credentialsId: 'quay-coreos-jenkins-push', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME'),
             ]) {
@@ -126,7 +125,6 @@ podTemplate(
                     "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
                     "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
-                    "KUBECONFIG=${KUBECONFIG}",
                     "ENABLE_AWS_BILLING=false",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPrefix}",
@@ -254,57 +252,68 @@ podTemplate(
                         }
                     }
 
-                    withEnv([
-                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                    ]) {
-                        container('docker'){
-                            dir(kubeChargebackDir) {
-                                stage('e2e tests') {
-                                    if (runE2ETests) {
-                                        echo "Running chargeback e2e tests"
-                                        try {
-                                            ansiColor('xterm') {
-                                                timeout(10) {
-                                                    sh '''#!/bin/bash -e
-                                                    rm -rf ${TEST_OUTPUT_DIR}
-                                                    mkdir -p ${TEST_OUTPUT_DIR}
-                                                    touch ${TEST_OUTPUT_DIR}/deploy.log
-                                                    touch ${TEST_OUTPUT_DIR}/test.log
-                                                    tail -f ${TEST_OUTPUT_DIR}/deploy.log &
-                                                    tail -f ${TEST_OUTPUT_DIR}/test.log &
-                                                    function cleanup() {
-                                                        kill "$(jobs -p)" || true
-                                                        (docker ps -q | xargs docker kill) || true
+                    parallel tectonic: {
+                        withCredentials([
+                            [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
+                        ]) {
+                            withEnv([
+                                "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                "INSTALL_METHOD=direct",
+                                "KUBECONFIG=${KUBECONFIG}",
+                            ]) {
+                                container('docker'){
+                                    dir(kubeChargebackDir) {
+                                        stage('e2e tests') {
+                                            if (runE2ETests) {
+                                                echo "Running chargeback e2e tests"
+                                                try {
+                                                    ansiColor('xterm') {
+                                                        timeout(10) {
+                                                            sh '''#!/bin/bash -e
+                                                            rm -rf ${TEST_OUTPUT_DIR}
+                                                            mkdir -p ${TEST_OUTPUT_DIR}
+                                                            touch ${TEST_OUTPUT_DIR}/deploy.log
+                                                            touch ${TEST_OUTPUT_DIR}/test.log
+                                                            tail -f ${TEST_OUTPUT_DIR}/deploy.log &
+                                                            tail -f ${TEST_OUTPUT_DIR}/test.log &
+                                                            function cleanup() {
+                                                                kill "$(jobs -p)" || true
+                                                                (docker ps -q | xargs docker kill) || true
+                                                            }
+                                                            trap 'cleanup' EXIT
+                                                            docker run \
+                                                                -i --rm \
+                                                                -e INSTALL_METHOD=${INSTALL_METHOD} \
+                                                                -e DEPLOY_SCRIPT=deploy-ci.sh \
+                                                                --env-file <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                                -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
+                                                                -v "${KUBECONFIG}:${KUBECONFIG}" \
+                                                                -v "${TEST_OUTPUT_DIR}:/out" \
+                                                                quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
+                                                            '''
+                                                        }
                                                     }
-                                                    trap 'cleanup' EXIT
-                                                    docker run \
-                                                        -i --rm \
-                                                        -e INSTALL_METHOD=direct \
-                                                        -e DEPLOY_SCRIPT=deploy-ci.sh \
-                                                        --env-file <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
-                                                        -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
-                                                        -v "${KUBECONFIG}:${KUBECONFIG}" \
-                                                        -v "${TEST_OUTPUT_DIR}:/out" \
-                                                        quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
-                                                    '''
+                                                } catch (e) {
+                                                    throw e
+                                                } finally {
+                                                    if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                                        sh '''#!/bin/bash -e
+                                                        ./hack/delete-ns.sh
+                                                        '''
+                                                    }
                                                 }
-                                            }
-                                        } catch (e) {
-                                            throw e
-                                        } finally {
-                                            if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                                sh '''#!/bin/bash -e
-                                                ./hack/delete-ns.sh
-                                                '''
+                                            } else {
+                                                echo "Non-master branch, skipping chargeback e2e tests"
                                             }
                                         }
-                                    } else {
-                                        echo "Non-master branch, skipping chargeback e2e tests"
                                     }
                                 }
                             }
                         }
-                    }
+                    }, openshift: {
+
+                    }, failFast: false
+
                 }
             }
         } catch (e) {
