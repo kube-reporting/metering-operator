@@ -1,0 +1,33 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "tectonic-chargeback"
+spec:
+  chargeback-operator:
+    config:
+      prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
+
+    image:
+      tag: latest
+
+  presto:
+    presto:
+      securityContext:
+        fsGroup: null
+
+      image:
+        tag: latest
+
+    hive:
+      image:
+        tag: latest
+
+      securityContext:
+        fsGroup: null
+  hdfs:
+    image:
+      tag: latest
+
+    securityContext:
+      fsGroup: null
+

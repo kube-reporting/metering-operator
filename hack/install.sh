@@ -1,10 +1,11 @@
 #!/bin/bash -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/default-env.sh
-source ${DIR}/util.sh
+source "${DIR}/default-env.sh"
+source "${DIR}/util.sh"
 
 : "${CREATE_NAMESPACE:=false}"
+: "${SKIP_COPY_PULL_SECRET:=false}"
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 
@@ -16,7 +17,7 @@ elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
     exit 1
 fi
 
-if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
+if [[ "$SKIP_COPY_PULL_SECRET" != "true" && "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]]; then
     msg "Configuring pull secrets"
     copy-tectonic-pull
 fi
