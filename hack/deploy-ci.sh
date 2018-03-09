@@ -61,6 +61,7 @@ cat <<EOF > "$CUSTOM_VALUES_FILE"
 name: chargeback-helm-operator
 image:
   tag: ${DEPLOY_TAG}
+reconcileIntervalSeconds: 5
 EOF
 
 echo "Creating installer manifests"
