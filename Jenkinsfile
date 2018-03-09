@@ -268,6 +268,7 @@ podTemplate(
                                             if (runE2ETests) {
                                                 echo "Running chargeback e2e tests"
                                                 sh 'kubectl con***REMOVED***g current-context'
+                                                sh 'kubectl con***REMOVED***g get-contexts'
                                                 try {
                                                     ansiColor('xterm') {
                                                         timeout(10) {
@@ -324,6 +325,7 @@ podTemplate(
                                             if (runE2ETests) {
                                                 echo "Running chargeback e2e tests"
                                                 sh 'kubectl con***REMOVED***g current-context'
+                                                sh 'kubectl con***REMOVED***g get-contexts'
                                                 try {
                                                     ansiColor('xterm') {
                                                         timeout(10) {
