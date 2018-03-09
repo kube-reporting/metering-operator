@@ -349,6 +349,8 @@ podTemplate(
                                                             '''
                                                         }
                                                     }
+                                                } catch (err) {
+                                                    echo "E2E Failed on openshift, err: ${err}"
                                                 } finally {
                                                     if (!params.SKIP_NAMESPACE_CLEANUP) {
                                                         sh '''#!/bin/bash -e
