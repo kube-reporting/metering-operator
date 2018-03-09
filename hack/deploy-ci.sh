@@ -1,12 +1,13 @@
 #!/bin/bash
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 : ${DEPLOY_TAG:?}
 
-export CHARGEBACK_CR_FILE="/tmp/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
-export INSTALLER_MANIFEST_DIR="/tmp/installer_manifests-${DEPLOY_TAG}"
-export DELETE_PVCS=true
+TMP_DIR="$(mktemp -d)"
+export CHARGEBACK_CR_FILE=${CHARGEBACK_CR_FILE:-"$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"}
+export INSTALLER_MANIFEST_DIR=${INSTALLER_MANIFEST_DIR:-"$TMP_DIR/installer_manifests-${DEPLOY_TAG}"}
+export CUSTOM_VALUES_FILE=${CUSTOM_VALUES_FILE:-"$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"}
+export DELETE_PVCS=${DELETE_PVCS:-true}
 
 : "${ENABLE_AWS_BILLING:=false}"
 : "${AWS_ACCESS_KEY_ID:=}"
@@ -55,7 +56,6 @@ spec:
       terminationGracePeriodSeconds: 0
 EOF
 
-CUSTOM_VALUES_FILE="/tmp/helm-operator-values-${DEPLOY_TAG}.yaml"
 
 cat <<EOF > "$CUSTOM_VALUES_FILE"
 name: chargeback-helm-operator
