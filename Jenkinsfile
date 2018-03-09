@@ -281,7 +281,6 @@ podTemplate(
                                                             tail -f ${TEST_OUTPUT_DIR}/test.log &
                                                             function cleanup() {
                                                                 kill "$(jobs -p)" || true
-                                                                (docker ps -q | xargs docker kill) || true
                                                             }
                                                             trap 'cleanup' EXIT
                                                             docker run \
@@ -338,7 +337,6 @@ podTemplate(
                                                             tail -f ${TEST_OUTPUT_DIR}/test.log &
                                                             function cleanup() {
                                                                 kill "$(jobs -p)" || true
-                                                                (docker ps -q | xargs docker kill) || true
                                                             }
                                                             trap 'cleanup' EXIT
                                                             docker run \
@@ -377,6 +375,11 @@ podTemplate(
         } ***REMOVED***nally {
             archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
             step([$class: "TapPublisher", testResults: "test_output/**/*.tap"])
+            container('docker') {
+                sh """#!/bin/bash
+                (docker ps -q | xargs docker kill) || true
+                """
+            }
             cleanWs notFailBuild: true
         }
     }
