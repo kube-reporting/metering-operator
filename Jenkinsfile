@@ -315,7 +315,7 @@ podTemplate(
                                 withEnv([
                                     "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
                                     "INSTALL_METHOD=openshift-direct",
-                                    "DEPLOY_SCRIPT=deploy-ci.sh",
+                                    "DEPLOY_SCRIPT=deploy-openshift-ci.sh",
                                     "SKIP_COPY_PULL_SECRET=false",
                                     "KUBECONFIG=${KUBECONFIG}",
                                     "TEST_OUTPUT_DIR=${testOutputDir}/openshift",
