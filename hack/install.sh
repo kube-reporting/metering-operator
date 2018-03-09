@@ -20,6 +20,14 @@ elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
 if [[ "$SKIP_COPY_PULL_SECRET" != "true" && "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]]; then
     msg "Con***REMOVED***guring pull secrets"
     copy-tectonic-pull
+elif [ -s "$CHARGEBACK_PULL_SECRET_PATH" ]; then
+    kubectl -n "${CHARGEBACK_NAMESPACE}" \
+        create secret generic coreos-pull-secret \
+        --from-***REMOVED***le=.dockercon***REMOVED***gjson="${CHARGEBACK_PULL_SECRET_PATH}" \
+        --type='kubernetes.io/dockercon***REMOVED***gjson'
+***REMOVED***
+    echo "\$SKIP_COPY_PULL_SECRET and \$CHARGEBACK_PULL_SECRET_PATH not a dockercon***REMOVED***gjson"
+    exit 1
 ***REMOVED***
 
 msg "Installing Custom Resource De***REMOVED***nitions"

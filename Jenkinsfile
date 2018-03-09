@@ -260,6 +260,7 @@ podTemplate(
                                 withEnv([
                                     "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
                                     "INSTALL_METHOD=direct",
+                                    "DEPLOY_SCRIPT=deploy-ci.sh",
                                     "KUBECONFIG=${KUBECONFIG}",
                                 ]) {
                                     container('docker'){
@@ -284,9 +285,7 @@ podTemplate(
                                                             trap 'cleanup' EXIT
                                                             docker run \
                                                                 -i --rm \
-                                                                -e INSTALL_METHOD=${INSTALL_METHOD} \
-                                                                -e DEPLOY_SCRIPT=deploy-ci.sh \
-                                                                --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                                --env-***REMOVED***le <(env | grep -E 'INSTALL_METHOD|DEPLOY_SCRIPT|DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
                                                                 -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                                                                 -v "${KUBECONFIG}:${KUBECONFIG}" \
                                                                 -v "${TEST_OUTPUT_DIR}:/out" \
@@ -315,6 +314,8 @@ podTemplate(
                                 withEnv([
                                     "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
                                     "INSTALL_METHOD=openshift-direct",
+                                    "DEPLOY_SCRIPT=deploy-ci.sh",
+                                    "SKIP_COPY_PULL_SECRET=false",
                                     "KUBECONFIG=${KUBECONFIG}",
                                 ]) {
                                     container('docker'){
@@ -339,9 +340,7 @@ podTemplate(
                                                             trap 'cleanup' EXIT
                                                             docker run \
                                                                 -i --rm \
-                                                                -e INSTALL_METHOD=${INSTALL_METHOD} \
-                                                                -e DEPLOY_SCRIPT=deploy-ci.sh \
-                                                                --env-***REMOVED***le <(env | grep -E 'DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
+                                                                --env-***REMOVED***le <(env | grep -E 'INSTALL_METHOD|DEPLOY_SCRIPT|DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK|PULL_SECRET') \
                                                                 -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                                                                 -v "${KUBECONFIG}:${KUBECONFIG}" \
                                                                 -v "${TEST_OUTPUT_DIR}:/out" \
