@@ -268,8 +268,8 @@ func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time
 			}
 		}
 		timeRanges = append(timeRanges, prom.Range{
-			Start: chunkStart,
-			End:   chunkEnd,
+			Start: chunkStart.UTC(),
+			End:   chunkEnd.UTC(),
 			Step:  stepSize,
 		})
 
