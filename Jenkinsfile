@@ -130,7 +130,6 @@ podTemplate(
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
-                    "TEST_OUTPUT_DIR=${testOutputDir}",
                     "CLEANUP_CHARGEBACK=${!params.SKIP_NAMESPACE_CLEANUP}",
                 ]){
                     container('docker'){
@@ -262,6 +261,7 @@ podTemplate(
                                     "INSTALL_METHOD=direct",
                                     "DEPLOY_SCRIPT=deploy-ci.sh",
                                     "KUBECONFIG=${KUBECONFIG}",
+                                    "TEST_OUTPUT_DIR=${testOutputDir}/tectonic",
                                 ]) {
                                     container('docker'){
                                         dir(kubeChargebackDir) {
@@ -317,6 +317,7 @@ podTemplate(
                                     "DEPLOY_SCRIPT=deploy-ci.sh",
                                     "SKIP_COPY_PULL_SECRET=false",
                                     "KUBECONFIG=${KUBECONFIG}",
+                                    "TEST_OUTPUT_DIR=${testOutputDir}/openshift",
                                 ]) {
                                     container('docker'){
                                         dir(kubeChargebackDir) {

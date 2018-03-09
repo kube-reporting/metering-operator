@@ -40,7 +40,13 @@ function cleanup() {
     uninstall_chargeback "$INSTALL_METHOD" >> /out/deploy.log
 }
 
+
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
+    TMP_DIR="$(mktemp -d)"
+    export CHARGEBACK_CR_FILE="$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
+    export INSTALLER_MANIFEST_DIR="$TMP_DIR/installer_manifests-${DEPLOY_TAG}"
+    export CUSTOM_VALUES_FILE="$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"
+
     if [ "$CLEANUP_CHARGEBACK" == "true" ]; then
         trap cleanup EXIT SIGINT
     ***REMOVED***
