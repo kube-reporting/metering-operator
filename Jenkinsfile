@@ -266,6 +266,7 @@ podTemplate(
                                         dir(kubeChargebackDir) {
                                             if (runE2ETests) {
                                                 echo "Running chargeback e2e tests"
+                                                sh 'kubectl con***REMOVED***g current-context'
                                                 try {
                                                     ansiColor('xterm') {
                                                         timeout(10) {
@@ -320,6 +321,7 @@ podTemplate(
                                         dir(kubeChargebackDir) {
                                             if (runE2ETests) {
                                                 echo "Running chargeback e2e tests"
+                                                sh 'kubectl con***REMOVED***g current-context'
                                                 try {
                                                     ansiColor('xterm') {
                                                         timeout(10) {
