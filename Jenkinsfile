@@ -376,7 +376,7 @@ podTemplate(
             throw e
         } ***REMOVED***nally {
             archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
-            step([$class: "TapPublisher", testResults: "test_output/test-log.tap"])
+            step([$class: "TapPublisher", testResults: "test_output/**/*.tap"])
             cleanWs notFailBuild: true
         }
     }
