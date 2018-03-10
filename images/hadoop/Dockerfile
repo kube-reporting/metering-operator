@@ -8,6 +8,9 @@ RUN \
         curl \
         less  \
         perl \
+        procps \
+        net-tools \
+        dnsutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -46,14 +49,21 @@ RUN set -x \
 
 RUN ln -s /opt/hadoop-$HADOOP_VERSION/etc/hadoop /etc/hadoop
 RUN cp /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml
-RUN mkdir /opt/hadoop-$HADOOP_VERSION/logs
+RUN mkdir -p /opt/hadoop-$HADOOP_VERSION/logs
 
-RUN mkdir /hadoop-data
 ADD entrypoint.sh /usr/local/bin
 ADD datanode-entrypoint.sh /usr/local/bin
 ADD namenode-entrypoint.sh /usr/local/bin
 ADD start-name.sh /usr/local/bin
 ADD etc /etc/hadoop
 
+# to allow running as non-root
+RUN \
+    mkdir -p /hadoop/dfs/data /hadoop/dfs/name && \
+    chown -R 1002:0 /opt /hadoop /hadoop /etc/hadoop && \
+    chmod -R 770 /opt /hadoop /etc/hadoop /etc/passwd
+
+VOLUME /hadoop/dfs/data /hadoop/dfs/name
 ENTRYPOINT ["entrypoint.sh"]
 
+USER 1002

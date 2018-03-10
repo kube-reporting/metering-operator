@@ -6,3 +6,5 @@ RUN apk add ca-certificates bash
 ADD ./bin/chargeback /usr/local/bin/chargeback
 
 ENTRYPOINT ["chargeback"]
+
+USER 3001

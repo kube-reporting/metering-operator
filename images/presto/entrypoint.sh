@@ -70,6 +70,14 @@ echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.config"
 # Presto
 configure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 configure "${PRESTO_HOME}/etc/config.properties" presto-conf PRESTO_CONF
+configure "${PRESTO_HOME}/etc/log.properties" presto-log PRESTO_LOG
+
+# add UID to /etc/passwd if missing
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
+fi
 
 exec $@
 

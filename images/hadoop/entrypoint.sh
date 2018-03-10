@@ -58,5 +58,12 @@ else
     echo "Setting HADOOP_HEAPSIZE to ${HADOOP_HEAPSIZE}M"
 fi
 
+# add UID to /etc/passwd if missing
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
+fi
+
 exec $@
 

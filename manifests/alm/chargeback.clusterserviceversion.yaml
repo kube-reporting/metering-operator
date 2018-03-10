@@ -174,7 +174,9 @@ spec:
                   app: chargeback-helm-operator
               spec:
                 containers:
-                - env:
+                - args:
+                  - run-operator.sh
+                  env:
                   - name: HELM_RELEASE_CRD_NAME
                     value: Chargeback
                   - name: HELM_RELEASE_CRD_API_GROUP
@@ -194,10 +196,10 @@ spec:
                   - name: HELM_WAIT
                     value: "false"
                   - name: HELM_RECONCILE_INTERVAL_SECONDS
-                    value: "120"
+                    value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:0.5.1
+                  image: quay.io/coreos/chargeback-helm-operator:latest
                   imagePullPolicy: Always
                   name: chargeback-helm-operator
                   resources:
@@ -207,14 +209,16 @@ spec:
                     requests:
                       cpu: 50m
                       memory: 25Mi
-                - env:
+                - args:
+                  - /tiller
+                  env:
                   - name: TILLER_NAMESPACE
                     valueFrom:
                       fieldRef:
                         fieldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: gcr.io/kubernetes-helm/tiller:v2.6.2
+                  image: quay.io/coreos/chargeback-helm-operator:latest
                   imagePullPolicy: Always
                   livenessProbe:
                     failureThreshold: 3
@@ -247,6 +251,8 @@ spec:
                 imagePullSecrets:
                 - name: coreos-pull-secret
                 restartPolicy: Always
+                securityContext:
+                  runAsNonRoot: true
                 serviceAccount: chargeback-helm-operator
                 terminationGracePeriodSeconds: 30
   customresourcedefinitions:

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hdfs-config
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log-level: {{ upper .Values.config.logLevel | quote }}
+  default-fs: {{ printf "hdfs://%s:%d" .Values.config.namenodeHost (int .Values.config.namenodePort) | quote}}
+  namenode-host: {{ .Values.config.namenodeHost | quote}}
+  datanode-data-dir-perms: {{ .Values.config.datanodeDataDirPerms | quote}}

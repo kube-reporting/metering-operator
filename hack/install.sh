@@ -1,10 +1,11 @@
 #!/bin/bash -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/default-env.sh
-source ${DIR}/util.sh
+source "${DIR}/default-env.sh"
+source "${DIR}/util.sh"
 
 : "${CREATE_NAMESPACE:=false}"
+: "${SKIP_COPY_PULL_SECRET:=false}"
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 
@@ -16,9 +17,17 @@ elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
     exit 1
 fi
 
-if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
+if [[ "$SKIP_COPY_PULL_SECRET" != "true" && "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]]; then
     msg "Configuring pull secrets"
     copy-tectonic-pull
+elif [ -s "$CHARGEBACK_PULL_SECRET_PATH" ]; then
+    kubectl -n "${CHARGEBACK_NAMESPACE}" \
+        create secret generic coreos-pull-secret \
+        --from-file=.dockerconfigjson="${CHARGEBACK_PULL_SECRET_PATH}" \
+        --type='kubernetes.io/dockerconfigjson'
+else
+    echo "\$SKIP_COPY_PULL_SECRET and \$CHARGEBACK_PULL_SECRET_PATH not a dockerconfigjson"
+    exit 1
 fi
 
 msg "Installing Custom Resource Definitions"

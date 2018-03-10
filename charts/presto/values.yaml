@@ -3,6 +3,15 @@ presto:
     repository: quay.io/coreos/chargeback-presto
     tag: latest
     pullPolicy: Always
+
+  config:
+    logLevel: info
+
+  securityContext:
+    runAsNonRoot: true
+
+  terminationGracePeriodSeconds: 30
+
   resources:
     requests:
       memory: "1536Mi"
@@ -16,6 +25,15 @@ hive:
     repository: quay.io/coreos/chargeback-hive
     tag: latest
     pullPolicy: Always
+
+  config:
+    logLevel: info
+    defaultfs: hdfs://hdfs-namenode-proxy:8020
+
+  securityContext:
+    runAsNonRoot: true
+
+  terminationGracePeriodSeconds: 30
 
   metastore:
     resources:

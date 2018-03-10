@@ -16,11 +16,14 @@ spec:
       labels:
         app: hive
       annotations:
+        hive-configmap-hash: {{ include (print $.Template.BasePath "/hive-configmap.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
     spec:
+      securityContext:
+{{ toYaml .Values.hive.securityContext | indent 8 }}
       containers:
       - name: metastore
-        args: ["/opt/hive/bin/hive", "--service", "metastore"]
+        args: ["--service", "metastore"]
         image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
         imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
         ports:
@@ -29,7 +32,10 @@ spec:
           protocol: TCP
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-proxy:8020
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: default-fs
         - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
@@ -40,6 +46,11 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -70,7 +81,7 @@ spec:
         resources:
 {{ toYaml .Values.hive.metastore.resources | indent 10 }}
       - name: hiveserver2
-        args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
+        args: ["--service", "hiveserver2"]
         image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
         imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
         ports:
@@ -83,7 +94,10 @@ spec:
         terminationMessagePath: /dev/termination-log
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-proxy:8020
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: default-fs
         - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
@@ -94,6 +108,11 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -122,7 +141,8 @@ spec:
 {{ toYaml .Values.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: 5
+      terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
+      serviceAccount: hive
       imagePullSecrets:
       - name: coreos-pull-secret
       volumes:

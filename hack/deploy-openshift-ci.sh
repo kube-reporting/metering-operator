@@ -19,7 +19,7 @@ cat <<EOF > "$CHARGEBACK_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Chargeback
 metadata:
-  name: "tectonic-chargeback"
+  name: "openshift-chargeback"
 spec:
   chargeback-operator:
     image:
@@ -27,22 +27,18 @@ spec:
 
     config:
       disablePromsum: true
-      awsBillingDataSource:
-        enabled: ${ENABLE_AWS_BILLING}
-        bucket: "${AWS_BILLING_BUCKET}"
-        prefix: "${AWS_BILLING_BUCKET_PREFIX}"
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
+      prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
 
   presto:
-    config:
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
     presto:
       terminationGracePeriodSeconds: 0
+      securityContext:
+        fsGroup: null
       image:
         tag: ${DEPLOY_TAG}
     hive:
+      securityContext:
+        fsGroup: null
       terminationGracePeriodSeconds: 0
       image:
         tag: ${DEPLOY_TAG}
@@ -50,6 +46,8 @@ spec:
   hdfs:
     image:
       tag: ${DEPLOY_TAG}
+    securityContext:
+      fsGroup: null
     datanode:
       terminationGracePeriodSeconds: 0
     namenode:

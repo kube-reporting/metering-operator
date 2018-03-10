@@ -40,7 +40,14 @@ COPY entrypoint.sh /usr/local/bin
 ENV PRESTO_CONF_discovery_uri http://localhost:8080
 
 EXPOSE 8080
-VOLUME /var/presto/data
 
+RUN \
+    mkdir -p /var/presto/data && \
+    chown -R 1003:0 /opt /var/presto/data && \
+    chmod -R 770 /opt /var/presto/data /etc/passwd
+
+VOLUME /var/presto/data
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["bin/launcher", "run"]
+
+USER 1003
