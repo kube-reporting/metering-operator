@@ -27,6 +27,13 @@ NEEDS_EXIT=false
 
 trap setNeedsExit SIGINT SIGTERM
 
+
+OWNER_PATCH_FILE=/tmp/owner-patch.json
+OWNER_VALUES_FILE=/tmp/owner-values.yaml
+HELM_RELEASES_FILE=/tmp/helm-release.json
+CURRENT_RELEASE_FILE=/tmp/current-release.json
+RELEASE_CONFIGMAPS_FILE=/tmp/release-con***REMOVED***gmaps.json
+
 setNeedsExit() {
     echo "Got shutdown signal"
     NEEDS_EXIT=true
@@ -39,29 +46,29 @@ checkExit() {
     ***REMOVED***
 }
 
-getReleaseCon***REMOVED***gmaps() {
+writeReleaseCon***REMOVED***gmapsFile() {
     HELM_RELEASE_NAME=$1
     kubectl \
         --namespace "$MY_POD_NAMESPACE" \
         get con***REMOVED***gmap \
         -l "OWNER=TILLER,NAME=$HELM_RELEASE_NAME" \
-        -o json | jq '.' -r
+        -o json | jq '.' -r > "$RELEASE_CONFIGMAPS_FILE"
 }
 
 setOwnerOnReleaseCon***REMOVED***gmaps(){
     if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
         echo "Setting ownerReferences for Helm release con***REMOVED***gmaps"
 
-        RELEASE_CM_NAMES="$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r "$1")"
+        RELEASE_CM_NAMES="$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r "$RELEASE_CONFIGMAPS_FILE")"
         if [ -z "$RELEASE_CM_NAMES" ]; then
             echo "No release con***REMOVED***gmaps to patch ownership of yet"
         ***REMOVED***
-            echo -n "$RELEASE_CM_NAMES" | while read -r cm; do
-                echo "Setting owner of $cm to deployment $MY_DEPLOYMENT_NAME - $MY_DEPLOYMENT_UID"
+            echo "$RELEASE_CM_NAMES" | while read -r cm; do
+                echo "Setting owner of $cm"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
                     patch con***REMOVED***gmap "$cm" \
-                    -p "$(cat /tmp/owner-patch.json)"
+                    -p "$(cat $OWNER_PATCH_FILE)"
             done
         ***REMOVED***
     ***REMOVED***
@@ -70,11 +77,11 @@ setOwnerOnReleaseCon***REMOVED***gmaps(){
 cleanupOldReleaseCon***REMOVED***gmaps() {
     if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
         echo "Getting list of helm release con***REMOVED***gmaps to delete"
-        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 ***REMOVED*** $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$1")"
+        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 ***REMOVED*** $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$RELEASE_CONFIGMAPS_FILE")"
         if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
             echo "No release con***REMOVED***gmaps to delete yet"
         ***REMOVED***
-            echo -n "$DELETE_RELEASE_CM_NAMES" | while read -r cm; do
+            echo "$DELETE_RELEASE_CM_NAMES" | while read -r cm; do
                 echo "Deleting helm release con***REMOVED***gmap $cm"
                 kubectl \
                     --namespace "$MY_POD_NAMESPACE" \
@@ -89,7 +96,7 @@ writeReleaseCon***REMOVED***gMapOwnerPatchFile() {
     OWNER_KIND=$2
     OWNER_NAME=$3
     OWNER_UID=$4
-    cat <<EOF > /tmp/owner-patch.json
+    cat <<EOF > "$OWNER_PATCH_FILE"
 {
   "metadata": {
     "ownerReferences": [{
@@ -105,12 +112,13 @@ writeReleaseCon***REMOVED***gMapOwnerPatchFile() {
 EOF
 }
 
+
 writeReleaseOwnerValuesFile() {
     OWNER_API_VERSION=$1
     OWNER_KIND=$2
     OWNER_NAME=$3
     OWNER_UID=$4
-    cat <<EOF > /tmp/owner-values.yaml
+    cat <<EOF > "$OWNER_VALUES_FILE"
 global:
   ownerReferences:
   - apiVersion: "$OWNER_API_VERSION"
@@ -145,24 +153,6 @@ done
 
 checkExit
 
-if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
-    echo "Getting pod $MY_POD_NAME owner information"
-    source get_owner.sh
-
-    echo "Querying for Deployment $MY_DEPLOYMENT_NAME"
-    kubectl \
-        --namespace "$MY_POD_NAMESPACE" \
-        get deployment \
-        "$MY_DEPLOYMENT_NAME" \
-        -o json > /tmp/my_deployment.json
-    MY_DEPLOYMENT_API_VERSION="$(jq -Mcr '.apiVersion' /tmp/my_deployment.json)"
-
-    writeReleaseCon***REMOVED***gMapOwnerPatchFile "$MY_DEPLOYMENT_API_VERSION" "Deployment" "$MY_DEPLOYMENT_NAME" "$MY_DEPLOYMENT_UID"
-
-    checkExit
-***REMOVED***
-
-
 while true; do
     checkExit
 
@@ -171,16 +161,16 @@ while true; do
         --namespace "$MY_POD_NAMESPACE" \
         get "$CRD" \
         --ignore-not-found \
-        -o json > /tmp/helm-releases.json
+        -o json > "$HELM_RELEASES_FILE"
 
-    if [ -s /tmp/helm-releases.json ]; then
+    if [ -s "$HELM_RELEASES_FILE" ]; then
         while read -r release; do
-            echo -E "$release" > /tmp/current-release.json
-            RELEASE_NAME="$(jq -Mcr '.metadata.name' /tmp/current-release.json)"
-            RELEASE_UID="$(jq -Mcr '.metadata.uid' /tmp/current-release.json)"
-            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' /tmp/current-release.json)"
-            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' /tmp/current-release.json)"
-            RELEASE_VALUES="$(jq -Mcr '.spec // empty' /tmp/current-release.json)"
+            echo -E "$release" > "$CURRENT_RELEASE_FILE"
+            RELEASE_NAME="$(jq -Mcr '.metadata.name' "$CURRENT_RELEASE_FILE")"
+            RELEASE_UID="$(jq -Mcr '.metadata.uid' "$CURRENT_RELEASE_FILE")"
+            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
+            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
+            RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
 
             if [ -z "$RELEASE_VALUES" ]; then
                 echo "No values, using default values"
@@ -198,18 +188,19 @@ while true; do
                 echo "$RELEASE_RESOURCE_VERSION" > "/tmp/$RELEASE_NAME.resourceVersion"
 
                 writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                EXTRA_ARGS=("-f" /tmp/owner-values.yaml)
+                writeReleaseCon***REMOVED***gMapOwnerPatchFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+                EXTRA_ARGS=("-f" "$OWNER_VALUES_FILE")
 
                 echo "Running helm upgrade for release $RELEASE_NAME"
                 helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
 
-                getReleaseCon***REMOVED***gmaps "$RELEASE_NAME" > /tmp/release-con***REMOVED***gmaps.json
-                setOwnerOnReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
-                cleanupOldReleaseCon***REMOVED***gmaps /tmp/release-con***REMOVED***gmaps.json
+                writeReleaseCon***REMOVED***gmapsFile "$RELEASE_NAME"
+                setOwnerOnReleaseCon***REMOVED***gmaps
+                cleanupOldReleaseCon***REMOVED***gmaps
             ***REMOVED***
 
             checkExit
-        done < <(jq '.items[]' -Mcr /tmp/helm-releases.json)
+        done < <(jq '.items[]' -Mcr "$HELM_RELEASES_FILE")
 
         echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
         for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do

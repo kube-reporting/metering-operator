@@ -13,10 +13,13 @@ spec:
       labels:
         app: {{ .Values.name }}
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
       - name: {{ .Values.name }}
-        image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
-        imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args: ["run-operator.sh"]
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: HELM_RELEASE_CRD_NAME
           value: {{ .Values.crd.kind }}
@@ -32,12 +35,10 @@ spec:
               ***REMOVED***eldPath: metadata.namespace
         - name: HELM_HOST
           value: "127.0.0.1:44134"
-        - name: SET_OWNER_REFERENCE_VALUE
-          value: "true"
         - name: HELM_WAIT
           value: "false"
         - name: HELM_RECONCILE_INTERVAL_SECONDS
-          value: "120"
+          value: {{ .Values.reconcileIntervalSeconds | quote }}
         - name: RELEASE_HISTORY_LIMIT
           value: "3"
         resources:
@@ -48,8 +49,9 @@ spec:
             memory: "25Mi"
             cpu: "50m"
       - name: tiller
-        image: "{{ .Values.tiller.image.repository }}:{{ .Values.tiller.image.tag }}"
-        imagePullPolicy: {{ .Values.tiller.image.pullPolicy }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        args: ["/tiller"]
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: TILLER_NAMESPACE
           valueFrom:

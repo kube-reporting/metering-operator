@@ -13,17 +13,10 @@ crd:
   kind: HelmRelease
   listKind: HelmReleaseList
 
-operator:
-  image:
-    repository: quay.io/coreosinc/helm-operator
-    tag: latest
-    pullPolicy: Always
-
-tiller:
-  image:
-    repository: gcr.io/kubernetes-helm/tiller
-    tag: v2.6.2
-    pullPolicy: Always
+image:
+  repository: quay.io/coreosinc/helm-operator
+  tag: latest
+  pullPolicy: Always
 
 serviceAccountName: helm-operator
 imagePullSecrets: []
@@ -31,3 +24,5 @@ imagePullSecrets: []
 rbac:
   roleName: helm-operator
   rules: []
+
+reconcileIntervalSeconds: 30

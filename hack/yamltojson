@@ -1,0 +1,14 @@
+#!/usr/bin/env python2
+import sys, yaml, json, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', dest='slurp', action='store_true')
+options = parser.parse_args()
+
+contents = None
+if options.slurp:
+    contents = list(yaml.load_all(sys.stdin))
+***REMOVED***:
+    contents = yaml.load(sys.stdin)
+
+json.dump(contents, sys.stdout, indent=4)

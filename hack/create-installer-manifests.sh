@@ -13,10 +13,6 @@ OUTPUT_DIR="$(cd "${OUTPUT_DIR:=$DIR/..}" && pwd)"
 
 
 echo "helm-operator values ***REMOVED***le: $HELM_OPERATOR_VALUES_FILE"
-echo "Output directory: ${OUTPUT_DIR}"
-echo "Installer manifest directory: $INSTALLER_MANIFEST_DIR"
-echo "CRD manifest directory: $CRD_DIR"
-
 VALUES_ARGS=(-f "$HELM_OPERATOR_VALUES_FILE")
 
 if [[ $# -ne 0 ]] ; then
@@ -28,6 +24,9 @@ if [[ $# -ne 0 ]] ; then
         shift
     done
 ***REMOVED***
+echo "Output directory: ${OUTPUT_DIR}"
+echo "Installer manifest directory: $INSTALLER_MANIFEST_DIR"
+echo "CRD manifest directory: $CRD_DIR"
 
 mkdir -p "${INSTALLER_MANIFEST_DIR}" "${CRD_DIR}"
 

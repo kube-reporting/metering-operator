@@ -6,6 +6,7 @@ ENV PATH=$HIVE_HOME/bin:$PATH
 
 WORKDIR /opt
 
+USER root
 # Install Hive
 RUN set -x \
     && curl -fSLs http://apache.osuosl.org/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xz && mv apache-hive-$HIVE_VERSION-bin hive
@@ -19,11 +20,18 @@ RUN set -x \
 
 # Con***REMOVED***gure JSON SerDe and AWS Jars
 RUN mkdir -p /usr/hdp/current/hive-server2/auxlib && ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/*aws* /opt/hive/lib
-ADD json-serde-1.3.8-jar-with-dependencies.jar /usr/hdp/current/hive-server2/auxlib
+COPY json-serde-1.3.8-jar-with-dependencies.jar /usr/hdp/current/hive-server2/auxlib
 
-ADD conf/* $HIVE_HOME/conf/
+COPY metastore.sh /opt/hive/bin/ext/metastore.sh
+COPY hive-entrypoint.sh /usr/local/bin/hive-entrypoint.sh
+COPY conf/* $HIVE_HOME/conf/
 
-VOLUME /user/hive/warehouse
-VOLUME /var/lib/hive
+RUN \
+    mkdir -p /var/lib/hive /user/hive/warehouse && \
+    chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse && \
+    chmod -R 770 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
 
-CMD ["/opt/hive/bin/hive", "--service", "metastore"]
+VOLUME /user/hive/warehouse /var/lib/hive
+ENTRYPOINT ["hive-entrypoint.sh"]
+
+USER 1002

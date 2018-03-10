@@ -16,8 +16,11 @@ spec:
        app: presto
        presto: coordinator
       annotations:
+        presto-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-con***REMOVED***g.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
     spec:
+      securityContext:
+{{ toYaml .Values.presto.securityContext | indent 8 }}
       containers:
       - name: presto
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
@@ -35,6 +38,11 @@ spec:
               key: aws-secret-access-key
         - name: PRESTO_CONF_discovery_uri
           value: "http://presto:8080"
+        - name: PRESTO_LOG_com_facebook_presto
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-con***REMOVED***g
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             ***REMOVED***eldRef:
@@ -75,4 +83,5 @@ spec:
       - name: coreos-pull-secret
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: 30
+      serviceAccount: presto
+      terminationGracePeriodSeconds: {{ .Values.presto.terminationGracePeriodSeconds }}

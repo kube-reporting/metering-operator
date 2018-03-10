@@ -165,7 +165,12 @@ test:
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
-	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -s -w
+	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
+
+# validates no unstaged changes exist
+ci-validate: k8s-verify-codegen chargeback-manifests fmt
+	@echo Checking for unstaged changes
+	git diff-index --cached --quiet HEAD --ignore-submodules --
 
 chargeback-bin: images/chargeback/bin/chargeback
 

@@ -3,8 +3,18 @@ image:
   tag: latest
   pullPolicy: Always
 
+con***REMOVED***g:
+  logLevel: "info"
+  namenodeHost: hdfs-namenode-0.hdfs-namenode
+  namenodePort: 8020
+  datanodeDataDirPerms: "770"
+
+securityContext:
+  runAsNonRoot: true
+
 datanode:
   replicas: 1
+  terminationGracePeriodSeconds: 30
   resources:
     requests:
       memory: "250Mi"
@@ -21,6 +31,7 @@ datanode:
     size: "5Gi"
 
 namenode:
+  terminationGracePeriodSeconds: 10
   resources:
     requests:
       memory: "350Mi"
@@ -32,3 +43,4 @@ namenode:
   storage:
     size: "5Gi"
     class: null
+

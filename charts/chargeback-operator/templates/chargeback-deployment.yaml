@@ -15,6 +15,8 @@ spec:
         chargeback-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/chargeback-con***REMOVED***g.yaml") . | sha256sum }}
         chargeback-secrets-hash: {{ include (print $.Template.BasePath "/chargeback-secrets.yaml") . | sha256sum }}
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
       - name: chargeback
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

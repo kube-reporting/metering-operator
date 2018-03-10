@@ -51,8 +51,12 @@ spec:
     metadata:
       labels:
         app: hdfs-namenode
+      annotations:
+        hdfs-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/con***REMOVED***gmap.yaml") . | sha256sum }}
     spec:
-      terminationGracePeriodSeconds: 5
+      terminationGracePeriodSeconds: {{ .Values.namenode.terminationGracePeriodSeconds }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -60,9 +64,17 @@ spec:
         args: ["namenode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
-          value: hdfs://hdfs-namenode-0.hdfs-namenode:8020
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: default-fs
         - name: CLUSTER_NAME
           value: hdfs-k8s
+        - name: HADOOP_LOGLEVEL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: hdfs-con***REMOVED***g
+              key: log-level
         - name: MY_NODE_NAME
           valueFrom:
             ***REMOVED***eldRef:
@@ -96,6 +108,7 @@ spec:
           subPath: hadoop/dfs/name
         resources:
 {{ toYaml .Values.namenode.resources | indent 10 }}
+      serviceAccount: hdfs
       imagePullSecrets:
       - name: coreos-pull-secret
   volumeClaimTemplates:

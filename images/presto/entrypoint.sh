@@ -70,6 +70,14 @@ echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
 # Presto
 con***REMOVED***gure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 con***REMOVED***gure "${PRESTO_HOME}/etc/con***REMOVED***g.properties" presto-conf PRESTO_CONF
+con***REMOVED***gure "${PRESTO_HOME}/etc/log.properties" presto-log PRESTO_LOG
+
+# add UID to /etc/passwd if missing
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  ***REMOVED***
+***REMOVED***
 
 exec $@
 
