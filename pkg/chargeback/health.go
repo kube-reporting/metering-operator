@@ -34,7 +34,7 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
-	_, err := c.prestoConn.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
+	err := c.hiveQueryer.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
 	if err != nil {
 		logger.WithError(err).Debugf("cannot create Presto table chargeback_health_check")
 		return false
