@@ -28,3 +28,17 @@ spec:
     storage:
       storageLocationName: {{ .Values.config.storageLocationName | quote }}
 
+---
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-usage-cpu-cores"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-usage-cpu-cores"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
