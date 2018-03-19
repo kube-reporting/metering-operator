@@ -52,3 +52,11 @@ required = [
     name = "k8s.io/code-generator"
     unused-packages = false
     non-go = false
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/prestodb/presto-go-client"
+
+[[constraint]]
+  name = "github.com/go-chi/chi"
+  version = "3.3.2"
