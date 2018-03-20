@@ -352,10 +352,14 @@ podTemplate(
                                                 } catch (err) {
                                                     echo "E2E Failed on openshift, err: ${err}"
                                                 } ***REMOVED***nally {
-                                                    if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                                        sh '''#!/bin/bash -e
-                                                        ./hack/delete-ns.sh
-                                                        '''
+                                                    try {
+                                                        if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                                            sh '''#!/bin/bash -e
+                                                            ./hack/delete-ns.sh
+                                                            '''
+                                                        }
+                                                    } catch (err) {
+                                                        echo "Failed to clean up openshift namespace: ${err}"
                                                     }
                                                 }
                                             } ***REMOVED*** {
