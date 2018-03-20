@@ -2,7 +2,6 @@ package aws
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -153,26 +152,27 @@ func getS3Client(bucket string, creds *credentials.Credentials) (s3iface.S3API, 
 		awsSession.Con***REMOVED***g.Credentials = creds
 	}
 
-	var err error
 	tmpClient := s3.New(awsSession, aws.NewCon***REMOVED***g().WithRegion(defaultS3Region))
-	if awsSession.Con***REMOVED***g.Region, err = retrieveRegion(tmpClient, bucket); err != nil {
+	region, err := retrieveRegion(tmpClient, bucket)
+	if err != nil {
 		return nil, err
 	}
+	awsSession.Con***REMOVED***g.Region = &region
 
 	return s3.New(awsSession), nil
 }
 
 // retrieveRegion performs a request to determine the region the bucket has been created in.
-func retrieveRegion(client s3iface.S3API, bucket string) (*string, error) {
+func retrieveRegion(client s3iface.S3API, bucket string) (string, error) {
 	bucketResp, err := client.GetBucketLocation(&s3.GetBucketLocationInput{
 		Bucket: aws.String(bucket),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve bucket region: %v", err)
+		return "", fmt.Errorf("failed to retrieve bucket region: %v", err)
 	}
 
-	if bucketResp == nil || bucketResp.LocationConstraint == nil {
-		return nil, errors.New("bucket response or bucket name was nil")
+	if bucketResp.LocationConstraint == nil || *bucketResp.LocationConstraint == "" {
+		return "us-east-1", nil
 	}
-	return bucketResp.LocationConstraint, nil
+	return *bucketResp.LocationConstraint, nil
 }
