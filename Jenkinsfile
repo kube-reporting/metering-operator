@@ -380,7 +380,7 @@ podTemplate(
             throw e
         } ***REMOVED***nally {
             archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
-            step([$class: "TapPublisher", testResults: "test_output/**/*.tap", failIfNoResults: false])
+            step([$class: "TapPublisher", testResults: "test_output/**/*.tap", failIfNoResults: false, planRequired: false])
             container('docker') {
                 sh """#!/bin/bash
                 (docker ps -q | xargs docker kill) || true
