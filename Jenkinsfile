@@ -352,10 +352,14 @@ podTemplate(
                                                 } catch (err) {
                                                     echo "E2E Failed on openshift, err: ${err}"
                                                 } finally {
-                                                    if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                                        sh '''#!/bin/bash -e
-                                                        ./hack/delete-ns.sh
-                                                        '''
+                                                    try {
+                                                        if (!params.SKIP_NAMESPACE_CLEANUP) {
+                                                            sh '''#!/bin/bash -e
+                                                            ./hack/delete-ns.sh
+                                                            '''
+                                                        }
+                                                    } catch (err) {
+                                                        echo "Failed to clean up openshift namespace: ${err}"
                                                     }
                                                 }
                                             } else {
@@ -376,7 +380,7 @@ podTemplate(
             throw e
         } finally {
             archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
-            step([$class: "TapPublisher", testResults: "test_output/**/*.tap"])
+            step([$class: "TapPublisher", testResults: "test_output/**/*.tap", failIfNoResults: false, planRequired: false])
             container('docker') {
                 sh """#!/bin/bash
                 (docker ps -q | xargs docker kill) || true
