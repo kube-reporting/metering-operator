@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	log "github.com/sirupsen/logrus"
@@ -390,11 +391,11 @@ func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
 	// up.
-	connStr := fmt.Sprintf("presto://%s/hive/default", c.cfg.PrestoHost)
+	connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", c.cfg.PrestoHost)
 	startTime := c.clock.Now()
 	c.logger.Debugf("getting Presto connection")
 	for {
-		db, err := sql.Open("prestgo", connStr)
+		db, err := sql.Open("presto", connStr)
 		if err == nil {
 			return db, nil
 		} ***REMOVED*** if c.clock.Since(startTime) > maxConnWaitTime {
