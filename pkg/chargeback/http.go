@@ -12,11 +12,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 
 	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
+	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
@@ -30,22 +32,23 @@ type server struct {
 
 func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	logger = logger.WithField("component", "api")
-	mux := http.NewServeMux()
+	router := chi.NewRouter()
 	httpServer := &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: router,
 	}
 	srv := &server{
 		chargeback: c,
 		logger:     logger,
 		httpServer: httpServer,
 	}
-	mux.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
-	mux.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
-	mux.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
-	mux.HandleFunc("/api/v1/collect/prometheus", srv.collectPromsumDataHandler)
-	mux.HandleFunc("/api/v1/store/prometheus", srv.storePromsumDataHandler)
-	mux.HandleFunc("/ready", srv.readinessHandler)
+	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
+	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/store", srv.storePromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/{datasourceName}", srv.getPromsumDataHandler)
+	router.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
 
@@ -386,4 +389,94 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+}
+
+func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+
+	name := chi.URLParam(r, "datasourceName")
+	err := r.ParseForm()
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode body: %v", err)
+		return
+	}
+
+	datasourceTable := dataSourceTableName(name)
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+	var startTime, endTime time.Time
+	if start != "" {
+		startTime, err = time.Parse(time.RFC3339, start)
+		if err != nil {
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid start time parameter: %v", err)
+			return
+		}
+	}
+	if end != "" {
+		endTime, err = time.Parse(time.RFC3339, end)
+		if err != nil {
+			srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid end time parameter: %v", err)
+			return
+		}
+	}
+
+	results, err := queryPromsumDatasource(logger, srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
+		return
+	}
+
+	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
+}
+
+func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
+	whereClause := ""
+	if !start.IsZero() {
+		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
+	}
+	if !end.IsZero() {
+		if !start.IsZero() {
+			whereClause += " AND "
+		} ***REMOVED*** {
+			whereClause += " WHERE "
+		}
+		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
+	}
+
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s`, datasourceTable, whereClause)
+	rows, err := queryer.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []*PromsumRecord
+	for rows.Next() {
+		var dbRecord promsumDBRecord
+		if err := rows.Scan(&dbRecord.Labels, &dbRecord.Amount, &dbRecord.TimePrecision, &dbRecord.Timestamp); err != nil {
+			return nil, err
+		}
+		labels := make(map[string]string)
+		for key, value := range dbRecord.Labels {
+			var ok bool
+			labels[key], ok = value.(string)
+			if !ok {
+				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
+			}
+		}
+		record := PromsumRecord{
+			Labels:    labels,
+			Amount:    dbRecord.Amount,
+			StepSize:  dbRecord.TimePrecision,
+			Timestamp: dbRecord.Timestamp,
+		}
+		results = append(results, &record)
+	}
+	return results, nil
+}
+
+type promsumDBRecord struct {
+	Labels        map[string]interface{}
+	Amount        float64
+	TimePrecision time.Duration
+	Timestamp     time.Time
 }
