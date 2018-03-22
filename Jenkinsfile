@@ -10,7 +10,7 @@ properties([
     parameters([
         booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
         booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
-        booleanParam(name: 'RUN_E2E_TESTS', defaultValue: true, description: 'If true, run e2e tests even if branch is not master'),
+        booleanParam(name: 'RUN_E2E_TESTS', defaultValue: true, description: 'If true, run e2e tests.'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
         booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
         booleanParam(name: 'SKIP_NAMESPACE_CLEANUP', defaultValue: false, description: 'If true, skips deleting the Kubernetes namespace at the end of the job'),
@@ -24,13 +24,14 @@ def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
 def chargebackNamespacePrefix = "chargeback-ci-${branchTag}"
 def chargebackE2ENamespace = "${chargebackNamespacePrefix}-e2e"
-def chargebackIntegrationNamespace = "${chargebackNamespacePrefix}-integration"
 
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
 
 def awsBillingBucket = "team-chargeback"
 def awsBillingBucketPrefix = "cost-usage-report/team-chargeback-chancez/"
+
+echo "Params:\n${params}"
 
 podTemplate(
     cloud: 'kubernetes',
@@ -64,7 +65,12 @@ podTemplate(
 
         def gopath = "${env.WORKSPACE}/go"
         def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
-        def testOutputDir = "${env.WORKSPACE}/test_output"
+        def testOutputDir = "test_output"
+        def testOutputDirAbsolutePath = "${env.WORKSPACE}/${testOutputDir}"
+
+        def e2eTestLogFile = 'e2e-tests.log'
+        def e2eDeployLogFile = 'e2e-tests-deploy.log'
+        def e2eTestTapFile = 'e2e-tests.tap'
 
         def dockerBuildArgs = ''
         if (isMasterBranch) {
@@ -123,7 +129,6 @@ podTemplate(
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
                     "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
-                    "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "ENABLE_AWS_BILLING=false",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
@@ -252,124 +257,57 @@ podTemplate(
                     }
 
                     stage('e2e tests') {
-                        parallel tectonic: {
-                            withCredentials([
-                                [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
-                            ]) {
-                                withEnv([
-                                    "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                                    "INSTALL_METHOD=direct",
-                                    "DEPLOY_SCRIPT=deploy-ci.sh",
-                                    "KUBECONFIG=${KUBECONFIG}",
-                                    "TEST_OUTPUT_DIR=${testOutputDir}/tectonic",
-                                ]) {
-                                    container('docker'){
-                                        dir(kubeChargebackDir) {
-                                            if (runE2ETests) {
-                                                echo "Running chargeback e2e tests"
-                                                sh 'kubectl config current-context'
-                                                sh 'kubectl config get-contexts'
-                                                try {
-                                                    ansiColor('xterm') {
-                                                        timeout(10) {
-                                                            sh '''#!/bin/bash -e
-                                                            rm -rf ${TEST_OUTPUT_DIR}
-                                                            mkdir -p ${TEST_OUTPUT_DIR}
-                                                            touch ${TEST_OUTPUT_DIR}/deploy.log
-                                                            touch ${TEST_OUTPUT_DIR}/test.log
-                                                            tail -f ${TEST_OUTPUT_DIR}/deploy.log &
-                                                            tail -f ${TEST_OUTPUT_DIR}/test.log &
-                                                            function cleanup() {
-                                                                kill "$(jobs -p)" || true
-                                                            }
-                                                            trap 'cleanup' EXIT
-                                                            docker run \
-                                                                -i --rm \
-                                                                --env-file <(env | grep -E 'INSTALL_METHOD|DEPLOY_SCRIPT|DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK') \
-                                                                -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
-                                                                -v "${KUBECONFIG}:${KUBECONFIG}" \
-                                                                -v "${TEST_OUTPUT_DIR}:/out" \
-                                                                quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
-                                                            '''
-                                                        }
-                                                    }
-                                                } finally {
-                                                    if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                                        sh '''#!/bin/bash -e
-                                                        ./hack/delete-ns.sh
-                                                        '''
-                                                    }
-                                                }
-                                            } else {
-                                                echo "Non-master branch, skipping chargeback e2e tests"
-                                            }
-                                        }
-                                    }
+                        withCredentials([
+                            [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'TECTONIC_KUBECONFIG'],
+                            [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubeconfig', variable: 'OPENSHIFT_KUBECONFIG'],
+                        ]) {
+                            parallel "tectonic-e2e": {
+                                if (runE2ETests) {
+                                    echo "Running chargeback e2e tests"
+                                    def myTestDir = "${testOutputDir}/tectonic_e2e"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_e2e"
+                                    e2eRunner(kubeChargebackDir, [
+                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                        "INSTALL_METHOD=direct",
+                                        "DEPLOY_SCRIPT=deploy-ci.sh",
+                                        "KUBECONFIG=${TECTONIC_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_LOG_FILE=${e2eTestLogFile}",
+                                        "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                        "TEST_TAP_FILE=${e2eTestTapFile}",
+                                        "ENTRYPOINT=hack/e2e.sh",
+                                    ])
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } else {
+                                    echo "Non-master branch, skipping chargeback e2e tests"
                                 }
-                            }
-                        }, openshift: {
-                            withCredentials([
-                                [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubeconfig', variable: 'KUBECONFIG'],
-                            ]) {
-                                withEnv([
-                                    "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                                    "INSTALL_METHOD=openshift-direct",
-                                    "DEPLOY_SCRIPT=deploy-openshift-ci.sh",
-                                    "SKIP_COPY_PULL_SECRET=false",
-                                    "KUBECONFIG=${KUBECONFIG}",
-                                    "TEST_OUTPUT_DIR=${testOutputDir}/openshift",
-                                ]) {
-                                    container('docker'){
-                                        dir(kubeChargebackDir) {
-                                            if (runE2ETests) {
-                                                echo "Running chargeback e2e tests"
-                                                sh 'kubectl config current-context'
-                                                sh 'kubectl config get-contexts'
-                                                try {
-                                                    ansiColor('xterm') {
-                                                        timeout(10) {
-                                                            sh '''#!/bin/bash -e
-                                                            rm -rf ${TEST_OUTPUT_DIR}
-                                                            mkdir -p ${TEST_OUTPUT_DIR}
-                                                            touch ${TEST_OUTPUT_DIR}/deploy.log
-                                                            touch ${TEST_OUTPUT_DIR}/test.log
-                                                            tail -f ${TEST_OUTPUT_DIR}/deploy.log &
-                                                            tail -f ${TEST_OUTPUT_DIR}/test.log &
-                                                            function cleanup() {
-                                                                kill "$(jobs -p)" || true
-                                                            }
-                                                            trap 'cleanup' EXIT
-                                                            docker run \
-                                                                -i --rm \
-                                                                --env-file <(env | grep -E 'INSTALL_METHOD|DEPLOY_SCRIPT|DEPLOY_TAG|KUBECONFIG|AWS|CHARGEBACK|PULL_SECRET') \
-                                                                -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
-                                                                -v "${KUBECONFIG}:${KUBECONFIG}" \
-                                                                -v "${TEST_OUTPUT_DIR}:/out" \
-                                                                quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG}
-                                                            '''
-                                                        }
-                                                    }
-                                                } catch (err) {
-                                                    echo "E2E Failed on openshift, err: ${err}"
-                                                } finally {
-                                                    try {
-                                                        if (!params.SKIP_NAMESPACE_CLEANUP) {
-                                                            sh '''#!/bin/bash -e
-                                                            ./hack/delete-ns.sh
-                                                            '''
-                                                        }
-                                                    } catch (err) {
-                                                        echo "Failed to clean up openshift namespace: ${err}"
-                                                    }
-                                                }
-                                            } else {
-                                                echo "Non-master branch, skipping chargeback e2e tests"
-                                            }
-                                        }
+                            }, "openshift-e2e": {
+                                if (runE2ETests) {
+                                    echo "Running chargeback e2e tests"
+                                    def myTestDir = "${testOutputDir}/openshift_e2e"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/openshift_e2e"
+                                    try {
+                                        e2eRunner(kubeChargebackDir, [
+                                            "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                            "INSTALL_METHOD=openshift-direct",
+                                            "DEPLOY_SCRIPT=deploy-openshift-ci.sh",
+                                            "SKIP_COPY_PULL_SECRET=false",
+                                            "KUBECONFIG=${OPENSHIFT_KUBECONFIG}",
+                                            "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                            "TEST_LOG_FILE=${e2eTestLogFile}",
+                                            "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                            "TEST_TAP_FILE=${e2eTestTapFile}",
+                                            "ENTRYPOINT=hack/e2e.sh",
+                                        ])
+                                    } catch (e) {
+                                        echo "Openshift e2e failed: ${e}"
                                     }
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false, failedTestsMarkBuildAsFailure: false])
+                                } else {
+                                    echo "Non-master branch, skipping chargeback e2e tests"
                                 }
-                            }
-                        }, failFast: false
+                            }, failFast: false
+                        }
                     }
                 }
             }
@@ -379,15 +317,50 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } finally {
-            archiveArtifacts artifacts: "test_output/**", onlyIfSuccessful: false
-            step([$class: "TapPublisher", testResults: "test_output/**/*.tap", failIfNoResults: false, planRequired: false])
+            archiveArtifacts artifacts: "${testOutputDir}/**", onlyIfSuccessful: false
             container('docker') {
-                sh """#!/bin/bash
-                (docker ps -q | xargs docker kill) || true
-                """
+                sh '((docker ps -aq | xargs docker kill) || true) > /dev/null 2>&1'
             }
             cleanWs notFailBuild: true
         }
     }
 } // timestamps end
 } // podTemplate end
+
+def e2eRunner(kubeChargebackDir, envVars) {
+    withEnv(envVars) {
+        container('docker'){
+            dir(kubeChargebackDir) {
+                sh 'kubectl config current-context'
+                sh 'kubectl config get-contexts'
+                try {
+                    ansiColor('xterm') {
+                        timeout(15) {
+                            sh '''#!/bin/bash -ex
+                            mkdir -p ${TEST_OUTPUT_DIR}
+                            touch ${TEST_OUTPUT_DIR}/${DEPLOY_LOG_FILE}
+                            touch ${TEST_OUTPUT_DIR}/${TEST_LOG_FILE}
+                            tail -f ${TEST_OUTPUT_DIR}/${DEPLOY_LOG_FILE} &
+                            tail -f ${TEST_OUTPUT_DIR}/${TEST_LOG_FILE} &
+                            docker run \
+                            -i --rm \
+                            --env-file <(env | grep -E 'INSTALL_METHOD|TEST|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|PULL_SECRET') \
+                            -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
+                            -v "${KUBECONFIG}:${KUBECONFIG}" \
+                            -v "${TEST_OUTPUT_DIR}:/out" \
+                            quay.io/coreos/chargeback-integration-tests:${DEPLOY_TAG} \
+                            ${ENTRYPOINT}
+                            '''
+                        }
+                    }
+                } finally {
+                    if (!params.SKIP_NAMESPACE_CLEANUP) {
+                        sh '''#!/bin/bash -e
+                        ./hack/delete-ns.sh
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
