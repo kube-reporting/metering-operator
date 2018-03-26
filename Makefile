@@ -202,7 +202,7 @@ release:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart \
-	chargeback-manifests release
+	chargeback-manifests release bill-of-materials.json
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
@@ -231,3 +231,5 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
+bill-of-materials.json: bill-of-materials.override.json
+	license-bill-of-materials --override-file $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
