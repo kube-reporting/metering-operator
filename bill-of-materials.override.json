@@ -1,0 +1,26 @@
+[
+	{
+		"project": "github.com/ghodss/yaml",
+		"licenses": [
+			{
+				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License"
+			}
+		]
+	},
+	{
+		"project": "github.com/jmespath/go-jmespath",
+		"licenses": [
+			{
+				"type": "Apache License 2.0"
+			}
+		]
+	},
+	{
+		"project": "github.com/go-openapi/spec",
+		"licenses": [
+			{
+				"type": "Apache License 2.0"
+			}
+		]
+	}
+]

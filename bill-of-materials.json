@@ -66,8 +66,8 @@
 		"project": "github.com/ghodss/yaml",
 		"licenses": [
 			{
-				"type": "BSD 3-clause \"New\" or \"Revised\" License",
-				"con***REMOVED***dence": 0.8357142857142857
+				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
+				"con***REMOVED***dence": 1
 			}
 		]
 	},
@@ -111,12 +111,12 @@
 		"project": "github.com/go-openapi/spec",
 		"licenses": [
 			{
-				"type": "Apache License 2.0",
+				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
 				"con***REMOVED***dence": 1
 			},
 			{
-				"type": "The Unlicense",
-				"con***REMOVED***dence": 0.3422459893048128
+				"type": "Apache License 2.0",
+				"con***REMOVED***dence": 1
 			}
 		]
 	},
@@ -223,8 +223,16 @@
 		"project": "github.com/jmespath/go-jmespath",
 		"licenses": [
 			{
-				"type": "The Unlicense",
-				"con***REMOVED***dence": 0.35294117647058826
+				"type": "MIT License and BSD 3-clause \"New\" or \"Revised\" License",
+				"con***REMOVED***dence": 1
+			},
+			{
+				"type": "Apache License 2.0",
+				"con***REMOVED***dence": 1
+			},
+			{
+				"type": "Apache License 2.0",
+				"con***REMOVED***dence": 1
 			}
 		]
 	},
