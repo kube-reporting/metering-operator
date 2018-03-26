@@ -232,4 +232,4 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
 
 bill-of-materials.json: bill-of-materials.override.json
-	license-bill-of-materials ./... > $(ROOT_DIR)/bill-of-materials.json
+	license-bill-of-materials --override-file $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
