@@ -302,7 +302,7 @@ podTemplate(
                                     } catch (e) {
                                         echo "Openshift e2e failed: ${e}"
                                     }
-                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false, failedTestsMarkBuildAsFailure: false])
+                                    // step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
                                     echo "Non-master branch, skipping chargeback e2e tests"
                                 }
