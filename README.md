@@ -31,4 +31,13 @@ See the above installation guide for links to con***REMOVED***guring and using C
 - Make
 - Docker
 - Dep
+- jq
+- realpath
+
+If you're using MacOS with homebrew you can install all of these using the
+following:
+
+```
+$ brew install go kubernetes-helm make docker dep jq coreutils
+```
 
