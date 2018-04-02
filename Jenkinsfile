@@ -24,6 +24,7 @@ def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
 def chargebackNamespacePrefix = "chargeback-ci-${branchTag}"
 def chargebackE2ENamespace = "${chargebackNamespacePrefix}-e2e"
+def chargebackIntegrationNamespace = "${chargebackNamespacePrefix}-integration"
 
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
@@ -72,6 +73,10 @@ podTemplate(
         def e2eDeployLogFile = 'e2e-tests-deploy.log'
         def e2eTestTapFile = 'e2e-tests.tap'
         def e2eDeployPodLogsFile = 'e2e-pod-logs.log'
+        def integrationTestLogFile = 'integration-tests.log'
+        def integrationDeployLogFile = 'integration-tests-deploy.log'
+        def integrationTestTapFile = 'integration-tests.tap'
+        def integrationDeployPodLogsFile = 'integration-pod-logs.log'
 
         def dockerBuildArgs = ''
         if (isMasterBranch) {
@@ -130,6 +135,7 @@ podTemplate(
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
                     "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
+                    "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "ENABLE_AWS_BILLING=false",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
@@ -257,7 +263,7 @@ podTemplate(
                         }
                     }
 
-                    stage('e2e tests') {
+                    stage('integration/e2e tests') {
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'TECTONIC_KUBECONFIG'],
                             [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubeconfig', variable: 'OPENSHIFT_KUBECONFIG'],
@@ -282,6 +288,27 @@ podTemplate(
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } else {
                                     echo "Non-master branch, skipping chargeback e2e tests"
+                                }
+                            }, "tectonic-integration": {
+                                if (runE2ETests) {
+                                    echo "Running chargeback integration tests"
+                                    def myTestDir = "${testOutputDir}/tectonic_integration"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_integration"
+                                    e2eRunner(kubeChargebackDir, [
+                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_INTEGRATION_NAMESPACE}",
+                                        "INSTALL_METHOD=direct",
+                                        "DEPLOY_SCRIPT=deploy-ci.sh",
+                                        "KUBECONFIG=${TECTONIC_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_LOG_FILE=${integrationTestLogFile}",
+                                        "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "TEST_TAP_FILE=${integrationTestTapFile}",
+                                        "ENTRYPOINT=hack/integration.sh",
+                                    ])
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } else {
+                                    echo "Non-master branch, skipping chargeback integration tests"
                                 }
                             }, failFast: false
                         }
