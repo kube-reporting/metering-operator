@@ -65,3 +65,10 @@ required = [
   name = "git.apache.org/thrift.git"
   revision = "0dd823580c78a79ae9696eb9b3650e400fff140f"
   source = "github.com/apache/thrift"
+
+[[constraint]]
+  name = "github.com/spf13/pflag"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.2"
