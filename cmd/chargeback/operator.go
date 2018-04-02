@@ -1,127 +1,88 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/signal"
-	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/clock"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"k8s.io/apimachinery/pkg/util/clock"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
 
 var (
-	HiveHost   = "hive:10000"
-	PrestoHost = "presto:8080"
-
-	defaultPromHost = "http://prometheus.tectonic-system.svc.cluster.local:9090"
-
-	// logReport logs out report results after creating a report result table
-	logReport bool
-	// logDMLQueries controls if we log data manipulation queries made via
-	// Presto (SELECT, INSERT, etc)
-	logDMLQueries bool
-	// logDDLQueries controls if we log data de***REMOVED***nition language queries made
-	// via Hive (CREATE TABLE, DROP TABLE, etc).
-	logDDLQueries bool
-
-	// promsumInterval is how often we poll prometheus
-	promsumInterval = time.Minute * 5
-	// promsumStepSize is the query step size for Promethus query. This
-	// controls resolution of results.
-	promsumStepSize = time.Minute
-	// promsumChunkSize controls how much the range query window size
-	// by limiting the range query to a range of time no longer than this
-	// duration.
-	promsumChunkSize = time.Minute * 5
-	disablePromsum   = false
+	defaultHiveHost         = "hive:10000"
+	defaultPrestoHost       = "presto:8080"
+	defaultPromHost         = "http://prometheus.tectonic-system.svc.cluster.local:9090"
+	defaultPromsumInterval  = time.Minute * 5
+	defaultPromsumStepSize  = time.Minute
+	defaultPromsumChunkSize = time.Minute * 5
+	// cfg is the con***REMOVED***g for our operator
+	cfg chargeback.Con***REMOVED***g
 )
+
+var rootCmd = &cobra.Command{
+	Use:   "chargeback",
+	Short: "",
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		return cmd.Help()
+	},
+}
+
+var startCmd = &cobra.Command{
+	Use:   "start",
+	Short: "starts the Chargeback operator",
+	Run:   startChargeback,
+}
+
+func AddCommands() {
+	rootCmd.AddCommand(startCmd)
+}
 
 func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", " ")
+	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, " ")
+	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, " ")
+	startCmd.Flags().StringVar(&cfg.PromHost, "prom-host", defaultPromHost, " ")
+	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, " ")
+	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "logs out report results after creating a report result table")
+	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
+	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data de***REMOVED***nition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
+	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "how often we poll prometheus")
+	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
+	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 }
 
 func main() {
+	AddCommands()
+	SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK")
+	rootCmd.Execute()
+}
+
+func startChargeback(cmd *cobra.Command, args []string) {
 	logger := log.WithFields(log.Fields{
 		"app": "chargeback-operator",
 	})
-	if logReportEnv := os.Getenv("LOG_REPORT"); logReportEnv != "" {
-		var err error
-		logReport, err = strconv.ParseBool(logReportEnv)
+	if cfg.Namespace == "" {
+		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if err != nil {
-			logger.WithError(err).Fatalf("LOG_REPORT environment variable was not a bool, got %v", logReportEnv)
+			logger.WithError(err).Fatal("could not determine namespace")
 		}
+		cfg.Namespace = string(namespace)
 	}
-	if logDMLQueriesStr := os.Getenv("LOG_DML_QUERIES"); logDMLQueriesStr != "" {
-		var err error
-		logDMLQueries, err = strconv.ParseBool(logDMLQueriesStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("LOG_DML_REPORT environment variable was not a bool, got %v", logDMLQueriesStr)
-		}
-	}
-	if logDDLQueriesStr := os.Getenv("LOG_DDL_QUERIES"); logDDLQueriesStr != "" {
-		var err error
-		logDDLQueries, err = strconv.ParseBool(logDDLQueriesStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("LOG_DDL_REPORT environment variable was not a bool, got %v", logDDLQueriesStr)
-		}
-	}
-	if promsumIntervalStr := os.Getenv("PROMSUM_INTERVAL"); promsumIntervalStr != "" {
-		var err error
-		promsumInterval, err = time.ParseDuration(promsumIntervalStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("PROMSUM_INTERVAL environment variable was not a duration, got %q", promsumIntervalStr)
-		}
-	}
-	if promsumStepSizeStr := os.Getenv("PROMSUM_STEP_SIZE"); promsumStepSizeStr != "" {
-		var err error
-		promsumStepSize, err = time.ParseDuration(promsumStepSizeStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("PROMSUM_STEP_SIZE environment variable was not a duration, got %q", promsumStepSizeStr)
-		}
-	}
-	if promsumChunkSizeStr := os.Getenv("PROMSUM_CHUNK_SIZE"); promsumChunkSizeStr != "" {
-		var err error
-		promsumChunkSize, err = time.ParseDuration(promsumChunkSizeStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("PROMSUM_CHUNK_SIZE environment variable was not a duration, got %q", promsumChunkSize)
-		}
-	}
-	promHost := os.Getenv("PROMETHEUS_HOST")
-	if promHost == "" {
-		promHost = defaultPromHost
-	}
-	if disablePromsumStr := os.Getenv("DISABLE_PROMSUM"); disablePromsumStr != "" {
-		var err error
-		disablePromsum, err = strconv.ParseBool(disablePromsumStr)
-		if err != nil {
-			logger.WithError(err).Fatalf("DISABLE_PROMSUM environment variable was not a bool, got %q", disablePromsumStr)
-		}
-	}
-	namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
-	if err != nil {
-		logger.WithError(err).Fatal("could not determine namespace")
-	}
-	cfg := chargeback.Con***REMOVED***g{
-		Namespace:        string(namespace),
-		HiveHost:         HiveHost,
-		PrestoHost:       PrestoHost,
-		PromHost:         promHost,
-		DisablePromsum:   disablePromsum,
-		LogReport:        logReport,
-		LogDMLQueries:    logDMLQueries,
-		LogDDLQueries:    logDDLQueries,
-		PromsumInterval:  promsumInterval,
-		PromsumStepSize:  promsumStepSize,
-		PromsumChunkSize: promsumChunkSize,
-	}
+	runChargeback(logger, cfg)
+}
 
+func runChargeback(logger log.FieldLogger, cfg chargeback.Con***REMOVED***g) {
 	clock := clock.RealClock{}
 	op, err := chargeback.New(logger, cfg, clock)
 	if err != nil {
@@ -129,9 +90,9 @@ func main() {
 	}
 
 	sigs := make(chan os.Signal, 1)
-	stopCh := make(chan struct{})
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	stopCh := make(chan struct{})
 	go func() {
 		sig := <-sigs
 		logger.Infof("got signal %s, performing shutdown", sig)
@@ -141,4 +102,30 @@ func main() {
 	if err = op.Run(stopCh); err != nil {
 		logger.WithError(err).Fatal("error occurred while the Chargeback operator was running")
 	}
+
+}
+
+// SetFlagsFromEnv parses all registered flags in the given flagset,
+// and if they are not already set it attempts to set their values from
+// environment variables. Environment variables take the name of the flag but
+// are UPPERCASE, and any dashes are replaced by underscores. Environment
+// variables additionally are pre***REMOVED***xed by the given string followed by
+// and underscore. For example, if pre***REMOVED***x=PREFIX: some-flag => PREFIX_SOME_FLAG
+func SetFlagsFromEnv(fs *pflag.FlagSet, pre***REMOVED***x string) (err error) {
+	alreadySet := make(map[string]bool)
+	fs.Visit(func(f *pflag.Flag) {
+		alreadySet[f.Name] = true
+	})
+	fs.VisitAll(func(f *pflag.Flag) {
+		if !alreadySet[f.Name] {
+			key := pre***REMOVED***x + "_" + strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
+			val := os.Getenv(key)
+			if val != "" {
+				if serr := fs.Set(f.Name, val); serr != nil {
+					err = fmt.Errorf("invalid value %q for %s: %v", val, key, serr)
+				}
+			}
+		}
+	})
+	return err
 }
