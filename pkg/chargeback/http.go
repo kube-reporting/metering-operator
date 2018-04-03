@@ -46,8 +46,8 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/store", srv.storePromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/{datasourceName}", srv.getPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
 	router.HandleFunc("/ready", srv.readinessHandler)
 	return srv
 }
@@ -366,13 +366,14 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 }
 
 type StorePromsumDataRequest struct {
-	DataSourceName string           `json:"dataSourceName"`
-	Records        []*PromsumRecord `json:"records"`
+	Records []*PromsumRecord `json:"records"`
 }
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	srv.logRequest(logger, r)
+
+	name := chi.URLParam(r, "datasourceName")
 
 	decoder := json.NewDecoder(r.Body)
 	var req StorePromsumDataRequest
@@ -382,7 +383,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(req.DataSourceName), req.Records)
+	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), req.Records)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
 		return
@@ -391,8 +392,9 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-func (srv *server) getPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
+	srv.logRequest(logger, r)
 
 	name := chi.URLParam(r, "datasourceName")
 	err := r.ParseForm()
