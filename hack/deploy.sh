@@ -10,7 +10,7 @@ export SKIP_DELETE_CRDS=true
 CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 
 : "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
-: "${UNINSTALL_CHARGEBACK:=true}"
+: "${UNINSTALL_CHARGEBACK_BEFORE_INSTALL:=false}"
 : "${INSTALL_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=direct}"
 
@@ -37,7 +37,7 @@ done
 echo "Creating namespace $CHARGEBACK_NAMESPACE"
 kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
-if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
+if [ "$UNINSTALL_CHARGEBACK_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling chargeback"
     uninstall_chargeback "${INSTALL_METHOD}"
 else
@@ -70,12 +70,14 @@ echo "chargeback helm-operator is ready"
 EXPECTED_POD_COUNT=6
 until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods -o json | jq '.items | length' -r)" == "$EXPECTED_POD_COUNT" ]; do
     echo 'waiting for chargeback pods to be created'
+    kubectl -n $CHARGEBACK_NAMESPACE get pods --no-headers -o wide
     sleep 10
 done
 echo "all of the chargeback pods have been started"
 
 until [ "$(kubectl -n $CHARGEBACK_NAMESPACE get pods  -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
     echo 'waiting for all pods to be ready'
+    kubectl -n $CHARGEBACK_NAMESPACE get pods --no-headers -o wide
     sleep 10
 done
 echo "chargeback pods are all ready"
