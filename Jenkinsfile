@@ -71,6 +71,7 @@ podTemplate(
         def e2eTestLogFile = 'e2e-tests.log'
         def e2eDeployLogFile = 'e2e-tests-deploy.log'
         def e2eTestTapFile = 'e2e-tests.tap'
+        def e2eDeployPodLogsFile = 'e2e-pod-logs.log'
 
         def dockerBuildArgs = ''
         if (isMasterBranch) {
@@ -274,6 +275,7 @@ podTemplate(
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_LOG_FILE=${e2eTestLogFile}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e.sh",
                                     ])
@@ -296,6 +298,7 @@ podTemplate(
                                             "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                             "TEST_LOG_FILE=${e2eTestLogFile}",
                                             "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                            "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                             "TEST_TAP_FILE=${e2eTestTapFile}",
                                             "ENTRYPOINT=hack/e2e.sh",
                                         ])
