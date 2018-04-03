@@ -10,7 +10,7 @@ export SKIP_DELETE_CRDS=true
 CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
 
 : "${CUSTOM_CHARGEBACK_SETTINGS_FILE:=}"
-: "${UNINSTALL_CHARGEBACK:=true}"
+: "${UNINSTALL_CHARGEBACK_BEFORE_INSTALL:=false}"
 : "${INSTALL_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=direct}"
 
@@ -37,7 +37,7 @@ done
 echo "Creating namespace $CHARGEBACK_NAMESPACE"
 kubectl create ns "$CHARGEBACK_NAMESPACE" || true
 
-if [ "$UNINSTALL_CHARGEBACK" == "true" ]; then
+if [ "$UNINSTALL_CHARGEBACK_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling chargeback"
     uninstall_chargeback "${INSTALL_METHOD}"
 else
