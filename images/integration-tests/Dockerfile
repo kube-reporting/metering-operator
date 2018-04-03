@@ -22,6 +22,15 @@ RUN curl \
     -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
+ENV STERN_VERSION 1.6.0
+RUN curl \
+    --silent \
+    --show-error \
+    --location \
+    "https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_linux_amd64" \
+    -o /usr/local/bin/stern \
+    && chmod +x /usr/local/bin/stern
+
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
 RUN mkdir -p /go/src/github.com/coreos-inc

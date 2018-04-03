@@ -13,6 +13,7 @@ source ${DIR}/util.sh
 : "${DEPLOY_LOG_FILE:?}"
 : "${TEST_TAP_FILE:?}"
 
+: "${DEPLOY_POD_LOGS_LOG_FILE:=""}"
 : "${DEPLOY_CHARGEBACK:=true}"
 : "${CLEANUP_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=alm}"
@@ -30,6 +31,7 @@ mkdir -p /out
 touch "/out/$TEST_LOG_FILE"
 touch "/out/$DEPLOY_LOG_FILE"
 touch "/out/$TEST_TAP_FILE"
+touch "/out/$DEPLOY_POD_LOGS_LOG_FILE"
 
 # fail with the last non-zero exit code (preserves test fail exit code)
 set -o pipefail
@@ -40,9 +42,19 @@ export DELETE_PVCS=true
 function cleanup() {
     echo "Performing cleanup"
     uninstall_chargeback "$INSTALL_METHOD" >> "/out/$DEPLOY_LOG_FILE"
+
+    # kill any background jobs, such as stern
+    jobs -p | xargs kill
+    # Wait for any jobs
+    wait
 }
 
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
+    if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
+        echo "Capturing pod logs"
+        stern -n "$CHARGEBACK_NAMESPACE" '.*' >> "/out/$DEPLOY_POD_LOGS_LOG_FILE" &
+    ***REMOVED***
+
     TMP_DIR="$(mktemp -d)"
     export CHARGEBACK_CR_FILE="$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
     export INSTALLER_MANIFEST_DIR="$TMP_DIR/installer_manifests-${DEPLOY_TAG}"
