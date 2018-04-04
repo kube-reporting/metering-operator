@@ -51,6 +51,12 @@ func main() {
 	logger := log.WithFields(log.Fields{
 		"app": "chargeback-operator",
 	})
+
+	logger.Warnf("im failuring at startup 1!")
+	logger.Warnf("im failuring at startup 2!")
+	logger.Warnf("im failuring at startup 3!")
+	logger.Fatalf("exiting chargeback-operator")
+
 	if logReportEnv := os.Getenv("LOG_REPORT"); logReportEnv != "" {
 		var err error
 		logReport, err = strconv.ParseBool(logReportEnv)
