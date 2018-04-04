@@ -52,7 +52,7 @@ function cleanup() {
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
     if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
         echo "Capturing pod logs"
-        stern -n "$CHARGEBACK_NAMESPACE" '.*' >> "/out/$DEPLOY_POD_LOGS_LOG_FILE" &
+        stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' >> "/out/$DEPLOY_POD_LOGS_LOG_FILE" &
     fi
 
     TMP_DIR="$(mktemp -d)"
