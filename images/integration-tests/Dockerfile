@@ -1,4 +1,4 @@
-FROM golang:1.10-rc-alpine
+FROM golang:1.10-alpine
 
 RUN apk update
 RUN apk add libc-dev git bash jq zip curl make
@@ -22,14 +22,19 @@ RUN curl \
     -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
-ENV STERN_VERSION 1.6.0
-RUN curl \
-    --silent \
-    --show-error \
-    --location \
-    "https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_linux_amd64" \
-    -o /usr/local/bin/stern \
-    && chmod +x /usr/local/bin/stern
+RUN go get -u github.com/kardianos/govendor
+RUN \
+    set -x \
+    && mkdir -p $GOPATH/src/github.com/wercker \
+    && git clone \
+        https://github.com/wercker/stern \
+        $GOPATH/src/github.com/wercker/stern \
+    && cd $GOPATH/src/github.com/wercker/stern \
+    && git remote add coreos https://github.com/coreos/stern \
+    && git fetch coreos remove_terminated_containers \
+    && git checkout coreos/remove_terminated_containers \
+    && govendor sync -v \
+    && go install
 
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
