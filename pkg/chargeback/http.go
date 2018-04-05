@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 
@@ -30,9 +31,21 @@ type server struct {
 	httpServer *http.Server
 }
 
+type requestLogger struct {
+	log.FieldLogger
+}
+
+func (l *requestLogger) Print(v ...interface{}) {
+	l.FieldLogger.Info(v...)
+}
+
 func newServer(c *Chargeback, logger log.FieldLogger) *server {
-	logger = logger.WithField("component", "api")
 	router := chi.NewRouter()
+
+	logger = logger.WithField("component", "api")
+	requestLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: &requestLogger{logger}})
+	router.Use(requestLogger)
+
 	httpServer := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
@@ -42,6 +55,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 		logger:     logger,
 		httpServer: httpServer,
 	}
+
 	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
@@ -66,10 +80,6 @@ func (srv *server) newLogger(r *http.Request) log.FieldLogger {
 		"method": r.Method,
 		"url":    r.URL.String(),
 	}).WithFields(srv.chargeback.newLogIdenti***REMOVED***er())
-}
-
-func (srv *server) logRequest(logger log.FieldLogger, r *http.Request) {
-	logger.Infof("%s %s", r.Method, r.URL.String())
 }
 
 type errorResponse struct {
@@ -98,7 +108,6 @@ func (srv *server) writeResponseWithBody(logger log.FieldLogger, w http.Response
 }
 
 func (srv *server) validateGetReportReq(logger log.FieldLogger, w http.ResponseWriter, r *http.Request) bool {
-	srv.logRequest(logger, r)
 	if r.Method != "GET" {
 		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
 		return false
@@ -139,7 +148,6 @@ func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Requ
 
 func (srv *server) runReportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	srv.logRequest(logger, r)
 	if r.Method != "GET" {
 		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
 		return
@@ -344,7 +352,6 @@ type CollectPromsumDataRequest struct {
 
 func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	srv.logRequest(logger, r)
 
 	decoder := json.NewDecoder(r.Body)
 	var req CollectPromsumDataRequest
@@ -371,7 +378,6 @@ type StorePromsumDataRequest struct {
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	srv.logRequest(logger, r)
 
 	name := chi.URLParam(r, "datasourceName")
 
@@ -394,7 +400,6 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 
 func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	srv.logRequest(logger, r)
 
 	name := chi.URLParam(r, "datasourceName")
 	err := r.ParseForm()
@@ -445,7 +450,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
 	}
 
-	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s`, datasourceTable, whereClause)
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp" DESC`, datasourceTable, whereClause)
 	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
