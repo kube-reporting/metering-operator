@@ -14,7 +14,11 @@ ifdef DOCKER_CACHE_FROM_ENABLED
 	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 endif
+
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
+GOOS = "linux"
+
+CHARGEBACK_BIN_OUT = images/chargeback/bin/chargeback
 
 CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
 CHARGEBACK_IMAGE := quay.io/coreos/chargeback
@@ -172,12 +176,12 @@ ci-validate: k8s-verify-codegen chargeback-manifests fmt
 	@echo Checking for unstaged changes
 	git diff-index --cached --quiet HEAD --ignore-submodules --
 
-chargeback-bin: images/chargeback/bin/chargeback
+chargeback-bin: $(CHARGEBACK_BIN_OUT)
 
-images/chargeback/bin/chargeback: $(CHARGEBACK_GO_FILES)
+$(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 	$(MAKE) k8s-update-codegen
 	mkdir -p $(dir $@)
-	CGO_ENABLED=0 GOOS=linux go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
+	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
 tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
 
