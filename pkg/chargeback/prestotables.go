@@ -124,9 +124,9 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 
 	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
 	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
-	logger.Debugf("partitions to remove: %s", strings.Join(toRemovePartitionsList, ", "))
-	logger.Debugf("partitions to add: %s", strings.Join(toAddPartitionsList, ", "))
-	logger.Debugf("partitions to update: %s", strings.Join(toUpdatePartitionsList, ", "))
+	logger.Debugf("partitions to remove: [%s]", strings.Join(toRemovePartitionsList, ", "))
+	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
+	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
 
 	toRemove := append(changes.toRemovePartitions, changes.toUpdatePartitions...)
 	toAdd := append(changes.toAddPartitions, changes.toUpdatePartitions...)
