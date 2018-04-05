@@ -162,7 +162,7 @@ hive-docker-build: images/hive/Dockerfile hadoop-docker-build
 
 # Update dependencies
 vendor: Gopkg.toml
-	dep ensure
+	dep ensure -v
 
 test:
 	go test ./pkg/...
