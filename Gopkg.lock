@@ -5,6 +5,7 @@
   name = "git.apache.org/thrift.git"
   packages = ["lib/go/thrift"]
   revision = "0dd823580c78a79ae9696eb9b3650e400fff140f"
+  source = "github.com/apache/thrift"
 
 [[projects]]
   name = "github.com/PuerkitoBio/purell"
@@ -69,7 +70,10 @@
 
 [[projects]]
   name = "github.com/go-chi/chi"
-  packages = ["."]
+  packages = [
+    ".",
+    "middleware"
+  ]
   revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
   version = "v3.3.2"
 
@@ -540,6 +544,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ff6523b1bb0069028f5e8de349436bd6d1007c68b9395823447df3139041be0a"
+  inputs-digest = "3305de7f136f3e2d0da9fd0d7ecac4d8483a09430a52fa014407202a256b9bef"
   solver-name = "gps-cdcl"
   solver-version = 1
