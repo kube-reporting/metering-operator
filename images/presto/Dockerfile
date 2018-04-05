@@ -17,6 +17,7 @@ RUN \
 ENV PRESTO_VERSION 0.188
 ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
 ENV TERM linux
+ENV HOME /opt/presto
 
 RUN set -x \
     && curl -fSLs -o /tmp/presto.tar.gz http://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
@@ -26,10 +27,12 @@ RUN set -x \
 
 WORKDIR $PRESTO_HOME
 
+RUN adduser presto --uid 1003 --home /opt/presto --no-create-home
 RUN set -x \
         && curl -fSLs -o /opt/presto/presto-server-$PRESTO_VERSION/presto-cli https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/$PRESTO_VERSION/presto-cli-$PRESTO_VERSION-executable.jar \
         && chmod +x /opt/presto/presto-server-$PRESTO_VERSION/presto-cli \
-        && ln -s /opt/presto/presto-server-$PRESTO_VERSION/presto-cli /usr/local/bin/presto-cli
+        && ln /opt/presto/presto-server-$PRESTO_VERSION/presto-cli /usr/local/bin/presto-cli \
+        && chmod 755 /usr/local/bin/presto-cli
 # Configure JSON serialization
 ADD json-serde-1.3.8-jar-with-dependencies.jar ${PRESTO_HOME}/plugin/hive-hadoop2/
 
@@ -43,8 +46,9 @@ EXPOSE 8080
 
 RUN \
     mkdir -p /var/presto/data && \
-    chown -R 1003:0 /opt /var/presto/data && \
-    chmod -R 770 /opt /var/presto/data /etc/passwd
+    chown -R 1003:0 /opt/presto /var/presto/data && \
+    chmod -R 770 /var/presto/data /etc/passwd && \
+    chmod -R 775 /opt/presto
 
 VOLUME /var/presto/data
 ENTRYPOINT ["entrypoint.sh"]
