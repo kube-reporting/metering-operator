@@ -9,7 +9,7 @@ metadata:
 {{- end }}
 spec:
   reportQueries:
-  - "pod-cpu-request"
+  - "pod-cpu-request-raw"
   - "node-cpu-allocatable"
   - "aws-ec2-billing-data"
   view:
@@ -54,7 +54,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
-      FROM {| generationQueryViewName "pod-cpu-request" |}
+      FROM {| generationQueryViewName "pod-cpu-request-raw" |}
       WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
       GROUP BY pod, namespace, node

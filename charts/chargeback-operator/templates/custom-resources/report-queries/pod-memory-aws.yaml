@@ -9,7 +9,7 @@ metadata:
 {{- end }}
 spec:
   reportQueries:
-  - "pod-memory-request"
+  - "pod-memory-request-raw"
   - "node-memory-allocatable"
   - "aws-ec2-billing-data"
   view:
