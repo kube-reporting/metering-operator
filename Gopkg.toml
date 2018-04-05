@@ -60,3 +60,8 @@ required = [
 [[constraint]]
   name = "github.com/go-chi/chi"
   version = "3.3.2"
+
+[[constraint]]
+  name = "git.apache.org/thrift.git"
+  revision = "0dd823580c78a79ae9696eb9b3650e400fff140f"
+  source = "github.com/apache/thrift"
