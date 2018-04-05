@@ -20,6 +20,10 @@ properties([
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
+def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
+def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
+def skipNamespaceCleanup = params.SKIP_NAMESPACE_CLEANUP || (isPullRequest && pullRequest.labels.contains("skip-namespace-cleanup"))
+
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
 def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}"
@@ -61,9 +65,6 @@ podTemplate(
 ) {
     node (podLabel) {
     timestamps {
-        def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
-        def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
-
         def gopath = "${env.WORKSPACE}/go"
         def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
         def testOutputDir = "test_output"
@@ -142,7 +143,7 @@ podTemplate(
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
-                    "CLEANUP_CHARGEBACK=${!params.SKIP_NAMESPACE_CLEANUP}",
+                    "CLEANUP_CHARGEBACK=${!skipNamespaceCleanup}",
                 ]){
                     container('docker'){
                         echo "Authenticating to docker registry"
@@ -358,7 +359,7 @@ def e2eRunner(kubeChargebackDir, envVars) {
                         }
                     }
                 } ***REMOVED***nally {
-                    if (!params.SKIP_NAMESPACE_CLEANUP) {
+                    if (!skipNamespaceCleanup) {
                         sh '''#!/bin/bash -e
                         ./hack/delete-ns.sh
                         '''
