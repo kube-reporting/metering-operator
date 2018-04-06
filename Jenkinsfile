@@ -274,6 +274,10 @@ podTemplate(
                                     echo "Running chargeback e2e tests"
                                     def myTestDir = "${testOutputDir}/tectonic_e2e"
                                     def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_e2e"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
                                     e2eRunner(kubeChargebackDir, [
                                         "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
                                         "INSTALL_METHOD=direct",
@@ -281,6 +285,7 @@ podTemplate(
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_LOG_FILE=${e2eTestLogFile}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
@@ -295,12 +300,17 @@ podTemplate(
                                     echo "Running chargeback integration tests"
                                     def myTestDir = "${testOutputDir}/tectonic_integration"
                                     def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_integration"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
                                     e2eRunner(kubeChargebackDir, [
                                         "CHARGEBACK_NAMESPACE=${CHARGEBACK_INTEGRATION_NAMESPACE}",
                                         "INSTALL_METHOD=direct",
                                         "DEPLOY_SCRIPT=deploy-ci.sh",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "TEST_LOG_FILE=${integrationTestLogFile}",
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
