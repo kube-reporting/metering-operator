@@ -32,42 +32,42 @@ spec:
             secretKeyRef:
               name: chargeback-secrets
               key: aws-secret-access-key
-        - name: LOG_DML_QUERIES
+        - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: log-dml-queries
-        - name: LOG_DDL_QUERIES
+        - name: CHARGEBACK_LOG_DDL_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: log-ddl-queries
-        - name: LOG_REPORT
+        - name: CHARGEBACK_LOG_REPORT
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: log-reports
-        - name: PROMETHEUS_HOST
+        - name: CHARGEBACK_PROMETHEUS_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: prometheus-url
-        - name: PROMSUM_INTERVAL
+        - name: CHARGEBACK_PROMSUM_INTERVAL
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: promsum-poll-interval
-        - name: PROMSUM_CHUNK_SIZE
+        - name: CHARGEBACK_PROMSUM_CHUNK_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: promsum-chunk-size
-        - name: PROMSUM_STEP_SIZE
+        - name: CHARGEBACK_PROMSUM_STEP_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: promsum-step-size
-        - name: DISABLE_PROMSUM
+        - name: CHARGEBACK_DISABLE_PROMSUM
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
