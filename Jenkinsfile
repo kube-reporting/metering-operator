@@ -285,7 +285,7 @@ podTemplate(
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e.sh",
-                                    ])
+                                    ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
                                     echo "Non-master branch, skipping chargeback e2e tests"
@@ -306,7 +306,7 @@ podTemplate(
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
                                         "ENTRYPOINT=hack/integration.sh",
-                                    ])
+                                    ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
                                     echo "Non-master branch, skipping chargeback integration tests"
@@ -332,7 +332,7 @@ podTemplate(
 } // timestamps end
 } // podTemplate end
 
-def e2eRunner(kubeChargebackDir, envVars) {
+def e2eRunner(kubeChargebackDir, envVars, skipNamespaceCleanup) {
     withEnv(envVars) {
         container('docker'){
             dir(kubeChargebackDir) {
