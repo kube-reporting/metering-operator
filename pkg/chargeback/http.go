@@ -450,7 +450,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
 	}
 
-	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp" DESC`, datasourceTable, whereClause)
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp" ASC`, datasourceTable, whereClause)
 	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
