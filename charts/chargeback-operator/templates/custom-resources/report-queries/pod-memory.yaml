@@ -147,7 +147,7 @@ spec:
     type: timestamp
   - name: data_end
     type: timestamp
-  - name: pod_request_memory_byte_seconds
+  - name: pod_usage_memory_byte_seconds
     type: double
   query: |
     SELECT pod,
@@ -155,14 +155,15 @@ spec:
             node,
             min("timestamp") as data_start,
             max("timestamp") as data_end,
-            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-    FROM {| generationQueryViewName "pod-memory-request-raw" |}
+            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
     AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     GROUP BY namespace, pod, node
-    ORDER BY namespace, pod, node ASC, pod_request_memory_byte_seconds DESC
+    ORDER BY namespace, pod, node ASC, pod_usage_memory_byte_seconds DESC
 
 ---
+
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
@@ -196,6 +197,40 @@ spec:
     GROUP BY namespace
     ORDER BY pod_request_memory_byte_seconds DESC
 
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-memory-usage"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: namespace
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_usage_memory_byte_seconds
+    type: double
+  query: |
+    SELECT namespace,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_usage_memory_byte_seconds DESC
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
