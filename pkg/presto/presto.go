@@ -2,6 +2,7 @@ package presto
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -44,7 +45,13 @@ func ExecuteInsertQuery(queryer db.Queryer, target, query string) error {
 // ExecuteSelectQuery performs the query on the table target. It's expected
 // target has the correct schema.
 func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, error) {
+	var results []map[string]interface{}
+
 	rows, err := queryer.Query(query)
+	// queryer.Query() returns EOF on an empty set; we need to ignore an empty resultset
+	if err == io.EOF {
+		return results, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +60,6 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, 
 		return nil, err
 	}
 
-	var results []map[string]interface{}
 	for rows.Next() {
 		// Create a slice of interface{}'s to represent each column,
 		// and a second slice to contain pointers to each item in the columns slice.
@@ -77,6 +83,7 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, 
 		}
 		results = append(results, m)
 	}
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
