@@ -60,8 +60,18 @@ func TestReportsProduceData(t *testing.T) {
 			timeout:   reportTestTimeout,
 		},
 		{
+			name:      "namespace-cpu-usage",
+			queryName: "namespace-cpu-usage",
+			timeout:   reportTestTimeout,
+		},
+		{
 			name:      "namespace-memory-request",
 			queryName: "namespace-memory-request",
+			timeout:   reportTestTimeout + time.Minute,
+		},
+		{
+			name:      "namespace-memory-usage",
+			queryName: "namespace-memory-usage",
 			timeout:   reportTestTimeout + time.Minute,
 		},
 		{
@@ -70,8 +80,18 @@ func TestReportsProduceData(t *testing.T) {
 			timeout:   reportTestTimeout,
 		},
 		{
+			name:      "pod-cpu-usage",
+			queryName: "pod-cpu-usage",
+			timeout:   reportTestTimeout,
+		},
+		{
 			name:      "pod-memory-request",
 			queryName: "pod-memory-request",
+			timeout:   reportTestTimeout,
+		},
+		{
+			name:      "pod-memory-usage",
+			queryName: "pod-memory-usage",
 			timeout:   reportTestTimeout,
 		},
 		{
