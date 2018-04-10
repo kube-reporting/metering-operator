@@ -226,7 +226,7 @@
   branch = "master"
   name = "github.com/prestodb/presto-go-client"
   packages = ["presto"]
-  revision = "4d48bb52c29b24c4d7e602c71560bb178be3e701"
+  revision = "568bdb2f6dbce76a5b9685d24163b3c42ae0f450"
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
@@ -557,6 +557,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3febcc2a88b6ac8e911014f2e16bd1a49cdf17abbe8c3d49474f39eb48118e0c"
+  inputs-digest = "3506ae9fe08ec27761795d00d6e1232894f16825ef59daeb653779f6e5c2a52f"
   solver-name = "gps-cdcl"
   solver-version = 1
