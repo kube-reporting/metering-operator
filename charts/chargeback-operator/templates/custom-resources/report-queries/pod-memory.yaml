@@ -43,6 +43,48 @@ spec:
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
+  name: "pod-memory-usage-raw"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "pod-usage-memory-bytes"
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: labels
+    type: map(varchar, varchar)
+  - name: pod_usage_memory_bytes
+    type: double
+  - name: timeprecision
+    type: double
+  - name: pod_usage_memory_byte_seconds
+    type: double
+  - name: timestamp
+    type: timestamp
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          element_at(labels, 'node') as node,
+          labels,
+          amount as pod_usage_memory_bytes,
+          timeprecision,
+          amount * timeprecision as pod_usage_memory_byte_seconds,
+          "timestamp"
+      FROM {| dataSourceTableName "pod-usage-memory-bytes" |}
+      WHERE element_at(labels, 'node') IS NOT NULL
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
   name: "pod-memory-request"
   labels:
     tectonic-chargeback: "true"
@@ -84,6 +126,47 @@ spec:
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
+  name: "pod-memory-usage"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: pod
+    type: string
+  - name: namespace
+    type: string
+  - name: node
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_usage_memory_byte_seconds
+    type: double
+  query: |
+    SELECT pod,
+            namespace,
+            node,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_usage_memory_byte_seconds DESC
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
   name: "namespace-memory-request"
   labels:
     tectonic-chargeback: "true"
@@ -114,6 +197,40 @@ spec:
     GROUP BY namespace
     ORDER BY pod_request_memory_byte_seconds DESC
 
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-memory-usage"
+  labels:
+    tectonic-chargeback: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: namespace
+    type: string
+  - name: data_start
+    type: timestamp
+  - name: data_end
+    type: timestamp
+  - name: pod_usage_memory_byte_seconds
+    type: double
+  query: |
+    SELECT namespace,
+            min("timestamp") as data_start,
+            max("timestamp") as data_end,
+            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_usage_memory_byte_seconds DESC
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
