@@ -42,7 +42,7 @@ spec:
     ON aws_billing.lineItem_resourceId = resource_id_list.resource_id
     WHERE position('.csv' IN aws_billing."$path") != 0 -- This prevents JSON manifest files from being loaded.
     AND lineitem_productcode = 'AmazonEC2'
-    AND lineItem_operation = 'RunInstances'
+    AND lineItem_operation LIKE 'RunInstances%'
     AND lineItem_UsageStartDate IS NOT NULL
     AND lineItem_UsageEndDate IS NOT NULL
 ---
