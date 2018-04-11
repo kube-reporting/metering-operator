@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
@@ -81,6 +82,34 @@ func startChargeback(cmd *cobra.Command, args []string) {
 		}
 		cfg.Namespace = string(namespace)
 	}
+	kubeConfig, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+	kubeClient,err := corev1.NewForConfig(kubeConfig)
+
+		rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
+			namespace, "chargeback-operator", kubeClient,
+			resource.lockResourceLockConfig{
+				Identity: id,
+				EventRecorder: record.EventRecorder
+			})
+			if err != nil {
+				logrus.Fatalf("error creating lock %v", err)
+			}
+		 leaderelection.RunOrDie(leaderelection.LeaderElectionConfig{
+			 Lock: rl
+			 LeaseDuration: 15* time.Second,
+			 RenewDeadline: 10 * time.Second,
+			 RetryPeriod: 2 * time.Second,
+			 Callbacks: leaderelection.LeaderCallbacks{
+				 OnStartedLeading: run,
+				 OnStoppedLeading: func() {
+					 logrus.Fatalf("leader election lost")
+				 },
+			 },
+		 })
+
 	runChargeback(logger, cfg)
 }
 
