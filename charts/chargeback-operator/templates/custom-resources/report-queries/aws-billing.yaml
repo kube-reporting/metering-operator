@@ -19,12 +19,12 @@ spec:
     type: timestamp
   - name: period_stop
     type: timestamp
-  - name: partition_start
-    type: timestamp
-  - name: partition_stop
-    type: timestamp
   - name: period_cost
     type: double
+  - name: partition_start
+    type: string
+  - name: partition_stop
+    type: string
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
