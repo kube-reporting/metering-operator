@@ -397,9 +397,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-type StorePromsumDataRequest struct {
-	Records []*PromsumRecord `json:"records"`
-}
+type StorePromsumDataRequest []*PromsumRecord
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
@@ -414,7 +412,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), req.Records)
+	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), []*PromsumRecord(req))
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
 		return
