@@ -498,7 +498,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		record := PromsumRecord{
 			Labels:    labels,
 			Amount:    dbRecord.Amount,
-			StepSize:  dbRecord.TimePrecision,
+			StepSize:  time.Duration(dbRecord.TimePrecision) * time.Second,
 			Timestamp: dbRecord.Timestamp,
 		}
 		results = append(results, &record)
@@ -509,7 +509,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 type promsumDBRecord struct {
 	Labels        map[string]interface{}
 	Amount        float64
-	TimePrecision time.Duration
+	TimePrecision float64
 	Timestamp     time.Time
 }
 
