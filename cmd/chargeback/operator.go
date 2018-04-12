@@ -13,9 +13,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/clock"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/record"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
@@ -84,31 +86,43 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	}
 	kubeConfig, err := rest.InClusterConfig()
 	if err != nil {
-		return nil, err
+		log.Fatalf("error assigning config")
 	}
-	kubeClient,err := corev1.NewForConfig(kubeConfig)
 
-		rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
-			namespace, "chargeback-operator", kubeClient,
-			resource.lockResourceLockConfig{
-				Identity: id,
-				EventRecorder: record.EventRecorder
-			})
-			if err != nil {
-				logrus.Fatalf("error creating lock %v", err)
-			}
-		 leaderelection.RunOrDie(leaderelection.LeaderElectionConfig{
-			 Lock: rl
-			 LeaseDuration: 15* time.Second,
-			 RenewDeadline: 10 * time.Second,
-			 RetryPeriod: 2 * time.Second,
-			 Callbacks: leaderelection.LeaderCallbacks{
-				 OnStartedLeading: run,
-				 OnStoppedLeading: func() {
-					 logrus.Fatalf("leader election lost")
-				 },
-			 },
-		 })
+	kubeClient, err := corev1.NewForConfig(kubeConfig)
+	id, err := os.Hostname()
+	
+//modify this
+	func createRecorder(kubeClient.Interface, name, cfg.Namespace string) record.EventRecorder {
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartLogging(log.Infof)
+	eventBroadcaster.StartRecordingToSink(&v1core.EventSinkImpl{Interface: v1core.New(kubeClient.Core().RESTClient()).Events(cfg.Namespace)})
+	return eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: name})
+}
+
+	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
+		cfg.Namespace, "chargeback-operator", kubeClient,
+		resourcelock.ResourceLockConfig{
+			Identity:      id,
+			EventRecorder: record.EventRecorder,
+		})
+	if err != nil {
+		log.Fatalf("error creating lock %v", err)
+	}
+	leaseDuration := 60 * time.Second
+
+	leaderelection.RunOrDie(leaderelection.LeaderElectionConfig{
+		Lock:          rl,
+		LeaseDuration: leaseDuration,
+		RenewDeadline: leaseDuration / 2,
+		RetryPeriod:   2 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: run,
+			OnStoppedLeading: func() {
+				log.Fatalf("leader election lost")
+			},
+		},
+	})
 
 	runChargeback(logger, cfg)
 }
@@ -119,17 +133,6 @@ func runChargeback(logger log.FieldLogger, cfg chargeback.Config) {
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup Chargeback operator")
 	}
-
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	stopCh := make(chan struct{})
-	go func() {
-		sig := <-sigs
-		logger.Infof("got signal %s, performing shutdown", sig)
-		close(stopCh)
-	}()
-
 	if err = op.Run(stopCh); err != nil {
 		logger.WithError(err).Fatal("error occurred while the Chargeback operator was running")
 	}
@@ -159,4 +162,18 @@ func SetFlagsFromEnv(fs *pflag.FlagSet, prefix string) (err error) {
 		}
 	})
 	return err
+}
+
+func SetupSignals() chan struct{} {
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	stopCh := make(chan struct{})
+	go func() {
+		sig := <-sigs
+		log.Infof("got signal %s, performing shutdown", sig)
+		close(stopCh)
+	}()
+	return stopCh
 }
