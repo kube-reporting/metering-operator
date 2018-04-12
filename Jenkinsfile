@@ -280,8 +280,6 @@ podTemplate(
                                     }
                                     e2eRunner(kubeChargebackDir, [
                                         "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                                        "INSTALL_METHOD=direct",
-                                        "DEPLOY_SCRIPT=deploy-ci.sh",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_LOG_FILE=${e2eTestLogFile}",
@@ -289,7 +287,7 @@ podTemplate(
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
-                                        "ENTRYPOINT=hack/e2e.sh",
+                                        "ENTRYPOINT=hack/e2e-ci.sh",
                                     ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } else {
@@ -306,8 +304,6 @@ podTemplate(
                                     }
                                     e2eRunner(kubeChargebackDir, [
                                         "CHARGEBACK_NAMESPACE=${CHARGEBACK_INTEGRATION_NAMESPACE}",
-                                        "INSTALL_METHOD=direct",
-                                        "DEPLOY_SCRIPT=deploy-ci.sh",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
@@ -315,7 +311,7 @@ podTemplate(
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
-                                        "ENTRYPOINT=hack/integration.sh",
+                                        "ENTRYPOINT=hack/integration-ci.sh",
                                     ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } else {
