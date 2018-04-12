@@ -321,42 +321,50 @@ func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng
 }
 
 func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, tableName string, records []*PromsumRecord) error {
-	var queryValues [][]string
+	var queryValues []string
 
 	for _, record := range records {
-		queryValues = append(queryValues, []string{generateRecordSQLValues(record)})
+		recordValue := generateRecordSQLValues(record)
+		queryValues = append(queryValues, recordValue)
 	}
 	// capacity prestoQueryCap, length 0
 	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
-	// queryBuf.Reset()
-	queryBuf.WriteString("VALUES ")
-	queryBufIsEmpty := true
-	for _, values := range queryValues {
-		if !queryBufIsEmpty {
+
+	insertStatementLength := len(presto.FormatInsertQuery(tableName, ""))
+	// calculate the queryCap with the "INSERT INTO $table_name" portion
+	// accounted for
+	queryCap := prestoQueryCap - insertStatementLength
+
+	for _, value := range queryValues {
+		// If the buffer is empty, we add VALUES to it, and everything the
+		// follows will be a single row to insert
+		if queryBuf.Len() == 0 {
+			queryBuf.WriteString("VALUES ")
+		} ***REMOVED*** {
+			// if the buffer isn't empty, then before we add more rows to the
+			// insert query, add a comma to separate them.
 			queryBuf.WriteString(",")
 		}
 
-		currValue := fmt.Sprintf("(%s)", strings.Join(values, ","))
-
-		queryCap := prestoQueryCap - len(presto.FormatInsertQuery(tableName, ""))
-
 		// There's a character limit of prestoQueryCap on insert
 		// queries, so let's chunk them at that limit.
-		if len(currValue)+queryBuf.Len() > queryCap {
+		bytesToWrite := len(value)
+		newBufferSize := (bytesToWrite + queryBuf.Len())
+
+		// if writing the current value to the buffer would exceed the
+		// prestoQueryCap, preform the insert query, and reset the buffer
+		if newBufferSize > queryCap {
 			err := presto.ExecuteInsertQuery(c.prestoConn, tableName, queryBuf.String())
 			if err != nil {
 				return fmt.Errorf("failed to store metrics into presto: %v", err)
 			}
 			queryBuf.Reset()
-			queryBuf.WriteString("VALUES ")
-			queryBuf.WriteString(currValue)
-			queryBufIsEmpty = false
 		} ***REMOVED*** {
-			queryBuf.WriteString(currValue)
-			queryBufIsEmpty = false
+			queryBuf.WriteString(value)
 		}
 	}
-	if !queryBufIsEmpty {
+	// if the buffer has unwritten values, perform the ***REMOVED***nal insert
+	if queryBuf.Len() != 0 {
 		err := presto.ExecuteInsertQuery(c.prestoConn, tableName, queryBuf.String())
 		if err != nil {
 			return fmt.Errorf("failed to store metrics into presto: %v", err)
