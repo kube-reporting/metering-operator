@@ -19,12 +19,12 @@ spec:
     type: timestamp
   - name: period_stop
     type: timestamp
-  - name: partition_start
-    type: timestamp
-  - name: partition_stop
-    type: timestamp
   - name: period_cost
     type: double
+  - name: partition_start
+    type: string
+  - name: partition_stop
+    type: string
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
@@ -42,7 +42,7 @@ spec:
     ON aws_billing.lineItem_resourceId = resource_id_list.resource_id
     WHERE position('.csv' IN aws_billing."$path") != 0 -- This prevents JSON manifest ***REMOVED***les from being loaded.
     AND lineitem_productcode = 'AmazonEC2'
-    AND lineItem_operation = 'RunInstances'
+    AND lineItem_operation LIKE 'RunInstances%'
     AND lineItem_UsageStartDate IS NOT NULL
     AND lineItem_UsageEndDate IS NOT NULL
 ---
