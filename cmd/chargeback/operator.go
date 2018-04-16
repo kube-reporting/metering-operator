@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -56,6 +57,7 @@ func AddCommands() {
 func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	startCmd.Flags().AddGoFlagSet(flag.CommandLine)
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", " ")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, " ")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, " ")
@@ -67,6 +69,7 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "how often we poll prometheus")
 	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
+	startCmd.Flags().DurationVar(leaseDuration, "lease-duration", 60*time.Second, "controls how much time elapses before declaring leader")
 }
 
 func main() {
@@ -105,7 +108,7 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: podName})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
-		cfg.Namespace, "chargeback-operator", kubeClient,
+		cfg.Namespace, "chargeback-operator-leader-lease", kubeClient,
 		resourcelock.ResourceLockConfig{
 			Identity:      id,
 			EventRecorder: eventRecorder,
@@ -113,7 +116,6 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("error creating lock %v", err)
 	}
-	leaseDuration := 60 * time.Second
 
 	signalStopCh := setupSignals()
 	// run shuts down chargeback by closing the stopCh passed to it when a signal is received or when chargeback stops being leader
@@ -185,7 +187,6 @@ func SetFlagsFromEnv(fs *pflag.FlagSet, prefix string) (err error) {
 }
 
 func setupSignals() chan struct{} {
-
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
