@@ -13,8 +13,8 @@ spec:
   template:
     metadata:
       labels:
-       app: presto
-       presto: coordinator
+        app: presto
+        presto: coordinator
 {{- if .Values.presto.labels }}
 {{ toYaml .Values.presto.labels | indent 8 }}
 {{- end }}
