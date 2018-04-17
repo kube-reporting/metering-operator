@@ -15,9 +15,9 @@ spec:
   columns:
   - name: resource_id
     type: string
-  - name: period_start
+  - name: usage_start_date
     type: timestamp
-  - name: period_stop
+  - name: usage_end_date
     type: timestamp
   - name: period_cost
     type: double
@@ -32,8 +32,8 @@ spec:
       GROUP BY resource_id
     )
     SELECT lineItem_resourceId as resource_id,
-           lineItem_UsageStartDate as period_start,
-           lineItem_UsageEndDate as period_stop,
+           lineItem_UsageStartDate as usage_start_date,
+           lineItem_UsageEndDate as usage_end_date,
            lineItem_BlendedCost as period_cost,
            billing_period_start as partition_start,
            billing_period_end as partition_stop
@@ -69,8 +69,8 @@ spec:
   query: |
     WITH aws_billing_filtered AS ( {| filterAWSData .Report "aws-ec2-billing-data" |} )
     SELECT
-        min(period_start) as data_start,
-        max(period_stop) as data_stop,
+        min(usage_start_date) as data_start,
+        max(usage_end_date) as data_stop,
         sum(period_cost * period_percent) as cluster_cost
     FROM aws_billing_filtered
 {{- end -}}
