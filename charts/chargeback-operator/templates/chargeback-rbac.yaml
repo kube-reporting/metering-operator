@@ -11,11 +11,21 @@ rules:
   - ""
   resources:
   - configmaps
-  - event
   verbs:
   - create
   - delete
   - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
   - get
   - list
   - patch
