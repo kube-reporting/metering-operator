@@ -32,6 +32,7 @@ var (
 	defaultPromsumInterval  = time.Minute * 5
 	defaultPromsumStepSize  = time.Minute
 	defaultPromsumChunkSize = time.Minute * 5
+	defaultLeaseDuration    = time.Second * 60
 	// cfg is the config for our operator
 	cfg chargeback.Config
 )
@@ -69,7 +70,7 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "how often we poll prometheus")
 	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
-	startCmd.Flags().DurationVar(leaseDuration, "lease-duration", 60*time.Second, "controls how much time elapses before declaring leader")
+	startCmd.Flags().DurationVar(&defaultLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 }
 
 func main() {
@@ -137,8 +138,8 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	}
 	leaderelection.RunOrDie(leaderelection.LeaderElectionConfig{
 		Lock:          rl,
-		LeaseDuration: leaseDuration,
-		RenewDeadline: leaseDuration / 2,
+		LeaseDuration: defaultLeaseDuration,
+		RenewDeadline: defaultLeaseDuration / 2,
 		RetryPeriod:   2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: run,
