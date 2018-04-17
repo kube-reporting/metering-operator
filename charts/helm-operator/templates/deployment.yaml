@@ -12,6 +12,13 @@ spec:
     metadata:
       labels:
         app: {{ .Values.name }}
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 8 }}
+{{- end }}
+      annotations:
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
     spec:
       securityContext:
         runAsNonRoot: true

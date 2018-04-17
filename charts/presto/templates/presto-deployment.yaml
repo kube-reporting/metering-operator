@@ -15,9 +15,15 @@ spec:
       labels:
        app: presto
        presto: coordinator
+{{- if .Values.presto.labels }}
+{{ toYaml .Values.presto.labels | indent 8 }}
+{{- end }}
       annotations:
         presto-config-hash: {{ include (print $.Template.BasePath "/presto-config.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
+{{- if .Values.presto.annotations }}
+{{ toYaml .Values.presto.annotations | indent 8 }}
+{{- end }}
     spec:
       securityContext:
 {{ toYaml .Values.presto.securityContext | indent 8 }}

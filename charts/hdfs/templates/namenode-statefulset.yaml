@@ -67,8 +67,14 @@ spec:
     metadata:
       labels:
         app: hdfs-namenode
+{{- if .Values.namenode.labels }}
+{{ toYaml .Values.namenode.labels | indent 8 }}
+{{- end }}
       annotations:
         hdfs-configmap-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+{{- if .Values.namenode.annotations }}
+{{ toYaml .Values.namenode.annotations | indent 8 }}
+{{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.namenode.terminationGracePeriodSeconds }}
       securityContext:

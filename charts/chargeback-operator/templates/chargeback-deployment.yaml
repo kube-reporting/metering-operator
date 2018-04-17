@@ -11,9 +11,15 @@ spec:
     metadata:
       labels:
         app: chargeback
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 8 }}
+{{- end }}
       annotations:
         chargeback-config-hash: {{ include (print $.Template.BasePath "/chargeback-config.yaml") . | sha256sum }}
         chargeback-secrets-hash: {{ include (print $.Template.BasePath "/chargeback-secrets.yaml") . | sha256sum }}
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
     spec:
       securityContext:
         runAsNonRoot: true
