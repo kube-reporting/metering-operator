@@ -15,8 +15,8 @@ spec:
 {{- if .Values.labels }}
 {{ toYaml .Values.labels | indent 8 }}
 {{- end }}
-      annotations:
 {{- if .Values.annotations }}
+      annotations:
 {{ toYaml .Values.annotations | indent 8 }}
 {{- end }}
     spec:
