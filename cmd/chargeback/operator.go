@@ -104,7 +104,8 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	podName := os.Getenv("POD_NAME")
 
 	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(log.Infof)
+	eventBroadcaster.StartLogging(logger.Infof)
+	logger.Infof("this is the namespace: %s", cfg.Namespace)
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.Namespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: podName})
 
