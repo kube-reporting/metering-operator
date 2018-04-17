@@ -66,7 +66,7 @@ rules:
   - apiGroups:
     - ""
     resources:
-    - event
+    - events
     verbs:
     - create
     - update
