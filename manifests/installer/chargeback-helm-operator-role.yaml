@@ -66,6 +66,14 @@ rules:
   - apiGroups:
     - ""
     resources:
+    - event
+    verbs:
+    - create
+    - update
+    - patch
+  - apiGroups:
+    - ""
+    resources:
     - namespaces
     verbs:
     - get
