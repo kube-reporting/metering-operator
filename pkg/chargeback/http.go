@@ -21,6 +21,7 @@ import (
 	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/coreos-inc/kube-chargeback/pkg/db"
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
+	"github.com/coreos-inc/kube-chargeback/pkg/util/orderedmap"
 )
 
 var ErrReportIsRunning = errors.New("the report is still running")
@@ -196,8 +197,16 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		}
 	}
 
+	reportQuery, err := srv.chargeback.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(srv.chargeback.cfg.Namespace).Get(report.Spec.GenerationQueryName)
+	if err != nil {
+		logger.WithError(err).Errorf("error getting report: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		return
+	}
+
+	orderByColsStr := getReportOrderByColumnsString(reportQuery)
 	reportTable := scheduledReportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY period_start, period_end ASC", reportTable)
+	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
 	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
@@ -222,7 +231,6 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 
 	srv.writeResults(logger, format, columns, results, w, r)
 }
-
 func (srv *server) getReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a ***REMOVED***nished state
 	report, err := srv.chargeback.informers.Chargeback().V1alpha1().Reports().Lister().Reports(srv.chargeback.cfg.Namespace).Get(name)
@@ -247,8 +255,16 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		return
 	}
 
+	reportQuery, err := srv.chargeback.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(srv.chargeback.cfg.Namespace).Get(report.Spec.GenerationQueryName)
+	if err != nil {
+		logger.WithError(err).Errorf("error getting report: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		return
+	}
+
+	orderByColsStr := getReportOrderByColumnsString(reportQuery)
 	reportTable := reportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY period_start, period_end ASC", reportTable)
+	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
 	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
@@ -277,7 +293,16 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
-		srv.writeResponseWithBody(logger, w, http.StatusOK, results)
+		newResults := make([]*orderedmap.OrderedMap, len(results))
+		for i, item := range results {
+			var err error
+			newResults[i], err = orderedmap.NewFromMap(item)
+			if err != nil {
+				srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting results: %v", err)
+				return
+			}
+		}
+		srv.writeResponseWithBody(logger, w, http.StatusOK, newResults)
 		return
 	case "csv":
 		buf := &bytes.Buffer{}
@@ -372,9 +397,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-type StorePromsumDataRequest struct {
-	Records []*PromsumRecord `json:"records"`
-}
+type StorePromsumDataRequest []*PromsumRecord
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
@@ -389,7 +412,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), req.Records)
+	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), []*PromsumRecord(req))
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
 		return
@@ -450,7 +473,9 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
 	}
 
-	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp" ASC`, datasourceTable, whereClause)
+	// we use map_entries for ordering on the labels because maps are
+	// unorderable in Presto.
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp", map_entries(labels), amount, timeprecision ASC`, datasourceTable, whereClause)
 	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
@@ -473,7 +498,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		record := PromsumRecord{
 			Labels:    labels,
 			Amount:    dbRecord.Amount,
-			StepSize:  dbRecord.TimePrecision,
+			StepSize:  time.Duration(dbRecord.TimePrecision) * time.Second,
 			Timestamp: dbRecord.Timestamp,
 		}
 		results = append(results, &record)
@@ -484,6 +509,24 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 type promsumDBRecord struct {
 	Labels        map[string]interface{}
 	Amount        float64
-	TimePrecision time.Duration
+	TimePrecision float64
 	Timestamp     time.Time
+}
+
+func getReportOrderByColumnsString(query *api.ReportGenerationQuery) string {
+	cols := query.Spec.Columns
+	var quotedColumns []string
+	for _, col := range cols {
+		colName := col.Name
+		// if we detect a map(...) in the column, use map_entries to do
+		// ordering. we detect a map column using a best effort approach by
+		// checking if the column type contains the string "map(" , and is
+		// followed by a ")" after that string.
+		if mapIndex := strings.Index(col.Type, "map("); mapIndex != -1 && strings.Index(col.Type, ")") > mapIndex {
+			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
+		} ***REMOVED*** {
+			quotedColumns = append(quotedColumns, fmt.Sprintf(`"%s"`, colName))
+		}
+	}
+	return fmt.Sprintf("period_start, period_end, %s ASC", strings.Join(quotedColumns, ", "))
 }

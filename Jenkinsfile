@@ -20,10 +20,15 @@ properties([
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
+def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
+def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
+def skipNamespaceCleanup = params.SKIP_NAMESPACE_CLEANUP || (isPullRequest && pullRequest.labels.contains("skip-namespace-cleanup"))
+
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
 def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}"
 def chargebackE2ENamespace = "${chargebackNamespacePre***REMOVED***x}-e2e"
+def chargebackIntegrationNamespace = "${chargebackNamespacePre***REMOVED***x}-integration"
 
 def instanceCap = isMasterBranch ? 1 : 5
 def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
@@ -60,9 +65,6 @@ podTemplate(
 ) {
     node (podLabel) {
     timestamps {
-        def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
-        def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
-
         def gopath = "${env.WORKSPACE}/go"
         def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
         def testOutputDir = "test_output"
@@ -72,6 +74,10 @@ podTemplate(
         def e2eDeployLogFile = 'e2e-tests-deploy.log'
         def e2eTestTapFile = 'e2e-tests.tap'
         def e2eDeployPodLogsFile = 'e2e-pod-logs.log'
+        def integrationTestLogFile = 'integration-tests.log'
+        def integrationDeployLogFile = 'integration-tests-deploy.log'
+        def integrationTestTapFile = 'integration-tests.tap'
+        def integrationDeployPodLogsFile = 'integration-pod-logs.log'
 
         def dockerBuildArgs = ''
         if (isMasterBranch) {
@@ -130,13 +136,14 @@ podTemplate(
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
                     "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
+                    "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
                     "ENABLE_AWS_BILLING=false",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
-                    "CLEANUP_CHARGEBACK=${!params.SKIP_NAMESPACE_CLEANUP}",
+                    "CLEANUP_CHARGEBACK=${!skipNamespaceCleanup}",
                 ]){
                     container('docker'){
                         echo "Authenticating to docker registry"
@@ -257,7 +264,7 @@ podTemplate(
                         }
                     }
 
-                    stage('e2e tests') {
+                    stage('integration/e2e tests') {
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'TECTONIC_KUBECONFIG'],
                             [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubecon***REMOVED***g', variable: 'OPENSHIFT_KUBECONFIG'],
@@ -267,21 +274,48 @@ podTemplate(
                                     echo "Running chargeback e2e tests"
                                     def myTestDir = "${testOutputDir}/tectonic_e2e"
                                     def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_e2e"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
                                     e2eRunner(kubeChargebackDir, [
                                         "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
-                                        "INSTALL_METHOD=direct",
-                                        "DEPLOY_SCRIPT=deploy-ci.sh",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_LOG_FILE=${e2eTestLogFile}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
-                                        "ENTRYPOINT=hack/e2e.sh",
-                                    ])
+                                        "ENTRYPOINT=hack/e2e-ci.sh",
+                                    ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
                                     echo "Non-master branch, skipping chargeback e2e tests"
+                                }
+                            }, "tectonic-integration": {
+                                if (runE2ETests) {
+                                    echo "Running chargeback integration tests"
+                                    def myTestDir = "${testOutputDir}/tectonic_integration"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_integration"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
+                                    e2eRunner(kubeChargebackDir, [
+                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_INTEGRATION_NAMESPACE}",
+                                        "KUBECONFIG=${TECTONIC_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
+                                        "TEST_LOG_FILE=${integrationTestLogFile}",
+                                        "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "TEST_TAP_FILE=${integrationTestTapFile}",
+                                        "ENTRYPOINT=hack/integration-ci.sh",
+                                    ], skipNamespaceCleanup)
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping chargeback integration tests"
                                 }
                             }, failFast: false
                         }
@@ -304,7 +338,7 @@ podTemplate(
 } // timestamps end
 } // podTemplate end
 
-def e2eRunner(kubeChargebackDir, envVars) {
+def e2eRunner(kubeChargebackDir, envVars, skipNamespaceCleanup) {
     withEnv(envVars) {
         container('docker'){
             dir(kubeChargebackDir) {
@@ -331,7 +365,7 @@ def e2eRunner(kubeChargebackDir, envVars) {
                         }
                     }
                 } ***REMOVED***nally {
-                    if (!params.SKIP_NAMESPACE_CLEANUP) {
+                    if (!skipNamespaceCleanup) {
                         sh '''#!/bin/bash -e
                         ./hack/delete-ns.sh
                         '''

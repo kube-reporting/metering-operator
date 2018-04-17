@@ -16,8 +16,10 @@ source ${DIR}/util.sh
 : "${DEPLOY_POD_LOGS_LOG_FILE:=""}"
 : "${DEPLOY_CHARGEBACK:=true}"
 : "${CLEANUP_CHARGEBACK:=true}"
-: "${INSTALL_METHOD:=alm}"
+: "${INSTALL_METHOD:=direct}"
 : "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh
+: "${TEST_OUTPUT_DIRECTORY:=/out}"
+: "${TEST_OUTPUT_LOG_STDOUT:=false}"
 
 export INSTALL_METHOD
 export CHARGEBACK_NAMESPACE
@@ -27,11 +29,11 @@ echo "\$KUBECONFIG=$KUBECONFIG"
 echo "\$CHARGEBACK_NAMESPACE=$CHARGEBACK_NAMESPACE"
 echo "\$INSTALL_METHOD=$INSTALL_METHOD"
 
-mkdir -p /out
-touch "/out/$TEST_LOG_FILE"
-touch "/out/$DEPLOY_LOG_FILE"
-touch "/out/$TEST_TAP_FILE"
-touch "/out/$DEPLOY_POD_LOGS_LOG_FILE"
+mkdir -p $TEST_OUTPUT_DIRECTORY
+touch "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE"
+touch "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
+touch "$TEST_OUTPUT_DIRECTORY/$TEST_TAP_FILE"
+touch "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE"
 
 # fail with the last non-zero exit code (preserves test fail exit code)
 set -o pipefail
@@ -41,7 +43,11 @@ export DELETE_PVCS=true
 
 function cleanup() {
     echo "Performing cleanup"
-    uninstall_chargeback "$INSTALL_METHOD" >> "/out/$DEPLOY_LOG_FILE"
+    if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
+        uninstall_chargeback "$INSTALL_METHOD" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
+    ***REMOVED***
+        uninstall_chargeback "$INSTALL_METHOD" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
+    ***REMOVED***
 
     # kill any background jobs, such as stern
     jobs -p | xargs kill
@@ -52,31 +58,35 @@ function cleanup() {
 if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
     if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
         echo "Capturing pod logs"
-        stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' >> "/out/$DEPLOY_POD_LOGS_LOG_FILE" &
+        if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
+            stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
+        ***REMOVED***
+            stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
+        ***REMOVED***
     ***REMOVED***
-
-    TMP_DIR="$(mktemp -d)"
-    export CHARGEBACK_CR_FILE="$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
-    export INSTALLER_MANIFEST_DIR="$TMP_DIR/installer_manifests-${DEPLOY_TAG}"
-    export CUSTOM_VALUES_FILE="$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"
 
     if [ "$CLEANUP_CHARGEBACK" == "true" ]; then
         trap cleanup EXIT SIGINT
     ***REMOVED***
+
     echo "Deploying Chargeback"
-    "${DIR}/${DEPLOY_SCRIPT}" >> "/out/$DEPLOY_LOG_FILE" 2>&1
+    if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
+        "${DIR}/${DEPLOY_SCRIPT}" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
+    ***REMOVED***
+        "${DIR}/${DEPLOY_SCRIPT}" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
+    ***REMOVED***
 ***REMOVED***
 
 echo "Running tests"
 
 "$TEST_SCRIPT" 2>&1 \
-    | tee -a "/out/$TEST_LOG_FILE" \
+    | tee -a "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE" \
     | go tool test2json \
-    | tee -a "/out/${TEST_LOG_FILE}.json" \
+    | tee -a "$TEST_OUTPUT_DIRECTORY/${TEST_LOG_FILE}.json" \
     | jq -r -s -f "$DIR/tap-output.jq" \
-    | tee -a "/out/$TEST_TAP_FILE"
+    | tee -a "$TEST_OUTPUT_DIRECTORY/$TEST_TAP_FILE"
 
-if grep -q '^not' < "/out/$TEST_LOG_FILE"; then
+if grep -q '^not' < "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE"; then
   exit 1
 ***REMOVED***
   exit 0
