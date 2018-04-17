@@ -93,7 +93,7 @@ spec:
           - apiGroups:
             - ""
             resources:
-            - event
+            - events
             verbs:
             - create
             - update
