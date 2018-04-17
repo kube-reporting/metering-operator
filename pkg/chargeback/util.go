@@ -94,5 +94,5 @@ func validateDayOfMonth(dom int64) error {
 	if dom >= 1 && dom <= 31 {
 		return nil
 	}
-	return fmt.Errorf("invalid day of month: %s, must be between 1 and 31", dom)
+	return fmt.Errorf("invalid day of month: %d, must be between 1 and 31", dom)
 }
