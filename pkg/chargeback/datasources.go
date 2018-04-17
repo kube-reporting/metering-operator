@@ -44,7 +44,8 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	reportDataSource, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataSource %s does not exist anymore", key)
+			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
+			c.deleteReportDataSourceTable(name)
 			return nil
 		}
 		return err
@@ -58,6 +59,28 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	}
 	logger.Infof("successfully synced reportDataSource %s", reportDataSource.GetName())
 	return nil
+}
+
+func (c *Chargeback) handleReportDataSourceDeleted(obj interface{}) {
+	dataSource, ok := obj.(*cbTypes.ReportDataSource)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			c.logger.Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
+		if !ok {
+			c.logger.Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
+			return
+		}
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(dataSource)
+	if err != nil {
+		c.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
+		return
+	}
+	c.queues.reportDataSourceQueue.Add(key)
 }
 
 func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
@@ -171,4 +194,13 @@ func (c *Chargeback) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 		return err
 	}
 	return nil
+}
+
+func (c *Chargeback) deleteReportDataSourceTable(name string) {
+	tableName := dataSourceTableName(name)
+	err := hive.DropTable(c.hiveQueryer, tableName, true)
+	if err != nil {
+		c.logger.WithError(err).Error("unable to drop ReportDataSource table")
+	}
+	c.logger.Infof("successfully deleted table %s", tableName)
 }
