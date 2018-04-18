@@ -160,8 +160,8 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 					FileName:       "testdata/datasources/node-allocatable-cpu-cores.json",
 				},
 				{
-					DatasourceName: "pod-usage-cpu-cores",
-					FileName:       "testdata/datasources/pod-usage-cpu-cores.json",
+					DatasourceName: "pod-request-cpu-cores",
+					FileName:       "testdata/datasources/pod-request-cpu-cores.json",
 				},
 			},
 			expectedReportOutputFileName: "testdata/reports/node-cpu-utilization.json",
