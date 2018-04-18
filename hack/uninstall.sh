@@ -6,6 +6,7 @@ source ${DIR}/util.sh
 : "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 : "${DELETE_PVCS:=false}"
+: "${SKIP_DELETE_CRDS:=true}"
 
 if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
     msg "Removing pull secrets"
