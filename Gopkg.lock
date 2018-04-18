@@ -304,8 +304,8 @@
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
-  version = "v1.0.0"
+  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -616,6 +616,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "04132abf25fd892d281c2286543725a267dba35fb8d0bf48544919828e48fa62"
+  inputs-digest = "3acc75b59c4283daff7bf8afbb4d8ca5f515914f7083484e9aca40282bdd6f32"
   solver-name = "gps-cdcl"
   solver-version = 1
