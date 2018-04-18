@@ -34,6 +34,8 @@ GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
+USE_RELEASE_TAG = true
+RELEASE_TAG = 0.6.0-latest
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 IMAGE_TAG = $(GIT_SHA)
 TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
@@ -62,6 +64,9 @@ endif
 ifdef BRANCH_TAG
 	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
 endif
+ifeq ($(USE_RELEASE_TAG), true)
+	$(MAKE) docker-tag IMAGE_TAG=$(RELEASE_TAG)
+endif
 ifeq ($(USE_LATEST_TAG), true)
 	$(MAKE) docker-tag IMAGE_TAG=latest
 endif
@@ -85,6 +90,9 @@ docker-pull:
 
 docker-push:
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
+ifeq ($(USE_RELEASE_TAG), true)
+	docker push $(IMAGE_NAME):$(RELEASE_TAG)
+endif
 ifeq ($(USE_LATEST_TAG), true)
 	docker push $(IMAGE_NAME):latest
 endif
@@ -145,7 +153,7 @@ chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeba
 chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
@@ -183,20 +191,21 @@ $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
-tectonic-chargeback-chart: tectonic-chargeback-0.1.0.tgz
+images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml: ./hack/render-tectonic-chargeback-chart-override-values.sh
+	./hack/render-tectonic-chargeback-chart-override-values.sh $(RELEASE_TAG) > $@
 
-tectonic-chargeback-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
+tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz
+
+images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
 
-chargeback-manifests: hack/chargeback-helm-operator-values.yaml hack/chargeback-alm-values.yaml
-	./hack/create-installer-manifests.sh
-	./hack/create-alm-csv-manifests.sh
+chargeback-manifests:
+	./hack/create-chargeback-manifests.sh $(RELEASE_TAG)
 
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
 	@./hack/create-release.sh tectonic-chargeback-$(RELEASE_VERSION).zip
-
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift \
@@ -206,6 +215,7 @@ release:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart \
+	images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml \
 	chargeback-manifests release bill-of-materials.json
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)

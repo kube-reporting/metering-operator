@@ -12,6 +12,7 @@ if [ "$ENABLE_DEBUG" == "true" ]; then
 
 : ${HELM_WAIT:=false}
 : ${HELM_WAIT_TIMEOUT:=120}
+: ${EXTRA_VALUES_FILE:=}
 
 : ${MY_POD_NAMESPACE:?}
 
@@ -172,6 +173,7 @@ while true; do
             RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
             RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
 
+            HELM_ARGS=()
             if [ -z "$RELEASE_VALUES" ]; then
                 echo "No values, using default values"
             ***REMOVED***
@@ -179,6 +181,10 @@ while true; do
                 echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
 
                 HELM_ARGS=("-f" "$VALUES_FILE")
+            ***REMOVED***
+
+            if [ -s "$EXTRA_VALUES_FILE" ]; then
+                HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
             ***REMOVED***
 
             # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
