@@ -24,6 +24,7 @@ echo "Output directory: ${OUTPUT_DIR}"
 mkdir -p "${INSTALLER_MANIFEST_DIR}" "${ALM_MANIFEST_DIR}"
 
 JQ_CRD_SCRIPT=$(cat <<EOF
+sort_by(.metadata.name) |
 {
     spec: {
         customresourcede***REMOVED***nitions: {
