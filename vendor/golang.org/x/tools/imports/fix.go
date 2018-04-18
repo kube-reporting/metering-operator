@@ -32,16 +32,26 @@ var (
 	testMu  sync.RWMutex // guards globals reset by tests; used only if inTests
 )
 
-// LocalPre***REMOVED***x, if set, instructs Process to sort import paths with the given
-// pre***REMOVED***x into another group after 3rd-party packages.
+// LocalPre***REMOVED***x is a comma-separated string of import path pre***REMOVED***xes, which, if
+// set, instructs Process to sort the import paths with the given pre***REMOVED***xes
+// into another group after 3rd-party packages.
 var LocalPre***REMOVED***x string
+
+func localPre***REMOVED***xes() []string {
+	if LocalPre***REMOVED***x != "" {
+		return strings.Split(LocalPre***REMOVED***x, ",")
+	}
+	return nil
+}
 
 // importToGroup is a list of functions which map from an import path to
 // a group number.
 var importToGroup = []func(importPath string) (num int, ok bool){
 	func(importPath string) (num int, ok bool) {
-		if LocalPre***REMOVED***x != "" && strings.HasPre***REMOVED***x(importPath, LocalPre***REMOVED***x) {
-			return 3, true
+		for _, p := range localPre***REMOVED***xes() {
+			if strings.HasPre***REMOVED***x(importPath, p) || strings.TrimSuf***REMOVED***x(p, "/") == importPath {
+				return 3, true
+			}
 		}
 		return
 	},

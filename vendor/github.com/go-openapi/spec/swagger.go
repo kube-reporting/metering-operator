@@ -77,7 +77,7 @@ type SwaggerProps struct {
 	Host                string                 `json:"host,omitempty"`
 	BasePath            string                 `json:"basePath,omitempty"` // must start with a leading "/"
 	Paths               *Paths                 `json:"paths"`              // required
-	De***REMOVED***nitions         De***REMOVED***nitions            `json:"de***REMOVED***nitions"`
+	De***REMOVED***nitions         De***REMOVED***nitions            `json:"de***REMOVED***nitions,omitempty"`
 	Parameters          map[string]Parameter   `json:"parameters,omitempty"`
 	Responses           map[string]Response    `json:"responses,omitempty"`
 	SecurityDe***REMOVED***nitions SecurityDe***REMOVED***nitions    `json:"securityDe***REMOVED***nitions,omitempty"`
@@ -156,7 +156,7 @@ func (s SchemaOrStringArray) MarshalJSON() ([]byte, error) {
 	if s.Schema != nil {
 		return json.Marshal(s.Schema)
 	}
-	return nil, nil
+	return []byte("null"), nil
 }
 
 // UnmarshalJSON converts this schema object or array from a JSON structure

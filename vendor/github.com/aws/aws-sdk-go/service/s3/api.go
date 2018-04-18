@@ -18,19 +18,18 @@ const opAbortMultipartUpload = "AbortMultipartUpload"
 
 // AbortMultipartUploadRequest generates a "aws/request.Request" representing the
 // client's request for the AbortMultipartUpload operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See AbortMultipartUpload for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the AbortMultipartUpload method directly
-// instead.
+// See AbortMultipartUpload for more information on using the AbortMultipartUpload
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the AbortMultipartUploadRequest method.
 //    req, resp := client.AbortMultipartUploadRequest(params)
@@ -40,7 +39,7 @@ const opAbortMultipartUpload = "AbortMultipartUpload"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUpload
 func (c *S3) AbortMultipartUploadRequest(input *AbortMultipartUploadInput) (req *request.Request, output *AbortMultipartUploadOutput) {
 	op := &request.Operation{
 		Name:       opAbortMultipartUpload,
@@ -76,7 +75,7 @@ func (c *S3) AbortMultipartUploadRequest(input *AbortMultipartUploadInput) (req 
 //   * ErrCodeNoSuchUpload "NoSuchUpload"
 //   The speci***REMOVED***ed multipart upload does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUpload
 func (c *S3) AbortMultipartUpload(input *AbortMultipartUploadInput) (*AbortMultipartUploadOutput, error) {
 	req, out := c.AbortMultipartUploadRequest(input)
 	return out, req.Send()
@@ -102,19 +101,18 @@ const opCompleteMultipartUpload = "CompleteMultipartUpload"
 
 // CompleteMultipartUploadRequest generates a "aws/request.Request" representing the
 // client's request for the CompleteMultipartUpload operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See CompleteMultipartUpload for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the CompleteMultipartUpload method directly
-// instead.
+// See CompleteMultipartUpload for more information on using the CompleteMultipartUpload
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the CompleteMultipartUploadRequest method.
 //    req, resp := client.CompleteMultipartUploadRequest(params)
@@ -124,7 +122,7 @@ const opCompleteMultipartUpload = "CompleteMultipartUpload"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUpload
 func (c *S3) CompleteMultipartUploadRequest(input *CompleteMultipartUploadInput) (req *request.Request, output *CompleteMultipartUploadOutput) {
 	op := &request.Operation{
 		Name:       opCompleteMultipartUpload,
@@ -151,7 +149,7 @@ func (c *S3) CompleteMultipartUploadRequest(input *CompleteMultipartUploadInput)
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation CompleteMultipartUpload for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUpload
 func (c *S3) CompleteMultipartUpload(input *CompleteMultipartUploadInput) (*CompleteMultipartUploadOutput, error) {
 	req, out := c.CompleteMultipartUploadRequest(input)
 	return out, req.Send()
@@ -177,19 +175,18 @@ const opCopyObject = "CopyObject"
 
 // CopyObjectRequest generates a "aws/request.Request" representing the
 // client's request for the CopyObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See CopyObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the CopyObject method directly
-// instead.
+// See CopyObject for more information on using the CopyObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the CopyObjectRequest method.
 //    req, resp := client.CopyObjectRequest(params)
@@ -199,7 +196,7 @@ const opCopyObject = "CopyObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObject
 func (c *S3) CopyObjectRequest(input *CopyObjectInput) (req *request.Request, output *CopyObjectOutput) {
 	op := &request.Operation{
 		Name:       opCopyObject,
@@ -232,7 +229,7 @@ func (c *S3) CopyObjectRequest(input *CopyObjectInput) (req *request.Request, ou
 //   The source object of the COPY operation is not in the active tier and is
 //   only stored in Amazon Glacier.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObject
 func (c *S3) CopyObject(input *CopyObjectInput) (*CopyObjectOutput, error) {
 	req, out := c.CopyObjectRequest(input)
 	return out, req.Send()
@@ -258,19 +255,18 @@ const opCreateBucket = "CreateBucket"
 
 // CreateBucketRequest generates a "aws/request.Request" representing the
 // client's request for the CreateBucket operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See CreateBucket for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the CreateBucket method directly
-// instead.
+// See CreateBucket for more information on using the CreateBucket
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the CreateBucketRequest method.
 //    req, resp := client.CreateBucketRequest(params)
@@ -280,7 +276,7 @@ const opCreateBucket = "CreateBucket"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucket
 func (c *S3) CreateBucketRequest(input *CreateBucketInput) (req *request.Request, output *CreateBucketOutput) {
 	op := &request.Operation{
 		Name:       opCreateBucket,
@@ -315,7 +311,7 @@ func (c *S3) CreateBucketRequest(input *CreateBucketInput) (req *request.Request
 //
 //   * ErrCodeBucketAlreadyOwnedByYou "BucketAlreadyOwnedByYou"
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucket
 func (c *S3) CreateBucket(input *CreateBucketInput) (*CreateBucketOutput, error) {
 	req, out := c.CreateBucketRequest(input)
 	return out, req.Send()
@@ -341,19 +337,18 @@ const opCreateMultipartUpload = "CreateMultipartUpload"
 
 // CreateMultipartUploadRequest generates a "aws/request.Request" representing the
 // client's request for the CreateMultipartUpload operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See CreateMultipartUpload for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the CreateMultipartUpload method directly
-// instead.
+// See CreateMultipartUpload for more information on using the CreateMultipartUpload
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the CreateMultipartUploadRequest method.
 //    req, resp := client.CreateMultipartUploadRequest(params)
@@ -363,7 +358,7 @@ const opCreateMultipartUpload = "CreateMultipartUpload"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUpload
 func (c *S3) CreateMultipartUploadRequest(input *CreateMultipartUploadInput) (req *request.Request, output *CreateMultipartUploadOutput) {
 	op := &request.Operation{
 		Name:       opCreateMultipartUpload,
@@ -396,7 +391,7 @@ func (c *S3) CreateMultipartUploadRequest(input *CreateMultipartUploadInput) (re
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation CreateMultipartUpload for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUpload
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUpload
 func (c *S3) CreateMultipartUpload(input *CreateMultipartUploadInput) (*CreateMultipartUploadOutput, error) {
 	req, out := c.CreateMultipartUploadRequest(input)
 	return out, req.Send()
@@ -422,19 +417,18 @@ const opDeleteBucket = "DeleteBucket"
 
 // DeleteBucketRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucket operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucket for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucket method directly
-// instead.
+// See DeleteBucket for more information on using the DeleteBucket
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketRequest method.
 //    req, resp := client.DeleteBucketRequest(params)
@@ -444,7 +438,7 @@ const opDeleteBucket = "DeleteBucket"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucket
 func (c *S3) DeleteBucketRequest(input *DeleteBucketInput) (req *request.Request, output *DeleteBucketOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucket,
@@ -474,7 +468,7 @@ func (c *S3) DeleteBucketRequest(input *DeleteBucketInput) (req *request.Request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucket for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucket
 func (c *S3) DeleteBucket(input *DeleteBucketInput) (*DeleteBucketOutput, error) {
 	req, out := c.DeleteBucketRequest(input)
 	return out, req.Send()
@@ -500,19 +494,18 @@ const opDeleteBucketAnalyticsCon***REMOVED***guration = "DeleteBucketAnalyticsCo
 
 // DeleteBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketAnalyticsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketAnalyticsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketAnalyticsCon***REMOVED***guration method directly
-// instead.
+// See DeleteBucketAnalyticsCon***REMOVED***guration for more information on using the DeleteBucketAnalyticsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketAnalyticsCon***REMOVED***gurationRequest method.
 //    req, resp := client.DeleteBucketAnalyticsCon***REMOVED***gurationRequest(params)
@@ -522,7 +515,7 @@ const opDeleteBucketAnalyticsCon***REMOVED***guration = "DeleteBucketAnalyticsCo
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
 func (c *S3) DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input *DeleteBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketAnalyticsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketAnalyticsCon***REMOVED***guration,
@@ -552,7 +545,7 @@ func (c *S3) DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input *DeleteB
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***guration
 func (c *S3) DeleteBucketAnalyticsCon***REMOVED***guration(input *DeleteBucketAnalyticsCon***REMOVED***gurationInput) (*DeleteBucketAnalyticsCon***REMOVED***gurationOutput, error) {
 	req, out := c.DeleteBucketAnalyticsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -578,19 +571,18 @@ const opDeleteBucketCors = "DeleteBucketCors"
 
 // DeleteBucketCorsRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketCors operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketCors for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketCors method directly
-// instead.
+// See DeleteBucketCors for more information on using the DeleteBucketCors
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketCorsRequest method.
 //    req, resp := client.DeleteBucketCorsRequest(params)
@@ -600,7 +592,7 @@ const opDeleteBucketCors = "DeleteBucketCors"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCors
 func (c *S3) DeleteBucketCorsRequest(input *DeleteBucketCorsInput) (req *request.Request, output *DeleteBucketCorsOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketCors,
@@ -629,7 +621,7 @@ func (c *S3) DeleteBucketCorsRequest(input *DeleteBucketCorsInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketCors for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCors
 func (c *S3) DeleteBucketCors(input *DeleteBucketCorsInput) (*DeleteBucketCorsOutput, error) {
 	req, out := c.DeleteBucketCorsRequest(input)
 	return out, req.Send()
@@ -651,23 +643,98 @@ func (c *S3) DeleteBucketCorsWithContext(ctx aws.Context, input *DeleteBucketCor
 	return out, req.Send()
 }
 
+const opDeleteBucketEncryption = "DeleteBucketEncryption"
+
+// DeleteBucketEncryptionRequest generates a "aws/request.Request" representing the
+// client's request for the DeleteBucketEncryption operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfuly.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See DeleteBucketEncryption for more information on using the DeleteBucketEncryption
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the DeleteBucketEncryptionRequest method.
+//    req, resp := client.DeleteBucketEncryptionRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now ***REMOVED***lled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketEncryption
+func (c *S3) DeleteBucketEncryptionRequest(input *DeleteBucketEncryptionInput) (req *request.Request, output *DeleteBucketEncryptionOutput) {
+	op := &request.Operation{
+		Name:       opDeleteBucketEncryption,
+		HTTPMethod: "DELETE",
+		HTTPPath:   "/{Bucket}?encryption",
+	}
+
+	if input == nil {
+		input = &DeleteBucketEncryptionInput{}
+	}
+
+	output = &DeleteBucketEncryptionOutput{}
+	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(restxml.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	return
+}
+
+// DeleteBucketEncryption API operation for Amazon Simple Storage Service.
+//
+// Deletes the server-side encryption con***REMOVED***guration from the bucket.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon Simple Storage Service's
+// API operation DeleteBucketEncryption for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketEncryption
+func (c *S3) DeleteBucketEncryption(input *DeleteBucketEncryptionInput) (*DeleteBucketEncryptionOutput, error) {
+	req, out := c.DeleteBucketEncryptionRequest(input)
+	return out, req.Send()
+}
+
+// DeleteBucketEncryptionWithContext is the same as DeleteBucketEncryption with the addition of
+// the ability to pass a context and additional request options.
+//
+// See DeleteBucketEncryption for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *S3) DeleteBucketEncryptionWithContext(ctx aws.Context, input *DeleteBucketEncryptionInput, opts ...request.Option) (*DeleteBucketEncryptionOutput, error) {
+	req, out := c.DeleteBucketEncryptionRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opDeleteBucketInventoryCon***REMOVED***guration = "DeleteBucketInventoryCon***REMOVED***guration"
 
 // DeleteBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketInventoryCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketInventoryCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketInventoryCon***REMOVED***guration method directly
-// instead.
+// See DeleteBucketInventoryCon***REMOVED***guration for more information on using the DeleteBucketInventoryCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketInventoryCon***REMOVED***gurationRequest method.
 //    req, resp := client.DeleteBucketInventoryCon***REMOVED***gurationRequest(params)
@@ -677,7 +744,7 @@ const opDeleteBucketInventoryCon***REMOVED***guration = "DeleteBucketInventoryCo
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
 func (c *S3) DeleteBucketInventoryCon***REMOVED***gurationRequest(input *DeleteBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketInventoryCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketInventoryCon***REMOVED***guration,
@@ -707,7 +774,7 @@ func (c *S3) DeleteBucketInventoryCon***REMOVED***gurationRequest(input *DeleteB
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketInventoryCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***guration
 func (c *S3) DeleteBucketInventoryCon***REMOVED***guration(input *DeleteBucketInventoryCon***REMOVED***gurationInput) (*DeleteBucketInventoryCon***REMOVED***gurationOutput, error) {
 	req, out := c.DeleteBucketInventoryCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -733,19 +800,18 @@ const opDeleteBucketLifecycle = "DeleteBucketLifecycle"
 
 // DeleteBucketLifecycleRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketLifecycle operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketLifecycle for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketLifecycle method directly
-// instead.
+// See DeleteBucketLifecycle for more information on using the DeleteBucketLifecycle
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketLifecycleRequest method.
 //    req, resp := client.DeleteBucketLifecycleRequest(params)
@@ -755,7 +821,7 @@ const opDeleteBucketLifecycle = "DeleteBucketLifecycle"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycle
 func (c *S3) DeleteBucketLifecycleRequest(input *DeleteBucketLifecycleInput) (req *request.Request, output *DeleteBucketLifecycleOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketLifecycle,
@@ -784,7 +850,7 @@ func (c *S3) DeleteBucketLifecycleRequest(input *DeleteBucketLifecycleInput) (re
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketLifecycle for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycle
 func (c *S3) DeleteBucketLifecycle(input *DeleteBucketLifecycleInput) (*DeleteBucketLifecycleOutput, error) {
 	req, out := c.DeleteBucketLifecycleRequest(input)
 	return out, req.Send()
@@ -810,19 +876,18 @@ const opDeleteBucketMetricsCon***REMOVED***guration = "DeleteBucketMetricsCon***
 
 // DeleteBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketMetricsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketMetricsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketMetricsCon***REMOVED***guration method directly
-// instead.
+// See DeleteBucketMetricsCon***REMOVED***guration for more information on using the DeleteBucketMetricsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketMetricsCon***REMOVED***gurationRequest method.
 //    req, resp := client.DeleteBucketMetricsCon***REMOVED***gurationRequest(params)
@@ -832,7 +897,7 @@ const opDeleteBucketMetricsCon***REMOVED***guration = "DeleteBucketMetricsCon***
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
 func (c *S3) DeleteBucketMetricsCon***REMOVED***gurationRequest(input *DeleteBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *DeleteBucketMetricsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketMetricsCon***REMOVED***guration,
@@ -862,7 +927,7 @@ func (c *S3) DeleteBucketMetricsCon***REMOVED***gurationRequest(input *DeleteBuc
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketMetricsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***guration
 func (c *S3) DeleteBucketMetricsCon***REMOVED***guration(input *DeleteBucketMetricsCon***REMOVED***gurationInput) (*DeleteBucketMetricsCon***REMOVED***gurationOutput, error) {
 	req, out := c.DeleteBucketMetricsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -888,19 +953,18 @@ const opDeleteBucketPolicy = "DeleteBucketPolicy"
 
 // DeleteBucketPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketPolicy operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketPolicy for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketPolicy method directly
-// instead.
+// See DeleteBucketPolicy for more information on using the DeleteBucketPolicy
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketPolicyRequest method.
 //    req, resp := client.DeleteBucketPolicyRequest(params)
@@ -910,7 +974,7 @@ const opDeleteBucketPolicy = "DeleteBucketPolicy"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicy
 func (c *S3) DeleteBucketPolicyRequest(input *DeleteBucketPolicyInput) (req *request.Request, output *DeleteBucketPolicyOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketPolicy,
@@ -939,7 +1003,7 @@ func (c *S3) DeleteBucketPolicyRequest(input *DeleteBucketPolicyInput) (req *req
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketPolicy for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicy
 func (c *S3) DeleteBucketPolicy(input *DeleteBucketPolicyInput) (*DeleteBucketPolicyOutput, error) {
 	req, out := c.DeleteBucketPolicyRequest(input)
 	return out, req.Send()
@@ -965,19 +1029,18 @@ const opDeleteBucketReplication = "DeleteBucketReplication"
 
 // DeleteBucketReplicationRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketReplication operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketReplication for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketReplication method directly
-// instead.
+// See DeleteBucketReplication for more information on using the DeleteBucketReplication
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketReplicationRequest method.
 //    req, resp := client.DeleteBucketReplicationRequest(params)
@@ -987,7 +1050,7 @@ const opDeleteBucketReplication = "DeleteBucketReplication"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplication
 func (c *S3) DeleteBucketReplicationRequest(input *DeleteBucketReplicationInput) (req *request.Request, output *DeleteBucketReplicationOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketReplication,
@@ -1016,7 +1079,7 @@ func (c *S3) DeleteBucketReplicationRequest(input *DeleteBucketReplicationInput)
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketReplication for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplication
 func (c *S3) DeleteBucketReplication(input *DeleteBucketReplicationInput) (*DeleteBucketReplicationOutput, error) {
 	req, out := c.DeleteBucketReplicationRequest(input)
 	return out, req.Send()
@@ -1042,19 +1105,18 @@ const opDeleteBucketTagging = "DeleteBucketTagging"
 
 // DeleteBucketTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketTagging method directly
-// instead.
+// See DeleteBucketTagging for more information on using the DeleteBucketTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketTaggingRequest method.
 //    req, resp := client.DeleteBucketTaggingRequest(params)
@@ -1064,7 +1126,7 @@ const opDeleteBucketTagging = "DeleteBucketTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging
 func (c *S3) DeleteBucketTaggingRequest(input *DeleteBucketTaggingInput) (req *request.Request, output *DeleteBucketTaggingOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketTagging,
@@ -1093,7 +1155,7 @@ func (c *S3) DeleteBucketTaggingRequest(input *DeleteBucketTaggingInput) (req *r
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTagging
 func (c *S3) DeleteBucketTagging(input *DeleteBucketTaggingInput) (*DeleteBucketTaggingOutput, error) {
 	req, out := c.DeleteBucketTaggingRequest(input)
 	return out, req.Send()
@@ -1119,19 +1181,18 @@ const opDeleteBucketWebsite = "DeleteBucketWebsite"
 
 // DeleteBucketWebsiteRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteBucketWebsite operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteBucketWebsite for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteBucketWebsite method directly
-// instead.
+// See DeleteBucketWebsite for more information on using the DeleteBucketWebsite
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteBucketWebsiteRequest method.
 //    req, resp := client.DeleteBucketWebsiteRequest(params)
@@ -1141,7 +1202,7 @@ const opDeleteBucketWebsite = "DeleteBucketWebsite"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsite
 func (c *S3) DeleteBucketWebsiteRequest(input *DeleteBucketWebsiteInput) (req *request.Request, output *DeleteBucketWebsiteOutput) {
 	op := &request.Operation{
 		Name:       opDeleteBucketWebsite,
@@ -1170,7 +1231,7 @@ func (c *S3) DeleteBucketWebsiteRequest(input *DeleteBucketWebsiteInput) (req *r
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteBucketWebsite for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsite
 func (c *S3) DeleteBucketWebsite(input *DeleteBucketWebsiteInput) (*DeleteBucketWebsiteOutput, error) {
 	req, out := c.DeleteBucketWebsiteRequest(input)
 	return out, req.Send()
@@ -1196,19 +1257,18 @@ const opDeleteObject = "DeleteObject"
 
 // DeleteObjectRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteObject method directly
-// instead.
+// See DeleteObject for more information on using the DeleteObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteObjectRequest method.
 //    req, resp := client.DeleteObjectRequest(params)
@@ -1218,7 +1278,7 @@ const opDeleteObject = "DeleteObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObject
 func (c *S3) DeleteObjectRequest(input *DeleteObjectInput) (req *request.Request, output *DeleteObjectOutput) {
 	op := &request.Operation{
 		Name:       opDeleteObject,
@@ -1247,7 +1307,7 @@ func (c *S3) DeleteObjectRequest(input *DeleteObjectInput) (req *request.Request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteObject for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObject
 func (c *S3) DeleteObject(input *DeleteObjectInput) (*DeleteObjectOutput, error) {
 	req, out := c.DeleteObjectRequest(input)
 	return out, req.Send()
@@ -1273,19 +1333,18 @@ const opDeleteObjectTagging = "DeleteObjectTagging"
 
 // DeleteObjectTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteObjectTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteObjectTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteObjectTagging method directly
-// instead.
+// See DeleteObjectTagging for more information on using the DeleteObjectTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteObjectTaggingRequest method.
 //    req, resp := client.DeleteObjectTaggingRequest(params)
@@ -1295,7 +1354,7 @@ const opDeleteObjectTagging = "DeleteObjectTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTagging
 func (c *S3) DeleteObjectTaggingRequest(input *DeleteObjectTaggingInput) (req *request.Request, output *DeleteObjectTaggingOutput) {
 	op := &request.Operation{
 		Name:       opDeleteObjectTagging,
@@ -1322,7 +1381,7 @@ func (c *S3) DeleteObjectTaggingRequest(input *DeleteObjectTaggingInput) (req *r
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteObjectTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTagging
 func (c *S3) DeleteObjectTagging(input *DeleteObjectTaggingInput) (*DeleteObjectTaggingOutput, error) {
 	req, out := c.DeleteObjectTaggingRequest(input)
 	return out, req.Send()
@@ -1348,19 +1407,18 @@ const opDeleteObjects = "DeleteObjects"
 
 // DeleteObjectsRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteObjects operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See DeleteObjects for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the DeleteObjects method directly
-// instead.
+// See DeleteObjects for more information on using the DeleteObjects
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the DeleteObjectsRequest method.
 //    req, resp := client.DeleteObjectsRequest(params)
@@ -1370,7 +1428,7 @@ const opDeleteObjects = "DeleteObjects"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjects
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjects
 func (c *S3) DeleteObjectsRequest(input *DeleteObjectsInput) (req *request.Request, output *DeleteObjectsOutput) {
 	op := &request.Operation{
 		Name:       opDeleteObjects,
@@ -1398,7 +1456,7 @@ func (c *S3) DeleteObjectsRequest(input *DeleteObjectsInput) (req *request.Reque
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation DeleteObjects for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjects
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjects
 func (c *S3) DeleteObjects(input *DeleteObjectsInput) (*DeleteObjectsOutput, error) {
 	req, out := c.DeleteObjectsRequest(input)
 	return out, req.Send()
@@ -1424,19 +1482,18 @@ const opGetBucketAccelerateCon***REMOVED***guration = "GetBucketAccelerateCon***
 
 // GetBucketAccelerateCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketAccelerateCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketAccelerateCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketAccelerateCon***REMOVED***guration method directly
-// instead.
+// See GetBucketAccelerateCon***REMOVED***guration for more information on using the GetBucketAccelerateCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketAccelerateCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketAccelerateCon***REMOVED***gurationRequest(params)
@@ -1446,7 +1503,7 @@ const opGetBucketAccelerateCon***REMOVED***guration = "GetBucketAccelerateCon***
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
 func (c *S3) GetBucketAccelerateCon***REMOVED***gurationRequest(input *GetBucketAccelerateCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketAccelerateCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketAccelerateCon***REMOVED***guration,
@@ -1473,7 +1530,7 @@ func (c *S3) GetBucketAccelerateCon***REMOVED***gurationRequest(input *GetBucket
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketAccelerateCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***guration
 func (c *S3) GetBucketAccelerateCon***REMOVED***guration(input *GetBucketAccelerateCon***REMOVED***gurationInput) (*GetBucketAccelerateCon***REMOVED***gurationOutput, error) {
 	req, out := c.GetBucketAccelerateCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -1499,19 +1556,18 @@ const opGetBucketAcl = "GetBucketAcl"
 
 // GetBucketAclRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketAcl operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketAcl for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketAcl method directly
-// instead.
+// See GetBucketAcl for more information on using the GetBucketAcl
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketAclRequest method.
 //    req, resp := client.GetBucketAclRequest(params)
@@ -1521,7 +1577,7 @@ const opGetBucketAcl = "GetBucketAcl"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAcl
 func (c *S3) GetBucketAclRequest(input *GetBucketAclInput) (req *request.Request, output *GetBucketAclOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketAcl,
@@ -1548,7 +1604,7 @@ func (c *S3) GetBucketAclRequest(input *GetBucketAclInput) (req *request.Request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketAcl for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAcl
 func (c *S3) GetBucketAcl(input *GetBucketAclInput) (*GetBucketAclOutput, error) {
 	req, out := c.GetBucketAclRequest(input)
 	return out, req.Send()
@@ -1574,19 +1630,18 @@ const opGetBucketAnalyticsCon***REMOVED***guration = "GetBucketAnalyticsCon***RE
 
 // GetBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketAnalyticsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketAnalyticsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketAnalyticsCon***REMOVED***guration method directly
-// instead.
+// See GetBucketAnalyticsCon***REMOVED***guration for more information on using the GetBucketAnalyticsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketAnalyticsCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketAnalyticsCon***REMOVED***gurationRequest(params)
@@ -1596,7 +1651,7 @@ const opGetBucketAnalyticsCon***REMOVED***guration = "GetBucketAnalyticsCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
 func (c *S3) GetBucketAnalyticsCon***REMOVED***gurationRequest(input *GetBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketAnalyticsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketAnalyticsCon***REMOVED***guration,
@@ -1624,7 +1679,7 @@ func (c *S3) GetBucketAnalyticsCon***REMOVED***gurationRequest(input *GetBucketA
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***guration
 func (c *S3) GetBucketAnalyticsCon***REMOVED***guration(input *GetBucketAnalyticsCon***REMOVED***gurationInput) (*GetBucketAnalyticsCon***REMOVED***gurationOutput, error) {
 	req, out := c.GetBucketAnalyticsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -1650,19 +1705,18 @@ const opGetBucketCors = "GetBucketCors"
 
 // GetBucketCorsRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketCors operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketCors for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketCors method directly
-// instead.
+// See GetBucketCors for more information on using the GetBucketCors
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketCorsRequest method.
 //    req, resp := client.GetBucketCorsRequest(params)
@@ -1672,7 +1726,7 @@ const opGetBucketCors = "GetBucketCors"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCors
 func (c *S3) GetBucketCorsRequest(input *GetBucketCorsInput) (req *request.Request, output *GetBucketCorsOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketCors,
@@ -1699,7 +1753,7 @@ func (c *S3) GetBucketCorsRequest(input *GetBucketCorsInput) (req *request.Reque
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketCors for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCors
 func (c *S3) GetBucketCors(input *GetBucketCorsInput) (*GetBucketCorsOutput, error) {
 	req, out := c.GetBucketCorsRequest(input)
 	return out, req.Send()
@@ -1721,23 +1775,96 @@ func (c *S3) GetBucketCorsWithContext(ctx aws.Context, input *GetBucketCorsInput
 	return out, req.Send()
 }
 
+const opGetBucketEncryption = "GetBucketEncryption"
+
+// GetBucketEncryptionRequest generates a "aws/request.Request" representing the
+// client's request for the GetBucketEncryption operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfuly.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See GetBucketEncryption for more information on using the GetBucketEncryption
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the GetBucketEncryptionRequest method.
+//    req, resp := client.GetBucketEncryptionRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now ***REMOVED***lled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketEncryption
+func (c *S3) GetBucketEncryptionRequest(input *GetBucketEncryptionInput) (req *request.Request, output *GetBucketEncryptionOutput) {
+	op := &request.Operation{
+		Name:       opGetBucketEncryption,
+		HTTPMethod: "GET",
+		HTTPPath:   "/{Bucket}?encryption",
+	}
+
+	if input == nil {
+		input = &GetBucketEncryptionInput{}
+	}
+
+	output = &GetBucketEncryptionOutput{}
+	req = c.newRequest(op, input, output)
+	return
+}
+
+// GetBucketEncryption API operation for Amazon Simple Storage Service.
+//
+// Returns the server-side encryption con***REMOVED***guration of a bucket.
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon Simple Storage Service's
+// API operation GetBucketEncryption for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketEncryption
+func (c *S3) GetBucketEncryption(input *GetBucketEncryptionInput) (*GetBucketEncryptionOutput, error) {
+	req, out := c.GetBucketEncryptionRequest(input)
+	return out, req.Send()
+}
+
+// GetBucketEncryptionWithContext is the same as GetBucketEncryption with the addition of
+// the ability to pass a context and additional request options.
+//
+// See GetBucketEncryption for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *S3) GetBucketEncryptionWithContext(ctx aws.Context, input *GetBucketEncryptionInput, opts ...request.Option) (*GetBucketEncryptionOutput, error) {
+	req, out := c.GetBucketEncryptionRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opGetBucketInventoryCon***REMOVED***guration = "GetBucketInventoryCon***REMOVED***guration"
 
 // GetBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketInventoryCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketInventoryCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketInventoryCon***REMOVED***guration method directly
-// instead.
+// See GetBucketInventoryCon***REMOVED***guration for more information on using the GetBucketInventoryCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketInventoryCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketInventoryCon***REMOVED***gurationRequest(params)
@@ -1747,7 +1874,7 @@ const opGetBucketInventoryCon***REMOVED***guration = "GetBucketInventoryCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
 func (c *S3) GetBucketInventoryCon***REMOVED***gurationRequest(input *GetBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketInventoryCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketInventoryCon***REMOVED***guration,
@@ -1775,7 +1902,7 @@ func (c *S3) GetBucketInventoryCon***REMOVED***gurationRequest(input *GetBucketI
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketInventoryCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***guration
 func (c *S3) GetBucketInventoryCon***REMOVED***guration(input *GetBucketInventoryCon***REMOVED***gurationInput) (*GetBucketInventoryCon***REMOVED***gurationOutput, error) {
 	req, out := c.GetBucketInventoryCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -1801,19 +1928,18 @@ const opGetBucketLifecycle = "GetBucketLifecycle"
 
 // GetBucketLifecycleRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketLifecycle operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketLifecycle for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketLifecycle method directly
-// instead.
+// See GetBucketLifecycle for more information on using the GetBucketLifecycle
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketLifecycleRequest method.
 //    req, resp := client.GetBucketLifecycleRequest(params)
@@ -1823,7 +1949,7 @@ const opGetBucketLifecycle = "GetBucketLifecycle"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycle
 func (c *S3) GetBucketLifecycleRequest(input *GetBucketLifecycleInput) (req *request.Request, output *GetBucketLifecycleOutput) {
 	if c.Client.Con***REMOVED***g.Logger != nil {
 		c.Client.Con***REMOVED***g.Logger.Log("This operation, GetBucketLifecycle, has been deprecated")
@@ -1853,7 +1979,7 @@ func (c *S3) GetBucketLifecycleRequest(input *GetBucketLifecycleInput) (req *req
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketLifecycle for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycle
 func (c *S3) GetBucketLifecycle(input *GetBucketLifecycleInput) (*GetBucketLifecycleOutput, error) {
 	req, out := c.GetBucketLifecycleRequest(input)
 	return out, req.Send()
@@ -1879,19 +2005,18 @@ const opGetBucketLifecycleCon***REMOVED***guration = "GetBucketLifecycleCon***RE
 
 // GetBucketLifecycleCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketLifecycleCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketLifecycleCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketLifecycleCon***REMOVED***guration method directly
-// instead.
+// See GetBucketLifecycleCon***REMOVED***guration for more information on using the GetBucketLifecycleCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketLifecycleCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketLifecycleCon***REMOVED***gurationRequest(params)
@@ -1901,7 +2026,7 @@ const opGetBucketLifecycleCon***REMOVED***guration = "GetBucketLifecycleCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
 func (c *S3) GetBucketLifecycleCon***REMOVED***gurationRequest(input *GetBucketLifecycleCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketLifecycleCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketLifecycleCon***REMOVED***guration,
@@ -1928,7 +2053,7 @@ func (c *S3) GetBucketLifecycleCon***REMOVED***gurationRequest(input *GetBucketL
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketLifecycleCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***guration
 func (c *S3) GetBucketLifecycleCon***REMOVED***guration(input *GetBucketLifecycleCon***REMOVED***gurationInput) (*GetBucketLifecycleCon***REMOVED***gurationOutput, error) {
 	req, out := c.GetBucketLifecycleCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -1954,19 +2079,18 @@ const opGetBucketLocation = "GetBucketLocation"
 
 // GetBucketLocationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketLocation operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketLocation for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketLocation method directly
-// instead.
+// See GetBucketLocation for more information on using the GetBucketLocation
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketLocationRequest method.
 //    req, resp := client.GetBucketLocationRequest(params)
@@ -1976,7 +2100,7 @@ const opGetBucketLocation = "GetBucketLocation"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocation
 func (c *S3) GetBucketLocationRequest(input *GetBucketLocationInput) (req *request.Request, output *GetBucketLocationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketLocation,
@@ -2003,7 +2127,7 @@ func (c *S3) GetBucketLocationRequest(input *GetBucketLocationInput) (req *reque
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketLocation for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocation
 func (c *S3) GetBucketLocation(input *GetBucketLocationInput) (*GetBucketLocationOutput, error) {
 	req, out := c.GetBucketLocationRequest(input)
 	return out, req.Send()
@@ -2029,19 +2153,18 @@ const opGetBucketLogging = "GetBucketLogging"
 
 // GetBucketLoggingRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketLogging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketLogging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketLogging method directly
-// instead.
+// See GetBucketLogging for more information on using the GetBucketLogging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketLoggingRequest method.
 //    req, resp := client.GetBucketLoggingRequest(params)
@@ -2051,7 +2174,7 @@ const opGetBucketLogging = "GetBucketLogging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLogging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLogging
 func (c *S3) GetBucketLoggingRequest(input *GetBucketLoggingInput) (req *request.Request, output *GetBucketLoggingOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketLogging,
@@ -2079,7 +2202,7 @@ func (c *S3) GetBucketLoggingRequest(input *GetBucketLoggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketLogging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLogging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLogging
 func (c *S3) GetBucketLogging(input *GetBucketLoggingInput) (*GetBucketLoggingOutput, error) {
 	req, out := c.GetBucketLoggingRequest(input)
 	return out, req.Send()
@@ -2105,19 +2228,18 @@ const opGetBucketMetricsCon***REMOVED***guration = "GetBucketMetricsCon***REMOVE
 
 // GetBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketMetricsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketMetricsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketMetricsCon***REMOVED***guration method directly
-// instead.
+// See GetBucketMetricsCon***REMOVED***guration for more information on using the GetBucketMetricsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketMetricsCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketMetricsCon***REMOVED***gurationRequest(params)
@@ -2127,7 +2249,7 @@ const opGetBucketMetricsCon***REMOVED***guration = "GetBucketMetricsCon***REMOVE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
 func (c *S3) GetBucketMetricsCon***REMOVED***gurationRequest(input *GetBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *GetBucketMetricsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketMetricsCon***REMOVED***guration,
@@ -2155,7 +2277,7 @@ func (c *S3) GetBucketMetricsCon***REMOVED***gurationRequest(input *GetBucketMet
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketMetricsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***guration
 func (c *S3) GetBucketMetricsCon***REMOVED***guration(input *GetBucketMetricsCon***REMOVED***gurationInput) (*GetBucketMetricsCon***REMOVED***gurationOutput, error) {
 	req, out := c.GetBucketMetricsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -2181,19 +2303,18 @@ const opGetBucketNoti***REMOVED***cation = "GetBucketNoti***REMOVED***cation"
 
 // GetBucketNoti***REMOVED***cationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketNoti***REMOVED***cation operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketNoti***REMOVED***cation for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketNoti***REMOVED***cation method directly
-// instead.
+// See GetBucketNoti***REMOVED***cation for more information on using the GetBucketNoti***REMOVED***cation
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketNoti***REMOVED***cationRequest method.
 //    req, resp := client.GetBucketNoti***REMOVED***cationRequest(params)
@@ -2203,7 +2324,7 @@ const opGetBucketNoti***REMOVED***cation = "GetBucketNoti***REMOVED***cation"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
 func (c *S3) GetBucketNoti***REMOVED***cationRequest(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (req *request.Request, output *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) {
 	if c.Client.Con***REMOVED***g.Logger != nil {
 		c.Client.Con***REMOVED***g.Logger.Log("This operation, GetBucketNoti***REMOVED***cation, has been deprecated")
@@ -2233,7 +2354,7 @@ func (c *S3) GetBucketNoti***REMOVED***cationRequest(input *GetBucketNoti***REMO
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketNoti***REMOVED***cation for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cation
 func (c *S3) GetBucketNoti***REMOVED***cation(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*Noti***REMOVED***cationCon***REMOVED***gurationDeprecated, error) {
 	req, out := c.GetBucketNoti***REMOVED***cationRequest(input)
 	return out, req.Send()
@@ -2259,19 +2380,18 @@ const opGetBucketNoti***REMOVED***cationCon***REMOVED***guration = "GetBucketNot
 
 // GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketNoti***REMOVED***cationCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketNoti***REMOVED***cationCon***REMOVED***guration method directly
-// instead.
+// See GetBucketNoti***REMOVED***cationCon***REMOVED***guration for more information on using the GetBucketNoti***REMOVED***cationCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest method.
 //    req, resp := client.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(params)
@@ -2281,7 +2401,7 @@ const opGetBucketNoti***REMOVED***cationCon***REMOVED***guration = "GetBucketNot
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
 func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (req *request.Request, output *Noti***REMOVED***cationCon***REMOVED***guration) {
 	op := &request.Operation{
 		Name:       opGetBucketNoti***REMOVED***cationCon***REMOVED***guration,
@@ -2308,7 +2428,7 @@ func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(inp
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***guration
 func (c *S3) GetBucketNoti***REMOVED***cationCon***REMOVED***guration(input *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) (*Noti***REMOVED***cationCon***REMOVED***guration, error) {
 	req, out := c.GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -2334,19 +2454,18 @@ const opGetBucketPolicy = "GetBucketPolicy"
 
 // GetBucketPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketPolicy operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketPolicy for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketPolicy method directly
-// instead.
+// See GetBucketPolicy for more information on using the GetBucketPolicy
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketPolicyRequest method.
 //    req, resp := client.GetBucketPolicyRequest(params)
@@ -2356,7 +2475,7 @@ const opGetBucketPolicy = "GetBucketPolicy"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicy
 func (c *S3) GetBucketPolicyRequest(input *GetBucketPolicyInput) (req *request.Request, output *GetBucketPolicyOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketPolicy,
@@ -2383,7 +2502,7 @@ func (c *S3) GetBucketPolicyRequest(input *GetBucketPolicyInput) (req *request.R
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketPolicy for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicy
 func (c *S3) GetBucketPolicy(input *GetBucketPolicyInput) (*GetBucketPolicyOutput, error) {
 	req, out := c.GetBucketPolicyRequest(input)
 	return out, req.Send()
@@ -2409,19 +2528,18 @@ const opGetBucketReplication = "GetBucketReplication"
 
 // GetBucketReplicationRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketReplication operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketReplication for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketReplication method directly
-// instead.
+// See GetBucketReplication for more information on using the GetBucketReplication
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketReplicationRequest method.
 //    req, resp := client.GetBucketReplicationRequest(params)
@@ -2431,7 +2549,7 @@ const opGetBucketReplication = "GetBucketReplication"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplication
 func (c *S3) GetBucketReplicationRequest(input *GetBucketReplicationInput) (req *request.Request, output *GetBucketReplicationOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketReplication,
@@ -2458,7 +2576,7 @@ func (c *S3) GetBucketReplicationRequest(input *GetBucketReplicationInput) (req 
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketReplication for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplication
 func (c *S3) GetBucketReplication(input *GetBucketReplicationInput) (*GetBucketReplicationOutput, error) {
 	req, out := c.GetBucketReplicationRequest(input)
 	return out, req.Send()
@@ -2484,19 +2602,18 @@ const opGetBucketRequestPayment = "GetBucketRequestPayment"
 
 // GetBucketRequestPaymentRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketRequestPayment operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketRequestPayment for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketRequestPayment method directly
-// instead.
+// See GetBucketRequestPayment for more information on using the GetBucketRequestPayment
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketRequestPaymentRequest method.
 //    req, resp := client.GetBucketRequestPaymentRequest(params)
@@ -2506,7 +2623,7 @@ const opGetBucketRequestPayment = "GetBucketRequestPayment"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPayment
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPayment
 func (c *S3) GetBucketRequestPaymentRequest(input *GetBucketRequestPaymentInput) (req *request.Request, output *GetBucketRequestPaymentOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketRequestPayment,
@@ -2533,7 +2650,7 @@ func (c *S3) GetBucketRequestPaymentRequest(input *GetBucketRequestPaymentInput)
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketRequestPayment for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPayment
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPayment
 func (c *S3) GetBucketRequestPayment(input *GetBucketRequestPaymentInput) (*GetBucketRequestPaymentOutput, error) {
 	req, out := c.GetBucketRequestPaymentRequest(input)
 	return out, req.Send()
@@ -2559,19 +2676,18 @@ const opGetBucketTagging = "GetBucketTagging"
 
 // GetBucketTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketTagging method directly
-// instead.
+// See GetBucketTagging for more information on using the GetBucketTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketTaggingRequest method.
 //    req, resp := client.GetBucketTaggingRequest(params)
@@ -2581,7 +2697,7 @@ const opGetBucketTagging = "GetBucketTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging
 func (c *S3) GetBucketTaggingRequest(input *GetBucketTaggingInput) (req *request.Request, output *GetBucketTaggingOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketTagging,
@@ -2608,7 +2724,7 @@ func (c *S3) GetBucketTaggingRequest(input *GetBucketTaggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTagging
 func (c *S3) GetBucketTagging(input *GetBucketTaggingInput) (*GetBucketTaggingOutput, error) {
 	req, out := c.GetBucketTaggingRequest(input)
 	return out, req.Send()
@@ -2634,19 +2750,18 @@ const opGetBucketVersioning = "GetBucketVersioning"
 
 // GetBucketVersioningRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketVersioning operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketVersioning for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketVersioning method directly
-// instead.
+// See GetBucketVersioning for more information on using the GetBucketVersioning
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketVersioningRequest method.
 //    req, resp := client.GetBucketVersioningRequest(params)
@@ -2656,7 +2771,7 @@ const opGetBucketVersioning = "GetBucketVersioning"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioning
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioning
 func (c *S3) GetBucketVersioningRequest(input *GetBucketVersioningInput) (req *request.Request, output *GetBucketVersioningOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketVersioning,
@@ -2683,7 +2798,7 @@ func (c *S3) GetBucketVersioningRequest(input *GetBucketVersioningInput) (req *r
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketVersioning for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioning
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioning
 func (c *S3) GetBucketVersioning(input *GetBucketVersioningInput) (*GetBucketVersioningOutput, error) {
 	req, out := c.GetBucketVersioningRequest(input)
 	return out, req.Send()
@@ -2709,19 +2824,18 @@ const opGetBucketWebsite = "GetBucketWebsite"
 
 // GetBucketWebsiteRequest generates a "aws/request.Request" representing the
 // client's request for the GetBucketWebsite operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetBucketWebsite for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetBucketWebsite method directly
-// instead.
+// See GetBucketWebsite for more information on using the GetBucketWebsite
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetBucketWebsiteRequest method.
 //    req, resp := client.GetBucketWebsiteRequest(params)
@@ -2731,7 +2845,7 @@ const opGetBucketWebsite = "GetBucketWebsite"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsite
 func (c *S3) GetBucketWebsiteRequest(input *GetBucketWebsiteInput) (req *request.Request, output *GetBucketWebsiteOutput) {
 	op := &request.Operation{
 		Name:       opGetBucketWebsite,
@@ -2758,7 +2872,7 @@ func (c *S3) GetBucketWebsiteRequest(input *GetBucketWebsiteInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetBucketWebsite for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsite
 func (c *S3) GetBucketWebsite(input *GetBucketWebsiteInput) (*GetBucketWebsiteOutput, error) {
 	req, out := c.GetBucketWebsiteRequest(input)
 	return out, req.Send()
@@ -2784,19 +2898,18 @@ const opGetObject = "GetObject"
 
 // GetObjectRequest generates a "aws/request.Request" representing the
 // client's request for the GetObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetObject method directly
-// instead.
+// See GetObject for more information on using the GetObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetObjectRequest method.
 //    req, resp := client.GetObjectRequest(params)
@@ -2806,7 +2919,7 @@ const opGetObject = "GetObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject
 func (c *S3) GetObjectRequest(input *GetObjectInput) (req *request.Request, output *GetObjectOutput) {
 	op := &request.Operation{
 		Name:       opGetObject,
@@ -2838,7 +2951,7 @@ func (c *S3) GetObjectRequest(input *GetObjectInput) (req *request.Request, outp
 //   * ErrCodeNoSuchKey "NoSuchKey"
 //   The speci***REMOVED***ed key does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObject
 func (c *S3) GetObject(input *GetObjectInput) (*GetObjectOutput, error) {
 	req, out := c.GetObjectRequest(input)
 	return out, req.Send()
@@ -2864,19 +2977,18 @@ const opGetObjectAcl = "GetObjectAcl"
 
 // GetObjectAclRequest generates a "aws/request.Request" representing the
 // client's request for the GetObjectAcl operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetObjectAcl for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetObjectAcl method directly
-// instead.
+// See GetObjectAcl for more information on using the GetObjectAcl
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetObjectAclRequest method.
 //    req, resp := client.GetObjectAclRequest(params)
@@ -2886,7 +2998,7 @@ const opGetObjectAcl = "GetObjectAcl"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAcl
 func (c *S3) GetObjectAclRequest(input *GetObjectAclInput) (req *request.Request, output *GetObjectAclOutput) {
 	op := &request.Operation{
 		Name:       opGetObjectAcl,
@@ -2918,7 +3030,7 @@ func (c *S3) GetObjectAclRequest(input *GetObjectAclInput) (req *request.Request
 //   * ErrCodeNoSuchKey "NoSuchKey"
 //   The speci***REMOVED***ed key does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAcl
 func (c *S3) GetObjectAcl(input *GetObjectAclInput) (*GetObjectAclOutput, error) {
 	req, out := c.GetObjectAclRequest(input)
 	return out, req.Send()
@@ -2944,19 +3056,18 @@ const opGetObjectTagging = "GetObjectTagging"
 
 // GetObjectTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the GetObjectTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetObjectTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetObjectTagging method directly
-// instead.
+// See GetObjectTagging for more information on using the GetObjectTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetObjectTaggingRequest method.
 //    req, resp := client.GetObjectTaggingRequest(params)
@@ -2966,7 +3077,7 @@ const opGetObjectTagging = "GetObjectTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTagging
 func (c *S3) GetObjectTaggingRequest(input *GetObjectTaggingInput) (req *request.Request, output *GetObjectTaggingOutput) {
 	op := &request.Operation{
 		Name:       opGetObjectTagging,
@@ -2993,7 +3104,7 @@ func (c *S3) GetObjectTaggingRequest(input *GetObjectTaggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetObjectTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTagging
 func (c *S3) GetObjectTagging(input *GetObjectTaggingInput) (*GetObjectTaggingOutput, error) {
 	req, out := c.GetObjectTaggingRequest(input)
 	return out, req.Send()
@@ -3019,19 +3130,18 @@ const opGetObjectTorrent = "GetObjectTorrent"
 
 // GetObjectTorrentRequest generates a "aws/request.Request" representing the
 // client's request for the GetObjectTorrent operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See GetObjectTorrent for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the GetObjectTorrent method directly
-// instead.
+// See GetObjectTorrent for more information on using the GetObjectTorrent
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the GetObjectTorrentRequest method.
 //    req, resp := client.GetObjectTorrentRequest(params)
@@ -3041,7 +3151,7 @@ const opGetObjectTorrent = "GetObjectTorrent"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrent
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrent
 func (c *S3) GetObjectTorrentRequest(input *GetObjectTorrentInput) (req *request.Request, output *GetObjectTorrentOutput) {
 	op := &request.Operation{
 		Name:       opGetObjectTorrent,
@@ -3068,7 +3178,7 @@ func (c *S3) GetObjectTorrentRequest(input *GetObjectTorrentInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation GetObjectTorrent for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrent
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrent
 func (c *S3) GetObjectTorrent(input *GetObjectTorrentInput) (*GetObjectTorrentOutput, error) {
 	req, out := c.GetObjectTorrentRequest(input)
 	return out, req.Send()
@@ -3094,19 +3204,18 @@ const opHeadBucket = "HeadBucket"
 
 // HeadBucketRequest generates a "aws/request.Request" representing the
 // client's request for the HeadBucket operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See HeadBucket for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the HeadBucket method directly
-// instead.
+// See HeadBucket for more information on using the HeadBucket
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the HeadBucketRequest method.
 //    req, resp := client.HeadBucketRequest(params)
@@ -3116,7 +3225,7 @@ const opHeadBucket = "HeadBucket"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucket
 func (c *S3) HeadBucketRequest(input *HeadBucketInput) (req *request.Request, output *HeadBucketOutput) {
 	op := &request.Operation{
 		Name:       opHeadBucket,
@@ -3151,7 +3260,7 @@ func (c *S3) HeadBucketRequest(input *HeadBucketInput) (req *request.Request, ou
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
 //   The speci***REMOVED***ed bucket does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucket
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucket
 func (c *S3) HeadBucket(input *HeadBucketInput) (*HeadBucketOutput, error) {
 	req, out := c.HeadBucketRequest(input)
 	return out, req.Send()
@@ -3177,19 +3286,18 @@ const opHeadObject = "HeadObject"
 
 // HeadObjectRequest generates a "aws/request.Request" representing the
 // client's request for the HeadObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See HeadObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the HeadObject method directly
-// instead.
+// See HeadObject for more information on using the HeadObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the HeadObjectRequest method.
 //    req, resp := client.HeadObjectRequest(params)
@@ -3199,7 +3307,7 @@ const opHeadObject = "HeadObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObject
 func (c *S3) HeadObjectRequest(input *HeadObjectInput) (req *request.Request, output *HeadObjectOutput) {
 	op := &request.Operation{
 		Name:       opHeadObject,
@@ -3231,7 +3339,7 @@ func (c *S3) HeadObjectRequest(input *HeadObjectInput) (req *request.Request, ou
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation HeadObject for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObject
 func (c *S3) HeadObject(input *HeadObjectInput) (*HeadObjectOutput, error) {
 	req, out := c.HeadObjectRequest(input)
 	return out, req.Send()
@@ -3257,19 +3365,18 @@ const opListBucketAnalyticsCon***REMOVED***gurations = "ListBucketAnalyticsCon**
 
 // ListBucketAnalyticsCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
 // client's request for the ListBucketAnalyticsCon***REMOVED***gurations operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListBucketAnalyticsCon***REMOVED***gurations for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListBucketAnalyticsCon***REMOVED***gurations method directly
-// instead.
+// See ListBucketAnalyticsCon***REMOVED***gurations for more information on using the ListBucketAnalyticsCon***REMOVED***gurations
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListBucketAnalyticsCon***REMOVED***gurationsRequest method.
 //    req, resp := client.ListBucketAnalyticsCon***REMOVED***gurationsRequest(params)
@@ -3279,7 +3386,7 @@ const opListBucketAnalyticsCon***REMOVED***gurations = "ListBucketAnalyticsCon**
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
 func (c *S3) ListBucketAnalyticsCon***REMOVED***gurationsRequest(input *ListBucketAnalyticsCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketAnalyticsCon***REMOVED***gurationsOutput) {
 	op := &request.Operation{
 		Name:       opListBucketAnalyticsCon***REMOVED***gurations,
@@ -3306,7 +3413,7 @@ func (c *S3) ListBucketAnalyticsCon***REMOVED***gurationsRequest(input *ListBuck
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListBucketAnalyticsCon***REMOVED***gurations for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurations
 func (c *S3) ListBucketAnalyticsCon***REMOVED***gurations(input *ListBucketAnalyticsCon***REMOVED***gurationsInput) (*ListBucketAnalyticsCon***REMOVED***gurationsOutput, error) {
 	req, out := c.ListBucketAnalyticsCon***REMOVED***gurationsRequest(input)
 	return out, req.Send()
@@ -3332,19 +3439,18 @@ const opListBucketInventoryCon***REMOVED***gurations = "ListBucketInventoryCon**
 
 // ListBucketInventoryCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
 // client's request for the ListBucketInventoryCon***REMOVED***gurations operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListBucketInventoryCon***REMOVED***gurations for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListBucketInventoryCon***REMOVED***gurations method directly
-// instead.
+// See ListBucketInventoryCon***REMOVED***gurations for more information on using the ListBucketInventoryCon***REMOVED***gurations
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListBucketInventoryCon***REMOVED***gurationsRequest method.
 //    req, resp := client.ListBucketInventoryCon***REMOVED***gurationsRequest(params)
@@ -3354,7 +3460,7 @@ const opListBucketInventoryCon***REMOVED***gurations = "ListBucketInventoryCon**
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
 func (c *S3) ListBucketInventoryCon***REMOVED***gurationsRequest(input *ListBucketInventoryCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketInventoryCon***REMOVED***gurationsOutput) {
 	op := &request.Operation{
 		Name:       opListBucketInventoryCon***REMOVED***gurations,
@@ -3381,7 +3487,7 @@ func (c *S3) ListBucketInventoryCon***REMOVED***gurationsRequest(input *ListBuck
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListBucketInventoryCon***REMOVED***gurations for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurations
 func (c *S3) ListBucketInventoryCon***REMOVED***gurations(input *ListBucketInventoryCon***REMOVED***gurationsInput) (*ListBucketInventoryCon***REMOVED***gurationsOutput, error) {
 	req, out := c.ListBucketInventoryCon***REMOVED***gurationsRequest(input)
 	return out, req.Send()
@@ -3407,19 +3513,18 @@ const opListBucketMetricsCon***REMOVED***gurations = "ListBucketMetricsCon***REM
 
 // ListBucketMetricsCon***REMOVED***gurationsRequest generates a "aws/request.Request" representing the
 // client's request for the ListBucketMetricsCon***REMOVED***gurations operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListBucketMetricsCon***REMOVED***gurations for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListBucketMetricsCon***REMOVED***gurations method directly
-// instead.
+// See ListBucketMetricsCon***REMOVED***gurations for more information on using the ListBucketMetricsCon***REMOVED***gurations
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListBucketMetricsCon***REMOVED***gurationsRequest method.
 //    req, resp := client.ListBucketMetricsCon***REMOVED***gurationsRequest(params)
@@ -3429,7 +3534,7 @@ const opListBucketMetricsCon***REMOVED***gurations = "ListBucketMetricsCon***REM
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
 func (c *S3) ListBucketMetricsCon***REMOVED***gurationsRequest(input *ListBucketMetricsCon***REMOVED***gurationsInput) (req *request.Request, output *ListBucketMetricsCon***REMOVED***gurationsOutput) {
 	op := &request.Operation{
 		Name:       opListBucketMetricsCon***REMOVED***gurations,
@@ -3456,7 +3561,7 @@ func (c *S3) ListBucketMetricsCon***REMOVED***gurationsRequest(input *ListBucket
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListBucketMetricsCon***REMOVED***gurations for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurations
 func (c *S3) ListBucketMetricsCon***REMOVED***gurations(input *ListBucketMetricsCon***REMOVED***gurationsInput) (*ListBucketMetricsCon***REMOVED***gurationsOutput, error) {
 	req, out := c.ListBucketMetricsCon***REMOVED***gurationsRequest(input)
 	return out, req.Send()
@@ -3482,19 +3587,18 @@ const opListBuckets = "ListBuckets"
 
 // ListBucketsRequest generates a "aws/request.Request" representing the
 // client's request for the ListBuckets operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListBuckets for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListBuckets method directly
-// instead.
+// See ListBuckets for more information on using the ListBuckets
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListBucketsRequest method.
 //    req, resp := client.ListBucketsRequest(params)
@@ -3504,7 +3608,7 @@ const opListBuckets = "ListBuckets"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBuckets
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBuckets
 func (c *S3) ListBucketsRequest(input *ListBucketsInput) (req *request.Request, output *ListBucketsOutput) {
 	op := &request.Operation{
 		Name:       opListBuckets,
@@ -3531,7 +3635,7 @@ func (c *S3) ListBucketsRequest(input *ListBucketsInput) (req *request.Request, 
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListBuckets for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBuckets
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBuckets
 func (c *S3) ListBuckets(input *ListBucketsInput) (*ListBucketsOutput, error) {
 	req, out := c.ListBucketsRequest(input)
 	return out, req.Send()
@@ -3557,19 +3661,18 @@ const opListMultipartUploads = "ListMultipartUploads"
 
 // ListMultipartUploadsRequest generates a "aws/request.Request" representing the
 // client's request for the ListMultipartUploads operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListMultipartUploads for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListMultipartUploads method directly
-// instead.
+// See ListMultipartUploads for more information on using the ListMultipartUploads
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListMultipartUploadsRequest method.
 //    req, resp := client.ListMultipartUploadsRequest(params)
@@ -3579,7 +3682,7 @@ const opListMultipartUploads = "ListMultipartUploads"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploads
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploads
 func (c *S3) ListMultipartUploadsRequest(input *ListMultipartUploadsInput) (req *request.Request, output *ListMultipartUploadsOutput) {
 	op := &request.Operation{
 		Name:       opListMultipartUploads,
@@ -3612,7 +3715,7 @@ func (c *S3) ListMultipartUploadsRequest(input *ListMultipartUploadsInput) (req 
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListMultipartUploads for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploads
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploads
 func (c *S3) ListMultipartUploads(input *ListMultipartUploadsInput) (*ListMultipartUploadsOutput, error) {
 	req, out := c.ListMultipartUploadsRequest(input)
 	return out, req.Send()
@@ -3688,19 +3791,18 @@ const opListObjectVersions = "ListObjectVersions"
 
 // ListObjectVersionsRequest generates a "aws/request.Request" representing the
 // client's request for the ListObjectVersions operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListObjectVersions for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListObjectVersions method directly
-// instead.
+// See ListObjectVersions for more information on using the ListObjectVersions
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListObjectVersionsRequest method.
 //    req, resp := client.ListObjectVersionsRequest(params)
@@ -3710,7 +3812,7 @@ const opListObjectVersions = "ListObjectVersions"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersions
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersions
 func (c *S3) ListObjectVersionsRequest(input *ListObjectVersionsInput) (req *request.Request, output *ListObjectVersionsOutput) {
 	op := &request.Operation{
 		Name:       opListObjectVersions,
@@ -3743,7 +3845,7 @@ func (c *S3) ListObjectVersionsRequest(input *ListObjectVersionsInput) (req *req
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListObjectVersions for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersions
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersions
 func (c *S3) ListObjectVersions(input *ListObjectVersionsInput) (*ListObjectVersionsOutput, error) {
 	req, out := c.ListObjectVersionsRequest(input)
 	return out, req.Send()
@@ -3819,19 +3921,18 @@ const opListObjects = "ListObjects"
 
 // ListObjectsRequest generates a "aws/request.Request" representing the
 // client's request for the ListObjects operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListObjects for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListObjects method directly
-// instead.
+// See ListObjects for more information on using the ListObjects
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListObjectsRequest method.
 //    req, resp := client.ListObjectsRequest(params)
@@ -3841,7 +3942,7 @@ const opListObjects = "ListObjects"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects
 func (c *S3) ListObjectsRequest(input *ListObjectsInput) (req *request.Request, output *ListObjectsOutput) {
 	op := &request.Operation{
 		Name:       opListObjects,
@@ -3881,7 +3982,7 @@ func (c *S3) ListObjectsRequest(input *ListObjectsInput) (req *request.Request, 
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
 //   The speci***REMOVED***ed bucket does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjects
 func (c *S3) ListObjects(input *ListObjectsInput) (*ListObjectsOutput, error) {
 	req, out := c.ListObjectsRequest(input)
 	return out, req.Send()
@@ -3957,19 +4058,18 @@ const opListObjectsV2 = "ListObjectsV2"
 
 // ListObjectsV2Request generates a "aws/request.Request" representing the
 // client's request for the ListObjectsV2 operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListObjectsV2 for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListObjectsV2 method directly
-// instead.
+// See ListObjectsV2 for more information on using the ListObjectsV2
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListObjectsV2Request method.
 //    req, resp := client.ListObjectsV2Request(params)
@@ -3979,7 +4079,7 @@ const opListObjectsV2 = "ListObjectsV2"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2
 func (c *S3) ListObjectsV2Request(input *ListObjectsV2Input) (req *request.Request, output *ListObjectsV2Output) {
 	op := &request.Operation{
 		Name:       opListObjectsV2,
@@ -4020,7 +4120,7 @@ func (c *S3) ListObjectsV2Request(input *ListObjectsV2Input) (req *request.Reque
 //   * ErrCodeNoSuchBucket "NoSuchBucket"
 //   The speci***REMOVED***ed bucket does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2
 func (c *S3) ListObjectsV2(input *ListObjectsV2Input) (*ListObjectsV2Output, error) {
 	req, out := c.ListObjectsV2Request(input)
 	return out, req.Send()
@@ -4096,19 +4196,18 @@ const opListParts = "ListParts"
 
 // ListPartsRequest generates a "aws/request.Request" representing the
 // client's request for the ListParts operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See ListParts for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the ListParts method directly
-// instead.
+// See ListParts for more information on using the ListParts
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the ListPartsRequest method.
 //    req, resp := client.ListPartsRequest(params)
@@ -4118,7 +4217,7 @@ const opListParts = "ListParts"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListParts
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListParts
 func (c *S3) ListPartsRequest(input *ListPartsInput) (req *request.Request, output *ListPartsOutput) {
 	op := &request.Operation{
 		Name:       opListParts,
@@ -4151,7 +4250,7 @@ func (c *S3) ListPartsRequest(input *ListPartsInput) (req *request.Request, outp
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation ListParts for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListParts
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListParts
 func (c *S3) ListParts(input *ListPartsInput) (*ListPartsOutput, error) {
 	req, out := c.ListPartsRequest(input)
 	return out, req.Send()
@@ -4227,19 +4326,18 @@ const opPutBucketAccelerateCon***REMOVED***guration = "PutBucketAccelerateCon***
 
 // PutBucketAccelerateCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketAccelerateCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketAccelerateCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketAccelerateCon***REMOVED***guration method directly
-// instead.
+// See PutBucketAccelerateCon***REMOVED***guration for more information on using the PutBucketAccelerateCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketAccelerateCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketAccelerateCon***REMOVED***gurationRequest(params)
@@ -4249,7 +4347,7 @@ const opPutBucketAccelerateCon***REMOVED***guration = "PutBucketAccelerateCon***
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
 func (c *S3) PutBucketAccelerateCon***REMOVED***gurationRequest(input *PutBucketAccelerateCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketAccelerateCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketAccelerateCon***REMOVED***guration,
@@ -4278,7 +4376,7 @@ func (c *S3) PutBucketAccelerateCon***REMOVED***gurationRequest(input *PutBucket
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketAccelerateCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***guration
 func (c *S3) PutBucketAccelerateCon***REMOVED***guration(input *PutBucketAccelerateCon***REMOVED***gurationInput) (*PutBucketAccelerateCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketAccelerateCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -4304,19 +4402,18 @@ const opPutBucketAcl = "PutBucketAcl"
 
 // PutBucketAclRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketAcl operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketAcl for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketAcl method directly
-// instead.
+// See PutBucketAcl for more information on using the PutBucketAcl
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketAclRequest method.
 //    req, resp := client.PutBucketAclRequest(params)
@@ -4326,7 +4423,7 @@ const opPutBucketAcl = "PutBucketAcl"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAcl
 func (c *S3) PutBucketAclRequest(input *PutBucketAclInput) (req *request.Request, output *PutBucketAclOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketAcl,
@@ -4355,7 +4452,7 @@ func (c *S3) PutBucketAclRequest(input *PutBucketAclInput) (req *request.Request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketAcl for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAcl
 func (c *S3) PutBucketAcl(input *PutBucketAclInput) (*PutBucketAclOutput, error) {
 	req, out := c.PutBucketAclRequest(input)
 	return out, req.Send()
@@ -4381,19 +4478,18 @@ const opPutBucketAnalyticsCon***REMOVED***guration = "PutBucketAnalyticsCon***RE
 
 // PutBucketAnalyticsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketAnalyticsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketAnalyticsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketAnalyticsCon***REMOVED***guration method directly
-// instead.
+// See PutBucketAnalyticsCon***REMOVED***guration for more information on using the PutBucketAnalyticsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketAnalyticsCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketAnalyticsCon***REMOVED***gurationRequest(params)
@@ -4403,7 +4499,7 @@ const opPutBucketAnalyticsCon***REMOVED***guration = "PutBucketAnalyticsCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
 func (c *S3) PutBucketAnalyticsCon***REMOVED***gurationRequest(input *PutBucketAnalyticsCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketAnalyticsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketAnalyticsCon***REMOVED***guration,
@@ -4433,7 +4529,7 @@ func (c *S3) PutBucketAnalyticsCon***REMOVED***gurationRequest(input *PutBucketA
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketAnalyticsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***guration
 func (c *S3) PutBucketAnalyticsCon***REMOVED***guration(input *PutBucketAnalyticsCon***REMOVED***gurationInput) (*PutBucketAnalyticsCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketAnalyticsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -4459,19 +4555,18 @@ const opPutBucketCors = "PutBucketCors"
 
 // PutBucketCorsRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketCors operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketCors for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketCors method directly
-// instead.
+// See PutBucketCors for more information on using the PutBucketCors
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketCorsRequest method.
 //    req, resp := client.PutBucketCorsRequest(params)
@@ -4481,7 +4576,7 @@ const opPutBucketCors = "PutBucketCors"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCors
 func (c *S3) PutBucketCorsRequest(input *PutBucketCorsInput) (req *request.Request, output *PutBucketCorsOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketCors,
@@ -4510,7 +4605,7 @@ func (c *S3) PutBucketCorsRequest(input *PutBucketCorsInput) (req *request.Reque
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketCors for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCors
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCors
 func (c *S3) PutBucketCors(input *PutBucketCorsInput) (*PutBucketCorsOutput, error) {
 	req, out := c.PutBucketCorsRequest(input)
 	return out, req.Send()
@@ -4532,23 +4627,99 @@ func (c *S3) PutBucketCorsWithContext(ctx aws.Context, input *PutBucketCorsInput
 	return out, req.Send()
 }
 
+const opPutBucketEncryption = "PutBucketEncryption"
+
+// PutBucketEncryptionRequest generates a "aws/request.Request" representing the
+// client's request for the PutBucketEncryption operation. The "output" return
+// value will be populated with the request's response once the request completes
+// successfuly.
+//
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
+//
+// See PutBucketEncryption for more information on using the PutBucketEncryption
+// API call, and error handling.
+//
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
+//
+//    // Example sending a request using the PutBucketEncryptionRequest method.
+//    req, resp := client.PutBucketEncryptionRequest(params)
+//
+//    err := req.Send()
+//    if err == nil { // resp is now ***REMOVED***lled
+//        fmt.Println(resp)
+//    }
+//
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketEncryption
+func (c *S3) PutBucketEncryptionRequest(input *PutBucketEncryptionInput) (req *request.Request, output *PutBucketEncryptionOutput) {
+	op := &request.Operation{
+		Name:       opPutBucketEncryption,
+		HTTPMethod: "PUT",
+		HTTPPath:   "/{Bucket}?encryption",
+	}
+
+	if input == nil {
+		input = &PutBucketEncryptionInput{}
+	}
+
+	output = &PutBucketEncryptionOutput{}
+	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(restxml.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	return
+}
+
+// PutBucketEncryption API operation for Amazon Simple Storage Service.
+//
+// Creates a new server-side encryption con***REMOVED***guration (or replaces an existing
+// one, if present).
+//
+// Returns awserr.Error for service API and SDK errors. Use runtime type assertions
+// with awserr.Error's Code and Message methods to get detailed information about
+// the error.
+//
+// See the AWS API reference guide for Amazon Simple Storage Service's
+// API operation PutBucketEncryption for usage and error information.
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketEncryption
+func (c *S3) PutBucketEncryption(input *PutBucketEncryptionInput) (*PutBucketEncryptionOutput, error) {
+	req, out := c.PutBucketEncryptionRequest(input)
+	return out, req.Send()
+}
+
+// PutBucketEncryptionWithContext is the same as PutBucketEncryption with the addition of
+// the ability to pass a context and additional request options.
+//
+// See PutBucketEncryption for details on how to use this API operation.
+//
+// The context must be non-nil and will be used for request cancellation. If
+// the context is nil a panic will occur. In the future the SDK may create
+// sub-contexts for http.Requests. See https://golang.org/pkg/context/
+// for more information on using Contexts.
+func (c *S3) PutBucketEncryptionWithContext(ctx aws.Context, input *PutBucketEncryptionInput, opts ...request.Option) (*PutBucketEncryptionOutput, error) {
+	req, out := c.PutBucketEncryptionRequest(input)
+	req.SetContext(ctx)
+	req.ApplyOptions(opts...)
+	return out, req.Send()
+}
+
 const opPutBucketInventoryCon***REMOVED***guration = "PutBucketInventoryCon***REMOVED***guration"
 
 // PutBucketInventoryCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketInventoryCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketInventoryCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketInventoryCon***REMOVED***guration method directly
-// instead.
+// See PutBucketInventoryCon***REMOVED***guration for more information on using the PutBucketInventoryCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketInventoryCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketInventoryCon***REMOVED***gurationRequest(params)
@@ -4558,7 +4729,7 @@ const opPutBucketInventoryCon***REMOVED***guration = "PutBucketInventoryCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
 func (c *S3) PutBucketInventoryCon***REMOVED***gurationRequest(input *PutBucketInventoryCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketInventoryCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketInventoryCon***REMOVED***guration,
@@ -4588,7 +4759,7 @@ func (c *S3) PutBucketInventoryCon***REMOVED***gurationRequest(input *PutBucketI
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketInventoryCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***guration
 func (c *S3) PutBucketInventoryCon***REMOVED***guration(input *PutBucketInventoryCon***REMOVED***gurationInput) (*PutBucketInventoryCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketInventoryCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -4614,19 +4785,18 @@ const opPutBucketLifecycle = "PutBucketLifecycle"
 
 // PutBucketLifecycleRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketLifecycle operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketLifecycle for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketLifecycle method directly
-// instead.
+// See PutBucketLifecycle for more information on using the PutBucketLifecycle
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketLifecycleRequest method.
 //    req, resp := client.PutBucketLifecycleRequest(params)
@@ -4636,7 +4806,7 @@ const opPutBucketLifecycle = "PutBucketLifecycle"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycle
 func (c *S3) PutBucketLifecycleRequest(input *PutBucketLifecycleInput) (req *request.Request, output *PutBucketLifecycleOutput) {
 	if c.Client.Con***REMOVED***g.Logger != nil {
 		c.Client.Con***REMOVED***g.Logger.Log("This operation, PutBucketLifecycle, has been deprecated")
@@ -4668,7 +4838,7 @@ func (c *S3) PutBucketLifecycleRequest(input *PutBucketLifecycleInput) (req *req
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketLifecycle for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycle
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycle
 func (c *S3) PutBucketLifecycle(input *PutBucketLifecycleInput) (*PutBucketLifecycleOutput, error) {
 	req, out := c.PutBucketLifecycleRequest(input)
 	return out, req.Send()
@@ -4694,19 +4864,18 @@ const opPutBucketLifecycleCon***REMOVED***guration = "PutBucketLifecycleCon***RE
 
 // PutBucketLifecycleCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketLifecycleCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketLifecycleCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketLifecycleCon***REMOVED***guration method directly
-// instead.
+// See PutBucketLifecycleCon***REMOVED***guration for more information on using the PutBucketLifecycleCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketLifecycleCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketLifecycleCon***REMOVED***gurationRequest(params)
@@ -4716,7 +4885,7 @@ const opPutBucketLifecycleCon***REMOVED***guration = "PutBucketLifecycleCon***RE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
 func (c *S3) PutBucketLifecycleCon***REMOVED***gurationRequest(input *PutBucketLifecycleCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketLifecycleCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketLifecycleCon***REMOVED***guration,
@@ -4746,7 +4915,7 @@ func (c *S3) PutBucketLifecycleCon***REMOVED***gurationRequest(input *PutBucketL
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketLifecycleCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***guration
 func (c *S3) PutBucketLifecycleCon***REMOVED***guration(input *PutBucketLifecycleCon***REMOVED***gurationInput) (*PutBucketLifecycleCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketLifecycleCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -4772,19 +4941,18 @@ const opPutBucketLogging = "PutBucketLogging"
 
 // PutBucketLoggingRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketLogging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketLogging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketLogging method directly
-// instead.
+// See PutBucketLogging for more information on using the PutBucketLogging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketLoggingRequest method.
 //    req, resp := client.PutBucketLoggingRequest(params)
@@ -4794,7 +4962,7 @@ const opPutBucketLogging = "PutBucketLogging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLogging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLogging
 func (c *S3) PutBucketLoggingRequest(input *PutBucketLoggingInput) (req *request.Request, output *PutBucketLoggingOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketLogging,
@@ -4825,7 +4993,7 @@ func (c *S3) PutBucketLoggingRequest(input *PutBucketLoggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketLogging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLogging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLogging
 func (c *S3) PutBucketLogging(input *PutBucketLoggingInput) (*PutBucketLoggingOutput, error) {
 	req, out := c.PutBucketLoggingRequest(input)
 	return out, req.Send()
@@ -4851,19 +5019,18 @@ const opPutBucketMetricsCon***REMOVED***guration = "PutBucketMetricsCon***REMOVE
 
 // PutBucketMetricsCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketMetricsCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketMetricsCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketMetricsCon***REMOVED***guration method directly
-// instead.
+// See PutBucketMetricsCon***REMOVED***guration for more information on using the PutBucketMetricsCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketMetricsCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketMetricsCon***REMOVED***gurationRequest(params)
@@ -4873,7 +5040,7 @@ const opPutBucketMetricsCon***REMOVED***guration = "PutBucketMetricsCon***REMOVE
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
 func (c *S3) PutBucketMetricsCon***REMOVED***gurationRequest(input *PutBucketMetricsCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketMetricsCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketMetricsCon***REMOVED***guration,
@@ -4903,7 +5070,7 @@ func (c *S3) PutBucketMetricsCon***REMOVED***gurationRequest(input *PutBucketMet
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketMetricsCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***guration
 func (c *S3) PutBucketMetricsCon***REMOVED***guration(input *PutBucketMetricsCon***REMOVED***gurationInput) (*PutBucketMetricsCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketMetricsCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -4929,19 +5096,18 @@ const opPutBucketNoti***REMOVED***cation = "PutBucketNoti***REMOVED***cation"
 
 // PutBucketNoti***REMOVED***cationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketNoti***REMOVED***cation operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketNoti***REMOVED***cation for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketNoti***REMOVED***cation method directly
-// instead.
+// See PutBucketNoti***REMOVED***cation for more information on using the PutBucketNoti***REMOVED***cation
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketNoti***REMOVED***cationRequest method.
 //    req, resp := client.PutBucketNoti***REMOVED***cationRequest(params)
@@ -4951,7 +5117,7 @@ const opPutBucketNoti***REMOVED***cation = "PutBucketNoti***REMOVED***cation"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
 func (c *S3) PutBucketNoti***REMOVED***cationRequest(input *PutBucketNoti***REMOVED***cationInput) (req *request.Request, output *PutBucketNoti***REMOVED***cationOutput) {
 	if c.Client.Con***REMOVED***g.Logger != nil {
 		c.Client.Con***REMOVED***g.Logger.Log("This operation, PutBucketNoti***REMOVED***cation, has been deprecated")
@@ -4983,7 +5149,7 @@ func (c *S3) PutBucketNoti***REMOVED***cationRequest(input *PutBucketNoti***REMO
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketNoti***REMOVED***cation for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cation
 func (c *S3) PutBucketNoti***REMOVED***cation(input *PutBucketNoti***REMOVED***cationInput) (*PutBucketNoti***REMOVED***cationOutput, error) {
 	req, out := c.PutBucketNoti***REMOVED***cationRequest(input)
 	return out, req.Send()
@@ -5009,19 +5175,18 @@ const opPutBucketNoti***REMOVED***cationCon***REMOVED***guration = "PutBucketNot
 
 // PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketNoti***REMOVED***cationCon***REMOVED***guration operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketNoti***REMOVED***cationCon***REMOVED***guration method directly
-// instead.
+// See PutBucketNoti***REMOVED***cationCon***REMOVED***guration for more information on using the PutBucketNoti***REMOVED***cationCon***REMOVED***guration
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest method.
 //    req, resp := client.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(params)
@@ -5031,7 +5196,7 @@ const opPutBucketNoti***REMOVED***cationCon***REMOVED***guration = "PutBucketNot
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
 func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (req *request.Request, output *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketNoti***REMOVED***cationCon***REMOVED***guration,
@@ -5060,7 +5225,7 @@ func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(inp
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketNoti***REMOVED***cationCon***REMOVED***guration for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***guration
 func (c *S3) PutBucketNoti***REMOVED***cationCon***REMOVED***guration(input *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) (*PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput, error) {
 	req, out := c.PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest(input)
 	return out, req.Send()
@@ -5086,19 +5251,18 @@ const opPutBucketPolicy = "PutBucketPolicy"
 
 // PutBucketPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketPolicy operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketPolicy for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketPolicy method directly
-// instead.
+// See PutBucketPolicy for more information on using the PutBucketPolicy
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketPolicyRequest method.
 //    req, resp := client.PutBucketPolicyRequest(params)
@@ -5108,7 +5272,7 @@ const opPutBucketPolicy = "PutBucketPolicy"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicy
 func (c *S3) PutBucketPolicyRequest(input *PutBucketPolicyInput) (req *request.Request, output *PutBucketPolicyOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketPolicy,
@@ -5138,7 +5302,7 @@ func (c *S3) PutBucketPolicyRequest(input *PutBucketPolicyInput) (req *request.R
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketPolicy for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicy
 func (c *S3) PutBucketPolicy(input *PutBucketPolicyInput) (*PutBucketPolicyOutput, error) {
 	req, out := c.PutBucketPolicyRequest(input)
 	return out, req.Send()
@@ -5164,19 +5328,18 @@ const opPutBucketReplication = "PutBucketReplication"
 
 // PutBucketReplicationRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketReplication operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketReplication for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketReplication method directly
-// instead.
+// See PutBucketReplication for more information on using the PutBucketReplication
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketReplicationRequest method.
 //    req, resp := client.PutBucketReplicationRequest(params)
@@ -5186,7 +5349,7 @@ const opPutBucketReplication = "PutBucketReplication"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplication
 func (c *S3) PutBucketReplicationRequest(input *PutBucketReplicationInput) (req *request.Request, output *PutBucketReplicationOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketReplication,
@@ -5216,7 +5379,7 @@ func (c *S3) PutBucketReplicationRequest(input *PutBucketReplicationInput) (req 
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketReplication for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplication
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplication
 func (c *S3) PutBucketReplication(input *PutBucketReplicationInput) (*PutBucketReplicationOutput, error) {
 	req, out := c.PutBucketReplicationRequest(input)
 	return out, req.Send()
@@ -5242,19 +5405,18 @@ const opPutBucketRequestPayment = "PutBucketRequestPayment"
 
 // PutBucketRequestPaymentRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketRequestPayment operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketRequestPayment for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketRequestPayment method directly
-// instead.
+// See PutBucketRequestPayment for more information on using the PutBucketRequestPayment
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketRequestPaymentRequest method.
 //    req, resp := client.PutBucketRequestPaymentRequest(params)
@@ -5264,7 +5426,7 @@ const opPutBucketRequestPayment = "PutBucketRequestPayment"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPayment
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPayment
 func (c *S3) PutBucketRequestPaymentRequest(input *PutBucketRequestPaymentInput) (req *request.Request, output *PutBucketRequestPaymentOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketRequestPayment,
@@ -5297,7 +5459,7 @@ func (c *S3) PutBucketRequestPaymentRequest(input *PutBucketRequestPaymentInput)
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketRequestPayment for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPayment
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPayment
 func (c *S3) PutBucketRequestPayment(input *PutBucketRequestPaymentInput) (*PutBucketRequestPaymentOutput, error) {
 	req, out := c.PutBucketRequestPaymentRequest(input)
 	return out, req.Send()
@@ -5323,19 +5485,18 @@ const opPutBucketTagging = "PutBucketTagging"
 
 // PutBucketTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketTagging method directly
-// instead.
+// See PutBucketTagging for more information on using the PutBucketTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketTaggingRequest method.
 //    req, resp := client.PutBucketTaggingRequest(params)
@@ -5345,7 +5506,7 @@ const opPutBucketTagging = "PutBucketTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging
 func (c *S3) PutBucketTaggingRequest(input *PutBucketTaggingInput) (req *request.Request, output *PutBucketTaggingOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketTagging,
@@ -5374,7 +5535,7 @@ func (c *S3) PutBucketTaggingRequest(input *PutBucketTaggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTagging
 func (c *S3) PutBucketTagging(input *PutBucketTaggingInput) (*PutBucketTaggingOutput, error) {
 	req, out := c.PutBucketTaggingRequest(input)
 	return out, req.Send()
@@ -5400,19 +5561,18 @@ const opPutBucketVersioning = "PutBucketVersioning"
 
 // PutBucketVersioningRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketVersioning operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketVersioning for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketVersioning method directly
-// instead.
+// See PutBucketVersioning for more information on using the PutBucketVersioning
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketVersioningRequest method.
 //    req, resp := client.PutBucketVersioningRequest(params)
@@ -5422,7 +5582,7 @@ const opPutBucketVersioning = "PutBucketVersioning"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioning
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioning
 func (c *S3) PutBucketVersioningRequest(input *PutBucketVersioningInput) (req *request.Request, output *PutBucketVersioningOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketVersioning,
@@ -5452,7 +5612,7 @@ func (c *S3) PutBucketVersioningRequest(input *PutBucketVersioningInput) (req *r
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketVersioning for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioning
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioning
 func (c *S3) PutBucketVersioning(input *PutBucketVersioningInput) (*PutBucketVersioningOutput, error) {
 	req, out := c.PutBucketVersioningRequest(input)
 	return out, req.Send()
@@ -5478,19 +5638,18 @@ const opPutBucketWebsite = "PutBucketWebsite"
 
 // PutBucketWebsiteRequest generates a "aws/request.Request" representing the
 // client's request for the PutBucketWebsite operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutBucketWebsite for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutBucketWebsite method directly
-// instead.
+// See PutBucketWebsite for more information on using the PutBucketWebsite
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutBucketWebsiteRequest method.
 //    req, resp := client.PutBucketWebsiteRequest(params)
@@ -5500,7 +5659,7 @@ const opPutBucketWebsite = "PutBucketWebsite"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsite
 func (c *S3) PutBucketWebsiteRequest(input *PutBucketWebsiteInput) (req *request.Request, output *PutBucketWebsiteOutput) {
 	op := &request.Operation{
 		Name:       opPutBucketWebsite,
@@ -5529,7 +5688,7 @@ func (c *S3) PutBucketWebsiteRequest(input *PutBucketWebsiteInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutBucketWebsite for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsite
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsite
 func (c *S3) PutBucketWebsite(input *PutBucketWebsiteInput) (*PutBucketWebsiteOutput, error) {
 	req, out := c.PutBucketWebsiteRequest(input)
 	return out, req.Send()
@@ -5555,19 +5714,18 @@ const opPutObject = "PutObject"
 
 // PutObjectRequest generates a "aws/request.Request" representing the
 // client's request for the PutObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutObject method directly
-// instead.
+// See PutObject for more information on using the PutObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutObjectRequest method.
 //    req, resp := client.PutObjectRequest(params)
@@ -5577,7 +5735,7 @@ const opPutObject = "PutObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObject
 func (c *S3) PutObjectRequest(input *PutObjectInput) (req *request.Request, output *PutObjectOutput) {
 	op := &request.Operation{
 		Name:       opPutObject,
@@ -5604,7 +5762,7 @@ func (c *S3) PutObjectRequest(input *PutObjectInput) (req *request.Request, outp
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutObject for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObject
 func (c *S3) PutObject(input *PutObjectInput) (*PutObjectOutput, error) {
 	req, out := c.PutObjectRequest(input)
 	return out, req.Send()
@@ -5630,19 +5788,18 @@ const opPutObjectAcl = "PutObjectAcl"
 
 // PutObjectAclRequest generates a "aws/request.Request" representing the
 // client's request for the PutObjectAcl operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutObjectAcl for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutObjectAcl method directly
-// instead.
+// See PutObjectAcl for more information on using the PutObjectAcl
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutObjectAclRequest method.
 //    req, resp := client.PutObjectAclRequest(params)
@@ -5652,7 +5809,7 @@ const opPutObjectAcl = "PutObjectAcl"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAcl
 func (c *S3) PutObjectAclRequest(input *PutObjectAclInput) (req *request.Request, output *PutObjectAclOutput) {
 	op := &request.Operation{
 		Name:       opPutObjectAcl,
@@ -5685,7 +5842,7 @@ func (c *S3) PutObjectAclRequest(input *PutObjectAclInput) (req *request.Request
 //   * ErrCodeNoSuchKey "NoSuchKey"
 //   The speci***REMOVED***ed key does not exist.
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAcl
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAcl
 func (c *S3) PutObjectAcl(input *PutObjectAclInput) (*PutObjectAclOutput, error) {
 	req, out := c.PutObjectAclRequest(input)
 	return out, req.Send()
@@ -5711,19 +5868,18 @@ const opPutObjectTagging = "PutObjectTagging"
 
 // PutObjectTaggingRequest generates a "aws/request.Request" representing the
 // client's request for the PutObjectTagging operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See PutObjectTagging for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the PutObjectTagging method directly
-// instead.
+// See PutObjectTagging for more information on using the PutObjectTagging
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the PutObjectTaggingRequest method.
 //    req, resp := client.PutObjectTaggingRequest(params)
@@ -5733,7 +5889,7 @@ const opPutObjectTagging = "PutObjectTagging"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTagging
 func (c *S3) PutObjectTaggingRequest(input *PutObjectTaggingInput) (req *request.Request, output *PutObjectTaggingOutput) {
 	op := &request.Operation{
 		Name:       opPutObjectTagging,
@@ -5760,7 +5916,7 @@ func (c *S3) PutObjectTaggingRequest(input *PutObjectTaggingInput) (req *request
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation PutObjectTagging for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTagging
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTagging
 func (c *S3) PutObjectTagging(input *PutObjectTaggingInput) (*PutObjectTaggingOutput, error) {
 	req, out := c.PutObjectTaggingRequest(input)
 	return out, req.Send()
@@ -5786,19 +5942,18 @@ const opRestoreObject = "RestoreObject"
 
 // RestoreObjectRequest generates a "aws/request.Request" representing the
 // client's request for the RestoreObject operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See RestoreObject for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the RestoreObject method directly
-// instead.
+// See RestoreObject for more information on using the RestoreObject
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the RestoreObjectRequest method.
 //    req, resp := client.RestoreObjectRequest(params)
@@ -5808,7 +5963,7 @@ const opRestoreObject = "RestoreObject"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObject
 func (c *S3) RestoreObjectRequest(input *RestoreObjectInput) (req *request.Request, output *RestoreObjectOutput) {
 	op := &request.Operation{
 		Name:       opRestoreObject,
@@ -5840,7 +5995,7 @@ func (c *S3) RestoreObjectRequest(input *RestoreObjectInput) (req *request.Reque
 //   * ErrCodeObjectAlreadyInActiveTierError "ObjectAlreadyInActiveTierError"
 //   This operation is not allowed against this storage tier
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObject
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObject
 func (c *S3) RestoreObject(input *RestoreObjectInput) (*RestoreObjectOutput, error) {
 	req, out := c.RestoreObjectRequest(input)
 	return out, req.Send()
@@ -5866,19 +6021,18 @@ const opUploadPart = "UploadPart"
 
 // UploadPartRequest generates a "aws/request.Request" representing the
 // client's request for the UploadPart operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See UploadPart for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the UploadPart method directly
-// instead.
+// See UploadPart for more information on using the UploadPart
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the UploadPartRequest method.
 //    req, resp := client.UploadPartRequest(params)
@@ -5888,7 +6042,7 @@ const opUploadPart = "UploadPart"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPart
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPart
 func (c *S3) UploadPartRequest(input *UploadPartInput) (req *request.Request, output *UploadPartOutput) {
 	op := &request.Operation{
 		Name:       opUploadPart,
@@ -5921,7 +6075,7 @@ func (c *S3) UploadPartRequest(input *UploadPartInput) (req *request.Request, ou
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation UploadPart for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPart
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPart
 func (c *S3) UploadPart(input *UploadPartInput) (*UploadPartOutput, error) {
 	req, out := c.UploadPartRequest(input)
 	return out, req.Send()
@@ -5947,19 +6101,18 @@ const opUploadPartCopy = "UploadPartCopy"
 
 // UploadPartCopyRequest generates a "aws/request.Request" representing the
 // client's request for the UploadPartCopy operation. The "output" return
-// value can be used to capture response data after the request's "Send" method
-// is called.
+// value will be populated with the request's response once the request completes
+// successfuly.
 //
-// See UploadPartCopy for usage and error information.
+// Use "Send" method on the returned Request to send the API call to the service.
+// the "output" return value is not valid until after Send returns without error.
 //
-// Creating a request object using this method should be used when you want to inject
-// custom logic into the request's lifecycle using a custom handler, or if you want to
-// access properties on the request object before or after sending the request. If
-// you just want the service response, call the UploadPartCopy method directly
-// instead.
+// See UploadPartCopy for more information on using the UploadPartCopy
+// API call, and error handling.
 //
-// Note: You must call the "Send" method on the returned request object in order
-// to execute the request.
+// This method is useful when you want to inject custom logic or con***REMOVED***guration
+// into the SDK's request lifecycle. Such as custom headers, or retry logic.
+//
 //
 //    // Example sending a request using the UploadPartCopyRequest method.
 //    req, resp := client.UploadPartCopyRequest(params)
@@ -5969,7 +6122,7 @@ const opUploadPartCopy = "UploadPartCopy"
 //        fmt.Println(resp)
 //    }
 //
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopy
 func (c *S3) UploadPartCopyRequest(input *UploadPartCopyInput) (req *request.Request, output *UploadPartCopyOutput) {
 	op := &request.Operation{
 		Name:       opUploadPartCopy,
@@ -5996,7 +6149,7 @@ func (c *S3) UploadPartCopyRequest(input *UploadPartCopyInput) (req *request.Req
 //
 // See the AWS API reference guide for Amazon Simple Storage Service's
 // API operation UploadPartCopy for usage and error information.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopy
+// See also, https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopy
 func (c *S3) UploadPartCopy(input *UploadPartCopyInput) (*UploadPartCopyOutput, error) {
 	req, out := c.UploadPartCopyRequest(input)
 	return out, req.Send()
@@ -6020,7 +6173,6 @@ func (c *S3) UploadPartCopyWithContext(ctx aws.Context, input *UploadPartCopyInp
 
 // Speci***REMOVED***es the days since the initiation of an Incomplete Multipart Upload
 // that Lifecycle will wait before permanently removing all parts of the upload.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortIncompleteMultipartUpload
 type AbortIncompleteMultipartUpload struct {
 	_ struct{} `type:"structure"`
 
@@ -6045,7 +6197,6 @@ func (s *AbortIncompleteMultipartUpload) SetDaysAfterInitiation(v int64) *AbortI
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUploadRequest
 type AbortMultipartUploadInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6103,6 +6254,13 @@ func (s *AbortMultipartUploadInput) SetBucket(v string) *AbortMultipartUploadInp
 	return s
 }
 
+func (s *AbortMultipartUploadInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *AbortMultipartUploadInput) SetKey(v string) *AbortMultipartUploadInput {
 	s.Key = &v
@@ -6121,7 +6279,6 @@ func (s *AbortMultipartUploadInput) SetUploadId(v string) *AbortMultipartUploadI
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AbortMultipartUploadOutput
 type AbortMultipartUploadOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6146,7 +6303,6 @@ func (s *AbortMultipartUploadOutput) SetRequestCharged(v string) *AbortMultipart
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AccelerateCon***REMOVED***guration
 type AccelerateCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -6170,7 +6326,6 @@ func (s *AccelerateCon***REMOVED***guration) SetStatus(v string) *AccelerateCon*
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AccessControlPolicy
 type AccessControlPolicy struct {
 	_ struct{} `type:"structure"`
 
@@ -6222,7 +6377,45 @@ func (s *AccessControlPolicy) SetOwner(v *Owner) *AccessControlPolicy {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsAndOperator
+// Container for information regarding the access control for replicas.
+type AccessControlTranslation struct {
+	_ struct{} `type:"structure"`
+
+	// The override value for the owner of the replica object.
+	//
+	// Owner is a required ***REMOVED***eld
+	Owner *string `type:"string" required:"true" enum:"OwnerOverride"`
+}
+
+// String returns the string representation
+func (s AccessControlTranslation) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s AccessControlTranslation) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *AccessControlTranslation) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AccessControlTranslation"}
+	if s.Owner == nil {
+		invalidParams.Add(request.NewErrParamRequired("Owner"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetOwner sets the Owner ***REMOVED***eld's value.
+func (s *AccessControlTranslation) SetOwner(v string) *AccessControlTranslation {
+	s.Owner = &v
+	return s
+}
+
 type AnalyticsAndOperator struct {
 	_ struct{} `type:"structure"`
 
@@ -6275,7 +6468,6 @@ func (s *AnalyticsAndOperator) SetTags(v []*Tag) *AnalyticsAndOperator {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsCon***REMOVED***guration
 type AnalyticsCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -6350,7 +6542,6 @@ func (s *AnalyticsCon***REMOVED***guration) SetStorageClassAnalysis(v *StorageCl
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsExportDestination
 type AnalyticsExportDestination struct {
 	_ struct{} `type:"structure"`
 
@@ -6394,7 +6585,6 @@ func (s *AnalyticsExportDestination) SetS3BucketDestination(v *AnalyticsS3Bucket
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsFilter
 type AnalyticsFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -6457,7 +6647,6 @@ func (s *AnalyticsFilter) SetTag(v *Tag) *AnalyticsFilter {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsS3BucketDestination
 type AnalyticsS3BucketDestination struct {
 	_ struct{} `type:"structure"`
 
@@ -6512,6 +6701,13 @@ func (s *AnalyticsS3BucketDestination) SetBucket(v string) *AnalyticsS3BucketDes
 	return s
 }
 
+func (s *AnalyticsS3BucketDestination) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetBucketAccountId sets the BucketAccountId ***REMOVED***eld's value.
 func (s *AnalyticsS3BucketDestination) SetBucketAccountId(v string) *AnalyticsS3BucketDestination {
 	s.BucketAccountId = &v
@@ -6530,7 +6726,6 @@ func (s *AnalyticsS3BucketDestination) SetPre***REMOVED***x(v string) *Analytics
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Bucket
 type Bucket struct {
 	_ struct{} `type:"structure"`
 
@@ -6563,7 +6758,6 @@ func (s *Bucket) SetName(v string) *Bucket {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/BucketLifecycleCon***REMOVED***guration
 type BucketLifecycleCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -6610,10 +6804,12 @@ func (s *BucketLifecycleCon***REMOVED***guration) SetRules(v []*LifecycleRule) *
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/BucketLoggingStatus
 type BucketLoggingStatus struct {
 	_ struct{} `type:"structure"`
 
+	// Container for logging information. Presence of this element indicates that
+	// logging is enabled. Parameters TargetBucket and TargetPre***REMOVED***x are required
+	// in this case.
 	LoggingEnabled *LoggingEnabled `type:"structure"`
 }
 
@@ -6648,7 +6844,6 @@ func (s *BucketLoggingStatus) SetLoggingEnabled(v *LoggingEnabled) *BucketLoggin
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CORSCon***REMOVED***guration
 type CORSCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -6695,7 +6890,6 @@ func (s *CORSCon***REMOVED***guration) SetCORSRules(v []*CORSRule) *CORSCon***RE
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CORSRule
 type CORSRule struct {
 	_ struct{} `type:"structure"`
 
@@ -6779,7 +6973,138 @@ func (s *CORSRule) SetMaxAgeSeconds(v int64) *CORSRule {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CloudFunctionCon***REMOVED***guration
+// Describes how a CSV-formatted input object is formatted.
+type CSVInput struct {
+	_ struct{} `type:"structure"`
+
+	// Single character used to indicate a row should be ignored when present at
+	// the start of a row.
+	Comments *string `type:"string"`
+
+	// Value used to separate individual ***REMOVED***elds in a record.
+	FieldDelimiter *string `type:"string"`
+
+	// Describes the ***REMOVED***rst line of input. Valid values: None, Ignore, Use.
+	FileHeaderInfo *string `type:"string" enum:"FileHeaderInfo"`
+
+	// Value used for escaping where the ***REMOVED***eld delimiter is part of the value.
+	QuoteCharacter *string `type:"string"`
+
+	// Single character used for escaping the quote character inside an already
+	// escaped value.
+	QuoteEscapeCharacter *string `type:"string"`
+
+	// Value used to separate individual records.
+	RecordDelimiter *string `type:"string"`
+}
+
+// String returns the string representation
+func (s CSVInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s CSVInput) GoString() string {
+	return s.String()
+}
+
+// SetComments sets the Comments ***REMOVED***eld's value.
+func (s *CSVInput) SetComments(v string) *CSVInput {
+	s.Comments = &v
+	return s
+}
+
+// SetFieldDelimiter sets the FieldDelimiter ***REMOVED***eld's value.
+func (s *CSVInput) SetFieldDelimiter(v string) *CSVInput {
+	s.FieldDelimiter = &v
+	return s
+}
+
+// SetFileHeaderInfo sets the FileHeaderInfo ***REMOVED***eld's value.
+func (s *CSVInput) SetFileHeaderInfo(v string) *CSVInput {
+	s.FileHeaderInfo = &v
+	return s
+}
+
+// SetQuoteCharacter sets the QuoteCharacter ***REMOVED***eld's value.
+func (s *CSVInput) SetQuoteCharacter(v string) *CSVInput {
+	s.QuoteCharacter = &v
+	return s
+}
+
+// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter ***REMOVED***eld's value.
+func (s *CSVInput) SetQuoteEscapeCharacter(v string) *CSVInput {
+	s.QuoteEscapeCharacter = &v
+	return s
+}
+
+// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+func (s *CSVInput) SetRecordDelimiter(v string) *CSVInput {
+	s.RecordDelimiter = &v
+	return s
+}
+
+// Describes how CSV-formatted results are formatted.
+type CSVOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Value used to separate individual ***REMOVED***elds in a record.
+	FieldDelimiter *string `type:"string"`
+
+	// Value used for escaping where the ***REMOVED***eld delimiter is part of the value.
+	QuoteCharacter *string `type:"string"`
+
+	// Single character used for escaping the quote character inside an already
+	// escaped value.
+	QuoteEscapeCharacter *string `type:"string"`
+
+	// Indicates whether or not all output ***REMOVED***elds should be quoted.
+	QuoteFields *string `type:"string" enum:"QuoteFields"`
+
+	// Value used to separate individual records.
+	RecordDelimiter *string `type:"string"`
+}
+
+// String returns the string representation
+func (s CSVOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s CSVOutput) GoString() string {
+	return s.String()
+}
+
+// SetFieldDelimiter sets the FieldDelimiter ***REMOVED***eld's value.
+func (s *CSVOutput) SetFieldDelimiter(v string) *CSVOutput {
+	s.FieldDelimiter = &v
+	return s
+}
+
+// SetQuoteCharacter sets the QuoteCharacter ***REMOVED***eld's value.
+func (s *CSVOutput) SetQuoteCharacter(v string) *CSVOutput {
+	s.QuoteCharacter = &v
+	return s
+}
+
+// SetQuoteEscapeCharacter sets the QuoteEscapeCharacter ***REMOVED***eld's value.
+func (s *CSVOutput) SetQuoteEscapeCharacter(v string) *CSVOutput {
+	s.QuoteEscapeCharacter = &v
+	return s
+}
+
+// SetQuoteFields sets the QuoteFields ***REMOVED***eld's value.
+func (s *CSVOutput) SetQuoteFields(v string) *CSVOutput {
+	s.QuoteFields = &v
+	return s
+}
+
+// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+func (s *CSVOutput) SetRecordDelimiter(v string) *CSVOutput {
+	s.RecordDelimiter = &v
+	return s
+}
+
 type CloudFunctionCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -6837,7 +7162,6 @@ func (s *CloudFunctionCon***REMOVED***guration) SetInvocationRole(v string) *Clo
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CommonPre***REMOVED***x
 type CommonPre***REMOVED***x struct {
 	_ struct{} `type:"structure"`
 
@@ -6860,7 +7184,6 @@ func (s *CommonPre***REMOVED***x) SetPre***REMOVED***x(v string) *CommonPre***RE
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUploadRequest
 type CompleteMultipartUploadInput struct {
 	_ struct{} `type:"structure" payload:"MultipartUpload"`
 
@@ -6920,6 +7243,13 @@ func (s *CompleteMultipartUploadInput) SetBucket(v string) *CompleteMultipartUpl
 	return s
 }
 
+func (s *CompleteMultipartUploadInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *CompleteMultipartUploadInput) SetKey(v string) *CompleteMultipartUploadInput {
 	s.Key = &v
@@ -6944,7 +7274,6 @@ func (s *CompleteMultipartUploadInput) SetUploadId(v string) *CompleteMultipartU
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompleteMultipartUploadOutput
 type CompleteMultipartUploadOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6991,6 +7320,13 @@ func (s CompleteMultipartUploadOutput) GoString() string {
 func (s *CompleteMultipartUploadOutput) SetBucket(v string) *CompleteMultipartUploadOutput {
 	s.Bucket = &v
 	return s
+}
+
+func (s *CompleteMultipartUploadOutput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
 }
 
 // SetETag sets the ETag ***REMOVED***eld's value.
@@ -7041,7 +7377,6 @@ func (s *CompleteMultipartUploadOutput) SetVersionId(v string) *CompleteMultipar
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompletedMultipartUpload
 type CompletedMultipartUpload struct {
 	_ struct{} `type:"structure"`
 
@@ -7064,7 +7399,6 @@ func (s *CompletedMultipartUpload) SetParts(v []*CompletedPart) *CompletedMultip
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CompletedPart
 type CompletedPart struct {
 	_ struct{} `type:"structure"`
 
@@ -7098,7 +7432,6 @@ func (s *CompletedPart) SetPartNumber(v int64) *CompletedPart {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Condition
 type Condition struct {
 	_ struct{} `type:"structure"`
 
@@ -7141,7 +7474,6 @@ func (s *Condition) SetKeyPre***REMOVED***xEquals(v string) *Condition {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObjectRequest
 type CopyObjectInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7318,6 +7650,13 @@ func (s *CopyObjectInput) SetBucket(v string) *CopyObjectInput {
 	return s
 }
 
+func (s *CopyObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetCacheControl sets the CacheControl ***REMOVED***eld's value.
 func (s *CopyObjectInput) SetCacheControl(v string) *CopyObjectInput {
 	s.CacheControl = &v
@@ -7388,6 +7727,13 @@ func (s *CopyObjectInput) SetCopySourceSSECustomerAlgorithm(v string) *CopyObjec
 func (s *CopyObjectInput) SetCopySourceSSECustomerKey(v string) *CopyObjectInput {
 	s.CopySourceSSECustomerKey = &v
 	return s
+}
+
+func (s *CopyObjectInput) getCopySourceSSECustomerKey() (v string) {
+	if s.CopySourceSSECustomerKey == nil {
+		return v
+	}
+	return *s.CopySourceSSECustomerKey
 }
 
 // SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 ***REMOVED***eld's value.
@@ -7462,6 +7808,13 @@ func (s *CopyObjectInput) SetSSECustomerKey(v string) *CopyObjectInput {
 	return s
 }
 
+func (s *CopyObjectInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *CopyObjectInput) SetSSECustomerKeyMD5(v string) *CopyObjectInput {
 	s.SSECustomerKeyMD5 = &v
@@ -7504,7 +7857,6 @@ func (s *CopyObjectInput) SetWebsiteRedirectLocation(v string) *CopyObjectInput 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObjectOutput
 type CopyObjectOutput struct {
 	_ struct{} `type:"structure" payload:"CopyObjectResult"`
 
@@ -7605,7 +7957,6 @@ func (s *CopyObjectOutput) SetVersionId(v string) *CopyObjectOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyObjectResult
 type CopyObjectResult struct {
 	_ struct{} `type:"structure"`
 
@@ -7636,7 +7987,6 @@ func (s *CopyObjectResult) SetLastModi***REMOVED***ed(v time.Time) *CopyObjectRe
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CopyPartResult
 type CopyPartResult struct {
 	_ struct{} `type:"structure"`
 
@@ -7669,7 +8019,6 @@ func (s *CopyPartResult) SetLastModi***REMOVED***ed(v time.Time) *CopyPartResult
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucketCon***REMOVED***guration
 type CreateBucketCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -7694,7 +8043,6 @@ func (s *CreateBucketCon***REMOVED***guration) SetLocationConstraint(v string) *
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucketRequest
 type CreateBucketInput struct {
 	_ struct{} `type:"structure" payload:"CreateBucketCon***REMOVED***guration"`
 
@@ -7758,6 +8106,13 @@ func (s *CreateBucketInput) SetBucket(v string) *CreateBucketInput {
 	return s
 }
 
+func (s *CreateBucketInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetCreateBucketCon***REMOVED***guration sets the CreateBucketCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *CreateBucketInput) SetCreateBucketCon***REMOVED***guration(v *CreateBucketCon***REMOVED***guration) *CreateBucketInput {
 	s.CreateBucketCon***REMOVED***guration = v
@@ -7794,7 +8149,6 @@ func (s *CreateBucketInput) SetGrantWriteACP(v string) *CreateBucketInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateBucketOutput
 type CreateBucketOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7817,7 +8171,6 @@ func (s *CreateBucketOutput) SetLocation(v string) *CreateBucketOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUploadRequest
 type CreateMultipartUploadInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7899,6 +8252,9 @@ type CreateMultipartUploadInput struct {
 	// The type of storage to use for the object. Defaults to 'STANDARD'.
 	StorageClass *string `location:"header" locationName:"x-amz-storage-class" type:"string" enum:"StorageClass"`
 
+	// The tag-set for the object. The tag-set must be encoded as URL Query parameters
+	Tagging *string `location:"header" locationName:"x-amz-tagging" type:"string"`
+
 	// If the bucket is con***REMOVED***gured as a website, redirects requests for this object
 	// to another object in the same bucket or to an external URL. Amazon S3 stores
 	// the value of this header in the object metadata.
@@ -7944,6 +8300,13 @@ func (s *CreateMultipartUploadInput) SetACL(v string) *CreateMultipartUploadInpu
 func (s *CreateMultipartUploadInput) SetBucket(v string) *CreateMultipartUploadInput {
 	s.Bucket = &v
 	return s
+}
+
+func (s *CreateMultipartUploadInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
 }
 
 // SetCacheControl sets the CacheControl ***REMOVED***eld's value.
@@ -8036,6 +8399,13 @@ func (s *CreateMultipartUploadInput) SetSSECustomerKey(v string) *CreateMultipar
 	return s
 }
 
+func (s *CreateMultipartUploadInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *CreateMultipartUploadInput) SetSSECustomerKeyMD5(v string) *CreateMultipartUploadInput {
 	s.SSECustomerKeyMD5 = &v
@@ -8060,13 +8430,18 @@ func (s *CreateMultipartUploadInput) SetStorageClass(v string) *CreateMultipartU
 	return s
 }
 
+// SetTagging sets the Tagging ***REMOVED***eld's value.
+func (s *CreateMultipartUploadInput) SetTagging(v string) *CreateMultipartUploadInput {
+	s.Tagging = &v
+	return s
+}
+
 // SetWebsiteRedirectLocation sets the WebsiteRedirectLocation ***REMOVED***eld's value.
 func (s *CreateMultipartUploadInput) SetWebsiteRedirectLocation(v string) *CreateMultipartUploadInput {
 	s.WebsiteRedirectLocation = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/CreateMultipartUploadOutput
 type CreateMultipartUploadOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8137,6 +8512,13 @@ func (s *CreateMultipartUploadOutput) SetBucket(v string) *CreateMultipartUpload
 	return s
 }
 
+func (s *CreateMultipartUploadOutput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *CreateMultipartUploadOutput) SetKey(v string) *CreateMultipartUploadOutput {
 	s.Key = &v
@@ -8179,7 +8561,6 @@ func (s *CreateMultipartUploadOutput) SetUploadId(v string) *CreateMultipartUplo
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Delete
 type Delete struct {
 	_ struct{} `type:"structure"`
 
@@ -8236,7 +8617,6 @@ func (s *Delete) SetQuiet(v bool) *Delete {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***gurationRequest
 type DeleteBucketAnalyticsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8283,13 +8663,19 @@ func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string)
 	return s
 }
 
+func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *DeleteBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketAnalyticsCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketAnalyticsCon***REMOVED***gurationOutput
 type DeleteBucketAnalyticsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8304,7 +8690,6 @@ func (s DeleteBucketAnalyticsCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCorsRequest
 type DeleteBucketCorsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8341,7 +8726,13 @@ func (s *DeleteBucketCorsInput) SetBucket(v string) *DeleteBucketCorsInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketCorsOutput
+func (s *DeleteBucketCorsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketCorsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8356,7 +8747,66 @@ func (s DeleteBucketCorsOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketRequest
+type DeleteBucketEncryptionInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the bucket containing the server-side encryption con***REMOVED***guration
+	// to delete.
+	//
+	// Bucket is a required ***REMOVED***eld
+	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s DeleteBucketEncryptionInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DeleteBucketEncryptionInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *DeleteBucketEncryptionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteBucketEncryptionInput"}
+	if s.Bucket == nil {
+		invalidParams.Add(request.NewErrParamRequired("Bucket"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetBucket sets the Bucket ***REMOVED***eld's value.
+func (s *DeleteBucketEncryptionInput) SetBucket(v string) *DeleteBucketEncryptionInput {
+	s.Bucket = &v
+	return s
+}
+
+func (s *DeleteBucketEncryptionInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+type DeleteBucketEncryptionOutput struct {
+	_ struct{} `type:"structure"`
+}
+
+// String returns the string representation
+func (s DeleteBucketEncryptionOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DeleteBucketEncryptionOutput) GoString() string {
+	return s.String()
+}
+
 type DeleteBucketInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8393,7 +8843,13 @@ func (s *DeleteBucketInput) SetBucket(v string) *DeleteBucketInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***gurationRequest
+func (s *DeleteBucketInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketInventoryCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8440,13 +8896,19 @@ func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string)
 	return s
 }
 
+func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *DeleteBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketInventoryCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketInventoryCon***REMOVED***gurationOutput
 type DeleteBucketInventoryCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8461,7 +8923,6 @@ func (s DeleteBucketInventoryCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycleRequest
 type DeleteBucketLifecycleInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8498,7 +8959,13 @@ func (s *DeleteBucketLifecycleInput) SetBucket(v string) *DeleteBucketLifecycleI
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketLifecycleOutput
+func (s *DeleteBucketLifecycleInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketLifecycleOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8513,7 +8980,6 @@ func (s DeleteBucketLifecycleOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***gurationRequest
 type DeleteBucketMetricsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8560,13 +9026,19 @@ func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *
 	return s
 }
 
+func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *DeleteBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *DeleteBucketMetricsCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketMetricsCon***REMOVED***gurationOutput
 type DeleteBucketMetricsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8581,7 +9053,6 @@ func (s DeleteBucketMetricsCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketOutput
 type DeleteBucketOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8596,7 +9067,6 @@ func (s DeleteBucketOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicyRequest
 type DeleteBucketPolicyInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8633,7 +9103,13 @@ func (s *DeleteBucketPolicyInput) SetBucket(v string) *DeleteBucketPolicyInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketPolicyOutput
+func (s *DeleteBucketPolicyInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketPolicyOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8648,7 +9124,6 @@ func (s DeleteBucketPolicyOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplicationRequest
 type DeleteBucketReplicationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8685,7 +9160,13 @@ func (s *DeleteBucketReplicationInput) SetBucket(v string) *DeleteBucketReplicat
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketReplicationOutput
+func (s *DeleteBucketReplicationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketReplicationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8700,7 +9181,6 @@ func (s DeleteBucketReplicationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTaggingRequest
 type DeleteBucketTaggingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8737,7 +9217,13 @@ func (s *DeleteBucketTaggingInput) SetBucket(v string) *DeleteBucketTaggingInput
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketTaggingOutput
+func (s *DeleteBucketTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketTaggingOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8752,7 +9238,6 @@ func (s DeleteBucketTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsiteRequest
 type DeleteBucketWebsiteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8789,7 +9274,13 @@ func (s *DeleteBucketWebsiteInput) SetBucket(v string) *DeleteBucketWebsiteInput
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteBucketWebsiteOutput
+func (s *DeleteBucketWebsiteInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type DeleteBucketWebsiteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8804,7 +9295,6 @@ func (s DeleteBucketWebsiteOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteMarkerEntry
 type DeleteMarkerEntry struct {
 	_ struct{} `type:"structure"`
 
@@ -8864,7 +9354,6 @@ func (s *DeleteMarkerEntry) SetVersionId(v string) *DeleteMarkerEntry {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectRequest
 type DeleteObjectInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8923,6 +9412,13 @@ func (s *DeleteObjectInput) SetBucket(v string) *DeleteObjectInput {
 	return s
 }
 
+func (s *DeleteObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *DeleteObjectInput) SetKey(v string) *DeleteObjectInput {
 	s.Key = &v
@@ -8947,7 +9443,6 @@ func (s *DeleteObjectInput) SetVersionId(v string) *DeleteObjectInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectOutput
 type DeleteObjectOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8992,7 +9487,6 @@ func (s *DeleteObjectOutput) SetVersionId(v string) *DeleteObjectOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTaggingRequest
 type DeleteObjectTaggingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9041,6 +9535,13 @@ func (s *DeleteObjectTaggingInput) SetBucket(v string) *DeleteObjectTaggingInput
 	return s
 }
 
+func (s *DeleteObjectTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *DeleteObjectTaggingInput) SetKey(v string) *DeleteObjectTaggingInput {
 	s.Key = &v
@@ -9053,7 +9554,6 @@ func (s *DeleteObjectTaggingInput) SetVersionId(v string) *DeleteObjectTaggingIn
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectTaggingOutput
 type DeleteObjectTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9077,7 +9577,6 @@ func (s *DeleteObjectTaggingOutput) SetVersionId(v string) *DeleteObjectTaggingO
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectsRequest
 type DeleteObjectsInput struct {
 	_ struct{} `type:"structure" payload:"Delete"`
 
@@ -9135,6 +9634,13 @@ func (s *DeleteObjectsInput) SetBucket(v string) *DeleteObjectsInput {
 	return s
 }
 
+func (s *DeleteObjectsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetDelete sets the Delete ***REMOVED***eld's value.
 func (s *DeleteObjectsInput) SetDelete(v *Delete) *DeleteObjectsInput {
 	s.Delete = v
@@ -9153,7 +9659,6 @@ func (s *DeleteObjectsInput) SetRequestPayer(v string) *DeleteObjectsInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeleteObjectsOutput
 type DeleteObjectsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9194,7 +9699,6 @@ func (s *DeleteObjectsOutput) SetRequestCharged(v string) *DeleteObjectsOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/DeletedObject
 type DeletedObject struct {
 	_ struct{} `type:"structure"`
 
@@ -9241,15 +9745,25 @@ func (s *DeletedObject) SetVersionId(v string) *DeletedObject {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Destination
+// Container for replication destination information.
 type Destination struct {
 	_ struct{} `type:"structure"`
+
+	// Container for information regarding the access control for replicas.
+	AccessControlTranslation *AccessControlTranslation `type:"structure"`
+
+	// Account ID of the destination bucket. Currently this is only being veri***REMOVED***ed
+	// if Access Control Translation is enabled
+	Account *string `type:"string"`
 
 	// Amazon resource name (ARN) of the bucket where you want Amazon S3 to store
 	// replicas of the object identi***REMOVED***ed by the rule.
 	//
 	// Bucket is a required ***REMOVED***eld
 	Bucket *string `type:"string" required:"true"`
+
+	// Container for information regarding encryption based con***REMOVED***guration for replicas.
+	EncryptionCon***REMOVED***guration *EncryptionCon***REMOVED***guration `type:"structure"`
 
 	// The class of storage used to store the object.
 	StorageClass *string `type:"string" enum:"StorageClass"`
@@ -9271,6 +9785,11 @@ func (s *Destination) Validate() error {
 	if s.Bucket == nil {
 		invalidParams.Add(request.NewErrParamRequired("Bucket"))
 	}
+	if s.AccessControlTranslation != nil {
+		if err := s.AccessControlTranslation.Validate(); err != nil {
+			invalidParams.AddNested("AccessControlTranslation", err.(request.ErrInvalidParams))
+		}
+	}
 
 	if invalidParams.Len() > 0 {
 		return invalidParams
@@ -9278,9 +9797,34 @@ func (s *Destination) Validate() error {
 	return nil
 }
 
+// SetAccessControlTranslation sets the AccessControlTranslation ***REMOVED***eld's value.
+func (s *Destination) SetAccessControlTranslation(v *AccessControlTranslation) *Destination {
+	s.AccessControlTranslation = v
+	return s
+}
+
+// SetAccount sets the Account ***REMOVED***eld's value.
+func (s *Destination) SetAccount(v string) *Destination {
+	s.Account = &v
+	return s
+}
+
 // SetBucket sets the Bucket ***REMOVED***eld's value.
 func (s *Destination) SetBucket(v string) *Destination {
 	s.Bucket = &v
+	return s
+}
+
+func (s *Destination) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+// SetEncryptionCon***REMOVED***guration sets the EncryptionCon***REMOVED***guration ***REMOVED***eld's value.
+func (s *Destination) SetEncryptionCon***REMOVED***guration(v *EncryptionCon***REMOVED***guration) *Destination {
+	s.EncryptionCon***REMOVED***guration = v
 	return s
 }
 
@@ -9290,7 +9834,91 @@ func (s *Destination) SetStorageClass(v string) *Destination {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Error
+// Describes the server-side encryption that will be applied to the restore
+// results.
+type Encryption struct {
+	_ struct{} `type:"structure"`
+
+	// The server-side encryption algorithm used when storing job results in Amazon
+	// S3 (e.g., AES256, aws:kms).
+	//
+	// EncryptionType is a required ***REMOVED***eld
+	EncryptionType *string `type:"string" required:"true" enum:"ServerSideEncryption"`
+
+	// If the encryption type is aws:kms, this optional value can be used to specify
+	// the encryption context for the restore results.
+	KMSContext *string `type:"string"`
+
+	// If the encryption type is aws:kms, this optional value speci***REMOVED***es the AWS
+	// KMS key ID to use for encryption of job results.
+	KMSKeyId *string `type:"string"`
+}
+
+// String returns the string representation
+func (s Encryption) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s Encryption) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *Encryption) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Encryption"}
+	if s.EncryptionType == nil {
+		invalidParams.Add(request.NewErrParamRequired("EncryptionType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetEncryptionType sets the EncryptionType ***REMOVED***eld's value.
+func (s *Encryption) SetEncryptionType(v string) *Encryption {
+	s.EncryptionType = &v
+	return s
+}
+
+// SetKMSContext sets the KMSContext ***REMOVED***eld's value.
+func (s *Encryption) SetKMSContext(v string) *Encryption {
+	s.KMSContext = &v
+	return s
+}
+
+// SetKMSKeyId sets the KMSKeyId ***REMOVED***eld's value.
+func (s *Encryption) SetKMSKeyId(v string) *Encryption {
+	s.KMSKeyId = &v
+	return s
+}
+
+// Container for information regarding encryption based con***REMOVED***guration for replicas.
+type EncryptionCon***REMOVED***guration struct {
+	_ struct{} `type:"structure"`
+
+	// The id of the KMS key used to encrypt the replica object.
+	ReplicaKmsKeyID *string `type:"string"`
+}
+
+// String returns the string representation
+func (s EncryptionCon***REMOVED***guration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s EncryptionCon***REMOVED***guration) GoString() string {
+	return s.String()
+}
+
+// SetReplicaKmsKeyID sets the ReplicaKmsKeyID ***REMOVED***eld's value.
+func (s *EncryptionCon***REMOVED***guration) SetReplicaKmsKeyID(v string) *EncryptionCon***REMOVED***guration {
+	s.ReplicaKmsKeyID = &v
+	return s
+}
+
 type Error struct {
 	_ struct{} `type:"structure"`
 
@@ -9337,7 +9965,6 @@ func (s *Error) SetVersionId(v string) *Error {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ErrorDocument
 type ErrorDocument struct {
 	_ struct{} `type:"structure"`
 
@@ -9380,7 +10007,6 @@ func (s *ErrorDocument) SetKey(v string) *ErrorDocument {
 }
 
 // Container for key value pair that de***REMOVED***nes the criteria for the ***REMOVED***lter rule.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/FilterRule
 type FilterRule struct {
 	_ struct{} `type:"structure"`
 
@@ -9415,7 +10041,6 @@ func (s *FilterRule) SetValue(v string) *FilterRule {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***gurationRequest
 type GetBucketAccelerateCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9454,7 +10079,13 @@ func (s *GetBucketAccelerateCon***REMOVED***gurationInput) SetBucket(v string) *
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAccelerateCon***REMOVED***gurationOutput
+func (s *GetBucketAccelerateCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketAccelerateCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9478,7 +10109,6 @@ func (s *GetBucketAccelerateCon***REMOVED***gurationOutput) SetStatus(v string) 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAclRequest
 type GetBucketAclInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9515,7 +10145,13 @@ func (s *GetBucketAclInput) SetBucket(v string) *GetBucketAclInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAclOutput
+func (s *GetBucketAclInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketAclOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9547,7 +10183,6 @@ func (s *GetBucketAclOutput) SetOwner(v *Owner) *GetBucketAclOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***gurationRequest
 type GetBucketAnalyticsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9594,13 +10229,19 @@ func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string) *G
 	return s
 }
 
+func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *GetBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *GetBucketAnalyticsCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketAnalyticsCon***REMOVED***gurationOutput
 type GetBucketAnalyticsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure" payload:"AnalyticsCon***REMOVED***guration"`
 
@@ -9624,7 +10265,6 @@ func (s *GetBucketAnalyticsCon***REMOVED***gurationOutput) SetAnalyticsCon***REM
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCorsRequest
 type GetBucketCorsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9661,7 +10301,13 @@ func (s *GetBucketCorsInput) SetBucket(v string) *GetBucketCorsInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketCorsOutput
+func (s *GetBucketCorsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketCorsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9684,7 +10330,76 @@ func (s *GetBucketCorsOutput) SetCORSRules(v []*CORSRule) *GetBucketCorsOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***gurationRequest
+type GetBucketEncryptionInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the bucket from which the server-side encryption con***REMOVED***guration
+	// is retrieved.
+	//
+	// Bucket is a required ***REMOVED***eld
+	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s GetBucketEncryptionInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s GetBucketEncryptionInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *GetBucketEncryptionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetBucketEncryptionInput"}
+	if s.Bucket == nil {
+		invalidParams.Add(request.NewErrParamRequired("Bucket"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetBucket sets the Bucket ***REMOVED***eld's value.
+func (s *GetBucketEncryptionInput) SetBucket(v string) *GetBucketEncryptionInput {
+	s.Bucket = &v
+	return s
+}
+
+func (s *GetBucketEncryptionInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+type GetBucketEncryptionOutput struct {
+	_ struct{} `type:"structure" payload:"ServerSideEncryptionCon***REMOVED***guration"`
+
+	// Container for server-side encryption con***REMOVED***guration rules. Currently S3 supports
+	// one rule only.
+	ServerSideEncryptionCon***REMOVED***guration *ServerSideEncryptionCon***REMOVED***guration `type:"structure"`
+}
+
+// String returns the string representation
+func (s GetBucketEncryptionOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s GetBucketEncryptionOutput) GoString() string {
+	return s.String()
+}
+
+// SetServerSideEncryptionCon***REMOVED***guration sets the ServerSideEncryptionCon***REMOVED***guration ***REMOVED***eld's value.
+func (s *GetBucketEncryptionOutput) SetServerSideEncryptionCon***REMOVED***guration(v *ServerSideEncryptionCon***REMOVED***guration) *GetBucketEncryptionOutput {
+	s.ServerSideEncryptionCon***REMOVED***guration = v
+	return s
+}
+
 type GetBucketInventoryCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9731,13 +10446,19 @@ func (s *GetBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string) *G
 	return s
 }
 
+func (s *GetBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *GetBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *GetBucketInventoryCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketInventoryCon***REMOVED***gurationOutput
 type GetBucketInventoryCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure" payload:"InventoryCon***REMOVED***guration"`
 
@@ -9761,7 +10482,6 @@ func (s *GetBucketInventoryCon***REMOVED***gurationOutput) SetInventoryCon***REM
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***gurationRequest
 type GetBucketLifecycleCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9798,7 +10518,13 @@ func (s *GetBucketLifecycleCon***REMOVED***gurationInput) SetBucket(v string) *G
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleCon***REMOVED***gurationOutput
+func (s *GetBucketLifecycleCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketLifecycleCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9821,7 +10547,6 @@ func (s *GetBucketLifecycleCon***REMOVED***gurationOutput) SetRules(v []*Lifecyc
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleRequest
 type GetBucketLifecycleInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9858,7 +10583,13 @@ func (s *GetBucketLifecycleInput) SetBucket(v string) *GetBucketLifecycleInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLifecycleOutput
+func (s *GetBucketLifecycleInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketLifecycleOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9881,7 +10612,6 @@ func (s *GetBucketLifecycleOutput) SetRules(v []*Rule) *GetBucketLifecycleOutput
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocationRequest
 type GetBucketLocationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9918,7 +10648,13 @@ func (s *GetBucketLocationInput) SetBucket(v string) *GetBucketLocationInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLocationOutput
+func (s *GetBucketLocationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketLocationOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9941,7 +10677,6 @@ func (s *GetBucketLocationOutput) SetLocationConstraint(v string) *GetBucketLoca
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLoggingRequest
 type GetBucketLoggingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9978,10 +10713,19 @@ func (s *GetBucketLoggingInput) SetBucket(v string) *GetBucketLoggingInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketLoggingOutput
+func (s *GetBucketLoggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketLoggingOutput struct {
 	_ struct{} `type:"structure"`
 
+	// Container for logging information. Presence of this element indicates that
+	// logging is enabled. Parameters TargetBucket and TargetPre***REMOVED***x are required
+	// in this case.
 	LoggingEnabled *LoggingEnabled `type:"structure"`
 }
 
@@ -10001,7 +10745,6 @@ func (s *GetBucketLoggingOutput) SetLoggingEnabled(v *LoggingEnabled) *GetBucket
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***gurationRequest
 type GetBucketMetricsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10048,13 +10791,19 @@ func (s *GetBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *Get
 	return s
 }
 
+func (s *GetBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *GetBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *GetBucketMetricsCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketMetricsCon***REMOVED***gurationOutput
 type GetBucketMetricsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure" payload:"MetricsCon***REMOVED***guration"`
 
@@ -10078,7 +10827,6 @@ func (s *GetBucketMetricsCon***REMOVED***gurationOutput) SetMetricsCon***REMOVED
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest
 type GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest struct {
 	_ struct{} `type:"structure"`
 
@@ -10117,7 +10865,13 @@ func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) SetBuc
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicyRequest
+func (s *GetBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketPolicyInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10154,7 +10908,13 @@ func (s *GetBucketPolicyInput) SetBucket(v string) *GetBucketPolicyInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketPolicyOutput
+func (s *GetBucketPolicyInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketPolicyOutput struct {
 	_ struct{} `type:"structure" payload:"Policy"`
 
@@ -10178,7 +10938,6 @@ func (s *GetBucketPolicyOutput) SetPolicy(v string) *GetBucketPolicyOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplicationRequest
 type GetBucketReplicationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10215,7 +10974,13 @@ func (s *GetBucketReplicationInput) SetBucket(v string) *GetBucketReplicationInp
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketReplicationOutput
+func (s *GetBucketReplicationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketReplicationOutput struct {
 	_ struct{} `type:"structure" payload:"ReplicationCon***REMOVED***guration"`
 
@@ -10240,7 +11005,6 @@ func (s *GetBucketReplicationOutput) SetReplicationCon***REMOVED***guration(v *R
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPaymentRequest
 type GetBucketRequestPaymentInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10277,7 +11041,13 @@ func (s *GetBucketRequestPaymentInput) SetBucket(v string) *GetBucketRequestPaym
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketRequestPaymentOutput
+func (s *GetBucketRequestPaymentInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketRequestPaymentOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10301,7 +11071,6 @@ func (s *GetBucketRequestPaymentOutput) SetPayer(v string) *GetBucketRequestPaym
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTaggingRequest
 type GetBucketTaggingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10338,7 +11107,13 @@ func (s *GetBucketTaggingInput) SetBucket(v string) *GetBucketTaggingInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketTaggingOutput
+func (s *GetBucketTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10362,7 +11137,6 @@ func (s *GetBucketTaggingOutput) SetTagSet(v []*Tag) *GetBucketTaggingOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioningRequest
 type GetBucketVersioningInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10399,7 +11173,13 @@ func (s *GetBucketVersioningInput) SetBucket(v string) *GetBucketVersioningInput
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketVersioningOutput
+func (s *GetBucketVersioningInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketVersioningOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10434,7 +11214,6 @@ func (s *GetBucketVersioningOutput) SetStatus(v string) *GetBucketVersioningOutp
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsiteRequest
 type GetBucketWebsiteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10471,7 +11250,13 @@ func (s *GetBucketWebsiteInput) SetBucket(v string) *GetBucketWebsiteInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetBucketWebsiteOutput
+func (s *GetBucketWebsiteInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type GetBucketWebsiteOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10518,7 +11303,6 @@ func (s *GetBucketWebsiteOutput) SetRoutingRules(v []*RoutingRule) *GetBucketWeb
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAclRequest
 type GetObjectAclInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10573,6 +11357,13 @@ func (s *GetObjectAclInput) SetBucket(v string) *GetObjectAclInput {
 	return s
 }
 
+func (s *GetObjectAclInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *GetObjectAclInput) SetKey(v string) *GetObjectAclInput {
 	s.Key = &v
@@ -10591,7 +11382,6 @@ func (s *GetObjectAclInput) SetVersionId(v string) *GetObjectAclInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectAclOutput
 type GetObjectAclOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10633,7 +11423,6 @@ func (s *GetObjectAclOutput) SetRequestCharged(v string) *GetObjectAclOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectRequest
 type GetObjectInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10746,6 +11535,13 @@ func (s *GetObjectInput) SetBucket(v string) *GetObjectInput {
 	return s
 }
 
+func (s *GetObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetIfMatch sets the IfMatch ***REMOVED***eld's value.
 func (s *GetObjectInput) SetIfMatch(v string) *GetObjectInput {
 	s.IfMatch = &v
@@ -10842,6 +11638,13 @@ func (s *GetObjectInput) SetSSECustomerKey(v string) *GetObjectInput {
 	return s
 }
 
+func (s *GetObjectInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *GetObjectInput) SetSSECustomerKeyMD5(v string) *GetObjectInput {
 	s.SSECustomerKeyMD5 = &v
@@ -10854,7 +11657,6 @@ func (s *GetObjectInput) SetVersionId(v string) *GetObjectInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectOutput
 type GetObjectOutput struct {
 	_ struct{} `type:"structure" payload:"Body"`
 
@@ -11138,7 +11940,6 @@ func (s *GetObjectOutput) SetWebsiteRedirectLocation(v string) *GetObjectOutput 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTaggingRequest
 type GetObjectTaggingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11186,6 +11987,13 @@ func (s *GetObjectTaggingInput) SetBucket(v string) *GetObjectTaggingInput {
 	return s
 }
 
+func (s *GetObjectTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *GetObjectTaggingInput) SetKey(v string) *GetObjectTaggingInput {
 	s.Key = &v
@@ -11198,7 +12006,6 @@ func (s *GetObjectTaggingInput) SetVersionId(v string) *GetObjectTaggingInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTaggingOutput
 type GetObjectTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11230,7 +12037,6 @@ func (s *GetObjectTaggingOutput) SetVersionId(v string) *GetObjectTaggingOutput 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrentRequest
 type GetObjectTorrentInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11282,6 +12088,13 @@ func (s *GetObjectTorrentInput) SetBucket(v string) *GetObjectTorrentInput {
 	return s
 }
 
+func (s *GetObjectTorrentInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *GetObjectTorrentInput) SetKey(v string) *GetObjectTorrentInput {
 	s.Key = &v
@@ -11294,7 +12107,6 @@ func (s *GetObjectTorrentInput) SetRequestPayer(v string) *GetObjectTorrentInput
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GetObjectTorrentOutput
 type GetObjectTorrentOutput struct {
 	_ struct{} `type:"structure" payload:"Body"`
 
@@ -11327,7 +12139,6 @@ func (s *GetObjectTorrentOutput) SetRequestCharged(v string) *GetObjectTorrentOu
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GlacierJobParameters
 type GlacierJobParameters struct {
 	_ struct{} `type:"structure"`
 
@@ -11366,7 +12177,6 @@ func (s *GlacierJobParameters) SetTier(v string) *GlacierJobParameters {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Grant
 type Grant struct {
 	_ struct{} `type:"structure"`
 
@@ -11413,7 +12223,6 @@ func (s *Grant) SetPermission(v string) *Grant {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Grantee
 type Grantee struct {
 	_ struct{} `type:"structure" xmlPre***REMOVED***x:"xsi" xmlURI:"http://www.w3.org/2001/XMLSchema-instance"`
 
@@ -11488,7 +12297,6 @@ func (s *Grantee) SetURI(v string) *Grantee {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucketRequest
 type HeadBucketInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11525,7 +12333,13 @@ func (s *HeadBucketInput) SetBucket(v string) *HeadBucketInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadBucketOutput
+func (s *HeadBucketInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type HeadBucketOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -11540,7 +12354,6 @@ func (s HeadBucketOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObjectRequest
 type HeadObjectInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11636,6 +12449,13 @@ func (s *HeadObjectInput) SetBucket(v string) *HeadObjectInput {
 	return s
 }
 
+func (s *HeadObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetIfMatch sets the IfMatch ***REMOVED***eld's value.
 func (s *HeadObjectInput) SetIfMatch(v string) *HeadObjectInput {
 	s.IfMatch = &v
@@ -11696,6 +12516,13 @@ func (s *HeadObjectInput) SetSSECustomerKey(v string) *HeadObjectInput {
 	return s
 }
 
+func (s *HeadObjectInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *HeadObjectInput) SetSSECustomerKeyMD5(v string) *HeadObjectInput {
 	s.SSECustomerKeyMD5 = &v
@@ -11708,7 +12535,6 @@ func (s *HeadObjectInput) SetVersionId(v string) *HeadObjectInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/HeadObjectOutput
 type HeadObjectOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11965,7 +12791,6 @@ func (s *HeadObjectOutput) SetWebsiteRedirectLocation(v string) *HeadObjectOutpu
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/IndexDocument
 type IndexDocument struct {
 	_ struct{} `type:"structure"`
 
@@ -12007,7 +12832,6 @@ func (s *IndexDocument) SetSuf***REMOVED***x(v string) *IndexDocument {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Initiator
 type Initiator struct {
 	_ struct{} `type:"structure"`
 
@@ -12041,7 +12865,49 @@ func (s *Initiator) SetID(v string) *Initiator {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventoryCon***REMOVED***guration
+// Describes the serialization format of the object.
+type InputSerialization struct {
+	_ struct{} `type:"structure"`
+
+	// Describes the serialization of a CSV-encoded object.
+	CSV *CSVInput `type:"structure"`
+
+	// Speci***REMOVED***es object's compression format. Valid values: NONE, GZIP. Default
+	// Value: NONE.
+	CompressionType *string `type:"string" enum:"CompressionType"`
+
+	// Speci***REMOVED***es JSON as object's input serialization format.
+	JSON *JSONInput `type:"structure"`
+}
+
+// String returns the string representation
+func (s InputSerialization) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s InputSerialization) GoString() string {
+	return s.String()
+}
+
+// SetCSV sets the CSV ***REMOVED***eld's value.
+func (s *InputSerialization) SetCSV(v *CSVInput) *InputSerialization {
+	s.CSV = v
+	return s
+}
+
+// SetCompressionType sets the CompressionType ***REMOVED***eld's value.
+func (s *InputSerialization) SetCompressionType(v string) *InputSerialization {
+	s.CompressionType = &v
+	return s
+}
+
+// SetJSON sets the JSON ***REMOVED***eld's value.
+func (s *InputSerialization) SetJSON(v *JSONInput) *InputSerialization {
+	s.JSON = v
+	return s
+}
+
 type InventoryCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -12170,7 +13036,6 @@ func (s *InventoryCon***REMOVED***guration) SetSchedule(v *InventorySchedule) *I
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventoryDestination
 type InventoryDestination struct {
 	_ struct{} `type:"structure"`
 
@@ -12215,7 +13080,55 @@ func (s *InventoryDestination) SetS3BucketDestination(v *InventoryS3BucketDestin
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventoryFilter
+// Contains the type of server-side encryption used to encrypt the inventory
+// results.
+type InventoryEncryption struct {
+	_ struct{} `type:"structure"`
+
+	// Speci***REMOVED***es the use of SSE-KMS to encrypt delievered Inventory reports.
+	SSEKMS *SSEKMS `locationName:"SSE-KMS" type:"structure"`
+
+	// Speci***REMOVED***es the use of SSE-S3 to encrypt delievered Inventory reports.
+	SSES3 *SSES3 `locationName:"SSE-S3" type:"structure"`
+}
+
+// String returns the string representation
+func (s InventoryEncryption) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s InventoryEncryption) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *InventoryEncryption) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InventoryEncryption"}
+	if s.SSEKMS != nil {
+		if err := s.SSEKMS.Validate(); err != nil {
+			invalidParams.AddNested("SSEKMS", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetSSEKMS sets the SSEKMS ***REMOVED***eld's value.
+func (s *InventoryEncryption) SetSSEKMS(v *SSEKMS) *InventoryEncryption {
+	s.SSEKMS = v
+	return s
+}
+
+// SetSSES3 sets the SSES3 ***REMOVED***eld's value.
+func (s *InventoryEncryption) SetSSES3(v *SSES3) *InventoryEncryption {
+	s.SSES3 = v
+	return s
+}
+
 type InventoryFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -12254,7 +13167,6 @@ func (s *InventoryFilter) SetPre***REMOVED***x(v string) *InventoryFilter {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventoryS3BucketDestination
 type InventoryS3BucketDestination struct {
 	_ struct{} `type:"structure"`
 
@@ -12266,6 +13178,10 @@ type InventoryS3BucketDestination struct {
 	//
 	// Bucket is a required ***REMOVED***eld
 	Bucket *string `type:"string" required:"true"`
+
+	// Contains the type of server-side encryption used to encrypt the inventory
+	// results.
+	Encryption *InventoryEncryption `type:"structure"`
 
 	// Speci***REMOVED***es the output format of the inventory results.
 	//
@@ -12295,6 +13211,11 @@ func (s *InventoryS3BucketDestination) Validate() error {
 	if s.Format == nil {
 		invalidParams.Add(request.NewErrParamRequired("Format"))
 	}
+	if s.Encryption != nil {
+		if err := s.Encryption.Validate(); err != nil {
+			invalidParams.AddNested("Encryption", err.(request.ErrInvalidParams))
+		}
+	}
 
 	if invalidParams.Len() > 0 {
 		return invalidParams
@@ -12314,6 +13235,19 @@ func (s *InventoryS3BucketDestination) SetBucket(v string) *InventoryS3BucketDes
 	return s
 }
 
+func (s *InventoryS3BucketDestination) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+// SetEncryption sets the Encryption ***REMOVED***eld's value.
+func (s *InventoryS3BucketDestination) SetEncryption(v *InventoryEncryption) *InventoryS3BucketDestination {
+	s.Encryption = v
+	return s
+}
+
 // SetFormat sets the Format ***REMOVED***eld's value.
 func (s *InventoryS3BucketDestination) SetFormat(v string) *InventoryS3BucketDestination {
 	s.Format = &v
@@ -12326,7 +13260,6 @@ func (s *InventoryS3BucketDestination) SetPre***REMOVED***x(v string) *Inventory
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventorySchedule
 type InventorySchedule struct {
 	_ struct{} `type:"structure"`
 
@@ -12365,8 +13298,53 @@ func (s *InventorySchedule) SetFrequency(v string) *InventorySchedule {
 	return s
 }
 
+type JSONInput struct {
+	_ struct{} `type:"structure"`
+
+	// The type of JSON. Valid values: Document, Lines.
+	Type *string `type:"string" enum:"JSONType"`
+}
+
+// String returns the string representation
+func (s JSONInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s JSONInput) GoString() string {
+	return s.String()
+}
+
+// SetType sets the Type ***REMOVED***eld's value.
+func (s *JSONInput) SetType(v string) *JSONInput {
+	s.Type = &v
+	return s
+}
+
+type JSONOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The value used to separate individual records in the output.
+	RecordDelimiter *string `type:"string"`
+}
+
+// String returns the string representation
+func (s JSONOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s JSONOutput) GoString() string {
+	return s.String()
+}
+
+// SetRecordDelimiter sets the RecordDelimiter ***REMOVED***eld's value.
+func (s *JSONOutput) SetRecordDelimiter(v string) *JSONOutput {
+	s.RecordDelimiter = &v
+	return s
+}
+
 // Container for object key name pre***REMOVED***x and suf***REMOVED***x ***REMOVED***ltering rules.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/S3KeyFilter
 type KeyFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -12392,7 +13370,6 @@ func (s *KeyFilter) SetFilterRules(v []*FilterRule) *KeyFilter {
 }
 
 // Container for specifying the AWS Lambda noti***REMOVED***cation con***REMOVED***guration.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LambdaFunctionCon***REMOVED***guration
 type LambdaFunctionCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -12464,7 +13441,6 @@ func (s *LambdaFunctionCon***REMOVED***guration) SetLambdaFunctionArn(v string) 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LifecycleCon***REMOVED***guration
 type LifecycleCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -12511,7 +13487,6 @@ func (s *LifecycleCon***REMOVED***guration) SetRules(v []*Rule) *LifecycleCon***
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LifecycleExpiration
 type LifecycleExpiration struct {
 	_ struct{} `type:"structure"`
 
@@ -12558,7 +13533,6 @@ func (s *LifecycleExpiration) SetExpiredObjectDeleteMarker(v bool) *LifecycleExp
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LifecycleRule
 type LifecycleRule struct {
 	_ struct{} `type:"structure"`
 
@@ -12682,7 +13656,6 @@ func (s *LifecycleRule) SetTransitions(v []*Transition) *LifecycleRule {
 // This is used in a Lifecycle Rule Filter to apply a logical AND to two or
 // more predicates. The Lifecycle Rule will apply to any object matching all
 // of the predicates con***REMOVED***gured inside the And operator.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LifecycleRuleAndOperator
 type LifecycleRuleAndOperator struct {
 	_ struct{} `type:"structure"`
 
@@ -12737,7 +13710,6 @@ func (s *LifecycleRuleAndOperator) SetTags(v []*Tag) *LifecycleRuleAndOperator {
 
 // The Filter is used to identify objects that a Lifecycle Rule applies to.
 // A Filter must have exactly one of Pre***REMOVED***x, Tag, or And speci***REMOVED***ed.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LifecycleRuleFilter
 type LifecycleRuleFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -12801,7 +13773,6 @@ func (s *LifecycleRuleFilter) SetTag(v *Tag) *LifecycleRuleFilter {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurationsRequest
 type ListBucketAnalyticsCon***REMOVED***gurationsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12844,13 +13815,19 @@ func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) SetBucket(v string) 
 	return s
 }
 
+func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
 func (s *ListBucketAnalyticsCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketAnalyticsCon***REMOVED***gurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketAnalyticsCon***REMOVED***gurationsOutput
 type ListBucketAnalyticsCon***REMOVED***gurationsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12905,7 +13882,6 @@ func (s *ListBucketAnalyticsCon***REMOVED***gurationsOutput) SetNextContinuation
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurationsRequest
 type ListBucketInventoryCon***REMOVED***gurationsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12950,13 +13926,19 @@ func (s *ListBucketInventoryCon***REMOVED***gurationsInput) SetBucket(v string) 
 	return s
 }
 
+func (s *ListBucketInventoryCon***REMOVED***gurationsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
 func (s *ListBucketInventoryCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketInventoryCon***REMOVED***gurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketInventoryCon***REMOVED***gurationsOutput
 type ListBucketInventoryCon***REMOVED***gurationsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13011,7 +13993,6 @@ func (s *ListBucketInventoryCon***REMOVED***gurationsOutput) SetNextContinuation
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurationsRequest
 type ListBucketMetricsCon***REMOVED***gurationsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13056,13 +14037,19 @@ func (s *ListBucketMetricsCon***REMOVED***gurationsInput) SetBucket(v string) *L
 	return s
 }
 
+func (s *ListBucketMetricsCon***REMOVED***gurationsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
 func (s *ListBucketMetricsCon***REMOVED***gurationsInput) SetContinuationToken(v string) *ListBucketMetricsCon***REMOVED***gurationsInput {
 	s.ContinuationToken = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketMetricsCon***REMOVED***gurationsOutput
 type ListBucketMetricsCon***REMOVED***gurationsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13119,7 +14106,6 @@ func (s *ListBucketMetricsCon***REMOVED***gurationsOutput) SetNextContinuationTo
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketsInput
 type ListBucketsInput struct {
 	_ struct{} `type:"structure"`
 }
@@ -13134,7 +14120,6 @@ func (s ListBucketsInput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListBucketsOutput
 type ListBucketsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13165,7 +14150,6 @@ func (s *ListBucketsOutput) SetOwner(v *Owner) *ListBucketsOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploadsRequest
 type ListMultipartUploadsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13231,6 +14215,13 @@ func (s *ListMultipartUploadsInput) SetBucket(v string) *ListMultipartUploadsInp
 	return s
 }
 
+func (s *ListMultipartUploadsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetDelimiter sets the Delimiter ***REMOVED***eld's value.
 func (s *ListMultipartUploadsInput) SetDelimiter(v string) *ListMultipartUploadsInput {
 	s.Delimiter = &v
@@ -13267,7 +14258,6 @@ func (s *ListMultipartUploadsInput) SetUploadIdMarker(v string) *ListMultipartUp
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListMultipartUploadsOutput
 type ListMultipartUploadsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13326,6 +14316,13 @@ func (s ListMultipartUploadsOutput) GoString() string {
 func (s *ListMultipartUploadsOutput) SetBucket(v string) *ListMultipartUploadsOutput {
 	s.Bucket = &v
 	return s
+}
+
+func (s *ListMultipartUploadsOutput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
 }
 
 // SetCommonPre***REMOVED***xes sets the CommonPre***REMOVED***xes ***REMOVED***eld's value.
@@ -13394,7 +14391,6 @@ func (s *ListMultipartUploadsOutput) SetUploads(v []*MultipartUpload) *ListMulti
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersionsRequest
 type ListObjectVersionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13455,6 +14451,13 @@ func (s *ListObjectVersionsInput) SetBucket(v string) *ListObjectVersionsInput {
 	return s
 }
 
+func (s *ListObjectVersionsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetDelimiter sets the Delimiter ***REMOVED***eld's value.
 func (s *ListObjectVersionsInput) SetDelimiter(v string) *ListObjectVersionsInput {
 	s.Delimiter = &v
@@ -13491,7 +14494,6 @@ func (s *ListObjectVersionsInput) SetVersionIdMarker(v string) *ListObjectVersio
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectVersionsOutput
 type ListObjectVersionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13619,7 +14621,6 @@ func (s *ListObjectVersionsOutput) SetVersions(v []*ObjectVersion) *ListObjectVe
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsRequest
 type ListObjectsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13682,6 +14683,13 @@ func (s *ListObjectsInput) SetBucket(v string) *ListObjectsInput {
 	return s
 }
 
+func (s *ListObjectsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetDelimiter sets the Delimiter ***REMOVED***eld's value.
 func (s *ListObjectsInput) SetDelimiter(v string) *ListObjectsInput {
 	s.Delimiter = &v
@@ -13718,7 +14726,6 @@ func (s *ListObjectsInput) SetRequestPayer(v string) *ListObjectsInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsOutput
 type ListObjectsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13823,7 +14830,6 @@ func (s *ListObjectsOutput) SetPre***REMOVED***x(v string) *ListObjectsOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2Request
 type ListObjectsV2Input struct {
 	_ struct{} `type:"structure"`
 
@@ -13894,6 +14900,13 @@ func (s *ListObjectsV2Input) SetBucket(v string) *ListObjectsV2Input {
 	return s
 }
 
+func (s *ListObjectsV2Input) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetContinuationToken sets the ContinuationToken ***REMOVED***eld's value.
 func (s *ListObjectsV2Input) SetContinuationToken(v string) *ListObjectsV2Input {
 	s.ContinuationToken = &v
@@ -13942,7 +14955,6 @@ func (s *ListObjectsV2Input) SetStartAfter(v string) *ListObjectsV2Input {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListObjectsV2Output
 type ListObjectsV2Output struct {
 	_ struct{} `type:"structure"`
 
@@ -14076,7 +15088,6 @@ func (s *ListObjectsV2Output) SetStartAfter(v string) *ListObjectsV2Output {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListPartsRequest
 type ListPartsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14143,6 +15154,13 @@ func (s *ListPartsInput) SetBucket(v string) *ListPartsInput {
 	return s
 }
 
+func (s *ListPartsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *ListPartsInput) SetKey(v string) *ListPartsInput {
 	s.Key = &v
@@ -14173,7 +15191,6 @@ func (s *ListPartsInput) SetUploadId(v string) *ListPartsInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ListPartsOutput
 type ListPartsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14250,6 +15267,13 @@ func (s *ListPartsOutput) SetBucket(v string) *ListPartsOutput {
 	return s
 }
 
+func (s *ListPartsOutput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetInitiator sets the Initiator ***REMOVED***eld's value.
 func (s *ListPartsOutput) SetInitiator(v *Initiator) *ListPartsOutput {
 	s.Initiator = v
@@ -14316,7 +15340,137 @@ func (s *ListPartsOutput) SetUploadId(v string) *ListPartsOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LoggingEnabled
+// Describes an S3 location that will receive the results of the restore request.
+type Location struct {
+	_ struct{} `type:"structure"`
+
+	// A list of grants that control access to the staged results.
+	AccessControlList []*Grant `locationNameList:"Grant" type:"list"`
+
+	// The name of the bucket where the restore results will be placed.
+	//
+	// BucketName is a required ***REMOVED***eld
+	BucketName *string `type:"string" required:"true"`
+
+	// The canned ACL to apply to the restore results.
+	CannedACL *string `type:"string" enum:"ObjectCannedACL"`
+
+	// Describes the server-side encryption that will be applied to the restore
+	// results.
+	Encryption *Encryption `type:"structure"`
+
+	// The pre***REMOVED***x that is prepended to the restore results for this request.
+	//
+	// Pre***REMOVED***x is a required ***REMOVED***eld
+	Pre***REMOVED***x *string `type:"string" required:"true"`
+
+	// The class of storage used to store the restore results.
+	StorageClass *string `type:"string" enum:"StorageClass"`
+
+	// The tag-set that is applied to the restore results.
+	Tagging *Tagging `type:"structure"`
+
+	// A list of metadata to store with the restore results in S3.
+	UserMetadata []*MetadataEntry `locationNameList:"MetadataEntry" type:"list"`
+}
+
+// String returns the string representation
+func (s Location) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s Location) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *Location) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Location"}
+	if s.BucketName == nil {
+		invalidParams.Add(request.NewErrParamRequired("BucketName"))
+	}
+	if s.Pre***REMOVED***x == nil {
+		invalidParams.Add(request.NewErrParamRequired("Pre***REMOVED***x"))
+	}
+	if s.AccessControlList != nil {
+		for i, v := range s.AccessControlList {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "AccessControlList", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+	if s.Encryption != nil {
+		if err := s.Encryption.Validate(); err != nil {
+			invalidParams.AddNested("Encryption", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Tagging != nil {
+		if err := s.Tagging.Validate(); err != nil {
+			invalidParams.AddNested("Tagging", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetAccessControlList sets the AccessControlList ***REMOVED***eld's value.
+func (s *Location) SetAccessControlList(v []*Grant) *Location {
+	s.AccessControlList = v
+	return s
+}
+
+// SetBucketName sets the BucketName ***REMOVED***eld's value.
+func (s *Location) SetBucketName(v string) *Location {
+	s.BucketName = &v
+	return s
+}
+
+// SetCannedACL sets the CannedACL ***REMOVED***eld's value.
+func (s *Location) SetCannedACL(v string) *Location {
+	s.CannedACL = &v
+	return s
+}
+
+// SetEncryption sets the Encryption ***REMOVED***eld's value.
+func (s *Location) SetEncryption(v *Encryption) *Location {
+	s.Encryption = v
+	return s
+}
+
+// SetPre***REMOVED***x sets the Pre***REMOVED***x ***REMOVED***eld's value.
+func (s *Location) SetPre***REMOVED***x(v string) *Location {
+	s.Pre***REMOVED***x = &v
+	return s
+}
+
+// SetStorageClass sets the StorageClass ***REMOVED***eld's value.
+func (s *Location) SetStorageClass(v string) *Location {
+	s.StorageClass = &v
+	return s
+}
+
+// SetTagging sets the Tagging ***REMOVED***eld's value.
+func (s *Location) SetTagging(v *Tagging) *Location {
+	s.Tagging = v
+	return s
+}
+
+// SetUserMetadata sets the UserMetadata ***REMOVED***eld's value.
+func (s *Location) SetUserMetadata(v []*MetadataEntry) *Location {
+	s.UserMetadata = v
+	return s
+}
+
+// Container for logging information. Presence of this element indicates that
+// logging is enabled. Parameters TargetBucket and TargetPre***REMOVED***x are required
+// in this case.
 type LoggingEnabled struct {
 	_ struct{} `type:"structure"`
 
@@ -14326,13 +15480,17 @@ type LoggingEnabled struct {
 	// to deliver their logs to the same target bucket. In this case you should
 	// choose a different TargetPre***REMOVED***x for each source bucket so that the delivered
 	// log ***REMOVED***les can be distinguished by key.
-	TargetBucket *string `type:"string"`
+	//
+	// TargetBucket is a required ***REMOVED***eld
+	TargetBucket *string `type:"string" required:"true"`
 
 	TargetGrants []*TargetGrant `locationNameList:"Grant" type:"list"`
 
 	// This element lets you specify a pre***REMOVED***x for the keys that the log ***REMOVED***les will
 	// be stored under.
-	TargetPre***REMOVED***x *string `type:"string"`
+	//
+	// TargetPre***REMOVED***x is a required ***REMOVED***eld
+	TargetPre***REMOVED***x *string `type:"string" required:"true"`
 }
 
 // String returns the string representation
@@ -14348,6 +15506,12 @@ func (s LoggingEnabled) GoString() string {
 // Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
 func (s *LoggingEnabled) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "LoggingEnabled"}
+	if s.TargetBucket == nil {
+		invalidParams.Add(request.NewErrParamRequired("TargetBucket"))
+	}
+	if s.TargetPre***REMOVED***x == nil {
+		invalidParams.Add(request.NewErrParamRequired("TargetPre***REMOVED***x"))
+	}
 	if s.TargetGrants != nil {
 		for i, v := range s.TargetGrants {
 			if v == nil {
@@ -14383,7 +15547,37 @@ func (s *LoggingEnabled) SetTargetPre***REMOVED***x(v string) *LoggingEnabled {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MetricsAndOperator
+// A metadata key-value pair to store with an object.
+type MetadataEntry struct {
+	_ struct{} `type:"structure"`
+
+	Name *string `type:"string"`
+
+	Value *string `type:"string"`
+}
+
+// String returns the string representation
+func (s MetadataEntry) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s MetadataEntry) GoString() string {
+	return s.String()
+}
+
+// SetName sets the Name ***REMOVED***eld's value.
+func (s *MetadataEntry) SetName(v string) *MetadataEntry {
+	s.Name = &v
+	return s
+}
+
+// SetValue sets the Value ***REMOVED***eld's value.
+func (s *MetadataEntry) SetValue(v string) *MetadataEntry {
+	s.Value = &v
+	return s
+}
+
 type MetricsAndOperator struct {
 	_ struct{} `type:"structure"`
 
@@ -14436,7 +15630,6 @@ func (s *MetricsAndOperator) SetTags(v []*Tag) *MetricsAndOperator {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MetricsCon***REMOVED***guration
 type MetricsCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -14491,7 +15684,6 @@ func (s *MetricsCon***REMOVED***guration) SetId(v string) *MetricsCon***REMOVED*
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MetricsFilter
 type MetricsFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -14555,7 +15747,6 @@ func (s *MetricsFilter) SetTag(v *Tag) *MetricsFilter {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MultipartUpload
 type MultipartUpload struct {
 	_ struct{} `type:"structure"`
 
@@ -14628,7 +15819,6 @@ func (s *MultipartUpload) SetUploadId(v string) *MultipartUpload {
 // con***REMOVED***guration action on a bucket that has versioning enabled (or suspended)
 // to request that Amazon S3 delete noncurrent object versions at a speci***REMOVED***c
 // period in the object's lifetime.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/NoncurrentVersionExpiration
 type NoncurrentVersionExpiration struct {
 	_ struct{} `type:"structure"`
 
@@ -14656,11 +15846,11 @@ func (s *NoncurrentVersionExpiration) SetNoncurrentDays(v int64) *NoncurrentVers
 }
 
 // Container for the transition rule that describes when noncurrent objects
-// transition to the STANDARD_IA or GLACIER storage class. If your bucket is
-// versioning-enabled (or versioning is suspended), you can set this action
-// to request that Amazon S3 transition noncurrent object versions to the STANDARD_IA
-// or GLACIER storage class at a speci***REMOVED***c period in the object's lifetime.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/NoncurrentVersionTransition
+// transition to the STANDARD_IA, ONEZONE_IA or GLACIER storage class. If your
+// bucket is versioning-enabled (or versioning is suspended), you can set this
+// action to request that Amazon S3 transition noncurrent object versions to
+// the STANDARD_IA, ONEZONE_IA or GLACIER storage class at a speci***REMOVED***c period
+// in the object's lifetime.
 type NoncurrentVersionTransition struct {
 	_ struct{} `type:"structure"`
 
@@ -14698,7 +15888,6 @@ func (s *NoncurrentVersionTransition) SetStorageClass(v string) *NoncurrentVersi
 
 // Container for specifying the noti***REMOVED***cation con***REMOVED***guration of the bucket. If
 // this element is empty, noti***REMOVED***cations are turned off on the bucket.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Noti***REMOVED***cationCon***REMOVED***guration
 type Noti***REMOVED***cationCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -14777,7 +15966,6 @@ func (s *Noti***REMOVED***cationCon***REMOVED***guration) SetTopicCon***REMOVED*
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Noti***REMOVED***cationCon***REMOVED***gurationDeprecated
 type Noti***REMOVED***cationCon***REMOVED***gurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
@@ -14818,7 +16006,6 @@ func (s *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) SetTopicCon*
 
 // Container for object key name ***REMOVED***ltering rules. For information about key
 // name ***REMOVED***ltering, go to Con***REMOVED***guring Event Noti***REMOVED***cations (http://docs.aws.amazon.com/AmazonS3/latest/dev/Noti***REMOVED***cationHowTo.html)
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Noti***REMOVED***cationCon***REMOVED***gurationFilter
 type Noti***REMOVED***cationCon***REMOVED***gurationFilter struct {
 	_ struct{} `type:"structure"`
 
@@ -14842,7 +16029,6 @@ func (s *Noti***REMOVED***cationCon***REMOVED***gurationFilter) SetKey(v *KeyFil
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Object
 type Object struct {
 	_ struct{} `type:"structure"`
 
@@ -14906,7 +16092,6 @@ func (s *Object) SetStorageClass(v string) *Object {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ObjectIdenti***REMOVED***er
 type ObjectIdenti***REMOVED***er struct {
 	_ struct{} `type:"structure"`
 
@@ -14957,7 +16142,6 @@ func (s *ObjectIdenti***REMOVED***er) SetVersionId(v string) *ObjectIdenti***REM
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ObjectVersion
 type ObjectVersion struct {
 	_ struct{} `type:"structure"`
 
@@ -15043,7 +16227,78 @@ func (s *ObjectVersion) SetVersionId(v string) *ObjectVersion {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Owner
+// Describes the location where the restore job's output is stored.
+type OutputLocation struct {
+	_ struct{} `type:"structure"`
+
+	// Describes an S3 location that will receive the results of the restore request.
+	S3 *Location `type:"structure"`
+}
+
+// String returns the string representation
+func (s OutputLocation) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s OutputLocation) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *OutputLocation) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "OutputLocation"}
+	if s.S3 != nil {
+		if err := s.S3.Validate(); err != nil {
+			invalidParams.AddNested("S3", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetS3 sets the S3 ***REMOVED***eld's value.
+func (s *OutputLocation) SetS3(v *Location) *OutputLocation {
+	s.S3 = v
+	return s
+}
+
+// Describes how results of the Select job are serialized.
+type OutputSerialization struct {
+	_ struct{} `type:"structure"`
+
+	// Describes the serialization of CSV-encoded Select results.
+	CSV *CSVOutput `type:"structure"`
+
+	// Speci***REMOVED***es JSON as request's output serialization format.
+	JSON *JSONOutput `type:"structure"`
+}
+
+// String returns the string representation
+func (s OutputSerialization) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s OutputSerialization) GoString() string {
+	return s.String()
+}
+
+// SetCSV sets the CSV ***REMOVED***eld's value.
+func (s *OutputSerialization) SetCSV(v *CSVOutput) *OutputSerialization {
+	s.CSV = v
+	return s
+}
+
+// SetJSON sets the JSON ***REMOVED***eld's value.
+func (s *OutputSerialization) SetJSON(v *JSONOutput) *OutputSerialization {
+	s.JSON = v
+	return s
+}
+
 type Owner struct {
 	_ struct{} `type:"structure"`
 
@@ -15074,7 +16329,6 @@ func (s *Owner) SetID(v string) *Owner {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Part
 type Part struct {
 	_ struct{} `type:"structure"`
 
@@ -15126,7 +16380,6 @@ func (s *Part) SetSize(v int64) *Part {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***gurationRequest
 type PutBucketAccelerateCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"AccelerateCon***REMOVED***guration"`
 
@@ -15179,7 +16432,13 @@ func (s *PutBucketAccelerateCon***REMOVED***gurationInput) SetBucket(v string) *
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAccelerateCon***REMOVED***gurationOutput
+func (s *PutBucketAccelerateCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 type PutBucketAccelerateCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15194,7 +16453,6 @@ func (s PutBucketAccelerateCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAclRequest
 type PutBucketAclInput struct {
 	_ struct{} `type:"structure" payload:"AccessControlPolicy"`
 
@@ -15269,6 +16527,13 @@ func (s *PutBucketAclInput) SetBucket(v string) *PutBucketAclInput {
 	return s
 }
 
+func (s *PutBucketAclInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
 func (s *PutBucketAclInput) SetGrantFullControl(v string) *PutBucketAclInput {
 	s.GrantFullControl = &v
@@ -15299,7 +16564,6 @@ func (s *PutBucketAclInput) SetGrantWriteACP(v string) *PutBucketAclInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAclOutput
 type PutBucketAclOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15314,7 +16578,6 @@ func (s PutBucketAclOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***gurationRequest
 type PutBucketAnalyticsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"AnalyticsCon***REMOVED***guration"`
 
@@ -15380,13 +16643,19 @@ func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) SetBucket(v string) *P
 	return s
 }
 
+func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *PutBucketAnalyticsCon***REMOVED***gurationInput) SetId(v string) *PutBucketAnalyticsCon***REMOVED***gurationInput {
 	s.Id = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketAnalyticsCon***REMOVED***gurationOutput
 type PutBucketAnalyticsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15401,7 +16670,6 @@ func (s PutBucketAnalyticsCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCorsRequest
 type PutBucketCorsInput struct {
 	_ struct{} `type:"structure" payload:"CORSCon***REMOVED***guration"`
 
@@ -15449,13 +16717,19 @@ func (s *PutBucketCorsInput) SetBucket(v string) *PutBucketCorsInput {
 	return s
 }
 
+func (s *PutBucketCorsInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetCORSCon***REMOVED***guration sets the CORSCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketCorsInput) SetCORSCon***REMOVED***guration(v *CORSCon***REMOVED***guration) *PutBucketCorsInput {
 	s.CORSCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketCorsOutput
 type PutBucketCorsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15470,7 +16744,86 @@ func (s PutBucketCorsOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***gurationRequest
+type PutBucketEncryptionInput struct {
+	_ struct{} `type:"structure" payload:"ServerSideEncryptionCon***REMOVED***guration"`
+
+	// The name of the bucket for which the server-side encryption con***REMOVED***guration
+	// is set.
+	//
+	// Bucket is a required ***REMOVED***eld
+	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
+
+	// Container for server-side encryption con***REMOVED***guration rules. Currently S3 supports
+	// one rule only.
+	//
+	// ServerSideEncryptionCon***REMOVED***guration is a required ***REMOVED***eld
+	ServerSideEncryptionCon***REMOVED***guration *ServerSideEncryptionCon***REMOVED***guration `locationName:"ServerSideEncryptionCon***REMOVED***guration" type:"structure" required:"true" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
+}
+
+// String returns the string representation
+func (s PutBucketEncryptionInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PutBucketEncryptionInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *PutBucketEncryptionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutBucketEncryptionInput"}
+	if s.Bucket == nil {
+		invalidParams.Add(request.NewErrParamRequired("Bucket"))
+	}
+	if s.ServerSideEncryptionCon***REMOVED***guration == nil {
+		invalidParams.Add(request.NewErrParamRequired("ServerSideEncryptionCon***REMOVED***guration"))
+	}
+	if s.ServerSideEncryptionCon***REMOVED***guration != nil {
+		if err := s.ServerSideEncryptionCon***REMOVED***guration.Validate(); err != nil {
+			invalidParams.AddNested("ServerSideEncryptionCon***REMOVED***guration", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetBucket sets the Bucket ***REMOVED***eld's value.
+func (s *PutBucketEncryptionInput) SetBucket(v string) *PutBucketEncryptionInput {
+	s.Bucket = &v
+	return s
+}
+
+func (s *PutBucketEncryptionInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+// SetServerSideEncryptionCon***REMOVED***guration sets the ServerSideEncryptionCon***REMOVED***guration ***REMOVED***eld's value.
+func (s *PutBucketEncryptionInput) SetServerSideEncryptionCon***REMOVED***guration(v *ServerSideEncryptionCon***REMOVED***guration) *PutBucketEncryptionInput {
+	s.ServerSideEncryptionCon***REMOVED***guration = v
+	return s
+}
+
+type PutBucketEncryptionOutput struct {
+	_ struct{} `type:"structure"`
+}
+
+// String returns the string representation
+func (s PutBucketEncryptionOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PutBucketEncryptionOutput) GoString() string {
+	return s.String()
+}
+
 type PutBucketInventoryCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"InventoryCon***REMOVED***guration"`
 
@@ -15530,6 +16883,13 @@ func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetBucket(v string) *P
 	return s
 }
 
+func (s *PutBucketInventoryCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetId(v string) *PutBucketInventoryCon***REMOVED***gurationInput {
 	s.Id = &v
@@ -15542,7 +16902,6 @@ func (s *PutBucketInventoryCon***REMOVED***gurationInput) SetInventoryCon***REMO
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketInventoryCon***REMOVED***gurationOutput
 type PutBucketInventoryCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15557,7 +16916,6 @@ func (s PutBucketInventoryCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***gurationRequest
 type PutBucketLifecycleCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"LifecycleCon***REMOVED***guration"`
 
@@ -15601,13 +16959,19 @@ func (s *PutBucketLifecycleCon***REMOVED***gurationInput) SetBucket(v string) *P
 	return s
 }
 
+func (s *PutBucketLifecycleCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetLifecycleCon***REMOVED***guration sets the LifecycleCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketLifecycleCon***REMOVED***gurationInput) SetLifecycleCon***REMOVED***guration(v *BucketLifecycleCon***REMOVED***guration) *PutBucketLifecycleCon***REMOVED***gurationInput {
 	s.LifecycleCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleCon***REMOVED***gurationOutput
 type PutBucketLifecycleCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15622,7 +16986,6 @@ func (s PutBucketLifecycleCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleRequest
 type PutBucketLifecycleInput struct {
 	_ struct{} `type:"structure" payload:"LifecycleCon***REMOVED***guration"`
 
@@ -15666,13 +17029,19 @@ func (s *PutBucketLifecycleInput) SetBucket(v string) *PutBucketLifecycleInput {
 	return s
 }
 
+func (s *PutBucketLifecycleInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetLifecycleCon***REMOVED***guration sets the LifecycleCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketLifecycleInput) SetLifecycleCon***REMOVED***guration(v *LifecycleCon***REMOVED***guration) *PutBucketLifecycleInput {
 	s.LifecycleCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLifecycleOutput
 type PutBucketLifecycleOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15687,7 +17056,6 @@ func (s PutBucketLifecycleOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLoggingRequest
 type PutBucketLoggingInput struct {
 	_ struct{} `type:"structure" payload:"BucketLoggingStatus"`
 
@@ -15735,13 +17103,19 @@ func (s *PutBucketLoggingInput) SetBucket(v string) *PutBucketLoggingInput {
 	return s
 }
 
+func (s *PutBucketLoggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetBucketLoggingStatus sets the BucketLoggingStatus ***REMOVED***eld's value.
 func (s *PutBucketLoggingInput) SetBucketLoggingStatus(v *BucketLoggingStatus) *PutBucketLoggingInput {
 	s.BucketLoggingStatus = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketLoggingOutput
 type PutBucketLoggingOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15756,7 +17130,6 @@ func (s PutBucketLoggingOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***gurationRequest
 type PutBucketMetricsCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"MetricsCon***REMOVED***guration"`
 
@@ -15816,6 +17189,13 @@ func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetBucket(v string) *Put
 	return s
 }
 
+func (s *PutBucketMetricsCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetId sets the Id ***REMOVED***eld's value.
 func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetId(v string) *PutBucketMetricsCon***REMOVED***gurationInput {
 	s.Id = &v
@@ -15828,7 +17208,6 @@ func (s *PutBucketMetricsCon***REMOVED***gurationInput) SetMetricsCon***REMOVED*
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketMetricsCon***REMOVED***gurationOutput
 type PutBucketMetricsCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15843,7 +17222,6 @@ func (s PutBucketMetricsCon***REMOVED***gurationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***gurationRequest
 type PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput struct {
 	_ struct{} `type:"structure" payload:"Noti***REMOVED***cationCon***REMOVED***guration"`
 
@@ -15894,13 +17272,19 @@ func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) SetBucke
 	return s
 }
 
+func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetNoti***REMOVED***cationCon***REMOVED***guration sets the Noti***REMOVED***cationCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput) SetNoti***REMOVED***cationCon***REMOVED***guration(v *Noti***REMOVED***cationCon***REMOVED***guration) *PutBucketNoti***REMOVED***cationCon***REMOVED***gurationInput {
 	s.Noti***REMOVED***cationCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput
 type PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15915,7 +17299,6 @@ func (s PutBucketNoti***REMOVED***cationCon***REMOVED***gurationOutput) GoString
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationRequest
 type PutBucketNoti***REMOVED***cationInput struct {
 	_ struct{} `type:"structure" payload:"Noti***REMOVED***cationCon***REMOVED***guration"`
 
@@ -15958,13 +17341,19 @@ func (s *PutBucketNoti***REMOVED***cationInput) SetBucket(v string) *PutBucketNo
 	return s
 }
 
+func (s *PutBucketNoti***REMOVED***cationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetNoti***REMOVED***cationCon***REMOVED***guration sets the Noti***REMOVED***cationCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketNoti***REMOVED***cationInput) SetNoti***REMOVED***cationCon***REMOVED***guration(v *Noti***REMOVED***cationCon***REMOVED***gurationDeprecated) *PutBucketNoti***REMOVED***cationInput {
 	s.Noti***REMOVED***cationCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketNoti***REMOVED***cationOutput
 type PutBucketNoti***REMOVED***cationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15979,12 +17368,15 @@ func (s PutBucketNoti***REMOVED***cationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicyRequest
 type PutBucketPolicyInput struct {
 	_ struct{} `type:"structure" payload:"Policy"`
 
 	// Bucket is a required ***REMOVED***eld
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
+
+	// Set this parameter to true to con***REMOVED***rm that you want to remove your permissions
+	// to change this bucket policy in the future.
+	Con***REMOVED***rmRemoveSelfBucketAccess *bool `location:"header" locationName:"x-amz-con***REMOVED***rm-remove-self-bucket-access" type:"boolean"`
 
 	// The bucket policy as a JSON document.
 	//
@@ -16024,13 +17416,25 @@ func (s *PutBucketPolicyInput) SetBucket(v string) *PutBucketPolicyInput {
 	return s
 }
 
+func (s *PutBucketPolicyInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
+// SetCon***REMOVED***rmRemoveSelfBucketAccess sets the Con***REMOVED***rmRemoveSelfBucketAccess ***REMOVED***eld's value.
+func (s *PutBucketPolicyInput) SetCon***REMOVED***rmRemoveSelfBucketAccess(v bool) *PutBucketPolicyInput {
+	s.Con***REMOVED***rmRemoveSelfBucketAccess = &v
+	return s
+}
+
 // SetPolicy sets the Policy ***REMOVED***eld's value.
 func (s *PutBucketPolicyInput) SetPolicy(v string) *PutBucketPolicyInput {
 	s.Policy = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketPolicyOutput
 type PutBucketPolicyOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16045,7 +17449,6 @@ func (s PutBucketPolicyOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplicationRequest
 type PutBucketReplicationInput struct {
 	_ struct{} `type:"structure" payload:"ReplicationCon***REMOVED***guration"`
 
@@ -16096,13 +17499,19 @@ func (s *PutBucketReplicationInput) SetBucket(v string) *PutBucketReplicationInp
 	return s
 }
 
+func (s *PutBucketReplicationInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetReplicationCon***REMOVED***guration sets the ReplicationCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketReplicationInput) SetReplicationCon***REMOVED***guration(v *ReplicationCon***REMOVED***guration) *PutBucketReplicationInput {
 	s.ReplicationCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketReplicationOutput
 type PutBucketReplicationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16117,7 +17526,6 @@ func (s PutBucketReplicationOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPaymentRequest
 type PutBucketRequestPaymentInput struct {
 	_ struct{} `type:"structure" payload:"RequestPaymentCon***REMOVED***guration"`
 
@@ -16165,13 +17573,19 @@ func (s *PutBucketRequestPaymentInput) SetBucket(v string) *PutBucketRequestPaym
 	return s
 }
 
+func (s *PutBucketRequestPaymentInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetRequestPaymentCon***REMOVED***guration sets the RequestPaymentCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketRequestPaymentInput) SetRequestPaymentCon***REMOVED***guration(v *RequestPaymentCon***REMOVED***guration) *PutBucketRequestPaymentInput {
 	s.RequestPaymentCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketRequestPaymentOutput
 type PutBucketRequestPaymentOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16186,7 +17600,6 @@ func (s PutBucketRequestPaymentOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTaggingRequest
 type PutBucketTaggingInput struct {
 	_ struct{} `type:"structure" payload:"Tagging"`
 
@@ -16234,13 +17647,19 @@ func (s *PutBucketTaggingInput) SetBucket(v string) *PutBucketTaggingInput {
 	return s
 }
 
+func (s *PutBucketTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetTagging sets the Tagging ***REMOVED***eld's value.
 func (s *PutBucketTaggingInput) SetTagging(v *Tagging) *PutBucketTaggingInput {
 	s.Tagging = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketTaggingOutput
 type PutBucketTaggingOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16255,7 +17674,6 @@ func (s PutBucketTaggingOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioningRequest
 type PutBucketVersioningInput struct {
 	_ struct{} `type:"structure" payload:"VersioningCon***REMOVED***guration"`
 
@@ -16302,6 +17720,13 @@ func (s *PutBucketVersioningInput) SetBucket(v string) *PutBucketVersioningInput
 	return s
 }
 
+func (s *PutBucketVersioningInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetMFA sets the MFA ***REMOVED***eld's value.
 func (s *PutBucketVersioningInput) SetMFA(v string) *PutBucketVersioningInput {
 	s.MFA = &v
@@ -16314,7 +17739,6 @@ func (s *PutBucketVersioningInput) SetVersioningCon***REMOVED***guration(v *Vers
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketVersioningOutput
 type PutBucketVersioningOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16329,7 +17753,6 @@ func (s PutBucketVersioningOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsiteRequest
 type PutBucketWebsiteInput struct {
 	_ struct{} `type:"structure" payload:"WebsiteCon***REMOVED***guration"`
 
@@ -16377,13 +17800,19 @@ func (s *PutBucketWebsiteInput) SetBucket(v string) *PutBucketWebsiteInput {
 	return s
 }
 
+func (s *PutBucketWebsiteInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetWebsiteCon***REMOVED***guration sets the WebsiteCon***REMOVED***guration ***REMOVED***eld's value.
 func (s *PutBucketWebsiteInput) SetWebsiteCon***REMOVED***guration(v *WebsiteCon***REMOVED***guration) *PutBucketWebsiteInput {
 	s.WebsiteCon***REMOVED***guration = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutBucketWebsiteOutput
 type PutBucketWebsiteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -16398,7 +17827,6 @@ func (s PutBucketWebsiteOutput) GoString() string {
 	return s.String()
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAclRequest
 type PutObjectAclInput struct {
 	_ struct{} `type:"structure" payload:"AccessControlPolicy"`
 
@@ -16491,6 +17919,13 @@ func (s *PutObjectAclInput) SetBucket(v string) *PutObjectAclInput {
 	return s
 }
 
+func (s *PutObjectAclInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetGrantFullControl sets the GrantFullControl ***REMOVED***eld's value.
 func (s *PutObjectAclInput) SetGrantFullControl(v string) *PutObjectAclInput {
 	s.GrantFullControl = &v
@@ -16539,7 +17974,6 @@ func (s *PutObjectAclInput) SetVersionId(v string) *PutObjectAclInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectAclOutput
 type PutObjectAclOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16564,7 +17998,6 @@ func (s *PutObjectAclOutput) SetRequestCharged(v string) *PutObjectAclOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectRequest
 type PutObjectInput struct {
 	_ struct{} `type:"structure" payload:"Body"`
 
@@ -16596,6 +18029,9 @@ type PutObjectInput struct {
 	// Size of the body in bytes. This parameter is useful when the size of the
 	// body cannot be determined automatically.
 	ContentLength *int64 `location:"header" locationName:"Content-Length" type:"long"`
+
+	// The base64-encoded 128-bit MD5 digest of the part data.
+	ContentMD5 *string `location:"header" locationName:"Content-MD5" type:"string"`
 
 	// A standard MIME type describing the format of the object data.
 	ContentType *string `location:"header" locationName:"Content-Type" type:"string"`
@@ -16713,6 +18149,13 @@ func (s *PutObjectInput) SetBucket(v string) *PutObjectInput {
 	return s
 }
 
+func (s *PutObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetCacheControl sets the CacheControl ***REMOVED***eld's value.
 func (s *PutObjectInput) SetCacheControl(v string) *PutObjectInput {
 	s.CacheControl = &v
@@ -16740,6 +18183,12 @@ func (s *PutObjectInput) SetContentLanguage(v string) *PutObjectInput {
 // SetContentLength sets the ContentLength ***REMOVED***eld's value.
 func (s *PutObjectInput) SetContentLength(v int64) *PutObjectInput {
 	s.ContentLength = &v
+	return s
+}
+
+// SetContentMD5 sets the ContentMD5 ***REMOVED***eld's value.
+func (s *PutObjectInput) SetContentMD5(v string) *PutObjectInput {
+	s.ContentMD5 = &v
 	return s
 }
 
@@ -16809,6 +18258,13 @@ func (s *PutObjectInput) SetSSECustomerKey(v string) *PutObjectInput {
 	return s
 }
 
+func (s *PutObjectInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *PutObjectInput) SetSSECustomerKeyMD5(v string) *PutObjectInput {
 	s.SSECustomerKeyMD5 = &v
@@ -16845,7 +18301,6 @@ func (s *PutObjectInput) SetWebsiteRedirectLocation(v string) *PutObjectInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectOutput
 type PutObjectOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16940,7 +18395,6 @@ func (s *PutObjectOutput) SetVersionId(v string) *PutObjectOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTaggingRequest
 type PutObjectTaggingInput struct {
 	_ struct{} `type:"structure" payload:"Tagging"`
 
@@ -16999,6 +18453,13 @@ func (s *PutObjectTaggingInput) SetBucket(v string) *PutObjectTaggingInput {
 	return s
 }
 
+func (s *PutObjectTaggingInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *PutObjectTaggingInput) SetKey(v string) *PutObjectTaggingInput {
 	s.Key = &v
@@ -17017,7 +18478,6 @@ func (s *PutObjectTaggingInput) SetVersionId(v string) *PutObjectTaggingInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/PutObjectTaggingOutput
 type PutObjectTaggingOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -17042,7 +18502,6 @@ func (s *PutObjectTaggingOutput) SetVersionId(v string) *PutObjectTaggingOutput 
 
 // Container for specifying an con***REMOVED***guration when you want Amazon S3 to publish
 // events to an Amazon Simple Queue Service (Amazon SQS) queue.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/QueueCon***REMOVED***guration
 type QueueCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -17114,7 +18573,6 @@ func (s *QueueCon***REMOVED***guration) SetQueueArn(v string) *QueueCon***REMOVE
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/QueueCon***REMOVED***gurationDeprecated
 type QueueCon***REMOVED***gurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
@@ -17164,7 +18622,6 @@ func (s *QueueCon***REMOVED***gurationDeprecated) SetQueue(v string) *QueueCon**
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Redirect
 type Redirect struct {
 	_ struct{} `type:"structure"`
 
@@ -17233,7 +18690,6 @@ func (s *Redirect) SetReplaceKeyWith(v string) *Redirect {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RedirectAllRequestsTo
 type RedirectAllRequestsTo struct {
 	_ struct{} `type:"structure"`
 
@@ -17284,7 +18740,6 @@ func (s *RedirectAllRequestsTo) SetProtocol(v string) *RedirectAllRequestsTo {
 
 // Container for replication rules. You can add as many as 1,000 rules. Total
 // replication con***REMOVED***guration size can be up to 2 MB.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ReplicationCon***REMOVED***guration
 type ReplicationCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -17349,10 +18804,12 @@ func (s *ReplicationCon***REMOVED***guration) SetRules(v []*ReplicationRule) *Re
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/ReplicationRule
+// Container for information about a particular replication rule.
 type ReplicationRule struct {
 	_ struct{} `type:"structure"`
 
+	// Container for replication destination information.
+	//
 	// Destination is a required ***REMOVED***eld
 	Destination *Destination `type:"structure" required:"true"`
 
@@ -17365,6 +18822,9 @@ type ReplicationRule struct {
 	//
 	// Pre***REMOVED***x is a required ***REMOVED***eld
 	Pre***REMOVED***x *string `type:"string" required:"true"`
+
+	// Container for ***REMOVED***lters that de***REMOVED***ne which source objects should be replicated.
+	SourceSelectionCriteria *SourceSelectionCriteria `type:"structure"`
 
 	// The rule is ignored if status is not Enabled.
 	//
@@ -17399,6 +18859,11 @@ func (s *ReplicationRule) Validate() error {
 			invalidParams.AddNested("Destination", err.(request.ErrInvalidParams))
 		}
 	}
+	if s.SourceSelectionCriteria != nil {
+		if err := s.SourceSelectionCriteria.Validate(); err != nil {
+			invalidParams.AddNested("SourceSelectionCriteria", err.(request.ErrInvalidParams))
+		}
+	}
 
 	if invalidParams.Len() > 0 {
 		return invalidParams
@@ -17424,13 +18889,18 @@ func (s *ReplicationRule) SetPre***REMOVED***x(v string) *ReplicationRule {
 	return s
 }
 
+// SetSourceSelectionCriteria sets the SourceSelectionCriteria ***REMOVED***eld's value.
+func (s *ReplicationRule) SetSourceSelectionCriteria(v *SourceSelectionCriteria) *ReplicationRule {
+	s.SourceSelectionCriteria = v
+	return s
+}
+
 // SetStatus sets the Status ***REMOVED***eld's value.
 func (s *ReplicationRule) SetStatus(v string) *ReplicationRule {
 	s.Status = &v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RequestPaymentCon***REMOVED***guration
 type RequestPaymentCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -17469,7 +18939,6 @@ func (s *RequestPaymentCon***REMOVED***guration) SetPayer(v string) *RequestPaym
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObjectRequest
 type RestoreObjectInput struct {
 	_ struct{} `type:"structure" payload:"RestoreRequest"`
 
@@ -17485,6 +18954,7 @@ type RestoreObjectInput struct {
 	// at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
 	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
 
+	// Container for restore job parameters.
 	RestoreRequest *RestoreRequest `locationName:"RestoreRequest" type:"structure" xmlURI:"http://s3.amazonaws.com/doc/2006-03-01/"`
 
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
@@ -17530,6 +19000,13 @@ func (s *RestoreObjectInput) SetBucket(v string) *RestoreObjectInput {
 	return s
 }
 
+func (s *RestoreObjectInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetKey sets the Key ***REMOVED***eld's value.
 func (s *RestoreObjectInput) SetKey(v string) *RestoreObjectInput {
 	s.Key = &v
@@ -17554,13 +19031,16 @@ func (s *RestoreObjectInput) SetVersionId(v string) *RestoreObjectInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreObjectOutput
 type RestoreObjectOutput struct {
 	_ struct{} `type:"structure"`
 
 	// If present, indicates that the requester was successfully charged for the
 	// request.
 	RequestCharged *string `location:"header" locationName:"x-amz-request-charged" type:"string" enum:"RequestCharged"`
+
+	// Indicates the path in the provided S3 output location where Select results
+	// will be restored to.
+	RestoreOutputPath *string `location:"header" locationName:"x-amz-restore-output-path" type:"string"`
 }
 
 // String returns the string representation
@@ -17579,17 +19059,38 @@ func (s *RestoreObjectOutput) SetRequestCharged(v string) *RestoreObjectOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreRequest
+// SetRestoreOutputPath sets the RestoreOutputPath ***REMOVED***eld's value.
+func (s *RestoreObjectOutput) SetRestoreOutputPath(v string) *RestoreObjectOutput {
+	s.RestoreOutputPath = &v
+	return s
+}
+
+// Container for restore job parameters.
 type RestoreRequest struct {
 	_ struct{} `type:"structure"`
 
-	// Lifetime of the active copy in days
-	//
-	// Days is a required ***REMOVED***eld
-	Days *int64 `type:"integer" required:"true"`
+	// Lifetime of the active copy in days. Do not use with restores that specify
+	// OutputLocation.
+	Days *int64 `type:"integer"`
 
-	// Glacier related prameters pertaining to this job.
+	// The optional description for the job.
+	Description *string `type:"string"`
+
+	// Glacier related parameters pertaining to this job. Do not use with restores
+	// that specify OutputLocation.
 	GlacierJobParameters *GlacierJobParameters `type:"structure"`
+
+	// Describes the location where the restore job's output is stored.
+	OutputLocation *OutputLocation `type:"structure"`
+
+	// Describes the parameters for Select job types.
+	SelectParameters *SelectParameters `type:"structure"`
+
+	// Glacier retrieval tier at which the restore will be processed.
+	Tier *string `type:"string" enum:"Tier"`
+
+	// Type of restore request.
+	Type *string `type:"string" enum:"RestoreRequestType"`
 }
 
 // String returns the string representation
@@ -17605,12 +19106,19 @@ func (s RestoreRequest) GoString() string {
 // Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
 func (s *RestoreRequest) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "RestoreRequest"}
-	if s.Days == nil {
-		invalidParams.Add(request.NewErrParamRequired("Days"))
-	}
 	if s.GlacierJobParameters != nil {
 		if err := s.GlacierJobParameters.Validate(); err != nil {
 			invalidParams.AddNested("GlacierJobParameters", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.OutputLocation != nil {
+		if err := s.OutputLocation.Validate(); err != nil {
+			invalidParams.AddNested("OutputLocation", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.SelectParameters != nil {
+		if err := s.SelectParameters.Validate(); err != nil {
+			invalidParams.AddNested("SelectParameters", err.(request.ErrInvalidParams))
 		}
 	}
 
@@ -17626,13 +19134,42 @@ func (s *RestoreRequest) SetDays(v int64) *RestoreRequest {
 	return s
 }
 
+// SetDescription sets the Description ***REMOVED***eld's value.
+func (s *RestoreRequest) SetDescription(v string) *RestoreRequest {
+	s.Description = &v
+	return s
+}
+
 // SetGlacierJobParameters sets the GlacierJobParameters ***REMOVED***eld's value.
 func (s *RestoreRequest) SetGlacierJobParameters(v *GlacierJobParameters) *RestoreRequest {
 	s.GlacierJobParameters = v
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RoutingRule
+// SetOutputLocation sets the OutputLocation ***REMOVED***eld's value.
+func (s *RestoreRequest) SetOutputLocation(v *OutputLocation) *RestoreRequest {
+	s.OutputLocation = v
+	return s
+}
+
+// SetSelectParameters sets the SelectParameters ***REMOVED***eld's value.
+func (s *RestoreRequest) SetSelectParameters(v *SelectParameters) *RestoreRequest {
+	s.SelectParameters = v
+	return s
+}
+
+// SetTier sets the Tier ***REMOVED***eld's value.
+func (s *RestoreRequest) SetTier(v string) *RestoreRequest {
+	s.Tier = &v
+	return s
+}
+
+// SetType sets the Type ***REMOVED***eld's value.
+func (s *RestoreRequest) SetType(v string) *RestoreRequest {
+	s.Type = &v
+	return s
+}
+
 type RoutingRule struct {
 	_ struct{} `type:"structure"`
 
@@ -17685,7 +19222,6 @@ func (s *RoutingRule) SetRedirect(v *Redirect) *RoutingRule {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Rule
 type Rule struct {
 	_ struct{} `type:"structure"`
 
@@ -17706,10 +19242,11 @@ type Rule struct {
 	NoncurrentVersionExpiration *NoncurrentVersionExpiration `type:"structure"`
 
 	// Container for the transition rule that describes when noncurrent objects
-	// transition to the STANDARD_IA or GLACIER storage class. If your bucket is
-	// versioning-enabled (or versioning is suspended), you can set this action
-	// to request that Amazon S3 transition noncurrent object versions to the STANDARD_IA
-	// or GLACIER storage class at a speci***REMOVED***c period in the object's lifetime.
+	// transition to the STANDARD_IA, ONEZONE_IA or GLACIER storage class. If your
+	// bucket is versioning-enabled (or versioning is suspended), you can set this
+	// action to request that Amazon S3 transition noncurrent object versions to
+	// the STANDARD_IA, ONEZONE_IA or GLACIER storage class at a speci***REMOVED***c period
+	// in the object's lifetime.
 	NoncurrentVersionTransition *NoncurrentVersionTransition `type:"structure"`
 
 	// Pre***REMOVED***x identifying one or more objects to which the rule applies.
@@ -17800,7 +19337,365 @@ func (s *Rule) SetTransition(v *Transition) *Rule {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/StorageClassAnalysis
+// Speci***REMOVED***es the use of SSE-KMS to encrypt delievered Inventory reports.
+type SSEKMS struct {
+	_ struct{} `locationName:"SSE-KMS" type:"structure"`
+
+	// Speci***REMOVED***es the ID of the AWS Key Management Service (KMS) master encryption
+	// key to use for encrypting Inventory reports.
+	//
+	// KeyId is a required ***REMOVED***eld
+	KeyId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s SSEKMS) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SSEKMS) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *SSEKMS) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SSEKMS"}
+	if s.KeyId == nil {
+		invalidParams.Add(request.NewErrParamRequired("KeyId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetKeyId sets the KeyId ***REMOVED***eld's value.
+func (s *SSEKMS) SetKeyId(v string) *SSEKMS {
+	s.KeyId = &v
+	return s
+}
+
+// Speci***REMOVED***es the use of SSE-S3 to encrypt delievered Inventory reports.
+type SSES3 struct {
+	_ struct{} `locationName:"SSE-S3" type:"structure"`
+}
+
+// String returns the string representation
+func (s SSES3) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SSES3) GoString() string {
+	return s.String()
+}
+
+// Describes the parameters for Select job types.
+type SelectParameters struct {
+	_ struct{} `type:"structure"`
+
+	// The expression that is used to query the object.
+	//
+	// Expression is a required ***REMOVED***eld
+	Expression *string `type:"string" required:"true"`
+
+	// The type of the provided expression (e.g., SQL).
+	//
+	// ExpressionType is a required ***REMOVED***eld
+	ExpressionType *string `type:"string" required:"true" enum:"ExpressionType"`
+
+	// Describes the serialization format of the object.
+	//
+	// InputSerialization is a required ***REMOVED***eld
+	InputSerialization *InputSerialization `type:"structure" required:"true"`
+
+	// Describes how the results of the Select job are serialized.
+	//
+	// OutputSerialization is a required ***REMOVED***eld
+	OutputSerialization *OutputSerialization `type:"structure" required:"true"`
+}
+
+// String returns the string representation
+func (s SelectParameters) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SelectParameters) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *SelectParameters) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SelectParameters"}
+	if s.Expression == nil {
+		invalidParams.Add(request.NewErrParamRequired("Expression"))
+	}
+	if s.ExpressionType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ExpressionType"))
+	}
+	if s.InputSerialization == nil {
+		invalidParams.Add(request.NewErrParamRequired("InputSerialization"))
+	}
+	if s.OutputSerialization == nil {
+		invalidParams.Add(request.NewErrParamRequired("OutputSerialization"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetExpression sets the Expression ***REMOVED***eld's value.
+func (s *SelectParameters) SetExpression(v string) *SelectParameters {
+	s.Expression = &v
+	return s
+}
+
+// SetExpressionType sets the ExpressionType ***REMOVED***eld's value.
+func (s *SelectParameters) SetExpressionType(v string) *SelectParameters {
+	s.ExpressionType = &v
+	return s
+}
+
+// SetInputSerialization sets the InputSerialization ***REMOVED***eld's value.
+func (s *SelectParameters) SetInputSerialization(v *InputSerialization) *SelectParameters {
+	s.InputSerialization = v
+	return s
+}
+
+// SetOutputSerialization sets the OutputSerialization ***REMOVED***eld's value.
+func (s *SelectParameters) SetOutputSerialization(v *OutputSerialization) *SelectParameters {
+	s.OutputSerialization = v
+	return s
+}
+
+// Describes the default server-side encryption to apply to new objects in the
+// bucket. If Put Object request does not specify any server-side encryption,
+// this default encryption will be applied.
+type ServerSideEncryptionByDefault struct {
+	_ struct{} `type:"structure"`
+
+	// KMS master key ID to use for the default encryption. This parameter is allowed
+	// if SSEAlgorithm is aws:kms.
+	KMSMasterKeyID *string `type:"string"`
+
+	// Server-side encryption algorithm to use for the default encryption.
+	//
+	// SSEAlgorithm is a required ***REMOVED***eld
+	SSEAlgorithm *string `type:"string" required:"true" enum:"ServerSideEncryption"`
+}
+
+// String returns the string representation
+func (s ServerSideEncryptionByDefault) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ServerSideEncryptionByDefault) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *ServerSideEncryptionByDefault) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionByDefault"}
+	if s.SSEAlgorithm == nil {
+		invalidParams.Add(request.NewErrParamRequired("SSEAlgorithm"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetKMSMasterKeyID sets the KMSMasterKeyID ***REMOVED***eld's value.
+func (s *ServerSideEncryptionByDefault) SetKMSMasterKeyID(v string) *ServerSideEncryptionByDefault {
+	s.KMSMasterKeyID = &v
+	return s
+}
+
+// SetSSEAlgorithm sets the SSEAlgorithm ***REMOVED***eld's value.
+func (s *ServerSideEncryptionByDefault) SetSSEAlgorithm(v string) *ServerSideEncryptionByDefault {
+	s.SSEAlgorithm = &v
+	return s
+}
+
+// Container for server-side encryption con***REMOVED***guration rules. Currently S3 supports
+// one rule only.
+type ServerSideEncryptionCon***REMOVED***guration struct {
+	_ struct{} `type:"structure"`
+
+	// Container for information about a particular server-side encryption con***REMOVED***guration
+	// rule.
+	//
+	// Rules is a required ***REMOVED***eld
+	Rules []*ServerSideEncryptionRule `locationName:"Rule" type:"list" flattened:"true" required:"true"`
+}
+
+// String returns the string representation
+func (s ServerSideEncryptionCon***REMOVED***guration) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ServerSideEncryptionCon***REMOVED***guration) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *ServerSideEncryptionCon***REMOVED***guration) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionCon***REMOVED***guration"}
+	if s.Rules == nil {
+		invalidParams.Add(request.NewErrParamRequired("Rules"))
+	}
+	if s.Rules != nil {
+		for i, v := range s.Rules {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Rules", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetRules sets the Rules ***REMOVED***eld's value.
+func (s *ServerSideEncryptionCon***REMOVED***guration) SetRules(v []*ServerSideEncryptionRule) *ServerSideEncryptionCon***REMOVED***guration {
+	s.Rules = v
+	return s
+}
+
+// Container for information about a particular server-side encryption con***REMOVED***guration
+// rule.
+type ServerSideEncryptionRule struct {
+	_ struct{} `type:"structure"`
+
+	// Describes the default server-side encryption to apply to new objects in the
+	// bucket. If Put Object request does not specify any server-side encryption,
+	// this default encryption will be applied.
+	ApplyServerSideEncryptionByDefault *ServerSideEncryptionByDefault `type:"structure"`
+}
+
+// String returns the string representation
+func (s ServerSideEncryptionRule) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ServerSideEncryptionRule) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *ServerSideEncryptionRule) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ServerSideEncryptionRule"}
+	if s.ApplyServerSideEncryptionByDefault != nil {
+		if err := s.ApplyServerSideEncryptionByDefault.Validate(); err != nil {
+			invalidParams.AddNested("ApplyServerSideEncryptionByDefault", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetApplyServerSideEncryptionByDefault sets the ApplyServerSideEncryptionByDefault ***REMOVED***eld's value.
+func (s *ServerSideEncryptionRule) SetApplyServerSideEncryptionByDefault(v *ServerSideEncryptionByDefault) *ServerSideEncryptionRule {
+	s.ApplyServerSideEncryptionByDefault = v
+	return s
+}
+
+// Container for ***REMOVED***lters that de***REMOVED***ne which source objects should be replicated.
+type SourceSelectionCriteria struct {
+	_ struct{} `type:"structure"`
+
+	// Container for ***REMOVED***lter information of selection of KMS Encrypted S3 objects.
+	SseKmsEncryptedObjects *SseKmsEncryptedObjects `type:"structure"`
+}
+
+// String returns the string representation
+func (s SourceSelectionCriteria) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SourceSelectionCriteria) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *SourceSelectionCriteria) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SourceSelectionCriteria"}
+	if s.SseKmsEncryptedObjects != nil {
+		if err := s.SseKmsEncryptedObjects.Validate(); err != nil {
+			invalidParams.AddNested("SseKmsEncryptedObjects", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetSseKmsEncryptedObjects sets the SseKmsEncryptedObjects ***REMOVED***eld's value.
+func (s *SourceSelectionCriteria) SetSseKmsEncryptedObjects(v *SseKmsEncryptedObjects) *SourceSelectionCriteria {
+	s.SseKmsEncryptedObjects = v
+	return s
+}
+
+// Container for ***REMOVED***lter information of selection of KMS Encrypted S3 objects.
+type SseKmsEncryptedObjects struct {
+	_ struct{} `type:"structure"`
+
+	// The replication for KMS encrypted S3 objects is disabled if status is not
+	// Enabled.
+	//
+	// Status is a required ***REMOVED***eld
+	Status *string `type:"string" required:"true" enum:"SseKmsEncryptedObjectsStatus"`
+}
+
+// String returns the string representation
+func (s SseKmsEncryptedObjects) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SseKmsEncryptedObjects) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the ***REMOVED***elds of the type to determine if they are valid.
+func (s *SseKmsEncryptedObjects) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SseKmsEncryptedObjects"}
+	if s.Status == nil {
+		invalidParams.Add(request.NewErrParamRequired("Status"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetStatus sets the Status ***REMOVED***eld's value.
+func (s *SseKmsEncryptedObjects) SetStatus(v string) *SseKmsEncryptedObjects {
+	s.Status = &v
+	return s
+}
+
 type StorageClassAnalysis struct {
 	_ struct{} `type:"structure"`
 
@@ -17840,7 +19735,6 @@ func (s *StorageClassAnalysis) SetDataExport(v *StorageClassAnalysisDataExport) 
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/StorageClassAnalysisDataExport
 type StorageClassAnalysisDataExport struct {
 	_ struct{} `type:"structure"`
 
@@ -17898,7 +19792,6 @@ func (s *StorageClassAnalysisDataExport) SetOutputSchemaVersion(v string) *Stora
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Tag
 type Tag struct {
 	_ struct{} `type:"structure"`
 
@@ -17954,7 +19847,6 @@ func (s *Tag) SetValue(v string) *Tag {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Tagging
 type Tagging struct {
 	_ struct{} `type:"structure"`
 
@@ -18001,7 +19893,6 @@ func (s *Tagging) SetTagSet(v []*Tag) *Tagging {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/TargetGrant
 type TargetGrant struct {
 	_ struct{} `type:"structure"`
 
@@ -18050,7 +19941,6 @@ func (s *TargetGrant) SetPermission(v string) *TargetGrant {
 
 // Container for specifying the con***REMOVED***guration when you want Amazon S3 to publish
 // events to an Amazon Simple Noti***REMOVED***cation Service (Amazon SNS) topic.
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/TopicCon***REMOVED***guration
 type TopicCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -18122,7 +20012,6 @@ func (s *TopicCon***REMOVED***guration) SetTopicArn(v string) *TopicCon***REMOVE
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/TopicCon***REMOVED***gurationDeprecated
 type TopicCon***REMOVED***gurationDeprecated struct {
 	_ struct{} `type:"structure"`
 
@@ -18174,7 +20063,6 @@ func (s *TopicCon***REMOVED***gurationDeprecated) SetTopic(v string) *TopicCon**
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Transition
 type Transition struct {
 	_ struct{} `type:"structure"`
 
@@ -18218,7 +20106,6 @@ func (s *Transition) SetStorageClass(v string) *Transition {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopyRequest
 type UploadPartCopyInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18345,6 +20232,13 @@ func (s *UploadPartCopyInput) SetBucket(v string) *UploadPartCopyInput {
 	return s
 }
 
+func (s *UploadPartCopyInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetCopySource sets the CopySource ***REMOVED***eld's value.
 func (s *UploadPartCopyInput) SetCopySource(v string) *UploadPartCopyInput {
 	s.CopySource = &v
@@ -18393,6 +20287,13 @@ func (s *UploadPartCopyInput) SetCopySourceSSECustomerKey(v string) *UploadPartC
 	return s
 }
 
+func (s *UploadPartCopyInput) getCopySourceSSECustomerKey() (v string) {
+	if s.CopySourceSSECustomerKey == nil {
+		return v
+	}
+	return *s.CopySourceSSECustomerKey
+}
+
 // SetCopySourceSSECustomerKeyMD5 sets the CopySourceSSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *UploadPartCopyInput) SetCopySourceSSECustomerKeyMD5(v string) *UploadPartCopyInput {
 	s.CopySourceSSECustomerKeyMD5 = &v
@@ -18429,6 +20330,13 @@ func (s *UploadPartCopyInput) SetSSECustomerKey(v string) *UploadPartCopyInput {
 	return s
 }
 
+func (s *UploadPartCopyInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *UploadPartCopyInput) SetSSECustomerKeyMD5(v string) *UploadPartCopyInput {
 	s.SSECustomerKeyMD5 = &v
@@ -18441,7 +20349,6 @@ func (s *UploadPartCopyInput) SetUploadId(v string) *UploadPartCopyInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartCopyOutput
 type UploadPartCopyOutput struct {
 	_ struct{} `type:"structure" payload:"CopyPartResult"`
 
@@ -18526,7 +20433,6 @@ func (s *UploadPartCopyOutput) SetServerSideEncryption(v string) *UploadPartCopy
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartRequest
 type UploadPartInput struct {
 	_ struct{} `type:"structure" payload:"Body"`
 
@@ -18541,6 +20447,9 @@ type UploadPartInput struct {
 	// Size of the body in bytes. This parameter is useful when the size of the
 	// body cannot be determined automatically.
 	ContentLength *int64 `location:"header" locationName:"Content-Length" type:"long"`
+
+	// The base64-encoded 128-bit MD5 digest of the part data.
+	ContentMD5 *string `location:"header" locationName:"Content-MD5" type:"string"`
 
 	// Object key for which the multipart upload was initiated.
 	//
@@ -18628,9 +20537,22 @@ func (s *UploadPartInput) SetBucket(v string) *UploadPartInput {
 	return s
 }
 
+func (s *UploadPartInput) getBucket() (v string) {
+	if s.Bucket == nil {
+		return v
+	}
+	return *s.Bucket
+}
+
 // SetContentLength sets the ContentLength ***REMOVED***eld's value.
 func (s *UploadPartInput) SetContentLength(v int64) *UploadPartInput {
 	s.ContentLength = &v
+	return s
+}
+
+// SetContentMD5 sets the ContentMD5 ***REMOVED***eld's value.
+func (s *UploadPartInput) SetContentMD5(v string) *UploadPartInput {
+	s.ContentMD5 = &v
 	return s
 }
 
@@ -18664,6 +20586,13 @@ func (s *UploadPartInput) SetSSECustomerKey(v string) *UploadPartInput {
 	return s
 }
 
+func (s *UploadPartInput) getSSECustomerKey() (v string) {
+	if s.SSECustomerKey == nil {
+		return v
+	}
+	return *s.SSECustomerKey
+}
+
 // SetSSECustomerKeyMD5 sets the SSECustomerKeyMD5 ***REMOVED***eld's value.
 func (s *UploadPartInput) SetSSECustomerKeyMD5(v string) *UploadPartInput {
 	s.SSECustomerKeyMD5 = &v
@@ -18676,7 +20605,6 @@ func (s *UploadPartInput) SetUploadId(v string) *UploadPartInput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/UploadPartOutput
 type UploadPartOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -18752,7 +20680,6 @@ func (s *UploadPartOutput) SetServerSideEncryption(v string) *UploadPartOutput {
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/VersioningCon***REMOVED***guration
 type VersioningCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -18787,7 +20714,6 @@ func (s *VersioningCon***REMOVED***guration) SetStatus(v string) *VersioningCon*
 	return s
 }
 
-// Please also see https://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/WebsiteCon***REMOVED***guration
 type WebsiteCon***REMOVED***guration struct {
 	_ struct{} `type:"structure"`
 
@@ -18950,6 +20876,14 @@ const (
 	BucketVersioningStatusSuspended = "Suspended"
 )
 
+const (
+	// CompressionTypeNone is a CompressionType enum value
+	CompressionTypeNone = "NONE"
+
+	// CompressionTypeGzip is a CompressionType enum value
+	CompressionTypeGzip = "GZIP"
+)
+
 // Requests Amazon S3 to encode the object keys in the response and speci***REMOVED***es
 // the encoding method to use. An object key may contain any Unicode character;
 // however, XML 1.0 parser cannot parse some characters, such as characters
@@ -19000,6 +20934,22 @@ const (
 )
 
 const (
+	// ExpressionTypeSql is a ExpressionType enum value
+	ExpressionTypeSql = "SQL"
+)
+
+const (
+	// FileHeaderInfoUse is a FileHeaderInfo enum value
+	FileHeaderInfoUse = "USE"
+
+	// FileHeaderInfoIgnore is a FileHeaderInfo enum value
+	FileHeaderInfoIgnore = "IGNORE"
+
+	// FileHeaderInfoNone is a FileHeaderInfo enum value
+	FileHeaderInfoNone = "NONE"
+)
+
+const (
 	// FilterRuleNamePre***REMOVED***x is a FilterRuleName enum value
 	FilterRuleNamePre***REMOVED***x = "pre***REMOVED***x"
 
@@ -19010,6 +20960,9 @@ const (
 const (
 	// InventoryFormatCsv is a InventoryFormat enum value
 	InventoryFormatCsv = "CSV"
+
+	// InventoryFormatOrc is a InventoryFormat enum value
+	InventoryFormatOrc = "ORC"
 )
 
 const (
@@ -19046,6 +20999,17 @@ const (
 
 	// InventoryOptionalFieldReplicationStatus is a InventoryOptionalField enum value
 	InventoryOptionalFieldReplicationStatus = "ReplicationStatus"
+
+	// InventoryOptionalFieldEncryptionStatus is a InventoryOptionalField enum value
+	InventoryOptionalFieldEncryptionStatus = "EncryptionStatus"
+)
+
+const (
+	// JSONTypeDocument is a JSONType enum value
+	JSONTypeDocument = "DOCUMENT"
+
+	// JSONTypeLines is a JSONType enum value
+	JSONTypeLines = "LINES"
 )
 
 const (
@@ -19104,11 +21068,22 @@ const (
 
 	// ObjectStorageClassGlacier is a ObjectStorageClass enum value
 	ObjectStorageClassGlacier = "GLACIER"
+
+	// ObjectStorageClassStandardIa is a ObjectStorageClass enum value
+	ObjectStorageClassStandardIa = "STANDARD_IA"
+
+	// ObjectStorageClassOnezoneIa is a ObjectStorageClass enum value
+	ObjectStorageClassOnezoneIa = "ONEZONE_IA"
 )
 
 const (
 	// ObjectVersionStorageClassStandard is a ObjectVersionStorageClass enum value
 	ObjectVersionStorageClassStandard = "STANDARD"
+)
+
+const (
+	// OwnerOverrideDestination is a OwnerOverride enum value
+	OwnerOverrideDestination = "Destination"
 )
 
 const (
@@ -19142,6 +21117,14 @@ const (
 
 	// ProtocolHttps is a Protocol enum value
 	ProtocolHttps = "https"
+)
+
+const (
+	// QuoteFieldsAlways is a QuoteFields enum value
+	QuoteFieldsAlways = "ALWAYS"
+
+	// QuoteFieldsAsneeded is a QuoteFields enum value
+	QuoteFieldsAsneeded = "ASNEEDED"
 )
 
 const (
@@ -19183,11 +21166,24 @@ const (
 )
 
 const (
+	// RestoreRequestTypeSelect is a RestoreRequestType enum value
+	RestoreRequestTypeSelect = "SELECT"
+)
+
+const (
 	// ServerSideEncryptionAes256 is a ServerSideEncryption enum value
 	ServerSideEncryptionAes256 = "AES256"
 
 	// ServerSideEncryptionAwsKms is a ServerSideEncryption enum value
 	ServerSideEncryptionAwsKms = "aws:kms"
+)
+
+const (
+	// SseKmsEncryptedObjectsStatusEnabled is a SseKmsEncryptedObjectsStatus enum value
+	SseKmsEncryptedObjectsStatusEnabled = "Enabled"
+
+	// SseKmsEncryptedObjectsStatusDisabled is a SseKmsEncryptedObjectsStatus enum value
+	SseKmsEncryptedObjectsStatusDisabled = "Disabled"
 )
 
 const (
@@ -19199,6 +21195,9 @@ const (
 
 	// StorageClassStandardIa is a StorageClass enum value
 	StorageClassStandardIa = "STANDARD_IA"
+
+	// StorageClassOnezoneIa is a StorageClass enum value
+	StorageClassOnezoneIa = "ONEZONE_IA"
 )
 
 const (
@@ -19231,6 +21230,9 @@ const (
 
 	// TransitionStorageClassStandardIa is a TransitionStorageClass enum value
 	TransitionStorageClassStandardIa = "STANDARD_IA"
+
+	// TransitionStorageClassOnezoneIa is a TransitionStorageClass enum value
+	TransitionStorageClassOnezoneIa = "ONEZONE_IA"
 )
 
 const (

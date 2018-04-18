@@ -47,6 +47,9 @@ func FindInGoSearchPath(pkg string) string {
 // FullGoSearchPath gets the search paths for ***REMOVED***nding packages
 func FullGoSearchPath() string {
 	allPaths := os.Getenv(GOPATHKey)
+	if allPaths == "" {
+		allPaths = ***REMOVED***lepath.Join(os.Getenv("HOME"), "go")
+	}
 	if allPaths != "" {
 		allPaths = strings.Join([]string{allPaths, runtime.GOROOT()}, ":")
 	} ***REMOVED*** {

@@ -61,14 +61,18 @@ func main() {
 	convertUtsnameRegex := regexp.MustCompile(`((Sys|Node|Domain)name|Release|Version|Machine)(\s+)\[(\d+)\]u?int8`)
 	b = convertUtsnameRegex.ReplaceAll(b, []byte("$1$3[$4]byte"))
 
+	// Remove spare ***REMOVED***elds (e.g. in Statx_t)
+	spareFieldsRegex := regexp.MustCompile(`X__spare\S*`)
+	b = spareFieldsRegex.ReplaceAll(b, []byte("_"))
+
+	// Remove cgo padding ***REMOVED***elds
+	removePaddingFieldsRegex := regexp.MustCompile(`Pad_cgo_\d+`)
+	b = removePaddingFieldsRegex.ReplaceAll(b, []byte("_"))
+
 	// We refuse to export private ***REMOVED***elds on s390x
 	if goarch == "s390x" && goos == "linux" {
-		// Remove cgo padding ***REMOVED***elds
-		removeFieldsRegex := regexp.MustCompile(`Pad_cgo_\d+`)
-		b = removeFieldsRegex.ReplaceAll(b, []byte("_"))
-
 		// Remove padding, hidden, or unused ***REMOVED***elds
-		removeFieldsRegex = regexp.MustCompile(`X_\S+`)
+		removeFieldsRegex = regexp.MustCompile(`\bX_\S+`)
 		b = removeFieldsRegex.ReplaceAll(b, []byte("_"))
 	}
 

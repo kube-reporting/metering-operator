@@ -676,7 +676,10 @@ func (l *loggingT) output(s severity, buf *buffer, ***REMOVED***le string, line 
 		}
 	}
 	data := buf.Bytes()
-	if l.toStderr {
+	if !flag.Parsed() {
+		os.Stderr.Write([]byte("ERROR: logging before flag.Parse: "))
+		os.Stderr.Write(data)
+	} ***REMOVED*** if l.toStderr {
 		os.Stderr.Write(data)
 	} ***REMOVED*** {
 		if alsoToStderr || l.alsoToStderr || s >= l.stderrThreshold.get() {

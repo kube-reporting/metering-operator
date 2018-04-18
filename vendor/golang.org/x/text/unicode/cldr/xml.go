@@ -636,6 +636,13 @@ type SupplementalData struct {
 			Path string `xml:"path,attr"`
 		} `xml:"rgPath"`
 	} `xml:"rgScope"`
+	LanguageGroups *struct {
+		Common
+		LanguageGroup []*struct {
+			Common
+			Parent string `xml:"parent,attr"`
+		} `xml:"languageGroup"`
+	} `xml:"languageGroups"`
 }
 
 // LDML is the top-level type for locale-speci***REMOVED***c data.
@@ -1484,4 +1491,4 @@ type Numbers struct {
 }
 
 // Version is the version of CLDR from which the XML de***REMOVED***nitions are generated.
-const Version = "31"
+const Version = "32"

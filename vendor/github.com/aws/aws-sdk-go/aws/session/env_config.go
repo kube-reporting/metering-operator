@@ -5,7 +5,11 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 )
+
+// EnvProviderName provides a name of the provider when con***REMOVED***g is loaded from environment.
+const EnvProviderName = "EnvCon***REMOVED***gCredentials"
 
 // envCon***REMOVED***g is a collection of environment values the SDK will read
 // setup con***REMOVED***g from. All environment values are optional. But some values
@@ -76,7 +80,7 @@ type envCon***REMOVED***g struct {
 	SharedCon***REMOVED***gFile string
 
 	// Sets the path to a custom Credentials Authroity (CA) Bundle PEM ***REMOVED***le
-	// that the SDK will use instead of the the system's root CA bundle.
+	// that the SDK will use instead of the system's root CA bundle.
 	// Only use this if you want to con***REMOVED***gure the SDK to use a custom set
 	// of CAs.
 	//
@@ -157,7 +161,7 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) envCon***REMOV
 	if len(cfg.Creds.AccessKeyID) == 0 || len(cfg.Creds.SecretAccessKey) == 0 {
 		cfg.Creds = credentials.Value{}
 	} ***REMOVED*** {
-		cfg.Creds.ProviderName = "EnvCon***REMOVED***gCredentials"
+		cfg.Creds.ProviderName = EnvProviderName
 	}
 
 	regionKeys := regionEnvKeys
@@ -172,6 +176,13 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) envCon***REMOV
 
 	setFromEnvVal(&cfg.SharedCredentialsFile, sharedCredsFileEnvKey)
 	setFromEnvVal(&cfg.SharedCon***REMOVED***gFile, sharedCon***REMOVED***gFileEnvKey)
+
+	if len(cfg.SharedCredentialsFile) == 0 {
+		cfg.SharedCredentialsFile = defaults.SharedCredentialsFilename()
+	}
+	if len(cfg.SharedCon***REMOVED***gFile) == 0 {
+		cfg.SharedCon***REMOVED***gFile = defaults.SharedCon***REMOVED***gFilename()
+	}
 
 	cfg.CustomCABundle = os.Getenv("AWS_CA_BUNDLE")
 
