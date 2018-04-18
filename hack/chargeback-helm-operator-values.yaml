@@ -90,6 +90,14 @@ rbac:
   - apiGroups:
     - ""
     resources:
+    - events
+    verbs:
+    - create
+    - update
+    - patch
+  - apiGroups:
+    - ""
+    resources:
     - namespaces
     verbs:
     - get
