@@ -21,7 +21,7 @@ import (
 //
 // The best way to use this interface is so the SDK's service client's calls
 // can be stubbed out for unit testing your code with the SDK without needing
-// to inject custom request handlers into the the SDK's request pipeline.
+// to inject custom request handlers into the SDK's request pipeline.
 //
 //    // myFunc uses an SDK service client to make a request to
 //    // Amazon Simple Storage Service.
@@ -92,6 +92,10 @@ type S3API interface {
 	DeleteBucketCorsWithContext(aws.Context, *s3.DeleteBucketCorsInput, ...request.Option) (*s3.DeleteBucketCorsOutput, error)
 	DeleteBucketCorsRequest(*s3.DeleteBucketCorsInput) (*request.Request, *s3.DeleteBucketCorsOutput)
 
+	DeleteBucketEncryption(*s3.DeleteBucketEncryptionInput) (*s3.DeleteBucketEncryptionOutput, error)
+	DeleteBucketEncryptionWithContext(aws.Context, *s3.DeleteBucketEncryptionInput, ...request.Option) (*s3.DeleteBucketEncryptionOutput, error)
+	DeleteBucketEncryptionRequest(*s3.DeleteBucketEncryptionInput) (*request.Request, *s3.DeleteBucketEncryptionOutput)
+
 	DeleteBucketInventoryCon***REMOVED***guration(*s3.DeleteBucketInventoryCon***REMOVED***gurationInput) (*s3.DeleteBucketInventoryCon***REMOVED***gurationOutput, error)
 	DeleteBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.DeleteBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.DeleteBucketInventoryCon***REMOVED***gurationOutput, error)
 	DeleteBucketInventoryCon***REMOVED***gurationRequest(*s3.DeleteBucketInventoryCon***REMOVED***gurationInput) (*request.Request, *s3.DeleteBucketInventoryCon***REMOVED***gurationOutput)
@@ -147,6 +151,10 @@ type S3API interface {
 	GetBucketCors(*s3.GetBucketCorsInput) (*s3.GetBucketCorsOutput, error)
 	GetBucketCorsWithContext(aws.Context, *s3.GetBucketCorsInput, ...request.Option) (*s3.GetBucketCorsOutput, error)
 	GetBucketCorsRequest(*s3.GetBucketCorsInput) (*request.Request, *s3.GetBucketCorsOutput)
+
+	GetBucketEncryption(*s3.GetBucketEncryptionInput) (*s3.GetBucketEncryptionOutput, error)
+	GetBucketEncryptionWithContext(aws.Context, *s3.GetBucketEncryptionInput, ...request.Option) (*s3.GetBucketEncryptionOutput, error)
+	GetBucketEncryptionRequest(*s3.GetBucketEncryptionInput) (*request.Request, *s3.GetBucketEncryptionOutput)
 
 	GetBucketInventoryCon***REMOVED***guration(*s3.GetBucketInventoryCon***REMOVED***gurationInput) (*s3.GetBucketInventoryCon***REMOVED***gurationOutput, error)
 	GetBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.GetBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.GetBucketInventoryCon***REMOVED***gurationOutput, error)
@@ -294,6 +302,10 @@ type S3API interface {
 	PutBucketCors(*s3.PutBucketCorsInput) (*s3.PutBucketCorsOutput, error)
 	PutBucketCorsWithContext(aws.Context, *s3.PutBucketCorsInput, ...request.Option) (*s3.PutBucketCorsOutput, error)
 	PutBucketCorsRequest(*s3.PutBucketCorsInput) (*request.Request, *s3.PutBucketCorsOutput)
+
+	PutBucketEncryption(*s3.PutBucketEncryptionInput) (*s3.PutBucketEncryptionOutput, error)
+	PutBucketEncryptionWithContext(aws.Context, *s3.PutBucketEncryptionInput, ...request.Option) (*s3.PutBucketEncryptionOutput, error)
+	PutBucketEncryptionRequest(*s3.PutBucketEncryptionInput) (*request.Request, *s3.PutBucketEncryptionOutput)
 
 	PutBucketInventoryCon***REMOVED***guration(*s3.PutBucketInventoryCon***REMOVED***gurationInput) (*s3.PutBucketInventoryCon***REMOVED***gurationOutput, error)
 	PutBucketInventoryCon***REMOVED***gurationWithContext(aws.Context, *s3.PutBucketInventoryCon***REMOVED***gurationInput, ...request.Option) (*s3.PutBucketInventoryCon***REMOVED***gurationOutput, error)

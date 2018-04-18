@@ -55,7 +55,7 @@ func (r *Ref) RemoteURI() string {
 }
 
 // IsValidURI returns true when the url the ref points to can be found
-func (r *Ref) IsValidURI() bool {
+func (r *Ref) IsValidURI(basepaths ...string) bool {
 	if r.String() == "" {
 		return true
 	}
@@ -81,14 +81,18 @@ func (r *Ref) IsValidURI() bool {
 	// check for local ***REMOVED***le
 	pth := v
 	if r.HasURLPathOnly {
-		p, e := ***REMOVED***lepath.Abs(pth)
+		base := "."
+		if len(basepaths) > 0 {
+			base = ***REMOVED***lepath.Dir(***REMOVED***lepath.Join(basepaths...))
+		}
+		p, e := ***REMOVED***lepath.Abs(***REMOVED***lepath.ToSlash(***REMOVED***lepath.Join(base, pth)))
 		if e != nil {
 			return false
 		}
 		pth = p
 	}
 
-	***REMOVED***, err := os.Stat(pth)
+	***REMOVED***, err := os.Stat(***REMOVED***lepath.ToSlash(pth))
 	if err != nil {
 		return false
 	}
@@ -116,25 +120,18 @@ func NewRef(refURI string) (Ref, error) {
 	return Ref{Ref: ref}, nil
 }
 
-// MustCreateRef creates a ref object but
+// MustCreateRef creates a ref object but panics when refURI is invalid.
+// Use the NewRef method for a version that returns an error.
 func MustCreateRef(refURI string) Ref {
 	return Ref{Ref: jsonreference.MustCreateRef(refURI)}
 }
-
-// // NewResolvedRef creates a resolved ref
-// func NewResolvedRef(refURI string, data interface{}) Ref {
-// 	return Ref{
-// 		Ref:      jsonreference.MustCreateRef(refURI),
-// 		Resolved: data,
-// 	}
-// }
 
 // MarshalJSON marshals this ref into a JSON object
 func (r Ref) MarshalJSON() ([]byte, error) {
 	str := r.String()
 	if str == "" {
 		if r.IsRoot() {
-			return []byte(`{"$ref":"#"}`), nil
+			return []byte(`{"$ref":""}`), nil
 		}
 		return []byte("{}"), nil
 	}
@@ -148,7 +145,10 @@ func (r *Ref) UnmarshalJSON(d []byte) error {
 	if err := json.Unmarshal(d, &v); err != nil {
 		return err
 	}
+	return r.fromMap(v)
+}
 
+func (r *Ref) fromMap(v map[string]interface{}) error {
 	if v == nil {
 		return nil
 	}

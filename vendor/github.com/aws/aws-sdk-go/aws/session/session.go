@@ -26,7 +26,7 @@ import (
 // Sessions are safe to create service clients concurrently, but it is not safe
 // to mutate the Session concurrently.
 //
-// The Session satis***REMOVED***es the service client's client.ClientCon***REMOVED***gProvider.
+// The Session satis***REMOVED***es the service client's client.Con***REMOVED***gProvider.
 type Session struct {
 	Con***REMOVED***g   *aws.Con***REMOVED***g
 	Handlers request.Handlers
@@ -58,7 +58,12 @@ func New(cfgs ...*aws.Con***REMOVED***g) *Session {
 	envCfg := loadEnvCon***REMOVED***g()
 
 	if envCfg.EnableSharedCon***REMOVED***g {
-		s, err := newSession(Options{}, envCfg, cfgs...)
+		var cfg aws.Con***REMOVED***g
+		cfg.MergeIn(cfgs...)
+		s, err := NewSessionWithOptions(Options{
+			Con***REMOVED***g:            cfg,
+			SharedCon***REMOVED***gState: SharedCon***REMOVED***gEnable,
+		})
 		if err != nil {
 			// Old session.New expected all errors to be discovered when
 			// a request is made, and would report the errors then. This
@@ -241,13 +246,6 @@ func NewSessionWithOptions(opts Options) (*Session, error) {
 		envCfg.EnableSharedCon***REMOVED***g = false
 	case SharedCon***REMOVED***gEnable:
 		envCfg.EnableSharedCon***REMOVED***g = true
-	}
-
-	if len(envCfg.SharedCredentialsFile) == 0 {
-		envCfg.SharedCredentialsFile = defaults.SharedCredentialsFilename()
-	}
-	if len(envCfg.SharedCon***REMOVED***gFile) == 0 {
-		envCfg.SharedCon***REMOVED***gFile = defaults.SharedCon***REMOVED***gFilename()
 	}
 
 	// Only use AWS_CA_BUNDLE if session option is not provided.
@@ -573,11 +571,12 @@ func (s *Session) clientCon***REMOVED***gWithErr(serviceName string, cfgs ...*aw
 	}
 
 	return client.Con***REMOVED***g{
-		Con***REMOVED***g:        s.Con***REMOVED***g,
-		Handlers:      s.Handlers,
-		Endpoint:      resolved.URL,
-		SigningRegion: resolved.SigningRegion,
-		SigningName:   resolved.SigningName,
+		Con***REMOVED***g:             s.Con***REMOVED***g,
+		Handlers:           s.Handlers,
+		Endpoint:           resolved.URL,
+		SigningRegion:      resolved.SigningRegion,
+		SigningNameDerived: resolved.SigningNameDerived,
+		SigningName:        resolved.SigningName,
 	}, err
 }
 
@@ -597,10 +596,11 @@ func (s *Session) ClientCon***REMOVED***gNoResolveEndpoint(cfgs ...*aws.Con***RE
 	}
 
 	return client.Con***REMOVED***g{
-		Con***REMOVED***g:        s.Con***REMOVED***g,
-		Handlers:      s.Handlers,
-		Endpoint:      resolved.URL,
-		SigningRegion: resolved.SigningRegion,
-		SigningName:   resolved.SigningName,
+		Con***REMOVED***g:             s.Con***REMOVED***g,
+		Handlers:           s.Handlers,
+		Endpoint:           resolved.URL,
+		SigningRegion:      resolved.SigningRegion,
+		SigningNameDerived: resolved.SigningNameDerived,
+		SigningName:        resolved.SigningName,
 	}
 }

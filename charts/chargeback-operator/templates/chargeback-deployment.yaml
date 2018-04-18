@@ -22,6 +22,10 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:

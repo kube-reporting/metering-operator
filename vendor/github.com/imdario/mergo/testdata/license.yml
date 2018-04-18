@@ -1,3 +1,4 @@
 import: ../../../../fossene/db/schema/thing.yml
 ***REMOVED***elds:
     site: string
+    author: root

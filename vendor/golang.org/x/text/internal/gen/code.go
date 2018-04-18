@@ -55,18 +55,36 @@ func (w *CodeWriter) WriteGoFile(***REMOVED***lename, pkg string) {
 		log.Fatalf("Could not create ***REMOVED***le %s: %v", ***REMOVED***lename, err)
 	}
 	defer f.Close()
-	if _, err = w.WriteGo(f, pkg); err != nil {
+	if _, err = w.WriteGo(f, pkg, ""); err != nil {
+		log.Fatalf("Error writing ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+	}
+}
+
+// WriteVersionedGoFile appends the buffer with the total size of all created
+// structures and writes it as a Go ***REMOVED***le to the the given ***REMOVED***le with the given
+// package name and build tags for the current Unicode version,
+func (w *CodeWriter) WriteVersionedGoFile(***REMOVED***lename, pkg string) {
+	tags := buildTags()
+	if tags != "" {
+		***REMOVED***lename = insertVersion(***REMOVED***lename, UnicodeVersion())
+	}
+	f, err := os.Create(***REMOVED***lename)
+	if err != nil {
+		log.Fatalf("Could not create ***REMOVED***le %s: %v", ***REMOVED***lename, err)
+	}
+	defer f.Close()
+	if _, err = w.WriteGo(f, pkg, tags); err != nil {
 		log.Fatalf("Error writing ***REMOVED***le %s: %v", ***REMOVED***lename, err)
 	}
 }
 
 // WriteGo appends the buffer with the total size of all created structures and
 // writes it as a Go ***REMOVED***le to the the given writer with the given package name.
-func (w *CodeWriter) WriteGo(out io.Writer, pkg string) (n int, err error) {
+func (w *CodeWriter) WriteGo(out io.Writer, pkg, tags string) (n int, err error) {
 	sz := w.Size
 	w.WriteComment("Total table size %d bytes (%dKiB); checksum: %X\n", sz, sz/1024, w.Hash.Sum32())
 	defer w.buf.Reset()
-	return WriteGo(out, pkg, w.buf.Bytes())
+	return WriteGo(out, pkg, tags, w.buf.Bytes())
 }
 
 func (w *CodeWriter) printf(f string, x ...interface{}) {

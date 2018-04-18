@@ -154,6 +154,7 @@ type ExtensionDesc struct {
 	Field         int32       // ***REMOVED***eld number
 	Name          string      // fully-quali***REMOVED***ed name of extension, for text formatting
 	Tag           string      // protobuf tag style
+	Filename      string      // name of the ***REMOVED***le in which the extension is de***REMOVED***ned
 }
 
 func (ed *ExtensionDesc) repeated() bool {

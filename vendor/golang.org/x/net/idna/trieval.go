@@ -26,9 +26,9 @@ package idna
 //       15..3  index into xor or mapping table
 //     }
 //   } ***REMOVED*** {
-//       15..13 unused
-//           12 modi***REMOVED***er (including virama)
-//           11 virama modi***REMOVED***er
+//       15..14 unused
+//       13     mayNeedNorm
+//       12..11 attributes
 //       10..8  joining type
 //        7..3  category type
 //   }
@@ -49,15 +49,20 @@ const (
 	joinShift = 8
 	joinMask  = 0x07
 
-	viramaModi***REMOVED***er = 0x0800
+	// Attributes
+	attributesMask = 0x1800
+	viramaModi***REMOVED***er = 0x1800
 	modi***REMOVED***er       = 0x1000
+	rtl            = 0x0800
+
+	mayNeedNorm = 0x2000
 )
 
 // A category corresponds to a category de***REMOVED***ned in the IDNA mapping table.
 type category uint16
 
 const (
-	unknown              category = 0 // not de***REMOVED***ned currently in unicode.
+	unknown              category = 0 // not currently de***REMOVED***ned in unicode.
 	mapped               category = 1
 	disallowedSTD3Mapped category = 2
 	deviation            category = 3
@@ -110,5 +115,5 @@ func (c info) isModi***REMOVED***er() bool {
 }
 
 func (c info) isViramaModi***REMOVED***er() bool {
-	return c&(viramaModi***REMOVED***er|catSmallMask) == viramaModi***REMOVED***er
+	return c&(attributesMask|catSmallMask) == viramaModi***REMOVED***er
 }

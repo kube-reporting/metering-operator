@@ -47,7 +47,7 @@ type Loader interface {
 	Reader(i int) (io.ReadCloser, error)
 }
 
-var ***REMOVED***leRe = regexp.MustCompile(".*/(.*)/(.*)\\.xml")
+var ***REMOVED***leRe = regexp.MustCompile(`.*[/\\](.*)[/\\](.*)\.xml`)
 
 // Decode loads and decodes the ***REMOVED***les represented by l.
 func (d *Decoder) Decode(l Loader) (cldr *CLDR, err error) {

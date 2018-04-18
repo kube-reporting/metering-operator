@@ -20,9 +20,6 @@ out
 dist
 dist.zip
 
-# Hidden data (like Secrets)
-private
-
 # IDE support
 .idea
 _tmp

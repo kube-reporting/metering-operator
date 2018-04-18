@@ -31,7 +31,8 @@ func isExported(***REMOVED***eld reflect.StructField) bool {
 // Traverses recursively both values, assigning src's ***REMOVED***elds values to dst.
 // The map argument tracks comparisons that have already been seen, which allows
 // short circuiting on recursive types.
-func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err error) {
+func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, con***REMOVED***g *Con***REMOVED***g) (err error) {
+	overwrite := con***REMOVED***g.Overwrite
 	if dst.CanAddr() {
 		addr := dst.UnsafeAddr()
 		h := 17 * addr
@@ -57,10 +58,17 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err
 			}
 			***REMOVED***eldName := ***REMOVED***eld.Name
 			***REMOVED***eldName = changeInitialCase(***REMOVED***eldName, unicode.ToLower)
-			if v, ok := dstMap[***REMOVED***eldName]; !ok || isEmptyValue(reflect.ValueOf(v)) {
+			if v, ok := dstMap[***REMOVED***eldName]; !ok || (isEmptyValue(reflect.ValueOf(v)) || overwrite) {
 				dstMap[***REMOVED***eldName] = src.Field(i).Interface()
 			}
 		}
+	case reflect.Ptr:
+		if dst.IsNil() {
+			v := reflect.New(dst.Type().Elem())
+			dst.Set(v)
+		}
+		dst = dst.Elem()
+		fallthrough
 	case reflect.Struct:
 		srcMap := src.Interface().(map[string]interface{})
 		for key := range srcMap {
@@ -85,21 +93,24 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err
 					srcKind = reflect.Ptr
 				}
 			}
+
 			if !srcElement.IsValid() {
 				continue
 			}
 			if srcKind == dstKind {
-				if err = deepMerge(dstElement, srcElement, visited, depth+1); err != nil {
+				if err = deepMerge(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+					return
+				}
+			} ***REMOVED*** if dstKind == reflect.Interface && dstElement.Kind() == reflect.Interface {
+				if err = deepMerge(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
+					return
+				}
+			} ***REMOVED*** if srcKind == reflect.Map {
+				if err = deepMap(dstElement, srcElement, visited, depth+1, con***REMOVED***g); err != nil {
 					return
 				}
 			} ***REMOVED*** {
-				if srcKind == reflect.Map {
-					if err = deepMap(dstElement, srcElement, visited, depth+1); err != nil {
-						return
-					}
-				} ***REMOVED*** {
-					return fmt.Errorf("type mismatch on %s ***REMOVED***eld: found %v, expected %v", ***REMOVED***eldName, srcKind, dstKind)
-				}
+				return fmt.Errorf("type mismatch on %s ***REMOVED***eld: found %v, expected %v", ***REMOVED***eldName, srcKind, dstKind)
 			}
 		}
 	}
@@ -117,18 +128,35 @@ func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err
 // doesn't apply if dst is a map.
 // This is separated method from Merge because it is cleaner and it keeps sane
 // semantics: merging equal types, mapping different (restricted) types.
-func Map(dst, src interface{}) error {
+func Map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+	return _map(dst, src, opts...)
+}
+
+// MapWithOverwrite will do the same as Map except that non-empty dst attributes will be overridden by
+// non-empty src attribute values.
+// Deprecated: Use Map(…) with WithOverride
+func MapWithOverwrite(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
+	return _map(dst, src, append(opts, WithOverride)...)
+}
+
+func _map(dst, src interface{}, opts ...func(*Con***REMOVED***g)) error {
 	var (
 		vDst, vSrc reflect.Value
 		err        error
 	)
+	con***REMOVED***g := &Con***REMOVED***g{}
+
+	for _, opt := range opts {
+		opt(con***REMOVED***g)
+	}
+
 	if vDst, vSrc, err = resolveValues(dst, src); err != nil {
 		return err
 	}
 	// To be friction-less, we redirect equal-type arguments
 	// to deepMerge. Only because arguments can be anything.
 	if vSrc.Kind() == vDst.Kind() {
-		return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0)
+		return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, con***REMOVED***g)
 	}
 	switch vSrc.Kind() {
 	case reflect.Struct:
@@ -142,5 +170,5 @@ func Map(dst, src interface{}) error {
 	default:
 		return ErrNotSupported
 	}
-	return deepMap(vDst, vSrc, make(map[uintptr]*visit), 0)
+	return deepMap(vDst, vSrc, make(map[uintptr]*visit), 0, con***REMOVED***g)
 }

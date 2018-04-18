@@ -15,6 +15,7 @@
 package compiler
 
 import (
+	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -53,10 +54,15 @@ func FetchFile(***REMOVED***leurl string) ([]byte, error) {
 		}
 		return bytes, nil
 	}
-	log.Printf("Fetching %s", ***REMOVED***leurl)
+	if verboseReader {
+		log.Printf("Fetching %s", ***REMOVED***leurl)
+	}
 	response, err := http.Get(***REMOVED***leurl)
 	if err != nil {
 		return nil, err
+	}
+	if response.StatusCode != 200 {
+		return nil, errors.New(fmt.Sprintf("Error downloading %s: %s", ***REMOVED***leurl, response.Status))
 	}
 	defer response.Body.Close()
 	bytes, err = ioutil.ReadAll(response.Body)

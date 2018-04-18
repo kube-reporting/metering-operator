@@ -7,6 +7,30 @@ rules:
 - apiGroups: ["chargeback.coreos.com"]
   resources: ["*"]
   verbs: ["*"]
+- apiGroups:
+  - ""
+  resources:
+  - con***REMOVED***gmaps
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
