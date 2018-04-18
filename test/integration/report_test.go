@@ -165,7 +165,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 				},
 			},
 			expectedReportOutputFileName: "testdata/reports/node-cpu-utilization.json",
-			comparisonColumnNames:        []string{"cpu_used_percent", "cpu_unused_percent", "node_allocatable_cpu_core_seconds", "pod_request_cpu_core_seconds"},
+			comparisonColumnNames:        []string{"node_allocatable_cpu_core_seconds", "pod_request_cpu_core_seconds", "cpu_used_percent", "cpu_unused_percent"},
 			timeout:                      reportTestTimeout,
 		},
 		"node-memory-utilization": {
@@ -181,7 +181,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 				},
 			},
 			expectedReportOutputFileName: "testdata/reports/node-memory-utilization.json",
-			comparisonColumnNames:        []string{"memory_used_percent", "memory_unused_percent", "node_allocatable_memory_byte_seconds", "pod_request_memory_byte_seconds"},
+			comparisonColumnNames:        []string{"node_allocatable_memory_byte_seconds", "pod_request_memory_byte_seconds", "memory_used_percent", "memory_unused_percent"},
 			timeout:                      reportTestTimeout,
 		},
 	}
