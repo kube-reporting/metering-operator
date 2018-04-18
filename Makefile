@@ -182,7 +182,7 @@ fmt:
 # validates no unstaged changes exist
 ci-validate: k8s-verify-codegen chargeback-manifests fmt
 	@echo Checking for unstaged changes
-	git diff-index --cached --quiet HEAD --ignore-submodules --
+	git diff --stat HEAD --ignore-submodules --exit-code
 
 chargeback-bin: $(CHARGEBACK_BIN_OUT)
 
