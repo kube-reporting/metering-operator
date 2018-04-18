@@ -3,7 +3,7 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: chargeback-helm-operator.v0.5.1
+  name: chargeback-helm-operator.v0.6.0-latest
   annotations:
     tectonic-visibility: tectonic-feature
   labels:
@@ -12,7 +12,7 @@ spec:
   displayName: Chargeback
   description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: [chargeback metrics reporting coreos]
-  version: 0.5.1
+  version: 0.6.0-latest
   maturity: alpha
   maintainers:
     - email: support@coreos.com
@@ -21,7 +21,7 @@ spec:
     name: CoreOS, Inc
   labels:
     alm-owner-chargeback: chargeback-helm-operator
-    alm-status-descriptors: chargeback-helm-operator.v0.5.1
+    alm-status-descriptors: chargeback-helm-operator.v0.6.0-latest
   selector:
     matchLabels:
       alm-owner-chargeback: chargeback-helm-operator
@@ -205,7 +205,7 @@ spec:
                     value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:latest
+                  image: quay.io/coreos/chargeback-helm-operator:0.6.0-latest
                   imagePullPolicy: Always
                   name: chargeback-helm-operator
                   resources:
@@ -224,7 +224,7 @@ spec:
                         ***REMOVED***eldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:latest
+                  image: quay.io/coreos/chargeback-helm-operator:0.6.0-latest
                   imagePullPolicy: Always
                   livenessProbe:
                     failureThreshold: 3
