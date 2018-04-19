@@ -12,18 +12,25 @@ spec:
   columns:
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: node_capacity_memory_bytes
     type: double
+    unit: byte_seconds
   - name: resource_id
     type: string
+    tableHidden: true
   - name: timeprecision
     type: double
+    unit: seconds
   - name: node_capacity_memory_byte_seconds
     type: double
+    unit: byte_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -50,18 +57,25 @@ spec:
   columns:
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: node_allocatable_memory_bytes
     type: double
+    unit: bytes
   - name: resource_id
     type: string
+    tableHidden: true
   - name: timeprecision
     type: double
+    unit: seconds
   - name: node_allocatable_memory_byte_seconds
     type: double
+    unit: byte_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -91,16 +105,22 @@ spec:
   columns:
   - name: node_allocatable_data_start
     type: timestamp
+    unit: date
   - name: node_allocatable_data_end
     type: timestamp
+    unit: date
   - name: node_allocatable_memory_byte_seconds
     type: double
+    unit: byte_seconds
   - name: pod_usage_data_start
     type: timestamp
+    unit: date
   - name: pod_usage_data_end
     type: timestamp
+    unit: date
   - name: pod_request_memory_byte_seconds
     type: double
+    unit: byte_seconds
   - name: memory_used_percent
     type: double
   - name: memory_unused_percent
