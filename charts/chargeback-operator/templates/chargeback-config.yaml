@@ -15,3 +15,4 @@ data:
   promsum-poll-interval: {{ .Values.config.promsumPollInterval | quote}}
   promsum-chunk-size: {{ .Values.config.promsumChunkSize | quote}}
   promsum-step-size: {{ .Values.config.promsumStepSize | quote}}
+  leader-lease-duration: {{ .Values.config.leaderLeaseDuration | quote }}

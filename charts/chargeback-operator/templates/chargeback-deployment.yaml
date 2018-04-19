@@ -84,6 +84,11 @@ spec:
             configMapKeyRef:
               name: chargeback-config
               key: disable-promsum
+        - name: CHARGEBACK_LEASE_DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: chargeback-config
+              key: leader-lease-duration
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         ports:
