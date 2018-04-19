@@ -18,7 +18,18 @@ OUTPUT_DIR="$(cd "${OUTPUT_DIR:=$DIR/..}" && pwd)"
 : "${RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST:=$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml}"
 : "${CSV_MANIFEST_DESTINATION:=$ALM_MANIFEST_DIR/chargeback.clusterserviceversion.yaml}"
 
+VALUES_ARGS=(-f "$ALM_VALUES_FILE" -f /tmp/alm-values.yaml)
 echo "alm values file: $ALM_VALUES_FILE"
+
+if [[ $# -ne 0 ]] ; then
+    echo "Extra values files: $*"
+    # prepends -f to each argument passed in, and stores the list of arguments
+    # (-f $arg1 -f $arg2) in VALUES_ARGS
+    while (($# > 0)); do
+        VALUES_ARGS+=(-f "$1")
+        shift
+    done
+fi
 echo "Output directory: ${OUTPUT_DIR}"
 
 mkdir -p "${INSTALLER_MANIFEST_DIR}" "${ALM_MANIFEST_DIR}"
@@ -108,7 +119,6 @@ jq -s '.[0] * .[1] * .[2]' \
 # The sed expression at the end trims trailing whitespace and removes empty
 # lines
 helm template "$CHART" \
-    -f "$ALM_VALUES_FILE" \
-    -f /tmp/alm-values.yaml \
+    "${VALUES_ARGS[@]}" \
     | sed -f "$DIR/remove-helm-template-header.sed" \
     > "$CSV_MANIFEST_DESTINATION"

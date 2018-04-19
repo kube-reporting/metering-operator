@@ -1,4 +1,4 @@
-name: chargeback-helm-operator.v0.5.1
+name: chargeback-helm-operator.vlatest
 annotations:
   tectonic-visibility: tectonic-feature
 labels:
@@ -7,7 +7,7 @@ spec:
   displayName: Chargeback
   description: Chargeback can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: ['chargeback', 'metrics', 'reporting', 'coreos']
-  version: 0.5.1
+  version: latest
   maturity: alpha
   maintainers:
     - name: CoreOS, Inc
@@ -16,7 +16,7 @@ spec:
     name: CoreOS, Inc
 
   labels:
-    alm-status-descriptors: chargeback-helm-operator.v0.5.1
+    alm-status-descriptors: chargeback-helm-operator.vlatest
     alm-owner-chargeback: chargeback-helm-operator
   matchLabels:
     alm-owner-chargeback: chargeback-helm-operator
