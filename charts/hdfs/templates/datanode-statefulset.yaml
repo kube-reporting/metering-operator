@@ -49,8 +49,14 @@ spec:
     metadata:
       labels:
         app: hdfs-datanode
+{{- if .Values.datanode.labels }}
+{{ toYaml .Values.datanode.labels | indent 8 }}
+{{- end }}
       annotations:
         hdfs-configmap-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+{{- if .Values.datanode.annotations }}
+{{ toYaml .Values.datanode.annotations | indent 8 }}
+{{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
       securityContext:
@@ -68,6 +74,13 @@ spec:
         - '/bin/bash'
         - '-c'
         - 'until nslookup $NAMENODE_HOST; do echo waiting for $NAMENODE_HOST; sleep 2; done;'
+        resources:
+          requests:
+            memory: "5Mi"
+            cpu: "10m"
+          limits:
+            memory: "50Mi"
+            cpu: "50m"
         env:
         - name: NAMENODE_HOST
           valueFrom:
