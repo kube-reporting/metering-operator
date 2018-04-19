@@ -1,16 +1,20 @@
 # Dev Installation
 
-If you want to install chargeback without ALM, using what's currently in master, first clone the repo and then run the following commands:
+If you want to install chargeback without ALM, using what's currently in master, first start by cloning the repo.
+Next, decide which namespace you want to install Chargeback into, and set the `CHARGEBACK_NAMESPACE` environment variable to the namespace you want to use.
+By default, if it's unset, it will use the `chargeback` namespace.
+
+Run the following commands:
 
 ```
-$ export CHARGEBACK_NAMESPACE=chargeback
+$ export CHARGEBACK_NAMESPACE=chargeback-$USER
 $ ./hack/install.sh
 ```
 
 To uninstall simply:
 
 ```
-$ export CHARGEBACK_NAMESPACE=chargeback
+$ export CHARGEBACK_NAMESPACE=chargeback-$USER
 $ ./hack/uninstall.sh
 ```
 
@@ -32,7 +36,7 @@ idea of what you can modify that relates to configuration and resource limits, a
 image tag of each component.
 
 ```
-$ export CHARGEBACK_NAMESPACE=chargeback
+$ export CHARGEBACK_NAMESPACE=chargeback-$USER
 $ export CHARGEBACK_CR_FILE=chargeback-custom.yaml
 $ ./hack/install.sh
 ```
