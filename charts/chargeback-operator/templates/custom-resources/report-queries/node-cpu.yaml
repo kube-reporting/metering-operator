@@ -12,18 +12,24 @@ spec:
   columns:
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: node_capacity_cpu_cores
     type: double
+    unit: cpu_cores
   - name: resource_id
     type: string
   - name: timeprecision
     type: double
+    unit: seconds
   - name: node_capacity_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -50,18 +56,24 @@ spec:
   columns:
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: node_allocatable_cpu_cores
     type: double
+    unit: cpu_cores
   - name: resource_id
     type: string
   - name: timeprecision
     type: double
+    unit: seconds
   - name: node_allocatable_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -90,16 +102,22 @@ spec:
   columns:
   - name: node_allocatable_data_start
     type: timestamp
+    unit: date
   - name: node_allocatable_data_end
     type: timestamp
+    unit: date
   - name: node_allocatable_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: pod_usage_data_start
     type: timestamp
+    unit: date
   - name: pod_usage_data_end
     type: timestamp
+    unit: date
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: cpu_used_percent
     type: double
   - name: cpu_unused_percent

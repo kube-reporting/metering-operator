@@ -45,8 +45,10 @@ type PrestoTableCreationParameters struct {
 }
 
 type PrestoTableColumn struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	TableHidden bool   `json:"tableHidden"`
+	Unit        string `json:"unit"`
 }
 
 type PrestoTablePartition struct {
