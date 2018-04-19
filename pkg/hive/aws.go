@@ -91,7 +91,7 @@ func DropPartition(queryer Queryer, tableName, start, end string) error {
 
 // hiveName is the identi***REMOVED***er used for Hive columns.
 func hiveName(c aws.Column) string {
-	name := fmt.Sprintf("%s_%s", c.Category, c.Name)
+	name := fmt.Sprintf("%s_%s", strings.TrimSpace(c.Category), strings.TrimSpace(c.Name))
 	// hive does not allow ':' or '.' in identi***REMOVED***ers
 	name = strings.Replace(name, ":", "_", -1)
 	name = strings.Replace(name, ".", "_", -1)
