@@ -12,20 +12,28 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: kubernetes_pod
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: pod_request_cpu_cores
     type: double
+    unit: cpu_cores
   - name: timeprecision
     type: double
+    unit: seconds
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
@@ -54,20 +62,28 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: kubernetes_pod
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: node
     type: string
+    unit: kubernetes_node
   - name: labels
     type: map(varchar, varchar)
+    tableHidden: true
   - name: pod_usage_cpu_cores
     type: double
+    unit: cpu_cores
   - name: timeprecision
     type: double
+    unit: seconds
   - name: pod_usage_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
+    unit: date
   query: |
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
@@ -98,16 +114,22 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: kubernetes_pod
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: node
     type: string
+    unit: kubernetes_node
   - name: data_start
     type: timestamp
+    unit: date
   - name: data_end
     type: timestamp
+    unit: date
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   query: |
     SELECT pod,
             namespace,
@@ -139,16 +161,22 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: kubernetes_pod
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: node
     type: string
+    unit: kubernetes_node
   - name: data_start
     type: timestamp
+    unit: date
   - name: data_end
     type: timestamp
+    unit: date
   - name: pod_usage_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   query: |
     SELECT pod,
             namespace,
@@ -180,12 +208,16 @@ spec:
   columns:
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: data_start
     type: timestamp
+    unit: date
   - name: data_end
     type: timestamp
+    unit: date
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   query: |
     SELECT namespace,
             min("timestamp") as data_start,
@@ -215,12 +247,16 @@ spec:
   columns:
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: data_start
     type: timestamp
+    unit: date
   - name: data_end
     type: timestamp
+    unit: date
   - name: pod_usage_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   query: |
     SELECT namespace,
             min("timestamp") as data_start,
@@ -251,16 +287,22 @@ spec:
   columns:
   - name: pod
     type: string
+    unit: kubernetes_pod
   - name: namespace
     type: string
+    unit: kubernetes_namespace
   - name: node
     type: string
+    unit: kubernetes_node
   - name: data_start
     type: timestamp
+    unit: date
   - name: data_end
     type: timestamp
+    unit: date
   - name: pod_request_cpu_core_seconds
     type: double
+    unit: cpu_core_seconds
   - name: pod_cpu_usage_percent
     type: double
   query: |
