@@ -3,6 +3,12 @@
 Debugging chargeback can be fairly dif***REMOVED***cult if you do not know how to directly interact with the components the operator is speaking to.
 Below, we detail how you can connect and query Presto and Hive, as well as view the dashboards of the Presto and HDFS components.
 
+All of the follow commands assume you've set the `CHARGEBACK_NAMESPACE` environment variable to the namespace your Chargeback installation is located in:
+
+```
+export CHARGEBACK_NAMESPACE=your-namespace
+```
+
 ## Query Presto using presto-cli
 
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod.
