@@ -5,7 +5,7 @@ metadata:
 spec:
   chargeback-operator:
     config:
-      prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
+      prometheusURL: "http://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
 
     image:
       tag: latest
