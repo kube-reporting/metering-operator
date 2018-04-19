@@ -37,3 +37,8 @@ $ export CHARGEBACK_CR_FILE=chargeback-custom.yaml
 $ ./hack/install.sh
 ```
 
+### Using images built by Jenkins
+
+If you have a PR or branch being built my Jenkins, you can use the images it's publishing from each build to test out the changes that aren't in master yet.
+For details on the image tag format, please follow the instructions in our [jenkins guide](jenkins.md#using-images-built-by-jenkins).
+
