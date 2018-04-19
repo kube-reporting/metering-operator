@@ -15,6 +15,22 @@ spec:
   selector:
     app: hdfs-datanode
 ---
+# A headless service for the web interface.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-datanode-web
+  labels:
+    app: hdfs-datanode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - port: 50075
+    name: web
+  selector:
+    app: hdfs-datanode
+---
 
 apiVersion: apps/v1beta1
 kind: StatefulSet
