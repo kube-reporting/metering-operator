@@ -312,7 +312,6 @@ podTemplate(
                                             "KUBECONFIG=${OPENSHIFT_KUBECONFIG}",
                                             "INSTALL_METHOD=openshift-direct",
                                             "DEPLOY_SCRIPT=deploy-openshift-ci.sh",
-                                            "SKIP_COPY_PULL_SECRET=false",
                                             "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                             "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                             "TEST_LOG_FILE=${e2eTestLogFile}",
