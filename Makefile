@@ -35,6 +35,7 @@ GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
 USE_RELEASE_TAG = true
+PUSH_RELEASE_TAG = false
 RELEASE_TAG = 0.6.0-latest
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 IMAGE_TAG = $(GIT_SHA)
@@ -90,7 +91,7 @@ docker-pull:
 
 docker-push:
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-ifeq ($(USE_RELEASE_TAG), true)
+ifeq ($(PUSH_RELEASE_TAG), true)
 	docker push $(IMAGE_NAME):$(RELEASE_TAG)
 endif
 ifeq ($(USE_LATEST_TAG), true)

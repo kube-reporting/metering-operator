@@ -130,6 +130,8 @@ podTemplate(
                     "JENKINS_WORKSPACE=${env.WORKSPACE}",
                     "GOPATH=${gopath}",
                     "USE_LATEST_TAG=${isMasterBranch}",
+                    "USE_RELEASE_TAG=${isMasterBranch}",
+                    "PUSH_RELEASE_TAG=${isMasterBranch}",
                     "BRANCH_TAG=${branchTag}",
                     "BRANCH_TAG_CACHE=${isMasterBranch}",
                     "DEPLOY_TAG=${deployTag}",
