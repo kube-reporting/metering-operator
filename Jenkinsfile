@@ -241,7 +241,8 @@ podTemplate(
                                     # image twice
                                     unset BRANCH_TAG
                                     make docker-push-all -j 2 \
-                                        IMAGE_TAG=${DEPLOY_TAG}
+                                        IMAGE_TAG=${DEPLOY_TAG} \
+                                        PUSH_RELEASE_TAG=${PUSH_RELEASE_TAG} \
                                         BRANCH_TAG=
                                     '''
                                 } else {
