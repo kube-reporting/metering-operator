@@ -62,8 +62,10 @@ function install_chargeback() {
 function uninstall_chargeback() {
     INSTALL_METHOD=$1
     echo "Uninstalling chargeback"
-    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "openshift-direct" ]]; then
+    if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
+        "$DIR/openshift-uninstall.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
         "$DIR/alm-uninstall.sh"
     else
