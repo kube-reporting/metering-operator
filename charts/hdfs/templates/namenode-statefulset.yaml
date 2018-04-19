@@ -33,6 +33,22 @@ spec:
     app: hdfs-namenode
 
 ---
+# A headless service for the web interface.
+apiVersion: v1
+kind: Service
+metadata:
+  name: hdfs-namenode-web
+  labels:
+    app: hdfs-namenode
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - port: 50070
+    name: web
+  selector:
+    app: hdfs-namenode
+---
 
 apiVersion: apps/v1beta1
 kind: StatefulSet
@@ -102,6 +118,8 @@ spec:
         ports:
         - containerPort: 8020
           name: fs
+        - containerPort: 50070
+          name: web
         volumeMounts:
         - name: hdfs-namenode-data
           mountPath: /hadoop/dfs/name
