@@ -15,3 +15,4 @@ data:
   promsum-poll-interval: {{ .Values.con***REMOVED***g.promsumPollInterval | quote}}
   promsum-chunk-size: {{ .Values.con***REMOVED***g.promsumChunkSize | quote}}
   promsum-step-size: {{ .Values.con***REMOVED***g.promsumStepSize | quote}}
+  leader-lease-duration: {{ .Values.con***REMOVED***g.leaderLeaseDuration | quote }}

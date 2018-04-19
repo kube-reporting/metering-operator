@@ -84,6 +84,11 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: chargeback-con***REMOVED***g
               key: disable-promsum
+        - name: CHARGEBACK_LEASE_DURATION
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: chargeback-con***REMOVED***g
+              key: leader-lease-duration
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         ports:
