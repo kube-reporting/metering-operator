@@ -39,3 +39,5 @@ resources:
     memory: "100Mi"
     cpu: "100m"
 
+updateStrategy:
+  type: Recreate

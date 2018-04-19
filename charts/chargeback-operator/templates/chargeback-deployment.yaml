@@ -21,6 +21,8 @@ spec:
 {{ toYaml .Values.annotations | indent 8 }}
 {{- end }}
     spec:
+      strategy:
+{{ toYaml .Values.updateStrategy | indent 8 }}
       securityContext:
         runAsNonRoot: true
       containers:
