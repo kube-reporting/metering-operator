@@ -2,7 +2,6 @@ package hive
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/aws"
@@ -42,11 +41,16 @@ func CreateAWSUsageTable(queryer Queryer, tableName, bucket, prefix string, mani
 	columns := make([]Column, 0)
 	seen := make(map[string]struct{})
 	for _, manifest := range manifests {
-		manifestColumns := awsBillingColumns(manifest.Columns)
-		for _, col := range manifestColumns {
-			if _, exists := seen[col.Name]; !exists {
-				seen[col.Name] = struct{}{}
-				columns = append(columns, col)
+		for _, c := range manifest.Columns {
+			name := hiveName(c)
+			colType := hiveType(c)
+
+			if _, exists := seen[name]; !exists {
+				seen[name] = struct{}{}
+				columns = append(columns, Column{
+					Name: name,
+					Type: colType,
+				})
 			}
 		}
 	}
@@ -104,31 +108,4 @@ func hiveType(c aws.Column) string {
 	default:
 		return "string"
 	}
-}
-
-// Columns returns a map of hive column name to it's hive column type.
-// Duplicate columns will be suffixed by an incrementing ordinal. This can
-// happen with user defined fields like tags.
-func awsBillingColumns(cols []aws.Column) []Column {
-	out := make([]Column, 0)
-	seen := make(map[string]int, len(cols))
-
-	for _, c := range cols {
-		name := hiveName(c)
-		colType := hiveType(c)
-
-		// prevent duplicates by numbering them
-		times, exists := seen[name]
-		seen[name] = times + 1
-
-		if exists {
-			name += strconv.Itoa(times)
-		}
-
-		out = append(out, Column{
-			Name: name,
-			Type: colType,
-		})
-	}
-	return out
 }
