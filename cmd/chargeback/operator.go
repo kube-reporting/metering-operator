@@ -55,7 +55,7 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", " ")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, " ")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, " ")
-	startCmd.Flags().StringVar(&cfg.PromHost, "prom-host", defaultPromHost, " ")
+	startCmd.Flags().StringVar(&cfg.PromHost, "prometheus-host", defaultPromHost, " ")
 	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, " ")
 	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "logs out report results after creating a report result table")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
