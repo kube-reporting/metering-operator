@@ -1,5 +1,3 @@
-chargeback-operator:
-
 presto:
   presto:
     securityContext:
