@@ -11,6 +11,6 @@ TMP_DIR="$(mktemp -d)"
 export CHARGEBACK_CR_FILE="$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"
 export INSTALLER_MANIFEST_DIR="$TMP_DIR/installer_manifests-${DEPLOY_TAG}"
 export CUSTOM_VALUES_FILE="$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"
-export DEPLOY_SCRIPT="deploy-ci.sh"
+export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-ci.sh}"
 
 "$DIR/integration.sh"
