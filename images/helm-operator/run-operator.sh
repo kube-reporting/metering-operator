@@ -174,17 +174,17 @@ while true; do
             RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
 
             HELM_ARGS=()
+            if [ -s "$EXTRA_VALUES_FILE" ]; then
+                HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+            fi
+
             if [ -z "$RELEASE_VALUES" ]; then
                 echo "No values, using default values"
             else
                 VALUES_FILE="/tmp/${RELEASE_NAME}-values.yaml"
                 echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
 
-                HELM_ARGS=("-f" "$VALUES_FILE")
-            fi
-
-            if [ -s "$EXTRA_VALUES_FILE" ]; then
-                HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+                HELM_ARGS+=("-f" "$VALUES_FILE")
             fi
 
             # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
@@ -195,10 +195,10 @@ while true; do
 
                 writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
                 writeReleaseConfigMapOwnerPatchFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                EXTRA_ARGS=("-f" "$OWNER_VALUES_FILE")
+                HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
 
                 echo "Running helm upgrade for release $RELEASE_NAME"
-                helmUpgrade "$RELEASE_NAME" "${EXTRA_ARGS[@]}" "${HELM_ARGS[@]}"
+                helmUpgrade "$RELEASE_NAME" "${HELM_ARGS[@]}"
 
                 writeReleaseConfigmapsFile "$RELEASE_NAME"
                 setOwnerOnReleaseConfigmaps
