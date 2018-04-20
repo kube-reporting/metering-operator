@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	goflag "flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -58,7 +58,7 @@ func AddCommands() {
 func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
-	startCmd.Flags().AddGoFlagSet(flag.CommandLine)
+
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", " ")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, " ")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, " ")
@@ -74,6 +74,10 @@ func init() {
 }
 
 func main() {
+	// these fix https://github.com/kubernetes/kubernetes/issues/17162
+	rootCmd.Flags().AddGoFlagSet(goflag.CommandLine)
+	goflag.CommandLine.Parse(nil)
+
 	AddCommands()
 	SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK")
 	rootCmd.Execute()

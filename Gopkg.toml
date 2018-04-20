@@ -68,6 +68,7 @@ required = [
 
 [[constraint]]
   name = "github.com/spf13/pflag"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
