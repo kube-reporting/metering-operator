@@ -32,7 +32,6 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 		"dataSourceTableName":         dataSourceTableName,
 		"generationQueryViewName":     generationQueryViewName,
 		"billingPeriodFormat":         billingPeriodFormat,
-		"filterAWSData":               filterAWSData,
 		"renderReportGenerationQuery": renderReportGenerationQuery,
 	}
 
@@ -89,35 +88,4 @@ func hiveAWSPartitionTimestamp(date time.Time) string {
 
 func prestoTimestamp(date time.Time) string {
 	return date.Format(PrestoTimestampFormat)
-}
-
-func filterAWSData(r *reportTemplateInfo, awsBillingDataSourceName string) string {
-	start := prestoTimestamp(r.StartPeriod)
-	stop := prestoTimestamp(r.EndPeriod)
-	partitionStart := hiveAWSPartitionTimestamp(r.StartPeriod)
-	partitionStop := hiveAWSPartitionTimestamp(r.EndPeriod)
-	return fmt.Sprintf(`
-        SELECT aws_billing.*,
-               CASE
-                   -- AWS data covers entire reporting period
-                   WHEN (aws_billing.usage_start_date <= timestamp '%s') AND ( timestamp '%s' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', timestamp '%s', timestamp '%s') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
-
-                   -- AWS data covers start to middle
-                   WHEN (aws_billing.usage_start_date <= timestamp '%s')
-                       THEN cast(date_diff('millisecond', timestamp '%s', aws_billing.usage_end_date) as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double
-
-                   -- AWS data covers middle to end
-                   WHEN ( timestamp '%s' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '%s') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as doub
-                   ELSE 1
-               END as period_percent
-        FROM %s as aws_billing
-
-        -- make sure the partition overlaps with our range
-        WHERE (partition_stop >= '%s' AND partition_start <= '%s')
-
-        -- make sure lineItem entries overlap with our range
-        AND (usage_end_date >= timestamp '%s' AND usage_start_date <= timestamp '%s')
-`, start, stop, start, stop, start, start, stop, stop, generationQueryViewName(awsBillingDataSourceName), partitionStart, partitionStop, start, stop)
 }
