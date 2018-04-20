@@ -82,7 +82,17 @@ func (c *Chargeback) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return nil
 	}
 
-	renderedQuery, err := renderGenerationQuery(generationQuery)
+	dependentQueries, err := c.getDependentGenerationQueries(generationQuery, true)
+	if err != nil {
+		return err
+	}
+	templateInfo := &templateInfo{
+		DynamicDependentQueries: dependentQueries,
+		Report:                  nil,
+	}
+
+	qr := queryRenderer{templateInfo: templateInfo}
+	renderedQuery, err := qr.Render(generationQuery.Spec.Query)
 	if err != nil {
 		return err
 	}
@@ -113,10 +123,18 @@ func (c *Chargeback) updateReportQueryViewName(logger log.FieldLogger, generatio
 // dependencies have a viewName or tableName set in the custom resource.
 // Returns false if there is a dependency that is uninitialized.
 func (c *Chargeback) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, queueUninitialized bool) (bool, error) {
-	generationQueries, err := c.getDependentGenerationQueries(generationQuery)
+	// Validate ReportGenerationQuery's that should be views
+	generationQueries, err := c.getDependentGenerationQueries(generationQuery, false)
 	if err != nil {
 		return false, err
 	}
+
+	// Validate dynamic generationQuery dependencies
+	_, err = c.getDependentGenerationQueries(generationQuery, true)
+	if err != nil {
+		return false, err
+	}
+
 	dataSources, err := c.getDependentDataSources(generationQuery)
 	if err != nil {
 		return false, err
@@ -183,9 +201,10 @@ func (c *Chargeback) getUninitializedReportGenerationQueries(generationQueries [
 	return uninitializedQueries, nil
 }
 
-func (c *Chargeback) getDependentGenerationQueries(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportGenerationQuery, error) {
+func (c *Chargeback) getDependentGenerationQueries(generationQuery *cbTypes.ReportGenerationQuery, dynamicQueries bool) ([]*cbTypes.ReportGenerationQuery, error) {
 	queriesAccumulator := make(map[string]*cbTypes.ReportGenerationQuery)
-	err := c.getDependentGenerationQueriesMemoized(generationQuery, queriesAccumulator)
+	const maxDepth = 100
+	err := c.getDependentGenerationQueriesMemoized(generationQuery, 0, maxDepth, queriesAccumulator, dynamicQueries)
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +215,17 @@ func (c *Chargeback) getDependentGenerationQueries(generationQuery *cbTypes.Repo
 	return queries, nil
 }
 
-func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTypes.ReportGenerationQuery, queriesAccumulator map[string]*cbTypes.ReportGenerationQuery) error {
-	for _, queryName := range generationQuery.Spec.ReportQueries {
+func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTypes.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*cbTypes.ReportGenerationQuery, dynamicQueries bool) error {
+	if depth >= maxDepth {
+		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
+	}
+	var queries []string
+	if dynamicQueries {
+		queries = generationQuery.Spec.DynamicReportQueries
+	} ***REMOVED*** {
+		queries = generationQuery.Spec.ReportQueries
+	}
+	for _, queryName := range queries {
 		if _, exists := queriesAccumulator[queryName]; exists {
 			continue
 		}
@@ -205,10 +233,11 @@ func (c *Chargeback) getDependentGenerationQueriesMemoized(generationQuery *cbTy
 		if err != nil {
 			return err
 		}
-		err = c.getDependentGenerationQueriesMemoized(genQuery, queriesAccumulator)
+		err = c.getDependentGenerationQueriesMemoized(genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
 		if err != nil {
 			return err
 		}
+		queriesAccumulator[genQuery.Name] = genQuery
 	}
 	return nil
 }

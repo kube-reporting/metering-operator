@@ -151,7 +151,6 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	report = newReport
-	columns := generateHiveColumns(genQuery)
 	tableName := reportTableName(report.Name)
 
 	results, err := c.generateReport(
@@ -163,8 +162,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		report.Spec.ReportingStart.Time,
 		report.Spec.ReportingEnd.Time,
 		report.Spec.Output,
-		columns,
-		genQuery.Spec.Query,
+		genQuery,
 		true,
 	)
 	if err != nil {
