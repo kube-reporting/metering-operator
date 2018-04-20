@@ -13,14 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"k8s.io/client-go/kubernetes/scheme"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/leaderelection"
-	"k8s.io/client-go/tools/leaderelection/resourcelock"
-	"k8s.io/client-go/tools/record"
 
 	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
 )
@@ -70,7 +63,7 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "how often we poll prometheus")
 	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
-	startCmd.Flags().DurationVar(&defaultLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
+	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 }
 
 func main() {
@@ -94,64 +87,17 @@ func startChargeback(cmd *cobra.Command, args []string) {
 		}
 		cfg.Namespace = string(namespace)
 	}
-	kubeCon***REMOVED***g, err := rest.InClusterCon***REMOVED***g()
+
+	cfg.PodName = os.Getenv("POD_NAME")
+
+	var err error
+	cfg.Hostname, err = os.Hostname()
 	if err != nil {
-		log.Fatalf("unable to get in-cluster credentials, err: %s", err)
-	}
-
-	kubeClient, err := corev1.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
-	id, err := os.Hostname()
-	if err != nil {
-		log.Fatalf("unable to get hostname, err: %s", err)
-	}
-
-	podName := os.Getenv("POD_NAME")
-
-	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(logger.Infof)
-	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: kubeClient.Events(cfg.Namespace)})
-	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: podName})
-
-	rl, err := resourcelock.New(resourcelock.Con***REMOVED***gMapsResourceLock,
-		cfg.Namespace, "chargeback-operator-leader-lease", kubeClient,
-		resourcelock.ResourceLockCon***REMOVED***g{
-			Identity:      id,
-			EventRecorder: eventRecorder,
-		})
-	if err != nil {
-		log.Fatalf("error creating lock %v", err)
+		logger.Fatalf("unable to get hostname, err: %s", err)
 	}
 
 	signalStopCh := setupSignals()
-	// run shuts down chargeback by closing the stopCh passed to it when a signal is received or when chargeback stops being leader
-	run := func(leaderStopCh <-chan struct{}) {
-		stopCh := make(chan struct{})
-		go func() {
-			select {
-			case <-leaderStopCh:
-				if stopCh != nil {
-					close(stopCh)
-				}
-			case <-signalStopCh:
-				if stopCh != nil {
-					close(stopCh)
-				}
-			}
-		}()
-		runChargeback(logger, cfg, stopCh)
-	}
-	leaderelection.RunOrDie(leaderelection.LeaderElectionCon***REMOVED***g{
-		Lock:          rl,
-		LeaseDuration: defaultLeaseDuration,
-		RenewDeadline: defaultLeaseDuration / 2,
-		RetryPeriod:   2 * time.Second,
-		Callbacks: leaderelection.LeaderCallbacks{
-			OnStartedLeading: run,
-			OnStoppedLeading: func() {
-				log.Fatalf("leader election lost")
-			},
-		},
-	})
+	runChargeback(logger, cfg, signalStopCh)
 }
 
 func runChargeback(logger log.FieldLogger, cfg chargeback.Con***REMOVED***g, stopCh <-chan struct{}) {
@@ -163,7 +109,7 @@ func runChargeback(logger log.FieldLogger, cfg chargeback.Con***REMOVED***g, sto
 	if err = op.Run(stopCh); err != nil {
 		logger.WithError(err).Fatal("error occurred while the Chargeback operator was running")
 	}
-
+	logger.Infof("Chargeback operator has stopped")
 }
 
 // SetFlagsFromEnv parses all registered flags in the given flagset,

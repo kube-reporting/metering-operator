@@ -15,10 +15,16 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes/scheme"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/leaderelection/resourcelock"
+	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
@@ -35,6 +41,8 @@ const (
 )
 
 type Con***REMOVED***g struct {
+	PodName   string
+	Hostname  string
 	Namespace string
 
 	HiveHost       string
@@ -49,6 +57,8 @@ type Con***REMOVED***g struct {
 	PromsumInterval  time.Duration
 	PromsumStepSize  time.Duration
 	PromsumChunkSize time.Duration
+
+	LeaderLeaseDuration time.Duration
 }
 
 type Chargeback struct {
@@ -56,6 +66,7 @@ type Chargeback struct {
 	informers        cbInformers.SharedInformerFactory
 	queues           queues
 	chargebackClient cbClientset.Interface
+	kubeClient       corev1.CoreV1Interface
 
 	prestoConn  db.Queryer
 	prestoDB    *sql.DB
@@ -86,13 +97,19 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Cha
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
 
-	con***REMOVED***g, err := rest.InClusterCon***REMOVED***g()
+	kubeCon***REMOVED***g, err := rest.InClusterCon***REMOVED***g()
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Debugf("setting up Kubernetes client...")
+	op.kubeClient, err = corev1.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, err
 	}
 
 	logger.Debugf("setting up chargeback client...")
-	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(con***REMOVED***g)
+	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -274,20 +291,70 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}, stopCh)
 	c.logger.Info("writes to Presto are succeeding")
 
-	var wg sync.WaitGroup
-	c.logger.Info("starting Chargeback workers")
-	c.startWorkers(wg, stopCh)
-
-	c.logger.Infof("Chargeback successfully initialized, waiting for reports...")
+	c.logger.Info("basic initialization completed")
 	c.setInitialized()
 
-	<-stopCh
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartLogging(c.logger.Infof)
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: c.kubeClient.Events(c.cfg.Namespace)})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: c.cfg.PodName})
+
+	rl, err := resourcelock.New(resourcelock.Con***REMOVED***gMapsResourceLock,
+		c.cfg.Namespace, "chargeback-operator-leader-lease", c.kubeClient,
+		resourcelock.ResourceLockCon***REMOVED***g{
+			Identity:      c.cfg.Hostname,
+			EventRecorder: eventRecorder,
+		})
+	if err != nil {
+		return fmt.Errorf("error creating lock %v", err)
+	}
+
+	var wg sync.WaitGroup
+	// run shuts down chargeback by closing the stopCh passed to it when a signal is received or when chargeback stops being leader
+	run := func(leaderStopCh <-chan struct{}) {
+		c.logger.Infof("became leader")
+		stopWorkersCh := make(chan struct{})
+		go func() {
+			select {
+			case <-leaderStopCh:
+				if stopWorkersCh != nil {
+					close(stopWorkersCh)
+				}
+			case <-stopCh:
+				if stopWorkersCh != nil {
+					close(stopWorkersCh)
+				}
+			}
+		}()
+		c.logger.Info("starting Chargeback workers")
+		c.startWorkers(wg, stopCh)
+
+		c.logger.Infof("Chargeback workers started, watching for reports...")
+		<-stopWorkersCh
+	}
+	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionCon***REMOVED***g{
+		Lock:          rl,
+		LeaseDuration: c.cfg.LeaderLeaseDuration,
+		RenewDeadline: c.cfg.LeaderLeaseDuration / 2,
+		RetryPeriod:   2 * time.Second,
+		Callbacks: leaderelection.LeaderCallbacks{
+			OnStartedLeading: run,
+			OnStoppedLeading: func() {
+				c.logger.Warn("leader election lost")
+			},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("error creating leader elector: %v", err)
+	}
+
+	c.logger.Infof("starting leader election")
+	leader.Run()
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
 	httpSrv.stop()
 	go c.queues.ShutdownQueues()
 	wg.Wait()
 	c.logger.Info("Chargeback workers and collectors stopped")
-
 	return nil
 }
 

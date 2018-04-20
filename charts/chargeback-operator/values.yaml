@@ -31,6 +31,8 @@ con***REMOVED***g:
   logDMLQueries: "false"
   disablePromsum: "false"
 
+  leaderLeaseDuration: "60s"
+
 resources:
   requests:
     memory: "50Mi"
@@ -40,4 +42,4 @@ resources:
     cpu: "100m"
 
 updateStrategy:
-  type: Recreate
+  type: RollingUpdate
