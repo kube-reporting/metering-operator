@@ -32,6 +32,13 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("invalid report kind: %s", reportKind)
 	}
 
+	// presto uses `map(varchar, varchar)` while hive is `MAP<STRING, STRING>`
+	for idx, c := range columns {
+		if mapIndex := strings.Index(c.Type, "map("); mapIndex != -1 && strings.Index(c.Type, ")") > mapIndex {
+			columns[idx].Type = "MAP<STRING, STRING>"
+		}
+	}
+
 	storageSpec, err := c.getStorageSpec(logger, storage, reportKind)
 	if err != nil {
 		return nil, err
