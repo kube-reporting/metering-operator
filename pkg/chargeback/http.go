@@ -392,7 +392,11 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return req.StartTime.UTC(), req.EndTime.UTC(), nil
 	})
 
-	srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
+	err = srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
+		return
+	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
