@@ -35,6 +35,7 @@ def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
 
 def awsBillingBucket = "team-chargeback"
 def awsBillingBucketPrefix = "cost-usage-report/team-chargeback-chancez/"
+def enableAWSBilling = true
 
 echo "Params:\n${params}"
 
@@ -140,7 +141,7 @@ podTemplate(
                     "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
                     "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
                     "CHARGEBACK_SHORT_TESTS=${shortTests}",
-                    "ENABLE_AWS_BILLING=false",
+                    "ENABLE_AWS_BILLING=${enableAWSBilling}",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPrefix}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
