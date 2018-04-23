@@ -6,7 +6,6 @@ source "${DIR}/util.sh"
 
 MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
-: "${SKIP_COPY_PULL_SECRET:=false}"
 : "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 
@@ -15,19 +14,6 @@ if [ "$CREATE_NAMESPACE" == "true" ]; then
     kubectl create namespace "${CHARGEBACK_NAMESPACE}" || true
 elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
     echo "Namespace '${CHARGEBACK_NAMESPACE}' does not exist, please create it before starting"
-    exit 1
-fi
-
-if [[ "$SKIP_COPY_PULL_SECRET" != "true" || "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]]; then
-    msg "Configuring pull secrets"
-    copy-tectonic-pull
-elif [ -s "$CHARGEBACK_PULL_SECRET_PATH" ]; then
-    kubectl -n "${CHARGEBACK_NAMESPACE}" \
-        create secret generic coreos-pull-secret \
-        --from-file=.dockerconfigjson="${CHARGEBACK_PULL_SECRET_PATH}" \
-        --type='kubernetes.io/dockerconfigjson'
-else
-    echo "\$SKIP_COPY_PULL_SECRET and \$CHARGEBACK_PULL_SECRET_PATH not a dockerconfigjson"
     exit 1
 fi
 
