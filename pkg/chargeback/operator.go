@@ -21,11 +21,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
@@ -65,6 +67,7 @@ type Config struct {
 
 type Chargeback struct {
 	cfg              Config
+	kubeConfig       *rest.Config
 	informers        cbInformers.SharedInformerFactory
 	queues           queues
 	chargebackClient cbClientset.Interface
@@ -112,19 +115,20 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, er
 		clientConfig = clientcmd.NewDefaultClientConfig(*apiCfg, configOverrides)
 	}
 
-	kubeConfig, err := clientConfig.ClientConfig()
+	var err error
+	op.kubeConfig, err = clientConfig.ClientConfig()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get Kubernetes client config: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	op.kubeClient, err = corev1.NewForConfig(kubeConfig)
+	op.kubeClient, err = corev1.NewForConfig(op.kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
 	logger.Debugf("setting up Chargeback client...")
-	op.chargebackClient, err = cbClientset.NewForConfig(kubeConfig)
+	op.chargebackClient, err = cbClientset.NewForConfig(op.kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Chargeback client: %v", err)
 	}
@@ -282,8 +286,19 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	defer c.prestoDB.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
+	transportConfig, err := c.kubeConfig.TransportConfig()
+	if err != nil {
+		return err
+	}
+
+	roundTripper, err := transport.New(transportConfig)
+	if err != nil {
+		return err
+	}
+
 	c.promConn, err = c.newPrometheusConn(promapi.Config{
-		Address: c.cfg.PromHost,
+		Address:      c.cfg.PromHost,
+		RoundTripper: roundTripper,
 	})
 	if err != nil {
 		return err
