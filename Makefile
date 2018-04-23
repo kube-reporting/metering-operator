@@ -154,7 +154,7 @@ chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/char
 chargeback-integration-tests-docker-build: images/integration-tests/Dockerfile hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Dockerfile images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Dockerfile images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz helm-operator-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Dockerfile
@@ -197,9 +197,15 @@ images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml: ./hack
 
 tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz
 
+openshift-chargeback-chart: images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz
+
 images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell find charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
+
+images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell find charts -type f)
+	helm dep update --skip-refresh charts/openshift-chargeback
+	helm package --save=false -d images/chargeback-helm-operator charts/openshift-chargeback
 
 chargeback-manifests:
 	./hack/create-chargeback-manifests.sh $(RELEASE_TAG)

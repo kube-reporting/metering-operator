@@ -133,14 +133,15 @@ EOF
 
 helmUpgrade() {
     RELEASE_NAME=$1
+    CHART_LOCATION=$2
     helm upgrade \
         --install \
         --namespace "$MY_POD_NAMESPACE" \
         --wait="$HELM_WAIT" \
         --timeout="$HELM_WAIT_TIMEOUT" \
         "$RELEASE_NAME"\
-        "$HELM_CHART_PATH" \
-        "${@:2}"
+        "$CHART_LOCATION" \
+        "${@:3}"
     HELM_EXIT_CODE=$?
     if [ $HELM_EXIT_CODE != 0 ]; then
         echo "helm upgrade failed, exit code: $HELM_EXIT_CODE"
@@ -172,6 +173,7 @@ while true; do
             RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
             RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
             RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
+            CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
 
             HELM_ARGS=()
             if [ -s "$EXTRA_VALUES_FILE" ]; then
@@ -198,7 +200,10 @@ while true; do
                 HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
 
                 echo "Running helm upgrade for release $RELEASE_NAME"
-                helmUpgrade "$RELEASE_NAME" "${HELM_ARGS[@]}"
+                # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
+                CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
+                echo "Using $CHART as chart"
+                helmUpgrade "$RELEASE_NAME" "$CHART" "${HELM_ARGS[@]}"
 
                 writeReleaseConfigmapsFile "$RELEASE_NAME"
                 setOwnerOnReleaseConfigmaps
