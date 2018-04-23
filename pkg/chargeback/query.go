@@ -190,7 +190,7 @@ func (c *Chargeback) getDependentGenerationQueries(generationQuery *cbTypes.Repo
 		return nil, err
 	}
 	queries := make([]*cbTypes.ReportGenerationQuery, 0, len(queriesAccumulator))
-	for _, query := range queries {
+	for _, query := range queriesAccumulator {
 		queries = append(queries, query)
 	}
 	return queries, nil
