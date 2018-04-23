@@ -149,8 +149,6 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
-      imagePullSecrets:
-      - name: coreos-pull-secret
       volumes:
       - name: hive-metastore-db-data
         persistentVolumeClaim:

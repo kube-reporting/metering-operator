@@ -85,8 +85,6 @@ spec:
       volumes:
       - name: presto-data
         emptyDir: {}
-      imagePullSecrets:
-      - name: coreos-pull-secret
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
