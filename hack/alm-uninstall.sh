@@ -7,11 +7,6 @@ source ${DIR}/util.sh
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 : "${SKIP_DELETE_CRDS:=true}"
 
-if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
-    msg "Removing pull secrets"
-    kube-remove-non-file secret coreos-pull-secret
-fi
-
 msg "Removing Chargeback Resource"
 kube-remove \
     "$CHARGEBACK_CR_FILE"

@@ -133,8 +133,6 @@ spec:
         resources:
 {{ toYaml .Values.namenode.resources | indent 10 }}
       serviceAccount: hdfs
-      imagePullSecrets:
-      - name: coreos-pull-secret
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-namenode-data"

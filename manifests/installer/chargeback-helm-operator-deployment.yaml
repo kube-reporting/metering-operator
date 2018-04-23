@@ -90,4 +90,4 @@ spec:
       terminationGracePeriodSeconds: 30
       serviceAccount: chargeback-helm-operator
       imagePullSecrets:
-        - name: coreos-pull-secret
+        []
