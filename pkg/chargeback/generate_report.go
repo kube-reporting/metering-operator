@@ -14,13 +14,29 @@ import (
 	"github.com/coreos-inc/kube-chargeback/pkg/presto"
 )
 
-func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, columns []hive.Column, query string, deleteExistingData bool) ([]map[string]interface{}, error) {
+func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, deleteExistingData bool) ([]map[string]interface{}, error) {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
 	})
 	logger.Infof("generating usage report")
-	query, err := renderReportGenerationQuery(reportStart, reportEnd, query)
+
+	dependentQueries, err := c.getDependentGenerationQueries(generationQuery, true)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get dependent generationQueries for %s, err: %v", generationQuery.Name, err)
+	}
+
+	columns := generateHiveColumns(generationQuery)
+
+	templateInfo := &templateInfo{
+		DynamicDependentQueries: dependentQueries,
+		Report: &reportTemplateInfo{
+			StartPeriod: reportStart,
+			EndPeriod:   reportEnd,
+		},
+	}
+	qr := queryRenderer{templateInfo: templateInfo}
+	query, err := qr.Render(generationQuery.Spec.Query)
 	if err != nil {
 		return nil, err
 	}

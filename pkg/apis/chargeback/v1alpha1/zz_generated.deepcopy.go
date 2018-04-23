@@ -443,6 +443,11 @@ func (in *ReportGenerationQuerySpec) DeepCopyInto(out *ReportGenerationQuerySpec
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.DynamicReportQueries != nil {
+		in, out := &in.DynamicReportQueries, &out.DynamicReportQueries
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.DataSources != nil {
 		in, out := &in.DataSources, &out.DataSources
 		*out = make([]string, len(*in))
