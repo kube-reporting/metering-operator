@@ -27,7 +27,7 @@ spec:
 
     config:
       disablePromsum: true
-      prometheusURL: "http://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
+      prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
 
   presto:
     presto:
