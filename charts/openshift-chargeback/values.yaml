@@ -1,0 +1,20 @@
+chargeback-operator:
+  con***REMOVED***g:
+    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
+
+  image:
+    tag: latest
+
+presto:
+  presto:
+    securityContext:
+      fsGroup: null
+  hive:
+    securityContext:
+      fsGroup: null
+hdfs:
+  enabled: true
+
+  securityContext:
+    fsGroup: null
+

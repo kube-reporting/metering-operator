@@ -20,6 +20,8 @@ apiVersion: chargeback.coreos.com/v1alpha1
 kind: Chargeback
 metadata:
   name: "openshift-chargeback"
+  annotations:
+    "helm-operator.coreos.com/chart-location": "/openshift-chargeback-0.1.0.tgz"
 spec:
   chargeback-operator:
     image:
@@ -27,18 +29,13 @@ spec:
 
     con***REMOVED***g:
       disablePromsum: true
-      prometheusURL: "http://prometheus-k8s.monitoring.svc.cluster.local:9090/"
 
   presto:
     presto:
       terminationGracePeriodSeconds: 0
-      securityContext:
-        fsGroup: null
       image:
         tag: ${DEPLOY_TAG}
     hive:
-      securityContext:
-        fsGroup: null
       terminationGracePeriodSeconds: 0
       image:
         tag: ${DEPLOY_TAG}
@@ -46,8 +43,6 @@ spec:
   hdfs:
     image:
       tag: ${DEPLOY_TAG}
-    securityContext:
-      fsGroup: null
     datanode:
       terminationGracePeriodSeconds: 0
     namenode:

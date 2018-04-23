@@ -1,0 +1,12 @@
+dependencies:
+- name: chargeback-operator
+  repository: ***REMOVED***le://../chargeback-operator
+  version: 0.1.0
+- name: presto
+  repository: ***REMOVED***le://../presto
+  version: 0.1.0
+- name: hdfs
+  repository: ***REMOVED***le://../hdfs
+  version: 0.1.0
+digest: sha256:14fb0eb05d0b8ace2fd3f2f759058fd03c85db0d0669f24e5cde541cd108f8d4
+generated: 2017-12-19T18:32:24.386546119-08:00
