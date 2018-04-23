@@ -8,11 +8,6 @@ source ${DIR}/util.sh
 : "${DELETE_PVCS:=false}"
 : "${SKIP_DELETE_CRDS:=true}"
 
-if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
-    msg "Removing pull secrets"
-    kube-remove-non-***REMOVED***le secret coreos-pull-secret
-***REMOVED***
-
 msg "Removing Chargeback Resource"
 kube-remove \
     "$CHARGEBACK_CR_FILE"

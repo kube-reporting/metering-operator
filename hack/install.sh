@@ -4,9 +4,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/default-env.sh"
 source "${DIR}/util.sh"
 
+MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
-: "${SKIP_COPY_PULL_SECRET:=false}"
-: "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
+: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/installer}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
@@ -17,22 +17,9 @@ elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
     exit 1
 ***REMOVED***
 
-if [[ "$SKIP_COPY_PULL_SECRET" != "true" && "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]]; then
-    msg "Con***REMOVED***guring pull secrets"
-    copy-tectonic-pull
-elif [ -s "$CHARGEBACK_PULL_SECRET_PATH" ]; then
-    kubectl -n "${CHARGEBACK_NAMESPACE}" \
-        create secret generic coreos-pull-secret \
-        --from-***REMOVED***le=.dockercon***REMOVED***gjson="${CHARGEBACK_PULL_SECRET_PATH}" \
-        --type='kubernetes.io/dockercon***REMOVED***gjson'
-***REMOVED***
-    echo "\$SKIP_COPY_PULL_SECRET and \$CHARGEBACK_PULL_SECRET_PATH not a dockercon***REMOVED***gjson"
-    exit 1
-***REMOVED***
-
 msg "Installing Custom Resource De***REMOVED***nitions"
 kube-install \
-    manifests/custom-resource-de***REMOVED***nitions
+    "$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions"
 
 msg "Installing chargeback-helm-operator service account and RBAC resources"
 kube-install \
