@@ -356,8 +356,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				reportPeriod.periodStart,
 				reportPeriod.periodEnd,
 				job.report.Spec.Output,
-				columns,
-				genQuery.Spec.Query,
+				genQuery,
 				false,
 			)
 

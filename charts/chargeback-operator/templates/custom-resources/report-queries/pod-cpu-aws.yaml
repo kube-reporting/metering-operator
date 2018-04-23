@@ -11,6 +11,7 @@ spec:
   reportQueries:
   - "pod-cpu-request-raw"
   - "node-cpu-allocatable"
+  dynamicReportQueries:
   - "aws-ec2-billing-data"
   view:
     disabled: true
@@ -33,7 +34,7 @@ spec:
     type: double
   query: |
     WITH aws_billing_filtered AS (
-        {| filterAWSData .Report "aws-ec2-billing-data" |}
+      {| renderReportGenerationQuery "aws-ec2-billing-data" . |}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_filtered.period_cost * aws_billing_filtered.period_percent) as cluster_cost
