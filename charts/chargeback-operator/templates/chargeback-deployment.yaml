@@ -107,5 +107,3 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: chargeback
-      imagePullSecrets:
-      - name: coreos-pull-secret
