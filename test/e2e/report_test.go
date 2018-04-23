@@ -104,7 +104,21 @@ func TestReportsProduceData(t *testing.T) {
 			queryName: "node-memory-utilization",
 			timeout:   reportTestTimeout,
 		},
-		// TODO(chancez): Add AWS Reports
+		{
+			name:      "pod-cpu-request-aws",
+			queryName: "pod-cpu-request-aws",
+			timeout:   reportTestTimeout,
+		},
+		{
+			name:      "pod-memory-request-aws",
+			queryName: "pod-memory-request-aws",
+			timeout:   reportTestTimeout,
+		},
+		{
+			name:      "aws-ec2-cluster-cost",
+			queryName: "aws-ec2-cluster-cost",
+			timeout:   reportTestTimeout,
+		},
 	}
 
 	reportStart, reportEnd := collectMetricsOnce(t)
