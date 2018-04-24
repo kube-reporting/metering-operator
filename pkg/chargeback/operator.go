@@ -290,7 +290,8 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return false, nil
 	}, stopCh)
 	c.logger.Info("writes to Presto are succeeding")
-
+	// this is a comment line
+	c.logger.Info("THIS IS A LINE TESTING THAT I AM VIEWING CHANGES IN MY CLUSTER/BRANCH")
 	c.logger.Info("basic initialization completed")
 	c.setInitialized()
 
