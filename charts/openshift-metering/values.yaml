@@ -1,6 +1,6 @@
 metering-operator:
   con***REMOVED***g:
-    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
+    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9090/"
 
   image:
     tag: latest
