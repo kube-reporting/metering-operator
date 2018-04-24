@@ -6,6 +6,8 @@ import (
 	"io"
 	"math/rand"
 	"net"
+	"net/http"
+	"os"
 	"sync"
 	"syscall"
 	"time"
@@ -41,6 +43,8 @@ const (
 	connBackoff         = time.Second * 15
 	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
+
+	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 )
 
 type Config struct {
@@ -291,9 +295,15 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	roundTripper, err := transport.New(transportConfig)
-	if err != nil {
-		return err
+	var roundTripper http.RoundTripper
+	if _, err := os.Stat(serviceServingCAFile); err == nil {
+		// use the service serving CA for prometheus
+		transportConfig.TLS.CAFile = serviceServingCAFile
+		roundTripper, err = transport.New(transportConfig)
+		if err != nil {
+			return err
+		}
+		c.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
 	}
 
 	c.promConn, err = c.newPrometheusConn(promapi.Config{
