@@ -11,6 +11,7 @@ RUN \
         procps \
         net-tools \
         dnsutils \
+        jq \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -52,6 +53,7 @@ RUN cp /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml
 RUN mkdir -p /opt/hadoop-$HADOOP_VERSION/logs
 
 ADD entrypoint.sh /usr/local/bin
+ADD check-datanode-healthy.sh /usr/local/bin
 ADD datanode-entrypoint.sh /usr/local/bin
 ADD namenode-entrypoint.sh /usr/local/bin
 ADD start-name.sh /usr/local/bin
