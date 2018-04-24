@@ -275,6 +275,9 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
+	// use the service serving CA for prometheus
+	transportConfig.TLS.CAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+
 	roundTripper, err := transport.New(transportConfig)
 	if err != nil {
 		return err
