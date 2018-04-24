@@ -141,6 +141,14 @@ spec:
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data
           subPath: hadoop/dfs/data
+        livenessProbe:
+          exec:
+            command:
+            - check-datanode-healthy.sh
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          failureThreshold: 2
+          successThreshold: 1
         resources:
 {{ toYaml .Values.datanode.resources | indent 10 }}
       serviceAccount: hdfs
