@@ -71,6 +71,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	}
 
 	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2Handler)
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
@@ -154,7 +155,7 @@ func (srv *server) writeResponseWithBody(logger log.FieldLogger, w http.Response
 	}
 }
 
-func (srv *server) validateGetReportReq(logger log.FieldLogger, w http.ResponseWriter, r *http.Request) bool {
+func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryParams []string, w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != "GET" {
 		srv.writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
 		return false
@@ -164,7 +165,7 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, w http.ResponseW
 		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
 		return false
 	}
-	err = checkForFields([]string{"name", "format"}, r.Form)
+	err = checkForFields(requiredQueryParams, r.Form)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusBadRequest, "%v", err)
 		return false
@@ -179,15 +180,24 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, w http.ResponseW
 
 func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	if !srv.validateGetReportReq(logger, w, r) {
+	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], w, r)
+	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, w, r)
+}
+
+func (srv *server) getReportV2Handler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	name := chi.URLParam(r, "name")
+	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
+		return
+	}
+	srv.getReport(logger, name, r.Form["format"][0], true, w, r)
 }
 
 func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	if !srv.validateGetReportReq(logger, w, r) {
+	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
 		return
 	}
 	srv.getScheduledReport(logger, r.Form["name"][0], r.Form["format"][0], w, r)
@@ -277,7 +287,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 
 	srv.writeResults(logger, format, columns, results, w, r)
 }
-func (srv *server) getReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
 	report, err := srv.chargeback.informers.Chargeback().V1alpha1().Reports().Lister().Reports(srv.chargeback.cfg.Namespace).Get(name)
 	if err != nil {
@@ -332,8 +342,11 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, w http
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
-
-	srv.writeResults(logger, format, columns, results, w, r)
+	if useNewFormat {
+		srv.writeResultsV2(logger, format, columns, results, w, r)
+	} else {
+		srv.writeResults(logger, format, columns, results, w, r)
+	}
 }
 
 func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
@@ -408,6 +421,44 @@ func (srv *server) writeResults(logger log.FieldLogger, format string, columns [
 		csvWriter.Flush()
 		w.Header().Set("Content-Type", "text/csv")
 		w.Write(buf.Bytes())
+	}
+}
+
+type GetReportResults struct {
+	Results []ReportResultEntry `json:"results"`
+}
+
+type ReportResultEntry struct {
+	Values []ReportResultValues `json:"values"`
+}
+
+type ReportResultValues struct {
+	Name  string      `json:"name"`
+	Value interface{} `json:"value"`
+}
+
+func convertsToGetReportResults(input []map[string]interface{}) GetReportResults {
+	results := GetReportResults{}
+
+	for _, row := range input {
+		var valSlice ReportResultEntry
+		for columnName, columnValue := range row {
+			resultsValue := ReportResultValues{
+				Name:  columnName,
+				Value: columnValue,
+			}
+			valSlice.Values = append(valSlice.Values, resultsValue)
+		}
+		results.Results = append(results.Results, valSlice)
+	}
+	return results
+}
+
+func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+	switch format {
+	case "json":
+		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results))
+		return
 	}
 }
 
