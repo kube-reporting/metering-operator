@@ -36,7 +36,7 @@
 		]
 	},
 	{
-		"project": "github.com/coreos-inc/kube-chargeback",
+		"project": "github.com/operator-framework/operator-metering",
 		"licenses": [
 			{
 				"type": "Apache License 2.0",
