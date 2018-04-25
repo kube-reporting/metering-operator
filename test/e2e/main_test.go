@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
-	"github.com/coreos-inc/kube-chargeback/test/framework"
+	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/test/framework"
 )
 
 var (

@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-SCRIPT_PACKAGE=github.com/coreos-inc/kube-chargeback
+SCRIPT_PACKAGE=github.com/operator-framework/operator-metering
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo k8s.io/code-generator)}
 

@@ -7,10 +7,10 @@ package v1alpha1
 import (
 	time "time"
 
-	chargeback_v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	versioned "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
-	internalinterfaces "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/generated/listers/chargeback/v1alpha1"
+	chargeback_v1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

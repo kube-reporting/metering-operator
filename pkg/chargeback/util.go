@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/sirupsen/logrus"
 )
 

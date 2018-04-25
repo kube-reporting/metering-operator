@@ -17,11 +17,11 @@ import (
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 
-	api "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
-	"github.com/coreos-inc/kube-chargeback/pkg/db"
-	"github.com/coreos-inc/kube-chargeback/pkg/presto"
-	"github.com/coreos-inc/kube-chargeback/pkg/util/orderedmap"
+	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/pkg/db"
+	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
 
 var ErrReportIsRunning = errors.New("the report is still running")

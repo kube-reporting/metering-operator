@@ -15,8 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/presto"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
 )
 
 type Framework struct {

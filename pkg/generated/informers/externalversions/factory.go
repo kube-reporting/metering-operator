@@ -9,9 +9,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
-	chargeback "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback"
-	internalinterfaces "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/internalinterfaces"
+	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
+	chargeback "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/chargeback"
+	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

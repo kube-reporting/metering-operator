@@ -34,7 +34,7 @@ RUN curl \
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
 RUN mkdir -p /go/src/github.com/coreos-inc
-COPY . /go/src/github.com/coreos-inc/kube-chargeback
-WORKDIR /go/src/github.com/coreos-inc/kube-chargeback
+COPY . /go/src/github.com/operator-framework/operator-metering
+WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 CMD ["hack/e2e.sh"]

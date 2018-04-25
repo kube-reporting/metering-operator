@@ -67,7 +67,7 @@ podTemplate(
     node (podLabel) {
     timestamps {
         def gopath = "${env.WORKSPACE}/go"
-        def kubeChargebackDir = "${gopath}/src/github.com/coreos-inc/kube-chargeback"
+        def kubeChargebackDir = "${gopath}/src/github.com/operator-framework/operator-metering"
         def testOutputDir = "test_output"
         def testOutputDirAbsolutePath = "${env.WORKSPACE}/${testOutputDir}"
 
