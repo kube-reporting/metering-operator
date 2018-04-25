@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/clock"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/chargeback"
 )
 
 var (

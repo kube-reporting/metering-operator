@@ -11,8 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	cbutil "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1/util"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
