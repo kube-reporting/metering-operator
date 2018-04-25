@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

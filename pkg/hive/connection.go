@@ -8,7 +8,7 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 	log "github.com/sirupsen/logrus"
 
-	hive "github.com/coreos-inc/kube-chargeback/pkg/hive/hive_thrift"
+	hive "github.com/operator-framework/operator-metering/pkg/hive/hive_thrift"
 )
 
 var (

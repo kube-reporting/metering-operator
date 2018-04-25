@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/aws"
+	"github.com/operator-framework/operator-metering/pkg/aws"
 )
 
 var (

@@ -7,7 +7,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	v1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )

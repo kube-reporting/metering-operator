@@ -3,9 +3,9 @@
 package fake
 
 import (
-	clientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
-	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
-	fakechargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1/fake"
+	clientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
+	fakechargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

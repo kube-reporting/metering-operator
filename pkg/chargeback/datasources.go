@@ -7,9 +7,9 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/aws"
-	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/aws"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 func (c *Chargeback) runReportDataSourceWorker() {
