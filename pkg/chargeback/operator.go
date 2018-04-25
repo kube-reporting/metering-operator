@@ -27,11 +27,11 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
-	cbTypes "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/db"
-	cbClientset "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
-	cbInformers "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions"
-	"github.com/coreos-inc/kube-chargeback/pkg/hive"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/db"
+	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
+	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 const (

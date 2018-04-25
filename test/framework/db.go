@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/coreos-inc/kube-chargeback/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/chargeback"
 )
 
 func (f *Framework) StoreDataSourceData(dataSourceName string, records []*chargeback.PromsumRecord) error {

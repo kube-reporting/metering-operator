@@ -1,7 +1,7 @@
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 # Package
-GO_PKG := github.com/coreos-inc/kube-chargeback
+GO_PKG := github.com/operator-framework/operator-metering
 CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
 
 DOCKER_BUILD_ARGS ?=
@@ -31,7 +31,6 @@ CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-test
 
 GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
 
-
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
 USE_RELEASE_TAG = true
@@ -45,7 +44,8 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq '.Deps[] | select(. | contains("github.com/coreos-inc/kube-chargeback"))' -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(CHARGEBACK_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
+CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(CHARGEBACK_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
 CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
 

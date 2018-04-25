@@ -3,8 +3,8 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
-	"github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned/scheme"
+	v1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/scheme"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )

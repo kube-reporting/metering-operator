@@ -7,7 +7,7 @@ package internalinterfaces
 import (
 	time "time"
 
-	versioned "github.com/coreos-inc/kube-chargeback/pkg/generated/clientset/versioned"
+	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	cache "k8s.io/client-go/tools/cache"

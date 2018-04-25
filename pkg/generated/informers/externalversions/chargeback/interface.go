@@ -5,8 +5,8 @@
 package chargeback
 
 import (
-	v1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/chargeback/v1alpha1"
-	internalinterfaces "github.com/coreos-inc/kube-chargeback/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/chargeback/v1alpha1"
+	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

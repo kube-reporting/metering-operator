@@ -5,7 +5,7 @@ import (
 
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	chargebackv1alpha1 "github.com/coreos-inc/kube-chargeback/pkg/apis/chargeback/v1alpha1"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 )
 
 func (f *Framework) CreateChargebackReport(report *chargebackv1alpha1.Report) error {
