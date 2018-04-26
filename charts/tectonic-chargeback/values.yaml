@@ -1,3 +1,6 @@
+chargeback-operator:
+  config:
+    prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
 presto:
   presto:
     securityContext:

@@ -20,7 +20,7 @@ config:
     bucket: ""
     path: ""
 
-  prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
+  prometheusURL: ""
 
   promsumPollInterval: "5m"
   promsumChunkSize: "5m"
