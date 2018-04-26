@@ -63,13 +63,13 @@ ifdef DOCKER_CACHE_FROM_ENABLED
 endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
-	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
 endif
 ifeq ($(USE_RELEASE_TAG), true)
-	$(MAKE) docker-tag IMAGE_TAG=$(RELEASE_TAG)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(RELEASE_TAG)
 endif
 ifeq ($(USE_LATEST_TAG), true)
-	$(MAKE) docker-tag IMAGE_TAG=latest
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=latest
 endif
 
 # Usage:
