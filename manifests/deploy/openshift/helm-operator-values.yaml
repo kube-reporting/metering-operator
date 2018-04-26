@@ -1,0 +1,7 @@
+name: chargeback-helm-operator
+
+cr:
+  create: true
+  name: "openshift-chargeback"
+
+chartPath: "/openshift-chargeback-0.1.0.tgz"
