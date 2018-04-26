@@ -9,10 +9,10 @@ crd:
   apiGroup: chargeback.coreos.com
   apiVersion: v1alpha1
 
-  plural: chargebacks
-  singular: chargeback
-  kind: Chargeback
-  listKind: ChargebackList
+  plural: meterings
+  singular: metering
+  kind: Metering
+  listKind: MeteringList
 
   annotations:
     catalog.app.coreos.com/displayName: "Chargeback"

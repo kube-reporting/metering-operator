@@ -22,7 +22,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: HELM_RELEASE_CRD_NAME
-          value: Chargeback
+          value: Metering
         - name: HELM_RELEASE_CRD_API_GROUP
           value: chargeback.coreos.com
         - name: HELM_CHART_PATH
