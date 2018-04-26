@@ -6,8 +6,8 @@ source "${DIR}/util.sh"
 
 MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/installer}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
+: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
+: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
     echo "Creating namespace ${CHARGEBACK_NAMESPACE}"
@@ -21,15 +21,15 @@ msg "Installing Custom Resource De***REMOVED***nitions"
 kube-install \
     "$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions"
 
-msg "Installing chargeback-helm-operator service account and RBAC resources"
+msg "Installing metering-helm-operator service account and RBAC resources"
 kube-install \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml" \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rolebinding.yaml"
+    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-service-account.yaml" \
+    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-role.yaml" \
+    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-rolebinding.yaml"
 
-msg "Installing chargeback-helm-operator"
+msg "Installing metering-helm-operator"
 kube-install \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-deployment.yaml"
 
 msg "Installing Chargeback Resource"
 kube-install \
