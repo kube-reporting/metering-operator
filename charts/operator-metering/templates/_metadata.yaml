@@ -1,0 +1,6 @@
+{{- de***REMOVED***ne "extraMetadata" }}
+{{- if .Values.global.ownerReferences }}
+  ownerReferences:
+{{ .Values.global.ownerReferences | toYaml | indent 2}}
+{{- end }}
+{{- end }}
