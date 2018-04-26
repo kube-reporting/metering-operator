@@ -25,6 +25,8 @@ spec:
           value: Chargeback
         - name: HELM_RELEASE_CRD_API_GROUP
           value: chargeback.coreos.com
+        - name: HELM_CHART_PATH
+          value: /tectonic-chargeback-0.1.0.tgz
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:

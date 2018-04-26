@@ -1,3 +1,5 @@
 tectonic-chargeback-0.1.0.tgz
-tectonic-chargeback-override-values.yaml
 openshift-chargeback-0.1.0.tgz
+operator-metering-0.1.0.tgz
+chargeback-override-values.yaml
+tectonic-chargeback-override-values.yaml
