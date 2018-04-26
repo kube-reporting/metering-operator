@@ -1,8 +1,0 @@
-apiVersion: app.coreos.com/v1alpha1
-kind: InstallPlan-v1
-metadata:
-  name: chargeback
-spec:
-  clusterServiceVersionNames:
-  - chargeback-helm-operator.v0.5.1
-  approval: Automatic

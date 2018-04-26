@@ -1,0 +1,6 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Chargeback
+metadata:
+  name: "openshift-chargeback"
+  annotations:
+    "helm-operator.coreos.com/chart-location": "/openshift-chargeback-0.1.0.tgz"
