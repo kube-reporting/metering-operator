@@ -1,7 +1,7 @@
-name: chargeback-helm-operator
+name: metering-helm-operator
 
 cr:
   create: true
-  name: "openshift-chargeback"
+  name: "openshift-metering"
 
-chartPath: "/openshift-chargeback-0.1.0.tgz"
+chartPath: "/openshift-metering-0.1.0.tgz"
