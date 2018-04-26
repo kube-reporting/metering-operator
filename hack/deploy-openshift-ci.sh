@@ -3,7 +3,11 @@ set -e
 
 : ${DEPLOY_TAG:?}
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 TMP_DIR="$(mktemp -d)"
+DEPLOY_DIR="$DIR/../manifests/deploy"
+
 export CHARGEBACK_CR_FILE=${CHARGEBACK_CR_FILE:-"$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"}
 export INSTALLER_MANIFEST_DIR=${INSTALLER_MANIFEST_DIR:-"$TMP_DIR/installer_manifests-${DEPLOY_TAG}"}
 export CUSTOM_VALUES_FILE=${CUSTOM_VALUES_FILE:-"$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"}
@@ -59,7 +63,11 @@ EOF
 
 echo "Creating installer manifests"
 
-./hack/create-installer-manifests.sh "$CUSTOM_VALUES_FILE"
+"$DIR/create-deploy-manifests.sh" \
+    "$INSTALLER_MANIFEST_DIR" \
+    "$DEPLOY_DIR/common-helm-operator-values.yaml" \
+    "$DEPLOY_DIR/openshift/helm-operator-values.yaml" \
+    "$CUSTOM_VALUES_FILE"
 
 echo "Deploying"
 
