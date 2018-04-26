@@ -154,7 +154,13 @@ chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeba
 chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz images/chargeback-helm-operator/chargeback-override-values.yaml images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz helm-operator-docker-build
+chargeback-helm-operator-docker-build: \
+		images/chargeback-helm-operator/Docker***REMOVED***le \
+		helm-operator-docker-build \
+		images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz \
+		images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz \
+		images/chargeback-helm-operator/operator-metering-0.1.0.tgz \
+		images/chargeback-helm-operator/chargeback-override-values.yaml
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
@@ -199,6 +205,8 @@ tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0
 
 openshift-chargeback-chart: images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz
 
+operator-metering-chart: images/chargeback-helm-operator/operator-metering-0.1.0.tgz
+
 images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
@@ -206,6 +214,10 @@ images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback
 images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/openshift-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/openshift-chargeback
+
+images/chargeback-helm-operator/operator-metering-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+	helm dep update --skip-refresh charts/operator-metering
+	helm package --save=false -d images/chargeback-helm-operator charts/operator-metering
 
 chargeback-manifests:
 	./hack/create-chargeback-manifests.sh $(RELEASE_TAG)
