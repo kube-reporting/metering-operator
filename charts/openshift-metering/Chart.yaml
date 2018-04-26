@@ -1,4 +1,4 @@
 apiVersion: v1
 description: A Helm chart for Kubernetes
-name: tectonic-chargeback
+name: openshift-metering
 version: 0.1.0

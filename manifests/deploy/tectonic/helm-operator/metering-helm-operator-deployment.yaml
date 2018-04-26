@@ -1,9 +1,9 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: chargeback-helm-operator
+  name: metering-helm-operator
   labels:
-    app: chargeback-helm-operator
+    app: metering-helm-operator
 spec:
   replicas: 1
   strategy:
@@ -11,12 +11,12 @@ spec:
   template:
     metadata:
       labels:
-        app: chargeback-helm-operator
+        app: metering-helm-operator
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - name: chargeback-helm-operator
+      - name: metering-helm-operator
         image: "quay.io/coreos/chargeback-helm-operator:0.6.0-latest"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
@@ -26,7 +26,7 @@ spec:
         - name: HELM_RELEASE_CRD_API_GROUP
           value: chargeback.coreos.com
         - name: HELM_CHART_PATH
-          value: /tectonic-chargeback-0.1.0.tgz
+          value: /tectonic-metering-0.1.0.tgz
         - name: MY_POD_NAME
           valueFrom:
             ***REMOVED***eldRef:
@@ -90,6 +90,6 @@ spec:
           timeoutSeconds: 1
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      serviceAccount: chargeback-helm-operator
+      serviceAccount: metering-helm-operator
       imagePullSecrets:
         []

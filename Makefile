@@ -155,12 +155,12 @@ chargeback-integration-tests-docker-build: images/integration-tests/Docker***REM
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 chargeback-helm-operator-docker-build: \
-		images/chargeback-helm-operator/Docker***REMOVED***le \
+		images/metering-helm-operator/Docker***REMOVED***le \
 		helm-operator-docker-build \
-		images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz \
-		images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz \
-		images/chargeback-helm-operator/operator-metering-0.1.0.tgz \
-		images/chargeback-helm-operator/chargeback-override-values.yaml
+		images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
+		images/metering-helm-operator/openshift-metering-0.1.0.tgz \
+		images/metering-helm-operator/operator-metering-0.1.0.tgz \
+		images/metering-helm-operator/metering-override-values.yaml
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
@@ -187,7 +187,7 @@ fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: k8s-verify-codegen chargeback-manifests fmt
+ci-validate: k8s-verify-codegen metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
@@ -198,29 +198,29 @@ $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
-images/chargeback-helm-operator/chargeback-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz
+tectonic-metering-chart: images/metering-helm-operator/tectonic-metering-0.1.0.tgz
 
-openshift-chargeback-chart: images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz
+openshift-metering-chart: images/metering-helm-operator/openshift-metering-0.1.0.tgz
 
-operator-metering-chart: images/chargeback-helm-operator/operator-metering-0.1.0.tgz
+operator-metering-chart: images/metering-helm-operator/operator-metering-0.1.0.tgz
 
-images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
-	helm dep update --skip-refresh charts/tectonic-chargeback
-	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
+images/metering-helm-operator/tectonic-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+	helm dep update --skip-refresh charts/tectonic-metering
+	helm package --save=false -d images/metering-helm-operator charts/tectonic-metering
 
-images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
-	helm dep update --skip-refresh charts/openshift-chargeback
-	helm package --save=false -d images/chargeback-helm-operator charts/openshift-chargeback
+images/metering-helm-operator/openshift-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+	helm dep update --skip-refresh charts/openshift-metering
+	helm package --save=false -d images/metering-helm-operator charts/openshift-metering
 
-images/chargeback-helm-operator/operator-metering-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+images/metering-helm-operator/operator-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/operator-metering
-	helm package --save=false -d images/chargeback-helm-operator charts/operator-metering
+	helm package --save=false -d images/metering-helm-operator charts/operator-metering
 
-chargeback-manifests:
-	./hack/create-chargeback-manifests.sh $(RELEASE_TAG)
+metering-manifests:
+	./hack/create-metering-manifests.sh $(RELEASE_TAG)
 
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
@@ -234,8 +234,8 @@ release:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart \
-	images/chargeback-helm-operator/chargeback-override-values.yaml \
-	chargeback-manifests release bill-of-materials.json \
+	images/metering-helm-operator/chargeback-override-values.yaml \
+	metering-manifests release bill-of-materials.json \
 	install-kube-prometheus-helm
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)

@@ -1,8 +1,8 @@
-name: chargeback-helm-operator
+name: metering-helm-operator
 
 cr:
   create: true
-  name: "tectonic-chargeback"
+  name: "operator-metering"
 
 crd:
   create: true
@@ -23,10 +23,10 @@ image:
   tag: latest
   pullPolicy: Always
 
-serviceAccountName: chargeback-helm-operator
+serviceAccountName: metering-helm-operator
 
 rbac:
-  roleName: chargeback-helm-operator
+  roleName: metering-helm-operator
   rules:
   - apiGroups: ["chargeback.coreos.com"]
     resources: ["*"]

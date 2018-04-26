@@ -1,5 +1,5 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Chargeback
 metadata:
-  name: openshift-chargeback
+  name: openshift-metering
 spec:

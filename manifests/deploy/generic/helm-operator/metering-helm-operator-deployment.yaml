@@ -90,6 +90,6 @@ spec:
           timeoutSeconds: 1
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      serviceAccount: chargeback-helm-operator
+      serviceAccount: metering-helm-operator
       imagePullSecrets:
         []
