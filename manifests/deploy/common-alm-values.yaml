@@ -1,0 +1,17 @@
+name: metering-helm-operator.vlatest
+spec:
+  displayName: Metering
+  description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
+  keywords: ['metering', 'metrics', 'reporting', 'coreos']
+  version: latest
+  maturity: alpha
+  maintainers:
+    - name: CoreOS, Inc
+      email: support@coreos.com
+  provider:
+    name: CoreOS, Inc
+  labels:
+    alm-status-descriptors: metering-helm-operator.vlatest
+    alm-owner-metering: metering-helm-operator
+  matchLabels:
+    alm-owner-metering: metering-helm-operator

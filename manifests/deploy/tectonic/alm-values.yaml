@@ -1,0 +1,4 @@
+annotations:
+  tectonic-visibility: tectonic-feature
+labels:
+  alm-catalog: tectonic-feature

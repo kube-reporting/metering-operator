@@ -223,7 +223,8 @@ release:
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart \
 	images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml \
-	chargeback-manifests release bill-of-materials.json
+	chargeback-manifests release bill-of-materials.json \
+	install-kube-prometheus-helm
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
@@ -254,3 +255,13 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 
 bill-of-materials.json: bill-of-materials.override.json
 	license-bill-of-materials --override-***REMOVED***le $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
+
+kube-prometheus-helm-install:
+	@echo "KUBECONFIG: $(KUBECONFIG)"
+	helm ls
+	helm version
+	helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+	helm upgrade --install --namespace monitoring prometheus-operator coreos/prometheus-operator --wait
+	# set https to false on kubelets for GKE and set the fullnameOverride for the
+	# Prometheus resource so our service has a consistent name.
+	helm upgrade --install --namespace monitoring kube-prometheus coreos/kube-prometheus --set 'prometheus.fullnameOverride=prometheus-k8s,exporter-kubelets.https=false' --wait
