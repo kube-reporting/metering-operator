@@ -17,7 +17,7 @@ source ${DIR}/util.sh
 : "${DEPLOY_CHARGEBACK:=true}"
 : "${CLEANUP_CHARGEBACK:=true}"
 : "${INSTALL_METHOD:=direct}"
-: "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh
+: "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh or deploy-openshift-ci.sh
 : "${TEST_OUTPUT_DIRECTORY:=/out}"
 : "${TEST_OUTPUT_LOG_STDOUT:=false}"
 

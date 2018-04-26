@@ -73,7 +73,10 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 		return startTime, endTime, nil
 	})
 
-	c.collectPromsumData(ctx, logger, timeBoundsGetter, defaultMaxPromTimeRanges, false)
+	err := c.collectPromsumData(ctx, logger, timeBoundsGetter, defaultMaxPromTimeRanges, false)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to collect prometheus data")
+	}
 }
 
 // promsumDataSourceTimeBoundsGetter takes a dataSource and returns the time
@@ -81,11 +84,10 @@ func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context
 // until.
 type promsumDataSourceTimeBoundsGetter func(dataSource *cbTypes.ReportDataSource) (startTime, endTime time.Time, err error)
 
-func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64, allowIncompleteChunks bool) {
+func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.FieldLogger, timeBoundsGetter promsumDataSourceTimeBoundsGetter, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
 	dataSources, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
-		logger.Errorf("couldn't list data stores: %v", err)
-		return
+		return fmt.Errorf("couldn't list data stores: %v", err)
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
@@ -121,15 +123,16 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 			})
 			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
 			if err != nil {
-				logger.WithError(err).Errorf("error collecting promsum data for datasource")
+				logger.WithError(err).Errorf("error collecting Prometheus data for datasource")
 				return err
 			}
 			return nil
 		})
 	}
 	if err := g.Wait(); err != nil {
-		logger.WithError(err).Errorf("some promsum datasources had errors when collecting data")
+		return fmt.Errorf("some Prometheus datasources had errors when collecting data, err: %v", err)
 	}
+	return nil
 }
 
 func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {

@@ -14,7 +14,7 @@ go test \
     -test.short="${CHARGEBACK_SHORT_TESTS}" \
     -test.v \
     -timeout 20m \
-    "./test/e2e" \
+    "github.com/coreos-inc/kube-chargeback/test/e2e" \
     -namespace "${CHARGEBACK_NAMESPACE}" \
     -kubeconfig "${KUBECONFIG}" "$@"
 

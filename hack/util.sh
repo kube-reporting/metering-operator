@@ -29,12 +29,6 @@ function msg() {
   echo -e "\x1b[1;35m${@}\x1b[0m"
 }
 
-function copy-tectonic-pull() {
-  local pullSecret=$(kubectl --namespace="${PULL_SECRET_NAMESPACE}" get secrets "${PULL_SECRET}" -o json --export)
-  pullSecret="${pullSecret/${PULL_SECRET_NAMESPACE}/${CHARGEBACK_NAMESPACE}}"
-  echo "${pullSecret}" | kube-install -
-}
-
 # formats flags for kubectl for the given files
 function kubectl_files() {
   local files=()

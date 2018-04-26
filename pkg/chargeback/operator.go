@@ -6,6 +6,8 @@ import (
 	"io"
 	"math/rand"
 	"net"
+	"net/http"
+	"os"
 	"sync"
 	"syscall"
 	"time"
@@ -25,6 +27,7 @@ import (
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
@@ -38,6 +41,8 @@ const (
 	connBackoff         = time.Second * 15
 	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
+
+	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 )
 
 type Config struct {
@@ -63,6 +68,7 @@ type Config struct {
 
 type Chargeback struct {
 	cfg              Config
+	kubeConfig       *rest.Config
 	informers        cbInformers.SharedInformerFactory
 	queues           queues
 	chargebackClient cbClientset.Interface
@@ -97,19 +103,20 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, er
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 	logger.Debugf("Config: %+v", cfg)
 
-	kubeConfig, err := rest.InClusterConfig()
+	var err error
+	op.kubeConfig, err = rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	op.kubeClient, err = corev1.NewForConfig(kubeConfig)
+	op.kubeClient, err = corev1.NewForConfig(op.kubeConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	logger.Debugf("setting up chargeback client...")
-	op.chargebackClient, err = cbClientset.NewForConfig(kubeConfig)
+	op.chargebackClient, err = cbClientset.NewForConfig(op.kubeConfig)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -267,8 +274,24 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	defer c.prestoDB.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
+	transportConfig, err := c.kubeConfig.TransportConfig()
+	if err != nil {
+		return err
+	}
+
+	var roundTripper http.RoundTripper
+	if _, err := os.Stat(serviceServingCAFile); err == nil {
+		// use the service serving CA for prometheus
+		transportConfig.TLS.CAFile = serviceServingCAFile
+		roundTripper, err = transport.New(transportConfig)
+		if err != nil {
+			return err
+		}
+	}
+
 	c.promConn, err = c.newPrometheusConn(promapi.Config{
-		Address: c.cfg.PromHost,
+		Address:      c.cfg.PromHost,
+		RoundTripper: roundTripper,
 	})
 	if err != nil {
 		return err
