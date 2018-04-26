@@ -46,3 +46,20 @@ echo "Creating Openshift ALM manifests"
     "$DEPLOY_DIR/common-alm-values.yaml" \
     "$DEPLOY_DIR/openshift/alm-values.yaml" \
     "$TMPDIR/override-alm-values.yaml"
+
+# generic
+echo
+echo "Creating Generic deploy manifests"
+"$DIR/create-deploy-manifests.sh" \
+    "$DEPLOY_DIR/generic/helm-operator" \
+    "$DEPLOY_DIR/common-helm-operator-values.yaml" \
+    "$DEPLOY_DIR/generic/helm-operator-values.yaml" \
+    "$TMPDIR/override-helm-operator-values.yaml"
+
+echo
+echo "Creating Generic ALM manifests"
+"$DIR/create-alm-csv-manifests.sh" \
+    "$DEPLOY_DIR/generic/helm-operator" \
+    "$DEPLOY_DIR/generic/alm" \
+    "$DEPLOY_DIR/common-alm-values.yaml" \
+    "$TMPDIR/override-alm-values.yaml"
