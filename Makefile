@@ -154,7 +154,7 @@ chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeba
 chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz helm-operator-docker-build
+chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Docker***REMOVED***le images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz images/chargeback-helm-operator/chargeback-override-values.yaml images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz helm-operator-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
@@ -192,18 +192,18 @@ $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
-images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml: ./hack/render-tectonic-chargeback-chart-override-values.sh
-	./hack/render-tectonic-chargeback-chart-override-values.sh $(RELEASE_TAG) > $@
+images/chargeback-helm-operator/chargeback-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
 tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz
 
 openshift-chargeback-chart: images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz
 
-images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
 
-images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+images/chargeback-helm-operator/openshift-chargeback-0.1.0.tgz: images/chargeback-helm-operator/chargeback-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/openshift-chargeback
 	helm package --save=false -d images/chargeback-helm-operator charts/openshift-chargeback
 
@@ -222,7 +222,7 @@ release:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin tectonic-chargeback-chart \
-	images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml \
+	images/chargeback-helm-operator/chargeback-override-values.yaml \
 	chargeback-manifests release bill-of-materials.json \
 	install-kube-prometheus-helm
 

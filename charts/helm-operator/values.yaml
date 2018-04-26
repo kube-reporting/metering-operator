@@ -26,3 +26,5 @@ rbac:
   rules: []
 
 reconcileIntervalSeconds: 30
+
+chartPath: ""

@@ -3,3 +3,5 @@ name: chargeback-helm-operator
 cr:
   create: true
   name: "tectonic-chargeback"
+
+chartPath: "/tectonic-chargeback-0.1.0.tgz"
