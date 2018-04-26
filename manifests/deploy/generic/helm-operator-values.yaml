@@ -1,0 +1,7 @@
+name: metering-helm-operator
+
+cr:
+  create: true
+  name: "metering"
+
+chartPath: "/operator-metering-0.1.0.tgz"
