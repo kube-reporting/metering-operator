@@ -6,7 +6,7 @@ source "${DIR}/util.sh"
 
 MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
+: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/generic/helm-operator}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then

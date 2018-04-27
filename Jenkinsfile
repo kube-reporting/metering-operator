@@ -290,6 +290,7 @@ podTemplate(
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=tectonic",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e-ci.sh",
                                     ], skipNamespaceCleanup)
@@ -314,6 +315,7 @@ podTemplate(
                                         "TEST_LOG_FILE=${integrationTestLogFile}",
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=tectonic",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
                                         "ENTRYPOINT=hack/integration-ci.sh",
                                     ], skipNamespaceCleanup)
