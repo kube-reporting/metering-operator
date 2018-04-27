@@ -233,7 +233,7 @@ release:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin tectonic-chargeback-chart \
+	chargeback-bin operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-helm-operator/chargeback-override-values.yaml \
 	metering-manifests release bill-of-materials.json \
 	install-kube-prometheus-helm
