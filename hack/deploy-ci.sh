@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-: ${DEPLOY_TAG:?}
+: "${DEPLOY_TAG:?}"
+: "${DEPLOY_PLATFORM:?must be set to either tectonic, openshift, or generic}"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -60,7 +61,6 @@ spec:
       terminationGracePeriodSeconds: 0
 EOF
 
-
 cat <<EOF > "$CUSTOM_VALUES_FILE"
 image:
   tag: ${DEPLOY_TAG}
@@ -72,7 +72,7 @@ echo "Creating installer manifests"
 "$DIR/create-deploy-manifests.sh" \
     "$INSTALLER_MANIFEST_DIR" \
     "$DEPLOY_DIR/common-helm-operator-values.yaml" \
-    "$DEPLOY_DIR/tectonic/helm-operator-values.yaml" \
+    "$DEPLOY_DIR/$DEPLOY_PLATFORM/helm-operator-values.yaml" \
     "$CUSTOM_VALUES_FILE"
 
 echo "Deploying"

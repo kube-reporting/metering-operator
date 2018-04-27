@@ -4,7 +4,7 @@ source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
 MANIFESTS_DIR="$DIR/../manifests"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
+: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/generic/helm-operator}"
 : "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 : "${DELETE_PVCS:=false}"
 : "${SKIP_DELETE_CRDS:=true}"
