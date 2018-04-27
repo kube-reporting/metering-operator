@@ -21,9 +21,9 @@ export DELETE_PVCS=${DELETE_PVCS:-true}
 
 cat <<EOF > "$CHARGEBACK_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: Chargeback
+kind: Metering
 metadata:
-  name: "tectonic-chargeback"
+  name: "operator-metering"
 spec:
   chargeback-operator:
     image:
