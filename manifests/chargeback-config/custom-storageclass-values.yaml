@@ -1,7 +1,7 @@
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: Chargeback
+kind: Metering
 metadata:
-  name: "tectonic-chargeback"
+  name: "operator-metering"
 spec:
   presto:
     # Uncomment the section below if you wish to adjust the StorageClass

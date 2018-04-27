@@ -21,9 +21,9 @@ export DELETE_PVCS=${DELETE_PVCS:-true}
 
 cat <<EOF > "$CHARGEBACK_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
-kind: Chargeback
+kind: Metering
 metadata:
-  name: "openshift-chargeback"
+  name: "openshift-metering"
   annotations:
     "helm-operator.coreos.com/chart-location": "/openshift-chargeback-0.1.0.tgz"
 spec:
