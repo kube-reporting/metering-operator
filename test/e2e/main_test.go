@@ -62,7 +62,7 @@ func collectMetricsOnce(t *testing.T) (reportStart time.Time, reportEnd time.Tim
 		}
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
-		req := testFramework.NewChargebackSVCPOSTRequest("chargeback", "/api/v1/datasources/prometheus/collect", body)
+		req := testFramework.NewChargebackSVCPOSTRequest("/api/v1/datasources/prometheus/collect", body)
 		result := req.Do()
 		resp, err := result.Raw()
 		require.NoErrorf(t, err, "expected no errors triggering data collection, body: %v", string(resp))
