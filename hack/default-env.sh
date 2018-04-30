@@ -1,3 +1,3 @@
 #!/bin/bash
-: "${CHARGEBACK_NAMESPACE:=chargeback}"
+: "${METERING_NAMESPACE:=operator-metering}"
 

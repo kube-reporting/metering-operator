@@ -5,13 +5,13 @@ source ${DIR}/util.sh
 
 MANIFESTS_DIR="$DIR/../manifests"
 : "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/generic/helm-operator}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 : "${DELETE_PVCS:=false}"
 : "${SKIP_DELETE_CRDS:=true}"
 
-msg "Removing Chargeback Resource"
+msg "Removing Metering Resource"
 kube-remove \
-    "$CHARGEBACK_CR_FILE"
+    "$METERING_CR_FILE"
 
 msg "Removing metering-helm-operator"
 kube-remove \

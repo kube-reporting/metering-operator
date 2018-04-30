@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
 : "${KUBECONFIG:?}"
-: "${CHARGEBACK_NAMESPACE:?}"
+: "${METERING_NAMESPACE:?}"
 
 : "${TEST_SCRIPT:?}"
 
@@ -14,19 +14,19 @@ source ${DIR}/util.sh
 : "${TEST_TAP_FILE:?}"
 
 : "${DEPLOY_POD_LOGS_LOG_FILE:=""}"
-: "${DEPLOY_CHARGEBACK:=true}"
-: "${CLEANUP_CHARGEBACK:=true}"
+: "${DEPLOY_METERING:=true}"
+: "${CLEANUP_METERING:=true}"
 : "${INSTALL_METHOD:=direct}"
 : "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh or deploy-openshift-ci.sh
 : "${TEST_OUTPUT_DIRECTORY:=/out}"
 : "${TEST_OUTPUT_LOG_STDOUT:=false}"
 
 export INSTALL_METHOD
-export CHARGEBACK_NAMESPACE
+export METERING_NAMESPACE
 
 # this script is run inside the container
 echo "\$KUBECONFIG=$KUBECONFIG"
-echo "\$CHARGEBACK_NAMESPACE=$CHARGEBACK_NAMESPACE"
+echo "\$METERING_NAMESPACE=$METERING_NAMESPACE"
 echo "\$INSTALL_METHOD=$INSTALL_METHOD"
 
 mkdir -p $TEST_OUTPUT_DIRECTORY
@@ -44,9 +44,9 @@ export DELETE_PVCS=true
 function cleanup() {
     echo "Performing cleanup"
     if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
-        uninstall_chargeback "$INSTALL_METHOD" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
+        uninstall_metering "$INSTALL_METHOD" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
     else
-        uninstall_chargeback "$INSTALL_METHOD" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
+        uninstall_metering "$INSTALL_METHOD" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
     fi
 
     # kill any background jobs, such as stern
@@ -55,21 +55,21 @@ function cleanup() {
     wait
 }
 
-if [ "$DEPLOY_CHARGEBACK" == "true" ]; then
+if [ "$DEPLOY_METERING" == "true" ]; then
     if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
         echo "Capturing pod logs"
         if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
-            stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
+            stern --timestamps -n "$METERING_NAMESPACE" '.*' | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
         else
-            stern --timestamps -n "$CHARGEBACK_NAMESPACE" '.*' >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
+            stern --timestamps -n "$METERING_NAMESPACE" '.*' >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE" &
         fi
     fi
 
-    if [ "$CLEANUP_CHARGEBACK" == "true" ]; then
+    if [ "$CLEANUP_METERING" == "true" ]; then
         trap cleanup EXIT SIGINT
     fi
 
-    echo "Deploying Chargeback"
+    echo "Deploying Metering"
     if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
         "${DIR}/${DEPLOY_SCRIPT}" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
     else

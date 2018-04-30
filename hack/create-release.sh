@@ -21,11 +21,11 @@ cp \
 
 mkdir -p "$OUTPUT_DIR/Documentation"
 cp \
-    $BASE_DIR/Documentation/install-chargeback.md \
+    $BASE_DIR/Documentation/install-metering.md \
     $BASE_DIR/Documentation/report.md \
-    $BASE_DIR/Documentation/using-chargeback.md \
-    $BASE_DIR/Documentation/chargeback-config.md \
-    $BASE_DIR/Documentation/troubleshooting-chargeback.md \
+    $BASE_DIR/Documentation/using-metering.md \
+    $BASE_DIR/Documentation/metering-config.md \
+    $BASE_DIR/Documentation/troubleshooting-metering.md \
     $BASE_DIR/Documentation/index.md \
     "$OUTPUT_DIR/Documentation/"
 
@@ -43,12 +43,10 @@ cp -r \
     "$OUTPUT_DIR/manifests/"
 
 cp -r \
-    $BASE_DIR/manifests/chargeback-config \
+    $BASE_DIR/manifests/metering-config \
     "$OUTPUT_DIR/manifests/"
-# Remove minikube values, we don't want users to use this.
-rm "$OUTPUT_DIR/manifests/chargeback-config/tectonic-chargeback-values-minikube.yaml"
 
-echo "Start with Documentation/install-chargeback.md" > "$OUTPUT_DIR/README"
+echo "Start with Documentation/install-metering.md" > "$OUTPUT_DIR/README"
 
 pushd "$TMPDIR"
 zip -r "$OUTFILE" "$OUTPUT_DIR_NAME"

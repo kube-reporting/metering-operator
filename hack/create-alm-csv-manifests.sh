@@ -3,7 +3,7 @@
 set -o pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHART="$DIR/../charts/chargeback-alm"
+CHART="$DIR/../charts/metering-alm"
 : "${MANIFESTS_DIR:=$DIR/../manifests}"
 : "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
 
@@ -121,10 +121,10 @@ jq -s '.[0] * .[1] * .[2]' \
     /tmp/alm-permissions.json \
     | "$DIR/jsontoyaml" > /tmp/alm-values.yaml
 
-# use helm template to create the csv using our chargeback-alm chart.  the
-# chargeback-alm-values is the set of values which are entirely ALM specific,
-# and the rest are things we can create from our installer manifests and CRD
-# manifests.
+# use helm template to create the csv using our metering-alm chart.
+# the metering-alm-values is the set of values which are entirely ALM
+# specific, and the rest are things we can create from our installer manifests
+# and CRD manifests.
 #
 # The sed expression at the end trims trailing whitespace and removes empty
 # lines

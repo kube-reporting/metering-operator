@@ -224,7 +224,7 @@ metering-manifests:
 
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
-	@./hack/create-release.sh tectonic-chargeback-$(RELEASE_VERSION).zip
+	@./hack/create-release.sh operator-metering-$(RELEASE_VERSION).zip
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift \
@@ -234,7 +234,7 @@ release:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-bin operator-metering-chart tectonic-metering-chart openshift-metering chart \
-	images/metering-helm-operator/chargeback-override-values.yaml \
+	images/metering-helm-operator/metering-override-values.yaml \
 	metering-manifests release bill-of-materials.json \
 	install-kube-prometheus-helm
 

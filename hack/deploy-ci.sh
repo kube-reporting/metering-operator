@@ -9,7 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TMP_DIR="$(mktemp -d)"
 DEPLOY_DIR="$DIR/../manifests/deploy"
 
-export CHARGEBACK_CR_FILE=${CHARGEBACK_CR_FILE:-"$TMP_DIR/custom-chargeback-cr-${DEPLOY_TAG}.yaml"}
+export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
 export INSTALLER_MANIFEST_DIR=${INSTALLER_MANIFEST_DIR:-"$TMP_DIR/installer_manifests-${DEPLOY_TAG}"}
 export CUSTOM_VALUES_FILE=${CUSTOM_VALUES_FILE:-"$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
@@ -20,13 +20,13 @@ export DELETE_PVCS=${DELETE_PVCS:-true}
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
 
-cat <<EOF > "$CHARGEBACK_CR_FILE"
+cat <<EOF > "$METERING_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  chargeback-operator:
+  metering-operator:
     image:
       tag: ${DEPLOY_TAG}
 
