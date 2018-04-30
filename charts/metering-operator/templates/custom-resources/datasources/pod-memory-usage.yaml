@@ -3,7 +3,7 @@ kind: ReportDataSource
 metadata:
   name: "pod-request-memory-bytes"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -19,7 +19,7 @@ kind: ReportDataSource
 metadata:
   name: "pod-limit-memory-bytes"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -34,7 +34,7 @@ kind: ReportDataSource
 metadata:
   name: "pod-usage-memory-bytes"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

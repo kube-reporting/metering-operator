@@ -1,14 +1,14 @@
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "node-memory-capacity"
+  name: "node-cpu-capacity"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportDataSources:
-  - "node-capacity-memory-bytes"
+  - "node-capacity-cpu-cores"
   columns:
   - name: node
     type: string
@@ -16,44 +16,43 @@ spec:
   - name: labels
     type: map(varchar, varchar)
     tableHidden: true
-  - name: node_capacity_memory_bytes
+  - name: node_capacity_cpu_cores
     type: double
-    unit: byte_seconds
+    unit: cpu_cores
   - name: resource_id
     type: string
-    tableHidden: true
   - name: timeprecision
     type: double
     unit: seconds
-  - name: node_capacity_memory_byte_seconds
+  - name: node_capacity_cpu_core_seconds
     type: double
-    unit: byte_seconds
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
     unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
-          amount as node_capacity_memory_bytes,
+          amount as node_capacity_cpu_cores,
           split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
-          amount * timeprecision as node_capacity_memory_byte_seconds,
+          amount * timeprecision as node_capacity_cpu_core_seconds,
           "timestamp"
-      FROM {| dataSourceTableName "node-capacity-memory-bytes" |}
+      FROM {| dataSourceTableName "node-capacity-cpu-cores" |}
 
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "node-memory-allocatable"
+  name: "node-cpu-allocatable"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportDataSources:
-  - "node-allocatable-memory-bytes"
+  - "node-allocatable-cpu-cores"
   columns:
   - name: node
     type: string
@@ -61,45 +60,43 @@ spec:
   - name: labels
     type: map(varchar, varchar)
     tableHidden: true
-  - name: node_allocatable_memory_bytes
+  - name: node_allocatable_cpu_cores
     type: double
-    unit: bytes
+    unit: cpu_cores
   - name: resource_id
     type: string
-    tableHidden: true
   - name: timeprecision
     type: double
     unit: seconds
-  - name: node_allocatable_memory_byte_seconds
+  - name: node_allocatable_cpu_core_seconds
     type: double
-    unit: byte_seconds
+    unit: cpu_core_seconds
   - name: timestamp
     type: timestamp
     unit: date
   query: |
       SELECT labels['node'] as node,
           labels,
-          amount as node_allocatable_memory_bytes,
+          amount as node_allocatable_cpu_cores,
           split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
-          amount * timeprecision as node_allocatable_memory_byte_seconds,
+          amount * timeprecision as node_allocatable_cpu_core_seconds,
           "timestamp"
-      FROM {| dataSourceTableName "node-allocatable-memory-bytes" |}
-
+      FROM {| dataSourceTableName "node-allocatable-cpu-cores" |}
 ---
 
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "node-memory-utilization"
+  name: "node-cpu-utilization"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "node-memory-allocatable"
-  - "pod-memory-request-raw"
+  - "node-cpu-allocatable"
+  - "pod-cpu-request-raw"
   view:
     disabled: true
   columns:
@@ -109,42 +106,42 @@ spec:
   - name: node_allocatable_data_end
     type: timestamp
     unit: date
-  - name: node_allocatable_memory_byte_seconds
+  - name: node_allocatable_cpu_core_seconds
     type: double
-    unit: byte_seconds
+    unit: cpu_core_seconds
   - name: pod_usage_data_start
     type: timestamp
     unit: date
   - name: pod_usage_data_end
     type: timestamp
     unit: date
-  - name: pod_request_memory_byte_seconds
+  - name: pod_request_cpu_core_seconds
     type: double
-    unit: byte_seconds
-  - name: memory_used_percent
+    unit: cpu_core_seconds
+  - name: cpu_used_percent
     type: double
-  - name: memory_unused_percent
+  - name: cpu_unused_percent
     type: double
   query: |
-    WITH node_memory_allocatable AS (
+    WITH node_cpu_allocatable AS (
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
-        sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| generationQueryViewName "node-memory-allocatable" |}
-        WHERE "timestamp" >= timestamp '{| .Report.StartPeriod | prestoTimestamp |}'
+        sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
+      FROM {| generationQueryViewName "node-cpu-allocatable" |}
+        WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
         AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
-    ), pod_memory_consumption AS (
+    ), pod_cpu_consumption AS (
       SELECT min("timestamp") as pod_usage_data_start,
         max("timestamp") as pod_usage_data_end,
-        sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-      FROM {| generationQueryViewName "pod-memory-request-raw" |}
+        sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+      FROM {| generationQueryViewName "pod-cpu-request-raw" |}
       WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     )
     SELECT
-      node_memory_allocatable.*,
-      pod_memory_consumption.*,
-      pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds,
-      1 - (pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds)
-    FROM node_memory_allocatable
-    CROSS JOIN pod_memory_consumption
+      node_cpu_allocatable.*,
+      pod_cpu_consumption.*,
+      pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds,
+      1 - (pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds)
+    FROM node_cpu_allocatable
+    CROSS JOIN pod_cpu_consumption

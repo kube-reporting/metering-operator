@@ -1,4 +1,4 @@
-chargeback-operator:
+metering-operator:
   config:
     prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
 presto:

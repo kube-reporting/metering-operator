@@ -3,7 +3,7 @@ kind: ReportPrometheusQuery
 metadata:
   name: "node-capacity-memory-bytes"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -16,7 +16,7 @@ kind: ReportPrometheusQuery
 metadata:
   name: "node-capacity-cpu-cores"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

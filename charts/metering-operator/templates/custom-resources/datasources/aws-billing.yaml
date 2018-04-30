@@ -4,7 +4,7 @@ kind: ReportDataSource
 metadata:
   name: "aws-billing"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
