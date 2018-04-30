@@ -4,7 +4,7 @@ kind: StorageLocation
 metadata:
   name: {{ .Values.con***REMOVED***g.defaultStorage.name }}
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- if .Values.con***REMOVED***g.defaultStorage.isDefault }}
   annotations:
     storagelocation.chargeback.coreos.com/is-default: "true"

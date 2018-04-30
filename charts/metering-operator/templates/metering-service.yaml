@@ -1,14 +1,14 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: chargeback
+  name: metering
   labels:
-    app: chargeback
+    app: metering
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   selector:
-    app: chargeback
+    app: metering
   ports:
   - protocol: TCP
     port: 8080

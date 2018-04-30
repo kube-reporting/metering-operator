@@ -1,15 +1,14 @@
-
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportDataSource
 metadata:
-  name: "node-allocatable-memory-bytes"
+  name: "node-capacity-memory-bytes"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   promsum:
-    query: "node-allocatable-memory-bytes"
+    query: "node-capacity-memory-bytes"
     storage:
       storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}
 
@@ -18,13 +17,13 @@ spec:
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportDataSource
 metadata:
-  name: "node-allocatable-cpu-cores"
+  name: "node-capacity-cpu-cores"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   promsum:
-    query: "node-allocatable-cpu-cores"
+    query: "node-capacity-cpu-cores"
     storage:
       storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}

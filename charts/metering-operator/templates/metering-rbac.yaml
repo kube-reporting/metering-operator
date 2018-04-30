@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: chargeback-admin
+  name: metering-admin
 rules:
 - apiGroups: ["chargeback.coreos.com"]
   resources: ["*"]
@@ -35,24 +35,24 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: chargeback
+  name: metering
   labels:
-    app: chargeback
+    app: metering
 {{- block "extraMetadata" . }}
 {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: chargeback-admin
+  name: metering-admin
 subjects:
 - kind: ServiceAccount
-  name: chargeback
+  name: metering
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: chargeback
+  name: metering
   labels:
-    app: chargeback
+    app: metering
 {{- block "extraMetadata" . }}
 {{- end }}

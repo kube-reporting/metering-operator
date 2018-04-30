@@ -1,4 +1,4 @@
-chargeback-operator:
+metering-operator:
   con***REMOVED***g:
     prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
 

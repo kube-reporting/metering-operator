@@ -1,6 +1,6 @@
 dependencies:
-- name: chargeback-operator
-  repository: ***REMOVED***le://../chargeback-operator
+- name: metering-operator
+  repository: ***REMOVED***le://../metering-operator
   version: 0.1.0
 - name: presto
   repository: ***REMOVED***le://../presto
@@ -8,5 +8,5 @@ dependencies:
 - name: hdfs
   repository: ***REMOVED***le://../hdfs
   version: 0.1.0
-digest: sha256:14fb0eb05d0b8ace2fd3f2f759058fd03c85db0d0669f24e5cde541cd108f8d4
-generated: 2017-12-19T18:32:24.386546119-08:00
+digest: sha256:e0c00a169e1babb5af3bd4a1fc37c61960100bd4a2be934c54dfb95d56546caa
+generated: 2018-04-30T09:55:25.902479128-07:00

@@ -4,7 +4,7 @@ kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-aws"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

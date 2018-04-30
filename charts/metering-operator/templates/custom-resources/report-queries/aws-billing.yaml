@@ -4,7 +4,7 @@ kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-billing-data-raw"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -52,7 +52,7 @@ kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-billing-data"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -103,7 +103,7 @@ kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-cluster-cost"
   labels:
-    tectonic-chargeback: "true"
+    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
