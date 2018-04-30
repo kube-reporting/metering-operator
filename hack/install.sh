@@ -7,13 +7,13 @@ source "${DIR}/util.sh"
 MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
 : "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/generic/helm-operator}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
-    echo "Creating namespace ${CHARGEBACK_NAMESPACE}"
-    kubectl create namespace "${CHARGEBACK_NAMESPACE}" || true
-elif ! kubectl get namespace ${CHARGEBACK_NAMESPACE} 2> /dev/null; then
-    echo "Namespace '${CHARGEBACK_NAMESPACE}' does not exist, please create it before starting"
+    echo "Creating namespace ${METERING_NAMESPACE}"
+    kubectl create namespace "${METERING_NAMESPACE}" || true
+elif ! kubectl get namespace ${METERING_NAMESPACE} 2> /dev/null; then
+    echo "Namespace '${METERING_NAMESPACE}' does not exist, please create it before starting"
     exit 1
 ***REMOVED***
 
@@ -31,6 +31,6 @@ msg "Installing metering-helm-operator"
 kube-install \
     "$INSTALLER_MANIFEST_DIR/metering-helm-operator-deployment.yaml"
 
-msg "Installing Chargeback Resource"
+msg "Installing Metering Resource"
 kube-install \
-    "$CHARGEBACK_CR_FILE"
+    "$METERING_CR_FILE"

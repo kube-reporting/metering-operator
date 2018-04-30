@@ -5,7 +5,7 @@ set -e
 : "${1?"Usage: $0 IMAGE_TAG"}"
 
 cat <<EOF
-chargeback-operator:
+metering-operator:
   image:
     tag: $1
 presto:

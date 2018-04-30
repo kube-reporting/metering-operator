@@ -7,7 +7,7 @@ function sanetize_namespace() {
 }
 
 function kubectl_cmd() {
-    kubectl --namespace="${CHARGEBACK_NAMESPACE}" "$@"
+    kubectl --namespace="${METERING_NAMESPACE}" "$@"
 }
 
 function kube-install() {
@@ -38,9 +38,9 @@ function kubectl_***REMOVED***les() {
   echo "${***REMOVED***les[@]}"
 }
 
-function install_chargeback() {
+function install_metering() {
     INSTALL_METHOD=$1
-    echo "Installing chargeback"
+    echo "Installing metering"
     if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/install.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
@@ -53,9 +53,9 @@ function install_chargeback() {
     ***REMOVED***
 }
 
-function uninstall_chargeback() {
+function uninstall_metering() {
     INSTALL_METHOD=$1
-    echo "Uninstalling chargeback"
+    echo "Uninstalling metering"
     if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "openshift-direct" ]]; then
         "$DIR/uninstall.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
