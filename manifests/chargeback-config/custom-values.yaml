@@ -3,7 +3,7 @@ kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  chargeback-operator:
+  metering-operator:
     con***REMOVED***g:
       awsBillingDataSource:
         # Change to false if you wish to enable the AWS Billing Report
@@ -19,7 +19,7 @@ spec:
 
       # If you want to use S3 for storage of reports, and collected metrics,
       # uncomment the section below, and set awsAccessKeyID and awsSecretAccessKey
-      # for the chargeback-operator, and presto con***REMOVED***g sections (above and below).
+      # for the metering-operator, and presto con***REMOVED***g sections (above and below).
       # defaultStorage:
       #   create: true
       #   name: "s3"
