@@ -1,12 +1,12 @@
-# Debugging Chargeback
+# Debugging Metering
 
-Debugging chargeback can be fairly difficult if you do not know how to directly interact with the components the operator is speaking to.
+Debugging metering can be fairly difficult if you do not know how to directly interact with the components the operator is speaking to.
 Below, we detail how you can connect and query Presto and Hive, as well as view the dashboards of the Presto and HDFS components.
 
-All of the follow commands assume you've set the `CHARGEBACK_NAMESPACE` environment variable to the namespace your Chargeback installation is located in:
+All of the follow commands assume you've set the `METERING_NAMESPACE` environment variable to the namespace your Metering installation is located in:
 
 ```
-export CHARGEBACK_NAMESPACE=your-namespace
+export METERING_NAMESPACE=your-namespace
 ```
 
 ## Query Presto using presto-cli
@@ -14,7 +14,7 @@ export CHARGEBACK_NAMESPACE=your-namespace
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod.
 
 ```
-kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $CHARGEBACK_NAMESPACE exec -it {} -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
+kubectl get pods -n $METERING_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
@@ -58,7 +58,7 @@ presto:default>
 The following will open up an interactive beeline session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Hive pod.
 
 ```
-kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=hive -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $CHARGEBACK_NAMESPACE exec -it {} -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
+kubectl get pods -n $METERING_NAMESPACE -l app=hive -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
@@ -100,7 +100,7 @@ The Presto web UI can be very useful when debugging.
 It will show what queries are running, which have succeeded, and which queries have failed.
 
 ```
-kubectl get pods -n $CHARGEBACK_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -I{} kubectl -n $CHARGEBACK_NAMESPACE port-forward {} 8080
+kubectl get pods -n $METERING_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
 ```
 
 You can now open http://127.0.0.1:8080 in your browser window to view the Presto web interface.
@@ -108,7 +108,7 @@ You can now open http://127.0.0.1:8080 in your browser window to view the Presto
 ## Port-forward to Hive web UI
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE port-forward hive-0 10002
+kubectl -n $METERING_NAMESPACE port-forward hive-0 10002
 ```
 
 You can now open http://127.0.0.1:10002 in your browser window to view the Hive web interface.
@@ -119,7 +119,7 @@ You can now open http://127.0.0.1:10002 in your browser window to view the Hive 
 To the namenode:
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE port-forward hdfs-namenode-0 50070
+kubectl -n $METERING_NAMESPACE port-forward hdfs-namenode-0 50070
 ```
 
 You can now open http://127.0.0.1:50070 in your browser window to view the HDFS web interface.
@@ -128,7 +128,7 @@ You can now open http://127.0.0.1:50070 in your browser window to view the HDFS 
 To the first datanode:
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE port-forward hdfs-datanode-0 50075
+kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 50075
 ```
 
 To check other datanodes, runt he above command, replacing `hdfs-datanode-0` with the pod you want to view information on.

@@ -1,15 +1,10 @@
-<br>
-<div class="alert alert-info" role="alert">
-<i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for an alpha feature. For questions and feedback on the Metering and Chargeback Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
-</div>
-
 # Reports and Scheduled Reports
 
-The `Report` and `ScheduledReport` custom resources are used to manage the execution and status of reports. Chargeback produces reports derived from usage data sources which can be used in further analysis and filtering.
+The `Report` and `ScheduledReport` custom resources are used to manage the execution and status of reports. Metering produces reports derived from usage data sources which can be used in further analysis and filtering.
 
 ## Scheduled Report object
 
-A single `ScheduledReport` resource represents a report which is updated with new information according to a schedule. Scheduled reports are always running, and will track what time periods it has collected data for, ensuring that if Chargeback is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
+A single `ScheduledReport` resource represents a report which is updated with new information according to a schedule. Scheduled reports are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
 
 ## Example Scheduled Report
 
@@ -37,7 +32,7 @@ Names the `ReportGenerationQuery` used to generate the report. The generation qu
 Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
  ```
- kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries
+ kubectl -n $METERING_NAMESPACE get reportgenerationqueries
  NAME                                            AGE
  aws-ec2-billing-data                            11m
  aws-ec2-cluster-cost                            11m
@@ -113,11 +108,11 @@ The execution of a scheduled report can be tracked using its status field. Any e
 The `status` field of a `ScheduledReport` currently has two fields:
 
 - `conditions`: Conditions is an list of conditions, each have a `Type`, `Reason`, and `Message` field. Possible values of a condition's `Type` field are `Running` and `Failure`, indicating the current state of the scheduled report. The `Reason` indicates why it's the `Condition` is in it's current state, with and the `Message` provides a detailed information on the `Reason`.
-- `lastReportTime`: Indicates the time Chargeback has collected data up to.
+- `lastReportTime`: Indicates the time Metering has collected data up to.
 
 ## Report object
 
-A single `Report` resource represents a report which runs the provided query for the specified time range. Once the object is created, Chargeback starts analyzing the data required to perform the report. A report cannot be updated after its creation and must run to completion.
+A single `Report` resource represents a report which runs the provided query for the specified time range. Once the object is created, Metering starts analyzing the data required to perform the report. A report cannot be updated after its creation and must run to completion.
 
 ## Example Report
 
@@ -171,7 +166,7 @@ Names the `ReportGenerationQuery` used to generate the report. The generation qu
 Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
  ```
- kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries
+ kubectl -n $METERING_NAMESPACE get reportgenerationqueries
  NAME                                            AGE
  aws-ec2-billing-data                            11m
  aws-ec2-cluster-cost                            11m
@@ -208,14 +203,14 @@ The `aws-ec2-billing-data` report is used by other queries, and should not be us
 For a complete list of fields each report query produces, use `kubectl` to get the object as JSON, and check the `columns` field:
 
 ```
-kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
+kubectl -n $METERING_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
 
 {
     "apiVersion": "chargeback.coreos.com/v1alpha1",
     "kind": "ReportGenerationQuery",
     "metadata": {
         "name": "namespace-memory-request",
-        "namespace": "chargeback"
+        "namespace": "metering"
     },
     "spec": {
         "columns": [
@@ -245,7 +240,7 @@ kubectl -n $CHARGEBACK_NAMESPACE get reportgenerationqueries namespace-memory-re
 The execution of a report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
 
 A report can have the following states:
-* `Started`: Chargeback has started executing the report. No modifications can be made at this point.
+* `Started`: Metering has started executing the report. No modifications can be made at this point.
 * `Finished`: The report successfully completed execution.
 * `Error`: A failure occurred running the report. Details are provided in the `output` field.
 

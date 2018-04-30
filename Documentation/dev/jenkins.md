@@ -1,14 +1,14 @@
 # Jenkins
 
-Jenkins is heavily used by Chargeback for continuous integration.
+Jenkins is heavily used by Metering for continuous integration.
 It's primary duties are:
 
-- Building the chargeback binary
-- Running chargeback unit tests
-- Building docker images for all of the chargeback components
+- Building the metering binary
+- Running metering unit tests
+- Building docker images for all of the metering components
 - Pushing docker images for each component to quay.io
 - Running integration and e2e tests
-  - Deploys Chargeback to a real Kubernetes cluster in a new namespace, and runs reports.
+  - Deploys Metering to a real Kubernetes cluster in a new namespace, and runs reports.
   - By default, it will delete the namespace it used to deploy after it runs tests.
 
 ## Pull-Requests
@@ -41,7 +41,7 @@ When developing a new feature, it's very common to have a workflow similar to th
 - Make changes to the repo
 - Submit a pull-request
 - Wait for the build to push the image
-- Manually install chargeback with your changes to a Kubernetes cluster to see if they work how you expect
+- Manually install metering with your changes to a Kubernetes cluster to see if they work how you expect
 
 This process is useful when trying to debug an issue causing the e2e deployment or tests to fail.
 
