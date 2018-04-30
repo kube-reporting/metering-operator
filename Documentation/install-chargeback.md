@@ -25,12 +25,11 @@ Chargeback requires the following components:
 
 ## Installation
 
-First, set up the namespace by creating it and copying the `coreos-pull-secret` into it:
+First, start by creating your namespace:
 
 ```
 export CHARGEBACK_NAMESPACE=chargeback
 kubectl create ns $CHARGEBACK_NAMESPACE
-kubectl get secret -n tectonic-system coreos-pull-secret --export -o json | kubectl create -n $CHARGEBACK_NAMESPACE -f -
 ```
 
 ### Configuration
