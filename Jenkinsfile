@@ -272,8 +272,59 @@ podTemplate(
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubeconfig', variable: 'TECTONIC_KUBECONFIG'],
                             [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubeconfig', variable: 'OPENSHIFT_KUBECONFIG'],
+                            [$class: 'FileBinding', credentialsId: 'gke-metering-ci-kubeconfig', variable: 'GKE_KUBECONFIG'],
                         ]) {
-                            parallel "tectonic-e2e": {
+                            parallel "generic-e2e": {
+                                if (runE2ETests) {
+                                    echo "Running metering e2e tests"
+                                    def myTestDir = "${testOutputDir}/generic_e2e"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/generic_e2e"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_E2E_NAMESPACE}",
+                                        "KUBECONFIG=${GKE_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_LOG_FILE=${e2eTestLogFile}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
+                                        "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=generic",
+                                        "TEST_TAP_FILE=${e2eTestTapFile}",
+                                        "ENTRYPOINT=hack/e2e-ci.sh",
+                                    ], skipNamespaceCleanup)
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } else {
+                                    echo "Non-master branch, skipping metering e2e tests"
+                                }
+                            }, "generic-integration": {
+                                if (runE2ETests) {
+                                    echo "Running metering integration tests"
+                                    def myTestDir = "${testOutputDir}/generic_integration"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/generic_integration"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_INTEGRATION_NAMESPACE}",
+                                        "KUBECONFIG=${GKE_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
+                                        "TEST_LOG_FILE=${integrationTestLogFile}",
+                                        "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=generic",
+                                        "TEST_TAP_FILE=${integrationTestTapFile}",
+                                        "ENTRYPOINT=hack/integration-ci.sh",
+                                    ], skipNamespaceCleanup)
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } else {
+                                    echo "Non-master branch, skipping metering integration tests"
+                                }
+                            }, "tectonic-e2e": {
                                 if (runE2ETests) {
                                     echo "Running metering e2e tests"
                                     def myTestDir = "${testOutputDir}/tectonic_e2e"
