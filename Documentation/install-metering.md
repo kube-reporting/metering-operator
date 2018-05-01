@@ -1,8 +1,8 @@
 # Installing Operator Metering
 
-Operator Metering consists of a few components:
+Operator Metering is a collection of a few components:
 
-- A Operator Metering Pod which aggregates Prometheus data and generates reports based
+- A Metering Operator Pod which aggregates Prometheus data and generates reports based
   on the collected usage information.
 - Hive and Presto clusters, used by the Operator Metering Pod to perform queries on the
   collected usage data.
@@ -13,6 +13,9 @@ Operator Metering requires the following components:
 
 - A Kubernetes 1.8 cluster.
 - A StorageClass for dynamic volume provisioning. ([See con***REMOVED***guring metering][con***REMOVED***guring-metering] for more information.)
+- A Prometheus installation within the cluster con***REMOVED***gured to do Kubernetes cluster-monitoring.
+    - The prometheus-operator repository's [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
+    - At a minimum, we require kube-state-metrics, node-exporter, and built-in Kubernetes target metrics.
 - 3.5GB Memory and 1.5 CPU Cores (1500 Millicores).
 - At least 1 node with 1.5GB available memory (the highest memory request for a single Operator Metering Pod)
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
@@ -32,6 +35,8 @@ kubectl create ns $METERING_NAMESPACE
 Before continuing with the installation, please read [Con***REMOVED***guring Operator Metering][con***REMOVED***guring-metering].
 Some options may not be changed post-install. Be certain to con***REMOVED***gure these options, if desired, before installation.
 
+If you're not using [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL con***REMOVED***g option][con***REMOVED***gure-prometheus-url] before proceeding.
+
 If you do not wish to modify the Operator Metering con***REMOVED***guration, a minimal con***REMOVED***guration example that doesn't override anything can be found in [default.yaml][default-con***REMOVED***g].
 
 ### Install Operator Metering with Con***REMOVED***guration
@@ -48,7 +53,7 @@ Install the install plan into the cluster:
 kubectl create -n $METERING_NAMESPACE -f metering.installplan.yaml
 ```
 
-Finally, install the `Operator Metering` resource, which causes the Operator Metering Helm operator to install and con***REMOVED***gure Operator Metering and its dependencies.
+Finally, install the `Metering` resource, which causes the Metering Helm operator to install and con***REMOVED***gure Metering and its dependencies.
 
 ```
 kubectl create -n $METERING_NAMESPACE -f metering.yaml
@@ -56,7 +61,7 @@ kubectl create -n $METERING_NAMESPACE -f metering.yaml
 
 ## Verifying operation
 
-First, wait until the Operator Metering Helm operator deploys all of the Operator Metering components:
+First, wait until the Metering Helm operator deploys all of the Metering components:
 
 ```
 kubectl get pods -n $METERING_NAMESPACE -l app=metering-helm-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-helm-operator
@@ -96,3 +101,5 @@ For instructions on using Operator Metering, please see [Using Operator Metering
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [using-metering]: using-metering.md
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
+[con***REMOVED***gure-prometheus-url]: metering-con***REMOVED***g.md#Prometheus-URL
+[kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus

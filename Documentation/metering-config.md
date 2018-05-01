@@ -35,6 +35,21 @@ kubectl -n $METERING_NAMESPACE apply -f manifests/metering-con***REMOVED***g/cus
 
 The example manifest [custom-values.yaml][example-con***REMOVED***g] contains the most common user con***REMOVED***guration values, including resource limits. The values listed are the defaults, which may be uncommented and adjusted as needed.
 
+### Prometheus URL
+
+By default, the Metering assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090` within the cluster.
+If your not using [kube-prometheus][kube-prometheus], then you will need to override the `metering-operator.con***REMOVED***g.prometheusURL` con***REMOVED***guration option.
+
+Below is an example of con***REMOVED***guring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
+
+```
+metering-operator:
+  con***REMOVED***g:
+    prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
+```
+
+> Note: currently we do not support https connections or authentication to Prometheus, but support for it is being developed.
+
 ### Persistent Volumes
 
 Metering requires at least 1 Persistent Volume to operate. (The example manifest includes 3 by default.) The Persistent Volume Claims (PVCs) are listed below:
@@ -123,3 +138,4 @@ This can be done either pre-install or post-install. Note that disabling it post
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [example-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-storageclass-values.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
+[kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
