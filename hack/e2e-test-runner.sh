@@ -20,6 +20,8 @@ source ${DIR}/util.sh
 : "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh or deploy-openshift-ci.sh
 : "${TEST_OUTPUT_DIRECTORY:=/out}"
 : "${TEST_OUTPUT_LOG_STDOUT:=false}"
+: "${ENABLE_AWS_BILLING:=false}"
+: "${ENABLE_AWS_BILLING_TEST:=false}"
 
 export INSTALL_METHOD
 export METERING_NAMESPACE
