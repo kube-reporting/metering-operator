@@ -141,7 +141,6 @@ podTemplate(
                     "METERING_E2E_NAMESPACE=${meteringE2ENamespace}",
                     "METERING_INTEGRATION_NAMESPACE=${meteringIntegrationNamespace}",
                     "METERING_SHORT_TESTS=${shortTests}",
-                    "ENABLE_AWS_BILLING=${enableAWSBilling}",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
@@ -341,6 +340,7 @@ podTemplate(
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "ENABLE_AWS_BILLING=${enableAWSBilling}",
                                         "DEPLOY_PLATFORM=tectonic",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e-ci.sh",
@@ -367,6 +367,7 @@ podTemplate(
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
                                         "DEPLOY_PLATFORM=tectonic",
+                                        "ENABLE_AWS_BILLING=${enableAWSBilling}",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
                                         "ENTRYPOINT=hack/integration-ci.sh",
                                     ], skipNamespaceCleanup)
