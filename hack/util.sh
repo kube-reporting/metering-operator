@@ -43,6 +43,8 @@ function install_metering() {
     echo "Installing metering"
     if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/install.sh"
+    elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
+        "$DIR/tectonic-install.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
         "$DIR/openshift-install.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
@@ -56,8 +58,12 @@ function install_metering() {
 function uninstall_metering() {
     INSTALL_METHOD=$1
     echo "Uninstalling metering"
-    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "openshift-direct" ]]; then
+    if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
+        "$DIR/tectonic-uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
+        "$DIR/openshift-uninstall.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
         "$DIR/alm-uninstall.sh"
     ***REMOVED***
