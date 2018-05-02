@@ -11,11 +11,6 @@ MANIFESTS_DIR="$DIR/../manifests"
 
 kubectl create namespace "${METERING_NAMESPACE}" || true
 
-if [ "$METERING_NAMESPACE" != "tectonic-system" ]; then
-    msg "Configuring pull secrets"
-    copy-tectonic-pull
-fi
-
 msg "Installing Custom Resource Definitions"
 kube-install \
     "$MANIFESTS_DIR/custom-resource-definitions"
