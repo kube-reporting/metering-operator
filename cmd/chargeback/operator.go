@@ -28,6 +28,10 @@ var (
 	defaultLeaseDuration    = time.Second * 60
 	// cfg is the con***REMOVED***g for our operator
 	cfg chargeback.Con***REMOVED***g
+
+	logger = log.WithFields(log.Fields{
+		"app": "chargeback-operator",
+	})
 )
 
 var rootCmd = &cobra.Command{
@@ -52,15 +56,15 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 
-	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", " ")
-	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, " ")
-	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, " ")
-	startCmd.Flags().StringVar(&cfg.PromHost, "prometheus-host", defaultPromHost, " ")
-	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, " ")
-	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "logs out report results after creating a report result table")
+	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
+	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
+	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
+	startCmd.Flags().StringVar(&cfg.PromHost, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
+	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
+	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "when enabled, logs report results after creating a report")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data de***REMOVED***nition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
-	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "how often we poll prometheus")
+	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "controls how often the operator polls Prometheus for metrics")
 	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
@@ -72,14 +76,16 @@ func main() {
 	goflag.CommandLine.Parse(nil)
 
 	AddCommands()
-	SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK")
-	rootCmd.Execute()
+
+	if err := SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK"); err != nil {
+		logger.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
+	}
+	if err := rootCmd.Execute(); err != nil {
+		logger.WithError(err).Fatalf("error executing command: %v", err)
+	}
 }
 
 func startChargeback(cmd *cobra.Command, args []string) {
-	logger := log.WithFields(log.Fields{
-		"app": "chargeback-operator",
-	})
 	if cfg.Namespace == "" {
 		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if err != nil {
