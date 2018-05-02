@@ -72,7 +72,7 @@ echo "Creating installer manifests"
 "$DIR/create-deploy-manifests.sh" \
     "$INSTALLER_MANIFEST_DIR" \
     "$DEPLOY_DIR/common-helm-operator-values.yaml" \
-    "$DEPLOY_DIR/$DEPLOY_PLATFORM/helm-operator-values.yaml" \
+    "$DEPLOY_DIR/${DEPLOY_PLATFORM}-helm-operator-values.yaml" \
     "$CUSTOM_VALUES_FILE"
 
 echo "Deploying"
