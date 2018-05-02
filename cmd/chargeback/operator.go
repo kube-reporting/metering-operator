@@ -28,6 +28,10 @@ var (
 	defaultLeaseDuration    = time.Second * 60
 	// cfg is the config for our operator
 	cfg chargeback.Config
+
+	logger = log.WithFields(log.Fields{
+		"app": "chargeback-operator",
+	})
 )
 
 var rootCmd = &cobra.Command{
@@ -72,14 +76,16 @@ func main() {
 	goflag.CommandLine.Parse(nil)
 
 	AddCommands()
-	SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK")
-	rootCmd.Execute()
+
+	if err := SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK"); err != nil {
+		logger.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
+	}
+	if err := rootCmd.Execute(); err != nil {
+		logger.WithError(err).Fatalf("error executing command: %v", err)
+	}
 }
 
 func startChargeback(cmd *cobra.Command, args []string) {
-	logger := log.WithFields(log.Fields{
-		"app": "chargeback-operator",
-	})
 	if cfg.Namespace == "" {
 		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if err != nil {
