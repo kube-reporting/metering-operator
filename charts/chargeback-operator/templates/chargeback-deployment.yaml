@@ -94,6 +94,8 @@ spec:
         ports:
         - name: "http"
           containerPort: 8080
+        - name: "pprof"
+          containerPort: 6060
         readinessProbe:
          initialDelaySeconds: 60
          timeoutSeconds: 3
