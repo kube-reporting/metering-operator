@@ -8,8 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -29,7 +31,11 @@ var ErrReportIsRunning = errors.New("the report is still running")
 type server struct {
 	chargeback *Chargeback
 	logger     log.FieldLogger
-	httpServer *http.Server
+
+	// wg is used to wait on httpServer and pprofServer stopping
+	wg          sync.WaitGroup
+	httpServer  *http.Server
+	pprofServer *http.Server
 }
 
 type requestLogger struct {
@@ -42,6 +48,7 @@ func (l *requestLogger) Print(v ...interface{}) {
 
 func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	router := chi.NewRouter()
+	pprofMux := http.NewServeMux()
 
 	logger = logger.WithField("component", "api")
 	requestLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: &requestLogger{logger}})
@@ -51,10 +58,16 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 		Addr:    ":8080",
 		Handler: router,
 	}
+	pprofServer := &http.Server{
+		Addr:    "127.0.0.1:6060",
+		Handler: pprofMux,
+	}
+
 	srv := &server{
-		chargeback: c,
-		logger:     logger,
-		httpServer: httpServer,
+		chargeback:  c,
+		logger:      logger,
+		httpServer:  httpServer,
+		pprofServer: pprofServer,
 	}
 
 	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
@@ -64,16 +77,49 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
 	router.HandleFunc("/ready", srv.readinessHandler)
+
+	pprofMux.HandleFunc("/debug/pprof/", pprof.Index)
+	pprofMux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	pprofMux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	pprofMux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	pprofMux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	return srv
 }
 
 func (srv *server) start() {
-	srv.logger.Infof("HTTP server started")
-	srv.logger.WithError(srv.httpServer.ListenAndServe()).Info("HTTP server exited")
+	srv.wg.Add(2)
+	go func() {
+		srv.logger.Infof("HTTP API server started")
+		srv.logger.WithError(srv.httpServer.ListenAndServe()).Info("HTTP API server exited")
+		srv.wg.Done()
+	}()
+	go func() {
+		srv.logger.Infof("pprof server started")
+		srv.logger.WithError(srv.pprofServer.ListenAndServe()).Info("pprof server exited")
+		srv.wg.Done()
+	}()
 }
 
 func (srv *server) stop() error {
-	return srv.httpServer.Shutdown(context.TODO())
+	srv.wg.Add(2)
+	go func() {
+		srv.logger.Infof("stopping HTTP API server")
+		err := srv.httpServer.Shutdown(context.TODO())
+		if err != nil {
+			srv.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
+		}
+		srv.wg.Done()
+	}()
+	go func() {
+		srv.logger.Infof("stopping pprof server")
+		err := srv.pprofServer.Shutdown(context.TODO())
+		if err != nil {
+			srv.logger.WithError(err).Warnf("got an error shutting down pprof server")
+		}
+		srv.wg.Done()
+	}()
+	srv.wg.Wait()
+	return nil
 }
 
 func (srv *server) newLogger(r *http.Request) log.FieldLogger {
