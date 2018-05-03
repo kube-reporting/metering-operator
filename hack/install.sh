@@ -7,7 +7,8 @@ source "${DIR}/util.sh"
 MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
 : "${DEPLOY_PLATFORM:=generic}"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/$DEPLOY_PLATFORM/helm-operator}"
+: "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
+: "${INSTALLER_MANIFEST_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
 : "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
