@@ -8,9 +8,15 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 : "${DEPLOY_TAG:?}"
 
 TMP_DIR="$(mktemp -d)"
-export METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
-export INSTALLER_MANIFESTS_DIR="$TMP_DIR/installer_manifests-${DEPLOY_TAG}"
-export CUSTOM_VALUES_FILE="$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"
+# We set these in here so that when we run e2e.sh, which runs e2e-test-runner.sh,
+# they're set to the same ***REMOVED***les for both the deploy-ci.sh script, and the
+# cleanup after deploy-ci.sh ***REMOVED***nishes. Without this, the cleanup would use the
+# default ***REMOVED***les, for uninstall rather than the same ***REMOVED***les used for deploy.
+export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
+export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
+export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
+export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
+
 export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-ci.sh}"
 
 "$DIR/e2e.sh"
