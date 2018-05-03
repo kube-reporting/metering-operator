@@ -6,8 +6,8 @@ source ${DIR}/util.sh
 MANIFESTS_DIR="$DIR/../manifests"
 : "${DEPLOY_PLATFORM:=generic}"
 : "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
-: "${INSTALLER_MANIFEST_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
+: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${DELETE_PVCS:=false}"
 : "${SKIP_DELETE_CRDS:=true}"
 
@@ -17,13 +17,13 @@ kube-remove \
 
 msg "Removing metering-helm-operator"
 kube-remove \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
 
 msg "Removing metering-helm-operator service account and RBAC resources"
 kube-remove \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-rolebinding.yaml" \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-service-account.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-rolebinding.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-role.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml"
 
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then

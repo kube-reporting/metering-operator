@@ -10,7 +10,7 @@ TMP_DIR="$(mktemp -d)"
 DEPLOY_DIR="$DIR/../manifests/deploy"
 
 export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
-export CUSTOM_DEPLOY_MANIFEST_DIR=${CUSTOM_DEPLOY_MANIFEST_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
+export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
@@ -80,9 +80,9 @@ spec:
 EOF
 
 echo "Creating metering manifests"
-"$DIR/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFEST_DIR"
+"$DIR/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFESTS_DIR"
 
 echo "Deploying"
 
-export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFEST_DIR"
+export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 ./hack/deploy.sh
