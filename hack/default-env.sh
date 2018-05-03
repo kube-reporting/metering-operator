@@ -1,3 +1,3 @@
 #!/bin/bash
-: "${METERING_NAMESPACE:=operator-metering}"
+: "${METERING_NAMESPACE:=metering}"
 
