@@ -1,0 +1,17 @@
+metering-operator:
+  con***REMOVED***g:
+    prometheusURL: "http://prometheus-k8s.monitoring.svc:9090/"
+presto:
+  presto:
+    securityContext:
+      fsGroup: 0
+  hive:
+    securityContext:
+      fsGroup: 0
+
+hdfs:
+  enabled: true
+  con***REMOVED***g:
+    datanodeDataDirPerms: "775"
+  securityContext:
+    fsGroup: 0

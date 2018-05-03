@@ -6,7 +6,7 @@ Metering records historical cluster usage, and can generate usage reports showin
 
 ## Getting Started
 
-For installation instructions, please see the [installation](Documentation/chargeback-install.md) portion of the documentation.
+For installation instructions, please see the [installation](Documentation/install-metering.md) portion of the documentation.
 
 See the above installation guide for links to con***REMOVED***guring and using Chargeback.
 

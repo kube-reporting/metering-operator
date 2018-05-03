@@ -1,0 +1,44 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-request-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-request-cpu-cores"
+    storage:
+      storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-limit-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-limit-cpu-cores"
+    storage:
+      storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}
+
+---
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-usage-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-usage-cpu-cores"
+    storage:
+      storageLocationName: {{ .Values.con***REMOVED***g.storageLocationName | quote }}

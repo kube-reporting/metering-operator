@@ -26,12 +26,12 @@ def skipNamespaceCleanup = params.SKIP_NAMESPACE_CLEANUP || (isPullRequest && pu
 
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
-def chargebackNamespacePre***REMOVED***x = "chargeback-ci-${branchTag}"
-def chargebackE2ENamespace = "${chargebackNamespacePre***REMOVED***x}-e2e"
-def chargebackIntegrationNamespace = "${chargebackNamespacePre***REMOVED***x}-integration"
+def meteringNamespacePre***REMOVED***x = "metering-ci-${branchTag}"
+def meteringE2ENamespace = "${meteringNamespacePre***REMOVED***x}-e2e"
+def meteringIntegrationNamespace = "${meteringNamespacePre***REMOVED***x}-integration"
 
 def instanceCap = isMasterBranch ? 1 : 5
-def podLabel = "kube-chargeback-build-${isMasterBranch ? 'master' : 'pr'}"
+def podLabel = "kube-metering-build-${isMasterBranch ? 'master' : 'pr'}"
 
 def awsBillingBucket = "team-chargeback"
 def awsBillingBucketPre***REMOVED***x = "cost-usage-report/team-chargeback-chancez/"
@@ -67,7 +67,7 @@ podTemplate(
     node (podLabel) {
     timestamps {
         def gopath = "${env.WORKSPACE}/go"
-        def kubeChargebackDir = "${gopath}/src/github.com/operator-framework/operator-metering"
+        def meteringSourceDir = "${gopath}/src/github.com/operator-framework/operator-metering"
         def testOutputDir = "test_output"
         def testOutputDirAbsolutePath = "${env.WORKSPACE}/${testOutputDir}"
 
@@ -101,12 +101,12 @@ podTemplate(
                     checkout([
                         $class: 'GitSCM',
                         branches: scm.branches,
-                        extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: kubeChargebackDir]],
+                        extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: meteringSourceDir]],
                         userRemoteCon***REMOVED***gs: scm.userRemoteCon***REMOVED***gs
                     ])
 
-                    gitCommit = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git rev-parse HEAD").trim()
-                    gitTag = sh(returnStdout: true, script: "cd ${kubeChargebackDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
+                    gitCommit = sh(returnStdout: true, script: "cd ${meteringSourceDir} && git rev-parse HEAD").trim()
+                    gitTag = sh(returnStdout: true, script: "cd ${meteringSourceDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
                     echo "Git Commit: ${gitCommit}"
                     if (gitTag) {
                         echo "This commit has a matching git Tag: ${gitTag}"
@@ -138,15 +138,14 @@ podTemplate(
                     "DEPLOY_TAG=${deployTag}",
                     "GIT_TAG=${gitTag}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
-                    "CHARGEBACK_E2E_NAMESPACE=${chargebackE2ENamespace}",
-                    "CHARGEBACK_INTEGRATION_NAMESPACE=${chargebackIntegrationNamespace}",
-                    "CHARGEBACK_SHORT_TESTS=${shortTests}",
-                    "ENABLE_AWS_BILLING=${enableAWSBilling}",
+                    "METERING_E2E_NAMESPACE=${meteringE2ENamespace}",
+                    "METERING_INTEGRATION_NAMESPACE=${meteringIntegrationNamespace}",
+                    "METERING_SHORT_TESTS=${shortTests}",
                     "AWS_BILLING_BUCKET=${awsBillingBucket}",
                     "AWS_BILLING_BUCKET_PREFIX=${awsBillingBucketPre***REMOVED***x}",
                     "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
                     "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}",
-                    "CLEANUP_CHARGEBACK=${!skipNamespaceCleanup}",
+                    "CLEANUP_METERING=${!skipNamespaceCleanup}",
                 ]){
                     container('docker'){
                         echo "Authenticating to docker registry"
@@ -179,7 +178,7 @@ podTemplate(
                             '''
                         }
 
-                        dir(kubeChargebackDir) {
+                        dir(meteringSourceDir) {
                             stage('test') {
                                 sh '''#!/bin/bash
                                 set -e
@@ -260,7 +259,7 @@ podTemplate(
                                     sh '''#!/bin/bash -ex
                                     make release RELEASE_VERSION=${BRANCH_TAG}
                                     '''
-                                    archiveArtifacts artifacts: 'tectonic-chargeback-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
+                                    archiveArtifacts artifacts: 'operator-metering-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
                                 } ***REMOVED*** {
                                     echo "Skipping release step, not a release"
                                 }
@@ -272,54 +271,111 @@ podTemplate(
                         withCredentials([
                             [$class: 'FileBinding', credentialsId: 'chargeback-ci-kubecon***REMOVED***g', variable: 'TECTONIC_KUBECONFIG'],
                             [$class: 'FileBinding', credentialsId: 'openshift-chargeback-ci-kubecon***REMOVED***g', variable: 'OPENSHIFT_KUBECONFIG'],
+                            [$class: 'FileBinding', credentialsId: 'gke-metering-ci-kubecon***REMOVED***g', variable: 'GKE_KUBECONFIG'],
                         ]) {
-                            parallel "tectonic-e2e": {
+                            parallel "generic-e2e": {
                                 if (runE2ETests) {
-                                    echo "Running chargeback e2e tests"
+                                    echo "Running metering e2e tests"
+                                    def myTestDir = "${testOutputDir}/generic_e2e"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/generic_e2e"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_E2E_NAMESPACE}",
+                                        "KUBECONFIG=${GKE_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_LOG_FILE=${e2eTestLogFile}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
+                                        "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=generic",
+                                        "TEST_TAP_FILE=${e2eTestTapFile}",
+                                        "ENTRYPOINT=hack/e2e-ci.sh",
+                                    ], skipNamespaceCleanup)
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping metering e2e tests"
+                                }
+                            }, "generic-integration": {
+                                if (runE2ETests) {
+                                    echo "Running metering integration tests"
+                                    def myTestDir = "${testOutputDir}/generic_integration"
+                                    def myTestDirAbs = "${testOutputDirAbsolutePath}/generic_integration"
+                                    def testReportResultsDir = "${myTestDirAbs}/test_report_results"
+                                    container('docker') {
+                                        sh "mkdir -p ${testReportResultsDir}"
+                                    }
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_INTEGRATION_NAMESPACE}",
+                                        "KUBECONFIG=${GKE_KUBECONFIG}",
+                                        "TEST_OUTPUT_DIR=${myTestDirAbs}",
+                                        "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
+                                        "TEST_LOG_FILE=${integrationTestLogFile}",
+                                        "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
+                                        "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=generic",
+                                        "TEST_TAP_FILE=${integrationTestTapFile}",
+                                        "ENTRYPOINT=hack/integration-ci.sh",
+                                    ], skipNamespaceCleanup)
+                                    step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
+                                } ***REMOVED*** {
+                                    echo "Non-master branch, skipping metering integration tests"
+                                }
+                            }, "tectonic-e2e": {
+                                if (runE2ETests) {
+                                    echo "Running metering e2e tests"
                                     def myTestDir = "${testOutputDir}/tectonic_e2e"
                                     def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_e2e"
                                     def testReportResultsDir = "${myTestDirAbs}/test_report_results"
                                     container('docker') {
                                         sh "mkdir -p ${testReportResultsDir}"
                                     }
-                                    e2eRunner(kubeChargebackDir, [
-                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_E2E_NAMESPACE}",
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_E2E_NAMESPACE}",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_LOG_FILE=${e2eTestLogFile}",
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "ENABLE_AWS_BILLING=${enableAWSBilling}",
+                                        "ENABLE_AWS_BILLING_TEST=${enableAWSBilling}",
+                                        "DEPLOY_PLATFORM=tectonic",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e-ci.sh",
                                     ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${e2eTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
-                                    echo "Non-master branch, skipping chargeback e2e tests"
+                                    echo "Non-master branch, skipping metering e2e tests"
                                 }
                             }, "tectonic-integration": {
                                 if (runE2ETests) {
-                                    echo "Running chargeback integration tests"
+                                    echo "Running metering integration tests"
                                     def myTestDir = "${testOutputDir}/tectonic_integration"
                                     def myTestDirAbs = "${testOutputDirAbsolutePath}/tectonic_integration"
                                     def testReportResultsDir = "${myTestDirAbs}/test_report_results"
                                     container('docker') {
                                         sh "mkdir -p ${testReportResultsDir}"
                                     }
-                                    e2eRunner(kubeChargebackDir, [
-                                        "CHARGEBACK_NAMESPACE=${CHARGEBACK_INTEGRATION_NAMESPACE}",
+                                    e2eRunner(meteringSourceDir, [
+                                        "METERING_NAMESPACE=${METERING_INTEGRATION_NAMESPACE}",
                                         "KUBECONFIG=${TECTONIC_KUBECONFIG}",
                                         "TEST_OUTPUT_DIR=${myTestDirAbs}",
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "TEST_LOG_FILE=${integrationTestLogFile}",
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "DEPLOY_PLATFORM=tectonic",
+                                        "ENABLE_AWS_BILLING=${enableAWSBilling}",
+                                        "ENABLE_AWS_BILLING_TEST=${enableAWSBilling}",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
                                         "ENTRYPOINT=hack/integration-ci.sh",
                                     ], skipNamespaceCleanup)
                                     step([$class: "TapPublisher", testResults: "${myTestDir}/${integrationTestTapFile}", failIfNoResults: false, planRequired: false])
                                 } ***REMOVED*** {
-                                    echo "Non-master branch, skipping chargeback integration tests"
+                                    echo "Non-master branch, skipping metering integration tests"
                                 }
                             }, failFast: false
                         }
@@ -342,10 +398,10 @@ podTemplate(
 } // timestamps end
 } // podTemplate end
 
-def e2eRunner(kubeChargebackDir, envVars, skipNamespaceCleanup) {
+def e2eRunner(meteringSourceDir, envVars, skipNamespaceCleanup) {
     withEnv(envVars) {
         container('docker'){
-            dir(kubeChargebackDir) {
+            dir(meteringSourceDir) {
                 sh 'kubectl con***REMOVED***g current-context'
                 sh 'kubectl con***REMOVED***g get-contexts'
                 try {
@@ -359,7 +415,7 @@ def e2eRunner(kubeChargebackDir, envVars, skipNamespaceCleanup) {
                             tail -f ${TEST_OUTPUT_DIR}/${TEST_LOG_FILE} &
                             docker run \
                             -i --rm \
-                            --env-***REMOVED***le <(env | grep -E 'INSTALL_METHOD|TEST|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|PULL_SECRET') \
+                            --env-***REMOVED***le <(env | grep -E 'INSTALL_METHOD|TEST|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|METERING|PULL_SECRET') \
                             -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                             -v "${KUBECONFIG}:${KUBECONFIG}" \
                             -v "${TEST_OUTPUT_DIR}:/out" \

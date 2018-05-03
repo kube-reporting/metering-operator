@@ -41,12 +41,12 @@ func collectMetricsOnce(t *testing.T) (reportStart time.Time, reportEnd time.Tim
 	t.Helper()
 	collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTCf for timestamps
-		now := time.Now().UTC()
+		currentTime := time.Now().UTC()
 		// reportEnd is an hour and 10 minutes ago because Prometheus may not
 		// have collected very recent data, and setting to hour ago ensures
 		// that a scheduledReport created with a LastReportTime of reportEnd
 		// will run immediately.
-		reportEnd = now.Add(-(time.Hour + 10*time.Minute))
+		reportEnd = currentTime.Add(-(time.Hour + 10*time.Minute))
 		// To make things faster, let's limit the window of collected data to
 		// 10 minutes
 		reportStart = reportEnd.Add(-10 * time.Minute)
@@ -62,9 +62,12 @@ func collectMetricsOnce(t *testing.T) (reportStart time.Time, reportEnd time.Tim
 		}
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
-		req := testFramework.NewChargebackSVCPOSTRequest("chargeback", "/api/v1/datasources/prometheus/collect", body)
+		collectEndpoint := "/api/v1/datasources/prometheus/collect"
+		t.Logf("Querying %s, currentTime: %s", collectEndpoint, currentTime)
+		req := testFramework.NewChargebackSVCPOSTRequest(collectEndpoint, body)
 		result := req.Do()
 		resp, err := result.Raw()
+		t.Logf("Finishing querying %s, took: %s to ***REMOVED***nish", collectEndpoint, time.Now().UTC().Sub(currentTime))
 		require.NoErrorf(t, err, "expected no errors triggering data collection, body: %v", string(resp))
 	})
 	return globalReportStart, globalReportEnd

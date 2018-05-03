@@ -1,0 +1,21 @@
+{{- if .Values.con***REMOVED***g.defaultStorage.create -}}
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: StorageLocation
+metadata:
+  name: {{ .Values.con***REMOVED***g.defaultStorage.name }}
+  labels:
+    operator-metering: "true"
+{{- if .Values.con***REMOVED***g.defaultStorage.isDefault }}
+  annotations:
+    storagelocation.chargeback.coreos.com/is-default: "true"
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+{{- if eq .Values.con***REMOVED***g.defaultStorage.type "local" }}
+  local: {}
+{{- ***REMOVED*** if eq .Values.con***REMOVED***g.defaultStorage.type "s3" }}
+  s3:
+{{ .Values.con***REMOVED***g.defaultStorage.s3 | toYaml | indent 4 }}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,12 @@
+---
+dependencies:
+- name: metering-operator
+  version: 0.1.0
+  repository: "***REMOVED***le://../metering-operator"
+- name: presto
+  version: 0.1.0
+  repository: "***REMOVED***le://../presto"
+- name: hdfs
+  version: 0.1.0
+  repository: "***REMOVED***le://../hdfs"
+  condition: hdfs.enabled

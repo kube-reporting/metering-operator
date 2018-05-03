@@ -7,7 +7,7 @@ function sanetize_namespace() {
 }
 
 function kubectl_cmd() {
-    kubectl --namespace="${CHARGEBACK_NAMESPACE}" "$@"
+    kubectl --namespace="${METERING_NAMESPACE}" "$@"
 }
 
 function kube-install() {
@@ -29,12 +29,6 @@ function msg() {
   echo -e "\x1b[1;35m${@}\x1b[0m"
 }
 
-function copy-tectonic-pull() {
-  local pullSecret=$(kubectl --namespace="${PULL_SECRET_NAMESPACE}" get secrets "${PULL_SECRET}" -o json --export)
-  pullSecret="${pullSecret/${PULL_SECRET_NAMESPACE}/${CHARGEBACK_NAMESPACE}}"
-  echo "${pullSecret}" | kube-install -
-}
-
 # formats flags for kubectl for the given ***REMOVED***les
 function kubectl_***REMOVED***les() {
   local ***REMOVED***les=()
@@ -44,11 +38,13 @@ function kubectl_***REMOVED***les() {
   echo "${***REMOVED***les[@]}"
 }
 
-function install_chargeback() {
+function install_metering() {
     INSTALL_METHOD=$1
-    echo "Installing chargeback"
+    echo "Installing metering"
     if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/install.sh"
+    elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
+        "$DIR/tectonic-install.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
         "$DIR/openshift-install.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
@@ -59,11 +55,15 @@ function install_chargeback() {
     ***REMOVED***
 }
 
-function uninstall_chargeback() {
+function uninstall_metering() {
     INSTALL_METHOD=$1
-    echo "Uninstalling chargeback"
-    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "openshift-direct" ]]; then
+    echo "Uninstalling metering"
+    if [ "$INSTALL_METHOD" == "direct" ]; then
         "$DIR/uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
+        "$DIR/tectonic-uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
+        "$DIR/openshift-uninstall.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
         "$DIR/alm-uninstall.sh"
     ***REMOVED***

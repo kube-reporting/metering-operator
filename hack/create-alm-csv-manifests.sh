@@ -3,26 +3,34 @@
 set -o pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHART="$DIR/../charts/chargeback-alm"
+CHART="$DIR/../charts/metering-alm"
+: "${MANIFESTS_DIR:=$DIR/../manifests}"
+: "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions}"
 
-# We use cd + pwd in a subshell to turn this into an absolute path (readlink -f isn't cross platform)
-OUTPUT_DIR="$(cd "${OUTPUT_DIR:=$DIR/..}" && pwd)"
-: "${MANIFESTS_DIR:=$OUTPUT_DIR/manifests}"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/installer}"
-: "${ALM_MANIFEST_DIR:=$MANIFESTS_DIR/alm}"
+if [[ $# -ge 3 ]] ; then
+    DEPLOYER_MANIFESTS_DIR=$1
+    echo "Deployer manifest directory: $DEPLOYER_MANIFESTS_DIR"
 
-: "${ALM_VALUES_FILE:=$DIR/chargeback-alm-values.yaml}"
+    DEPLOYMENT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
+    RBAC_ROLE_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-role.yaml"
+    RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml"
 
-: "${DEPLOYMENT_MANIFEST:=$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml}"
-: "${RBAC_ROLE_MANIFEST:=$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml}"
-: "${RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST:=$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml}"
-: "${CSV_MANIFEST_DESTINATION:=$ALM_MANIFEST_DIR/chargeback.clusterserviceversion.yaml}"
+    for f in "$DEPLOYMENT_MANIFEST" "$RBAC_ROLE_MANIFEST" "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST"; do
+        if [ ! -e "$f" ]; then
+            echo "Expected ***REMOVED***le $f to exist"
+            exit 1
+        ***REMOVED***
+    done
 
-VALUES_ARGS=(-f "$ALM_VALUES_FILE" -f /tmp/alm-values.yaml)
-echo "alm values ***REMOVED***le: $ALM_VALUES_FILE"
+    shift
 
-if [[ $# -ne 0 ]] ; then
-    echo "Extra values ***REMOVED***les: $*"
+    OUTPUT_DIR=$1
+    echo "Output directory: ${OUTPUT_DIR}"
+    mkdir -p "${OUTPUT_DIR}"
+    CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.clusterserviceversion.yaml"
+    shift
+
+    echo "ALM values ***REMOVED***les: $*"
     # prepends -f to each argument passed in, and stores the list of arguments
     # (-f $arg1 -f $arg2) in VALUES_ARGS
     while (($# > 0)); do
@@ -30,9 +38,11 @@ if [[ $# -ne 0 ]] ; then
         shift
     done
 ***REMOVED***
-echo "Output directory: ${OUTPUT_DIR}"
+    echo "Must specify: helm-operator directory, output directory and values ***REMOVED***les"
+    exit 1
+***REMOVED***
 
-mkdir -p "${INSTALLER_MANIFEST_DIR}" "${ALM_MANIFEST_DIR}"
+mkdir -p "$OUTPUT_DIR"
 
 JQ_CRD_SCRIPT=$(cat <<EOF
 sort_by(.metadata.name) |
@@ -86,7 +96,7 @@ EOF
 # of JSON objects separated by newlines.
 # this stream of JSON objects is used with jq -s to slurp them into an array,
 # which we map over in our $JQ_CRD_SCRIPT.
-***REMOVED***nd "$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions" \
+***REMOVED***nd "$CRD_DIR" \
     -type f \
     -exec sh -c "$DIR/yamltojson < \$0" {} \; \
     | jq -rcs "$JQ_CRD_SCRIPT" > /tmp/alm-crd.json
@@ -111,10 +121,10 @@ jq -s '.[0] * .[1] * .[2]' \
     /tmp/alm-permissions.json \
     | "$DIR/jsontoyaml" > /tmp/alm-values.yaml
 
-# use helm template to create the csv using our chargeback-alm chart.  the
-# chargeback-alm-values is the set of values which are entirely ALM speci***REMOVED***c,
-# and the rest are things we can create from our installer manifests and CRD
-# manifests.
+# use helm template to create the csv using our metering-alm chart.
+# the metering-alm-values is the set of values which are entirely ALM
+# speci***REMOVED***c, and the rest are things we can create from our installer manifests
+# and CRD manifests.
 #
 # The sed expression at the end trims trailing whitespace and removes empty
 # lines

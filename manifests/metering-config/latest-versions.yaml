@@ -1,0 +1,21 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  metering-operator:
+    image:
+      tag: latest
+
+  presto:
+    presto:
+      image:
+        tag: latest
+    hive:
+      image:
+        tag: latest
+
+  hdfs:
+    image:
+      tag: latest
+
