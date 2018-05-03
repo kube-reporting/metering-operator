@@ -4,9 +4,9 @@ source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
 MANIFESTS_DIR="$DIR/../manifests"
-: "${INSTALLER_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
-: "${ALM_MANIFEST_DIR:=$MANIFESTS_DIR/deploy/tectonic/alm}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
+: "${INSTALLER_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
+: "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/tectonic/alm}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${SKIP_DELETE_CRDS:=true}"
 
 msg "Removing Metering Resource"
@@ -15,7 +15,7 @@ kube-remove \
 
 msg "Removing Metering Cluster Service Version"
 kube-remove \
-    "$ALM_MANIFEST_DIR/metering.clusterserviceversion.yaml"
+    "$ALM_MANIFESTS_DIR/metering.clusterserviceversion.yaml"
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"

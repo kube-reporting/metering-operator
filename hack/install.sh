@@ -8,8 +8,8 @@ MANIFESTS_DIR="$DIR/../manifests"
 : "${CREATE_NAMESPACE:=true}"
 : "${DEPLOY_PLATFORM:=generic}"
 : "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
-: "${INSTALLER_MANIFEST_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFEST_DIR/metering.yaml}"
+: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
     echo "Creating namespace ${METERING_NAMESPACE}"
@@ -25,13 +25,13 @@ kube-install \
 
 msg "Installing metering-helm-operator service account and RBAC resources"
 kube-install \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-service-account.yaml" \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-rolebinding.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-role.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-rolebinding.yaml"
 
 msg "Installing metering-helm-operator"
 kube-install \
-    "$INSTALLER_MANIFEST_DIR/metering-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
 
 msg "Installing Metering Resource"
 kube-install \
