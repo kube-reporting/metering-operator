@@ -4,18 +4,50 @@ If you want to install metering without ALM, using what's currently in master, f
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
 
-Run the following commands:
+Depending on your Kubernetes platform (regular Kubernetes, Tectonic, or Openshift)
+
+For a standard Kubernetes cluster:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/install.sh
 ```
 
-To uninstall simply:
+If your using Tectonic, use tectonic-install.sh:
+
+```
+$ export METERING_NAMESPACE=metering-$USER
+$ ./hack/tectonic-install.sh
+```
+
+If your using Openshift, use openshift-install.sh:
+
+```
+$ export METERING_NAMESPACE=metering-$USER
+$ ./hack/openshift-uninstall.sh-install.sh
+```
+
+To uninstall the process is the same, pick the right uninstall script for your platform, and run it.
+
+For a standard Kubernetes cluster:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/uninstall.sh
+```
+
+If your using Tectonic, use tectonic-uninstall.sh:
+
+```
+$ export METERING_NAMESPACE=metering-$USER
+$ ./hack/tectonic-uninstall.sh
+```
+
+If your using Openshift, use openshift-uninstall.sh:
+
+```
+$ export METERING_NAMESPACE=metering-$USER
+$ ./hack/openshift-uninstall.sh
 ```
 
 ## Customize installation
@@ -38,8 +70,12 @@ image tag of each component.
 ```
 $ export METERING_NAMESPACE=metering-$USER
 $ export METERING_CR_FILE=metering-custom.yaml
-$ ./hack/install.sh
 ```
+
+Then run the installation script for your platform:
+- `./hack/install.sh`
+- `./hack/tectonic-install.sh`
+- `./hack/openshift-install.sh`
 
 ### Using images built by Jenkins
 
