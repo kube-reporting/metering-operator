@@ -63,13 +63,13 @@ ifdef DOCKER_CACHE_FROM_ENABLED
 endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
-	$(MAKE) docker-tag IMAGE_TAG=$(BRANCH_TAG)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
 endif
 ifeq ($(USE_RELEASE_TAG), true)
-	$(MAKE) docker-tag IMAGE_TAG=$(RELEASE_TAG)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(RELEASE_TAG)
 endif
 ifeq ($(USE_LATEST_TAG), true)
-	$(MAKE) docker-tag IMAGE_TAG=latest
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=latest
 endif
 
 # Usage:
@@ -154,7 +154,13 @@ chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/char
 chargeback-integration-tests-docker-build: images/integration-tests/Dockerfile hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: images/chargeback-helm-operator/Dockerfile images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz helm-operator-docker-build
+chargeback-helm-operator-docker-build: \
+		images/metering-helm-operator/Dockerfile \
+		helm-operator-docker-build \
+		images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
+		images/metering-helm-operator/openshift-metering-0.1.0.tgz \
+		images/metering-helm-operator/operator-metering-0.1.0.tgz \
+		images/metering-helm-operator/metering-override-values.yaml
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Dockerfile
@@ -181,7 +187,7 @@ fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: k8s-verify-codegen chargeback-manifests fmt
+ci-validate: k8s-verify-codegen metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
@@ -192,21 +198,37 @@ $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 	mkdir -p $(dir $@)
 	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
 
-images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml: ./hack/render-tectonic-chargeback-chart-override-values.sh
-	./hack/render-tectonic-chargeback-chart-override-values.sh $(RELEASE_TAG) > $@
+images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-tectonic-chargeback-chart: images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz
+tectonic-metering-chart: images/metering-helm-operator/tectonic-metering-0.1.0.tgz
 
-images/chargeback-helm-operator/tectonic-chargeback-0.1.0.tgz: images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml $(shell find charts -type f)
-	helm dep update --skip-refresh charts/tectonic-chargeback
-	helm package --save=false -d images/chargeback-helm-operator charts/tectonic-chargeback
+openshift-metering-chart: images/metering-helm-operator/openshift-metering-0.1.0.tgz
 
-chargeback-manifests:
-	./hack/create-chargeback-manifests.sh $(RELEASE_TAG)
+operator-metering-chart: images/metering-helm-operator/operator-metering-0.1.0.tgz
+
+images/metering-helm-operator/tectonic-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+	helm dep update --skip-refresh charts/tectonic-metering
+	helm package --save=false -d images/metering-helm-operator charts/tectonic-metering
+
+images/metering-helm-operator/openshift-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+	helm dep update --skip-refresh charts/openshift-metering
+	helm package --save=false -d images/metering-helm-operator charts/openshift-metering
+
+images/metering-helm-operator/operator-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+	helm dep update --skip-refresh charts/operator-metering
+	helm package --save=false -d images/metering-helm-operator charts/operator-metering
+
+metering-manifests:
+ifdef RELEASE_MANIFEST_OUTPUT_DIR
+	./hack/create-metering-manifests.sh $(RELEASE_TAG) $(RELEASE_MANIFEST_OUTPUT_DIR)
+else
+	./hack/create-metering-manifests.sh $(RELEASE_TAG)
+endif
 
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set
-	@./hack/create-release.sh tectonic-chargeback-$(RELEASE_VERSION).zip
+	@./hack/create-release.sh operator-metering-$(RELEASE_VERSION).zip
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift \
@@ -215,9 +237,10 @@ release:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin tectonic-chargeback-chart \
-	images/chargeback-helm-operator/tectonic-chargeback-override-values.yaml \
-	chargeback-manifests release bill-of-materials.json
+	chargeback-bin operator-metering-chart tectonic-metering-chart openshift-metering chart \
+	images/metering-helm-operator/metering-override-values.yaml \
+	metering-manifests release bill-of-materials.json \
+	install-kube-prometheus-helm
 
 k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
@@ -248,3 +271,13 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift
 
 bill-of-materials.json: bill-of-materials.override.json
 	license-bill-of-materials --override-file $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
+
+kube-prometheus-helm-install:
+	@echo "KUBECONFIG: $(KUBECONFIG)"
+	helm ls
+	helm version
+	helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+	helm upgrade --install --namespace monitoring prometheus-operator coreos/prometheus-operator --wait
+	# set https to false on kubelets for GKE and set the fullnameOverride for the
+	# Prometheus resource so our service has a consistent name.
+	helm upgrade --install --namespace monitoring kube-prometheus coreos/kube-prometheus --set 'prometheus.fullnameOverride=prometheus-k8s,exporter-kubelets.https=false' --wait

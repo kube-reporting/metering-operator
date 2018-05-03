@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
 : "${KUBECONFIG?}"
-: "${CHARGEBACK_NAMESPACE:=chargeback-e2e}"
+: "${METERING_NAMESPACE:=metering-e2e}"
 
 export TEST_SCRIPT="${TEST_SCRIPT:-$DIR/run-e2e-tests.sh}"
 export TEST_LOG_FILE="${TEST_LOG_FILE:-e2e-tests.log}"

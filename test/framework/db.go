@@ -15,7 +15,7 @@ func (f *Framework) StoreDataSourceData(dataSourceName string, records []*charge
 	}
 
 	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s", dataSourceName)
-	req := f.NewChargebackSVCPOSTRequest("chargeback", url, body)
+	req := f.NewChargebackSVCPOSTRequest(url, body)
 
 	resp, err := req.Do().Raw()
 	if err != nil {

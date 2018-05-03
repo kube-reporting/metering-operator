@@ -21,6 +21,7 @@ import (
 var (
 	reportTestTimeout         = 5 * time.Minute
 	reportTestOutputDirectory string
+	runAWSBillingTests        bool
 )
 
 func init() {
@@ -40,6 +41,8 @@ func init() {
 	if err != nil {
 		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
 	}
+
+	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
 }
 
 func TestReportsProduceData(t *testing.T) {
@@ -48,6 +51,7 @@ func TestReportsProduceData(t *testing.T) {
 		name      string
 		queryName string
 		timeout   time.Duration
+		skip      bool
 	}{
 		{
 			name:      "namespace-cpu-request",
@@ -108,16 +112,19 @@ func TestReportsProduceData(t *testing.T) {
 			name:      "pod-cpu-request-aws",
 			queryName: "pod-cpu-request-aws",
 			timeout:   reportTestTimeout,
+			skip:      !runAWSBillingTests,
 		},
 		{
 			name:      "pod-memory-request-aws",
 			queryName: "pod-memory-request-aws",
 			timeout:   reportTestTimeout,
+			skip:      !runAWSBillingTests,
 		},
 		{
 			name:      "aws-ec2-cluster-cost",
 			queryName: "aws-ec2-cluster-cost",
 			timeout:   reportTestTimeout,
+			skip:      !runAWSBillingTests,
 		},
 	}
 
@@ -136,7 +143,12 @@ func TestReportsProduceData(t *testing.T) {
 
 		t.Run(test.name, func(t *testing.T) {
 			if testing.Short() && i != 0 {
-				t.Skipf("skipping test in short mode")
+				t.Skip("skipping test in short mode")
+				return
+			}
+
+			if test.skip {
+				t.Skip("test configured to be skipped")
 				return
 			}
 
@@ -165,7 +177,7 @@ func TestReportsProduceData(t *testing.T) {
 			var reportResults []map[string]interface{}
 			var reportData []byte
 			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
-				req := testFramework.NewChargebackSVCRequest("chargeback", "/api/v1/reports/get", query)
+				req := testFramework.NewChargebackSVCRequest("/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
 				if err != nil {

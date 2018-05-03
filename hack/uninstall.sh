@@ -3,29 +3,27 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/default-env.sh
 source ${DIR}/util.sh
 
-: "${INSTALLER_MANIFEST_DIR:=$DIR/../manifests/installer}"
-: "${CHARGEBACK_CR_FILE:=$INSTALLER_MANIFEST_DIR/chargeback.yaml}"
+MANIFESTS_DIR="$DIR/../manifests"
+: "${DEPLOY_PLATFORM:=generic}"
+: "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
+: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
+: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${DELETE_PVCS:=false}"
 : "${SKIP_DELETE_CRDS:=true}"
 
-if [ "$CHARGEBACK_NAMESPACE" != "tectonic-system" ]; then
-    msg "Removing pull secrets"
-    kube-remove-non-file secret coreos-pull-secret
-fi
-
-msg "Removing Chargeback Resource"
+msg "Removing Metering Resource"
 kube-remove \
-    "$CHARGEBACK_CR_FILE"
+    "$METERING_CR_FILE"
 
-msg "Removing chargeback-helm-operator"
+msg "Removing metering-helm-operator"
 kube-remove \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
 
-msg "Removing chargeback-helm-operator service account and RBAC resources"
+msg "Removing metering-helm-operator service account and RBAC resources"
 kube-remove \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-rolebinding.yaml" \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFEST_DIR/chargeback-helm-operator-service-account.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-rolebinding.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-role.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml"
 
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then

@@ -32,6 +32,8 @@ spec:
           value: {{ .Values.crd.kind }}
         - name: HELM_RELEASE_CRD_API_GROUP
           value: {{ .Values.crd.apiGroup }}
+        - name: HELM_CHART_PATH
+          value: {{ required "chartPath is required" .Values.chartPath }}
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:

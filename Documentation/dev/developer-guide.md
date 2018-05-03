@@ -1,6 +1,6 @@
 # Developer Guide
 
-This document describes setting up your environment, as well as installing Chargeback.
+This document describes setting up your environment, as well as installing Metering.
 
 ## Development Dependencies
 

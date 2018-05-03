@@ -1,0 +1,21 @@
+{{- if .Values.config.defaultStorage.create -}}
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: StorageLocation
+metadata:
+  name: {{ .Values.config.defaultStorage.name }}
+  labels:
+    operator-metering: "true"
+{{- if .Values.config.defaultStorage.isDefault }}
+  annotations:
+    storagelocation.chargeback.coreos.com/is-default: "true"
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+{{- if eq .Values.config.defaultStorage.type "local" }}
+  local: {}
+{{- else if eq .Values.config.defaultStorage.type "s3" }}
+  s3:
+{{ .Values.config.defaultStorage.s3 | toYaml | indent 4 }}
+{{- end -}}
+{{- end -}}

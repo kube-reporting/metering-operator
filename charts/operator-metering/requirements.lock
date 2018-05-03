@@ -1,0 +1,12 @@
+dependencies:
+- name: metering-operator
+  repository: file://../metering-operator
+  version: 0.1.0
+- name: presto
+  repository: file://../presto
+  version: 0.1.0
+- name: hdfs
+  repository: file://../hdfs
+  version: 0.1.0
+digest: sha256:e0c00a169e1babb5af3bd4a1fc37c61960100bd4a2be934c54dfb95d56546caa
+generated: 2018-04-30T09:55:26.891558608-07:00

@@ -1,0 +1,111 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: metering
+  labels:
+    app: metering
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  strategy:
+{{ toYaml .Values.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      labels:
+        app: metering
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 8 }}
+{{- end }}
+      annotations:
+        metering-config-hash: {{ include (print $.Template.BasePath "/metering-config.yaml") . | sha256sum }}
+        metering-secrets-hash: {{ include (print $.Template.BasePath "/metering-secrets.yaml") . | sha256sum }}
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: metering
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: metering-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: metering-secrets
+              key: aws-secret-access-key
+        - name: CHARGEBACK_LOG_DML_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: log-dml-queries
+        - name: CHARGEBACK_LOG_DDL_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: log-ddl-queries
+        - name: CHARGEBACK_LOG_REPORT
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: log-reports
+        - name: CHARGEBACK_PROMETHEUS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: prometheus-url
+        - name: CHARGEBACK_PROMSUM_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: promsum-poll-interval
+        - name: CHARGEBACK_PROMSUM_CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: promsum-chunk-size
+        - name: CHARGEBACK_PROMSUM_STEP_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: promsum-step-size
+        - name: CHARGEBACK_DISABLE_PROMSUM
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: disable-promsum
+        - name: CHARGEBACK_LEASE_DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: leader-lease-duration
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        ports:
+        - name: "http"
+          containerPort: 8080
+        - name: "pprof"
+          containerPort: 6060
+        readinessProbe:
+         initialDelaySeconds: 60
+         timeoutSeconds: 3
+         periodSeconds: 10
+         successThreshold: 2
+         failureThreshold: 5
+         httpGet:
+           path: /ready
+           port: 8080
+           scheme: HTTP
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: metering

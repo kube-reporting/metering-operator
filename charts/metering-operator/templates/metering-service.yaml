@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: metering
+  labels:
+    app: metering
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  selector:
+    app: metering
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: "http"

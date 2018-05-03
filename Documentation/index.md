@@ -1,15 +1,15 @@
-# Tectonic Metering and Chargeback
+# Operator Metering
 
-- [Installing Chargeback][install-chargeback]
-- [Chargeback configuration options][chargeback-config]
-- [Using Chargeback][using-chargeback]
+- [Installing Metering][install-metering]
+- [Metering configuration options][metering-config]
+- [Using Metering][using-metering]
 - [Reports][report]
-- [Troubleshooting][troubleshooting-chargeback]
+- [Troubleshooting][troubleshooting-metering]
 
 
-[chargeback-config]: chargeback-config.md
-[install-chargeback]: install-chargeback.md
+[metering-config]: metering-config.md
+[install-metering]: install-metering.md
 [report]: report.md
-[using-chargeback]: using-chargeback.md
-[troubleshooting-chargeback]: troubleshooting-chargeback.md
+[using-metering]: using-metering.md
+[troubleshooting-metering]: troubleshooting-metering.md
 

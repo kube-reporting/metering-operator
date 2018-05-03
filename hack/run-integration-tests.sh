@@ -4,18 +4,18 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/util.sh
 
-export CHARGEBACK_NAMESPACE=${CHARGEBACK_NAMESPACE:-chargeback-ci-integration}
-export CHARGEBACK_SHORT_TESTS=${CHARGEBACK_SHORT_TESTS:-false}
+export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-ci-integration}
+export METERING_SHORT_TESTS=${METERING_SHORT_TESTS:-false}
 
 # lowercase the value, since namespaces must be lowercase values
-CHARGEBACK_NAMESPACE="$(sanetize_namespace "$CHARGEBACK_NAMESPACE")"
+METERING_NAMESPACE="$(sanetize_namespace "$METERING_NAMESPACE")"
 
 go test \
-    -test.short="${CHARGEBACK_SHORT_TESTS}" \
+    -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
     -timeout 20m \
     "./test/integration" \
-    -namespace "${CHARGEBACK_NAMESPACE}" \
+    -namespace "${METERING_NAMESPACE}" \
     -kubeconfig "${KUBECONFIG}" "$@"
 
 

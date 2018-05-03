@@ -1,0 +1,44 @@
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-request-memory-bytes"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-request-memory-bytes"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-limit-memory-bytes"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-limit-memory-bytes"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
+
+---
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-usage-memory-bytes"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "pod-usage-memory-bytes"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}

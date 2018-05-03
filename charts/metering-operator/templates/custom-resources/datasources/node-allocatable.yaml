@@ -1,0 +1,30 @@
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "node-allocatable-memory-bytes"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "node-allocatable-memory-bytes"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}
+
+---
+
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "node-allocatable-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  promsum:
+    query: "node-allocatable-cpu-cores"
+    storage:
+      storageLocationName: {{ .Values.config.storageLocationName | quote }}

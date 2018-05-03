@@ -1,0 +1,7 @@
+name: metering-helm-operator
+
+cr:
+  create: true
+  name: "openshift-metering"
+
+chartPath: "/openshift-metering-0.1.0.tgz"
