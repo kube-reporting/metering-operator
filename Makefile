@@ -220,7 +220,11 @@ images/metering-helm-operator/operator-metering-0.1.0.tgz: images/metering-helm-
 	helm package --save=false -d images/metering-helm-operator charts/operator-metering
 
 metering-manifests:
+ifdef RELEASE_MANIFEST_OUTPUT_DIR
+	./hack/create-metering-manifests.sh $(RELEASE_TAG) $(RELEASE_MANIFEST_OUTPUT_DIR)
+***REMOVED***
 	./hack/create-metering-manifests.sh $(RELEASE_TAG)
+endif
 
 release:
 	test -n "$(RELEASE_VERSION)" # $$RELEASE_VERSION must be set

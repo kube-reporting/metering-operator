@@ -10,8 +10,9 @@ TMP_DIR="$(mktemp -d)"
 DEPLOY_DIR="$DIR/../manifests/deploy"
 
 export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
-export INSTALLER_MANIFEST_DIR=${INSTALLER_MANIFEST_DIR:-"$TMP_DIR/installer_manifests-${DEPLOY_TAG}"}
-export CUSTOM_VALUES_FILE=${CUSTOM_VALUES_FILE:-"$TMP_DIR/helm-operator-values-${DEPLOY_TAG}.yaml"}
+export CUSTOM_DEPLOY_MANIFEST_DIR=${CUSTOM_DEPLOY_MANIFEST_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
+export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
+export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
 
 : "${ENABLE_AWS_BILLING:=false}"
@@ -61,20 +62,27 @@ spec:
       terminationGracePeriodSeconds: 0
 EOF
 
-cat <<EOF > "$CUSTOM_VALUES_FILE"
+cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
 reconcileIntervalSeconds: 5
 EOF
 
-echo "Creating installer manifests"
+cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
+name: metering-helm-operator.v${DEPLOY_TAG}
+spec:
+  version: ${DEPLOY_TAG}
+  labels:
+    alm-status-descriptors: metering-helm-operator.v${DEPLOY_TAG}
+    alm-owner-metering: metering-helm-operator
+  matchLabels:
+    alm-owner-metering: metering-helm-operator
+EOF
 
-"$DIR/create-deploy-manifests.sh" \
-    "$INSTALLER_MANIFEST_DIR" \
-    "$DEPLOY_DIR/common-helm-operator-values.yaml" \
-    "$DEPLOY_DIR/${DEPLOY_PLATFORM}-helm-operator-values.yaml" \
-    "$CUSTOM_VALUES_FILE"
+echo "Creating metering manifests"
+"$DIR/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFEST_DIR"
 
 echo "Deploying"
 
+export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFEST_DIR"
 ./hack/deploy.sh
