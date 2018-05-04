@@ -27,7 +27,6 @@ if [[ $# -ge 3 ]] ; then
     OUTPUT_DIR=$1
     echo "Output directory: ${OUTPUT_DIR}"
     mkdir -p "${OUTPUT_DIR}"
-    CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.clusterserviceversion.yaml"
     shift
 
     echo "ALM values files: $*"
@@ -121,14 +120,41 @@ jq -s '.[0] * .[1] * .[2]' \
     /tmp/alm-permissions.json \
     | "$DIR/jsontoyaml" > /tmp/alm-values.yaml
 
-# use helm template to create the csv using our metering-alm chart.
+# use helm template to create the csv and package using our metering-alm chart.
 # the metering-alm-values is the set of values which are entirely ALM
 # specific, and the rest are things we can create from our installer manifests
 # and CRD manifests.
 #
 # The sed expression at the end trims trailing whitespace and removes empty
 # lines
+
+# Render the CSV to a temporary location, so we can add the version into it's
+# filename after it's been rendered
+TMP_CSV="/tmp/metering.clusterserviceversion.yaml"
 helm template "$CHART" \
+    -f /tmp/alm-values.yaml \
     "${VALUES_ARGS[@]}" \
+    -x "templates/clusterserviceversion-v1.yaml" \
     | sed -f "$DIR/remove-helm-template-header.sed" \
-    > "$CSV_MANIFEST_DESTINATION"
+    > "$TMP_CSV"
+
+# Rename the file with it's version in it, and move it to the final destination
+CSV_VERSION="$("$DIR/yamltojson" < "$TMP_CSV" | jq -r '.spec.version' )"
+CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.${CSV_VERSION}.clusterserviceversion.yaml"
+mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
+
+PACKAGE_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.package.yaml"
+helm template "$CHART" \
+    -f /tmp/alm-values.yaml \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/package-v1.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$PACKAGE_MANIFEST_DESTINATION"
+
+SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
+helm template "$CHART" \
+    -f /tmp/alm-values.yaml \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/subscription-v1.yaml" \
+    | sed -f "$DIR/remove-helm-template-header.sed" \
+    > "$SUBSCRIPTION_MANIFEST_DESTINATION"

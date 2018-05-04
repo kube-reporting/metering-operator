@@ -63,7 +63,7 @@ echo "Creating Tectonic deploy manifests"
 
 echo
 echo "Creating Tectonic ALM manifests"
-"$DIR/create-alm-csv-manifests.sh" \
+"$DIR/create-alm-manifests.sh" \
     "$OUTPUT_DIR/tectonic/helm-operator" \
     "$OUTPUT_DIR/tectonic/alm" \
     "$DEPLOY_DIR/common-alm-values.yaml" \
@@ -81,7 +81,7 @@ echo "Creating Openshift deploy manifests"
 
 echo
 echo "Creating Openshift ALM manifests"
-"$DIR/create-alm-csv-manifests.sh" \
+"$DIR/create-alm-manifests.sh" \
     "$OUTPUT_DIR/openshift/helm-operator" \
     "$OUTPUT_DIR/openshift/alm" \
     "$DEPLOY_DIR/common-alm-values.yaml" \
@@ -99,8 +99,9 @@ echo "Creating Generic deploy manifests"
 
 echo
 echo "Creating Generic ALM manifests"
-"$DIR/create-alm-csv-manifests.sh" \
+"$DIR/create-alm-manifests.sh" \
     "$OUTPUT_DIR/generic/helm-operator" \
     "$OUTPUT_DIR/generic/alm" \
     "$DEPLOY_DIR/common-alm-values.yaml" \
+    "$DEPLOY_DIR/generic-alm-values.yaml" \
     "$ALM_OVERRIDE_VALUES_FILE"

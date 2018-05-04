@@ -1,0 +1,8 @@
+apiVersion: app.coreos.com/v1alpha1
+kind: Subscription-v1
+metadata:
+  name: metering-helm-operator.v0.6.0-latest
+spec:
+  channel: alpha
+  name: metering
+  source: tectonic-components

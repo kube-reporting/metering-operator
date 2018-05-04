@@ -15,9 +15,9 @@ msg "Installing Custom Resource Definitions"
 kube-install \
     "$MANIFESTS_DIR/custom-resource-definitions"
 
-msg "Installing Metering Cluster Service Version"
+msg "Installing Metering Cluster Service Versions"
 kube-install \
-    "$ALM_MANIFESTS_DIR/metering.clusterserviceversion.yaml"
+    "$ALM_MANIFESTS_DIR/metering.*.clusterserviceversion.yaml"
 
 msg "Installing Metering Resource"
 kube-install \

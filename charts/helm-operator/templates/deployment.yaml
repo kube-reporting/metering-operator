@@ -8,6 +8,12 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:
