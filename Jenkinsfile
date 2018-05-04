@@ -253,17 +253,6 @@ podTemplate(
                                     '''
                                 }
                             }
-
-                            stage('release') {
-                                if (params.BUILD_RELEASE) {
-                                    sh '''#!/bin/bash -ex
-                                    make release RELEASE_VERSION=${BRANCH_TAG}
-                                    '''
-                                    archiveArtifacts artifacts: 'operator-metering-*.zip', ***REMOVED***ngerprint: true, onlyIfSuccessful: true
-                                } ***REMOVED*** {
-                                    echo "Skipping release step, not a release"
-                                }
-                            }
                         }
                     }
 
