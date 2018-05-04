@@ -129,6 +129,8 @@ jq -s '.[0] * .[1] * .[2]' \
 # The sed expression at the end trims trailing whitespace and removes empty
 # lines
 helm template "$CHART" \
+    -f /tmp/alm-values.yaml \
     "${VALUES_ARGS[@]}" \
+    -x "templates/clusterserviceversion-v1.yaml" \
     | sed -f "$DIR/remove-helm-template-header.sed" \
     > "$CSV_MANIFEST_DESTINATION"
