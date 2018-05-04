@@ -15,7 +15,7 @@ kube-remove \
 
 msg "Removing Metering Cluster Service Version"
 kube-remove \
-    "$ALM_MANIFESTS_DIR/metering.clusterserviceversion.yaml"
+    "$ALM_MANIFESTS_DIR/metering.*.clusterserviceversion.yaml"
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
