@@ -13,4 +13,7 @@ spec:
     alm-owner-metering: metering-helm-operator
   matchLabels:
     alm-owner-metering: metering-helm-operator
+channels:
+- name: alpha
+  currentCSV: metering-helm-operator.v$1
 EOF
