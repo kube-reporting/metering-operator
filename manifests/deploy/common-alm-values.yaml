@@ -15,3 +15,10 @@ spec:
     alm-owner-metering: metering-helm-operator
   matchLabels:
     alm-owner-metering: metering-helm-operator
+
+packageName: metering
+channels:
+- name: alpha
+  currentCSV: metering-helm-operator.vlatest
+
+subscriptionChannel: alpha

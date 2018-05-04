@@ -1,13 +1,13 @@
-#! validate-crd: ../../deploy/chart/kube-1.8/templates/03-clusterserviceversion.crd.yaml
+#! validate-crd: ../../deploy/chart/templates/03-clusterserviceversion.crd.yaml
 #! parse-kind: ClusterServiceVersion
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
   name: metering-helm-operator.v0.6.0-latest
   annotations:
-    tectonic-visibility: openshift-feature
+    tectonic-visibility: tectonic-feature
   labels:
-    alm-catalog: openshift-feature
+    alm-catalog: tectonic-feature
 spec:
   displayName: Metering
   description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
@@ -174,6 +174,9 @@ spec:
         - name: metering-helm-operator
           spec:
             replicas: 1
+            selector:
+              matchLabels:
+                app: metering-helm-operator
             strategy:
               type: Recreate
             template:
@@ -190,7 +193,7 @@ spec:
                   - name: HELM_RELEASE_CRD_API_GROUP
                     value: chargeback.coreos.com
                   - name: HELM_CHART_PATH
-                    value: /openshift-metering-0.1.0.tgz
+                    value: /operator-metering-0.1.0.tgz
                   - name: MY_POD_NAME
                     valueFrom:
                       ***REMOVED***eldRef:
