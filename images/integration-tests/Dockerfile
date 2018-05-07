@@ -1,7 +1,6 @@
 FROM golang:1.10-rc-alpine
 
-RUN apk update
-RUN apk add libc-dev git bash jq zip curl make python py-pip
+RUN apk update && apk add libc-dev git bash jq zip curl make python py-pip
 RUN pip install pyyaml
 VOLUME /out
 
