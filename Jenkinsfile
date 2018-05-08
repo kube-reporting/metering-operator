@@ -8,8 +8,6 @@ properties([
     disableConcurrentBuilds(),
     pipelineTriggers([]),
     parameters([
-        booleanParam(name: 'BUILD_RELEASE', defaultValue: false, description: ''),
-        booleanParam(name: 'USE_BRANCH_AS_TAG', defaultValue: false, description: ''),
         booleanParam(name: 'RUN_E2E_TESTS', defaultValue: true, description: 'If true, run e2e tests.'),
         booleanParam(name: 'SHORT_TESTS', defaultValue: false, description: 'If true, run tests with -test.short=true for running a subset of tests'),
         booleanParam(name: 'SKIP_DOCKER_STAGES', defaultValue: false, description: 'If true, skips docker build, tag and push'),
@@ -85,9 +83,6 @@ podTemplate(
             dockerBuildArgs = '--no-cache'
         }
 
-        def gitCommit
-        def gitTag
-
         try {
             container('docker'){
 
@@ -104,22 +99,6 @@ podTemplate(
                         extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: meteringSourceDir]],
                         userRemoteConfigs: scm.userRemoteConfigs
                     ])
-
-                    gitCommit = sh(returnStdout: true, script: "cd ${meteringSourceDir} && git rev-parse HEAD").trim()
-                    gitTag = sh(returnStdout: true, script: "cd ${meteringSourceDir} && git describe --tags --exact-match HEAD 2>/dev/null || true").trim()
-                    echo "Git Commit: ${gitCommit}"
-                    if (gitTag) {
-                        echo "This commit has a matching git Tag: ${gitTag}"
-                    }
-
-                    if (params.BUILD_RELEASE) {
-                        if (params.USE_BRANCH_AS_TAG) {
-                            gitTag = branchTag
-                        } else if (!gitTag) {
-                            error "Unable to detect git tag"
-                        }
-                        deployTag = gitTag
-                    }
                 }
             }
 
@@ -134,9 +113,8 @@ podTemplate(
                     "USE_RELEASE_TAG=${isMasterBranch}",
                     "PUSH_RELEASE_TAG=${isMasterBranch}",
                     "BRANCH_TAG=${branchTag}",
-                    "BRANCH_TAG_CACHE=${isMasterBranch}",
                     "DEPLOY_TAG=${deployTag}",
-                    "GIT_TAG=${gitTag}",
+                    "BRANCH_TAG_CACHE=${isMasterBranch}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
                     "METERING_E2E_NAMESPACE=${meteringE2ENamespace}",
                     "METERING_INTEGRATION_NAMESPACE=${meteringIntegrationNamespace}",
@@ -191,39 +169,26 @@ podTemplate(
                             stage('build') {
                                 if (params.SKIP_DOCKER_STAGES) {
                                     echo "Skipping docker build"
-                                } else if (!params.BUILD_RELEASE) {
+                                } else {
                                     ansiColor('xterm') {
                                         sh '''#!/bin/bash -ex
                                         make docker-build-all -j 2 \
                                             BRANCH_TAG_CACHE=${BRANCH_TAG_CACHE} \
                                             USE_LATEST_TAG=${USE_LATEST_TAG} \
-                                            BRANCH_TAG=${BRANCH_TAG}
+                                            BRANCH_TAG=${BRANCH_TAG} \
+                                            DEPLOY_TAG=${DEPLOY_TAG}
                                         '''
                                     }
-                                } else {
-                                    // Images should already have been built if
-                                    // we're doing a release build. In the tag
-                                    // stage we will pull and tag these images
-                                    echo "Release build, skipping building of images."
                                 }
                             }
 
                             stage('tag') {
                                 if (params.SKIP_DOCKER_STAGES) {
                                     echo "Skipping docker tag"
-                                } else if (!params.BUILD_RELEASE) {
-                                    ansiColor('xterm') {
-                                        sh '''#!/bin/bash -ex
-                                        make docker-tag-all -j 2 \
-                                            IMAGE_TAG=${DEPLOY_TAG}
-                                        '''
-                                    }
                                 } else {
                                     ansiColor('xterm') {
                                         sh '''#!/bin/bash -ex
-                                        make docker-tag-all \
-                                            PULL_TAG_IMAGE_SOURCE=true \
-                                            IMAGE_TAG=${GIT_TAG}
+                                        make docker-tag-all -j 2
                                         '''
                                     }
                                 }
@@ -232,24 +197,13 @@ podTemplate(
                             stage('push') {
                                 if (params.SKIP_DOCKER_STAGES) {
                                     echo "Skipping docker push"
-                                } else if (!params.BUILD_RELEASE) {
-                                    sh '''#!/bin/bash -ex
-                                    make docker-push-all -j 2 \
-                                        USE_LATEST_TAG=${USE_LATEST_TAG} \
-                                        BRANCH_TAG=${BRANCH_TAG}
-                                    # Unset BRANCH_TAG so we don't push the same
-                                    # image twice
-                                    unset BRANCH_TAG
-                                    make docker-push-all -j 2 \
-                                        IMAGE_TAG=${DEPLOY_TAG} \
-                                        PUSH_RELEASE_TAG=${PUSH_RELEASE_TAG} \
-                                        BRANCH_TAG=
-                                    '''
                                 } else {
                                     sh '''#!/bin/bash -ex
                                     make docker-push-all -j 2 \
-                                        USE_LATEST_TAG=false \
-                                        IMAGE_TAG=${GIT_TAG}
+                                        USE_LATEST_TAG=${USE_LATEST_TAG} \
+                                        PUSH_RELEASE_TAG=${PUSH_RELEASE_TAG} \
+                                        BRANCH_TAG=${BRANCH_TAG} \
+                                        DEPLOY_TAG=${DEPLOY_TAG}
                                     '''
                                 }
                             }

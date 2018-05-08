@@ -29,13 +29,15 @@ PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-tests
 
-GIT_SHA := $(shell git -C $(ROOT_DIR) rev-parse HEAD)
+GIT_SHA    = $(shell git rev-parse HEAD)
+GIT_TAG    = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+RELEASE_TAG = 0.6.0-latest
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
 USE_RELEASE_TAG = true
 PUSH_RELEASE_TAG = false
-RELEASE_TAG = 0.6.0-latest
+
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 IMAGE_TAG = $(GIT_SHA)
 TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
@@ -64,6 +66,12 @@ endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
+endif
+ifdef DEPLOY_TAG
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(DEPLOY_TAG)
+endif
+ifneq ($(GIT_TAG),)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(GIT_TAG)
 endif
 ifeq ($(USE_RELEASE_TAG), true)
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(RELEASE_TAG)
@@ -97,8 +105,14 @@ endif
 ifeq ($(USE_LATEST_TAG), true)
 	docker push $(IMAGE_NAME):latest
 endif
+ifneq ($(GIT_TAG),)
+	docker push $(IMAGE_NAME):$(GIT_TAG)
+endif
 ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
+endif
+ifdef DEPLOY_TAG
+	docker push $(IMAGE_NAME):$(DEPLOY_TAG)
 endif
 
 DOCKER_TARGETS := \
