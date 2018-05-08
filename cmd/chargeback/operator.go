@@ -56,6 +56,8 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 
+	goflag.CommandLine.Set("logtostderr", "true")
+
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
@@ -71,8 +73,7 @@ func init() {
 }
 
 func main() {
-	// these ***REMOVED***x https://github.com/kubernetes/kubernetes/issues/17162
-	rootCmd.Flags().AddGoFlagSet(goflag.CommandLine)
+	// ***REMOVED***x https://github.com/kubernetes/kubernetes/issues/17162
 	goflag.CommandLine.Parse(nil)
 
 	AddCommands()
