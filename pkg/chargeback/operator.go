@@ -20,8 +20,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/rest"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
@@ -41,9 +42,10 @@ const (
 )
 
 type Config struct {
-	PodName   string
-	Hostname  string
-	Namespace string
+	PodName    string
+	Hostname   string
+	Namespace  string
+	Kubeconfig string
 
 	HiveHost       string
 	PrestoHost     string
@@ -97,21 +99,34 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, er
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 	logger.Debugf("Config: %+v", cfg)
 
-	kubeConfig, err := rest.InClusterConfig()
+	configOverrides := &clientcmd.ConfigOverrides{}
+	var clientConfig clientcmd.ClientConfig
+	if cfg.Kubeconfig == "" {
+		loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+		clientConfig = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+	} else {
+		apiCfg, err := clientcmd.LoadFromFile(cfg.Kubeconfig)
+		if err != nil {
+			return nil, err
+		}
+		clientConfig = clientcmd.NewDefaultClientConfig(*apiCfg, configOverrides)
+	}
+
+	kubeConfig, err := clientConfig.ClientConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to get Kubernetes client config: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
 	op.kubeClient, err = corev1.NewForConfig(kubeConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
-	logger.Debugf("setting up chargeback client...")
+	logger.Debugf("setting up Chargeback client...")
 	op.chargebackClient, err = cbClientset.NewForConfig(kubeConfig)
 	if err != nil {
-		logger.Fatal(err)
+		return nil, fmt.Errorf("Unable to create Chargeback client: %v", err)
 	}
 
 	op.setupInformers()
@@ -226,6 +241,7 @@ func (c *Chargeback) setupQueues() {
 
 func (qs queues) ShutdownQueues() {
 	for _, queue := range qs.queueList {
+		fmt.Printf("shutting down queue: %#v\n", queue)
 		queue.ShutDown()
 	}
 }
@@ -283,12 +299,15 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	// Poll until we can write to presto
 	c.logger.Info("testing ability to write to Presto")
-	wait.PollUntil(time.Second*5, func() (bool, error) {
+	err = wait.PollUntil(time.Second*5, func() (bool, error) {
 		if c.testWriteToPresto(c.logger) {
 			return true, nil
 		}
 		return false, nil
 	}, stopCh)
+	if err != nil {
+		return err
+	}
 	c.logger.Info("writes to Presto are succeeding")
 
 	c.logger.Info("basic initialization completed")
@@ -310,37 +329,32 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 
 	var wg sync.WaitGroup
-	// run shuts down chargeback by closing the stopCh passed to it when a signal is received or when chargeback stops being leader
-	run := func(leaderStopCh <-chan struct{}) {
-		c.logger.Infof("became leader")
-		stopWorkersCh := make(chan struct{})
-		go func() {
-			select {
-			case <-leaderStopCh:
-				if stopWorkersCh != nil {
-					close(stopWorkersCh)
-				}
-			case <-stopCh:
-				if stopWorkersCh != nil {
-					close(stopWorkersCh)
-				}
-			}
-		}()
-		c.logger.Info("starting Chargeback workers")
-		c.startWorkers(wg, stopCh)
 
-		c.logger.Infof("Chargeback workers started, watching for reports...")
-		<-stopWorkersCh
-	}
+	stopWorkersCh := make(chan struct{})
+	lostLeaderCh := make(chan struct{})
+
 	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
 		Lock:          rl,
 		LeaseDuration: c.cfg.LeaderLeaseDuration,
 		RenewDeadline: c.cfg.LeaderLeaseDuration / 2,
 		RetryPeriod:   2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
-			OnStartedLeading: run,
+			OnStartedLeading: func(leaderStopCh <-chan struct{}) {
+				c.logger.Infof("became leader")
+				// if we stop being leader or get a shutdown signal, stop the
+				// workers
+				go func() {
+					<-leaderStopCh
+					close(stopWorkersCh)
+				}()
+				c.logger.Info("starting Chargeback workers")
+				c.startWorkers(wg, stopWorkersCh)
+
+				c.logger.Infof("Chargeback workers started, watching for reports...")
+			},
 			OnStoppedLeading: func() {
 				c.logger.Warn("leader election lost")
+				close(lostLeaderCh)
 			},
 		},
 	})
@@ -349,10 +363,22 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 
 	c.logger.Infof("starting leader election")
-	leader.Run()
+	go leader.Run()
+
+	// wait for us to lose leadership or for a stop signal to begin shutdown
+	select {
+	case <-stopCh:
+	case <-lostLeaderCh:
+	}
+
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
 	httpSrv.stop()
+
+	// shutdown queues so that they get drained, and workers can begin their
+	// shutdown
 	go c.queues.ShutdownQueues()
+
+	// wait for our workers to stop
 	wg.Wait()
 	c.logger.Info("Chargeback workers and collectors stopped")
 	return nil
@@ -364,6 +390,7 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		c.logger.Infof("starting PrestoTable worker")
 		c.runPrestoTableWorker(stopCh)
 		wg.Done()
+		c.logger.Infof("PrestoTable worker stopped")
 	}()
 
 	threadiness := 2
@@ -435,24 +462,41 @@ func (c *Chargeback) isInitialized() bool {
 	return initialized
 }
 
+// getKeyFromQueueObj tries to convert the object from the queue into a string,
+// and if it isn't, it forgets the key from the queue, and logs an error.
+//
+// We expect strings to come off the workqueue. These are of the
+// form namespace/name. We do this as the delayed nature of the
+// workqueue means the items in the informer cache may actually be
+// more up to date that when the item was initially put onto the
+// workqueue.
+func (c *Chargeback) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
+	if key, ok := obj.(string); ok {
+		return key, ok
+	}
+	queue.Forget(obj)
+	logger.WithField(objType, obj).Errorf("expected string in work queue but got %#v", obj)
+	return "", false
+}
+
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string, key interface{}, queue workqueue.RateLimitingInterface) {
+func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
 	if err == nil {
-		queue.Forget(key)
+		queue.Forget(obj)
 		return
 	}
 
-	logger = logger.WithField(objType, key)
+	logger = logger.WithField(objType, obj)
 
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if queue.NumRequeues(key) < 5 {
-		logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, key)
-		queue.AddRateLimited(key)
+	if queue.NumRequeues(obj) < 5 {
+		logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, obj)
+		queue.AddRateLimited(obj)
 		return
 	}
 
-	queue.Forget(key)
-	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, key)
+	queue.Forget(obj)
+	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
 }
 
 func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
