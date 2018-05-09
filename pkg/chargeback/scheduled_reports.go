@@ -27,15 +27,21 @@ func (c *Chargeback) runScheduledReportWorker() {
 }
 
 func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
-	key, quit := c.queues.scheduledReportQueue.Get()
+	if c.queues.scheduledReportQueue.ShuttingDown() {
+		logger.Infof("queue is shutting down")
+	}
+	obj, quit := c.queues.scheduledReportQueue.Get()
 	if quit {
+		logger.Infof("queue is shutting down, exiting worker")
 		return false
 	}
-	defer c.queues.scheduledReportQueue.Done(key)
+	defer c.queues.scheduledReportQueue.Done(obj)
 
 	logger = logger.WithFields(c.newLogIdentifier())
-	err := c.syncScheduledReport(logger, key.(string))
-	c.handleErr(logger, err, "scheduledReport", key, c.queues.scheduledReportQueue)
+	if key, ok := c.getKeyFromQueueObj(logger, "ScheduledReport", obj, c.queues.scheduledReportQueue); ok {
+		err := c.syncScheduledReport(logger, key)
+		c.handleErr(logger, err, "ScheduledReport", obj, c.queues.scheduledReportQueue)
+	}
 	return true
 }
 
@@ -211,11 +217,13 @@ func newScheduledReportJob(chargeback *Chargeback, report *cbTypes.ScheduledRepo
 }
 
 func (job *scheduledReportJob) stop(dropTable bool) {
+	logger := job.chargeback.logger.WithField("scheduledReport", job.report.Name)
 	job.once.Do(func() {
+		logger.Info("stopping scheduledReport job")
 		close(job.stopCh)
 		// wait for start() to exit
+		logger.Info("waiting for scheduledReport job to finish")
 		<-job.doneCh
-		logger := job.chargeback.logger.WithField("scheduledReport", job.report.Name)
 		if dropTable {
 			tableName := scheduledReportTableName(job.report.Name)
 			logger.Infof("deleting scheduledReport table %s", tableName)
@@ -456,11 +464,9 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 		wg.Done()
 	}()
 	go func() {
-		select {
-		case <-stop:
-			job.stop(false)
-		case <-job.stopCh:
-		}
+		// when stop is closed, stop the running job
+		<-stop
+		job.stop(false)
 	}()
 	wg.Wait()
 	logger.Info("scheduledReport job stopped")

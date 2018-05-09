@@ -19,15 +19,21 @@ func (c *Chargeback) runReportGenerationQueryWorker() {
 }
 
 func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
-	key, quit := c.queues.reportGenerationQueryQueue.Get()
+	if c.queues.reportGenerationQueryQueue.ShuttingDown() {
+		logger.Infof("queue is shutting down")
+	}
+	obj, quit := c.queues.reportGenerationQueryQueue.Get()
 	if quit {
+		logger.Infof("queue is shutting down, exiting worker")
 		return false
 	}
-	defer c.queues.reportGenerationQueryQueue.Done(key)
+	defer c.queues.reportGenerationQueryQueue.Done(obj)
 
 	logger = logger.WithFields(c.newLogIdentifier())
-	err := c.syncReportGenerationQuery(logger, key.(string))
-	c.handleErr(logger, err, "ReportGenerationQuery", key, c.queues.reportGenerationQueryQueue)
+	if key, ok := c.getKeyFromQueueObj(logger, "ReportGenerationQuery", obj, c.queues.reportGenerationQueryQueue); ok {
+		err := c.syncReportGenerationQuery(logger, key)
+		c.handleErr(logger, err, "ReportGenerationQuery", key, c.queues.reportGenerationQueryQueue)
+	}
 	return true
 }
 

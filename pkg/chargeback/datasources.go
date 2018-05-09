@@ -21,15 +21,21 @@ func (c *Chargeback) runReportDataSourceWorker() {
 }
 
 func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
-	key, quit := c.queues.reportDataSourceQueue.Get()
+	if c.queues.reportDataSourceQueue.ShuttingDown() {
+		logger.Infof("queue is shutting down")
+	}
+	obj, quit := c.queues.reportDataSourceQueue.Get()
 	if quit {
+		logger.Infof("queue is shutting down, exiting worker")
 		return false
 	}
-	defer c.queues.reportDataSourceQueue.Done(key)
+	defer c.queues.reportDataSourceQueue.Done(obj)
 
 	logger = logger.WithFields(c.newLogIdentifier())
-	err := c.syncReportDataSource(logger, key.(string))
-	c.handleErr(logger, err, "ReportDataSource", key, c.queues.reportDataSourceQueue)
+	if key, ok := c.getKeyFromQueueObj(logger, "ReportDataSource", obj, c.queues.reportDataSourceQueue); ok {
+		err := c.syncReportDataSource(logger, key)
+		c.handleErr(logger, err, "ReportDataSource", key, c.queues.reportDataSourceQueue)
+	}
 	return true
 }
 

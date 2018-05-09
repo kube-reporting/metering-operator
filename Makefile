@@ -1,4 +1,5 @@
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
+include build/check_defined.mk
 
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
@@ -17,6 +18,7 @@ endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
+CGO_ENABLED = 0
 
 CHARGEBACK_BIN_OUT = images/chargeback/bin/chargeback
 
@@ -207,10 +209,22 @@ ci-validate: k8s-verify-codegen metering-manifests fmt
 
 chargeback-bin: $(CHARGEBACK_BIN_OUT)
 
+chargeback-local: $(CHARGEBACK_GO_FILES)
+	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
+
+.PHONY: run-chargeback-local
+run-chargeback-local:
+	$(MAKE) chargeback-local
+	./hack/run-local-with-port-forward.sh $(CHARGEBACK_ARGS)
+
 $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
+	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@
+
+build-chargeback:
+	@:$(call check_defined, CHARGEBACK_BIN_LOCATION, Path to output binary location)
 	$(MAKE) k8s-update-codegen
 	mkdir -p $(dir $@)
-	CGO_ENABLED=0 GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $@ $(CHARGEBACK_GO_PKG)
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(CHARGEBACK_BIN_LOCATION) $(CHARGEBACK_GO_PKG)
 
 images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
@@ -247,7 +261,8 @@ endif
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-bin operator-metering-chart tectonic-metering-chart openshift-metering chart \
+	build-chargeback chargeback-bin chargeback-local \
+	operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-helm-operator/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm

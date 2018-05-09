@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -38,29 +39,35 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Run collection immediately
-	done := make(chan struct{})
+	// run a go routine that waits for the stopCh to be closed and propagates
+	// the shutdown to the collectors by calling cancel()
 	go func() {
-		c.collectPromsumDataWithDefaultTimeBounds(ctx, logger)
-		close(done)
+		<-stopCh
+		logger.Infof("got shutdown signal, shutting down promsum collectors")
+		// if the stopCh is closed while we're waiting, cancel and wait for
+		// everything to return
+		cancel()
 	}()
-	// allow for cancellation
-	select {
-	case <-stopCh:
-		return
-	case <-done:
-	}
 
-	// From now on run collection every ticker interval
-	for {
-		select {
-		case <-stopCh:
-			// if the stopCh is closed while we're waiting, cancel and return
-			return
-		case <-c.clock.Tick(c.cfg.PromsumInterval):
-			c.collectPromsumDataWithDefaultTimeBounds(ctx, logger)
+	var wg sync.WaitGroup
+	ticker := time.NewTicker(c.cfg.PromsumInterval)
+	tickerCh := ticker.C
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-tickerCh:
+				c.collectPromsumDataWithDefaultTimeBounds(ctx, logger)
+				return
+			}
 		}
-	}
+	}()
+
+	wg.Wait()
+	logger.Infof("promsum collectors shutdown")
 }
 
 func (c *Chargeback) collectPromsumDataWithDefaultTimeBounds(ctx context.Context, logger logrus.FieldLogger) {
@@ -88,7 +95,7 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 		return
 	}
 
-	g, ctx := errgroup.WithContext(ctx)
+	var g errgroup.Group
 	for _, dataSource := range dataSources {
 		dataSource := dataSource
 		logger := logger.WithField("datasource", dataSource.Name)
@@ -119,8 +126,13 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 				"startTime": startTime,
 				"endTime":   endTime,
 			})
-			err = c.collectPromsumDataSourceData(logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
+			err = c.collectPromsumDataSourceData(ctx, logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
 			if err != nil {
+				// if the error is from cancellation, then it's handled
+				if err == context.Canceled {
+					logger.Infof("promsum datasource collector shutdown")
+					return nil
+				}
 				logger.WithError(err).Errorf("error collecting promsum data for datasource")
 				return err
 			}
@@ -130,15 +142,16 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 	if err := g.Wait(); err != nil {
 		logger.WithError(err).Errorf("some promsum datasources had errors when collecting data")
 	}
+	logger.Debugf("all promsum datasource collectors have finished")
 }
 
-func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
+func (c *Chargeback) collectPromsumDataSourceData(ctx context.Context, logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
 	logger.Debugf("processing data store %q", dataSource.Name)
 	if dataSource.Spec.Promsum == nil {
 		logger.Debugf("not a promsum store, skipping %q", dataSource.Name)
 		return nil
 	}
-	err := c.promsumCollectDataForQuery(logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
+	err := c.promsumCollectDataForQuery(ctx, logger, dataSource, startTime, endTime, maxPromTimeRanges, allowIncompleteChunks)
 	if err != nil {
 		return err
 	}
@@ -146,7 +159,7 @@ func (c *Chargeback) collectPromsumDataSourceData(logger logrus.FieldLogger, dat
 	return nil
 }
 
-func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
+func (c *Chargeback) promsumCollectDataForQuery(ctx context.Context, logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
 	timeRanges, err := promsumGetTimeRanges(startTime, endTime, c.cfg.PromsumChunkSize, c.cfg.PromsumStepSize, maxPromTimeRanges, allowIncompleteChunks)
 	if err != nil {
 		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
@@ -167,13 +180,28 @@ func (c *Chargeback) promsumCollectDataForQuery(logger logrus.FieldLogger, dataS
 	}
 
 	for _, queryRng := range timeRanges {
+		// check for cancellation
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			// continue processing if context isn't cancelled.
+		}
 		records, err := c.promsumQuery(query, queryRng)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
 				query.Name, queryRng.Start, queryRng.End, err)
 		}
 
-		err = c.promsumStoreRecords(logger, dataSource.TableName, records)
+		// check for cancellation
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			// continue processing if context isn't cancelled.
+		}
+
+		err = c.promsumStoreRecords(ctx, logger, dataSource.TableName, records)
 		if err != nil {
 			return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
 				query.Name, queryRng.Start, queryRng.End, err)
@@ -320,7 +348,7 @@ func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng
 	return records, nil
 }
 
-func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, tableName string, records []*PromsumRecord) error {
+func (c *Chargeback) promsumStoreRecords(ctx context.Context, logger logrus.FieldLogger, tableName string, records []*PromsumRecord) error {
 	var queryValues []string
 
 	for _, record := range records {
@@ -336,6 +364,13 @@ func (c *Chargeback) promsumStoreRecords(logger logrus.FieldLogger, tableName st
 	queryCap := prestoQueryCap - insertStatementLength
 
 	for _, value := range queryValues {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			// continue processing if context isn't cancelled.
+		}
+
 		// If the buffer is empty, we add VALUES to it, and everything the
 		// follows will be a single row to insert
 		if queryBuf.Len() == 0 {
