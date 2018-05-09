@@ -100,7 +100,7 @@ func (srv *server) start() {
 	}()
 }
 
-func (srv *server) stop() error {
+func (srv *server) stop() {
 	srv.wg.Add(2)
 	go func() {
 		srv.logger.Infof("stopping HTTP API server")
@@ -119,7 +119,6 @@ func (srv *server) stop() error {
 		srv.wg.Done()
 	}()
 	srv.wg.Wait()
-	return nil
 }
 
 func (srv *server) newLogger(r *http.Request) log.FieldLogger {
@@ -458,7 +457,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(logger, dataSourceTableName(name), []*PromsumRecord(req))
+	err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*PromsumRecord(req))
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
 		return
