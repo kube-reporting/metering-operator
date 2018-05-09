@@ -241,7 +241,7 @@ else
 endif
 
 .PHONY: \
-	test vendor fmt regenerate-hive-thrift \
+	test vendor fmt regenerate-hive-thrift thrift-gen \
 	k8s-update-codegen k8s-verify-codegen \
 	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
@@ -275,9 +275,11 @@ thrift/TCLIService.thrift: out/thrift.git
 	git -C $< show ${HIVE_SHA}:service-rpc/if/$(notdir $@) > $@
 
 # Generate source from Hive thrift defintions and remove executable packages.
-pkg/hive/hive_thrift: thrift/TCLIService.thrift
-	thrift -gen go:package_prefix=${GO_PKG}/$(dir $@),package=$(notdir $@) -out $(dir $@) $<
-	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./$@/...`; do rm -rf $$i; done
+pkg/hive/hive_thrift: thrift/TCLIService.thrift thrift-gen
+
+thrift-gen:
+	thrift -gen go:package_prefix=${GO_PKG}/pkg/hive,package=hive_thrift -out pkg/hive thrift/TCLIService.thrift
+	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./pkg/hive/hive_thrift/...`; do rm -rf $$i; done
 
 bill-of-materials.json: bill-of-materials.override.json
 	license-bill-of-materials --override-file $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
