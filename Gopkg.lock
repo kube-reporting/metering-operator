@@ -4,8 +4,9 @@
 [[projects]]
   name = "git.apache.org/thrift.git"
   packages = ["lib/go/thrift"]
-  revision = "0dd823580c78a79ae9696eb9b3650e400fff140f"
+  revision = "327ebb6c2b6df8bf075da02ef45a2a034e9b79ba"
   source = "github.com/apache/thrift"
+  version = "0.11.0"
 
 [[projects]]
   name = "github.com/PuerkitoBio/purell"
@@ -616,6 +617,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3acc75b59c4283daff7bf8afbb4d8ca5f515914f7083484e9aca40282bdd6f32"
+  inputs-digest = "4b18fee83f4f3e607cc391a3d6eee2cfeb48203983edde0a4e85aeb31a3ef8fb"
   solver-name = "gps-cdcl"
   solver-version = 1
