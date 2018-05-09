@@ -63,8 +63,8 @@ required = [
 
 [[constraint]]
   name = "git.apache.org/thrift.git"
-  revision = "0dd823580c78a79ae9696eb9b3650e400fff140f"
   source = "github.com/apache/thrift"
+  version = "0.11.0"
 
 [[constraint]]
   name = "github.com/spf13/pflag"
