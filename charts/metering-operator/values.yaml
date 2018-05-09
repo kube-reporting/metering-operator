@@ -1,3 +1,4 @@
+replicas: 1
 image:
   repository: quay.io/coreos/chargeback
   tag: latest
