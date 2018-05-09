@@ -26,15 +26,21 @@ func (c *Chargeback) runReportWorker() {
 }
 
 func (c *Chargeback) processReport(logger log.FieldLogger) bool {
-	key, quit := c.queues.reportQueue.Get()
+	if c.queues.reportQueue.ShuttingDown() {
+		logger.Infof("queue is shutting down")
+	}
+	obj, quit := c.queues.reportQueue.Get()
 	if quit {
+		logger.Infof("queue is shutting down, exiting worker")
 		return false
 	}
-	defer c.queues.reportQueue.Done(key)
+	defer c.queues.reportQueue.Done(obj)
 
 	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
-	err := c.syncReport(logger, key.(string))
-	c.handleErr(logger, err, "report", key, c.queues.reportQueue)
+	if key, ok := c.getKeyFromQueueObj(logger, "report", obj, c.queues.reportQueue); ok {
+		err := c.syncReport(logger, key)
+		c.handleErr(logger, err, "report", obj, c.queues.reportQueue)
+	}
 	return true
 }
 
