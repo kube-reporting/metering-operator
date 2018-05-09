@@ -1,6 +1,7 @@
 package hive
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -50,7 +51,7 @@ func Connect(host string) (*Connection, error) {
 	req := hive.NewTOpenSessionReq()
 	req.ClientProtocol = ThriftVersion
 
-	resp, err := client.OpenSession(req)
+	resp, err := client.OpenSession(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("attempt to open session failed: %v", err)
 	} else if resp.SessionHandle == nil {
@@ -78,7 +79,7 @@ func (c *Connection) Query(query string) error {
 	if c.logQueries {
 		c.logger.Debugf("QUERY: \n%s\n", query)
 	}
-	resp, err := c.client.ExecuteStatement(req)
+	resp, err := c.client.ExecuteStatement(context.Background(), req)
 	if err != nil {
 		return err
 	}
@@ -101,7 +102,7 @@ func (c *Connection) Close() error {
 	if c.session != nil {
 		req := hive.NewTCloseSessionReq()
 		req.SessionHandle = c.session
-		if resp, err := c.client.CloseSession(req); err != nil {
+		if resp, err := c.client.CloseSession(context.Background(), req); err != nil {
 			return fmt.Errorf("couldn't close connection: %+v, %v", resp, err)
 		}
 		c.session = nil
