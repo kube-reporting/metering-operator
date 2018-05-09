@@ -19,6 +19,7 @@ var (
 // Connection to a Hive server.
 type Connection struct {
 	client     *hive.TCLIServiceClient
+	transport  *thrift.TSocket
 	session    *hive.TSessionHandle
 	logger     log.FieldLogger
 	logQueries bool
@@ -57,9 +58,10 @@ func Connect(host string) (*Connection, error) {
 	}
 
 	return &Connection{
-		client:  client,
-		session: resp.SessionHandle,
-		logger:  logger,
+		client:    client,
+		transport: transport,
+		session:   resp.SessionHandle,
+		logger:    logger,
 	}, nil
 }
 
@@ -94,6 +96,7 @@ func (c *Connection) Query(query string) error {
 func (c *Connection) Close() error {
 	// Wait for any current queries to finish
 	c.queryLock.Lock()
+	defer c.transport.Close()
 	defer c.queryLock.Unlock()
 	if c.session != nil {
 		req := hive.NewTCloseSessionReq()
