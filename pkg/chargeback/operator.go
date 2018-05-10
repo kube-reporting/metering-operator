@@ -241,7 +241,6 @@ func (c *Chargeback) setupQueues() {
 
 func (qs queues) ShutdownQueues() {
 	for _, queue := range qs.queueList {
-		fmt.Printf("shutting down queue: %#v\n", queue)
 		queue.ShutDown()
 	}
 }
