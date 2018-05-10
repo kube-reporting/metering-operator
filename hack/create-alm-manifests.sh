@@ -2,10 +2,12 @@
 
 set -o pipefail
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHART="$DIR/../charts/metering-alm"
-: "${MANIFESTS_DIR:=$DIR/../manifests}"
-: "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions}"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
+
+TMPDIR="$(mktemp -d)"
+
+CHART="$ROOT_DIR/charts/metering-alm"
 
 if [[ $# -ge 3 ]] ; then
     DEPLOYER_MANIFESTS_DIR=$1
@@ -97,12 +99,12 @@ EOF
 # which we map over in our $JQ_CRD_SCRIPT.
 ***REMOVED***nd "$CRD_DIR" \
     -type f \
-    -exec sh -c "$DIR/yamltojson < \$0" {} \; \
-    | jq -rcs "$JQ_CRD_SCRIPT" > /tmp/alm-crd.json
+    -exec sh -c "$ROOT_DIR/hack/yamltojson < \$0" {} \; \
+    | jq -rcs "$JQ_CRD_SCRIPT" > "$TMPDIR/alm-crd.json"
 
-# Extract the spec of the deployment, and it's name$DIR/
-"$DIR/yamltojson" < "$DEPLOYMENT_MANIFEST" \
-    | jq -r "$JQ_DEPLOYMENT_SCRIPT" > /tmp/alm-deployment.json
+# Extract the spec of the deployment, and it's name
+"$ROOT_DIR/hack/yamltojson" < "$DEPLOYMENT_MANIFEST" \
+    | jq -r "$JQ_DEPLOYMENT_SCRIPT" > "$TMPDIR/alm-deployment.json"
 
 
 # Slurp both ***REMOVED***les, .[0] is the service account, .[1] is the role, based on the
@@ -110,15 +112,15 @@ EOF
 jq \
     -s \
     -r "$JQ_RBAC_SCRIPT" \
-    <("$DIR/yamltojson" < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
-    <("$DIR/yamltojson" < "$RBAC_ROLE_MANIFEST") > /tmp/alm-permissions.json
+    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
+    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_MANIFEST") > "$TMPDIR/alm-permissions.json"
 
 # Merge the 3 JSON objects created above
 jq -s '.[0] * .[1] * .[2]' \
-    /tmp/alm-crd.json \
-    /tmp/alm-deployment.json \
-    /tmp/alm-permissions.json \
-    | "$DIR/jsontoyaml" > /tmp/alm-values.yaml
+    "$TMPDIR/alm-crd.json" \
+    "$TMPDIR/alm-deployment.json" \
+    "$TMPDIR/alm-permissions.json" \
+    | "$ROOT_DIR/hack/jsontoyaml" > "$TMPDIR/alm-values.yaml"
 
 # use helm template to create the csv and package using our metering-alm chart.
 # the metering-alm-values is the set of values which are entirely ALM
@@ -130,31 +132,31 @@ jq -s '.[0] * .[1] * .[2]' \
 
 # Render the CSV to a temporary location, so we can add the version into it's
 # ***REMOVED***lename after it's been rendered
-TMP_CSV="/tmp/metering.clusterserviceversion.yaml"
+TMP_CSV="$TMPDIR/metering.clusterserviceversion.yaml"
 helm template "$CHART" \
-    -f /tmp/alm-values.yaml \
+    -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/clusterserviceversion-v1.yaml" \
-    | sed -f "$DIR/remove-helm-template-header.sed" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$TMP_CSV"
 
 # Rename the ***REMOVED***le with it's version in it, and move it to the ***REMOVED***nal destination
-CSV_VERSION="$("$DIR/yamltojson" < "$TMP_CSV" | jq -r '.spec.version' )"
+CSV_VERSION="$("$ROOT_DIR/hack/yamltojson" < "$TMP_CSV" | jq -r '.spec.version' )"
 CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.${CSV_VERSION}.clusterserviceversion.yaml"
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 
 PACKAGE_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.package.yaml"
 helm template "$CHART" \
-    -f /tmp/alm-values.yaml \
+    -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/package-v1.yaml" \
-    | sed -f "$DIR/remove-helm-template-header.sed" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
 SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
 helm template "$CHART" \
-    -f /tmp/alm-values.yaml \
+    -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/subscription-v1.yaml" \
-    | sed -f "$DIR/remove-helm-template-header.sed" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$SUBSCRIPTION_MANIFEST_DESTINATION"

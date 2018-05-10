@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 : "${METERING_NAMESPACE:?}"
 : "${KUBECONFIG:?}"
 : "${DEPLOY_TAG:?}"
@@ -19,4 +17,8 @@ export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom
 
 export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-ci.sh}"
 
-"$DIR/integration.sh"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
+
+
+"$ROOT_DIR/hack/integration.sh"

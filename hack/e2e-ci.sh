@@ -19,4 +19,7 @@ export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom
 
 export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-ci.sh}"
 
-"$DIR/e2e.sh"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
+
+"$ROOT_DIR/hack/e2e.sh"
