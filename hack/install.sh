@@ -1,20 +1,12 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/default-env.sh"
-source "${DIR}/util.sh"
-
-MANIFESTS_DIR="$DIR/../manifests"
-: "${CREATE_NAMESPACE:=true}"
-: "${DEPLOY_PLATFORM:=generic}"
-: "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
-: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 if [ "$CREATE_NAMESPACE" == "true" ]; then
     echo "Creating namespace ${METERING_NAMESPACE}"
     kubectl create namespace "${METERING_NAMESPACE}" || true
-elif ! kubectl get namespace ${METERING_NAMESPACE} 2> /dev/null; then
+elif ! kubectl get namespace "${METERING_NAMESPACE}" 2> /dev/null; then
     echo "Namespace '${METERING_NAMESPACE}' does not exist, please create it before starting"
     exit 1
 fi

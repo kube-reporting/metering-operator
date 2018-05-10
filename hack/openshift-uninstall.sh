@@ -1,8 +1,6 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/default-env.sh"
-source "${DIR}/util.sh"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 
 export DEPLOY_PLATFORM=openshift
-"${DIR}/uninstall.sh"
+"${ROOT_DIR}/uninstall.sh"

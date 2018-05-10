@@ -1,14 +1,11 @@
 #!/bin/bash
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/util.sh
-
 export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-ci-integration}
 export METERING_SHORT_TESTS=${METERING_SHORT_TESTS:-false}
 
-# lowercase the value, since namespaces must be lowercase values
-METERING_NAMESPACE="$(sanetize_namespace "$METERING_NAMESPACE")"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 go test \
     -test.short="${METERING_SHORT_TESTS}" \

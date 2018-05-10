@@ -1,12 +1,11 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/default-env.sh"
-source "${DIR}/util.sh"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 if command -v oc; then
     oc new-project "${METERING_NAMESPACE}" || oc project "${METERING_NAMESPACE}"
 fi
 
 export DEPLOY_PLATFORM=openshift
-"${DIR}/install.sh"
+"${ROOT_DIR}/install.sh"
