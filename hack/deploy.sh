@@ -14,7 +14,7 @@ while true; do
     echo "Checking namespace status"
     NS="$(kubectl get ns "$METERING_NAMESPACE" -o json --ignore-not-found)"
     if [ "$NS" == "" ]; then
-        echo "Namespace ${NAMESPACE} does not exist"
+        echo "Namespace ${METERING_NAMESPACE} does not exist"
         break
     fi
     PHASE="$(echo "$NS" | jq -r '.status.phase')"
