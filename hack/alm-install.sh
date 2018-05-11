@@ -3,9 +3,11 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+load_version_vars
+
 kubectl create namespace "${METERING_NAMESPACE}" || true
 
-echo "Deploying Metering $METERING_VERSION"
+echo "Deploying Metering ${METERING_VERSION}"
 
 msg "Installing Custom Resource De***REMOVED***nitions"
 kube-install \
