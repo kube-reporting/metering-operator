@@ -3,16 +3,16 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: metering-helm-operator.v0.6.0-latest
+  name: metering-helm-operator.v0.6.1-latest
   annotations:
-    tectonic-visibility: openshift-feature
+    tectonic-visibility: tectonic-feature
   labels:
-    alm-catalog: openshift-feature
+    alm-catalog: tectonic-feature
 spec:
   displayName: Metering
   description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: [metering metrics reporting coreos]
-  version: 0.6.0-latest
+  version: 0.6.1-latest
   maturity: alpha
   maintainers:
     - email: support@coreos.com
@@ -21,7 +21,7 @@ spec:
     name: CoreOS, Inc
   labels:
     alm-owner-metering: metering-helm-operator
-    alm-status-descriptors: metering-helm-operator.v0.6.0-latest
+    alm-status-descriptors: metering-helm-operator.v0.6.1-latest
   selector:
     matchLabels:
       alm-owner-metering: metering-helm-operator
@@ -193,7 +193,7 @@ spec:
                   - name: HELM_RELEASE_CRD_API_GROUP
                     value: chargeback.coreos.com
                   - name: HELM_CHART_PATH
-                    value: /openshift-metering-0.1.0.tgz
+                    value: /operator-metering-0.1.0.tgz
                   - name: MY_POD_NAME
                     valueFrom:
                       fieldRef:
@@ -210,7 +210,7 @@ spec:
                     value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:0.6.0-latest
+                  image: quay.io/coreos/chargeback-helm-operator:0.6.1-latest
                   imagePullPolicy: Always
                   name: metering-helm-operator
                   resources:
@@ -229,7 +229,7 @@ spec:
                         fieldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: quay.io/coreos/chargeback-helm-operator:0.6.0-latest
+                  image: quay.io/coreos/chargeback-helm-operator:0.6.1-latest
                   imagePullPolicy: Always
                   livenessProbe:
                     failureThreshold: 3
