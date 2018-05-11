@@ -29,6 +29,7 @@ func ExecuteInsertQuery(queryer db.Queryer, target, query string) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 	// Must call rows.Next() in order for errors to be populated correctly
 	// because Query() only submits the query, and doesn't handle
 	// success/failure. Next() is the method which inspects the submitted
@@ -48,6 +49,7 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, 
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	cols, err := rows.Columns()
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package hive
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -19,6 +20,7 @@ var (
 // Connection to a Hive server.
 type Connection struct {
 	client     *hive.TCLIServiceClient
+	transport  *thrift.TSocket
 	session    *hive.TSessionHandle
 	logger     log.FieldLogger
 	logQueries bool
@@ -49,7 +51,7 @@ func Connect(host string) (*Connection, error) {
 	req := hive.NewTOpenSessionReq()
 	req.ClientProtocol = ThriftVersion
 
-	resp, err := client.OpenSession(req)
+	resp, err := client.OpenSession(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("attempt to open session failed: %v", err)
 	} ***REMOVED*** if resp.SessionHandle == nil {
@@ -57,9 +59,10 @@ func Connect(host string) (*Connection, error) {
 	}
 
 	return &Connection{
-		client:  client,
-		session: resp.SessionHandle,
-		logger:  logger,
+		client:    client,
+		transport: transport,
+		session:   resp.SessionHandle,
+		logger:    logger,
 	}, nil
 }
 
@@ -76,7 +79,7 @@ func (c *Connection) Query(query string) error {
 	if c.logQueries {
 		c.logger.Debugf("QUERY: \n%s\n", query)
 	}
-	resp, err := c.client.ExecuteStatement(req)
+	resp, err := c.client.ExecuteStatement(context.Background(), req)
 	if err != nil {
 		return err
 	}
@@ -94,11 +97,12 @@ func (c *Connection) Query(query string) error {
 func (c *Connection) Close() error {
 	// Wait for any current queries to ***REMOVED***nish
 	c.queryLock.Lock()
+	defer c.transport.Close()
 	defer c.queryLock.Unlock()
 	if c.session != nil {
 		req := hive.NewTCloseSessionReq()
 		req.SessionHandle = c.session
-		if resp, err := c.client.CloseSession(req); err != nil {
+		if resp, err := c.client.CloseSession(context.Background(), req); err != nil {
 			return fmt.Errorf("couldn't close connection: %+v, %v", resp, err)
 		}
 		c.session = nil
