@@ -3,6 +3,8 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+set +e
+
 msg "Removing Metering Resource"
 kube-remove \
     "$METERING_CR_FILE"
