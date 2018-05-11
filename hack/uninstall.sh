@@ -1,15 +1,7 @@
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/default-env.sh
-source ${DIR}/util.sh
+#!/bin/bash -e
 
-MANIFESTS_DIR="$DIR/../manifests"
-: "${DEPLOY_PLATFORM:=generic}"
-: "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
-: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
-: "${DELETE_PVCS:=false}"
-: "${SKIP_DELETE_CRDS:=true}"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 msg "Removing Metering Resource"
 kube-remove \

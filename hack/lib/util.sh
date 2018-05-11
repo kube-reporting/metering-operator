@@ -1,5 +1,4 @@
 #!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # lowercase the value, and characters we use in branches with dashes
 function sanetize_namespace() {
@@ -42,13 +41,13 @@ function install_metering() {
     INSTALL_METHOD=$1
     echo "Installing metering"
     if [ "$INSTALL_METHOD" == "direct" ]; then
-        "$DIR/install.sh"
+        "$ROOT_DIR/hack/install.sh"
     elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
-        "$DIR/tectonic-install.sh"
+        "$ROOT_DIR/hack/tectonic-install.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
-        "$DIR/openshift-install.sh"
+        "$ROOT_DIR/hack/openshift-install.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
-        "$DIR/alm-install.sh"
+        "$ROOT_DIR/hack/alm-install.sh"
     else
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1
@@ -59,13 +58,13 @@ function uninstall_metering() {
     INSTALL_METHOD=$1
     echo "Uninstalling metering"
     if [ "$INSTALL_METHOD" == "direct" ]; then
-        "$DIR/uninstall.sh"
+        "$ROOT_DIR/hack/uninstall.sh"
     elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
-        "$DIR/tectonic-uninstall.sh"
+        "$ROOT_DIR/hack/tectonic-uninstall.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
-        "$DIR/openshift-uninstall.sh"
+        "$ROOT_DIR/hack/openshift-uninstall.sh"
     elif [ "$INSTALL_METHOD" == "alm" ]; then
-        "$DIR/alm-uninstall.sh"
+        "$ROOT_DIR/hack/alm-uninstall.sh"
     else
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1

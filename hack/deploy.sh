@@ -1,24 +1,20 @@
 #!/bin/bash
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/util.sh
-
 export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-ci}
-export SKIP_DELETE_CRDS=true
 
-METERING_NAMESPACE="$(sanetize_namespace "$METERING_NAMESPACE")"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
-: "${CUSTOM_METERING_SETTINGS_FILE:=}"
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
-: "${INSTALL_metering:=true}"
+: "${INSTALL_METERING:=true}"
 : "${INSTALL_METHOD:=direct}"
 
 while true; do
     echo "Checking namespace status"
     NS="$(kubectl get ns "$METERING_NAMESPACE" -o json --ignore-not-found)"
     if [ "$NS" == "" ]; then
-        echo "Namespace ${NAMESPACE} does not exist"
+        echo "Namespace ${METERING_NAMESPACE} does not exist"
         break
     fi
     PHASE="$(echo "$NS" | jq -r '.status.phase')"
@@ -39,7 +35,7 @@ kubectl create ns "$METERING_NAMESPACE" || true
 
 if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling metering"
-    uninstall_metering "${INSTALL_METHOD}"
+    uninstall_metering "${INSTALL_METHOD}" || true
 else
     echo "Skipping uninstall"
 fi
@@ -54,7 +50,7 @@ until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length
     sleep 5
 done
 
-if [ "$INSTALL_metering" == "true" ]; then
+if [ "$INSTALL_METERING" == "true" ]; then
     echo "Installing metering"
     install_metering "${INSTALL_METHOD}"
 else

@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include build/check_defined.mk
 
@@ -33,7 +35,7 @@ CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-test
 
 GIT_SHA    = $(shell git rev-parse HEAD)
 GIT_TAG    = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG = 0.6.0-latest
+RELEASE_TAG = $(shell hack/print-version.sh)
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
@@ -167,7 +169,7 @@ docker-pull-all: $(DOCKER_PULL_TARGETS)
 chargeback-docker-build: images/chargeback/Dockerfile images/chargeback/bin/chargeback
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
-chargeback-integration-tests-docker-build: images/integration-tests/Dockerfile hack/util.sh hack/install.sh hack/uninstall.sh hack/alm-uninstall.sh hack/alm-install.sh hack/deploy.sh hack/default-env.sh
+chargeback-integration-tests-docker-build: images/integration-tests/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 chargeback-helm-operator-docker-build: \
@@ -261,6 +263,7 @@ endif
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
+	chargeback-integration-tests-docker-build \
 	build-chargeback chargeback-bin chargeback-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-helm-operator/metering-override-values.yaml \
