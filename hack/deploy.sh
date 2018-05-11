@@ -35,7 +35,7 @@ kubectl create ns "$METERING_NAMESPACE" || true
 
 if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling metering"
-    uninstall_metering "${INSTALL_METHOD}"
+    uninstall_metering "${INSTALL_METHOD}" || true
 else
     echo "Skipping uninstall"
 fi
