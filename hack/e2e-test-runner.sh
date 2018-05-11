@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${DIR}/util.sh
-
 : "${KUBECONFIG:?}"
 : "${METERING_NAMESPACE:?}"
 
@@ -22,6 +19,9 @@ source ${DIR}/util.sh
 : "${TEST_OUTPUT_LOG_STDOUT:=false}"
 : "${ENABLE_AWS_BILLING:=false}"
 : "${ENABLE_AWS_BILLING_TEST:=false}"
+
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 export INSTALL_METHOD
 export METERING_NAMESPACE
@@ -73,9 +73,9 @@ if [ "$DEPLOY_METERING" == "true" ]; then
 
     echo "Deploying Metering"
     if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
-        "${DIR}/${DEPLOY_SCRIPT}" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
+        "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
     ***REMOVED***
-        "${DIR}/${DEPLOY_SCRIPT}" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
+        "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" >> "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE" 2>&1
     ***REMOVED***
 ***REMOVED***
 
@@ -85,7 +85,7 @@ echo "Running tests"
     | tee -a "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE" \
     | go tool test2json \
     | tee -a "$TEST_OUTPUT_DIRECTORY/${TEST_LOG_FILE}.json" \
-    | jq -r -s -f "$DIR/tap-output.jq" \
+    | jq -r -s -f "$ROOT_DIR/hack/tap-output.jq" \
     | tee -a "$TEST_OUTPUT_DIRECTORY/$TEST_TAP_FILE"
 
 if grep -q '^not' < "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE"; then

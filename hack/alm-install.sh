@@ -1,15 +1,11 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/default-env.sh"
-source "${DIR}/util.sh"
-
-MANIFESTS_DIR="$DIR/../manifests"
-: "${INSTALLER_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/tectonic/helm-operator}"
-: "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/tectonic/alm}"
-: "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 kubectl create namespace "${METERING_NAMESPACE}" || true
+
+echo "Deploying Metering $METERING_VERSION"
 
 msg "Installing Custom Resource De***REMOVED***nitions"
 kube-install \
@@ -17,7 +13,7 @@ kube-install \
 
 msg "Installing Metering Cluster Service Versions"
 kube-install \
-    "$ALM_MANIFESTS_DIR/metering.*.clusterserviceversion.yaml"
+    "$ALM_MANIFESTS_DIR/metering.${METERING_VERSION}.clusterserviceversion.yaml"
 
 msg "Installing Metering Resource"
 kube-install \

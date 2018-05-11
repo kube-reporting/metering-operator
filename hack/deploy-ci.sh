@@ -4,16 +4,16 @@ set -e
 : "${DEPLOY_TAG:?}"
 : "${DEPLOY_PLATFORM:?must be set to either tectonic, openshift, or generic}"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 TMP_DIR="$(mktemp -d)"
-DEPLOY_DIR="$DIR/../manifests/deploy"
 
 export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
 export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
+
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
 : "${ENABLE_AWS_BILLING:=false}"
 : "${AWS_ACCESS_KEY_ID:=}"
@@ -80,9 +80,9 @@ spec:
 EOF
 
 echo "Creating metering manifests"
-"$DIR/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFESTS_DIR"
+"$ROOT_DIR/hack/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFESTS_DIR"
 
 echo "Deploying"
 
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
-./hack/deploy.sh
+"${ROOT_DIR}/hack/deploy.sh"

@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/default-env.sh"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+source "${ROOT_DIR}/hack/common.sh"
 
-: "${CHARGEBACK_BIN:=$DIR/../chargeback-local}"
+: "${CHARGEBACK_BIN:=$ROOT_DIR/chargeback-local}"
 : "${METERING_NAMESPACE:?}"
 
 : "${METERING_PROMETHEUS_NAMESPACE:=tectonic-system}"
