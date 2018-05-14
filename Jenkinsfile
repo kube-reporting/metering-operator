@@ -18,9 +18,18 @@ properties([
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
-def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
 def shortTests = params.SHORT_TESTS || (isPullRequest && pullRequest.labels.contains("run-short-tests"))
 def skipNamespaceCleanup = params.SKIP_NAMESPACE_CLEANUP || (isPullRequest && pullRequest.labels.contains("skip-namespace-cleanup"))
+
+def skipBuildLabel = (isPullRequest && pullRequest.labels.contains("skip-build"))
+def skipBuild = params.SKIP_DOCKER_STAGES || skipBuildLabel
+
+def runE2ETests = isMasterBranch || params.RUN_E2E_TESTS || (isPullRequest && pullRequest.labels.contains("run-e2e-tests"))
+
+// skip-build GH label takes precedence over run-e2e-tests and params for running tests.
+if (skipBuild && runE2ETests && skipBuildLabel) {
+    runE2ETests = false
+}
 
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
@@ -167,7 +176,7 @@ podTemplate(
                             }
 
                             stage('build') {
-                                if (params.SKIP_DOCKER_STAGES) {
+                                if (skipBuild) {
                                     echo "Skipping docker build"
                                 } ***REMOVED*** {
                                     ansiColor('xterm') {
@@ -183,7 +192,7 @@ podTemplate(
                             }
 
                             stage('tag') {
-                                if (params.SKIP_DOCKER_STAGES) {
+                                if (skipBuild) {
                                     echo "Skipping docker tag"
                                 } ***REMOVED*** {
                                     ansiColor('xterm') {
@@ -195,7 +204,7 @@ podTemplate(
                             }
 
                             stage('push') {
-                                if (params.SKIP_DOCKER_STAGES) {
+                                if (skipBuild) {
                                     echo "Skipping docker push"
                                 } ***REMOVED*** {
                                     sh '''#!/bin/bash -ex
@@ -331,9 +340,11 @@ podTemplate(
             currentBuild.result = "FAILED"
             throw e
         } ***REMOVED***nally {
-            archiveArtifacts artifacts: "${testOutputDir}/**", onlyIfSuccessful: false
-            container('docker') {
-                sh '((docker ps -aq | xargs docker kill) || true) > /dev/null 2>&1'
+            if (runE2ETests) {
+                archiveArtifacts artifacts: "${testOutputDir}/**", onlyIfSuccessful: false
+                container('docker') {
+                    sh '((docker ps -aq | xargs docker kill) || true) > /dev/null 2>&1'
+                }
             }
             cleanWs notFailBuild: true
         }
