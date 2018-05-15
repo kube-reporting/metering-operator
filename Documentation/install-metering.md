@@ -139,5 +139,5 @@ For instructions on using Operator Metering, please see [Using Operator Metering
 [default-config]: ../manifests/metering-config/default.yaml
 [using-metering]: using-metering.md
 [configuring-metering]: metering-config.md
-[configure-prometheus-url]: metering-config.md#Prometheus-URL
+[configure-prometheus-url]: metering-config.md#prometheus-url
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
