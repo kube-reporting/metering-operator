@@ -35,4 +35,5 @@ set -x
     --namespace "$METERING_NAMESPACE" \
     --presto-host "127.0.0.1:9991" \
     --hive-host "127.0.0.1:9992" \
-    --prometheus-host "http://127.0.0.1:9993"
+    --prometheus-host "http://127.0.0.1:9993" \
+    "$@"
