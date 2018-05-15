@@ -61,7 +61,6 @@ func (c *Chargeback) runPromsumWorker(stopCh <-chan struct{}) {
 				return
 			case <-tickerCh:
 				c.collectPromsumDataWithDefaultTimeBounds(ctx, logger)
-				return
 			}
 		}
 	}()
