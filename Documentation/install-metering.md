@@ -139,5 +139,5 @@ For instructions on using Operator Metering, please see [Using Operator Metering
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [using-metering]: using-metering.md
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
-[con***REMOVED***gure-prometheus-url]: metering-con***REMOVED***g.md#Prometheus-URL
+[con***REMOVED***gure-prometheus-url]: metering-con***REMOVED***g.md#prometheus-url
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
