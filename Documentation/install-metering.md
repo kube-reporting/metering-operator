@@ -135,7 +135,7 @@ kubectl delete -n $METERING_NAMESPACE clusterserviceversion-v1s -l operator-mete
 
 For instructions on using Operator Metering, please see [Using Operator Metering][using-metering].
 
-[metering-subscription]: ../manifests/alm/metering.subscription.yaml
+[metering-subscription]: ../manifests/deploy/generic/alm/metering.subscription.yaml
 [default-config]: ../manifests/metering-config/default.yaml
 [using-metering]: using-metering.md
 [configuring-metering]: metering-config.md
