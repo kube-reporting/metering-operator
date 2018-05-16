@@ -7,7 +7,6 @@ import (
 	"time"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 const (
@@ -27,11 +26,10 @@ type reportTemplateInfo struct {
 
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
-		"hiveAWSPartitionTimestamp":   hiveAWSPartitionTimestamp,
 		"prestoTimestamp":             prestoTimestamp,
 		"dataSourceTableName":         dataSourceTableName,
 		"generationQueryViewName":     generationQueryViewName,
-		"billingPeriodFormat":         billingPeriodFormat,
+		"billingPeriodTimestamp":      billingPeriodTimestamp,
 		"renderReportGenerationQuery": renderReportGenerationQuery,
 	}
 
@@ -80,12 +78,4 @@ func renderReportGenerationQuery(generationQueryName string, templateInfo *templ
 		return "", fmt.Errorf("unable to render query %s, err: %v", generationQueryName, err)
 	}
 	return renderedQuery, nil
-}
-
-func hiveAWSPartitionTimestamp(date time.Time) string {
-	return date.Format(hive.HiveDateStringLayout)
-}
-
-func prestoTimestamp(date time.Time) string {
-	return date.Format(PrestoTimestampFormat)
 }
