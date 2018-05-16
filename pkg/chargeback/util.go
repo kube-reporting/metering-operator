@@ -35,8 +35,12 @@ func prestoTableResourceNameFromKind(kind, name string) string {
 	return strings.ToLower(fmt.Sprintf("%s-%s", kind, name))
 }
 
-func billingPeriodFormat(date time.Time) string {
+func billingPeriodTimestamp(date time.Time) string {
 	return date.Format(hive.HiveDateStringLayout)
+}
+
+func prestoTimestamp(date time.Time) string {
+	return date.Format(PrestoTimestampFormat)
 }
 
 func truncateToMinute(t time.Time) time.Time {
