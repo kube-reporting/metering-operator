@@ -15,8 +15,8 @@ crd:
   listKind: MeteringList
 
   annotations:
-    catalog.app.coreos.com/displayName: "Chargeback"
-    catalog.app.coreos.com/description: "An instance of Chargeback"
+    catalog.app.coreos.com/displayName: "Metering"
+    catalog.app.coreos.com/description: "An instance of Metering"
 
 image:
   repository: quay.io/coreos/chargeback-helm-operator
