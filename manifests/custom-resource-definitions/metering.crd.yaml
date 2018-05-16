@@ -3,8 +3,8 @@ kind: CustomResourceDefinition
 metadata:
   name: meterings.chargeback.coreos.com
   annotations:
-    catalog.app.coreos.com/description: An instance of Chargeback
-    catalog.app.coreos.com/displayName: Chargeback
+    catalog.app.coreos.com/description: An instance of Metering
+    catalog.app.coreos.com/displayName: Metering
 spec:
   group: chargeback.coreos.com
   version: v1alpha1
