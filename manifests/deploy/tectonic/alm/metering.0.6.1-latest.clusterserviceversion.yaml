@@ -268,8 +268,8 @@ spec:
                 terminationGracePeriodSeconds: 30
   customresourcede***REMOVED***nitions:
     owned:
-    - description: An instance of Chargeback
-      displayName: Chargeback
+    - description: An instance of Metering
+      displayName: Metering
       kind: Metering
       name: meterings.chargeback.coreos.com
       version: v1alpha1
