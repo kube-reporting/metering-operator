@@ -16,11 +16,11 @@ RUN \
 
 # ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
-ENV HADOOP_VERSION 2.8.3
+ENV HADOOP_VERSION 2.9.1
 ENV HADOOP_URL http://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 # The upstream .mds checksum files aren't supported by sha256sum or shasum so
 # this checksum is taken from that file and put here manually.
-ENV HADOOP_SHA256_CHECKSUM e8bf9a53337b1dca3b152b0a5b5e277dc734e76520543e525c301a050bb27eae
+ENV HADOOP_SHA256_CHECKSUM eed6015a123644d3b4247bac58770e4a8b31340fa62721987430e15a0dd942fc
 
 ENV HADOOP_CLASSPATH=/opt/hadoop-$HADOOP_VERSION/share/hadoop/tools/lib/*
 ENV HADOOP_PREFIX=/opt/hadoop-$HADOOP_VERSION
