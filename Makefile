@@ -33,9 +33,9 @@ PRESTO_IMAGE := quay.io/coreos/chargeback-presto
 CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
 CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-tests
 
-GIT_SHA    = $(shell git rev-parse HEAD)
-GIT_TAG    = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG = $(shell hack/print-version.sh)
+GIT_SHA    := $(shell git rev-parse HEAD)
+GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+RELEASE_TAG := $(shell hack/print-version.sh)
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
