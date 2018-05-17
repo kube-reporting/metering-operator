@@ -92,7 +92,7 @@ spec:
         FROM {| generationQueryViewName "aws-ec2-billing-data-raw" |} as aws_billing
 
         -- make sure the partition overlaps with our range
-        WHERE (partition_stop >= '{| .Report.StartPeriod | hiveAWSPartitionTimestamp |}' AND partition_start <= '{| .Report.EndPeriod | hiveAWSPartitionTimestamp |}')
+        WHERE (partition_stop >= '{| .Report.StartPeriod | billingPeriodTimestamp |}' AND partition_start <= '{| .Report.EndPeriod | billingPeriodTimestamp |}')
 
         -- make sure lineItem entries overlap with our range
         AND (usage_end_date >= timestamp '{| .Report.StartPeriod | prestoTimestamp |}' AND usage_start_date <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}')
