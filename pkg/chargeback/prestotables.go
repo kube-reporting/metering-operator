@@ -175,8 +175,8 @@ func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.
 			return nil, err
 		}
 		p := cbTypes.PrestoTablePartition{
-			Start:    manifest.BillingPeriod.Start.Format(hive.HiveDateStringLayout),
-			End:      manifest.BillingPeriod.End.Format(hive.HiveDateStringLayout),
+			Start:    billingPeriodTimestamp(manifest.BillingPeriod.Start.Time),
+			End:      billingPeriodTimestamp(manifest.BillingPeriod.End.Time),
 			Location: location,
 		}
 		desiredPartitions = append(desiredPartitions, p)
