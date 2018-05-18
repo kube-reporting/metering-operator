@@ -22,13 +22,15 @@ To read more details on how the different ReportDataSources work, read the [mete
 
 ## Table Schemas
 
-For ReportDataSources with a `spec.promsum` present, their tables have the following database schema:
+For ReportDataSources with a `spec.promsum` present, their tables have the following database table schema:
 
 - `timestamp`: The type of this column is `timestamp`. This is the time which the metric was collected.
    - Note: `timestamp` is also a reserved keyword (for the column type) in Presto, meaning any queries using it must use quotes to refer to the column, like so: `SELECT "timestamp" FROM datasource_unready_deployment_replicas LIMIT 1;`
 - `timeprecision`: The type of this column is a `double`. This is "query resolution step width" used to query this metric from Prometheus. This de***REMOVED***nes how accurate the data is. The bigger the value, the less accurate. This value is controlled globally by the operator, and has a default value of 60.
 - `labels`: The type of this column is a `map(varchar, varchar)`. This is the set of Prometheus labels and their values for the metric.
 - `amount`: The type of this column is a `double`. Amount is the value of the metric at that `timestamp`
+
+For ReportDataSources with a `spec.awsBilling` present, see [here](aws-billing-datasource-schema.md) for an example of what the table schema looks like.
 
 For more details read [the Presto Data Type documentation][presto-types].
 
