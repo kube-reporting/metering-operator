@@ -1,6 +1,7 @@
 # Using Metering
 
-Use Metering to create reports and fetch their results.
+This document demonstrating using Metering to create reports and fetch their results.
+If you want a guide on how to extend Metering with custom queries and reports, read the [writing custom queries guide][writing-custom-queries]
 
 *Note: Wait at least 15 minutes after installing Metering before generating reports to enable Metering to reach a consistent state and fetch some data from Prometheus*
 
@@ -91,3 +92,4 @@ $ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/metering/proxy
 
 [accessing-services]: https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-services/#manually-constructing-apiserver-proxy-urls
 [report-md]: report.md
+[writing-custom-queries]: writing-custom-queries.md
