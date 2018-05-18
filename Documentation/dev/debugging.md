@@ -9,6 +9,14 @@ All of the follow commands assume you've set the `METERING_NAMESPACE` environmen
 export METERING_NAMESPACE=your-namespace
 ```
 
+## Get Metering Operator Logs
+
+The command below will follow the logs of the metering-operator.
+
+```
+kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
+```
+
 ## Query Presto using presto-cli
 
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod.
