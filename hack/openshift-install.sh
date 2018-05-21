@@ -8,4 +8,4 @@ if command -v oc; then
 fi
 
 export DEPLOY_PLATFORM=openshift
-"${ROOT_DIR}/install.sh"
+"${ROOT_DIR}/hack/install.sh"
