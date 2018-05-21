@@ -20,8 +20,11 @@ Operator Metering requires the following components:
 - At least 1 node with 1.5GB available memory (the highest memory request for a single Operator Metering Pod)
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly con***REMOVED***gured kubectl to access the Kubernetes cluster.
+- [Operator Lifecycle Manager (OLM)][install-olm] version 0.4.0 or greater. Must be installed using the `upstream` install method.
 
 ## Installation
+
+> Requirements: Please make sure that the [Operator Lifecycle Manager][install-olm] is installed in the cluster before running this guide.
 
 First, start by creating your namespace:
 
@@ -135,6 +138,7 @@ kubectl delete -n $METERING_NAMESPACE clusterserviceversion-v1s -l operator-mete
 
 For instructions on using Operator Metering, please see [Using Operator Metering][using-metering].
 
+[install-olm]: https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#install-the-latest-released-version-of-olm-for-upstream-kubernetes
 [metering-subscription]: ../manifests/deploy/generic/alm/metering.subscription.yaml
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [using-metering]: using-metering.md
