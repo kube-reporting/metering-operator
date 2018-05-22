@@ -27,3 +27,10 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/$DEPLOY_PLATFORM/alm}"
 : "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
+
+# These are currently openshift specific config options, controlling if a
+# clusterrole and clusterrolebinding are created granting access to GET
+# namespaces. This is for granting access to querying the Prometheus API.
+: "${METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=true}"
+: "${METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=false}"
+: "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME:=${METERING_NAMESPACE}-metering-namespace-viewer}"
