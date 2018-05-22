@@ -39,8 +39,8 @@ function kubectl_***REMOVED***les() {
 
 function install_metering() {
     INSTALL_METHOD=$1
-    echo "Installing metering"
-    if [ "$INSTALL_METHOD" == "direct" ]; then
+    echo "Installing metering using "$INSTALL_METHOD" install method"
+    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "generic-direct" ]]; then
         "$ROOT_DIR/hack/install.sh"
     elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
         "$ROOT_DIR/hack/tectonic-install.sh"
@@ -56,8 +56,8 @@ function install_metering() {
 
 function uninstall_metering() {
     INSTALL_METHOD=$1
-    echo "Uninstalling metering"
-    if [ "$INSTALL_METHOD" == "direct" ]; then
+    echo "Uninstalling metering using "$INSTALL_METHOD" uninstall method"
+    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "generic-direct" ]]; then
         "$ROOT_DIR/hack/uninstall.sh"
     elif [ "$INSTALL_METHOD" == "tectonic-direct" ]; then
         "$ROOT_DIR/hack/tectonic-uninstall.sh"
