@@ -1,15 +1,21 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  name: presto-coordinator
   labels:
     app: presto
-  name: presto
+    presto: coordinator
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   replicas: 1
   selector:
+    matchLabels:
+      app: presto
+      presto: coordinator
+{{- if .Values.presto.labels }}
+{{ toYaml .Values.presto.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:
@@ -19,7 +25,7 @@ spec:
 {{ toYaml .Values.presto.labels | indent 8 }}
 {{- end }}
       annotations:
-        presto-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-con***REMOVED***g.yaml") . | sha256sum }}
+        presto-coordinator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-coordinator-con***REMOVED***g.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
 {{- if .Values.presto.annotations }}
 {{ toYaml .Values.presto.annotations | indent 8 }}
@@ -42,13 +48,34 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
-        - name: PRESTO_CONF_discovery_uri
-          value: "http://presto:8080"
         - name: PRESTO_LOG_com_facebook_presto
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: presto-con***REMOVED***g
+              name: presto-coordinator-con***REMOVED***g
               key: log-level
+        - name: PRESTO_CONF_discovery_uri
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: discovery-uri
+        - name: PRESTO_CONF_discovery___server_enabled
+          value: "true"
+        - name: PRESTO_CONF_coordinator
+          value: "true"
+        - name: PRESTO_CONF_node___scheduler_include___coordinator
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: node-scheduler-include-coordinator
+        - name: PRESTO_NODE_node_environment
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: environment
+        - name: PRESTO_NODE_node_id
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.uid
         - name: MY_NODE_NAME
           valueFrom:
             ***REMOVED***eldRef:
@@ -81,11 +108,11 @@ spec:
         - name: presto-data
           mountPath: /var/presto/data
         resources:
-{{ toYaml .Values.presto.resources | indent 10 }}
+{{ toYaml .Values.presto.coordinator.resources | indent 10 }}
       volumes:
       - name: presto-data
         emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
-      terminationGracePeriodSeconds: {{ .Values.presto.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.presto.coordinator.terminationGracePeriodSeconds }}

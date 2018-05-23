@@ -4,6 +4,7 @@ metadata:
   name: presto
   labels:
     app: presto
+    presto: coordinator
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

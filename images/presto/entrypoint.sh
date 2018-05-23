@@ -71,6 +71,7 @@ echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
 con***REMOVED***gure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 con***REMOVED***gure "${PRESTO_HOME}/etc/con***REMOVED***g.properties" presto-conf PRESTO_CONF
 con***REMOVED***gure "${PRESTO_HOME}/etc/log.properties" presto-log PRESTO_LOG
+con***REMOVED***gure "${PRESTO_HOME}/etc/node.properties" presto-node PRESTO_NODE
 
 # add UID to /etc/passwd if missing
 if ! whoami &> /dev/null; then
