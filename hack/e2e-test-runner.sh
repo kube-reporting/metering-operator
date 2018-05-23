@@ -11,6 +11,8 @@ set -e
 : "${TEST_TAP_FILE:?}"
 
 : "${DEPLOY_POD_LOGS_LOG_FILE:=""}"
+: "${FINAL_POD_LOGS_LOG_FILE:=""}"
+
 : "${DEPLOY_METERING:=true}"
 : "${CLEANUP_METERING:=true}"
 : "${INSTALL_METHOD:=direct}"
@@ -36,6 +38,7 @@ touch "$TEST_OUTPUT_DIRECTORY/$TEST_LOG_FILE"
 touch "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
 touch "$TEST_OUTPUT_DIRECTORY/$TEST_TAP_FILE"
 touch "$TEST_OUTPUT_DIRECTORY/$DEPLOY_POD_LOGS_LOG_FILE"
+touch "$TEST_OUTPUT_DIRECTORY/$FINAL_POD_LOGS_LOG_FILE"
 
 # fail with the last non-zero exit code (preserves test fail exit code)
 set -o pipefail
@@ -43,8 +46,41 @@ set -o pipefail
 export SKIP_DELETE_CRDS=true
 export DELETE_PVCS=true
 
+# Take and modi***REMOVED***ed slightly from https://github.com/kubernetes/charts/blob/f1711c220988b69e530263dc924eaed0a759e441/test/changed.sh#L42
+capture_pod_logs() {
+    # List all logs for all containers in all pods for the namespace which was
+    kubectl get pods --show-all --no-headers --namespace "$METERING_NAMESPACE" | awk '{ print $1 }' | while read -r pod; do
+        if [[ -n "$pod" ]]; then
+            printf '===Details from pod %s:===\n' "$pod"
+
+            printf '...Description of pod %s:...\n' "$pod"
+            kubectl describe pod --namespace "$METERING_NAMESPACE" "$pod" || true
+            printf '...End of description for pod %s...\n\n' "$pod"
+
+            # There can be multiple containers within a pod. We need to iterate
+            # over each of those
+            containers=$(kubectl get pods --show-all -o jsonpath="{.spec.containers[*].name}" --namespace "$METERING_NAMESPACE" "$pod")
+            for container in $containers; do
+                printf -- '---Logs from container %s in pod %s:---\n' "$container" "$pod"
+                kubectl logs --namespace "$METERING_NAMESPACE" -c "$container" "$pod" || true
+                printf -- '---End of logs for container %s in pod %s---\n\n' "$container" "$pod"
+            done
+
+            printf '===End of details for pod %s===\n' "$pod"
+        ***REMOVED***
+    done
+}
+
 function cleanup() {
     echo "Performing cleanup"
+
+    if [ -n "$FINAL_POD_LOGS_LOG_FILE" ]; then
+        echo "Capturing ***REMOVED***nal pod logs"
+        capture_pod_logs >> "$TEST_OUTPUT_DIRECTORY/$FINAL_POD_LOGS_LOG_FILE"
+        echo "Finished capturing ***REMOVED***nal pod logs"
+    ***REMOVED***
+
+    echo "Running uninstall"
     if [ "$TEST_OUTPUT_LOG_STDOUT" == "true" ]; then
         uninstall_metering "$INSTALL_METHOD" | tee "$TEST_OUTPUT_DIRECTORY/$DEPLOY_LOG_FILE"
     ***REMOVED***
