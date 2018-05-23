@@ -14,7 +14,7 @@ RUN \
 
 # ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
-ENV PRESTO_VERSION 0.188
+ENV PRESTO_VERSION 0.202
 ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
 ENV TERM linux
 ENV HOME /opt/presto
