@@ -77,6 +77,7 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
 	router.HandleFunc("/ready", srv.readinessHandler)
+	router.HandleFunc("/healthy", srv.healthinessHandler)
 
 	pprofMux.HandleFunc("/debug/pprof/", pprof.Index)
 	pprofMux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)

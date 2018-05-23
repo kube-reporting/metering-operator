@@ -11,6 +11,9 @@ type statusResponse struct {
 	Details interface{} `json:"details"`
 }
 
+// healthinessHandler is the readiness check for the metering operator. If this
+// no requests will be sent to this pod, and rolling updates will not proceed
+// until the checks succeed.
 func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	if !srv.chargeback.isInitialized() {
@@ -30,6 +33,21 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+}
+
+// healthinessHandler is the health check for the metering operator. If this
+// fails, the process will be restarted.
+func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	if !srv.chargeback.testWriteToPresto(logger) {
+		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
+			statusResponse{
+				Status:  "not healthy",
+				Details: "cannot write to PrestoDB",
+			})
+		return
+	}
 	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
 
