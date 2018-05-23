@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: presto-config
-{{- block "extraMetadata" . }}
-{{- end }}
-data:
-  log-level: {{ upper .Values.presto.config.logLevel | quote}}
