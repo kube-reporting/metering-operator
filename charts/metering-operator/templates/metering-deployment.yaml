@@ -85,6 +85,16 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: metering-con***REMOVED***g
               key: disable-promsum
+        - name: CHARGEBACK_PRESTO_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: metering-con***REMOVED***g
+              key: presto-host
+        - name: CHARGEBACK_HIVE_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: metering-con***REMOVED***g
+              key: hive-host
         - name: CHARGEBACK_LEASE_DURATION
           valueFrom:
             con***REMOVED***gMapKeyRef:
