@@ -16,3 +16,5 @@ data:
   promsum-chunk-size: {{ .Values.config.promsumChunkSize | quote}}
   promsum-step-size: {{ .Values.config.promsumStepSize | quote}}
   leader-lease-duration: {{ .Values.config.leaderLeaseDuration | quote }}
+  presto-host: {{ .Values.config.prestoHost | quote }}
+  hive-host: {{ .Values.config.hiveHost | quote }}
