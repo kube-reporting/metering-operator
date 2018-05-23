@@ -360,7 +360,7 @@ def e2eRunner(meteringSourceDir, envVars, skipNamespaceCleanup) {
                 sh 'kubectl con***REMOVED***g get-contexts'
                 try {
                     ansiColor('xterm') {
-                        timeout(15) {
+                        timeout(20) {
                             sh '''#!/bin/bash -ex
                             mkdir -p ${TEST_OUTPUT_DIR}
                             touch ${TEST_OUTPUT_DIR}/${DEPLOY_LOG_FILE}
