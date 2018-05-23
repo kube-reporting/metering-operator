@@ -36,4 +36,4 @@ metadata:
 {{- end }}
 spec:
   query: |
-    label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") * on (pod, namespace) group_left(node) kube_pod_info{pod_ip!="",node!="",host_ip!=""}
+    label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
