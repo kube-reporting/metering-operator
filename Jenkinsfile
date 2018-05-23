@@ -79,13 +79,16 @@ podTemplate(
         def testOutputDirAbsolutePath = "${env.WORKSPACE}/${testOutputDir}"
 
         def e2eTestLogFile = 'e2e-tests.log'
-        def e2eDeployLogFile = 'e2e-tests-deploy.log'
+        def e2eDeployLogFile = 'e2e-deploy.log'
         def e2eTestTapFile = 'e2e-tests.tap'
-        def e2eDeployPodLogsFile = 'e2e-pod-logs.log'
+        def e2eDeployPodLogsFile = 'e2e-deploy-pod-logs.log'
+        def e2eFinalPodLogsFile = 'e2e-final-pod-logs.log'
+
         def integrationTestLogFile = 'integration-tests.log'
-        def integrationDeployLogFile = 'integration-tests-deploy.log'
+        def integrationDeployLogFile = 'integration-deploy.log'
         def integrationTestTapFile = 'integration-tests.tap'
-        def integrationDeployPodLogsFile = 'integration-pod-logs.log'
+        def integrationDeployPodLogsFile = 'integration-deploy-pod-logs.log'
+        def integrationFinalPodLogsFile = 'integration-final-pod-logs.log'
 
         def dockerBuildArgs = ''
         if (isMasterBranch) {
@@ -242,6 +245,7 @@ podTemplate(
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "FINAL_POD_LOGS_LOG_FILE=${e2eFinalPodLogsFile}",
                                         "DEPLOY_PLATFORM=generic",
                                         "TEST_TAP_FILE=${e2eTestTapFile}",
                                         "ENTRYPOINT=hack/e2e-ci.sh",
@@ -267,6 +271,7 @@ podTemplate(
                                         "TEST_LOG_FILE=${integrationTestLogFile}",
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "FINAL_POD_LOGS_LOG_FILE=${integrationFinalPodLogsFile}",
                                         "DEPLOY_PLATFORM=generic",
                                         "TEST_TAP_FILE=${integrationTestTapFile}",
                                         "ENTRYPOINT=hack/integration-ci.sh",
@@ -292,6 +297,7 @@ podTemplate(
                                         "TEST_RESULT_REPORT_OUTPUT_DIRECTORY=${testReportResultsDir}",
                                         "DEPLOY_LOG_FILE=${e2eDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${e2eDeployPodLogsFile}",
+                                        "FINAL_POD_LOGS_LOG_FILE=${e2eFinalPodLogsFile}",
                                         "ENABLE_AWS_BILLING=${enableAWSBilling}",
                                         "ENABLE_AWS_BILLING_TEST=${enableAWSBilling}",
                                         "DEPLOY_PLATFORM=tectonic",
@@ -319,6 +325,7 @@ podTemplate(
                                         "TEST_LOG_FILE=${integrationTestLogFile}",
                                         "DEPLOY_LOG_FILE=${integrationDeployLogFile}",
                                         "DEPLOY_POD_LOGS_LOG_FILE=${integrationDeployPodLogsFile}",
+                                        "FINAL_POD_LOGS_LOG_FILE=${integrationFinalPodLogsFile}",
                                         "DEPLOY_PLATFORM=tectonic",
                                         "ENABLE_AWS_BILLING=${enableAWSBilling}",
                                         "ENABLE_AWS_BILLING_TEST=${enableAWSBilling}",
@@ -369,7 +376,7 @@ def e2eRunner(meteringSourceDir, envVars, skipNamespaceCleanup) {
                             tail -f ${TEST_OUTPUT_DIR}/${TEST_LOG_FILE} &
                             docker run \
                             -i --rm \
-                            --env-file <(env | grep -E 'INSTALL_METHOD|TEST|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|METERING|PULL_SECRET') \
+                            --env-file <(env | grep -E 'INSTALL_METHOD|TEST|LOG|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|METERING|PULL_SECRET') \
                             -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                             -v "${KUBECONFIG}:${KUBECONFIG}" \
                             -v "${TEST_OUTPUT_DIR}:/out" \
