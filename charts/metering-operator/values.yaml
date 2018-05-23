@@ -62,6 +62,6 @@ livenessProbe:
  successThreshold: 1
  failureThreshold: 2
  httpGet:
-   path: /ready
+   path: /healthy
    port: 8080
    scheme: HTTP
