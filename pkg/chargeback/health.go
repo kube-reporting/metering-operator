@@ -25,7 +25,7 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		return
 	}
-	if !srv.chargeback.testWriteToPresto(logger) {
+	if !srv.testWriteToPrestoSingleFlight(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
@@ -41,7 +41,7 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 // fails, the process will be restarted.
 func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	if !srv.chargeback.testWriteToPresto(logger) {
+	if !srv.testWriteToPrestoSingleFlight(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not healthy",
@@ -50,6 +50,17 @@ func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+}
+
+func (srv *server) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
+	const key = "health"
+	v, _, _ := srv.writeToPrestoGroup.Do(key, func() (interface{}, error) {
+		defer srv.writeToPrestoGroup.Forget(key)
+		healthy := srv.chargeback.testWriteToPresto(logger)
+		return healthy, nil
+	})
+	healthy := v.(bool)
+	return healthy
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
