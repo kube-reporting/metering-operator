@@ -67,6 +67,18 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: presto-coordinator-con***REMOVED***g
               key: node-scheduler-include-coordinator
+        - name: PRESTO_CONF_task_max____worker___threads
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: task-max-worker-threads
+              optional: true
+        - name: PRESTO_CONF_task_min___drivers
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: task-min-drivers
+              optional: true
         - name: PRESTO_NODE_node_environment
           valueFrom:
             con***REMOVED***gMapKeyRef:
