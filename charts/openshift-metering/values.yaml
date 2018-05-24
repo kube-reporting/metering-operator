@@ -1,6 +1,6 @@
 metering-operator:
   config:
-    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9090/"
+    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9090/"
 
   image:
     tag: latest
@@ -14,6 +14,8 @@ presto:
       fsGroup: null
 hdfs:
   enabled: true
+  config:
+    datanodeDataDirPerms: "775"
 
   securityContext:
     fsGroup: null
