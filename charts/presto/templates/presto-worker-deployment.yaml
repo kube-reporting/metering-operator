@@ -62,6 +62,18 @@ spec:
           value: "false"
         - name: PRESTO_CONF_coordinator
           value: "false"
+        - name: PRESTO_CONF_task_max____worker___threads
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: task-max-worker-threads
+              optional: true
+        - name: PRESTO_CONF_task_min___drivers
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: task-min-drivers
+              optional: true
         - name: PRESTO_NODE_node_environment
           valueFrom:
             configMapKeyRef:
