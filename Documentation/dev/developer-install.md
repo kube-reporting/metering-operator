@@ -24,7 +24,7 @@ If your using Openshift, use openshift-install.sh:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER
-$ ./hack/openshift-uninstall.sh-install.sh
+$ ./hack/openshift-install.sh
 ```
 
 To uninstall the process is the same, pick the right uninstall script for your platform, and run it.
@@ -104,7 +104,7 @@ By default the `run-chargeback-local` Make***REMOVED***le target assumes that th
 
 If you're Prometheus is located somewhere, ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus.
 
-Ex (these are the deafults):
+Ex (these are the defaults):
 ```
 export METERING_PROMETHEUS_NAMESPACE=tectonic-system
 export METERING_PROMTHEUS_LABEL_SELECTOR=app=prometheus

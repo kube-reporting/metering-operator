@@ -6,6 +6,8 @@ import (
 	"io"
 	"math/rand"
 	"net"
+	"net/http"
+	"os"
 	"sync"
 	"syscall"
 	"time"
@@ -21,11 +23,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
@@ -39,6 +43,8 @@ const (
 	connBackoff         = time.Second * 15
 	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
+
+	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 )
 
 type Con***REMOVED***g struct {
@@ -65,6 +71,7 @@ type Con***REMOVED***g struct {
 
 type Chargeback struct {
 	cfg              Con***REMOVED***g
+	kubeCon***REMOVED***g       *rest.Con***REMOVED***g
 	informers        cbInformers.SharedInformerFactory
 	queues           queues
 	chargebackClient cbClientset.Interface
@@ -112,19 +119,20 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Cha
 		clientCon***REMOVED***g = clientcmd.NewDefaultClientCon***REMOVED***g(*apiCfg, con***REMOVED***gOverrides)
 	}
 
-	kubeCon***REMOVED***g, err := clientCon***REMOVED***g.ClientCon***REMOVED***g()
+	var err error
+	op.kubeCon***REMOVED***g, err = clientCon***REMOVED***g.ClientCon***REMOVED***g()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get Kubernetes client con***REMOVED***g: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	op.kubeClient, err = corev1.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
+	op.kubeClient, err = corev1.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
 	logger.Debugf("setting up Chargeback client...")
-	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
+	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Chargeback client: %v", err)
 	}
@@ -282,8 +290,25 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	defer c.prestoDB.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
+	transportCon***REMOVED***g, err := c.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
+	if err != nil {
+		return err
+	}
+
+	var roundTripper http.RoundTripper
+	if _, err := os.Stat(serviceServingCAFile); err == nil {
+		// use the service serving CA for prometheus
+		transportCon***REMOVED***g.TLS.CAFile = serviceServingCAFile
+		roundTripper, err = transport.New(transportCon***REMOVED***g)
+		if err != nil {
+			return err
+		}
+		c.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	}
+
 	c.promConn, err = c.newPrometheusConn(promapi.Con***REMOVED***g{
-		Address: c.cfg.PromHost,
+		Address:      c.cfg.PromHost,
+		RoundTripper: roundTripper,
 	})
 	if err != nil {
 		return err
