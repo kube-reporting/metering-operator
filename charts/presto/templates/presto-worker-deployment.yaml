@@ -111,6 +111,10 @@ spec:
         - name: http
           containerPort: 8080
           protocol: TCP
+        - name: prometheus-jmx
+          containerPort: 8082
+          protocol: TCP
+        volumeMounts:
         volumeMounts:
         - name: presto-data
           mountPath: /var/presto/data
