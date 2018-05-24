@@ -39,13 +39,14 @@ spec:
     # requests. These examples use the defaults.
 
     # presto:
-    #   resources:
-    #     requests:
-    #       memory: "1536Mi"
-    #       cpu: "300m"
-    #     limits:
-    #       memory: "2048Mi"
-    #       cpu: "1000m"
+    #   coordinator:
+    #     resources:
+    #       requests:
+    #         memory: "1536Mi"
+    #         cpu: "300m"
+    #       limits:
+    #         memory: "2048Mi"
+    #         cpu: "1000m"
     # hive:
     #   metastore:
     #     resources:

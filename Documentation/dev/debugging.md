@@ -22,7 +22,7 @@ kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | 
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
+kubectl get pods -n $METERING_NAMESPACE -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
@@ -108,7 +108,7 @@ The Presto web UI can be very useful when debugging.
 It will show what queries are running, which have succeeded, and which queries have failed.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=presto -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
+kubectl get pods -n $METERING_NAMESPACE -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
 ```
 
 You can now open http://127.0.0.1:8080 in your browser window to view the Presto web interface.
