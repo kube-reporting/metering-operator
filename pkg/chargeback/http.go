@@ -39,7 +39,7 @@ type server struct {
 	httpServer  *http.Server
 	pprofServer *http.Server
 
-	writeToPrestoGroup singleflight.Group
+	healthCheckSingleFlight singleflight.Group
 }
 
 type requestLogger struct {
