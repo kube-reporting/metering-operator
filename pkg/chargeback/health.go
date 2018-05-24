@@ -17,6 +17,7 @@ type statusResponse struct {
 func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	if !srv.chargeback.isInitialized() {
+		logger.Debugf("not ready: operator is not yet initialized")
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
