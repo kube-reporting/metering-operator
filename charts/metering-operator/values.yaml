@@ -49,20 +49,21 @@ updateStrategy:
 
 readinessProbe:
  initialDelaySeconds: 60
- timeoutSeconds: 3
+ timeoutSeconds: 60
  periodSeconds: 10
- successThreshold: 2
- failureThreshold: 5
+ successThreshold: 1
+ failureThreshold: 6
  httpGet:
    path: /ready
    port: 8080
    scheme: HTTP
+
 livenessProbe:
  initialDelaySeconds: 120
- timeoutSeconds: 5
- periodSeconds: 120
+ timeoutSeconds: 60
+ periodSeconds: 60
  successThreshold: 1
- failureThreshold: 2
+ failureThreshold: 5
  httpGet:
    path: /healthy
    port: 8080
