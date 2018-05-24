@@ -20,4 +20,5 @@ trap "rm -rf $TMP" EXIT SIGINT
 
 "$ROOT_DIR/hack/create-metering-manifests.sh" "$HELM_OPERATOR_IMAGE_TAG" "$TMP"
 
+export DEPLOY_MANIFESTS_DIR="$TMP"
 "$@"
