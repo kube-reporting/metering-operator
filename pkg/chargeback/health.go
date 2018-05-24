@@ -25,11 +25,11 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		return
 	}
-	if !srv.testWriteToPrestoSingleFlight(logger) {
+	if !srv.testReadFromPrestoSingleFlight(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
-				Details: "cannot write to PrestoDB",
+				Details: "cannot read from PrestoDB",
 			})
 		return
 	}
@@ -53,14 +53,34 @@ func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *server) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
-	const key = "health"
-	v, _, _ := srv.writeToPrestoGroup.Do(key, func() (interface{}, error) {
-		defer srv.writeToPrestoGroup.Forget(key)
+	const key = "presto-write"
+	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer srv.healthCheckSingleFlight.Forget(key)
 		healthy := srv.chargeback.testWriteToPresto(logger)
 		return healthy, nil
 	})
 	healthy := v.(bool)
 	return healthy
+}
+
+func (srv *server) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) bool {
+	const key = "presto-read"
+	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer srv.healthCheckSingleFlight.Forget(key)
+		healthy := srv.chargeback.testReadFromPresto(logger)
+		return healthy, nil
+	})
+	healthy := v.(bool)
+	return healthy
+}
+
+func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
+	_, err := c.prestoConn.Query("SELECT * FROM system.runtime.nodes")
+	if err != nil {
+		logger.WithError(err).Debugf("cannot query Presto system.runtime.nodes table")
+		return false
+	}
+	return true
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
