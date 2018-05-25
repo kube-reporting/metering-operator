@@ -4,6 +4,7 @@ metadata:
   name: presto
   labels:
     app: presto
+    presto: coordinator
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -12,6 +13,10 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: 8080
+  - name: prometheus-jmx
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
   selector:
     app: presto
     presto: coordinator

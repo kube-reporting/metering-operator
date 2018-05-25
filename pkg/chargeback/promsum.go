@@ -96,6 +96,11 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 		return fmt.Errorf("couldn't list data stores: %v", err)
 	}
 
+	// sem acts as a semaphore limiting the number of active running
+	// collections at once
+	concurrency := 4
+	sem := make(chan struct{}, concurrency)
+
 	var g errgroup.Group
 	for _, dataSource := range dataSources {
 		dataSource := dataSource
@@ -116,7 +121,21 @@ func (c *Chargeback) collectPromsumData(ctx context.Context, logger logrus.Field
 			continue
 		}
 
+		// this blocks if we're at the concurrency limit, and will return if we
+		// get a context cancellation signal
+		select {
+		case sem <- struct{}{}:
+		case <-ctx.Done():
+			if err := g.Wait(); err != nil {
+				return err
+			}
+			return ctx.Err()
+		}
 		g.Go(func() error {
+			// release the semaphore at the end
+			defer func() {
+				<-sem
+			}()
 			startTime, endTime, err := timeBoundsGetter(dataSource)
 			if err != nil {
 				logger.WithError(err).Errorf("error getting collection time boundries for datasource")

@@ -12,7 +12,7 @@ source "${ROOT_DIR}/hack/common.sh"
 trap 'kill $(jobs -p)' SIGINT SIGTERM EXIT
 
 echo Starting presto port-forward
-kubectl get pods -n "$METERING_NAMESPACE" -l app=presto -o name \
+kubectl get pods -n "$METERING_NAMESPACE" -l app=presto,presto=coordinator -o name \
     | cut -d/ -f2 \
     | xargs -I{} kubectl -n "$METERING_NAMESPACE" port-forward {} 9991:8080 &
 

@@ -17,6 +17,7 @@ type statusResponse struct {
 func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	if !srv.chargeback.isInitialized() {
+		logger.Debugf("not ready: operator is not yet initialized")
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
@@ -24,11 +25,11 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		return
 	}
-	if !srv.chargeback.testWriteToPresto(logger) {
+	if !srv.testReadFromPrestoSingleFlight(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
-				Details: "cannot write to PrestoDB",
+				Details: "cannot read from PrestoDB",
 			})
 		return
 	}
@@ -40,7 +41,7 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 // fails, the process will be restarted.
 func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
-	if !srv.chargeback.testWriteToPresto(logger) {
+	if !srv.testWriteToPrestoSingleFlight(logger) {
 		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not healthy",
@@ -49,6 +50,37 @@ func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+}
+
+func (srv *server) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
+	const key = "presto-write"
+	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer srv.healthCheckSingleFlight.Forget(key)
+		healthy := srv.chargeback.testWriteToPresto(logger)
+		return healthy, nil
+	})
+	healthy := v.(bool)
+	return healthy
+}
+
+func (srv *server) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) bool {
+	const key = "presto-read"
+	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer srv.healthCheckSingleFlight.Forget(key)
+		healthy := srv.chargeback.testReadFromPresto(logger)
+		return healthy, nil
+	})
+	healthy := v.(bool)
+	return healthy
+}
+
+func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
+	_, err := c.prestoConn.Query("SELECT * FROM system.runtime.nodes")
+	if err != nil {
+		logger.WithError(err).Debugf("cannot query Presto system.runtime.nodes table")
+		return false
+	}
+	return true
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: presto-worker-con***REMOVED***g
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  environment: {{ .Values.presto.con***REMOVED***g.environment | quote }}
+  discovery-uri: {{ .Values.presto.con***REMOVED***g.discoveryURI | quote }}
+
+  log-level: {{ upper .Values.presto.worker.con***REMOVED***g.logLevel | quote }}
+{{- if .Values.presto.worker.con***REMOVED***g.taskMaxWorkerThreads }}
+  task-max-worker-threads: {{ .Values.presto.worker.con***REMOVED***g.taskMaxWorkerThreads | quote }}
+{{- end }}
+{{- if .Values.presto.worker.con***REMOVED***g.taskMinDrivers }}
+  task-min-drivers: {{ .Values.presto.worker.con***REMOVED***g.taskMinDrivers | quote }}
+{{- end }}
