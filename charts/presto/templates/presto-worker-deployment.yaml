@@ -1,25 +1,31 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  creationTimestamp: null
+  name: presto-worker
   labels:
     app: presto
-  name: presto
+    presto: worker
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.presto.worker.replicas }}
   selector:
+    matchLabels:
+      app: presto
+      presto: worker
+{{- if .Values.presto.labels }}
+{{ toYaml .Values.presto.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:
         app: presto
-        presto: coordinator
+        presto: worker
 {{- if .Values.presto.labels }}
 {{ toYaml .Values.presto.labels | indent 8 }}
 {{- end }}
       annotations:
-        presto-config-hash: {{ include (print $.Template.BasePath "/presto-config.yaml") . | sha256sum }}
+        presto-worker-config-hash: {{ include (print $.Template.BasePath "/presto-worker-config.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
 {{- if .Values.presto.annotations }}
 {{ toYaml .Values.presto.annotations | indent 8 }}
@@ -42,13 +48,41 @@ spec:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
-        - name: PRESTO_CONF_discovery_uri
-          value: "http://presto:8080"
         - name: PRESTO_LOG_com_facebook_presto
           valueFrom:
             configMapKeyRef:
-              name: presto-config
+              name: presto-worker-config
               key: log-level
+        - name: PRESTO_CONF_discovery_uri
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: discovery-uri
+        - name: PRESTO_CONF_discovery___server_enabled
+          value: "false"
+        - name: PRESTO_CONF_coordinator
+          value: "false"
+        - name: PRESTO_CONF_task_max____worker___threads
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: task-max-worker-threads
+              optional: true
+        - name: PRESTO_CONF_task_min___drivers
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: task-min-drivers
+              optional: true
+        - name: PRESTO_NODE_node_environment
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: environment
+        - name: PRESTO_NODE_node_id
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -77,15 +111,19 @@ spec:
         - name: http
           containerPort: 8080
           protocol: TCP
+        - name: prometheus-jmx
+          containerPort: 8082
+          protocol: TCP
+        volumeMounts:
         volumeMounts:
         - name: presto-data
           mountPath: /var/presto/data
         resources:
-{{ toYaml .Values.presto.resources | indent 10 }}
+{{ toYaml .Values.presto.worker.resources | indent 10 }}
       volumes:
       - name: presto-data
         emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
-      terminationGracePeriodSeconds: {{ .Values.presto.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.presto.worker.terminationGracePeriodSeconds }}

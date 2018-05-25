@@ -85,6 +85,16 @@ spec:
             configMapKeyRef:
               name: metering-config
               key: disable-promsum
+        - name: CHARGEBACK_PRESTO_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: presto-host
+        - name: CHARGEBACK_HIVE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: hive-host
         - name: CHARGEBACK_LEASE_DURATION
           valueFrom:
             configMapKeyRef:

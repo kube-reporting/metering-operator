@@ -14,6 +14,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/singleflight"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
@@ -36,6 +38,8 @@ type server struct {
 	wg          sync.WaitGroup
 	httpServer  *http.Server
 	pprofServer *http.Server
+
+	healthCheckSingleFlight singleflight.Group
 }
 
 type requestLogger struct {

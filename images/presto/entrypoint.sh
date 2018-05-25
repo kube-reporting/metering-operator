@@ -71,6 +71,7 @@ echo "-Xmx${MAX_HEAPSIZE}M" >> "${PRESTO_HOME}/etc/jvm.config"
 configure "${PRESTO_HOME}/etc/catalog/hive.properties" hive-catalog HIVE_CATALOG
 configure "${PRESTO_HOME}/etc/config.properties" presto-conf PRESTO_CONF
 configure "${PRESTO_HOME}/etc/log.properties" presto-log PRESTO_LOG
+configure "${PRESTO_HOME}/etc/node.properties" presto-node PRESTO_NODE
 
 # add UID to /etc/passwd if missing
 if ! whoami &> /dev/null; then

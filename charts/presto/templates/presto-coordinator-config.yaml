@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: presto-coordinator-config
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  environment: {{ .Values.presto.config.environment | quote }}
+  discovery-uri: {{ .Values.presto.config.discoveryURI | quote }}
+
+  log-level: {{ upper .Values.presto.coordinator.config.logLevel | quote }}
+  node-scheduler-include-coordinator: {{ .Values.presto.coordinator.config.nodeSchedulerIncludeCoordinator | quote }}
+{{- if .Values.presto.coordinator.config.taskMaxWorkerThreads }}
+  task-max-worker-threads: {{ .Values.presto.coordinator.config.taskMaxWorkerThreads | quote }}
+{{- end }}
+{{- if .Values.presto.coordinator.config.taskMinDrivers }}
+  task-min-drivers: {{ .Values.presto.coordinator.config.taskMinDrivers | quote }}
+{{- end }}
