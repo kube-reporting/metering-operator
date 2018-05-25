@@ -148,6 +148,25 @@ helmUpgrade() {
     fi
 }
 
+watchCRs() {
+    CRD=$1
+    OUTPUT_FILE=$2
+    while true; do
+        echo "Opening watch for $CRD"
+        kubectl \
+            --namespace "$MY_POD_NAMESPACE" \
+            get "$CRD" \
+            --ignore-not-found \
+            --watch \
+            -o json \
+            | jq '.' -cr >> "$OUTPUT_FILE"
+        echo "Watch closed, re-opening watch in 2 seconds"
+        checkExit
+        sleep 2
+    done
+    echo "Watch loop exited, no longer watching $CRD"
+}
+
 until curl -s $TILLER_READY_ENDPOINT; do
     echo "Waiting for Tiller to become ready"
     sleep 1
@@ -155,70 +174,67 @@ done
 
 checkExit
 
+
+CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
+touch "$HELM_RELEASES_FILE"
+
+echo "Starting watcher"
+watchCRs "$CRD" "$HELM_RELEASES_FILE" &
+
+echo "Starting reconciliation loop"
 while true; do
     checkExit
 
-    CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
-    kubectl \
-        --namespace "$MY_POD_NAMESPACE" \
-        get "$CRD" \
-        --ignore-not-found \
-        -o json > "$HELM_RELEASES_FILE"
+     tail -f "$HELM_RELEASES_FILE" | while read -r release; do
+        echo -E "$release" > "$CURRENT_RELEASE_FILE"
+        RELEASE_NAME="$(jq -Mcr '.metadata.name' "$CURRENT_RELEASE_FILE")"
+        RELEASE_UID="$(jq -Mcr '.metadata.uid' "$CURRENT_RELEASE_FILE")"
+        RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
+        RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
+        RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
+        CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
 
-    if [ -s "$HELM_RELEASES_FILE" ]; then
-        while read -r release; do
-            echo -E "$release" > "$CURRENT_RELEASE_FILE"
-            RELEASE_NAME="$(jq -Mcr '.metadata.name' "$CURRENT_RELEASE_FILE")"
-            RELEASE_UID="$(jq -Mcr '.metadata.uid' "$CURRENT_RELEASE_FILE")"
-            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
-            CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
+        HELM_ARGS=()
+        if [ -s "$EXTRA_VALUES_FILE" ]; then
+            HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+        fi
 
-            HELM_ARGS=()
-            if [ -s "$EXTRA_VALUES_FILE" ]; then
-                HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
-            fi
+        if [ -z "$RELEASE_VALUES" ]; then
+            echo "No values, using default values"
+        else
+            VALUES_FILE="/tmp/${RELEASE_NAME}-values.yaml"
+            echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
 
-            if [ -z "$RELEASE_VALUES" ]; then
-                echo "No values, using default values"
-            else
-                VALUES_FILE="/tmp/${RELEASE_NAME}-values.yaml"
-                echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
+            HELM_ARGS+=("-f" "$VALUES_FILE")
+        fi
 
-                HELM_ARGS+=("-f" "$VALUES_FILE")
-            fi
+        # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
+        if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
+            echo "Nothing has changed for release $RELEASE_NAME"
+        else
+            echo "$RELEASE_RESOURCE_VERSION" > "/tmp/$RELEASE_NAME.resourceVersion"
 
-            # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
-            if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
-                echo "Nothing has changed for release $RELEASE_NAME"
-            else
-                echo "$RELEASE_RESOURCE_VERSION" > "/tmp/$RELEASE_NAME.resourceVersion"
+            writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+            writeReleaseConfigMapOwnerPatchFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
+            HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
 
-                writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                writeReleaseConfigMapOwnerPatchFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
+            echo "Running helm upgrade for release $RELEASE_NAME"
+            # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
+            CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
+            echo "Using $CHART as chart"
+            helmUpgrade "$RELEASE_NAME" "$CHART" "${HELM_ARGS[@]}"
 
-                echo "Running helm upgrade for release $RELEASE_NAME"
-                # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
-                CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
-                echo "Using $CHART as chart"
-                helmUpgrade "$RELEASE_NAME" "$CHART" "${HELM_ARGS[@]}"
+            writeReleaseConfigmapsFile "$RELEASE_NAME"
+            setOwnerOnReleaseConfigmaps
+            cleanupOldReleaseConfigmaps
+        fi
 
-                writeReleaseConfigmapsFile "$RELEASE_NAME"
-                setOwnerOnReleaseConfigmaps
-                cleanupOldReleaseConfigmaps
-            fi
+        checkExit
+    done
 
-            checkExit
-        done < <(jq '.items[]' -Mcr "$HELM_RELEASES_FILE")
-
-        echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
-        for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
-            sleep 1
-            checkExit
-        done
-    else
-        echo "No resources with kind $HELM_RELEASE_CRD_NAME and group $HELM_RELEASE_CRD_API_GROUP"
-    fi
+    echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
+    for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
+        sleep 1
+        checkExit
+    done
 done
