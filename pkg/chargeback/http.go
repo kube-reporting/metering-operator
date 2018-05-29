@@ -459,6 +459,67 @@ func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns
 	case "json":
 		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results))
 		return
+	//	}
+
+	// add here
+	case "csv":
+		buf := &bytes.Buffer{}
+		csvWriter := csv.NewWriter(buf)
+
+		// Write headers
+		var keys []string
+		if len(results) >= 1 {
+			for _, column := range columns {
+				keys = append(keys, column.Name)
+			}
+			err := csvWriter.Write(keys)
+			if err != nil {
+				logger.WithError(err).Errorf("failed to write headers")
+				return
+			}
+		}
+
+		// Write the rest
+		for _, row := range results {
+			vals := make([]string, len(keys))
+			for i, key := range keys {
+				val, ok := row[key]
+				if !ok {
+					logger.Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
+					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
+					return
+				}
+				switch v := val.(type) {
+				case string:
+					vals[i] = v
+				case []byte:
+					vals[i] = string(v)
+				case uint, uint8, uint16, uint32, uint64,
+					int, int8, int16, int32, int64,
+					float32, float64,
+					complex64, complex128,
+					bool:
+					vals[i] = fmt.Sprintf("%v", v)
+				case time.Time:
+					vals[i] = v.String()
+				case nil:
+					vals[i] = ""
+				default:
+					logger.Errorf("error marshalling csv: unknown type %t for value %v", val, val)
+					srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)")
+					return
+				}
+			}
+			err := csvWriter.Write(vals)
+			if err != nil {
+				logger.Errorf("failed to write csv row: %v", err)
+				return
+			}
+		}
+
+		csvWriter.Flush()
+		w.Header().Set("Content-Type", "text/csv")
+		w.Write(buf.Bytes())
 	}
 }
 
