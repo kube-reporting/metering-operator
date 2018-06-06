@@ -23,6 +23,17 @@ datanode:
       memory: "250Mi"
       cpu: "250m"
 
+  af***REMOVED***nity:
+    podAntiAf***REMOVED***nity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - hdfs-datanode
+        topologyKey: "kubernetes.io/hostname"
+
   storage:
     # Default to null, which means using the default storage class if the
     # defaultStorageClass admission plugin is turned on (is by default on
@@ -39,6 +50,17 @@ namenode:
     limits:
       memory: "350Mi"
       cpu: "250m"
+
+  af***REMOVED***nity:
+    podAntiAf***REMOVED***nity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - hdfs-datanode
+        topologyKey: "kubernetes.io/hostname"
 
   storage:
     size: "5Gi"

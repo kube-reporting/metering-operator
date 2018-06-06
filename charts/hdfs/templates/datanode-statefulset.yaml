@@ -59,8 +59,14 @@ spec:
 {{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
+{{- if .Values.securityContext }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
+{{- end }}
+{{- if .Values.datanode.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.datanode.af***REMOVED***nity | indent 8 }}
+{{- end }}
       initContainers:
       # wait-for-namenode exists because for some reason the datanode is unable
       # to connect to the namenode if it starts before the namenode's DNS name
