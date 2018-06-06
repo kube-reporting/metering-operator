@@ -31,8 +31,14 @@ spec:
 {{ toYaml .Values.presto.annotations | indent 8 }}
 {{- end }}
     spec:
+{{- if .Values.presto.securityContext }}
       securityContext:
 {{ toYaml .Values.presto.securityContext | indent 8 }}
+{{- end }}
+{{- if .Values.presto.coordinator.affinity }}
+      affinity:
+{{ toYaml .Values.presto.coordinator.affinity | indent 8 }}
+{{- end }}
       containers:
       - name: presto
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
