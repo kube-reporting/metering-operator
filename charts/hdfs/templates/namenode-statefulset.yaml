@@ -77,8 +77,14 @@ spec:
 {{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.namenode.terminationGracePeriodSeconds }}
+{{- if .Values.securityContext }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
+{{- end }}
+{{- if .Values.namenode.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.namenode.af***REMOVED***nity | indent 8 }}
+{{- end }}
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

@@ -31,8 +31,14 @@ spec:
 {{ toYaml .Values.presto.annotations | indent 8 }}
 {{- end }}
     spec:
+{{- if .Values.presto.securityContext }}
       securityContext:
 {{ toYaml .Values.presto.securityContext | indent 8 }}
+{{- end }}
+{{- if .Values.presto.worker.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.presto.worker.af***REMOVED***nity | indent 8 }}
+{{- end }}
       containers:
       - name: presto
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
@@ -62,6 +68,12 @@ spec:
           value: "false"
         - name: PRESTO_CONF_coordinator
           value: "false"
+        - name: PRESTO_CONF_task_concurrency
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-worker-con***REMOVED***g
+              key: task-concurrency
+              optional: true
         - name: PRESTO_CONF_task_max___worker___threads
           valueFrom:
             con***REMOVED***gMapKeyRef:
