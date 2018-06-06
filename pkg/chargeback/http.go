@@ -459,9 +459,7 @@ func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns
 	case "json":
 		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results))
 		return
-	//	}
 
-	// add here
 	case "csv":
 		buf := &bytes.Buffer{}
 		csvWriter := csv.NewWriter(buf)
