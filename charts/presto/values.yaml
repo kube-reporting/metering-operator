@@ -22,6 +22,17 @@ presto:
       taskMaxWorkerThreads: null
       taskMinDrivers: null
 
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - presto
+          topologyKey: "kubernetes.io/hostname"
+
     resources:
       requests:
         memory: "1536Mi"
@@ -38,6 +49,17 @@ presto:
       logLevel: info
       taskMaxWorkerThreads: null
       taskMinDrivers: null
+
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - presto
+          topologyKey: "kubernetes.io/hostname"
 
     resources:
       requests:

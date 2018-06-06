@@ -9,6 +9,9 @@ data:
   discovery-uri: {{ .Values.presto.config.discoveryURI | quote }}
 
   log-level: {{ upper .Values.presto.worker.config.logLevel | quote }}
+{{- if .Values.presto.worker.config.taskConcurrency }}
+  task-concurrency: {{ .Values.presto.worker.config.taskConcurrency | quote }}
+{{- end }}
 {{- if .Values.presto.worker.config.taskMaxWorkerThreads }}
   task-max-worker-threads: {{ .Values.presto.worker.config.taskMaxWorkerThreads | quote }}
 {{- end }}

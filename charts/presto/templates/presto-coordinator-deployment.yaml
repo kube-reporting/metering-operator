@@ -31,8 +31,14 @@ spec:
 {{ toYaml .Values.presto.annotations | indent 8 }}
 {{- end }}
     spec:
+{{- if .Values.presto.securityContext }}
       securityContext:
 {{ toYaml .Values.presto.securityContext | indent 8 }}
+{{- end }}
+{{- if .Values.presto.coordinator.affinity }}
+      affinity:
+{{ toYaml .Values.presto.coordinator.affinity | indent 8 }}
+{{- end }}
       containers:
       - name: presto
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
@@ -67,6 +73,12 @@ spec:
             configMapKeyRef:
               name: presto-coordinator-config
               key: node-scheduler-include-coordinator
+        - name: PRESTO_CONF_task_concurrency
+          valueFrom:
+            configMapKeyRef:
+              name: presto-coordinator-config
+              key: task-concurrency
+              optional: true
         - name: PRESTO_CONF_task_max___worker___threads
           valueFrom:
             configMapKeyRef:
