@@ -68,6 +68,12 @@ spec:
           value: "false"
         - name: PRESTO_CONF_coordinator
           value: "false"
+        - name: PRESTO_CONF_task_concurrency
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-worker-con***REMOVED***g
+              key: task-concurrency
+              optional: true
         - name: PRESTO_CONF_task_max___worker___threads
           valueFrom:
             con***REMOVED***gMapKeyRef:

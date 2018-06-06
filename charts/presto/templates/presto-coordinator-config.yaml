@@ -10,6 +10,9 @@ data:
 
   log-level: {{ upper .Values.presto.coordinator.con***REMOVED***g.logLevel | quote }}
   node-scheduler-include-coordinator: {{ .Values.presto.coordinator.con***REMOVED***g.nodeSchedulerIncludeCoordinator | quote }}
+{{- if .Values.presto.coordinator.con***REMOVED***g.taskConcurrency }}
+  task-concurrency: {{ .Values.presto.coordinator.con***REMOVED***g.taskConcurrency | quote }}
+{{- end }}
 {{- if .Values.presto.coordinator.con***REMOVED***g.taskMaxWorkerThreads }}
   task-max-worker-threads: {{ .Values.presto.coordinator.con***REMOVED***g.taskMaxWorkerThreads | quote }}
 {{- end }}

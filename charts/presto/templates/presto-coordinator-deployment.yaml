@@ -73,6 +73,12 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: presto-coordinator-con***REMOVED***g
               key: node-scheduler-include-coordinator
+        - name: PRESTO_CONF_task_concurrency
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: task-concurrency
+              optional: true
         - name: PRESTO_CONF_task_max___worker___threads
           valueFrom:
             con***REMOVED***gMapKeyRef:
