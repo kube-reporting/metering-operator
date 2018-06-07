@@ -85,6 +85,10 @@ hive:
   terminationGracePeriodSeconds: 30
 
   metastore:
+    con***REMOVED***g:
+      dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
+      dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
+
     resources:
       requests:
         memory: "650Mi"
