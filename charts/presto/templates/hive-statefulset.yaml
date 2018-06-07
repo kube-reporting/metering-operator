@@ -57,6 +57,16 @@ spec:
             configMapKeyRef:
               name: hive-config
               key: log-level
+        - name: HIVE_SITE_CONF_javax_jdo_option_ConnectionURL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: db-connection-url
+        - name: HIVE_SITE_CONF_javax_jdo_option_ConnectionDriverName
+          valueFrom:
+            configMapKeyRef:
+              name: hive-config
+              key: db-connection-driver
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

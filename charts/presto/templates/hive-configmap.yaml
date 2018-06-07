@@ -7,3 +7,5 @@ metadata:
 data:
   log-level: {{ upper .Values.hive.config.logLevel | quote}}
   default-fs: {{ .Values.hive.config.defaultfs | quote}}
+  db-connection-url: {{ .Values.hive.metastore.config.dbConnectionURL | quote}}
+  db-connection-driver: {{ .Values.hive.metastore.config.dbConnectionDriver | quote}}
