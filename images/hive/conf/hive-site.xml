@@ -22,14 +22,6 @@
     <value>thrift://localhost:9083</value>
   </property>
   <property>
-    <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:derby:;databaseName=/var/lib/hive/data;create=true</value>
-  </property>
-  <property>
-    <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>org.apache.derby.jdbc.EmbeddedDriver</value>
-  </property>
-  <property>
     <name>hive.server2.enable.doAs</name>
     <value>false</value>
   </property>
