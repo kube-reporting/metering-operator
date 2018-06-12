@@ -282,14 +282,13 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	columns := prestoTable.State.CreationParameters.Columns
-	if len(results) > 0 && len(columns) != len(results[0]) {
+	if len(results) > 0 && len(prestoTable.State.CreationParameters.Columns) != len(results[0]) {
 		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.CreationParameters.Columns))
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
 
-	srv.writeResults(logger, format, columns, results, w, r)
+	srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
@@ -346,13 +345,14 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
+
 	if useNewFormat {
-		srv.writeResultsV2(logger, format, columns, results, w, r)
+		srv.writeResultsV2(logger, format, reportQuery.Spec.Columns, results, w, r)
 	} else {
-		srv.writeResults(logger, format, columns, results, w, r)
+		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
-func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	buf := &bytes.Buffer{}
 	csvWriter := csv.NewWriter(buf)
 
@@ -412,7 +412,7 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Prest
 	w.Write(buf.Bytes())
 }
 
-func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		newResults := make([]*orderedmap.OrderedMap, len(results))
@@ -461,7 +461,7 @@ func convertsToGetReportResults(input []map[string]interface{}) GetReportResults
 	return results
 }
 
-func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns []api.PrestoTableColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results))
