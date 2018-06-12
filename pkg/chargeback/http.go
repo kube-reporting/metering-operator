@@ -440,19 +440,26 @@ type ReportResultEntry struct {
 }
 
 type ReportResultValues struct {
-	Name  string      `json:"name"`
-	Value interface{} `json:"value"`
+	Name        string      `json:"name"`
+	Value       interface{} `json:"value"`
+	TableHidden bool        `json:"tableHidden"`
+	Unit        string      `json:"unit,omitempty"`
 }
 
-func convertsToGetReportResults(input []map[string]interface{}) GetReportResults {
+func convertsToGetReportResults(input []map[string]interface{}, columns []api.ReportGenerationQueryColumn) GetReportResults {
 	results := GetReportResults{}
-
+	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
+	for _, column := range columns {
+		columnsMap[column.Name] = column
+	}
 	for _, row := range input {
 		var valSlice ReportResultEntry
 		for columnName, columnValue := range row {
 			resultsValue := ReportResultValues{
-				Name:  columnName,
-				Value: columnValue,
+				Name:        columnName,
+				Value:       columnValue,
+				TableHidden: columnsMap[columnName].TableHidden,
+				Unit:        columnsMap[columnName].Unit,
 			}
 			valSlice.Values = append(valSlice.Values, resultsValue)
 		}
@@ -464,7 +471,7 @@ func convertsToGetReportResults(input []map[string]interface{}) GetReportResults
 func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
-		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results))
+		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results, columns))
 		return
 
 	case "csv":
