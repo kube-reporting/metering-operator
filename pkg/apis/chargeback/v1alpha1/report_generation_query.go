@@ -26,12 +26,19 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	ReportQueries        []string            `json:"reportQueries"`
-	DynamicReportQueries []string            `json:"dynamicReportQueries"`
-	DataSources          []string            `json:"reportDataSources"`
-	Query                string              `json:"query"`
-	Columns              []PrestoTableColumn `json:"columns"`
-	View                 GenQueryView        `json:"view"`
+	ReportQueries        []string                      `json:"reportQueries"`
+	DynamicReportQueries []string                      `json:"dynamicReportQueries"`
+	DataSources          []string                      `json:"reportDataSources"`
+	Query                string                        `json:"query"`
+	Columns              []ReportGenerationQueryColumn `json:"columns"`
+	View                 GenQueryView                  `json:"view"`
+}
+
+type ReportGenerationQueryColumn struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	TableHidden bool   `json:"tableHidden"`
+	Unit        string `json:"unit"`
 }
 
 type GenQueryView struct {
