@@ -114,3 +114,7 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{- end }}

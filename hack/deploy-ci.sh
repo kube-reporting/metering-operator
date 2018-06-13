@@ -13,6 +13,7 @@ export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALU
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
 
+
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
@@ -21,6 +22,14 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${AWS_SECRET_ACCESS_KEY:=}"
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
+: "${METERING_CREATE_PULL_SECRET:=false}"
+
+METERING_PULL_SECRET_NAME=""
+if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
+    : "${DOCKER_USERNAME:?}"
+    : "${DOCKER_PASSWORD:?}"
+    METERING_PULL_SECRET_NAME="metering-pull-secret"
+***REMOVED***
 
 cat <<EOF > "$METERING_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -63,6 +72,28 @@ spec:
       terminationGracePeriodSeconds: 0
 EOF
 
+
+
+if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
+
+    cat <<EOF >> "$METERING_CR_FILE"
+  metering-operator:
+    imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+
+  presto:
+    presto:
+      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+    hive:
+      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+  hdfs:
+    datanode:
+      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+    namenode:
+      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+EOF
+
+***REMOVED***
+
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
@@ -84,7 +115,19 @@ echo "Creating metering manifests"
 export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"
 
-echo "Deploying"
 
+if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
+    # We need to create the namespace in this situation because it isn't created normally until deploy is run
+    kubectl create ns "$METERING_NAMESPACE" || true
+    echo "\$METERING_CREATE_PULL_SECRET is true, creating pull-secret $METERING_PULL_SECRET_NAME"
+    kubectl -n "$METERING_NAMESPACE" \
+        create secret docker-registry "$METERING_PULL_SECRET_NAME" \
+        --docker-server=quay.io \
+        --docker-username="$DOCKER_USERNAME" \
+        --docker-password="$DOCKER_PASSWORD" \
+        --docker-email=example@example.com
+***REMOVED***
+
+echo "Deploying"
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "${ROOT_DIR}/hack/deploy.sh"

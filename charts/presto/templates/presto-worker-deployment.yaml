@@ -138,4 +138,8 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{- end }}
       terminationGracePeriodSeconds: {{ .Values.presto.worker.terminationGracePeriodSeconds }}
