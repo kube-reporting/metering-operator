@@ -24,12 +24,10 @@ if [[ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES-}" && -z "${CUSTOM_ALM_OVERRIDE
     : "${1?"Usage: $0 IMAGE_TAG"}"
     echo "Using $1 as IMAGE_TAG"
     IMAGE_TAG="$1"
-    shift
 ***REMOVED***
 
 # By default, we output into the deploy directory, but this can be overridden
-# by passing a second argument to this script
-OUTPUT_DIR="${1:-$DEPLOY_MANIFESTS_DIR}"
+: "${OUTPUT_DIR:=$DEPLOY_MANIFESTS_DIR}"
 
 echo "Using $OUTPUT_DIR as output directory"
 echo
