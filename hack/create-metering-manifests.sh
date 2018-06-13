@@ -24,14 +24,12 @@ if [[ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES-}" && -z "${CUSTOM_ALM_OVERRIDE
     : "${1?"Usage: $0 IMAGE_TAG"}"
     echo "Using $1 as IMAGE_TAG"
     IMAGE_TAG="$1"
-    shift
 fi
 
 # By default, we output into the deploy directory, but this can be overridden
-# by passing a second argument to this script
-OUTPUT_DIR="${1:-$DEPLOY_MANIFESTS_DIR}"
+: "${MANIFEST_OUTPUT_DIR:=$DEPLOY_MANIFESTS_DIR}"
 
-echo "Using $OUTPUT_DIR as output directory"
+echo "Using $MANIFEST_OUTPUT_DIR as output directory"
 echo
 
 trap "rm -rf $TMPDIR" EXIT
@@ -56,7 +54,7 @@ fi
 # tectonic
 echo "Creating Tectonic deploy manifests"
 "$ROOT_DIR/hack/create-deploy-manifests.sh" \
-    "$OUTPUT_DIR/tectonic/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/tectonic/helm-operator" \
     "$DEPLOY_MANIFESTS_DIR/common-helm-operator-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/tectonic-helm-operator-values.yaml" \
     "$HELM_OPERATOR_OVERRIDE_VALUES_FILE"
@@ -64,8 +62,8 @@ echo "Creating Tectonic deploy manifests"
 echo
 echo "Creating Tectonic ALM manifests"
 "$ROOT_DIR/hack/create-alm-manifests.sh" \
-    "$OUTPUT_DIR/tectonic/helm-operator" \
-    "$OUTPUT_DIR/tectonic/alm" \
+    "$MANIFEST_OUTPUT_DIR/tectonic/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/tectonic/alm" \
     "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/tectonic-alm-values.yaml" \
     "$ALM_OVERRIDE_VALUES_FILE"
@@ -74,7 +72,7 @@ echo "Creating Tectonic ALM manifests"
 echo
 echo "Creating Openshift deploy manifests"
 "$ROOT_DIR/hack/create-deploy-manifests.sh" \
-    "$OUTPUT_DIR/openshift/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/openshift/helm-operator" \
     "$DEPLOY_MANIFESTS_DIR/common-helm-operator-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/openshift-helm-operator-values.yaml" \
     "$HELM_OPERATOR_OVERRIDE_VALUES_FILE"
@@ -82,8 +80,8 @@ echo "Creating Openshift deploy manifests"
 echo
 echo "Creating Openshift ALM manifests"
 "$ROOT_DIR/hack/create-alm-manifests.sh" \
-    "$OUTPUT_DIR/openshift/helm-operator" \
-    "$OUTPUT_DIR/openshift/alm" \
+    "$MANIFEST_OUTPUT_DIR/openshift/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/openshift/alm" \
     "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/openshift-alm-values.yaml" \
     "$ALM_OVERRIDE_VALUES_FILE"
@@ -92,7 +90,7 @@ echo "Creating Openshift ALM manifests"
 echo
 echo "Creating Generic deploy manifests"
 "$ROOT_DIR/hack/create-deploy-manifests.sh" \
-    "$OUTPUT_DIR/generic/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/generic/helm-operator" \
     "$DEPLOY_MANIFESTS_DIR/common-helm-operator-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/generic-helm-operator-values.yaml" \
     "$HELM_OPERATOR_OVERRIDE_VALUES_FILE"
@@ -100,8 +98,8 @@ echo "Creating Generic deploy manifests"
 echo
 echo "Creating Generic ALM manifests"
 "$ROOT_DIR/hack/create-alm-manifests.sh" \
-    "$OUTPUT_DIR/generic/helm-operator" \
-    "$OUTPUT_DIR/generic/alm" \
+    "$MANIFEST_OUTPUT_DIR/generic/helm-operator" \
+    "$MANIFEST_OUTPUT_DIR/generic/alm" \
     "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/generic-alm-values.yaml" \
     "$ALM_OVERRIDE_VALUES_FILE"

@@ -103,6 +103,10 @@ spec:
           timeoutSeconds: 1
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+{{- if .Values.serviceAccountName}}
       serviceAccount: {{ .Values.serviceAccountName }}
+{{- end }}
+{{- if .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{- end }}

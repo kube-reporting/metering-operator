@@ -260,7 +260,6 @@ spec:
                     requests:
                       cpu: 50m
                       memory: 50Mi
-                imagePullSecrets: []
                 restartPolicy: Always
                 securityContext:
                   runAsNonRoot: true
