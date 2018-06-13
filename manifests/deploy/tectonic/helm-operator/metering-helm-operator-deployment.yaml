@@ -94,5 +94,3 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering-helm-operator
-      imagePullSecrets:
-        []
