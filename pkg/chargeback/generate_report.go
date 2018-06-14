@@ -67,8 +67,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	// Run the report
 	logger.Debugf("running report generation query")
-	wrappedQuery := fmt.Sprintf("SELECT timestamp '%s' as period_start, timestamp '%s' as period_end, * FROM (%s)", prestoTimestamp(reportStart), prestoTimestamp(reportEnd), query)
-	err = presto.ExecuteInsertQuery(c.prestoConn, tableName, wrappedQuery)
+	err = presto.ExecuteInsertQuery(c.prestoConn, tableName, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")
 		return nil, fmt.Errorf("Failed to execute %s usage report: %v", reportName, err)
