@@ -113,7 +113,7 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
         --docker-server=quay.io \
         --docker-username="$DOCKER_USERNAME" \
         --docker-password="$DOCKER_PASSWORD" \
-        --docker-email=example@example.com
+        --docker-email=example@example.com || true
 ***REMOVED***
 
 echo "Deploying"
