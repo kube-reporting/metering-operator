@@ -158,6 +158,10 @@ spec:
         resources:
 {{ toYaml .Values.datanode.resources | indent 10 }}
       serviceAccount: hdfs
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{- end }}
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-datanode-data"

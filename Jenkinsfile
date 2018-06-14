@@ -128,6 +128,7 @@ podTemplate(
                     "DEPLOY_TAG=${deployTag}",
                     "BRANCH_TAG_CACHE=${isMasterBranch}",
                     "DOCKER_BUILD_ARGS=${dockerBuildArgs}",
+                    "METERING_CREATE_PULL_SECRET=true",
                     "METERING_E2E_NAMESPACE=${meteringE2ENamespace}",
                     "METERING_INTEGRATION_NAMESPACE=${meteringIntegrationNamespace}",
                     "METERING_SHORT_TESTS=${shortTests}",
@@ -430,7 +431,7 @@ def e2eRunner(meteringSourceDir, envVars, skipNamespaceCleanup) {
                             tail -f ${TEST_OUTPUT_DIR}/${TEST_LOG_FILE} &
                             docker run \
                             -i --rm \
-                            --env-file <(env | grep -E 'INSTALL_METHOD|TEST|LOG|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|METERING|PULL_SECRET') \
+                            --env-file <(env | grep -E 'INSTALL_METHOD|DOCKER|TEST|LOG|DEPLOY|KUBECONFIG|AWS|CHARGEBACK|METERING|PULL_SECRET') \
                             -v "${JENKINS_WORKSPACE}:${JENKINS_WORKSPACE}" \
                             -v "${KUBECONFIG}:${KUBECONFIG}" \
                             -v "${TEST_OUTPUT_DIR}:/out" \
