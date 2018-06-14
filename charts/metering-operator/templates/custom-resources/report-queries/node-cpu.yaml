@@ -100,6 +100,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: node_allocatable_data_start
     type: timestamp
     unit: date
@@ -139,6 +145,8 @@ spec:
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     )
     SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
       node_cpu_allocatable.*,
       pod_cpu_consumption.*,
       pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds,
