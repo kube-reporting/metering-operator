@@ -9,6 +9,13 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
 : "${INSTALL_METERING:=true}"
 : "${INSTALL_METHOD:=direct}"
+: "${METERING_CREATE_PULL_SECRET:=false}"
+: "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
+
+if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
+    : "${DOCKER_USERNAME:?}"
+    : "${DOCKER_PASSWORD:?}"
+fi
 
 while true; do
     echo "Checking namespace status"
@@ -32,6 +39,16 @@ done
 
 echo "Creating namespace $METERING_NAMESPACE"
 kubectl create ns "$METERING_NAMESPACE" || true
+
+if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
+    echo "\$METERING_CREATE_PULL_SECRET is true, creating pull-secret $METERING_PULL_SECRET_NAME"
+    kubectl -n "$METERING_NAMESPACE" \
+        create secret docker-registry "$METERING_PULL_SECRET_NAME" \
+        --docker-server=quay.io \
+        --docker-username="$DOCKER_USERNAME" \
+        --docker-password="$DOCKER_PASSWORD" \
+        --docker-email=example@example.com || true
+fi
 
 if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling metering"
