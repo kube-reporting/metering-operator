@@ -22,15 +22,11 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${AWS_SECRET_ACCESS_KEY:=}"
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
-: "${METERING_CREATE_PULL_SECRET:=false}"
+: "${METERING_CREATE_PULL_SECRET:=true}"
+: "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 
-METERING_PULL_SECRET_NAME=""
 IMAGE_PULL_SECRET_TEXT=""
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
-    : "${DOCKER_USERNAME:?}"
-    : "${DOCKER_PASSWORD:?}"
-    METERING_PULL_SECRET_NAME="metering-pull-secret"
-
     IMAGE_PULL_SECRET_TEXT="imagePullSecrets: [ { name: \"$METERING_PULL_SECRET_NAME\" } ]"
 ***REMOVED***
 
@@ -102,19 +98,6 @@ EOF
 echo "Creating metering manifests"
 export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"
-
-
-if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
-    # We need to create the namespace in this situation because it isn't created normally until deploy is run
-    kubectl create ns "$METERING_NAMESPACE" || true
-    echo "\$METERING_CREATE_PULL_SECRET is true, creating pull-secret $METERING_PULL_SECRET_NAME"
-    kubectl -n "$METERING_NAMESPACE" \
-        create secret docker-registry "$METERING_PULL_SECRET_NAME" \
-        --docker-server=quay.io \
-        --docker-username="$DOCKER_USERNAME" \
-        --docker-password="$DOCKER_PASSWORD" \
-        --docker-email=example@example.com || true
-***REMOVED***
 
 echo "Deploying"
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
