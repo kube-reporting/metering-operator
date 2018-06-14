@@ -25,10 +25,13 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_CREATE_PULL_SECRET:=false}"
 
 METERING_PULL_SECRET_NAME=""
+IMAGE_PULL_SECRET_TEXT=""
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     : "${DOCKER_USERNAME:?}"
     : "${DOCKER_PASSWORD:?}"
     METERING_PULL_SECRET_NAME="metering-pull-secret"
+
+    IMAGE_PULL_SECRET_TEXT="imagePullSecrets: [ { name: \"$METERING_PULL_SECRET_NAME\" } ]"
 fi
 
 cat <<EOF > "$METERING_CR_FILE"
@@ -41,6 +44,8 @@ spec:
     image:
       tag: ${DEPLOY_TAG}
 
+    ${IMAGE_PULL_SECRET_TEXT:-}
+
     config:
       disablePromsum: true
       awsBillingDataSource:
@@ -51,6 +56,7 @@ spec:
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
   presto:
+    ${IMAGE_PULL_SECRET_TEXT:-}
     config:
       awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
@@ -66,6 +72,7 @@ spec:
   hdfs:
     image:
       tag: ${DEPLOY_TAG}
+    ${IMAGE_PULL_SECRET_TEXT:-}
     datanode:
       terminationGracePeriodSeconds: 0
     namenode:
@@ -73,31 +80,12 @@ spec:
 EOF
 
 
-
-if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
-
-    cat <<EOF >> "$METERING_CR_FILE"
-  metering-operator:
-    imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
-
-  presto:
-    presto:
-      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
-    hive:
-      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
-  hdfs:
-    datanode:
-      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
-    namenode:
-      imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
-EOF
-
-fi
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
 reconcileIntervalSeconds: 5
+imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
 EOF
 
 cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
