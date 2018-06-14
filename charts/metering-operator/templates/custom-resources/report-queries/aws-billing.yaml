@@ -73,6 +73,12 @@ spec:
     type: string
   - name: partition_stop
     type: string
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   query: |
         SELECT aws_billing.*,
                CASE
@@ -88,7 +94,9 @@ spec:
                    WHEN ( timestamp '{| .Report.EndPeriod | prestoTimestamp |}' <= aws_billing.usage_end_date)
                        THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '{| .Report.EndPeriod | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
                    ELSE 1
-               END as period_percent
+               END as period_percent,
+               timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+               timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end
         FROM {| generationQueryViewName "aws-ec2-billing-data-raw" |} as aws_billing
 
         -- make sure the partition overlaps with our range
