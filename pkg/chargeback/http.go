@@ -454,7 +454,9 @@ func convertsToGetReportResults(input []map[string]interface{}, columns []api.Re
 	}
 	for _, row := range input {
 		var valSlice ReportResultEntry
-		for columnName, columnValue := range row {
+		for _, column := range columns {
+			columnName := column.Name
+			columnValue := row[columnName]
 			resultsValue := ReportResultValues{
 				Name:        columnName,
 				Value:       columnValue,
