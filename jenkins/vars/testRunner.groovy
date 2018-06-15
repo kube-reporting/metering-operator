@@ -8,7 +8,7 @@ def call(body) {
     // The rest is the re-usable declarative pipeline
     pipeline {
         parameters {
-            string(name: 'DEPLOY_TAG', defaultValue: env.BRANCH_NAME, description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor.')
+            string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor. If unset, uses env.BRANCH_NAME')
             string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
             booleanParam(name: 'GENERIC', defaultValue: false, description: 'If true, run the con***REMOVED***gured tests against a GKE cluster using the generic con***REMOVED***g.')
             booleanParam(name: 'OPENSHIFT', defaultValue: false, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
@@ -16,7 +16,7 @@ def call(body) {
         }
         agent {
             kubernetes {
-                label "operator-metering-${pipelineParams.testType}-${params.DEPLOY_TAG}"
+                label "operator-metering-${pipelineParams.testType}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
                 instanceCap 2
                 idleMinutes 0
                 defaultContainer 'jnlp'
@@ -54,13 +54,13 @@ spec:
         environment {
             GOPATH                      = "/go"
             METERING_SRC_DIR            = "/go/src/github.com/operator-framework/operator-metering"
-            DEPLOY_TAG                  = "${params.DEPLOY_TAG}"
+            DEPLOY_TAG                  = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
             OUTPUT_DEPLOY_LOG_STDOUT    = "true"
             OUTPUT_TEST_LOG_STDOUT      = "true"
             OUTPUT_DIR                  = "test_output"
             METERING_CREATE_PULL_SECRET = "true"
             // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + DEPLOY_TAG
-            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-${pipelineParams.testType}-${params.DEPLOY_TAG}"}"
+            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-deploy-${env.DEPLOY_TAG}"}"
             SCRIPT                      = "${pipelineParams.testScript}"
             TEST_LOG_FILE               = "${pipelineParams.testType}-tests.log"
             TEST_TAP_FILE               = "${pipelineParams.testType}-tests.tap"
