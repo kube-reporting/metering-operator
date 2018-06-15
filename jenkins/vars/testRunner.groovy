@@ -60,7 +60,7 @@ spec:
             OUTPUT_DIR                  = "test_output"
             METERING_CREATE_PULL_SECRET = "true"
             // use the OVERRIDE_NAMESPACE if specified, otherwise set namespace to prefix + DEPLOY_TAG
-            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-deploy-${env.DEPLOY_TAG}"}"
+            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-${pipelineParams.testType}-${env.DEPLOY_TAG}"}"
             SCRIPT                      = "${pipelineParams.testScript}"
             TEST_LOG_FILE               = "${pipelineParams.testType}-tests.log"
             TEST_TAP_FILE               = "${pipelineParams.testType}-tests.tap"
