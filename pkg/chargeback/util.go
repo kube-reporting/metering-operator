@@ -48,10 +48,7 @@ func truncateToMinute(t time.Time) time.Time {
 }
 
 func generateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
-	columns := []hive.Column{
-		hive.Column{Name: "period_start", Type: "timestamp"},
-		hive.Column{Name: "period_end", Type: "timestamp"},
-	}
+	var columns []hive.Column
 	for _, c := range genQuery.Spec.Columns {
 		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
 	}

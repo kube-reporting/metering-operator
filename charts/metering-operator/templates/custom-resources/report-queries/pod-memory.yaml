@@ -112,6 +112,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: pod
     type: string
     unit: kubernetes_pod
@@ -131,12 +137,15 @@ spec:
     type: double
     unit: byte_seconds
   query: |
-    SELECT pod,
-            namespace,
-            node,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end,
-            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-request-raw" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
     AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
@@ -159,6 +168,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: pod
     type: string
     unit: kubernetes_pod
@@ -178,12 +193,15 @@ spec:
     type: double
     unit: byte_seconds
   query: |
-    SELECT pod,
-            namespace,
-            node,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end,
-            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-usage-raw" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
     AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
@@ -206,6 +224,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: namespace
     type: string
     unit: kubernetes_namespace
@@ -219,10 +243,13 @@ spec:
     type: double
     unit: byte_seconds
   query: |
-    SELECT namespace,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end,
-            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-request-raw" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
     AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
@@ -245,6 +272,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: namespace
     type: string
     unit: kubernetes_namespace
@@ -258,10 +291,13 @@ spec:
     type: double
     unit: byte_seconds
   query: |
-    SELECT namespace,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end,
-            sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-usage-raw" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
     AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
@@ -284,6 +320,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: pod
     type: string
     unit: kubernetes_pod
@@ -324,7 +366,10 @@ spec:
       AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
       GROUP BY pod, namespace, node
     )
-    SELECT pod_memory_consumption.*,
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod_memory_consumption.*,
       pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds as pod_memory_usage_percent
     FROM pod_memory_consumption
     CROSS JOIN node_memory_allocatable
