@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        string(name: 'DEPLOY_TAG', defaultValue: env.BRANCH_NAME, description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor.')
+        string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor. If unset, uses env.BRANCH_NAME')
         string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
         booleanParam(name: 'GENERIC', defaultValue: false, description: '')
         booleanParam(name: 'OPENSHIFT', defaultValue: false, description: '')
@@ -8,7 +8,7 @@ pipeline {
     }
     agent {
         kubernetes {
-            label "operator-metering-deploy-${params.DEPLOY_TAG}"
+            label "operator-metering-deploy-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
             instanceCap 2
             idleMinutes 0
             defaultContainer 'jnlp'
@@ -21,7 +21,7 @@ metadata:
 spec:
   containers:
   - name: metering-test-runner
-    image: quay.io/coreos/chargeback-integration-tests:${params.DEPLOY_TAG}
+    image: quay.io/coreos/chargeback-integration-tests:${params.DEPLOY_TAG ?: env.BRANCH_NAME}
     imagePullPolicy: Always
     command:
     - 'cat'
@@ -45,11 +45,11 @@ spec:
 
     environment {
         METERING_SRC_DIR            = "/go/src/github.com/operator-framework/operator-metering"
-        DEPLOY_TAG                  = "${params.DEPLOY_TAG}"
+        DEPLOY_TAG                  = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
         DELETE_PVCS                 = "false"
         METERING_CREATE_PULL_SECRET = "true"
         // use the OVERRIDE_NAMESPACE if specified, otherwise set namespace to prefix + DEPLOY_TAG
-        METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-deploy-${params.DEPLOY_TAG}"}"
+        METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-deploy-${env.DEPLOY_TAG}"}"
         OUTPUT_DIR                  = "test_output"
         OUTPUT_PATH                 = "${env.WORKSPACE}/${env.OUTPUT_DIR}"
         DOCKER_CREDS                = credentials('quay-coreos-jenkins-push')
