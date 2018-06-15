@@ -115,7 +115,9 @@ spec:
     }
     post {
         always {
-            archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", onlyIfSuccessful: false, allowEmptyArchive: true
+            container('jnlp') {
+                archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", onlyIfSuccessful: false, allowEmptyArchive: true
+            }
         }
     }
 }
