@@ -13,17 +13,22 @@ export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALU
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 export DELETE_PVCS=${DELETE_PVCS:-true}
 
+# Used in deploy.sh
+export DOCKER_USERNAME="$DOCKER_CREDS_USR"
+export DOCKER_PASSWORD="$DOCKER_CREDS_PSW"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
 : "${ENABLE_AWS_BILLING:=false}"
+: "${DISABLE_PROMSUM:=true}"
 : "${AWS_ACCESS_KEY_ID:=}"
 : "${AWS_SECRET_ACCESS_KEY:=}"
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
 : "${METERING_CREATE_PULL_SECRET:=true}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
+: "${TERMINATION_GRACE_PERIOD_SECONDS:=}"
 
 IMAGE_PULL_SECRET_TEXT=""
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
@@ -34,16 +39,17 @@ cat <<EOF > "$METERING_CR_FILE"
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: Metering
 metadata:
-  name: "operator-metering"
+  name: "${DEPLOY_PLATFORM}-metering"
 spec:
   metering-operator:
     image:
       tag: ${DEPLOY_TAG}
 
     ${IMAGE_PULL_SECRET_TEXT:-}
+    terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 
     config:
-      disablePromsum: true
+      disablePromsum: ${DISABLE_PROMSUM}
       awsBillingDataSource:
         enabled: ${ENABLE_AWS_BILLING}
         bucket: "${AWS_BILLING_BUCKET}"
@@ -51,17 +57,18 @@ spec:
       awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
+
   presto:
     ${IMAGE_PULL_SECRET_TEXT:-}
     config:
       awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
     presto:
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
       image:
         tag: ${DEPLOY_TAG}
     hive:
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
       image:
         tag: ${DEPLOY_TAG}
 
@@ -70,9 +77,9 @@ spec:
       tag: ${DEPLOY_TAG}
     ${IMAGE_PULL_SECRET_TEXT:-}
     datanode:
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
     namenode:
-      terminationGracePeriodSeconds: 0
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 EOF
 
 
@@ -81,7 +88,7 @@ cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
 reconcileIntervalSeconds: 5
-imagePullSecrets: [ { name: "$METERING_PULL_SECRET_NAME" } ]
+${IMAGE_PULL_SECRET_TEXT:-}
 EOF
 
 cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
