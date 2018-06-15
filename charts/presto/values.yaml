@@ -97,6 +97,7 @@ hive:
         memory: "650Mi"
         cpu: "500m"
     storage:
+      create: true
       # Default to null, which means using the default storage class if the
       # defaultStorageClass admission plugin is turned on (is by default on
       # Tectonic).

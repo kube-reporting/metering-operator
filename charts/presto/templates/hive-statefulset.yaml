@@ -91,9 +91,11 @@ spec:
               resource: limits.memory
         - name: JAVA_MAX_MEM_RATIO
           value: "50"
+{{- if .Values.hive.metastore.storage.create }}
         volumeMounts:
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
+{{- end }}
         resources:
 {{ toYaml .Values.hive.metastore.resources | indent 10 }}
       - name: hiveserver2
@@ -159,7 +161,9 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
+{{- if .Values.hive.metastore.storage.create }}
       volumes:
       - name: hive-metastore-db-data
         persistentVolumeClaim:
             claimName: hive-metastore-db-data
+{{- end }}
