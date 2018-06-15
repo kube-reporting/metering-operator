@@ -645,5 +645,5 @@ func getReportOrderByColumnsString(query *api.ReportGenerationQuery) string {
 			quotedColumns = append(quotedColumns, fmt.Sprintf(`"%s"`, colName))
 		}
 	}
-	return fmt.Sprintf("period_start, period_end, %s ASC", strings.Join(quotedColumns, ", "))
+	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }

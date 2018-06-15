@@ -16,6 +16,12 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: pod
     type: string
   - name: namespace
@@ -67,8 +73,11 @@ spec:
         CROSS JOIN node_cpu_allocatable
         ORDER BY pod_cpu_consumption.pod_request_cpu_core_seconds DESC
     )
-    SELECT cluster_usage.*,
-           aws_billing_sum.cluster_cost * cluster_usage.pod_cpu_usage_percent as pod_cost
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      cluster_usage.*,
+      aws_billing_sum.cluster_cost * cluster_usage.pod_cpu_usage_percent as pod_cost
     FROM cluster_usage
     CROSS JOIN aws_billing_sum
 {{- end -}}
