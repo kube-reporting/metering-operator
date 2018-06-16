@@ -14,7 +14,7 @@ function addXMLProperty() {
   local value=$3
 
   local entry="<property><name>$name</name><value>${value}</value></property>"
-  local escapedEntry=$(echo $entry | sed 's/\//\\\//g')
+  local escapedEntry=$(echo $entry | sed -e 's/\//\\\//g' -e 's/&/\\&/g' )
   sed -i "/<\/con***REMOVED***guration>/ s/.*/${escapedEntry}\n&/" $path
 }
 
