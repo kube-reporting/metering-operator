@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: hive-common-con***REMOVED***g
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  default-fs: {{ .Values.hive.con***REMOVED***g.defaultfs | quote}}
+  db-connection-url: {{ .Values.hive.con***REMOVED***g.dbConnectionURL | quote}}
+  db-connection-driver: {{ .Values.hive.con***REMOVED***g.dbConnectionDriver | quote}}
+  enable-metastore-schema-veri***REMOVED***cation: {{ .Values.hive.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation | quote}}
+  auto-create-metastore-schema: {{ .Values.hive.con***REMOVED***g.autoCreateMetastoreSchema | quote}}
+  default-***REMOVED***le-format: {{ .Values.hive.con***REMOVED***g.defaultFileFormat | quote}}
+  metastore-uris: {{ .Values.hive.con***REMOVED***g.metastoreURIs | quote}}
+
