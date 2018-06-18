@@ -80,7 +80,7 @@ until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-helm-operator
 done
 echo "metering helm-operator is ready"
 
-EXPECTED_POD_COUNT=6
+EXPECTED_POD_COUNT=7
 until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length' -r)" == "$EXPECTED_POD_COUNT" ]; do
     echo 'waiting for metering pods to be created'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
