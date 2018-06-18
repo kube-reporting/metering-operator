@@ -13,6 +13,7 @@ presto:
   con***REMOVED***g:
     discoveryURI: http://presto:8080
     environment: production
+    hiveMetastoreURI: thrift://hive-metastore:9083
 
   coordinator:
     terminationGracePeriodSeconds: 30
