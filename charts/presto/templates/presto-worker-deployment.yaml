@@ -44,16 +44,21 @@ spec:
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
         imagePullPolicy: {{ .Values.presto.image.pullPolicy }}
         env:
-        - name: "HIVE_CATALOG_hive_s3_aws___access___key"
+        - name: HIVE_CATALOG_hive_s3_aws___access___key
           valueFrom:
             secretKeyRef:
               name: presto-secrets
               key: aws-access-key-id
-        - name: "HIVE_CATALOG_hive_s3_aws___secret___key"
+        - name: HIVE_CATALOG_hive_s3_aws___secret___key
           valueFrom:
             secretKeyRef:
               name: presto-secrets
               key: aws-secret-access-key
+        - name: HIVE_CATALOG_hive_metastore_uri
+          valueFrom:
+            configMapKeyRef:
+              name: presto-worker-config
+              key: hive-metastore-uri
         - name: PRESTO_LOG_com_facebook_presto
           valueFrom:
             configMapKeyRef:
