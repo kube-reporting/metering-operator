@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hive-common-config
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  default-fs: {{ .Values.hive.config.defaultfs | quote}}
+  db-connection-url: {{ .Values.hive.config.dbConnectionURL | quote}}
+  db-connection-driver: {{ .Values.hive.config.dbConnectionDriver | quote}}
+  enable-metastore-schema-verification: {{ .Values.hive.config.enableMetastoreSchemaVerification | quote}}
+  auto-create-metastore-schema: {{ .Values.hive.config.autoCreateMetastoreSchema | quote}}
+  default-file-format: {{ .Values.hive.config.defaultFileFormat | quote}}
+  metastore-uris: {{ .Values.hive.config.metastoreURIs | quote}}
+

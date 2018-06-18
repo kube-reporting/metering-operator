@@ -76,8 +76,16 @@ hive:
     pullPolicy: Always
 
   config:
-    logLevel: info
     defaultfs: hdfs://hdfs-namenode-proxy:8020
+    dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
+    dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
+    dbConnectionUsername: null
+    dbConnectionPassword: null
+    enableMetastoreSchemaVerification: false
+    autoCreateMetastoreSchema: true
+    defaultFileFormat: "orc"
+    defaultCompression: "zlib"
+    metastoreURIs: "thrift://hive-metastore:9083"
 
   securityContext:
     runAsNonRoot: true
@@ -86,8 +94,7 @@ hive:
 
   metastore:
     config:
-      dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
-      dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
+      logLevel: info
 
     resources:
       requests:
@@ -105,6 +112,8 @@ hive:
       size: "5Gi"
 
   server:
+    config:
+      logLevel: info
     resources:
       requests:
         memory: "400Mi"
