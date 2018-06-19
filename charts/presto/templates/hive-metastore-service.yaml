@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hive
+  name: hive-metastore
   labels:
     app: hive
+    hive: metastore
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -12,15 +13,8 @@ spec:
     port: 9083
     protocol: TCP
     targetPort: 9083
-  - name: thrift
-    port: 10000
-    protocol: TCP
-    targetPort: 10000
-  - name: ui
-    port: 10002
-    protocol: TCP
-    targetPort: 10002
   selector:
     app: hive
+    hive: metastore
   sessionAf***REMOVED***nity: None
   type: ClusterIP

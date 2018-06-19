@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: hive-metastore-con***REMOVED***g
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log-level: {{ upper .Values.hive.metastore.con***REMOVED***g.logLevel | quote}}

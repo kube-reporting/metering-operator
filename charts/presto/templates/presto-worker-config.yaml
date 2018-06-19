@@ -7,6 +7,7 @@ metadata:
 data:
   environment: {{ .Values.presto.con***REMOVED***g.environment | quote }}
   discovery-uri: {{ .Values.presto.con***REMOVED***g.discoveryURI | quote }}
+  hive-metastore-uri: {{ .Values.presto.con***REMOVED***g.hiveMetastoreURI }}
 
   log-level: {{ upper .Values.presto.worker.con***REMOVED***g.logLevel | quote }}
 {{- if .Values.presto.worker.con***REMOVED***g.taskConcurrency }}
