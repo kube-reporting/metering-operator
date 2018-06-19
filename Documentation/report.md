@@ -27,7 +27,7 @@ spec:
 
 ## generationQuery
 
-Names the `ReportGenerationQuery` used to generate the report. The generation query controls the format of the report as well as the information contained within it.
+Names the `ReportGenerationQuery` used to generate the report. The generation query controls the schema of the report as well as the information contained within it.
 
 Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
