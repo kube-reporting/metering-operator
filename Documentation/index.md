@@ -1,17 +1,18 @@
 # Operator Metering
 
-- [Installing Metering][install-metering]
-- [Metering con***REMOVED***guration options][metering-con***REMOVED***g]
-- [Using Metering][using-metering]
-- [Reports][report]
-- [Troubleshooting][troubleshooting-metering]
-- [Writing Custom Queries Guide][writing-custom-queries]
-- [Debugging][debugging]
+- [Installing Metering](install-metering.md)
+- [Metering con***REMOVED***guration options](metering-con***REMOVED***g.md)
+- [Using Metering](using-metering.md)
+- [Troubleshooting](troubleshooting-metering.md)
+- [Writing Custom Queries Guide](writing-custom-queries.md)
+- [Debugging](dev/debugging.md)
+- [Architecture](metering-architecture.md)
 
-[metering-con***REMOVED***g]: metering-con***REMOVED***g.md
-[install-metering]: install-metering.md
-[report]: report.md
-[using-metering]: using-metering.md
-[troubleshooting-metering]: troubleshooting-metering.md
-[writing-custom-queries]: writing-custom-queries.md
-[debugging]: debugging.md
+Custom Resources:
+
+- [Reports](report.md)
+- [ReportGenerationQueries](reportgenerationqueries.md)
+- [ReportDataSources](reportdatasources.md)
+- [ReportPrometheusQueries](reportprometheusqueries.md)
+- [StorageLocations](storagelocations.md)
+
