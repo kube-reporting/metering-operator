@@ -23,7 +23,7 @@ config:
 
   prometheusURL: ""
   prestoHost: "presto:8080"
-  hiveHost: "hive:10000"
+  hiveHost: "hive-server:10000"
 
   promsumPollInterval: "5m"
   promsumChunkSize: "5m"

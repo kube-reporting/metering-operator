@@ -66,7 +66,7 @@ presto:default>
 The following will open up an interactive beeline session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Hive pod.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=hive -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
+kubectl get pods -n $METERING_NAMESPACE -l app=hive,hive=server -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:

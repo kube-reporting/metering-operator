@@ -1,0 +1,83 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: hive-metastore
+  labels:
+    app: hive
+    hive: metastore
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  serviceName: hive-metastore
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hive
+      hive: metastore
+{{- if .Values.hive.labels }}
+{{ toYaml .Values.hive.labels | indent 6 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: hive
+        hive: metastore
+{{- if .Values.hive.labels }}
+{{ toYaml .Values.hive.labels | indent 8 }}
+{{- end }}
+      annotations:
+        hive-common-configmap-hash: {{ include (print $.Template.BasePath "/hive-common-config.yaml") . | sha256sum }}
+        hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
+        hive-metastore-configmap-hash: {{ include (print $.Template.BasePath "/hive-metastore-config.yaml") . | sha256sum }}
+        presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
+{{- if .Values.hive.annotations }}
+{{ toYaml .Values.hive.annotations | indent 8 }}
+{{- end }}
+    spec:
+      securityContext:
+{{ toYaml .Values.hive.securityContext | indent 8 }}
+      containers:
+      - name: metastore
+        args: ["--service", "metastore"]
+        image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
+        imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
+        ports:
+        - name: meta
+          containerPort: 9083
+          protocol: TCP
+        env:
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-server-config
+              key: log-level
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: limits.memory
+{{ template "hive-env" . }}
+{{- if .Values.hive.metastore.storage.create }}
+        volumeMounts:
+        - name: hive-metastore-db-data
+          mountPath: /var/lib/hive
+{{- end }}
+        resources:
+{{ toYaml .Values.hive.metastore.resources | indent 10 }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
+      serviceAccount: hive
+{{- if .Values.hive.metastore.storage.create }}
+      volumes:
+      - name: hive-metastore-db-data
+        persistentVolumeClaim:
+            claimName: hive-metastore-db-data
+{{- end }}

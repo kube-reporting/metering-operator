@@ -7,6 +7,7 @@ metadata:
 data:
   environment: {{ .Values.presto.config.environment | quote }}
   discovery-uri: {{ .Values.presto.config.discoveryURI | quote }}
+  hive-metastore-uri: {{ .Values.presto.config.hiveMetastoreURI }}
 
   log-level: {{ upper .Values.presto.worker.config.logLevel | quote }}
 {{- if .Values.presto.worker.config.taskConcurrency }}

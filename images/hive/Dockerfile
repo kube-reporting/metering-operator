@@ -14,9 +14,18 @@ RUN set -x \
 ENV HADOOP_CLASSPATH /opt/hive/hcatalog/share/hcatalog/*:${HADOOP_CLASSPATH}
 ENV HIVE_AUX_JARS_PATH /usr/hdp/current/hive-server2/auxlib
 
+ENV POSTGRESQL_JDBC_JAR postgresql-42.2.2.jar
+# Using mysql-connector-java-8.0.11 resulted in hive schema creation failing due to incorrect syntax.
+ENV MYSQL_JDBC_VERSION mysql-connector-java-5.1.46
+ENV MYSQL_JDBC_JAR $MYSQL_JDBC_VERSION.jar
+
 # Install PostgreSQL JDBC
 RUN set -x \
-    && curl -fSLs -o $HIVE_HOME/lib/postgresql-jdbc.jar https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar
+    && curl -fSLs -o "$HIVE_HOME/lib/$POSTGRESQL_JDBC_JAR" "https://jdbc.postgresql.org/download/$POSTGRESQL_JDBC_JAR"
+
+# Install MySQL JDBC
+RUN set -x \
+    && curl -fSLs "https://dev.mysql.com/get/Downloads/Connector-J/$MYSQL_JDBC_VERSION.tar.gz" | tar -zx --strip-components=1 -C "$HIVE_HOME/lib" "$MYSQL_JDBC_VERSION/$MYSQL_JDBC_JAR"
 
 # Configure JSON SerDe and AWS Jars
 RUN mkdir -p /usr/hdp/current/hive-server2/auxlib && ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/*aws* /opt/hive/lib

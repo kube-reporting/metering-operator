@@ -13,6 +13,7 @@ presto:
   config:
     discoveryURI: http://presto:8080
     environment: production
+    hiveMetastoreURI: thrift://hive-metastore:9083
 
   coordinator:
     terminationGracePeriodSeconds: 30
@@ -76,8 +77,16 @@ hive:
     pullPolicy: Always
 
   config:
-    logLevel: info
     defaultfs: hdfs://hdfs-namenode-proxy:8020
+    dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
+    dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
+    dbConnectionUsername: null
+    dbConnectionPassword: null
+    enableMetastoreSchemaVerification: false
+    autoCreateMetastoreSchema: true
+    defaultFileFormat: "orc"
+    defaultCompression: "zlib"
+    metastoreURIs: "thrift://hive-metastore:9083"
 
   securityContext:
     runAsNonRoot: true
@@ -85,6 +94,9 @@ hive:
   terminationGracePeriodSeconds: 30
 
   metastore:
+    config:
+      logLevel: info
+
     resources:
       requests:
         memory: "650Mi"
@@ -93,6 +105,7 @@ hive:
         memory: "650Mi"
         cpu: "500m"
     storage:
+      create: true
       # Default to null, which means using the default storage class if the
       # defaultStorageClass admission plugin is turned on (is by default on
       # Tectonic).
@@ -100,6 +113,8 @@ hive:
       size: "5Gi"
 
   server:
+    config:
+      logLevel: info
     resources:
       requests:
         memory: "400Mi"
