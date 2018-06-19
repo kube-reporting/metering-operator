@@ -1,3 +1,9 @@
+def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
+def isMasterBranch = env.BRANCH_NAME == "master"
+
+def skipBuildLabel = (isPullRequest && pullRequest.labels.contains("skip-build"))
+def skipE2ELabel = (isPullRequest && pullRequest.labels.contains("skip-e2e"))
+
 pipeline {
     agent none
     parameters {
@@ -32,7 +38,10 @@ pipeline {
 
         stage('Build') {
             when {
-                equals expected: true, actual: params.BUILD
+                expression {
+                    return params.BUILD && !skipBuildLabel
+
+                }
             }
             steps {
                 echo "Building and pushing metering docker images"
@@ -44,7 +53,9 @@ pipeline {
             parallel {
                 stage("integration") {
                     when {
-                        equals expected: true, actual: params.INTEGRATION
+                        expression {
+                            return params.INTEGRATION && !(skipBuildLabel || skipE2ELabel)
+                        }
                     }
                     steps {
                         echo "Running metering integration tests"
@@ -58,7 +69,10 @@ pipeline {
                 }
                 stage("e2e") {
                     when {
-                        equals expected: true, actual: params.E2E
+                        expression {
+                            return params.E2E && !(skipBuildLabel || skipE2ELabel)
+
+                        }
                     }
                     steps {
                         echo "Running metering e2e tests"
