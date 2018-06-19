@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/promcollector"
 )
 
-func (f *Framework) StoreDataSourceData(dataSourceName string, records []*chargeback.PromsumRecord) error {
+func (f *Framework) StoreDataSourceData(dataSourceName string, records []*promcollector.Record) error {
 	params := chargeback.StorePromsumDataRequest(records)
 	body, err := json.Marshal(params)
 	if err != nil {

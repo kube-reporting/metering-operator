@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/promcollector"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -212,9 +212,9 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 					_, err = decoder.Token()
 					require.NoError(t, err)
 
-					var records []*chargeback.PromsumRecord
+					var records []*promcollector.Record
 					for decoder.More() {
-						var record chargeback.PromsumRecord
+						var record promcollector.Record
 						err = decoder.Decode(&record)
 						require.NoError(t, err)
 						if reportStart.IsZero() || record.Timestamp.Before(reportStart) {

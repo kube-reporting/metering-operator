@@ -25,6 +25,7 @@ import (
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/promcollector"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
 
@@ -517,7 +518,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-type StorePromsumDataRequest []*PromsumRecord
+type StorePromsumDataRequest []*promcollector.Record
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
@@ -532,7 +533,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*PromsumRecord(req))
+	err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*promcollector.Record(req))
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
 		return
@@ -578,7 +579,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 }
 
-func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
+func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*promcollector.Record, error) {
 	whereClause := ""
 	if !start.IsZero() {
 		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
@@ -600,7 +601,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		return nil, err
 	}
 
-	var results []*PromsumRecord
+	var results []*promcollector.Record
 	for rows.Next() {
 		var dbRecord promsumDBRecord
 		if err := rows.Scan(&dbRecord.Labels, &dbRecord.Amount, &dbRecord.TimePrecision, &dbRecord.Timestamp); err != nil {
@@ -614,7 +615,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
 			}
 		}
-		record := PromsumRecord{
+		record := promcollector.Record{
 			Labels:    labels,
 			Amount:    dbRecord.Amount,
 			StepSize:  time.Duration(dbRecord.TimePrecision) * time.Second,
