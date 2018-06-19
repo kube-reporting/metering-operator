@@ -8,16 +8,15 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/sync/errgroup"
-
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/promcollector"
 )
 
 const (
@@ -181,53 +180,41 @@ func (c *Chargeback) collectPromsumDataSourceData(ctx context.Context, logger lo
 }
 
 func (c *Chargeback) promsumCollectDataForQuery(ctx context.Context, logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, startTime, endTime time.Time, maxPromTimeRanges int64, allowIncompleteChunks bool) error {
-	timeRanges, err := promsumGetTimeRanges(startTime, endTime, c.cfg.PromsumChunkSize, c.cfg.PromsumStepSize, maxPromTimeRanges, allowIncompleteChunks)
+	queryName := dataSource.Spec.Promsum.Query
+	promQuery, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
 	if err != nil {
-		return fmt.Errorf("couldn't get time ranges to query for dataSource %s: %v", dataSource.Name, err)
+		return fmt.Errorf("could not get Prometheus query '%s': %s", queryName, err)
 	}
 
-	if len(timeRanges) == 0 {
-		logger.Info("no time ranges to query yet")
+	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
+		if len(timeRanges) == 0 {
+			logger.Info("no time ranges to query yet for ReportDataSource %s", dataSource.Name)
+		} else {
+			begin := timeRanges[0].Start
+			end := timeRanges[len(timeRanges)-1].End
+			logger.Infof("using query %s querying for data between %s and %s (chunks: %d)", queryName, begin, end, len(timeRanges))
+		}
 		return nil
-	} else {
-		begin := timeRanges[0].Start
-		end := timeRanges[len(timeRanges)-1].End
-		logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
 	}
 
-	query, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(c.cfg.Namespace).Get(dataSource.Spec.Promsum.Query)
-	if err != nil {
-		return fmt.Errorf("could not get prometheus query: %s", err)
-	}
-
-	for _, queryRng := range timeRanges {
-		// check for cancellation
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			// continue processing if context isn't cancelled.
-		}
-		records, err := c.promsumQuery(query, queryRng)
-		if err != nil {
-			return fmt.Errorf("failed to retrieve prometheus metrics for query '%s' in the range %v to %v: %v",
-				query.Name, queryRng.Start, queryRng.End, err)
-		}
-
-		// check for cancellation
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			// continue processing if context isn't cancelled.
-		}
-
+	postQueryHandler := func(ctx context.Context, timeRange prom.Range, records []*promcollector.Record) error {
 		err = c.promsumStoreRecords(ctx, logger, dataSource.TableName, records)
 		if err != nil {
-			return fmt.Errorf("failed to store prometheus metrics for query '%s' in the range %v to %v: %v",
-				query.Name, queryRng.Start, queryRng.End, err)
+			return fmt.Errorf("failed to store Prometheus metrics for ReportDataSource %s using query '%s' in the range %v to %v: %v",
+				dataSource.Name, queryName, timeRange.Start, timeRange.End, err)
 		}
+		return nil
 	}
+
+	collector := promcollector.New(c.promConn, promQuery.Spec.Query, preProcessingHandler, nil, postQueryHandler)
+	timeRangesCollected, err := collector.Collect(ctx, startTime, endTime, c.cfg.PromsumStepSize, c.cfg.PromsumChunkSize, maxPromTimeRanges, allowIncompleteChunks)
+	if err != nil {
+		return err
+	}
+	if len(timeRangesCollected) == 0 {
+		logger.Infof("no data collected for ReportDataSource %s", dataSource.Name)
+	}
+
 	return nil
 }
 
@@ -289,87 +276,7 @@ func (c *Chargeback) promsumGetTimeBounds(logger logrus.FieldLogger, dataSource 
 	return startTime, endTime, nil
 }
 
-func promsumGetTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxPromTimeRanges int64, allowIncompleteChunks bool) ([]prom.Range, error) {
-	chunkStart := truncateToMinute(beginTime)
-	chunkEnd := truncateToMinute(chunkStart.Add(chunkSize))
-
-	// don't set a limit if negative or zero
-	disableMax := maxPromTimeRanges <= 0
-
-	var timeRanges []prom.Range
-	for i := int64(0); disableMax || (i < maxPromTimeRanges); i++ {
-		if allowIncompleteChunks {
-			if chunkEnd.After(endTime) {
-				chunkEnd = truncateToMinute(endTime)
-			}
-			if chunkEnd.Equal(chunkStart) {
-				break
-			}
-		} else {
-			// Do not collect data after endTime
-			if chunkEnd.After(endTime) {
-				break
-			}
-
-			// Only get chunks that are a full chunk size
-			if chunkEnd.Sub(chunkStart) < chunkSize {
-				break
-			}
-		}
-		timeRanges = append(timeRanges, prom.Range{
-			Start: chunkStart.UTC(),
-			End:   chunkEnd.UTC(),
-			Step:  stepSize,
-		})
-
-		if allowIncompleteChunks && chunkEnd.Equal(truncateToMinute(endTime)) {
-			break
-		}
-
-		// Add the metrics step size to the start time so that we don't
-		// re-query the previous ranges end time in this range
-		chunkStart = truncateToMinute(chunkEnd.Add(stepSize))
-		// Add chunkSize to the end time to get our full chunk. If the chunkEnd
-		// is past the endTime, then this chunk is skipped.
-		chunkEnd = truncateToMinute(chunkStart.Add(chunkSize))
-	}
-
-	return timeRanges, nil
-}
-
-func (c *Chargeback) promsumQuery(query *cbTypes.ReportPrometheusQuery, queryRng prom.Range) ([]*PromsumRecord, error) {
-	pVal, err := c.promConn.QueryRange(context.Background(), query.Spec.Query, queryRng)
-	if err != nil {
-		return nil, fmt.Errorf("failed to perform billing query: %v", err)
-	}
-
-	matrix, ok := pVal.(model.Matrix)
-	if !ok {
-		return nil, fmt.Errorf("expected a matrix in response to query, got a %v", pVal.Type())
-	}
-
-	var records []*PromsumRecord
-	// iterate over segments of contiguous billing records
-	for _, sampleStream := range matrix {
-		for _, value := range sampleStream.Values {
-			labels := make(map[string]string, len(sampleStream.Metric))
-			for k, v := range sampleStream.Metric {
-				labels[string(k)] = string(v)
-			}
-
-			record := &PromsumRecord{
-				Labels:    labels,
-				Amount:    float64(value.Value),
-				StepSize:  c.cfg.PromsumStepSize,
-				Timestamp: value.Timestamp.Time().UTC(),
-			}
-			records = append(records, record)
-		}
-	}
-	return records, nil
-}
-
-func (c *Chargeback) promsumStoreRecords(ctx context.Context, logger logrus.FieldLogger, tableName string, records []*PromsumRecord) error {
+func (c *Chargeback) promsumStoreRecords(ctx context.Context, logger logrus.FieldLogger, tableName string, records []*promcollector.Record) error {
 	var queryValues []string
 
 	for _, record := range records {
@@ -429,7 +336,7 @@ func (c *Chargeback) promsumStoreRecords(ctx context.Context, logger logrus.Fiel
 	return nil
 }
 
-func generateRecordSQLValues(record *PromsumRecord) string {
+func generateRecordSQLValues(record *promcollector.Record) string {
 	var keys []string
 	var vals []string
 	for k, v := range record.Labels {
@@ -440,12 +347,4 @@ func generateRecordSQLValues(record *PromsumRecord) string {
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
 	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
 		record.Amount, record.Timestamp.Format(timestampFormat), record.StepSize.Seconds(), keyString, valString)
-}
-
-// PromsumRecord is a receipt of a usage determined by a query within a specific time range.
-type PromsumRecord struct {
-	Labels    map[string]string `json:"labels"`
-	Amount    float64           `json:"amount"`
-	StepSize  time.Duration     `json:"stepSize"`
-	Timestamp time.Time         `json:"timestamp"`
 }
