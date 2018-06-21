@@ -9,38 +9,14 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-// Collector queries Prometheus and handles querying Prometheus time series
-// over a given time range, breaking the queries up into multiple "chunks"
-// of a speci***REMOVED***c duration, to reduce the number of results being returned from
-// Prometheus at any given time.
-type Collector struct {
-	promConn              prom.API
-	query                 string
-	preProcessingHandler  func(context.Context, []prom.Range) error
-	preQueryHandler       func(context.Context, prom.Range) error
-	postQueryHandler      func(context.Context, prom.Range, model.Matrix) error
-	postProcessingHandler func(context.Context, []prom.Range) error
+type CollectHandlers struct {
+	PreProcessingHandler  func(context.Context, []prom.Range) error
+	PreQueryHandler       func(context.Context, prom.Range) error
+	PostQueryHandler      func(context.Context, prom.Range, model.Matrix) error
+	PostProcessingHandler func(context.Context, []prom.Range) error
 }
 
-func New(
-	promConn prom.API,
-	query string,
-	preProcessingHandler func(context.Context, []prom.Range) error,
-	preQueryHandler func(context.Context, prom.Range) error,
-	postQueryHandler func(context.Context, prom.Range, model.Matrix) error,
-	postProcessingHandler func(context.Context, []prom.Range) error,
-) *Collector {
-	return &Collector{
-		query:                 query,
-		promConn:              promConn,
-		preProcessingHandler:  preProcessingHandler,
-		preQueryHandler:       preQueryHandler,
-		postQueryHandler:      postQueryHandler,
-		postProcessingHandler: postProcessingHandler,
-	}
-}
-
-// Collect runs the con***REMOVED***gured query over the interval between start and end,
+// Collect runs the speci***REMOVED***ed query over the interval between start and end,
 // performing multiple Prometheus query_range queries of chunkSize. Returns the
 // time ranges queried and any errors encountered. Stops after the ***REMOVED***rst error,
 // consult timeRanges to determine how many chunks were queried.
@@ -52,14 +28,14 @@ func New(
 // that's incomplete, and if there are multiple chunks, whether or not the
 // ***REMOVED***nal chunk up to the endTime will be included even if the duration of
 // endTime - startTime isn't perfectly divisible by chunkSize.
-func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, stepSize, chunkSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool) (timeRanges []prom.Range, err error) {
+func Collect(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, stepSize, chunkSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers CollectHandlers) (timeRanges []prom.Range, err error) {
 	timeRangesToProcess := getTimeRanges(startTime, endTime, chunkSize, stepSize, maxTimeRanges, allowIncompleteChunks)
 	if len(timeRangesToProcess) == 0 {
 		return nil, nil
 	}
 
-	if c.preProcessingHandler != nil {
-		err = c.preProcessingHandler(ctx, timeRangesToProcess)
+	if handlers.PreProcessingHandler != nil {
+		err = handlers.PreProcessingHandler(ctx, timeRangesToProcess)
 		if err != nil {
 			return timeRanges, err
 		}
@@ -74,14 +50,14 @@ func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, s
 			// continue processing if context isn't cancelled.
 		}
 
-		if c.preQueryHandler != nil {
-			err = c.preQueryHandler(ctx, timeRange)
+		if handlers.PreQueryHandler != nil {
+			err = handlers.PreQueryHandler(ctx, timeRange)
 			if err != nil {
 				return timeRanges, err
 			}
 		}
 
-		pVal, err := c.promConn.QueryRange(ctx, c.query, timeRange)
+		pVal, err := promConn.QueryRange(ctx, query, timeRange)
 		if err != nil {
 			return nil, fmt.Errorf("failed to perform Prometheus query: %v", err)
 		}
@@ -99,8 +75,8 @@ func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, s
 			// continue processing if context isn't cancelled.
 		}
 
-		if c.postQueryHandler != nil {
-			err = c.postQueryHandler(ctx, timeRange, matrix)
+		if handlers.PostQueryHandler != nil {
+			err = handlers.PostQueryHandler(ctx, timeRange, matrix)
 			if err != nil {
 				return timeRanges, err
 			}
@@ -108,8 +84,8 @@ func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, s
 		timeRanges = append(timeRanges, timeRange)
 	}
 
-	if c.postProcessingHandler != nil {
-		err = c.postProcessingHandler(ctx, timeRanges)
+	if handlers.PostProcessingHandler != nil {
+		err = handlers.PostProcessingHandler(ctx, timeRanges)
 		if err != nil {
 			return timeRanges, err
 		}
@@ -155,7 +131,7 @@ func getTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Durati
 		}
 
 		// Add the metrics step size to the start time so that we don't
-		// re-query the previous ranges end time in this range
+		// re-query the Previous ranges end time in this range
 		chunkStart = truncateToMinute(chunkEnd.Add(stepSize))
 		// Add chunkSize to the end time to get our full chunk. If the chunkEnd
 		// is past the endTime, then this chunk is skipped.
