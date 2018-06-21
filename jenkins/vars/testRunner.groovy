@@ -29,7 +29,7 @@ metadata:
 spec:
   containers:
   - name: metering-test-runner
-    image: quay.io/coreos/chargeback-integration-tests:${params.DEPLOY_TAG}
+    image: quay.io/coreos/chargeback-integration-tests:${params.DEPLOY_TAG ?: env.BRANCH_NAME}
     imagePullPolicy: Always
     command:
     - 'cat'
