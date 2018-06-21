@@ -19,11 +19,11 @@ const (
 	prestoTimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-// storePrometheusRecords handles storing Prometheus records into the specified
+// StorePrometheusRecords handles storing Prometheus records into the specified
 // Presto table.
 //
 // Any Queryer is accepted, but this function expects a Presto connection.
-func storePrometheusRecords(ctx context.Context, queryer db.Queryer, tableName string, records []*Record) error {
+func StorePrometheusRecords(ctx context.Context, queryer db.Queryer, tableName string, records []*Record) error {
 	var queryValues []string
 
 	for _, record := range records {

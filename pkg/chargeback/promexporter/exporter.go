@@ -3,6 +3,7 @@ package promexporter
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -22,13 +23,23 @@ const (
 
 // PrestoExporter exports Prometheus metrics into Presto tables
 type PrestoExporter struct {
-	logger        logrus.FieldLogger
-	prestoQueryer db.Queryer
-	promConn      prom.API
-	clock         clock.Clock
-	cfg           Config
+	logger          logrus.FieldLogger
+	promConn        prom.API
+	prestoQueryer   db.Queryer
+	collectHandlers promcollector.CollectHandlers
+	clock           clock.Clock
+	cfg             Config
 
+	// exportLock ensures only one export is running at a time, protecting the
+	// lastTimestamp and records fields
+	exportLock sync.Mutex
+
+	//lastTimestamp is the lastTimestamp stored for this PrestoExporter
 	lastTimestamp *time.Time
+	// records contains the records we stored after an export. It is a pointer
+	// to a slice so we can change the contents from the postQueryHandler of
+	// our promcollector.Collector. After the export is finished it is expected that records is cleared.
+	records *[]*Record
 }
 
 type Config struct {
@@ -41,28 +52,61 @@ type Config struct {
 }
 
 func NewPrestoExporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer db.Queryer, clock clock.Clock, cfg Config) *PrestoExporter {
+	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
+		if len(timeRanges) == 0 {
+			logger.Info("no time ranges to query yet for table %s", cfg.PrestoTableName)
+		} else {
+			begin := timeRanges[0].Start
+			end := timeRanges[len(timeRanges)-1].End
+			logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
+		}
+		return nil
+	}
+
+	var recordsPtr *[]*Record
+	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
+		records := promMatrixToRecords(timeRange, matrix)
+		err := StorePrometheusRecords(ctx, prestoQueryer, cfg.PrestoTableName, records)
+		if err != nil {
+			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
+				cfg.PrestoTableName, timeRange.Start, timeRange.End, err)
+		}
+		recordsPtr = &records
+
+		return nil
+	}
+
+	collectHandlers := promcollector.CollectHandlers{
+		PreProcessingHandler: preProcessingHandler,
+		PostQueryHandler:     postQueryHandler,
+	}
+
 	return &PrestoExporter{
 		logger: logger.WithFields(logrus.Fields{
 			"component": "PrestoExporter",
 			"tableName": cfg.PrestoTableName,
 		}),
-		prestoQueryer: prestoQueryer,
-		promConn:      promConn,
-		clock:         clock,
-		cfg:           cfg,
+		promConn:        promConn,
+		prestoQueryer:   prestoQueryer,
+		collectHandlers: collectHandlers,
+		clock:           clock,
+		cfg:             cfg,
+		records:         recordsPtr,
 	}
 }
 
-// Export triggers the PrestoExporter to query Prometheus and store the results
-// in Presto. It will block until collection is finished.
+// ExportFromLastTimestamp executes a Presto query from the last time range it
+// queried and stores the results in a Presto table.
 
-// It queries Prometheus using promQuery, storing the results in tableName. The
-// exporter will track the last time series it retrieved and will pick up from
-// where it left off if paused or stopped. FOr more details, see
+// The exporter will track the last time series it retrieved and will query
+// the next time range starting from where it left off if paused or stopped.
+// For more details on how querying Prometheus is done, see the package
 // pkg/promcollector.
-func (c *PrestoExporter) Export(ctx context.Context) error {
+func (c *PrestoExporter) ExportFromLastTimestamp(ctx context.Context) ([]*Record, error) {
+	c.exportLock.Lock()
+	defer c.exportLock.Unlock()
 	logger := c.logger
-	logger.Infof("PrestoExporter started")
+	logger.Infof("PrestoExporter ExportFromLastTimestamp started")
 
 	endTime := c.clock.Now()
 
@@ -79,29 +123,6 @@ func (c *PrestoExporter) Export(ctx context.Context) error {
 		c.logger.Debugf("no data in data store %s yet", c.cfg.PrestoTableName)
 	}
 
-	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
-		if len(timeRanges) == 0 {
-			logger.Info("no time ranges to query yet for table %s", c.cfg.PrestoTableName)
-		} else {
-			begin := timeRanges[0].Start
-			end := timeRanges[len(timeRanges)-1].End
-			logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
-		}
-		return nil
-	}
-
-	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
-		records := promMatrixToRecords(timeRange, matrix)
-		err := storePrometheusRecords(ctx, c.prestoQueryer, c.cfg.PrestoTableName, records)
-		if err != nil {
-			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
-				c.cfg.PrestoTableName, timeRange.Start, timeRange.End, err)
-		}
-		return nil
-	}
-
-	collector := promcollector.New(c.promConn, c.cfg.PrometheusQuery, preProcessingHandler, nil, postQueryHandler, nil)
-
 	// if c.lastTimestamp is null then it's because we errored sometime
 	// last time we collected and need to re-query Presto to figure out
 	// the last timestamp
@@ -110,7 +131,7 @@ func (c *PrestoExporter) Export(ctx context.Context) error {
 		c.lastTimestamp, err = getLastTimestampForTable(c.prestoQueryer, c.cfg.PrestoTableName)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to get last timestamp for table %s", c.cfg.PrestoTableName)
-			return nil
+			return nil, err
 		}
 	}
 	// We don't want to duplicate the c.lastTimestamp record so add
@@ -131,35 +152,67 @@ func (c *PrestoExporter) Export(ctx context.Context) error {
 		"endTime":   endTime,
 	})
 
-	timeRangesCollected, err := collector.Collect(ctx, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, c.cfg.AllowIncompleteChunks)
+	timeRangesCollected, err := c.export(ctx, startTime, endTime)
 	if err != nil {
 		loggerWithFields.WithError(err).Error("error collecting metrics")
+	}
+
+	if len(timeRangesCollected) == 0 {
+		loggerWithFields.Infof("no data collected for table %s", c.cfg.PrestoTableName)
+		return timeRangesCollected, nil
+	}
+
+	logger.Infof("PrestoExporter ExportFromLastTimestamp finished")
+	return timeRangesCollected, nil
+
+}
+
+func (c *PrestoExporter) Export(ctx context.Context, startTime, endTime time.Time) ([]*Record, error) {
+	c.exportLock.Lock()
+	defer c.exportLock.Unlock()
+	logger := c.logger
+	logger.Infof("PrestoExporter Export started")
+	loggerWithFields := logger.WithFields(logrus.Fields{
+		"startTime": startTime,
+		"endTime":   endTime,
+	})
+
+	timeRangesCollected, err := c.export(ctx, startTime, endTime)
+	if err != nil {
+		loggerWithFields.WithError(err).Error("error collecting metrics")
+	}
+
+	if len(timeRangesCollected) == 0 {
+		loggerWithFields.Infof("no data collected for table %s", c.cfg.PrestoTableName)
+		return timeRangesCollected, nil
+	}
+	logger.Infof("PrestoExporter Export finished")
+	return timeRangesCollected, nil
+}
+
+func (c *PrestoExporter) export(ctx context.Context, startTime, endTime time.Time) ([]*Record, error) {
+	_, err := promcollector.Collect(ctx, c.promConn, c.cfg.PrometheusQuery, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, c.cfg.AllowIncompleteChunks, c.collectHandlers)
+	if err != nil {
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our c.lastTimestamp
 		c.lastTimestamp = nil
 	}
 
-	if len(timeRangesCollected) == 0 {
-		loggerWithFields.Infof("no data collected for table %s", c.cfg.PrestoTableName)
-		return nil
+	var records []*Record
+	if c.records != nil {
+		// keep a reference to our slice and
+		// reset c.records everytime we export it starts unset
+		records = *c.records
+		c.records = nil
 	}
 
-	// update our c.lastTimestamp
-	lastTS := timeRangesCollected[len(timeRangesCollected)-1].End
-	c.lastTimestamp = &lastTS
-
-	logger.Infof("PrestoExporter finished")
-	return nil
-}
-
-func Collect(ctx context.Context, promConn prom.API, queryer db.Queryer, query string, tableName string, startTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool) error {
-	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
-		records := promMatrixToRecords(timeRange, matrix)
-		return storePrometheusRecords(ctx, queryer, tableName, records)
+	// if we got records, update our cached lastTimestamp
+	if err == nil && len(records) != 0 {
+		lastTS := records[len(records)-1].Timestamp
+		c.lastTimestamp = &lastTS
 	}
-	collector := promcollector.New(promConn, query, nil, nil, postQueryHandler, nil)
-	_, err := collector.Collect(ctx, startTime, endTime, chunkSize, stepSize, maxTimeRanges, allowIncompleteChunks)
-	return err
+
+	return records, err
 }
 
 func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time, error) {

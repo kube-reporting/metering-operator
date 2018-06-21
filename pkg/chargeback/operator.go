@@ -95,12 +95,18 @@ type Chargeback struct {
 	prestoTablePartitionQueue                chan *cbTypes.ReportDataSource
 	prometheusExporterNewDataSourceQueue     chan *cbTypes.ReportDataSource
 	prometheusExporterDeletedDataSourceQueue chan string
+	promExporterTriggerFromLastTimestampCh   chan struct{}
+	promExporterTriggerForTimeRangeCh        chan promExporterTimeRangeTrigger
 }
 
 func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
 	op := &Chargeback{
 		cfg: cfg,
-		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataSource, 1),
+		prestoTablePartitionQueue:                make(chan *cbTypes.ReportDataSource, 1),
+		prometheusExporterNewDataSourceQueue:     make(chan *cbTypes.ReportDataSource),
+		prometheusExporterDeletedDataSourceQueue: make(chan string),
+		promExporterTriggerFromLastTimestampCh:   make(chan struct{}),
+		promExporterTriggerForTimeRangeCh:        make(chan promExporterTimeRangeTrigger),
 		logger: logger,
 		clock:  clock,
 	}

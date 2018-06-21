@@ -508,11 +508,11 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 
 	logger.Debugf("collecting promsum data between %s and %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	// err = srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
-	// if err != nil {
-	// 	srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
-	// 	return
-	// }
+	err = srv.chargeback.triggerPromExporterForTimeRange(context.Background(), start, end)
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
+		return
+	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
@@ -532,13 +532,11 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	_ = dataSourceTableName(name)
-
-	// err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*promexporter.Record(req))
-	// if err != nil {
-	// 	srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
-	// 	return
-	// }
+	err = promexporter.StorePrometheusRecords(context.Background(), srv.chargeback.prestoConn, dataSourceTableName(name), []*promexporter.Record(req))
+	if err != nil {
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
+		return
+	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
