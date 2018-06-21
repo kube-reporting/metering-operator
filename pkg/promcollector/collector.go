@@ -14,11 +14,12 @@ import (
 // of a specific duration, to reduce the number of results being returned from
 // Prometheus at any given time.
 type Collector struct {
-	promConn             prom.API
-	query                string
-	preProcessingHandler func(context.Context, []prom.Range) error
-	preQueryHandler      func(context.Context, prom.Range) error
-	postQueryHandler     func(context.Context, prom.Range, []*Record) error
+	promConn              prom.API
+	query                 string
+	preProcessingHandler  func(context.Context, []prom.Range) error
+	preQueryHandler       func(context.Context, prom.Range) error
+	postQueryHandler      func(context.Context, prom.Range, model.Matrix) error
+	postProcessingHandler func(context.Context, []prom.Range) error
 }
 
 func New(
@@ -26,14 +27,16 @@ func New(
 	query string,
 	preProcessingHandler func(context.Context, []prom.Range) error,
 	preQueryHandler func(context.Context, prom.Range) error,
-	postQueryHandler func(context.Context, prom.Range, []*Record) error,
+	postQueryHandler func(context.Context, prom.Range, model.Matrix) error,
+	postProcessingHandler func(context.Context, []prom.Range) error,
 ) *Collector {
 	return &Collector{
-		query:                query,
-		promConn:             promConn,
-		preProcessingHandler: preProcessingHandler,
-		preQueryHandler:      preQueryHandler,
-		postQueryHandler:     postQueryHandler,
+		query:                 query,
+		promConn:              promConn,
+		preProcessingHandler:  preProcessingHandler,
+		preQueryHandler:       preQueryHandler,
+		postQueryHandler:      postQueryHandler,
+		postProcessingHandler: postProcessingHandler,
 	}
 }
 
@@ -78,9 +81,14 @@ func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, s
 			}
 		}
 
-		records, err := Query(ctx, c.promConn, c.query, timeRange)
+		pVal, err := c.promConn.QueryRange(ctx, c.query, timeRange)
 		if err != nil {
-			return timeRanges, err
+			return nil, fmt.Errorf("failed to perform Prometheus query: %v", err)
+		}
+
+		matrix, ok := pVal.(model.Matrix)
+		if !ok {
+			return nil, fmt.Errorf("expected a matrix in response to query, got a %v", pVal.Type())
 		}
 
 		// check for cancellation
@@ -92,12 +100,19 @@ func (c *Collector) Collect(ctx context.Context, startTime, endTime time.Time, s
 		}
 
 		if c.postQueryHandler != nil {
-			err = c.postQueryHandler(ctx, timeRange, records)
+			err = c.postQueryHandler(ctx, timeRange, matrix)
 			if err != nil {
 				return timeRanges, err
 			}
 		}
 		timeRanges = append(timeRanges, timeRange)
+	}
+
+	if c.postProcessingHandler != nil {
+		err = c.postProcessingHandler(ctx, timeRanges)
+		if err != nil {
+			return timeRanges, err
+		}
 	}
 	return timeRanges, nil
 }
@@ -148,46 +163,6 @@ func getTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Durati
 	}
 
 	return timeRanges
-}
-
-// Record is a receipt of a usage determined by a query within a specific time range.
-type Record struct {
-	Labels    map[string]string `json:"labels"`
-	Amount    float64           `json:"amount"`
-	StepSize  time.Duration     `json:"stepSize"`
-	Timestamp time.Time         `json:"timestamp"`
-}
-
-func Query(ctx context.Context, promConn prom.API, query string, queryRng prom.Range) ([]*Record, error) {
-	pVal, err := promConn.QueryRange(ctx, query, queryRng)
-	if err != nil {
-		return nil, fmt.Errorf("failed to perform billing query: %v", err)
-	}
-
-	matrix, ok := pVal.(model.Matrix)
-	if !ok {
-		return nil, fmt.Errorf("expected a matrix in response to query, got a %v", pVal.Type())
-	}
-
-	var records []*Record
-	// iterate over segments of contiguous billing records
-	for _, sampleStream := range matrix {
-		for _, value := range sampleStream.Values {
-			labels := make(map[string]string, len(sampleStream.Metric))
-			for k, v := range sampleStream.Metric {
-				labels[string(k)] = string(v)
-			}
-
-			record := &Record{
-				Labels:    labels,
-				Amount:    float64(value.Value),
-				StepSize:  queryRng.Step,
-				Timestamp: value.Timestamp.Time().UTC(),
-			}
-			records = append(records, record)
-		}
-	}
-	return records, nil
 }
 
 func truncateToMinute(t time.Time) time.Time {

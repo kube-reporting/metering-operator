@@ -23,9 +23,9 @@ import (
 
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/pkg/chargeback/promexporter"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
-	"github.com/operator-framework/operator-metering/pkg/promcollector"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
 
@@ -503,22 +503,21 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	logger.Debugf("collecting promsum data between %s and %s", req.StartTime.Format(time.RFC3339), req.EndTime.Format(time.RFC3339))
+	start := req.StartTime.UTC()
+	end := req.EndTime.UTC()
 
-	timeBoundsGetter := promsumDataSourceTimeBoundsGetter(func(dataSource *api.ReportDataSource) (startTime, endTime time.Time, err error) {
-		return req.StartTime.UTC(), req.EndTime.UTC(), nil
-	})
+	logger.Debugf("collecting promsum data between %s and %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	err = srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
-	if err != nil {
-		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
-		return
-	}
+	// err = srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
+	// if err != nil {
+	// 	srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
+	// 	return
+	// }
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-type StorePromsumDataRequest []*promcollector.Record
+type StorePromsumDataRequest []*promexporter.Record
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
@@ -533,11 +532,13 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*promcollector.Record(req))
-	if err != nil {
-		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
-		return
-	}
+	_ = dataSourceTableName(name)
+
+	// err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*promexporter.Record(req))
+	// if err != nil {
+	// 	srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
+	// 	return
+	// }
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
@@ -579,7 +580,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 }
 
-func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*promcollector.Record, error) {
+func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*promexporter.Record, error) {
 	whereClause := ""
 	if !start.IsZero() {
 		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
@@ -601,7 +602,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		return nil, err
 	}
 
-	var results []*promcollector.Record
+	var results []*promexporter.Record
 	for rows.Next() {
 		var dbRecord promsumDBRecord
 		if err := rows.Scan(&dbRecord.Labels, &dbRecord.Amount, &dbRecord.TimePrecision, &dbRecord.Timestamp); err != nil {
@@ -615,7 +616,7 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
 			}
 		}
-		record := promcollector.Record{
+		record := promexporter.Record{
 			Labels:    labels,
 			Amount:    dbRecord.Amount,
 			StepSize:  time.Duration(dbRecord.TimePrecision) * time.Second,

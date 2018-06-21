@@ -92,7 +92,9 @@ type Chargeback struct {
 	initializedMu sync.Mutex
 	initialized   bool
 
-	prestoTablePartitionQueue chan *cbTypes.ReportDataSource
+	prestoTablePartitionQueue                chan *cbTypes.ReportDataSource
+	prometheusExporterNewDataSourceQueue     chan *cbTypes.ReportDataSource
+	prometheusExporterDeletedDataSourceQueue chan string
 }
 
 func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
@@ -465,10 +467,10 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 	if !c.cfg.DisablePromsum {
 		wg.Add(1)
 		go func() {
-			c.logger.Debugf("starting Promsum collector")
-			c.runPromsumWorker(stopCh)
+			c.logger.Debugf("starting PrometheusExporter")
+			c.runPrometheusExporterWorker(stopCh)
 			wg.Done()
-			c.logger.Debugf("Promsum collector stopped")
+			c.logger.Debugf("PrometheusExporter stopped")
 		}()
 	}
 }
