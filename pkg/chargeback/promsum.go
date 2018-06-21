@@ -60,30 +60,34 @@ func (c *Chargeback) triggerPromExporterForTimeRange(ctx context.Context, start,
 func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
 	logger := c.logger.WithField("component", "PrometheusExporter")
 	logger.Infof("PrometheusExporter worker started")
-	ticker := time.NewTicker(c.cfg.PromsumInterval)
 	promExporters := make(map[string]*promexporter.PrestoExporter)
 
-	defer func() {
-		logger.Infof("PrometheusExporterWorker shutdown")
-		ticker.Stop()
-	}()
+	defer logger.Infof("PrometheusExporterWorker shutdown")
 
-	timeCh := ticker.C
+	var timeCh <-chan time.Time
+	if c.cfg.DisablePromsum {
+		logger.Infof("Periodic Prometheus ReportDataSource exporting disabled")
+	} ***REMOVED*** {
+		logger.Infof("Periodiccally exporting Prometheus ReportDataSource every %s", c.cfg.PromsumInterval)
+		ticker := time.NewTicker(c.cfg.PromsumInterval)
+		timeCh = ticker.C
 
-	// this go routine runs the trigger export function every PollInterval tick
-	// causing the exporter to collect and store data
-	go func() {
-		for {
-			select {
-			case <-timeCh:
-				if err := c.triggerPromExporterFromLastTimestamp(ctx); err != nil {
+		defer ticker.Stop()
+		// this go routine runs the trigger export function every PollInterval tick
+		// causing the exporter to collect and store data
+		go func() {
+			for {
+				select {
+				case <-timeCh:
+					if err := c.triggerPromExporterFromLastTimestamp(ctx); err != nil {
+						return
+					}
+				case <-ctx.Done():
 					return
 				}
-			case <-ctx.Done():
-				return
 			}
-		}
-	}()
+		}()
+	}
 
 	for {
 		select {

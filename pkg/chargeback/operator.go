@@ -470,15 +470,13 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		c.logger.Debugf("ScheduledReportRunner stopped")
 	}()
 
-	if !c.cfg.DisablePromsum {
-		wg.Add(1)
-		go func() {
-			c.logger.Debugf("starting PrometheusExporter")
-			c.runPrometheusExporterWorker(stopCh)
-			wg.Done()
-			c.logger.Debugf("PrometheusExporter stopped")
-		}()
-	}
+	wg.Add(1)
+	go func() {
+		c.logger.Debugf("starting PrometheusExport worker")
+		c.runPrometheusExporterWorker(stopCh)
+		wg.Done()
+		c.logger.Debugf("PrometheusExport worker stopped")
+	}()
 }
 
 func (c *Chargeback) setInitialized() {
