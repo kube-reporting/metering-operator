@@ -39,10 +39,6 @@ func billingPeriodTimestamp(date time.Time) string {
 	return date.Format(hive.HiveDateStringLayout)
 }
 
-func prestoTimestamp(date time.Time) string {
-	return date.Format(PrestoTimestampFormat)
-}
-
 func truncateToMinute(t time.Time) time.Time {
 	return t.Truncate(time.Minute)
 }

@@ -24,7 +24,6 @@ import (
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
@@ -597,67 +596,13 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	results, err := queryPromsumDatasource(logger, srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
+	results, err := prestostore.GetPrometheusMetrics(srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
-}
-
-func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*prestostore.PrometheusMetric, error) {
-	whereClause := ""
-	if !start.IsZero() {
-		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
-	}
-	if !end.IsZero() {
-		if !start.IsZero() {
-			whereClause += " AND "
-		} else {
-			whereClause += " WHERE "
-		}
-		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
-	}
-
-	// we use map_entries for ordering on the labels because maps are
-	// unorderable in Presto.
-	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp", map_entries(labels), amount, timeprecision ASC`, datasourceTable, whereClause)
-	rows, err := queryer.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	var results []*prestostore.PrometheusMetric
-	for rows.Next() {
-		var dbPrometheusMetric promsumDBPrometheusMetric
-		if err := rows.Scan(&dbPrometheusMetric.Labels, &dbPrometheusMetric.Amount, &dbPrometheusMetric.TimePrecision, &dbPrometheusMetric.Timestamp); err != nil {
-			return nil, err
-		}
-		labels := make(map[string]string)
-		for key, value := range dbPrometheusMetric.Labels {
-			var ok bool
-			labels[key], ok = value.(string)
-			if !ok {
-				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
-			}
-		}
-		metric := prestostore.PrometheusMetric{
-			Labels:    labels,
-			Amount:    dbPrometheusMetric.Amount,
-			StepSize:  time.Duration(dbPrometheusMetric.TimePrecision) * time.Second,
-			Timestamp: dbPrometheusMetric.Timestamp,
-		}
-		results = append(results, &metric)
-	}
-	return results, nil
-}
-
-type promsumDBPrometheusMetric struct {
-	Labels        map[string]interface{}
-	Amount        float64
-	TimePrecision float64
-	Timestamp     time.Time
 }
 
 func getReportOrderByColumnsString(query *api.ReportGenerationQuery) string {

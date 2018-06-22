@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -14,10 +15,15 @@ const (
 	// prestoQueryCap is the maximum payload size a single SQL statement can contain
 	// before Presto will error due to the payload being too large.
 	prestoQueryCap = 1000000
-	// prestoTimestampFormat is the format Presto expects timetamps to look
-	// like. For use with time.Format()
-	prestoTimestampFormat = "2006-01-02 15:04:05.000"
 )
+
+// PrometheusMetric is a receipt of a usage determined by a query within a specific time range.
+type PrometheusMetric struct {
+	Labels    map[string]string `json:"labels"`
+	Amount    float64           `json:"amount"`
+	StepSize  time.Duration     `json:"stepSize"`
+	Timestamp time.Time         `json:"timestamp"`
+}
 
 // StorePrometheusMetrics handles storing Prometheus metrics into the specified
 // Presto table.
@@ -102,5 +108,81 @@ func generatePrometheusMetricSQLValues(metric *PrometheusMetric) string {
 	keyString := "ARRAY[" + strings.Join(keys, ",") + "]"
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
 	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
-		metric.Amount, metric.Timestamp.Format(prestoTimestampFormat), metric.StepSize.Seconds(), keyString, valString)
+		metric.Amount, presto.Timestamp(metric.Timestamp), metric.StepSize.Seconds(), keyString, valString)
+}
+
+func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time, error) {
+	// Get the most recent timestamp in the table for this query
+	getLastTimestampQuery := fmt.Sprintf(`
+				SELECT "timestamp"
+				FROM %s
+				ORDER BY "timestamp" DESC
+				LIMIT 1`, tableName)
+
+	results, err := presto.ExecuteSelect(queryer, getLastTimestampQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error getting last timestamp for table %s, maybe table doesn't exist yet? %v", tableName, err)
+	}
+
+	if len(results) != 0 {
+		ts := results[0]["timestamp"].(time.Time)
+		return &ts, nil
+	}
+	return nil, nil
+}
+
+func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.Time) ([]*PrometheusMetric, error) {
+	whereClause := ""
+	if !start.IsZero() {
+		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, presto.Timestamp(start))
+	}
+	if !end.IsZero() {
+		if !start.IsZero() {
+			whereClause += " AND "
+		} else {
+			whereClause += " WHERE "
+		}
+		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, presto.Timestamp(end))
+	}
+
+	// we use map_entries for ordering on the labels because maps are
+	// unorderable in Presto.
+	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp", map_entries(labels), amount, timeprecision ASC`, tableName, whereClause)
+	rows, err := queryer.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []*PrometheusMetric
+	for rows.Next() {
+		var dbMetric dbPrometheusMetric
+		if err := rows.Scan(&dbMetric.Labels, &dbMetric.Amount, &dbMetric.TimePrecision, &dbMetric.Timestamp); err != nil {
+			return nil, err
+		}
+		labels := make(map[string]string)
+		for key, value := range dbMetric.Labels {
+			var ok bool
+			labels[key], ok = value.(string)
+			if !ok {
+				return nil, fmt.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
+			}
+		}
+		metric := PrometheusMetric{
+			Labels:    labels,
+			Amount:    dbMetric.Amount,
+			StepSize:  time.Duration(dbMetric.TimePrecision) * time.Second,
+			Timestamp: dbMetric.Timestamp,
+		}
+		results = append(results, &metric)
+	}
+	return results, nil
+}
+
+// dbPrometheusMetric is used for scanning results from the database
+// before being turned into a PrometheusMetric
+type dbPrometheusMetric struct {
+	Labels        map[string]interface{}
+	Amount        float64
+	TimePrecision float64
+	Timestamp     time.Time
 }
