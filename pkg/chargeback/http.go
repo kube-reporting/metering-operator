@@ -274,10 +274,9 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	orderByColsStr := getReportOrderByColumnsString(reportQuery)
-	reportTable := scheduledReportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
-	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
+	prestoColumns := generatePrestoColumns(reportQuery)
+	tableName := scheduledReportTableName(name)
+	results, err := presto.GetRows(srv.chargeback.prestoConn, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
@@ -331,10 +330,9 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	orderByColsStr := getReportOrderByColumnsString(reportQuery)
-	reportTable := reportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
-	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
+	prestoColumns := generatePrestoColumns(reportQuery)
+	tableName := reportTableName(name)
+	results, err := presto.GetRows(srv.chargeback.prestoConn, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
@@ -362,7 +360,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
-func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	buf := &bytes.Buffer{}
 	csvWriter := csv.NewWriter(buf)
 
@@ -422,7 +420,7 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Repor
 	w.Write(buf.Bytes())
 }
 
-func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		newResults := make([]*orderedmap.OrderedMap, len(results))
@@ -456,8 +454,8 @@ type ReportResultValues struct {
 	Unit        string      `json:"unit,omitempty"`
 }
 
-// convertsToGetReportResults converts maps returned from `presto.ExecuteSelect` into a GetReportResults
-func convertsToGetReportResults(input []map[string]interface{}, columns []api.ReportGenerationQueryColumn) GetReportResults {
+// convertsToGetReportResults converts Rows returned from `presto.ExecuteSelect` into a GetReportResults
+func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerationQueryColumn) GetReportResults {
 	results := GetReportResults{}
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	for _, column := range columns {
@@ -479,7 +477,7 @@ func convertsToGetReportResults(input []map[string]interface{}, columns []api.Re
 	return results
 }
 
-func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	var ***REMOVED***lteredColumns []api.ReportGenerationQueryColumn
 	for _, column := range columns {
@@ -603,22 +601,4 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
-}
-
-func getReportOrderByColumnsString(query *api.ReportGenerationQuery) string {
-	cols := query.Spec.Columns
-	var quotedColumns []string
-	for _, col := range cols {
-		colName := col.Name
-		// if we detect a map(...) in the column, use map_entries to do
-		// ordering. we detect a map column using a best effort approach by
-		// checking if the column type contains the string "map(" , and is
-		// followed by a ")" after that string.
-		if mapIndex := strings.Index(col.Type, "map("); mapIndex != -1 && strings.Index(col.Type, ")") > mapIndex {
-			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
-		} ***REMOVED*** {
-			quotedColumns = append(quotedColumns, fmt.Sprintf(`"%s"`, colName))
-		}
-	}
-	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }

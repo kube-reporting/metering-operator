@@ -8,6 +8,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -47,6 +48,14 @@ func generateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column 
 	var columns []hive.Column
 	for _, c := range genQuery.Spec.Columns {
 		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
+	}
+	return columns
+}
+
+func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Column {
+	var columns []presto.Column
+	for _, c := range genQuery.Spec.Columns {
+		columns = append(columns, presto.Column{Name: c.Name, Type: c.Type})
 	}
 	return columns
 }

@@ -2,6 +2,7 @@ package presto
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -14,18 +15,18 @@ const (
 	TimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-func Timestamp(date time.Time) string {
-	return date.Format(TimestampFormat)
-}
-
 func FormatInsertQuery(target, query string) string {
 	return fmt.Sprintf("INSERT INTO %s %s", target, query)
 }
 
 // ExecuteInsertQuery performs the query an INSERT into the table target. It's expected target has the correct schema.
 func ExecuteInsertQuery(queryer db.Queryer, target, query string) error {
-	insert := FormatInsertQuery(target, query)
-	rows, err := queryer.Query(insert)
+	insertQuery := FormatInsertQuery(target, query)
+	return ExecuteQuery(queryer, insertQuery)
+}
+
+func ExecuteQuery(queryer db.Queryer, query string) error {
+	rows, err := queryer.Query(query)
 	if err != nil {
 		return err
 	}
@@ -42,9 +43,11 @@ func ExecuteInsertQuery(queryer db.Queryer, target, query string) error {
 	return nil
 }
 
+type Row map[string]interface{}
+
 // ExecuteSelectQuery performs the query on the table target. It's expected
 // target has the correct schema.
-func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, error) {
+func ExecuteSelect(queryer db.Queryer, query string) ([]Row, error) {
 	rows, err := queryer.Query(query)
 	if err != nil {
 		return nil, err
@@ -55,7 +58,7 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, 
 		return nil, err
 	}
 
-	var results []map[string]interface{}
+	var results []Row
 	for rows.Next() {
 		// Create a slice of interface{}'s to represent each column,
 		// and a second slice to contain pointers to each item in the columns slice.
@@ -77,11 +80,61 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]map[string]interface{}, 
 			val := columnPointers[i].(*interface{})
 			m[colName] = *val
 		}
-		results = append(results, m)
+		results = append(results, Row(m))
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return results, nil
+}
+
+func DeleteFrom(prestoConn db.Queryer, tableName string) error {
+	return ExecuteQuery(prestoConn, fmt.Sprintf("DELETE FROM %s", tableName))
+}
+
+type Column struct {
+	Name string
+	Type string
+}
+
+func GetRows(prestoConn db.Queryer, tableName string, columns []Column) ([]Row, error) {
+	columnsSQL := GenerateQuotedColumnsListSQL(columns)
+	orderBySQL := GenerateOrderBySQL(columns)
+	query := fmt.Sprintf("SELECT %s FROM %s ORDER BY %s", columnsSQL, tableName, orderBySQL)
+	return ExecuteSelect(prestoConn, query)
+}
+
+func GenerateQuotedColumnsListSQL(columns []Column) string {
+	var columnNames []string
+	for _, col := range columns {
+		columnNames = append(columnNames, quoteColumn(col))
+	}
+	columnsSQL := strings.Join(columnNames, ",")
+	return columnsSQL
+}
+
+func GenerateOrderBySQL(columns []Column) string {
+	var quotedColumns []string
+	for _, col := range columns {
+		colName := col.Name
+		// if we detect a map(...) in the column, use map_entries to do
+		// ordering. we detect a map column using a best effort approach by
+		// checking if the column type contains the string "map(" , and is
+		// followed by a ")" after that string.
+		if mapIndex := strings.Index(col.Type, "map("); mapIndex != -1 && strings.Index(col.Type, ")") > mapIndex {
+			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
+		} ***REMOVED*** {
+			quotedColumns = append(quotedColumns, quoteColumn(col))
+		}
+	}
+	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
+}
+
+func Timestamp(date time.Time) string {
+	return date.Format(TimestampFormat)
+}
+
+func quoteColumn(col Column) string {
+	return `"` + col.Name + `"`
 }
