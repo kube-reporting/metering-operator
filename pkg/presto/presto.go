@@ -14,8 +14,8 @@ const (
 	TimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-func prestoTime(t time.Time) string {
-	return t.Format(TimestampFormat)
+func Timestamp(date time.Time) string {
+	return date.Format(TimestampFormat)
 }
 
 func FormatInsertQuery(target, query string) string {
