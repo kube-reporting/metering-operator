@@ -76,7 +76,8 @@ func newServer(c *Chargeback, logger log.FieldLogger) *server {
 	}
 
 	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
-	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2Handler)
+	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2FullHandler)
+	router.HandleFunc("/api/v2/reports/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
@@ -188,16 +189,25 @@ func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
 	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, w, r)
+	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
 }
 
-func (srv *server) getReportV2Handler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
 	name := chi.URLParam(r, "name")
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, name, r.Form["format"][0], true, w, r)
+	srv.getReport(logger, name, r.Form["format"][0], true, true, w, r)
+}
+
+func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
+	logger := srv.newLogger(r)
+	name := chi.URLParam(r, "name")
+	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
+		return
+	}
+	srv.getReport(logger, name, r.Form["format"][0], true, false, w, r)
 }
 
 func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Request) {
@@ -291,7 +301,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 
 	srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 }
-func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
 	report, err := srv.chargeback.informers.Chargeback().V1alpha1().Reports().Lister().Reports(srv.chargeback.cfg.Namespace).Get(name)
 	if err != nil {
@@ -348,7 +358,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	if useNewFormat {
-		srv.writeResultsV2(logger, format, reportQuery.Spec.Columns, results, w, r)
+		srv.writeResultsV2(logger, full, format, reportQuery.Spec.Columns, results, w, r)
 	} else {
 		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
@@ -447,6 +457,7 @@ type ReportResultValues struct {
 	Unit        string      `json:"unit,omitempty"`
 }
 
+// convertsToGetReportResults converts maps returned from `presto.ExecuteSelect` into a GetReportResults
 func convertsToGetReportResults(input []map[string]interface{}, columns []api.ReportGenerationQueryColumn) GetReportResults {
 	results := GetReportResults{}
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
@@ -455,9 +466,7 @@ func convertsToGetReportResults(input []map[string]interface{}, columns []api.Re
 	}
 	for _, row := range input {
 		var valSlice ReportResultEntry
-		for _, column := range columns {
-			columnName := column.Name
-			columnValue := row[columnName]
+		for columnName, columnValue := range row {
 			resultsValue := ReportResultValues{
 				Name:        columnName,
 				Value:       columnValue,
@@ -471,14 +480,33 @@ func convertsToGetReportResults(input []map[string]interface{}, columns []api.Re
 	return results
 }
 
-func (srv *server) writeResultsV2(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
+	var filteredColumns []api.ReportGenerationQueryColumn
+	for _, column := range columns {
+		columnsMap[column.Name] = column
+		showColumn := !columnsMap[column.Name].TableHidden
+		// Build a new list of columns if full is false, containing only columns with TableHidden set to false
+		if showColumn || full {
+			filteredColumns = append(filteredColumns, column)
+		}
+	}
+	// Remove columns and their values from `input` if full is false and the column's TableHidden is true
+	for _, row := range results {
+		for _, column := range columnsMap {
+			if columnsMap[column.Name].TableHidden && !full {
+				delete(row, columnsMap[column.Name].Name)
+			}
+		}
+	}
+
 	switch format {
 	case "json":
-		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results, columns))
+		srv.writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
 		return
 
 	case "csv":
-		srv.writeResultsAsCSV(logger, columns, results, w, r)
+		srv.writeResultsAsCSV(logger, filteredColumns, results, w, r)
 	}
 }
 
