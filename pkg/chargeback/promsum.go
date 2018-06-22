@@ -127,12 +127,6 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				"tableName":        tableName,
 			})
 
-			if _, exists := prometheusImporters[dataSourceName]; exists {
-				// We've already got an importer for this ReportDataSource
-				// so we just need to update it
-				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration")
-			}
-
 			reportPromQuery, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
 			if err != nil {
 				c.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
@@ -148,8 +142,14 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				MaxTimeRanges:         defaultMaxPromTimeRanges,
 				AllowIncompleteChunks: true,
 			}
-			importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
-			prometheusImporters[dataSourceName] = importer
+
+			if importer, exists := prometheusImporters[dataSourceName]; exists {
+				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration")
+				importer.UpdateConfig(cfg)
+			} else {
+				importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
+				prometheusImporters[dataSourceName] = importer
+			}
 		}
 	}
 }

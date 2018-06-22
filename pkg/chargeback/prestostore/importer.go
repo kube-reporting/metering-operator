@@ -96,6 +96,12 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQ
 	}
 }
 
+func (c *PrometheusImporter) UpdateConfig(cfg Config) {
+	c.importLock.Lock()
+	c.cfg = cfg
+	c.importLock.Unlock()
+}
+
 // ImportFromLastTimestamp executes a Presto query from the last time range it
 // queried and stores the results in a Presto table.
 
