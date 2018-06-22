@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback/promexporter"
+	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -188,7 +188,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 
 	// For each datasource file, keep track
 	dataSourcesSubmitted := make(map[string]struct {
-		recordsStart, recordsEnd time.Time
+		metricsStart, metricsEnd time.Time
 	})
 
 	for name, test := range tests {
@@ -204,46 +204,46 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 
 			for _, dataSource := range test.dataSources {
 				if dataSourceTimes, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
-					recordsFile, err := os.Open(dataSource.FileName)
+					metricsFile, err := os.Open(dataSource.FileName)
 					require.NoError(t, err)
 
-					decoder := json.NewDecoder(recordsFile)
+					decoder := json.NewDecoder(metricsFile)
 
 					_, err = decoder.Token()
 					require.NoError(t, err)
 
-					var records []*promexporter.Record
+					var metrics []*prestostore.PrometheusMetric
 					for decoder.More() {
-						var record promexporter.Record
-						err = decoder.Decode(&record)
+						var metric prestostore.PrometheusMetric
+						err = decoder.Decode(&metric)
 						require.NoError(t, err)
-						if reportStart.IsZero() || record.Timestamp.Before(reportStart) {
-							reportStart = record.Timestamp
+						if reportStart.IsZero() || metric.Timestamp.Before(reportStart) {
+							reportStart = metric.Timestamp
 						}
-						if record.Timestamp.After(reportEnd) {
-							reportEnd = record.Timestamp
+						if metric.Timestamp.After(reportEnd) {
+							reportEnd = metric.Timestamp
 						}
-						records = append(records, &record)
-						// batch store records in amounts of 100
-						if len(records) >= 100 {
-							err := testFramework.StoreDataSourceData(dataSource.DatasourceName, records)
+						metrics = append(metrics, &metric)
+						// batch store metrics in amounts of 100
+						if len(metrics) >= 100 {
+							err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
 							require.NoError(t, err)
-							records = nil
+							metrics = nil
 						}
 					}
-					// flush any records left over
-					if len(records) != 0 {
-						err = testFramework.StoreDataSourceData(dataSource.DatasourceName, records)
+					// flush any metrics left over
+					if len(metrics) != 0 {
+						err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
 						require.NoError(t, err)
 					}
 
-					dataSourcesSubmitted[dataSource.DatasourceName] = struct{ recordsStart, recordsEnd time.Time }{
-						recordsStart: reportStart,
-						recordsEnd:   reportEnd,
+					dataSourcesSubmitted[dataSource.DatasourceName] = struct{ metricsStart, metricsEnd time.Time }{
+						metricsStart: reportStart,
+						metricsEnd:   reportEnd,
 					}
 				} else {
-					reportStart = dataSourceTimes.recordsStart
-					reportEnd = dataSourceTimes.recordsEnd
+					reportStart = dataSourceTimes.metricsStart
+					reportEnd = dataSourceTimes.metricsEnd
 				}
 			}
 

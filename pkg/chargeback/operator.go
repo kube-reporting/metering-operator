@@ -92,21 +92,21 @@ type Chargeback struct {
 	initializedMu sync.Mutex
 	initialized   bool
 
-	prestoTablePartitionQueue                chan *cbTypes.ReportDataSource
-	prometheusExporterNewDataSourceQueue     chan *cbTypes.ReportDataSource
-	prometheusExporterDeletedDataSourceQueue chan string
-	promExporterTriggerFromLastTimestampCh   chan struct{}
-	promExporterTriggerForTimeRangeCh        chan promExporterTimeRangeTrigger
+	prestoTablePartitionQueue                    chan *cbTypes.ReportDataSource
+	prometheusImporterNewDataSourceQueue         chan *cbTypes.ReportDataSource
+	prometheusImporterDeletedDataSourceQueue     chan string
+	prometheusImporterTriggerFromLastTimestampCh chan struct{}
+	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
 }
 
 func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
 	op := &Chargeback{
 		cfg: cfg,
-		prestoTablePartitionQueue:                make(chan *cbTypes.ReportDataSource, 1),
-		prometheusExporterNewDataSourceQueue:     make(chan *cbTypes.ReportDataSource),
-		prometheusExporterDeletedDataSourceQueue: make(chan string),
-		promExporterTriggerFromLastTimestampCh:   make(chan struct{}),
-		promExporterTriggerForTimeRangeCh:        make(chan promExporterTimeRangeTrigger),
+		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
+		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
+		prometheusImporterDeletedDataSourceQueue:     make(chan string),
+		prometheusImporterTriggerFromLastTimestampCh: make(chan struct{}),
+		prometheusImporterTriggerForTimeRangeCh:      make(chan prometheusImporterTimeRangeTrigger),
 		logger: logger,
 		clock:  clock,
 	}
@@ -472,10 +472,10 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 
 	wg.Add(1)
 	go func() {
-		c.logger.Debugf("starting PrometheusExport worker")
-		c.runPrometheusExporterWorker(stopCh)
+		c.logger.Debugf("starting PrometheusImport worker")
+		c.runPrometheusImporterWorker(stopCh)
 		wg.Done()
-		c.logger.Debugf("PrometheusExport worker stopped")
+		c.logger.Debugf("PrometheusImport worker stopped")
 	}()
 }
 

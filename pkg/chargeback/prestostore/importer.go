@@ -1,4 +1,4 @@
-package promexporter
+package prestostore
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
-	"github.com/operator-framework/operator-metering/pkg/promcollector"
+	"github.com/operator-framework/operator-metering/pkg/promquery"
 )
 
 const (
@@ -21,25 +21,26 @@ const (
 	maxChunkDuration = 24 * time.Hour
 )
 
-// PrestoExporter exports Prometheus metrics into Presto tables
-type PrestoExporter struct {
+// PrometheusImporter imports Prometheus metrics into Presto tables
+type PrometheusImporter struct {
 	logger          logrus.FieldLogger
 	promConn        prom.API
 	prestoQueryer   db.Queryer
-	collectHandlers promcollector.CollectHandlers
+	collectHandlers promquery.ResultHandler
 	clock           clock.Clock
 	cfg             Config
 
-	// exportLock ensures only one export is running at a time, protecting the
-	// lastTimestamp and records fields
-	exportLock sync.Mutex
+	// importLock ensures only one import is running at a time, protecting the
+	// lastTimestamp and metrics fields
+	importLock sync.Mutex
 
-	//lastTimestamp is the lastTimestamp stored for this PrestoExporter
+	//lastTimestamp is the lastTimestamp stored for this PrometheusImporter
 	lastTimestamp *time.Time
-	// records contains the records we stored after an export. It is a pointer
+	// metrics contains the metrics we stored after an import. It is a pointer
 	// to a slice so we can change the contents from the postQueryHandler of
-	// our promcollector.Collector. After the export is finished it is expected that records is cleared.
-	records *[]*Record
+	// our promquery.QueryRangeChunked. After the import is finished it is
+	// expected that metrics is cleared.
+	metrics *[]*PrometheusMetric
 }
 
 type Config struct {
@@ -51,7 +52,7 @@ type Config struct {
 	AllowIncompleteChunks bool
 }
 
-func NewPrestoExporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer db.Queryer, clock clock.Clock, cfg Config) *PrestoExporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer db.Queryer, clock clock.Clock, cfg Config) *PrometheusImporter {
 	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
 		if len(timeRanges) == 0 {
 			logger.Info("no time ranges to query yet for table %s", cfg.PrestoTableName)
@@ -63,27 +64,27 @@ func NewPrestoExporter(logger logrus.FieldLogger, promConn prom.API, prestoQuery
 		return nil
 	}
 
-	var recordsPtr *[]*Record
+	var metricsPtr *[]*PrometheusMetric
 	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
-		records := promMatrixToRecords(timeRange, matrix)
-		err := StorePrometheusRecords(ctx, prestoQueryer, cfg.PrestoTableName, records)
+		metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
+		err := StorePrometheusMetrics(ctx, prestoQueryer, cfg.PrestoTableName, metrics)
 		if err != nil {
 			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
 				cfg.PrestoTableName, timeRange.Start, timeRange.End, err)
 		}
-		recordsPtr = &records
+		metricsPtr = &metrics
 
 		return nil
 	}
 
-	collectHandlers := promcollector.CollectHandlers{
+	collectHandlers := promquery.ResultHandler{
 		PreProcessingHandler: preProcessingHandler,
 		PostQueryHandler:     postQueryHandler,
 	}
 
-	return &PrestoExporter{
+	return &PrometheusImporter{
 		logger: logger.WithFields(logrus.Fields{
-			"component": "PrestoExporter",
+			"component": "PrometheusImporter",
 			"tableName": cfg.PrestoTableName,
 		}),
 		promConn:        promConn,
@@ -91,22 +92,22 @@ func NewPrestoExporter(logger logrus.FieldLogger, promConn prom.API, prestoQuery
 		collectHandlers: collectHandlers,
 		clock:           clock,
 		cfg:             cfg,
-		records:         recordsPtr,
+		metrics:         metricsPtr,
 	}
 }
 
-// ExportFromLastTimestamp executes a Presto query from the last time range it
+// ImportFromLastTimestamp executes a Presto query from the last time range it
 // queried and stores the results in a Presto table.
 
-// The exporter will track the last time series it retrieved and will query
+// The importer will track the last time series it retrieved and will query
 // the next time range starting from where it left off if paused or stopped.
 // For more details on how querying Prometheus is done, see the package
-// pkg/promcollector.
-func (c *PrestoExporter) ExportFromLastTimestamp(ctx context.Context) ([]*Record, error) {
-	c.exportLock.Lock()
-	defer c.exportLock.Unlock()
+// pkg/promquery.
+func (c *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context) ([]*PrometheusMetric, error) {
+	c.importLock.Lock()
+	defer c.importLock.Unlock()
 	logger := c.logger
-	logger.Infof("PrestoExporter ExportFromLastTimestamp started")
+	logger.Infof("PrometheusImporter ImportFromLastTimestamp started")
 
 	endTime := c.clock.Now()
 
@@ -134,7 +135,7 @@ func (c *PrestoExporter) ExportFromLastTimestamp(ctx context.Context) ([]*Record
 			return nil, err
 		}
 	}
-	// We don't want to duplicate the c.lastTimestamp record so add
+	// We don't want to duplicate the c.lastTimestamp metric so add
 	// the step size so that we start at the next interval no longer in
 	// our range.
 	startTime := c.lastTimestamp.Add(c.cfg.StepSize)
@@ -152,7 +153,7 @@ func (c *PrestoExporter) ExportFromLastTimestamp(ctx context.Context) ([]*Record
 		"endTime":   endTime,
 	})
 
-	timeRangesCollected, err := c.export(ctx, startTime, endTime)
+	timeRangesCollected, err := c.importMetrics(ctx, startTime, endTime)
 	if err != nil {
 		loggerWithFields.WithError(err).Error("error collecting metrics")
 	}
@@ -162,22 +163,22 @@ func (c *PrestoExporter) ExportFromLastTimestamp(ctx context.Context) ([]*Record
 		return timeRangesCollected, nil
 	}
 
-	logger.Infof("PrestoExporter ExportFromLastTimestamp finished")
+	logger.Infof("PrometheusImporter ImportFromLastTimestamp finished")
 	return timeRangesCollected, nil
 
 }
 
-func (c *PrestoExporter) Export(ctx context.Context, startTime, endTime time.Time) ([]*Record, error) {
-	c.exportLock.Lock()
-	defer c.exportLock.Unlock()
+func (c *PrometheusImporter) ImportMetrics(ctx context.Context, startTime, endTime time.Time) ([]*PrometheusMetric, error) {
+	c.importLock.Lock()
+	defer c.importLock.Unlock()
 	logger := c.logger
-	logger.Infof("PrestoExporter Export started")
+	logger.Infof("PrometheusImporter Import started")
 	loggerWithFields := logger.WithFields(logrus.Fields{
 		"startTime": startTime,
 		"endTime":   endTime,
 	})
 
-	timeRangesCollected, err := c.export(ctx, startTime, endTime)
+	timeRangesCollected, err := c.importMetrics(ctx, startTime, endTime)
 	if err != nil {
 		loggerWithFields.WithError(err).Error("error collecting metrics")
 	}
@@ -186,33 +187,33 @@ func (c *PrestoExporter) Export(ctx context.Context, startTime, endTime time.Tim
 		loggerWithFields.Infof("no data collected for table %s", c.cfg.PrestoTableName)
 		return timeRangesCollected, nil
 	}
-	logger.Infof("PrestoExporter Export finished")
+	logger.Infof("PrometheusImporter Import finished")
 	return timeRangesCollected, nil
 }
 
-func (c *PrestoExporter) export(ctx context.Context, startTime, endTime time.Time) ([]*Record, error) {
-	_, err := promcollector.Collect(ctx, c.promConn, c.cfg.PrometheusQuery, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, c.cfg.AllowIncompleteChunks, c.collectHandlers)
+func (c *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTime time.Time) ([]*PrometheusMetric, error) {
+	_, err := promquery.QueryRangeChunked(ctx, c.promConn, c.cfg.PrometheusQuery, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, c.cfg.AllowIncompleteChunks, c.collectHandlers)
 	if err != nil {
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our c.lastTimestamp
 		c.lastTimestamp = nil
 	}
 
-	var records []*Record
-	if c.records != nil {
+	var metrics []*PrometheusMetric
+	if c.metrics != nil {
 		// keep a reference to our slice and
-		// reset c.records everytime we export it starts unset
-		records = *c.records
-		c.records = nil
+		// reset c.metrics everytime we import it starts unset
+		metrics = *c.metrics
+		c.metrics = nil
 	}
 
-	// if we got records, update our cached lastTimestamp
-	if err == nil && len(records) != 0 {
-		lastTS := records[len(records)-1].Timestamp
+	// if we got metrics, update our cached lastTimestamp
+	if err == nil && len(metrics) != 0 {
+		lastTS := metrics[len(metrics)-1].Timestamp
 		c.lastTimestamp = &lastTS
 	}
 
-	return records, err
+	return metrics, err
 }
 
 func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time, error) {
@@ -235,9 +236,9 @@ func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time,
 	return nil, nil
 }
 
-func promMatrixToRecords(timeRange prom.Range, matrix model.Matrix) []*Record {
-	var records []*Record
-	// iterate over segments of contiguous billing records
+func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []*PrometheusMetric {
+	var metrics []*PrometheusMetric
+	// iterate over segments of contiguous billing metrics
 	for _, sampleStream := range matrix {
 		for _, value := range sampleStream.Values {
 			labels := make(map[string]string, len(sampleStream.Metric))
@@ -245,20 +246,20 @@ func promMatrixToRecords(timeRange prom.Range, matrix model.Matrix) []*Record {
 				labels[string(k)] = string(v)
 			}
 
-			record := &Record{
+			metric := &PrometheusMetric{
 				Labels:    labels,
 				Amount:    float64(value.Value),
 				StepSize:  timeRange.Step,
 				Timestamp: value.Timestamp.Time().UTC(),
 			}
-			records = append(records, record)
+			metrics = append(metrics, metric)
 		}
 	}
-	return records
+	return metrics
 }
 
-// Record is a receipt of a usage determined by a query within a specific time range.
-type Record struct {
+// PrometheusMetric is a receipt of a usage determined by a query within a specific time range.
+type PrometheusMetric struct {
 	Labels    map[string]string `json:"labels"`
 	Amount    float64           `json:"amount"`
 	StepSize  time.Duration     `json:"stepSize"`

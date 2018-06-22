@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/operator-framework/operator-metering/pkg/chargeback"
-	"github.com/operator-framework/operator-metering/pkg/chargeback/promexporter"
+	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
 )
 
-func (f *Framework) StoreDataSourceData(dataSourceName string, records []*promexporter.Record) error {
-	params := chargeback.StorePromsumDataRequest(records)
+func (f *Framework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {
+	params := chargeback.StorePromsumDataRequest(metrics)
 	body, err := json.Marshal(params)
 	if err != nil {
 		return err

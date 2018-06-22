@@ -51,7 +51,7 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
-			c.prometheusExporterDeletedDataSourceQueue <- name
+			c.prometheusImporterDeletedDataSourceQueue <- name
 			c.deleteReportDataSourceTable(name)
 			return nil
 		}
@@ -150,7 +150,7 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 		return err
 	}
 
-	c.prometheusExporterNewDataSourceQueue <- dataSource
+	c.prometheusImporterNewDataSourceQueue <- dataSource
 
 	return nil
 }

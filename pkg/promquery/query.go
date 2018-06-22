@@ -1,4 +1,4 @@
-package promcollector
+package promquery
 
 import (
 	"context"
@@ -9,17 +9,17 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-type CollectHandlers struct {
+type ResultHandler struct {
 	PreProcessingHandler  func(context.Context, []prom.Range) error
 	PreQueryHandler       func(context.Context, prom.Range) error
 	PostQueryHandler      func(context.Context, prom.Range, model.Matrix) error
 	PostProcessingHandler func(context.Context, []prom.Range) error
 }
 
-// Collect runs the specified query over the interval between start and end,
-// performing multiple Prometheus query_range queries of chunkSize. Returns the
-// time ranges queried and any errors encountered. Stops after the first error,
-// consult timeRanges to determine how many chunks were queried.
+// QueryRangeChunked executes a promQL query over the interval between start
+// and end, performing multiple Prometheus query_range queries of chunkSize.
+// Returns the time ranges queried and any errors encountered. Stops after the
+// first error, consult timeRanges to determine how many chunks were queried.
 //
 // If the number of queries exceeds maxTimeRanges, then the timeRanges
 // exceeding that count will be skipped. The allowIncompleteChunks parameter
@@ -28,7 +28,7 @@ type CollectHandlers struct {
 // that's incomplete, and if there are multiple chunks, whether or not the
 // final chunk up to the endTime will be included even if the duration of
 // endTime - startTime isn't perfectly divisible by chunkSize.
-func Collect(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, stepSize, chunkSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers CollectHandlers) (timeRanges []prom.Range, err error) {
+func QueryRangeChunked(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, stepSize, chunkSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers ResultHandler) (timeRanges []prom.Range, err error) {
 	timeRangesToProcess := getTimeRanges(startTime, endTime, chunkSize, stepSize, maxTimeRanges, allowIncompleteChunks)
 	if len(timeRangesToProcess) == 0 {
 		return nil, nil

@@ -1,4 +1,4 @@
-package promexporter
+package prestostore
 
 import (
 	"bytes"
@@ -19,16 +19,16 @@ const (
 	prestoTimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-// StorePrometheusRecords handles storing Prometheus records into the specified
+// StorePrometheusMetrics handles storing Prometheus metrics into the specified
 // Presto table.
 //
 // Any Queryer is accepted, but this function expects a Presto connection.
-func StorePrometheusRecords(ctx context.Context, queryer db.Queryer, tableName string, records []*Record) error {
+func StorePrometheusMetrics(ctx context.Context, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
 	var queryValues []string
 
-	for _, record := range records {
-		recordValue := generateRecordSQLValues(record)
-		queryValues = append(queryValues, recordValue)
+	for _, metric := range metrics {
+		metricValue := generatePrometheusMetricSQLValues(metric)
+		queryValues = append(queryValues, metricValue)
 	}
 	// capacity prestoQueryCap, length 0
 	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
@@ -83,7 +83,7 @@ func StorePrometheusRecords(ctx context.Context, queryer db.Queryer, tableName s
 	return nil
 }
 
-// generateRecordSQLValues turns a Record into a SQL literal
+// generatePrometheusMetricSQLValues turns a PrometheusMetric into a SQL literal
 // suited for INSERT statements. To insert maps, we crete an array of keys and
 // values as recommended by Presto documentation.
 //
@@ -92,15 +92,15 @@ func StorePrometheusRecords(ctx context.Context, queryer db.Queryer, tableName s
 // column "timestamp" type: "timestamp"
 // column "timePrecision" type: "double"
 // column "labels" type: "map<string, string>"
-func generateRecordSQLValues(record *Record) string {
+func generatePrometheusMetricSQLValues(metric *PrometheusMetric) string {
 	var keys []string
 	var vals []string
-	for k, v := range record.Labels {
+	for k, v := range metric.Labels {
 		keys = append(keys, "'"+k+"'")
 		vals = append(vals, "'"+v+"'")
 	}
 	keyString := "ARRAY[" + strings.Join(keys, ",") + "]"
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
 	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
-		record.Amount, record.Timestamp.Format(prestoTimestampFormat), record.StepSize.Seconds(), keyString, valString)
+		metric.Amount, metric.Timestamp.Format(prestoTimestampFormat), metric.StepSize.Seconds(), keyString, valString)
 }

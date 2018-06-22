@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback/promexporter"
+	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -19,7 +19,7 @@ const (
 	defaultMaxPromTimeRanges = 2000
 )
 
-func (c *Chargeback) runPrometheusExporterWorker(stopCh <-chan struct{}) {
+func (c *Chargeback) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	// run a go routine that waits for the stopCh to be closed and propagates
@@ -30,56 +30,56 @@ func (c *Chargeback) runPrometheusExporterWorker(stopCh <-chan struct{}) {
 		// everything to return
 		cancel()
 	}()
-	c.startPrometheusExporter(ctx)
+	c.startPrometheusImporter(ctx)
 }
 
-func (c *Chargeback) triggerPromExporterFromLastTimestamp(ctx context.Context) error {
+func (c *Chargeback) triggerPrometheusImporterFromLastTimestamp(ctx context.Context) error {
 	select {
-	case c.promExporterTriggerFromLastTimestampCh <- struct{}{}:
+	case c.prometheusImporterTriggerFromLastTimestampCh <- struct{}{}:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-type promExporterTimeRangeTrigger struct {
+type prometheusImporterTimeRangeTrigger struct {
 	start, end time.Time
 	errCh      chan error
 }
 
-func (c *Chargeback) triggerPromExporterForTimeRange(ctx context.Context, start, end time.Time) error {
+func (c *Chargeback) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
 	errCh := make(chan error)
 	select {
-	case c.promExporterTriggerForTimeRangeCh <- promExporterTimeRangeTrigger{start, end, errCh}:
+	case c.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, errCh}:
 		return <-errCh
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
-	logger := c.logger.WithField("component", "PrometheusExporter")
-	logger.Infof("PrometheusExporter worker started")
-	promExporters := make(map[string]*promexporter.PrestoExporter)
+func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
+	logger := c.logger.WithField("component", "PrometheusImporter")
+	logger.Infof("PrometheusImporter worker started")
+	prometheusImporters := make(map[string]*prestostore.PrometheusImporter)
 
-	defer logger.Infof("PrometheusExporterWorker shutdown")
+	defer logger.Infof("PrometheusImporterWorker shutdown")
 
 	var timeCh <-chan time.Time
 	if c.cfg.DisablePromsum {
-		logger.Infof("Periodic Prometheus ReportDataSource exporting disabled")
+		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
 	} else {
-		logger.Infof("Periodiccally exporting Prometheus ReportDataSource every %s", c.cfg.PromsumInterval)
+		logger.Infof("Periodiccally importing Prometheus ReportDataSource every %s", c.cfg.PromsumInterval)
 		ticker := time.NewTicker(c.cfg.PromsumInterval)
 		timeCh = ticker.C
 
 		defer ticker.Stop()
-		// this go routine runs the trigger export function every PollInterval tick
-		// causing the exporter to collect and store data
+		// this go routine runs the trigger import function every PollInterval tick
+		// causing the importer to collect and store data
 		go func() {
 			for {
 				select {
 				case <-timeCh:
-					if err := c.triggerPromExporterFromLastTimestamp(ctx); err != nil {
+					if err := c.triggerPrometheusImporterFromLastTimestamp(ctx); err != nil {
 						return
 					}
 				case <-ctx.Done():
@@ -92,26 +92,26 @@ func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Infof("got shutdown signal, shutting down PrometheusExporters")
+			logger.Infof("got shutdown signal, shutting down PrometheusImporters")
 			return
-		case trigger := <-c.promExporterTriggerForTimeRangeCh:
-			// manually triggered export for a specific time range, usually from HTTP API
-			err := c.exportPrometheusDataSourceDataForTimeRange(ctx, logger, promExporters, trigger.start, trigger.end)
+		case trigger := <-c.prometheusImporterTriggerForTimeRangeCh:
+			// manually triggered import for a specific time range, usually from HTTP API
+			err := c.importPrometheusDataSourceDataForTimeRange(ctx, logger, prometheusImporters, trigger.start, trigger.end)
 			trigger.errCh <- err
-		case <-c.promExporterTriggerFromLastTimestampCh:
-			// every tick on timeCh this export Prometheus data for multiple
+		case <-c.prometheusImporterTriggerFromLastTimestampCh:
+			// every tick on timeCh this import Prometheus data for multiple
 			// ReportDataSources in parallel.
 			// we ignore the error because it's already logged and handled, but
 			// we may want to check it for cancellation in the future
-			_ = c.exportPrometheusDataSourceDataFromLastTimestamp(ctx, logger, promExporters)
-		case dataSourceName := <-c.prometheusExporterDeletedDataSourceQueue:
-			// if we have an exporter for this ReportDataSource then we need to
-			// remove it from our map so that the next time we export  Metrics
+			_ = c.importPrometheusDataSourceDataFromLastTimestamp(ctx, logger, prometheusImporters)
+		case dataSourceName := <-c.prometheusImporterDeletedDataSourceQueue:
+			// if we have an importer for this ReportDataSource then we need to
+			// remove it from our map so that the next time we import  Metrics
 			// it's not processed
-			if _, exists := promExporters[dataSourceName]; exists {
-				delete(promExporters, dataSourceName)
+			if _, exists := prometheusImporters[dataSourceName]; exists {
+				delete(prometheusImporters, dataSourceName)
 			}
-		case reportDataSource := <-c.prometheusExporterNewDataSourceQueue:
+		case reportDataSource := <-c.prometheusImporterNewDataSourceQueue:
 			if reportDataSource.Spec.Promsum == nil {
 				logger.Error("expected only Promsum ReportDataSources")
 				continue
@@ -127,10 +127,10 @@ func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
 				"tableName":        tableName,
 			})
 
-			if _, exists := promExporters[dataSourceName]; exists {
-				// We've already got an exporter for this ReportDataSource
+			if _, exists := prometheusImporters[dataSourceName]; exists {
+				// We've already got an importer for this ReportDataSource
 				// so we just need to update it
-				dataSourceLogger.Debugf("ReportDataSource %s already has an exporter, updating configuration")
+				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration")
 			}
 
 			reportPromQuery, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
@@ -140,7 +140,7 @@ func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
 			}
 			promQuery := reportPromQuery.Spec.Query
 
-			cfg := promexporter.Config{
+			cfg := prestostore.Config{
 				PrometheusQuery:       promQuery,
 				PrestoTableName:       tableName,
 				ChunkSize:             c.cfg.PromsumChunkSize,
@@ -148,42 +148,42 @@ func (c *Chargeback) startPrometheusExporter(ctx context.Context) {
 				MaxTimeRanges:         defaultMaxPromTimeRanges,
 				AllowIncompleteChunks: true,
 			}
-			exporter := promexporter.NewPrestoExporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
-			promExporters[dataSourceName] = exporter
+			importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
+			prometheusImporters[dataSourceName] = importer
 		}
 	}
 }
 
-type exporterFunc func(context.Context, *promexporter.PrestoExporter) ([]*promexporter.Record, error)
+type importFunc func(context.Context, *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error)
 
-func (c *Chargeback) exportPrometheusDataSourceDataFromLastTimestamp(ctx context.Context, logger logrus.FieldLogger, promExporters map[string]*promexporter.PrestoExporter) error {
-	return c.exportPrometheusDataSourceData(ctx, logger, promExporters, func(ctx context.Context, exporter *promexporter.PrestoExporter) ([]*promexporter.Record, error) {
-		return exporter.ExportFromLastTimestamp(ctx)
+func (c *Chargeback) importPrometheusDataSourceDataFromLastTimestamp(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter) error {
+	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error) {
+		return importer.ImportFromLastTimestamp(ctx)
 	})
 }
 
-func (c *Chargeback) exportPrometheusDataSourceDataForTimeRange(ctx context.Context, logger logrus.FieldLogger, promExporters map[string]*promexporter.PrestoExporter, start, end time.Time) error {
-	return c.exportPrometheusDataSourceData(ctx, logger, promExporters, func(ctx context.Context, exporter *promexporter.PrestoExporter) ([]*promexporter.Record, error) {
-		return exporter.Export(ctx, start, end)
+func (c *Chargeback) importPrometheusDataSourceDataForTimeRange(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter, start, end time.Time) error {
+	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error) {
+		return importer.ImportMetrics(ctx, start, end)
 	})
 }
 
-func (c *Chargeback) exportPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogger, promExporters map[string]*promexporter.PrestoExporter, export exporterFunc) error {
-	logger.Infof("Exporting Prometheus metrics to Presto")
+func (c *Chargeback) importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter, runImport importFunc) error {
+	logger.Infof("Importing Prometheus metrics to Presto")
 
 	const concurrency = 4
 	// create a channel to act as a semaphore to limit the number of
-	// exports happening in parallel
+	// importFuncs happening in parallel
 	semaphore := make(chan struct{}, concurrency)
 	g, ctx := errgroup.WithContext(ctx)
 
 	// start a go routine for each worker, where each Go routine will
 	// attempt to increment the semaphore, blocking if there are
 	// already `concurrency` go routines doing work. When a go routine
-	// is no longer exporting, it decrements the semaphore allowing
-	// other exporter Go routines to run
-	for dataSourceName, exporter := range promExporters {
-		exporter := exporter
+	// is no longer importing, it decrements the semaphore allowing
+	// other importer Go routines to run
+	for dataSourceName, prometheusImporter := range prometheusImporters {
+		prometheusImporter := prometheusImporter
 		g.Go(func() error {
 			// blocks trying to increment the semaphore (sending on the
 			// channel) or until the context is cancelled
@@ -195,18 +195,18 @@ func (c *Chargeback) exportPrometheusDataSourceData(ctx context.Context, logger 
 			dataSourceLogger := logger.WithField("reportDataSource", dataSourceName)
 			// decrement the semaphore at the end
 			defer func() {
-				dataSourceLogger.Infof("finished export for Prometheus ReportDataSource %s", dataSourceName)
+				dataSourceLogger.Infof("finished import for Prometheus ReportDataSource %s", dataSourceName)
 				<-semaphore
 			}()
-			dataSourceLogger.Infof("starting export for Prometheus ReportDataSource %s", dataSourceName)
+			dataSourceLogger.Infof("starting import for Prometheus ReportDataSource %s", dataSourceName)
 
-			_, err := export(ctx, exporter)
+			_, err := runImport(ctx, prometheusImporter)
 			return err
 		})
 	}
 	err := g.Wait()
 	if err != nil {
-		logger.WithError(err).Errorf("PrometheusExporter worker encountered errors while exporting data")
+		logger.WithError(err).Errorf("PrometheusImporter worker encountered errors while importing data")
 		return err
 	}
 	return nil
