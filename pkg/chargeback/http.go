@@ -23,6 +23,7 @@ import (
 
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
@@ -502,13 +503,12 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	logger.Debugf("collecting promsum data between %s and %s", req.StartTime.Format(time.RFC3339), req.EndTime.Format(time.RFC3339))
+	start := req.StartTime.UTC()
+	end := req.EndTime.UTC()
 
-	timeBoundsGetter := promsumDataSourceTimeBoundsGetter(func(dataSource *api.ReportDataSource) (startTime, endTime time.Time, err error) {
-		return req.StartTime.UTC(), req.EndTime.UTC(), nil
-	})
+	logger.Debugf("collecting promsum data between %s and %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	err = srv.chargeback.collectPromsumData(context.Background(), logger, timeBoundsGetter, -1, true)
+	err = srv.chargeback.triggerPrometheusImporterForTimeRange(context.Background(), start, end)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
 		return
@@ -517,7 +517,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	srv.writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
 }
 
-type StorePromsumDataRequest []*PromsumRecord
+type StorePromsumDataRequest []*prestostore.PrometheusMetric
 
 func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := srv.newLogger(r)
@@ -532,9 +532,9 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.chargeback.promsumStoreRecords(context.Background(), logger, dataSourceTableName(name), []*PromsumRecord(req))
+	err = prestostore.StorePrometheusMetrics(context.Background(), srv.chargeback.prestoConn, dataSourceTableName(name), []*prestostore.PrometheusMetric(req))
 	if err != nil {
-		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum records: %v", err)
+		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
 	}
 
@@ -578,7 +578,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
 }
 
-func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*PromsumRecord, error) {
+func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*prestostore.PrometheusMetric, error) {
 	whereClause := ""
 	if !start.IsZero() {
 		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
@@ -600,32 +600,32 @@ func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasour
 		return nil, err
 	}
 
-	var results []*PromsumRecord
+	var results []*prestostore.PrometheusMetric
 	for rows.Next() {
-		var dbRecord promsumDBRecord
-		if err := rows.Scan(&dbRecord.Labels, &dbRecord.Amount, &dbRecord.TimePrecision, &dbRecord.Timestamp); err != nil {
+		var dbPrometheusMetric promsumDBPrometheusMetric
+		if err := rows.Scan(&dbPrometheusMetric.Labels, &dbPrometheusMetric.Amount, &dbPrometheusMetric.TimePrecision, &dbPrometheusMetric.Timestamp); err != nil {
 			return nil, err
 		}
 		labels := make(map[string]string)
-		for key, value := range dbRecord.Labels {
+		for key, value := range dbPrometheusMetric.Labels {
 			var ok bool
 			labels[key], ok = value.(string)
 			if !ok {
 				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
 			}
 		}
-		record := PromsumRecord{
+		metric := prestostore.PrometheusMetric{
 			Labels:    labels,
-			Amount:    dbRecord.Amount,
-			StepSize:  time.Duration(dbRecord.TimePrecision) * time.Second,
-			Timestamp: dbRecord.Timestamp,
+			Amount:    dbPrometheusMetric.Amount,
+			StepSize:  time.Duration(dbPrometheusMetric.TimePrecision) * time.Second,
+			Timestamp: dbPrometheusMetric.Timestamp,
 		}
-		results = append(results, &record)
+		results = append(results, &metric)
 	}
 	return results, nil
 }
 
-type promsumDBRecord struct {
+type promsumDBPrometheusMetric struct {
 	Labels        map[string]interface{}
 	Amount        float64
 	TimePrecision float64

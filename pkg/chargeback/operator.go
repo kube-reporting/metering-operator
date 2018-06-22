@@ -92,13 +92,21 @@ type Chargeback struct {
 	initializedMu sync.Mutex
 	initialized   bool
 
-	prestoTablePartitionQueue chan *cbTypes.ReportDataSource
+	prestoTablePartitionQueue                    chan *cbTypes.ReportDataSource
+	prometheusImporterNewDataSourceQueue         chan *cbTypes.ReportDataSource
+	prometheusImporterDeletedDataSourceQueue     chan string
+	prometheusImporterTriggerFromLastTimestampCh chan struct{}
+	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
 }
 
 func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Chargeback, error) {
 	op := &Chargeback{
 		cfg: cfg,
-		prestoTablePartitionQueue: make(chan *cbTypes.ReportDataSource, 1),
+		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
+		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
+		prometheusImporterDeletedDataSourceQueue:     make(chan string),
+		prometheusImporterTriggerFromLastTimestampCh: make(chan struct{}),
+		prometheusImporterTriggerForTimeRangeCh:      make(chan prometheusImporterTimeRangeTrigger),
 		logger: logger,
 		clock:  clock,
 	}
@@ -462,15 +470,13 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		c.logger.Debugf("ScheduledReportRunner stopped")
 	}()
 
-	if !c.cfg.DisablePromsum {
-		wg.Add(1)
-		go func() {
-			c.logger.Debugf("starting Promsum collector")
-			c.runPromsumWorker(stopCh)
-			wg.Done()
-			c.logger.Debugf("Promsum collector stopped")
-		}()
-	}
+	wg.Add(1)
+	go func() {
+		c.logger.Debugf("starting PrometheusImport worker")
+		c.runPrometheusImporterWorker(stopCh)
+		wg.Done()
+		c.logger.Debugf("PrometheusImport worker stopped")
+	}()
 }
 
 func (c *Chargeback) setInitialized() {

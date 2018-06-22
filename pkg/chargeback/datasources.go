@@ -51,6 +51,7 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
+			c.prometheusImporterDeletedDataSourceQueue <- name
 			c.deleteReportDataSourceTable(name)
 			return nil
 		}
@@ -137,13 +138,21 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 	logger.Debugf("creating presto table CR for table %q", tableName)
 	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", createTableParams)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
+		logger.WithError(err).Errorf("failed to create PrestoTable resource %q", tableName)
 		return err
 	}
 
 	logger.Debugf("successfully created table %s", tableName)
 
-	return c.updateDataSourceTableName(logger, dataSource, tableName)
+	err = c.updateDataSourceTableName(logger, dataSource, tableName)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to update ReportDataSource TableName ***REMOVED***eld %q", tableName)
+		return err
+	}
+
+	c.prometheusImporterNewDataSourceQueue <- dataSource
+
+	return nil
 }
 
 func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
