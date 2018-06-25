@@ -14,7 +14,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, deleteExistingData bool) ([]map[string]interface{}, error) {
+func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, deleteExistingData bool) ([]presto.Row, error) {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
@@ -59,7 +59,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	if deleteExistingData {
 		logger.Debugf("deleting any preexisting rows in %s", tableName)
-		_, err = presto.ExecuteSelect(c.prestoConn, fmt.Sprintf("DELETE FROM %s", tableName))
+		err = presto.DeleteFrom(c.prestoConn, tableName)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", tableName, err)
 		}
@@ -73,8 +73,8 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("Failed to execute %s usage report: %v", reportName, err)
 	}
 
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s", tableName)
-	results, err := presto.ExecuteSelect(c.prestoConn, getReportQuery)
+	prestoColumns := generatePrestoColumns(generationQuery)
+	results, err := presto.GetRows(c.prestoConn, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("getting usage report FAILED!")
 		return nil, fmt.Errorf("Failed to get usage report results: %v", err)

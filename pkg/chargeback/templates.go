@@ -7,11 +7,7 @@ import (
 	"time"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-)
-
-const (
-	// PrestoTimestampFormat is the time format string used to produce Presto timestamps.
-	PrestoTimestampFormat = "2006-01-02 15:04:05.000"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 type templateInfo struct {
@@ -26,7 +22,7 @@ type reportTemplateInfo struct {
 
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
-		"prestoTimestamp":             prestoTimestamp,
+		"prestoTimestamp":             presto.Timestamp,
 		"dataSourceTableName":         dataSourceTableName,
 		"generationQueryViewName":     generationQueryViewName,
 		"billingPeriodTimestamp":      billingPeriodTimestamp,
