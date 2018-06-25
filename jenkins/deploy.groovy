@@ -46,6 +46,7 @@ spec:
     environment {
         METERING_SRC_DIR            = "/go/src/github.com/operator-framework/operator-metering"
         DEPLOY_TAG                  = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+        DISABLE_PROMSUM             = "false"
         DELETE_PVCS                 = "false"
         METERING_CREATE_PULL_SECRET = "true"
         // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + DEPLOY_TAG
