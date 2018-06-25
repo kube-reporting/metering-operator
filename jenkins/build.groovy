@@ -11,13 +11,14 @@ if (isMasterBranch) {
 
 def podLabel = "operator-metering-build-${isMasterBranch ? 'master' : 'pr'}"
 def maxInstances = isMasterBranch ? 1 : 5
+def idleMinutes = isMasterBranch ? 15 : 45
 
 pipeline {
     agent {
         kubernetes {
             label podLabel
             instanceCap maxInstances
-            idleMinutes 15
+            idleMinutes idleMinutes
             defaultContainer 'jnlp'
             yaml """
 apiVersion: v1
