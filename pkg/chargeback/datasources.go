@@ -96,7 +96,6 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 		logger.Infof("new dataSource discovered")
 	} else {
 		logger.Infof("existing dataSource discovered, tableName: %s", dataSource.TableName)
-		return nil
 	}
 
 	switch {
