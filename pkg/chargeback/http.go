@@ -24,7 +24,6 @@ import (
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
@@ -275,10 +274,9 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	orderByColsStr := getReportOrderByColumnsString(reportQuery)
-	reportTable := scheduledReportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
-	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
+	prestoColumns := generatePrestoColumns(reportQuery)
+	tableName := scheduledReportTableName(name)
+	results, err := presto.GetRows(srv.chargeback.prestoConn, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
@@ -332,10 +330,9 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	orderByColsStr := getReportOrderByColumnsString(reportQuery)
-	reportTable := reportTableName(name)
-	getReportQuery := fmt.Sprintf("SELECT * FROM %s ORDER BY %s", reportTable, orderByColsStr)
-	results, err := presto.ExecuteSelect(srv.chargeback.prestoConn, getReportQuery)
+	prestoColumns := generatePrestoColumns(reportQuery)
+	tableName := reportTableName(name)
+	results, err := presto.GetRows(srv.chargeback.prestoConn, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
@@ -363,7 +360,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
-func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	buf := &bytes.Buffer{}
 	csvWriter := csv.NewWriter(buf)
 
@@ -423,7 +420,7 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Repor
 	w.Write(buf.Bytes())
 }
 
-func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		newResults := make([]*orderedmap.OrderedMap, len(results))
@@ -457,8 +454,8 @@ type ReportResultValues struct {
 	Unit        string      `json:"unit,omitempty"`
 }
 
-// convertsToGetReportResults converts maps returned from `presto.ExecuteSelect` into a GetReportResults
-func convertsToGetReportResults(input []map[string]interface{}, columns []api.ReportGenerationQueryColumn) GetReportResults {
+// convertsToGetReportResults converts Rows returned from `presto.ExecuteSelect` into a GetReportResults
+func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerationQueryColumn) GetReportResults {
 	results := GetReportResults{}
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	for _, column := range columns {
@@ -480,7 +477,7 @@ func convertsToGetReportResults(input []map[string]interface{}, columns []api.Re
 	return results
 }
 
-func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []map[string]interface{}, w http.ResponseWriter, r *http.Request) {
+func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	var filteredColumns []api.ReportGenerationQueryColumn
 	for _, column := range columns {
@@ -597,83 +594,11 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	results, err := queryPromsumDatasource(logger, srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
+	results, err := prestostore.GetPrometheusMetrics(srv.chargeback.prestoConn, datasourceTable, startTime, endTime)
 	if err != nil {
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
 	}
 
 	srv.writeResponseWithBody(logger, w, http.StatusOK, results)
-}
-
-func queryPromsumDatasource(logger log.FieldLogger, queryer db.Queryer, datasourceTable string, start, end time.Time) ([]*prestostore.PrometheusMetric, error) {
-	whereClause := ""
-	if !start.IsZero() {
-		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, prestoTimestamp(start))
-	}
-	if !end.IsZero() {
-		if !start.IsZero() {
-			whereClause += " AND "
-		} else {
-			whereClause += " WHERE "
-		}
-		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, prestoTimestamp(end))
-	}
-
-	// we use map_entries for ordering on the labels because maps are
-	// unorderable in Presto.
-	query := fmt.Sprintf(`SELECT labels, amount, timeprecision, "timestamp" FROM %s %s ORDER BY "timestamp", map_entries(labels), amount, timeprecision ASC`, datasourceTable, whereClause)
-	rows, err := queryer.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	var results []*prestostore.PrometheusMetric
-	for rows.Next() {
-		var dbPrometheusMetric promsumDBPrometheusMetric
-		if err := rows.Scan(&dbPrometheusMetric.Labels, &dbPrometheusMetric.Amount, &dbPrometheusMetric.TimePrecision, &dbPrometheusMetric.Timestamp); err != nil {
-			return nil, err
-		}
-		labels := make(map[string]string)
-		for key, value := range dbPrometheusMetric.Labels {
-			var ok bool
-			labels[key], ok = value.(string)
-			if !ok {
-				logger.Errorf("invalid label %s, valueType: %T, value: %+v", key, value, value)
-			}
-		}
-		metric := prestostore.PrometheusMetric{
-			Labels:    labels,
-			Amount:    dbPrometheusMetric.Amount,
-			StepSize:  time.Duration(dbPrometheusMetric.TimePrecision) * time.Second,
-			Timestamp: dbPrometheusMetric.Timestamp,
-		}
-		results = append(results, &metric)
-	}
-	return results, nil
-}
-
-type promsumDBPrometheusMetric struct {
-	Labels        map[string]interface{}
-	Amount        float64
-	TimePrecision float64
-	Timestamp     time.Time
-}
-
-func getReportOrderByColumnsString(query *api.ReportGenerationQuery) string {
-	cols := query.Spec.Columns
-	var quotedColumns []string
-	for _, col := range cols {
-		colName := col.Name
-		// if we detect a map(...) in the column, use map_entries to do
-		// ordering. we detect a map column using a best effort approach by
-		// checking if the column type contains the string "map(" , and is
-		// followed by a ")" after that string.
-		if mapIndex := strings.Index(col.Type, "map("); mapIndex != -1 && strings.Index(col.Type, ")") > mapIndex {
-			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
-		} else {
-			quotedColumns = append(quotedColumns, fmt.Sprintf(`"%s"`, colName))
-		}
-	}
-	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }

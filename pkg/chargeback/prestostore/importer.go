@@ -12,7 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 
 	"github.com/operator-framework/operator-metering/pkg/db"
-	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/promquery"
 )
 
@@ -222,26 +221,6 @@ func (c *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTi
 	return metrics, err
 }
 
-func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time, error) {
-	// Get the most recent timestamp in the table for this query
-	getLastTimestampQuery := fmt.Sprintf(`
-				SELECT "timestamp"
-				FROM %s
-				ORDER BY "timestamp" DESC
-				LIMIT 1`, tableName)
-
-	results, err := presto.ExecuteSelect(queryer, getLastTimestampQuery)
-	if err != nil {
-		return nil, fmt.Errorf("error getting last timestamp for table %s, maybe table doesn't exist yet? %v", tableName, err)
-	}
-
-	if len(results) != 0 {
-		ts := results[0]["timestamp"].(time.Time)
-		return &ts, nil
-	}
-	return nil, nil
-}
-
 func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []*PrometheusMetric {
 	var metrics []*PrometheusMetric
 	// iterate over segments of contiguous billing metrics
@@ -262,12 +241,4 @@ func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []
 		}
 	}
 	return metrics
-}
-
-// PrometheusMetric is a receipt of a usage determined by a query within a specific time range.
-type PrometheusMetric struct {
-	Labels    map[string]string `json:"labels"`
-	Amount    float64           `json:"amount"`
-	StepSize  time.Duration     `json:"stepSize"`
-	Timestamp time.Time         `json:"timestamp"`
 }
