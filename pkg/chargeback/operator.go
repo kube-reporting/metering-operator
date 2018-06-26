@@ -642,6 +642,14 @@ func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
 	startTime := q.clock.Now()
 	q.logger.Debugf("getting hive connection")
 	for {
+		select {
+		case <-q.stopCh:
+			// check stopCh once before connecting in case the last select loop
+			// was on a tick and we got a cancellation since then
+			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
+		default:
+			// try connecting again
+		}
 		hive, err := hive.Connect(q.hiveHost)
 		if err == nil {
 			hive.SetLogQueries(q.logQueries)
