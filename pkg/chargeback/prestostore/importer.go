@@ -107,7 +107,7 @@ func (c *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context) ([]pro
 	logger := c.logger
 	logger.Infof("PrometheusImporter ImportFromLastTimestamp started")
 
-	endTime := c.clock.Now()
+	endTime := c.clock.Now().UTC()
 
 	// if c.lastTimestamp is null then it's because we errored sometime
 	// last time we collected and need to re-query Presto to figure out
