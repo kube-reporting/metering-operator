@@ -241,20 +241,21 @@ func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 	if err != nil {
 		return err
 	}
-	labels, err := accessor.Labels(obj)
+	objLabels, err := accessor.Labels(obj)
 	if err != nil {
 		return err
 	}
 
+	resourceName := prestoTableResourceNameFromKind(kind, name)
 	prestoTableCR := cbTypes.PrestoTable{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PrestoTable",
 			APIVersion: apiVersion,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      prestoTableResourceNameFromKind(kind, name),
+			Name:      resourceName,
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    objLabels,
 			OwnerReferences: []metav1.OwnerReference{
 				{
 					APIVersion: apiVersion,
@@ -289,6 +290,18 @@ func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 		})
 	}
 
-	_, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
-	return err
+	client := c.chargebackClient.ChargebackV1alpha1().PrestoTables(namespace)
+	_, err = client.Create(&prestoTableCR)
+	if k8serrors.IsAlreadyExists(err) {
+		if existing, err := client.Get(resourceName, metav1.GetOptions{}); err != nil {
+			return err
+		} ***REMOVED*** {
+			prestoTableCR.ResourceVersion = existing.ResourceVersion
+			_, err = client.Update(&prestoTableCR)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

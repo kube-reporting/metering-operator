@@ -28,7 +28,7 @@ type ResultHandler struct {
 // that's incomplete, and if there are multiple chunks, whether or not the
 // ***REMOVED***nal chunk up to the endTime will be included even if the duration of
 // endTime - startTime isn't perfectly divisible by chunkSize.
-func QueryRangeChunked(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, stepSize, chunkSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers ResultHandler) (timeRanges []prom.Range, err error) {
+func QueryRangeChunked(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers ResultHandler) (timeRanges []prom.Range, err error) {
 	timeRangesToProcess := getTimeRanges(startTime, endTime, chunkSize, stepSize, maxTimeRanges, allowIncompleteChunks)
 	if len(timeRangesToProcess) == 0 {
 		return nil, nil

@@ -4,9 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
 )
 
 const (
@@ -144,7 +146,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 			}
 
 			if importer, exists := prometheusImporters[dataSourceName]; exists {
-				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration")
+				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration", dataSourceName)
 				importer.UpdateCon***REMOVED***g(cfg)
 			} ***REMOVED*** {
 				importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
@@ -154,16 +156,16 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 	}
 }
 
-type importFunc func(context.Context, *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error)
+type importFunc func(context.Context, *prestostore.PrometheusImporter) ([]prom.Range, error)
 
 func (c *Chargeback) importPrometheusDataSourceDataFromLastTimestamp(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter) error {
-	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error) {
+	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
 		return importer.ImportFromLastTimestamp(ctx)
 	})
 }
 
 func (c *Chargeback) importPrometheusDataSourceDataForTimeRange(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter, start, end time.Time) error {
-	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]*prestostore.PrometheusMetric, error) {
+	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
 		return importer.ImportMetrics(ctx, start, end)
 	})
 }
