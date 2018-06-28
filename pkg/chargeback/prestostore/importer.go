@@ -64,6 +64,7 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQ
 
 	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
 		metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
+		logger.Infof("storing %d metrics into %s", len(metrics), cfg.PrestoTableName)
 		err := StorePrometheusMetrics(ctx, prestoQueryer, cfg.PrestoTableName, metrics)
 		if err != nil {
 			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
