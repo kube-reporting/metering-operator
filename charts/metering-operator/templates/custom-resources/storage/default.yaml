@@ -12,10 +12,10 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-{{- if eq .Values.con***REMOVED***g.defaultStorage.type "local" }}
-  local: {}
-{{- ***REMOVED*** if eq .Values.con***REMOVED***g.defaultStorage.type "s3" }}
-  s3:
-{{ .Values.con***REMOVED***g.defaultStorage.s3 | toYaml | indent 4 }}
+{{- if eq .Values.con***REMOVED***g.defaultStorage.type "hive" }}
+  hive:
+{{ toYaml .Values.con***REMOVED***g.defaultStorage.hive | indent 4 }}
+{{- ***REMOVED*** }}
+{{ printf "Unsupported defaultStorage.type: '%s'" .Values.con***REMOVED***g.defaultStorage.type | fail }}
 {{- end -}}
 {{- end -}}

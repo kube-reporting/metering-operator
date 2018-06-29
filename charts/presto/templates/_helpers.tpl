@@ -4,6 +4,7 @@
             con***REMOVED***gMapKeyRef:
               name: hive-common-con***REMOVED***g
               key: default-fs
+              optional: true
         - name: CORE_CONF_fs_s3a_access_key
           valueFrom:
             secretKeyRef:
