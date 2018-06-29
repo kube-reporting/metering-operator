@@ -5,10 +5,6 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  environment: {{ .Values.presto.config.environment | quote }}
-  discovery-uri: {{ .Values.presto.config.discoveryURI | quote }}
-  hive-metastore-uri: {{ .Values.presto.config.hiveMetastoreURI }}
-
   log-level: {{ upper .Values.presto.coordinator.config.logLevel | quote }}
   node-scheduler-include-coordinator: {{ .Values.presto.coordinator.config.nodeSchedulerIncludeCoordinator | quote }}
 {{- if .Values.presto.coordinator.config.taskConcurrency }}
