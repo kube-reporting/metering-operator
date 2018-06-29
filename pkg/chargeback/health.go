@@ -84,7 +84,7 @@ func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
-	err := c.hiveQueryer.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
+	_, err := c.hiveQueryer.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
 	if err != nil {
 		logger.WithError(err).Debugf("cannot create Presto table chargeback_health_check")
 		return false

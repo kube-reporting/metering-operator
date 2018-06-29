@@ -12,6 +12,15 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
+var (
+	promsumHiveColumns = []hive.Column{
+		{Name: "amount", Type: "double"},
+		{Name: "timestamp", Type: "timestamp"},
+		{Name: "timePrecision", Type: "double"},
+		{Name: "labels", Type: "map<string, string>"},
+	}
+)
+
 func (c *Chargeback) runReportDataSourceWorker() {
 	logger := c.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
@@ -117,16 +126,23 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 		return err
 	}
 
-	var createTableParams hive.CreateTableParameters
-	if storageSpec.Local != nil {
-		logger.Debugf("creating local table %s", tableName)
-		createTableParams, err = hive.CreateLocalPromsumTable(c.hiveQueryer, tableName)
+	var tableParams hive.TableParameters
+	var tableProperties hive.TableProperties
+	if storageSpec.Hive != nil {
+		tableProperties = hive.TableProperties(storageSpec.Hive.TableProperties)
+		tableParams = hive.TableParameters{
+			Name:         tableName,
+			Columns:      promsumHiveColumns,
+			IgnoreExists: true,
+		}
+		logger.Debugf("Creating table %s with Hive Storage %v", tableName, tableProperties)
+		err = hive.ExecuteCreateTable(c.hiveQueryer, tableParams, tableProperties, false)
 		if err != nil {
 			return err
 		}
 	} ***REMOVED*** if storageSpec.S3 != nil {
 		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
-		createTableParams, err = hive.CreateS3PromsumTable(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
+		tableParams, tableProperties, err = hive.ExecuteCreateS3Table(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x, promsumHiveColumns, false)
 		if err != nil {
 			return err
 		}
@@ -135,7 +151,7 @@ func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource 
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", createTableParams)
+	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", tableParams, tableProperties, nil)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable resource %q", tableName)
 		return err
@@ -177,13 +193,13 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	tableName := dataSourceTableName(dataSource.Name)
 	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-	createTableParams, err := hive.CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+	tableParams, tableProperties, err := CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
 	if err != nil {
 		return err
 	}
 
 	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", createTableParams)
+	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", tableParams, tableProperties, nil)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
@@ -212,7 +228,7 @@ func (c *Chargeback) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 
 func (c *Chargeback) deleteReportDataSourceTable(name string) {
 	tableName := dataSourceTableName(name)
-	err := hive.DropTable(c.hiveQueryer, tableName, true)
+	err := hive.ExecuteDropTable(c.hiveQueryer, tableName, true)
 	if err != nil {
 		c.logger.WithError(err).Error("unable to drop ReportDataSource table")
 	}

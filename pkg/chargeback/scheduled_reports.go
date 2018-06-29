@@ -227,7 +227,7 @@ func (job *scheduledReportJob) stop(dropTable bool) {
 		if dropTable {
 			tableName := scheduledReportTableName(job.report.Name)
 			logger.Infof("deleting scheduledReport table %s", tableName)
-			err := hive.DropTable(job.chargeback.hiveQueryer, tableName, true)
+			err := hive.ExecuteDropTable(job.chargeback.hiveQueryer, tableName, true)
 			if err != nil {
 				job.chargeback.logger.WithError(err).Error("unable to drop table")
 			}

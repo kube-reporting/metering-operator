@@ -2,6 +2,9 @@ package v1alpha1
 
 import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -22,35 +25,14 @@ type PrestoTable struct {
 	State PrestoTableState `json:"state"`
 }
 
+type TableParameters hive.TableParameters
+
+type TableProperties hive.TableProperties
+
+type TablePartition presto.TablePartition
+
 type PrestoTableState struct {
-	// CreationParameters holds all arguments used in the call to
-	// pkg/hive/query.go#createTable
-	CreationParameters PrestoTableCreationParameters `json:"creationParameters"`
-
-	// Partitions holds all currently con***REMOVED***gured partitions for a given table.
-	// Currently only relevant to tables backed by AWS billing reports.
-	Partitions []PrestoTablePartition `json:"partitions"`
-}
-
-type PrestoTableCreationParameters struct {
-	TableName    string              `json:"tableName"`
-	Location     string              `json:"location,omitempty"`
-	SerdeFmt     string              `json:"serdeFmt,omitempty"`
-	Format       string              `json:"format,omitempty"`
-	SerdeProps   map[string]string   `json:"serdeProps,omitempty"`
-	Columns      []PrestoTableColumn `json:"columns"`
-	Partitions   []PrestoTableColumn `json:"partitions,omitempty"`
-	External     bool                `json:"external,omitempty"`
-	IgnoreExists bool                `json:"ignoreExists,omitempty"`
-}
-
-type PrestoTableColumn struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
-
-type PrestoTablePartition struct {
-	Start    string `json:"start"`
-	End      string `json:"end"`
-	Location string `json:"location"`
+	Parameters TableParameters  `json:"parameters"`
+	Properties TableProperties  `json:"properties"`
+	Partitions []TablePartition `json:"partitions"`
 }
