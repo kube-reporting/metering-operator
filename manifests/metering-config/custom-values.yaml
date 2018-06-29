@@ -12,6 +12,7 @@ spec:
         # Replace these values with your own
         bucket: "your-aws-cost-report-bucket"
         pre***REMOVED***x: "path/to/report"
+        region: "your-buckets-region"
       # Replace these with your own AWS credentials
       awsAccessKeyID: "REPLACEME"
       awsSecretAccessKey: "REPLACEME"
