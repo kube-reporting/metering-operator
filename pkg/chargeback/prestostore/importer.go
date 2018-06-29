@@ -51,32 +51,51 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQ
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
 	})
+
+	var metricsCount int
 	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
+		metricsCount = 0
 		if len(timeRanges) == 0 {
 			logger.Info("no time ranges to query yet for table %s", cfg.PrestoTableName)
 		} ***REMOVED*** {
-			begin := timeRanges[0].Start
-			end := timeRanges[len(timeRanges)-1].End
+			begin := timeRanges[0].Start.UTC()
+			end := timeRanges[len(timeRanges)-1].End.UTC()
 			logger.Infof("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
 		}
 		return nil
 	}
 
+	preQueryHandler := func(ctx context.Context, timeRange prom.Range) error {
+		logger.Debugf("querying Prometheus using range %#v", timeRange)
+		return nil
+	}
+
 	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
 		metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
-		logger.Infof("storing %d metrics into %s", len(metrics), cfg.PrestoTableName)
+		logger.Debugf("got %d metrics, storing them into Presto into table %s", len(metrics), cfg.PrestoTableName)
 		err := StorePrometheusMetrics(ctx, prestoQueryer, cfg.PrestoTableName, metrics)
 		if err != nil {
 			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
 				cfg.PrestoTableName, timeRange.Start, timeRange.End, err)
 		}
+		logger.Debugf("stored %d metrics into Presto table %s successfully", len(metrics), cfg.PrestoTableName)
+		metricsCount += len(metrics)
+		return nil
+	}
 
+	postProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
+		begin := timeRanges[0].Start.UTC()
+		end := timeRanges[len(timeRanges)-1].End.UTC()
+		logger.Debugf("stored a total of %d metrics for data between %s and %s into %s", metricsCount, begin, end, cfg.PrestoTableName)
+		metricsCount = 0
 		return nil
 	}
 
 	collectHandlers := promquery.ResultHandler{
-		PreProcessingHandler: preProcessingHandler,
-		PostQueryHandler:     postQueryHandler,
+		PreProcessingHandler:  preProcessingHandler,
+		PreQueryHandler:       preQueryHandler,
+		PostQueryHandler:      postQueryHandler,
+		PostProcessingHandler: postProcessingHandler,
 	}
 
 	return &PrometheusImporter{
