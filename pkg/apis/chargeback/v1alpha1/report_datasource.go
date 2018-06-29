@@ -35,6 +35,11 @@ type AWSBillingDataSource struct {
 	Source *S3Bucket `json:"source"`
 }
 
+type S3Bucket struct {
+	Bucket string `json:"bucket"`
+	Prefix string `json:"prefix"`
+}
+
 type PrometheusMetricsDataSource struct {
 	Query   string              `json:"query"`
 	Storage *StorageLocationRef `json:"storage"`

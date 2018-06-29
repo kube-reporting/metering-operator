@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -31,10 +33,10 @@ var (
 const awsUsagePartitionDateStringLayout = "20060102"
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func CreateAWSUsageTable(queryer db.Queryer, tableName, bucket, prefix string, manifests []*aws.Manifest) (hive.TableParameters, hive.TableProperties, error) {
+func (c *Chargeback) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) error {
 	location, err := hive.S3Location(bucket, prefix)
 	if err != nil {
-		return hive.TableParameters{}, hive.TableProperties{}, err
+		return err
 	}
 
 	// Since the billing data likely exists already, we need to enumerate all
@@ -66,14 +68,13 @@ func CreateAWSUsageTable(queryer db.Queryer, tableName, bucket, prefix string, m
 		IgnoreExists: true,
 	}
 	properties := hive.TableProperties{
-		Location:        location,
-		Format:          "textfile",
-		SerdeFormat:     awsUsageHiveSerde,
-		SerdeProperties: awsUsageHiveSerdeProps,
-		External:        true,
+		Location:           location,
+		FileFormat:         "textfile",
+		SerdeFormat:        awsUsageHiveSerde,
+		SerdeRowProperties: awsUsageHiveSerdeProps,
+		External:           true,
 	}
-	err = hive.ExecuteCreateTable(queryer, params, properties, false)
-	return params, properties, err
+	return c.createTableWith(logger, dataSource, "ReportDataSource", dataSource.Name, params, properties, false)
 }
 
 // addAWSHivePartition will add a new partition to the given tableName for the time

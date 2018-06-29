@@ -25,13 +25,7 @@ type StorageLocation struct {
 }
 
 type StorageLocationSpec struct {
-	S3   *S3Bucket    `json:"s3,omitempty"`
-	Hive *HiveStorage `json:"hiveStorage,omitempty"`
-}
-
-type S3Bucket struct {
-	Bucket string `json:"bucket"`
-	Prefix string `json:"prefix"`
+	Hive *HiveStorage `json:"hive,omitempty"`
 }
 
 type HiveStorage struct {
