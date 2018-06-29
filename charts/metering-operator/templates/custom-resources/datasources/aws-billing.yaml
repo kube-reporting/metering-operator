@@ -12,4 +12,5 @@ spec:
     source:
       bucket: {{ .Values.con***REMOVED***g.awsBillingDataSource.bucket | quote }}
       pre***REMOVED***x: {{ .Values.con***REMOVED***g.awsBillingDataSource.pre***REMOVED***x | quote }}
+      region: {{ .Values.con***REMOVED***g.awsBillingDataSource.region | quote }}
 {{- end -}}
