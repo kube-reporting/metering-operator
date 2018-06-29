@@ -76,7 +76,10 @@ capture_pod_logs() {
     NS="$(sanetize_namespace "$1")"
     echo "Capturing logs for $NS"
     # List all logs for all containers in all pods for the namespace which was
-    kubectl get pods --show-all --no-headers --namespace "$NS" | awk '{ print $1 }' | while read -r pod; do
+    PODS="$(kubectl get pods --show-all --no-headers --namespace "$NS")"
+    echo '===Pods==='
+    echo "$PODS"
+    echo "$PODS" | awk '{ print $1 }' | while read -r pod; do
         if [[ -n "$pod" ]]; then
             printf '===Details from pod %s:===\n' "$pod"
 
