@@ -109,7 +109,7 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 
 	switch {
 	case dataSource.Spec.Promsum != nil:
-		return c.handlePromsumDataSource(logger, dataSource)
+		return c.handlePrometheusMetricsDataSource(logger, dataSource)
 	case dataSource.Spec.AWSBilling != nil:
 		return c.handleAWSBillingDataSource(logger, dataSource)
 	default:
@@ -117,7 +117,7 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 	}
 }
 
-func (c *Chargeback) handlePromsumDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	storage := dataSource.Spec.Promsum.Storage
 	tableName := dataSourceTableName(dataSource.Name)
 
