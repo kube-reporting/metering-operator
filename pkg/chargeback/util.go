@@ -37,7 +37,7 @@ func prestoTableResourceNameFromKind(kind, name string) string {
 }
 
 func billingPeriodTimestamp(date time.Time) string {
-	return date.Format(hive.HiveDateStringLayout)
+	return date.Format(awsUsagePartitionDateStringLayout)
 }
 
 func truncateToMinute(t time.Time) time.Time {

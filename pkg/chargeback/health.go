@@ -3,6 +3,8 @@ package chargeback
 import (
 	"net/http"
 
+	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -75,7 +77,7 @@ func (srv *server) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) boo
 }
 
 func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
-	_, err := c.prestoConn.Query("SELECT * FROM system.runtime.nodes")
+	_, err := presto.ExecuteSelect(c.prestoConn, "SELECT * FROM system.runtime.nodes")
 	if err != nil {
 		logger.WithError(err).Debugf("cannot query Presto system.runtime.nodes table")
 		return false
@@ -84,16 +86,18 @@ func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
 }
 
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
-	err := c.hiveQueryer.Query("CREATE TABLE IF NOT EXISTS chargeback_health_check (check_time TIMESTAMP)")
+	logger = logger.WithField("component", "testWriteToPresto")
+	const tableName = "chargeback_health_check"
+	err := c.createTableForStorageNoCR(logger, nil, tableName, []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}}, false)
 	if err != nil {
-		logger.WithError(err).Debugf("cannot create Presto table chargeback_health_check")
+		logger.WithError(err).Debugf("cannot create Presto table %s", tableName)
 		return false
 	}
 	// Hive does not support timezones, and now() returns a
 	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
-	_, err = c.prestoConn.Query("INSERT INTO chargeback_health_check VALUES (cast(now() AS TIMESTAMP))")
+	err = presto.ExecuteInsertQuery(c.prestoConn, tableName, "VALUES (cast(now() AS TIMESTAMP))")
 	if err != nil {
-		logger.WithError(err).Debugf("cannot insert into Presto table chargeback_health_check")
+		logger.WithError(err).Debugf("cannot insert into Presto table %s", tableName)
 		return false
 	}
 	return true

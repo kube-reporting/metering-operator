@@ -6,11 +6,9 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
@@ -48,11 +46,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("invalid report kind: %s", reportKind)
 	}
 
-	storageSpec, err := c.getStorageSpec(logger, storage, reportKind)
-	if err != nil {
-		return nil, err
-	}
-	err = c.createReportTable(logger, report, reportKind, reportName, tableName, storageSpec, columns, deleteExistingData)
+	err = c.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns, deleteExistingData)
 	if err != nil {
 		return nil, err
 	}
@@ -80,37 +74,4 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
 	}
 	return results, nil
-}
-
-func (c *Chargeback) createReportTable(logger log.FieldLogger, report runtime.Object, reportKind, reportName string, tableName string, storageSpec cbTypes.StorageLocationSpec, columns []hive.Column, dropTable bool) error {
-	var (
-		tableParams hive.CreateTableParameters
-		err         error
-	)
-	logger = logger.WithField("dropTable", dropTable)
-	if storageSpec.Local != nil {
-		logger.Debugf("Creating table %s backed by local storage", tableName)
-		tableParams, err = hive.CreateLocalReportTable(c.hiveQueryer, tableName, columns, dropTable)
-	} else if storageSpec.S3 != nil {
-		bucket, prefix := storageSpec.S3.Bucket, storageSpec.S3.Prefix
-		logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", tableName, bucket, prefix)
-		tableParams, err = hive.CreateS3ReportTable(c.hiveQueryer, tableName, bucket, prefix, columns, dropTable)
-	} else {
-		return fmt.Errorf("storage incorrectly configured on report: %s", reportName)
-	}
-
-	if err != nil {
-		return fmt.Errorf("couldn't create table for output report: %v", err)
-	}
-
-	logger.Infof("creating presto table resource for table %q", tableName)
-	err = c.createPrestoTableCR(report, cbTypes.GroupName, reportKind, tableParams)
-	if err != nil {
-		if errors.IsAlreadyExists(err) {
-			logger.Infof("presto table resource already exists")
-		} else {
-			return fmt.Errorf("couldn't create PrestoTable resource for report: %v", err)
-		}
-	}
-	return nil
 }

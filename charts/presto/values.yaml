@@ -77,7 +77,7 @@ hive:
     pullPolicy: Always
 
   config:
-    defaultfs: hdfs://hdfs-namenode-proxy:8020
+    defaultfs: null
     dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
     dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
     dbConnectionUsername: null

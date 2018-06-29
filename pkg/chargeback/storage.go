@@ -5,6 +5,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbListers "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/labels"
 )
@@ -41,7 +42,7 @@ func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing specified, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Infof("%s storage does not have a spec or storageLocationName set, using default storage location", kind)
+		logger.Infof("%s storage does not have a spec or storageLocationName set, getting default storage location", kind)
 		storageLocation, err := c.getDefaultStorageLocation(storageLister)
 		if err != nil {
 			return storageSpec, err
@@ -62,4 +63,17 @@ func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 		storageSpec = *storage.StorageSpec
 	}
 	return storageSpec, nil
+}
+
+func (c *Chargeback) getHiveTableProperties(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (*hive.TableProperties, error) {
+	storageSpec, err := c.getStorageSpec(logger, storage, kind)
+	if err != nil {
+		return nil, err
+	}
+	if storageSpec.Hive != nil {
+		props := hive.TableProperties(storageSpec.Hive.TableProperties)
+		return &props, nil
+	} else {
+		return nil, fmt.Errorf("incorrect storage configuration, must configure spec.hive")
+	}
 }
