@@ -39,16 +39,16 @@ func generateCreateTableSQL(params TableParameters, properties TableProperties) 
 	}
 
 	serdeFormatStr := ""
-	if properties.SerdeFormat != "" && properties.SerdeProperties != nil {
-		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", properties.SerdeFormat, generateSerdePropertiesSQL(properties.SerdeProperties))
+	if properties.SerdeFormat != "" && properties.SerdeRowProperties != nil {
+		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", properties.SerdeFormat, generateSerdeRowPropertiesSQL(properties.SerdeRowProperties))
 	}
 	location := ""
 	if properties.Location != "" {
 		location = fmt.Sprintf(`LOCATION "%s"`, properties.Location)
 	}
 	format := ""
-	if properties.Format != "" {
-		format = fmt.Sprintf("STORED AS %s", properties.Format)
+	if properties.FileFormat != "" {
+		format = fmt.Sprintf("STORED AS %s", properties.FileFormat)
 	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
@@ -74,8 +74,8 @@ func escapeColumn(columnName, columnType string) string {
 	return fmt.Sprintf("`%s` %s", columnName, columnType)
 }
 
-// generateSerdePropertiesSQL returns a formatted a set of SerDe properties for a Hive query.
-func generateSerdePropertiesSQL(props map[string]string) (propsTxt string) {
+// generateSerdeRowPropertiesSQL returns a formatted a set of SerDe properties for a Hive query.
+func generateSerdeRowPropertiesSQL(props map[string]string) (propsTxt string) {
 	***REMOVED***rst := true
 	for k, v := range props {
 		if !***REMOVED***rst {

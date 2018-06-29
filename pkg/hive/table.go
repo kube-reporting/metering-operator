@@ -8,50 +8,23 @@ import (
 )
 
 type Column struct {
-	Name string
-	Type string
+	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 type TableParameters struct {
 	Name         string   `json:"name"`
 	Columns      []Column `json:"columns"`
-	Partitions   []Column `json:"partitions"`
+	Partitions   []Column `json:"partitions,omitempty"`
 	IgnoreExists bool     `json:"ignoreExists"`
 }
 
 type TableProperties struct {
-	Location        string            `json:"location"`
-	SerdeFormat     string            `json:"serdeFormat"`
-	Format          string            `json:"format"`
-	SerdeProperties map[string]string `json:"serdeProperties"`
-	External        bool              `json:"external"`
-}
-
-// ExecuteCreateS3Table creates a new table backed by the given S3 bucket/pre***REMOVED***x with
-// the speci***REMOVED***ed columns
-func ExecuteCreateS3Table(queryer db.Queryer, tableName, bucket, pre***REMOVED***x string, columns []Column, dropTable bool) (TableParameters, TableProperties, error) {
-	path := path.Join(pre***REMOVED***x, tableName)
-	location, err := S3Location(bucket, path)
-	if err != nil {
-		return TableParameters{}, TableProperties{}, err
-	}
-
-	params := TableParameters{
-		Name:         tableName,
-		Columns:      columns,
-		Partitions:   nil,
-		IgnoreExists: false,
-	}
-	properties := TableProperties{
-		Location:        location,
-		SerdeFormat:     "",
-		Format:          "",
-		SerdeProperties: nil,
-		External:        false,
-	}
-	err = ExecuteCreateTable(queryer, params, properties, dropTable)
-	return params, properties, err
-
+	Location           string            `json:"location,omitempty"`
+	SerdeFormat        string            `json:"serdeFormat,omitempty"`
+	FileFormat         string            `json:"***REMOVED***leFormat,omitempty"`
+	SerdeRowProperties map[string]string `json:"serdeRowProperties,omitempty"`
+	External           bool              `json:"external,omitempty"`
 }
 
 func ExecuteCreateTable(queryer db.Queryer, params TableParameters, properties TableProperties, dropTable bool) error {

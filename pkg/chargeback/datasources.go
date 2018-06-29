@@ -120,44 +120,10 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	storage := dataSource.Spec.Promsum.Storage
 	tableName := dataSourceTableName(dataSource.Name)
-
-	storageSpec, err := c.getStorageSpec(logger, storage, "datasource")
+	err := c.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns, false)
 	if err != nil {
 		return err
 	}
-
-	var tableParams hive.TableParameters
-	var tableProperties hive.TableProperties
-	if storageSpec.Hive != nil {
-		tableProperties = hive.TableProperties(storageSpec.Hive.TableProperties)
-		tableParams = hive.TableParameters{
-			Name:         tableName,
-			Columns:      promsumHiveColumns,
-			IgnoreExists: true,
-		}
-		logger.Debugf("Creating table %s with Hive Storage %v", tableName, tableProperties)
-		err = hive.ExecuteCreateTable(c.hiveQueryer, tableParams, tableProperties, false)
-		if err != nil {
-			return err
-		}
-	} ***REMOVED*** if storageSpec.S3 != nil {
-		logger.Debugf("creating table %s backed by s3 bucket %s at pre***REMOVED***x %s", tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x)
-		tableParams, tableProperties, err = hive.ExecuteCreateS3Table(c.hiveQueryer, tableName, storageSpec.S3.Bucket, storageSpec.S3.Pre***REMOVED***x, promsumHiveColumns, false)
-		if err != nil {
-			return err
-		}
-	} ***REMOVED*** {
-		return fmt.Errorf("storage incorrectly con***REMOVED***gured on datasource %s", dataSource.Name)
-	}
-
-	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", tableParams, tableProperties, nil)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to create PrestoTable resource %q", tableName)
-		return err
-	}
-
-	logger.Debugf("successfully created table %s", tableName)
 
 	err = c.updateDataSourceTableName(logger, dataSource, tableName)
 	if err != nil {
@@ -193,20 +159,12 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	tableName := dataSourceTableName(dataSource.Name)
 	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-	tableParams, tableProperties, err := CreateAWSUsageTable(c.hiveQueryer, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+	err = c.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
 	if err != nil {
-		return err
-	}
-
-	logger.Debugf("creating presto table CR for table %q", tableName)
-	err = c.createPrestoTableCR(dataSource, cbTypes.GroupName, "datasource", tableParams, tableProperties, nil)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to create PrestoTable CR %q", tableName)
 		return err
 	}
 
 	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-
 	err = c.updateDataSourceTableName(logger, dataSource, tableName)
 	if err != nil {
 		return err

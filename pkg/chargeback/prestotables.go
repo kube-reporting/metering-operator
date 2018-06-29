@@ -285,11 +285,11 @@ func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 				Partitions:   params.Partitions,
 			}),
 			Properties: cbTypes.TableProperties(hive.TableProperties{
-				Location:        properties.Location,
-				Format:          properties.Format,
-				SerdeFormat:     properties.SerdeFormat,
-				SerdeProperties: properties.SerdeProperties,
-				External:        properties.External,
+				Location:           properties.Location,
+				FileFormat:         properties.FileFormat,
+				SerdeFormat:        properties.SerdeFormat,
+				SerdeRowProperties: properties.SerdeRowProperties,
+				External:           properties.External,
 			}),
 		},
 	}
