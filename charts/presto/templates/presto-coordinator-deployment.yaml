@@ -26,6 +26,7 @@ spec:
 {{- end }}
       annotations:
         presto-coordinator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-coordinator-con***REMOVED***g.yaml") . | sha256sum }}
+        presto-common-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-common-con***REMOVED***g.yaml") . | sha256sum }}
         presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
 {{- if .Values.presto.annotations }}
 {{ toYaml .Values.presto.annotations | indent 8 }}
@@ -44,31 +45,6 @@ spec:
         image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
         imagePullPolicy: {{ .Values.presto.image.pullPolicy }}
         env:
-        - name: HIVE_CATALOG_hive_s3_aws___access___key
-          valueFrom:
-            secretKeyRef:
-              name: presto-secrets
-              key: aws-access-key-id
-        - name: HIVE_CATALOG_hive_s3_aws___secret___key
-          valueFrom:
-            secretKeyRef:
-              name: presto-secrets
-              key: aws-secret-access-key
-        - name: HIVE_CATALOG_hive_metastore_uri
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: hive-metastore-uri
-        - name: PRESTO_LOG_com_facebook_presto
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: log-level
-        - name: PRESTO_CONF_discovery_uri
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: discovery-uri
         - name: PRESTO_CONF_discovery___server_enabled
           value: "true"
         - name: PRESTO_CONF_coordinator
@@ -78,57 +54,8 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: presto-coordinator-con***REMOVED***g
               key: node-scheduler-include-coordinator
-        - name: PRESTO_CONF_task_concurrency
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: task-concurrency
-              optional: true
-        - name: PRESTO_CONF_task_max___worker___threads
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: task-max-worker-threads
-              optional: true
-        - name: PRESTO_CONF_task_min___drivers
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: task-min-drivers
-              optional: true
-        - name: PRESTO_NODE_node_environment
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: presto-coordinator-con***REMOVED***g
-              key: environment
-        - name: PRESTO_NODE_node_id
-          valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.uid
-        - name: MY_NODE_NAME
-          valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: spec.nodeName
-        - name: MY_POD_NAME
-          valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.name
-        - name: MY_POD_NAMESPACE
-          valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.namespace
-        - name: MY_MEM_REQUEST
-          valueFrom:
-            resourceFieldRef:
-              containerName: presto
-              resource: requests.memory
-        - name: MY_MEM_LIMIT
-          valueFrom:
-            resourceFieldRef:
-              containerName: presto
-              resource: limits.memory
-        - name: JAVA_MAX_MEM_RATIO
-          value: "50"
+{{- include "presto-env" "presto-coordinator-con***REMOVED***g" | indent 8 }}
+{{- include "presto-common-env" . | indent 8 }}
         ports:
         - name: http
           containerPort: 8080

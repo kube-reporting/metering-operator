@@ -57,6 +57,7 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: hive-server-con***REMOVED***g
               key: log-level
+{{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
             resourceFieldRef:
@@ -67,7 +68,6 @@ spec:
             resourceFieldRef:
               containerName: hiveserver2
               resource: limits.memory
-{{ template "hive-env" . }}
         resources:
 {{ toYaml .Values.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst

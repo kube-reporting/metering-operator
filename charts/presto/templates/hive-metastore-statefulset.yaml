@@ -53,6 +53,7 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: hive-server-con***REMOVED***g
               key: log-level
+{{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
             resourceFieldRef:
@@ -63,7 +64,6 @@ spec:
             resourceFieldRef:
               containerName: metastore
               resource: limits.memory
-{{ template "hive-env" . }}
 {{- if .Values.hive.metastore.storage.create }}
         volumeMounts:
         - name: hive-metastore-db-data
