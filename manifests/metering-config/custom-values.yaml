@@ -24,10 +24,10 @@ spec:
       #   create: true
       #   name: "s3"
       #   isDefault: true
-      #   type: "s3"
-      #   s3:
-      #     bucket: "REPLACEME"
-      #     prefix: "REPLACEME"
+      #   type: "hive"
+      #   hive:
+      #     tableProperties:
+      #       location: "s3a://bucketName/pathInBucket"
 
   presto:
     config:
