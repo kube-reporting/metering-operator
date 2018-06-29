@@ -5,7 +5,9 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
+{{- if .Values.hive.config.defaultfs }}
   default-fs: {{ .Values.hive.config.defaultfs | quote}}
+{{- end }}
   db-connection-url: {{ .Values.hive.config.dbConnectionURL | quote}}
   db-connection-driver: {{ .Values.hive.config.dbConnectionDriver | quote}}
   enable-metastore-schema-verification: {{ .Values.hive.config.enableMetastoreSchemaVerification | quote}}

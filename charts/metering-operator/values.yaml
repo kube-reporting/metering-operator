@@ -12,9 +12,12 @@ config:
 
   defaultStorage:
     create: true
-    name: "local"
+    name: "hive-hdfs"
     isDefault: true
-    type: "local"
+    type: "hive"
+    hive:
+      tableProperties:
+        location: "hdfs://hdfs-namenode-proxy:8020/operator_metering/storage/"
 
   awsBillingDataSource:
     enabled: false
