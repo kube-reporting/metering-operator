@@ -143,6 +143,10 @@ To use S3 for storage, uncomment the `defaultStorage:` section in the example
 [custom-values.yaml][example-con***REMOVED***g] con***REMOVED***guration.
 Once uncommented, set `awsAccessKeyID` and `awsSecretAccessKey` in the `metering-operator.con***REMOVED***g` and `presto.con***REMOVED***g` sections.
 
+To store data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read and write access to the bucket.
+For an example of an IAM policy granting the required permissions see the [aws/read-write.json][aws/read-write.json] ***REMOVED***le.
+Replace `operator-metering-data` with the name of your bucket.
+
 Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
 
 Because the deployed HDFS cluster will not be used to store data, it may also be disabled. Uncomment the `hdfs.enabled: true` setting in `custom-values.yaml`, and set the
@@ -166,6 +170,10 @@ Next, update the `awsBillingDataSource` section in the [custom-values.yaml][exam
 Change the `enabled` value to `true`, and update the `bucket` and `pre***REMOVED***x` to the location of your AWS Detailed billing report.
 
 Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.con***REMOVED***g` and `spec.presto.con***REMOVED***g` sections.
+
+To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
+For an example of an IAM policy granting the required permissions see the [aws/read-only.json][aws/read-only.json] ***REMOVED***le.
+Replace `operator-metering-data` with the name of your bucket.
 
 This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the metering-operator.
 

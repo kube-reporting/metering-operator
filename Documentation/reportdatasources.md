@@ -19,6 +19,7 @@ To read more details on how the different ReportDataSources work, read the [mete
   - `source`:
     - `bucket`: Bucket name to store data into.
     - `pre***REMOVED***x`: Path within the bucket where to store data.
+    - `region`: The region where bucket is located.
 
 ## Table Schemas
 
