@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -33,16 +32,14 @@ type manifestRetriever struct {
 	bucket, pre***REMOVED***x string
 }
 
-func NewManifestRetriever(bucket, pre***REMOVED***x string) (ManifestRetriever, error) {
-	client, err := getS3Client(bucket, nil)
-	if err != nil {
-		return nil, err
-	}
+func NewManifestRetriever(region, bucket, pre***REMOVED***x string) ManifestRetriever {
+	awsSession := session.Must(session.NewSession())
+	client := s3.New(awsSession, aws.NewCon***REMOVED***g().WithRegion(region))
 	return &manifestRetriever{
 		s3API:  client,
 		bucket: bucket,
 		pre***REMOVED***x: pre***REMOVED***x,
-	}, nil
+	}
 }
 
 // RetrieveManifests downloads the billing manifest for the given bucket and
@@ -143,36 +140,4 @@ func retrieveManifest(client s3iface.S3API, bucket, key string) (*Manifest, erro
 		return nil, err
 	}
 	return &manifest, err
-}
-
-// getS3Client returns the singleton client.
-func getS3Client(bucket string, creds *credentials.Credentials) (s3iface.S3API, error) {
-	awsSession := session.Must(session.NewSession())
-	if creds != nil {
-		awsSession.Con***REMOVED***g.Credentials = creds
-	}
-
-	tmpClient := s3.New(awsSession, aws.NewCon***REMOVED***g().WithRegion(defaultS3Region))
-	region, err := retrieveRegion(tmpClient, bucket)
-	if err != nil {
-		return nil, err
-	}
-	awsSession.Con***REMOVED***g.Region = &region
-
-	return s3.New(awsSession), nil
-}
-
-// retrieveRegion performs a request to determine the region the bucket has been created in.
-func retrieveRegion(client s3iface.S3API, bucket string) (string, error) {
-	bucketResp, err := client.GetBucketLocation(&s3.GetBucketLocationInput{
-		Bucket: aws.String(bucket),
-	})
-	if err != nil {
-		return "", fmt.Errorf("failed to retrieve bucket region: %v", err)
-	}
-
-	if bucketResp.LocationConstraint == nil || *bucketResp.LocationConstraint == "" {
-		return "us-east-1", nil
-	}
-	return *bucketResp.LocationConstraint, nil
 }
