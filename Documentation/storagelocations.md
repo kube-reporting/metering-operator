@@ -8,15 +8,18 @@ Refer to the [Metering Configuration doc](metering-config.md#storing-data-in-s3)
 
 ## Fields
 
-- `s3`: If this section is present, then the `StorageLocation` will be configured to store data into an AWS S3 bucket.
-  - `bucket`: The name of the S3 bucket to store the data in.
-  - `prefix`: The path within the bucket to store the data in.
-- `local`: If this section is present, then the `StorageLocation` will be configured to store data based on what the operator defines as "local". Currently local storage is defined to be HDFS, and redefining what "local" maps to is not exposed as a configuration option, but is planned in the future. See the examples below for how to specify it.
+- `hive`: If this section is present, then the `StorageLocation` will be configured to store data in Presto by creating the table using Hive server.
+  - 'tableProperties': Contains configuration options for creating tables using Hive.
+    - `location`: The filesystem URL for Presto and Hive to use. This can be an `hdfs://` or `s3a://` filesystem URL.
+    - `fileFormat`: The format used for storing files in the filesystem. See the [Hive Documentation on File Storage Format for a list of options and more details][hiveFileFormat].
+    - `serdeFormat`: The [SerDe][hiveSerde] class for Hive to use to serialize and deserialize rows when fileFormat is `TEXTFILE`. See the [Hive Documentation on Row Formats & SerDe for more details][hiveSerdeFormat].
+    - `serdeRowProperties`: Additional properties used to configure `serdeFormat`. See the [Hive Documentation on Row Formats & SerDe for more details][hiveSerdeFormat].
+    - `external`: If specified, configures the table as an external table with existing data. If specified `location` is required. When tables using this storage are dropped, the contents are not deleted. See the [Hive documentation on External tables for more information][hiveExternalTables].
 
 ## Example StorageLocation
 
 This first example is what the built-in local storage option looks like.
-As you can see, it takes no options, so you must specify it using an empty object `{}`.
+As you can see, it's configured to use HDFS and supplies no additional options.
 
 ```yaml
 apiVersion: chargeback.coreos.com/v1alpha1
@@ -26,7 +29,8 @@ metadata:
   labels:
     operator-metering: "true"
   spec:
-    local: {}
+    hive:
+      location: "hdfs://hdfs-namenode-proxy:8020"
 ```
 
 The example below uses an AWS S3 bucket for storage.
@@ -40,9 +44,8 @@ metadata:
   labels:
     operator-metering: "true"
   spec:
-    s3:
-      bucket: bucket-name
-      prefix: path/within/bucket/
+    hive:
+      location: "s3a://bucket-name/path/within/bucket"
 ```
 
 ## Default StorageLocation
@@ -60,5 +63,11 @@ metadata:
   annotations:
     storagelocation.chargeback.coreos.com/is-default: "true"
   spec:
-    local: {}
+    hive:
+      location: "s3a://bucket-name/path/within/bucket"
 ```
+
+[hiveFileFormat]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
+[hiveSerdeFormat]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe
+[hiveSerde]: https://cwiki.apache.org/confluence/display/Hive/SerDe
+[hiveExternalTables]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-ExternalTables
