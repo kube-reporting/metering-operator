@@ -24,10 +24,10 @@ spec:
       #   create: true
       #   name: "s3"
       #   isDefault: true
-      #   type: "s3"
-      #   s3:
-      #     bucket: "REPLACEME"
-      #     pre***REMOVED***x: "REPLACEME"
+      #   type: "hive"
+      #   hive:
+      #     tableProperties:
+      #       location: "s3a://bucketName/pathInBucket"
 
   presto:
     con***REMOVED***g:

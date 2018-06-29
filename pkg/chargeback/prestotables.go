@@ -15,6 +15,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const prestoTableReconcileInterval = time.Minute
@@ -128,28 +129,34 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
 	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
 
-	toRemove := append(changes.toRemovePartitions, changes.toUpdatePartitions...)
-	toAdd := append(changes.toAddPartitions, changes.toUpdatePartitions...)
+	var toRemove []cbTypes.TablePartition = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
+	var toAdd []cbTypes.TablePartition = append(changes.toAddPartitions, changes.toUpdatePartitions...)
 	// We do removals then additions so that updates are supported as a combination of remove + add partition
+
+	tableName := prestoTable.State.Parameters.Name
 	for _, p := range toRemove {
-		logger.Warnf("Deleting partition from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
-		err = hive.DropPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+		start := p.PartitionSpec["start"]
+		end := p.PartitionSpec["end"]
+		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
+		err = dropAWSHivePartition(c.hiveQueryer, tableName, start, end)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
 			return err
 		}
-		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", tableName, start, end)
 	}
 
 	for _, p := range toAdd {
+		start := p.PartitionSpec["start"]
+		end := p.PartitionSpec["end"]
 		// This partition doesn't exist in hive. Create it.
-		logger.Debugf("Adding partition to presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
-		err = hive.AddPartition(c.hiveQueryer, prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
+		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
+		err = addAWSHivePartition(c.hiveQueryer, tableName, start, end, p.Location)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.CreationParameters.TableName, p.Start, p.End, p.Location)
+			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
 			return err
 		}
-		logger.Debugf("partition successfully added to presto table %q with range %s-%s", prestoTable.State.CreationParameters.TableName, p.Start, p.End)
+		logger.Debugf("partition successfully added to presto table %q with range %s-%s", tableName, start, end)
 	}
 
 	prestoTable.State.Partitions = desiredPartitions
@@ -165,8 +172,8 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	return nil
 }
 
-func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.ReportDataSource, manifests []*aws.Manifest) ([]cbTypes.PrestoTablePartition, error) {
-	desiredPartitions := make([]cbTypes.PrestoTablePartition, 0)
+func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.ReportDataSource, manifests []*aws.Manifest) ([]cbTypes.TablePartition, error) {
+	desiredPartitions := make([]cbTypes.TablePartition, 0)
 	// Manifests have a one-to-one correlation with hive currentPartitions
 	for _, manifest := range manifests {
 		manifestPath := manifest.DataDirectory()
@@ -174,10 +181,15 @@ func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.
 		if err != nil {
 			return nil, err
 		}
-		p := cbTypes.PrestoTablePartition{
-			Start:    billingPeriodTimestamp(manifest.BillingPeriod.Start.Time),
-			End:      billingPeriodTimestamp(manifest.BillingPeriod.End.Time),
+
+		start := billingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
+		end := billingPeriodTimestamp(manifest.BillingPeriod.End.Time)
+		p := cbTypes.TablePartition{
 			Location: location,
+			PartitionSpec: presto.PartitionSpec{
+				"start": start,
+				"end":   end,
+			},
 		}
 		desiredPartitions = append(desiredPartitions, p)
 	}
@@ -185,23 +197,23 @@ func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.
 }
 
 type partitionChanges struct {
-	toRemovePartitions []cbTypes.PrestoTablePartition
-	toAddPartitions    []cbTypes.PrestoTablePartition
-	toUpdatePartitions []cbTypes.PrestoTablePartition
+	toRemovePartitions []cbTypes.TablePartition
+	toAddPartitions    []cbTypes.TablePartition
+	toUpdatePartitions []cbTypes.TablePartition
 }
 
-func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTablePartition) partitionChanges {
-	currentPartitionsSet := make(map[string]cbTypes.PrestoTablePartition)
-	desiredPartitionsSet := make(map[string]cbTypes.PrestoTablePartition)
+func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePartition) partitionChanges {
+	currentPartitionsSet := make(map[string]cbTypes.TablePartition)
+	desiredPartitionsSet := make(map[string]cbTypes.TablePartition)
 
 	for _, p := range currentPartitions {
-		currentPartitionsSet[fmt.Sprintf("%s_%s", p.Start, p.End)] = p
+		currentPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
 	}
 	for _, p := range desiredPartitions {
-		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.Start, p.End)] = p
+		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
 	}
 
-	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.PrestoTablePartition
+	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.TablePartition
 
 	for key, partition := range currentPartitionsSet {
 		if _, exists := desiredPartitionsSet[key]; !exists {
@@ -227,7 +239,7 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.PrestoTa
 	}
 }
 
-func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.CreateTableParameters) error {
+func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
 	accessor := meta.NewAccessor()
 	name, err := accessor.Name(obj)
 	if err != nil {
@@ -266,28 +278,23 @@ func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 			},
 		},
 		State: cbTypes.PrestoTableState{
-			CreationParameters: cbTypes.PrestoTableCreationParameters{
-				TableName:    params.Name,
-				Location:     params.Location,
-				SerdeFmt:     params.SerdeFmt,
-				Format:       params.Format,
-				SerdeProps:   params.SerdeProps,
-				External:     params.External,
+			Parameters: cbTypes.TableParameters(hive.TableParameters{
+				Name:         params.Name,
+				Columns:      params.Columns,
 				IgnoreExists: params.IgnoreExists,
-			},
+				Partitions:   params.Partitions,
+			}),
+			Properties: cbTypes.TableProperties(hive.TableProperties{
+				Location:           properties.Location,
+				FileFormat:         properties.FileFormat,
+				SerdeFormat:        properties.SerdeFormat,
+				SerdeRowProperties: properties.SerdeRowProperties,
+				External:           properties.External,
+			}),
 		},
 	}
-	for _, col := range params.Columns {
-		prestoTableCR.State.CreationParameters.Columns = append(prestoTableCR.State.CreationParameters.Columns, cbTypes.PrestoTableColumn{
-			Name: col.Name,
-			Type: col.Type,
-		})
-	}
-	for _, par := range params.Partitions {
-		prestoTableCR.State.CreationParameters.Partitions = append(prestoTableCR.State.CreationParameters.Partitions, cbTypes.PrestoTableColumn{
-			Name: par.Name,
-			Type: par.Type,
-		})
+	for _, partition := range partitions {
+		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
 	client := c.chargebackClient.ChargebackV1alpha1().PrestoTables(namespace)

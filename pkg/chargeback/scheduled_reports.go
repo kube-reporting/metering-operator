@@ -227,7 +227,7 @@ func (job *scheduledReportJob) stop(dropTable bool) {
 		if dropTable {
 			tableName := scheduledReportTableName(job.report.Name)
 			logger.Infof("deleting scheduledReport table %s", tableName)
-			err := hive.DropTable(job.chargeback.hiveQueryer, tableName, true)
+			err := hive.ExecuteDropTable(job.chargeback.hiveQueryer, tableName, true)
 			if err != nil {
 				job.chargeback.logger.WithError(err).Error("unable to drop table")
 			}
@@ -284,12 +284,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 		tableName := scheduledReportTableName(job.report.Name)
 		columns := generateHiveColumns(genQuery)
-		storageSpec, err := job.chargeback.getStorageSpec(logger, job.report.Spec.Output, "ScheduledReport")
-		if err != nil {
-			logger.WithError(err).Error("unable to get report storage location")
-			return
-		}
-		err = job.chargeback.createReportTable(logger, job.report, "scheduledreport", job.report.Name, tableName, storageSpec, columns, false)
+		err = job.chargeback.createTableForStorage(logger, job.report, "scheduledreport", job.report.Name, job.report.Spec.Output, tableName, columns, false)
 		if err != nil {
 			logger.WithError(err).Error("error creating report table for scheduledReport")
 			return

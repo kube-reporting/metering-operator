@@ -15,6 +15,18 @@ const (
 	TimestampFormat = "2006-01-02 15:04:05.000"
 )
 
+type Column struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type PartitionSpec map[string]string
+
+type TablePartition struct {
+	Location      string        `json:"location"`
+	PartitionSpec PartitionSpec `json:"partitionSpec"`
+}
+
 func FormatInsertQuery(target, query string) string {
 	return fmt.Sprintf("INSERT INTO %s %s", target, query)
 }
@@ -91,11 +103,6 @@ func ExecuteSelect(queryer db.Queryer, query string) ([]Row, error) {
 
 func DeleteFrom(prestoConn db.Queryer, tableName string) error {
 	return ExecuteQuery(prestoConn, fmt.Sprintf("DELETE FROM %s", tableName))
-}
-
-type Column struct {
-	Name string
-	Type string
 }
 
 func GetRows(prestoConn db.Queryer, tableName string, columns []Column) ([]Row, error) {

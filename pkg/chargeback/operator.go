@@ -581,7 +581,7 @@ func newHiveQueryer(logger log.FieldLogger, clock clock.Clock, hiveHost string, 
 	}
 }
 
-func (q *hiveQueryer) Query(query string) error {
+func (q *hiveQueryer) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	const maxRetries = 3
 	for retries := 0; retries < maxRetries; retries++ {
 		hiveConn, err := q.getHiveConnection()
@@ -593,9 +593,9 @@ func (q *hiveQueryer) Query(query string) error {
 			}
 			// We don't close the connection here because we got an error while
 			// getting it
-			return err
+			return nil, err
 		}
-		err = hiveConn.Query(query)
+		rows, err := hiveConn.Query(query)
 		if err != nil {
 			if err == io.EOF || isErrBrokenPipe(err) {
 				q.logger.WithError(err).Debugf("error occurred while making query, attempting to create new connection and retry")
@@ -605,14 +605,14 @@ func (q *hiveQueryer) Query(query string) error {
 			// We don't close the connection here because we got a good
 			// connection, and made the query, but the query itself had an
 			// error.
-			return err
+			return nil, err
 		}
-		return nil
+		return rows, nil
 	}
 
 	// We've tries 3 times, so close any connection and return an error
 	q.closeHiveConnection()
-	return fmt.Errorf("unable to create new hive connection after existing hive connection closed")
+	return nil, fmt.Errorf("unable to create new hive connection after existing hive connection closed")
 }
 
 func (q *hiveQueryer) getHiveConnection() (*hive.Connection, error) {
