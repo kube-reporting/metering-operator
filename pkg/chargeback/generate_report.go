@@ -84,17 +84,24 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 
 func (c *Chargeback) createReportTable(logger log.FieldLogger, report runtime.Object, reportKind, reportName string, tableName string, storageSpec cbTypes.StorageLocationSpec, columns []hive.Column, dropTable bool) error {
 	var (
-		tableParams hive.CreateTableParameters
-		err         error
+		tableParams     hive.TableParameters
+		tableProperties hive.TableProperties
+		err             error
 	)
 	logger = logger.WithField("dropTable", dropTable)
-	if storageSpec.Local != nil {
-		logger.Debugf("Creating table %s backed by local storage", tableName)
-		tableParams, err = hive.CreateLocalReportTable(c.hiveQueryer, tableName, columns, dropTable)
+	if storageSpec.Hive != nil {
+		tableProperties = hive.TableProperties(storageSpec.Hive.TableProperties)
+		tableParams = hive.TableParameters{
+			Name:         tableName,
+			Columns:      columns,
+			IgnoreExists: true,
+		}
+		logger.Debugf("Creating table %s with Hive Storage %v", tableName, tableProperties)
+		err = hive.ExecuteCreateTable(c.hiveQueryer, tableParams, tableProperties, dropTable)
 	} else if storageSpec.S3 != nil {
 		bucket, prefix := storageSpec.S3.Bucket, storageSpec.S3.Prefix
 		logger.Debugf("Creating table %s pointing to s3 bucket %s at prefix %s", tableName, bucket, prefix)
-		tableParams, err = hive.CreateS3ReportTable(c.hiveQueryer, tableName, bucket, prefix, columns, dropTable)
+		tableParams, tableProperties, err = hive.ExecuteCreateS3Table(c.hiveQueryer, tableName, bucket, prefix, columns, dropTable)
 	} else {
 		return fmt.Errorf("storage incorrectly configured on report: %s", reportName)
 	}
@@ -104,7 +111,7 @@ func (c *Chargeback) createReportTable(logger log.FieldLogger, report runtime.Ob
 	}
 
 	logger.Infof("creating presto table resource for table %q", tableName)
-	err = c.createPrestoTableCR(report, cbTypes.GroupName, reportKind, tableParams)
+	err = c.createPrestoTableCR(report, cbTypes.GroupName, reportKind, tableParams, tableProperties, nil)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
 			logger.Infof("presto table resource already exists")

@@ -2,12 +2,10 @@ package hive
 
 import (
 	"fmt"
-	"net/url"
-	"path"
 	"strings"
 )
 
-func dropTable(name string, ignoreNotExists, purge bool) string {
+func generateDropTableSQL(name string, ignoreNotExists, purge bool) string {
 	ifExists := ""
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
@@ -20,25 +18,13 @@ func dropTable(name string, ignoreNotExists, purge bool) string {
 	return fmt.Sprintf("DROP TABLE %s %s %s", ifExists, name, purgeStr)
 }
 
-type CreateTableParameters struct {
-	Name         string
-	Location     string
-	SerdeFmt     string
-	Format       string
-	SerdeProps   map[string]string
-	Columns      []Column
-	Partitions   []Column
-	External     bool
-	IgnoreExists bool
-}
-
-// createTable returns a query for a CREATE statement which instantiates a new external Hive table.
+// generateCreateTableSQL returns a query for a CREATE statement which instantiates a new external Hive table.
 // If is external is set, an external Hive table will be used.
-func createTable(params CreateTableParameters) string {
-	columnsStr := fmtColumnText(params.Columns)
+func generateCreateTableSQL(params TableParameters, properties TableProperties) string {
+	columnsStr := generateColumnListSQL(params.Columns)
 
 	tableType := ""
-	if params.External {
+	if properties.External {
 		tableType = "EXTERNAL"
 	}
 
@@ -49,20 +35,20 @@ func createTable(params CreateTableParameters) string {
 
 	partitionedBy := ""
 	if len(params.Partitions) != 0 {
-		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", fmtColumnText(params.Partitions))
+		partitionedBy = fmt.Sprintf("PARTITIONED BY (%s)", generateColumnListSQL(params.Partitions))
 	}
 
 	serdeFormatStr := ""
-	if params.SerdeFmt != "" && params.SerdeProps != nil {
-		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", params.SerdeFmt, fmtSerdeProps(params.SerdeProps))
+	if properties.SerdeFormat != "" && properties.SerdeProperties != nil {
+		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", properties.SerdeFormat, generateSerdePropertiesSQL(properties.SerdeProperties))
 	}
 	location := ""
-	if params.Location != "" {
-		location = fmt.Sprintf(`LOCATION "%s"`, params.Location)
+	if properties.Location != "" {
+		location = fmt.Sprintf(`LOCATION "%s"`, properties.Location)
 	}
 	format := ""
-	if params.Format != "" {
-		format = fmt.Sprintf("STORED AS %s", params.Format)
+	if properties.Format != "" {
+		format = fmt.Sprintf("STORED AS %s", properties.Format)
 	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
@@ -74,12 +60,9 @@ func createTable(params CreateTableParameters) string {
 	)
 }
 
-type Column struct {
-	Name string
-	Type string
-}
-
-func fmtColumnText(columns []Column) string {
+// generateColumnListSQL returns a Hive CREATE column string from a slice of
+// name/type pairs. For example, "columnName string".
+func generateColumnListSQL(columns []Column) string {
 	c := make([]string, len(columns))
 	for i, col := range columns {
 		c[i] = escapeColumn(col.Name, col.Type)
@@ -91,8 +74,8 @@ func escapeColumn(columnName, columnType string) string {
 	return fmt.Sprintf("`%s` %s", columnName, columnType)
 }
 
-// fmtSerdeProps returns a formatted a set of SerDe properties for a Hive query.
-func fmtSerdeProps(props map[string]string) (propsTxt string) {
+// generateSerdePropertiesSQL returns a formatted a set of SerDe properties for a Hive query.
+func generateSerdePropertiesSQL(props map[string]string) (propsTxt string) {
 	first := true
 	for k, v := range props {
 		if !first {
@@ -104,21 +87,4 @@ func fmtSerdeProps(props map[string]string) (propsTxt string) {
 		propsTxt += pairStr
 	}
 	return
-}
-
-// fmtColumnText returns a Hive CREATE column string from a slice of name/type pairs. For example, "columnName string".
-// s3Location returns the HDFS path based on an S3 bucket and prefix.
-func S3Location(bucket, prefix string) (string, error) {
-	bucket = path.Join(bucket, prefix)
-	// Ensure the bucket URL has a trailing slash
-	if bucket[len(bucket)-1] != '/' {
-		bucket = bucket + "/"
-	}
-	location := "s3a://" + bucket
-
-	locationURL, err := url.Parse(location)
-	if err != nil {
-		return "", err
-	}
-	return locationURL.String(), nil
 }

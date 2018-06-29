@@ -291,8 +291,8 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	if len(results) > 0 && len(prestoTable.State.CreationParameters.Columns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.CreationParameters.Columns))
+	if len(results) > 0 && len(prestoTable.State.Parameters.Columns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.Parameters.Columns))
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
@@ -347,9 +347,9 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	columns := prestoTable.State.CreationParameters.Columns
+	columns := prestoTable.State.Parameters.Columns
 	if len(results) > 0 && len(columns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.CreationParameters.Columns))
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.Parameters.Columns))
 		srv.writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}

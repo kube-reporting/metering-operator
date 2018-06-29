@@ -1,6 +1,8 @@
 package v1alpha1
 
-import meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 const IsDefaultStorageLocationAnnotation = "storagelocation.chargeback.coreos.com/is-default"
 
@@ -23,8 +25,8 @@ type StorageLocation struct {
 }
 
 type StorageLocationSpec struct {
-	S3    *S3Bucket     `json:"s3,omitempty"`
-	Local *LocalStorage `json:"local,omitempty"`
+	S3   *S3Bucket    `json:"s3,omitempty"`
+	Hive *HiveStorage `json:"hiveStorage,omitempty"`
 }
 
 type S3Bucket struct {
@@ -32,7 +34,9 @@ type S3Bucket struct {
 	Prefix string `json:"prefix"`
 }
 
-type LocalStorage struct{}
+type HiveStorage struct {
+	TableProperties TableProperties `json:"tableProperties"`
+}
 
 type StorageLocationRef struct {
 	StorageLocationName string               `json:"storageLocationName,omitempty"`

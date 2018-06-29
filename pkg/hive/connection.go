@@ -2,6 +2,7 @@ package hive
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"sync"
@@ -25,10 +26,6 @@ type Connection struct {
 	logger     log.FieldLogger
 	logQueries bool
 	queryLock  sync.Mutex
-}
-
-type Queryer interface {
-	Query(query string) error
 }
 
 // Connect to a Hive cluster.
@@ -67,7 +64,7 @@ func Connect(host string) (*Connection, error) {
 }
 
 // Query a Hive server.
-func (c *Connection) Query(query string) error {
+func (c *Connection) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	// Only perform one query at a time
 	c.queryLock.Lock()
 	defer c.queryLock.Unlock()
@@ -81,16 +78,16 @@ func (c *Connection) Query(query string) error {
 	}
 	resp, err := c.client.ExecuteStatement(context.Background(), req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	switch resp.Status.GetStatusCode() {
 	case hive.TStatusCode_SUCCESS_STATUS:
 	case hive.TStatusCode_SUCCESS_WITH_INFO_STATUS:
 	default:
-		return fmt.Errorf("encountered error: code: %d, sqlState: %s, message: %s", resp.Status.GetErrorCode(), resp.Status.GetSqlState(), resp.Status.GetErrorMessage())
+		return nil, fmt.Errorf("encountered error: code: %d, sqlState: %s, message: %s", resp.Status.GetErrorCode(), resp.Status.GetSqlState(), resp.Status.GetErrorMessage())
 	}
-	return nil
+	return nil, nil
 }
 
 // Close connection to Hive server.

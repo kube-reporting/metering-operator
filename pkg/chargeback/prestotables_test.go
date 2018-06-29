@@ -6,88 +6,107 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 func TestGetPartitionChanges(t *testing.T) {
 	tests := []struct {
 		name             string
-		current          []cbTypes.PrestoTablePartition
-		desired          []cbTypes.PrestoTablePartition
-		expectedToRemove []cbTypes.PrestoTablePartition
-		expectedToAdd    []cbTypes.PrestoTablePartition
-		expectedToUpdate []cbTypes.PrestoTablePartition
+		current          []cbTypes.TablePartition
+		desired          []cbTypes.TablePartition
+		expectedToRemove []cbTypes.TablePartition
+		expectedToAdd    []cbTypes.TablePartition
+		expectedToUpdate []cbTypes.TablePartition
 	}{
 		{
 			name: "current and desired are same",
-			current: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			current: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			desired: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
 		},
 		{
 			name: "empty current should have desired in to add list",
-			desired: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			desired: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
-			expectedToAdd: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			expectedToAdd: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
 		},
 		{
 			name: "desired is empty and current should be removed",
-			current: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			current: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
-			expectedToRemove: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			expectedToRemove: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
 		},
 		{
 			name: "desired matches and replaces current",
-			current: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			current: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			desired: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "fizbuzz",
 				},
 			},
-			expectedToUpdate: []cbTypes.PrestoTablePartition{
-				cbTypes.PrestoTablePartition{
-					Start:    "20170101",
-					End:      "20170201",
+			expectedToUpdate: []cbTypes.TablePartition{
+				{
+					PartitionSpec: presto.PartitionSpec{
+						"start": "20170101",
+						"end":   "20170201",
+					},
 					Location: "fizbuzz",
 				},
 			},
