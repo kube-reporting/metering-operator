@@ -96,7 +96,7 @@ capture_pod_logs() {
                 printf -- '---End of logs for container %s in pod %s---\n\n' "$container" "$pod"
             done
 
-            printf '===End of details for pod %s===\n' "$pod"
+            printf '===End of details for pod %s===\n\n' "$pod"
         fi
     done
 }
