@@ -12,4 +12,5 @@ spec:
     source:
       bucket: {{ .Values.config.awsBillingDataSource.bucket | quote }}
       prefix: {{ .Values.config.awsBillingDataSource.prefix | quote }}
+      region: {{ .Values.config.awsBillingDataSource.region | quote }}
 {{- end -}}
