@@ -16,19 +16,19 @@ type statusResponse struct {
 // healthinessHandler is the readiness check for the metering operator. If this
 // no requests will be sent to this pod, and rolling updates will not proceed
 // until the checks succeed.
-func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
-	logger := srv.newLogger(r)
-	if !srv.chargeback.isInitialized() {
+func (c *Chargeback) readinessHandler(w http.ResponseWriter, r *http.Request) {
+	logger := newRequestLogger(c.logger, r, c.rand)
+	if !c.isInitialized() {
 		logger.Debugf("not ready: operator is not yet initialized")
-		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
+		writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
 				Details: "not initialized",
 			})
 		return
 	}
-	if !srv.testReadFromPrestoSingleFlight(logger) {
-		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
+	if !c.testReadFromPrestoSingleFlight(logger) {
+		writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
 				Details: "cannot read from PrestoDB",
@@ -36,40 +36,40 @@ func (srv *server) readinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+	writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
 
 // healthinessHandler is the health check for the metering operator. If this
 // fails, the process will be restarted.
-func (srv *server) healthinessHandler(w http.ResponseWriter, r *http.Request) {
-	logger := srv.newLogger(r)
-	if !srv.testWriteToPrestoSingleFlight(logger) {
-		srv.writeResponseWithBody(logger, w, http.StatusInternalServerError,
+func (c *Chargeback) healthinessHandler(w http.ResponseWriter, r *http.Request) {
+	logger := newRequestLogger(c.logger, r, c.rand)
+	if !c.testWriteToPrestoSingleFlight(logger) {
+		writeResponseWithBody(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not healthy",
 				Details: "cannot write to PrestoDB",
 			})
 		return
 	}
-	srv.writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+	writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
 
-func (srv *server) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
+func (c *Chargeback) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
 	const key = "presto-write"
-	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
-		defer srv.healthCheckSingleFlight.Forget(key)
-		healthy := srv.chargeback.testWriteToPresto(logger)
+	v, _, _ := c.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer c.healthCheckSingleFlight.Forget(key)
+		healthy := c.testWriteToPresto(logger)
 		return healthy, nil
 	})
 	healthy := v.(bool)
 	return healthy
 }
 
-func (srv *server) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) bool {
+func (c *Chargeback) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) bool {
 	const key = "presto-read"
-	v, _, _ := srv.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
-		defer srv.healthCheckSingleFlight.Forget(key)
-		healthy := srv.chargeback.testReadFromPresto(logger)
+	v, _, _ := c.healthCheckSingleFlight.Do(key, func() (interface{}, error) {
+		defer c.healthCheckSingleFlight.Forget(key)
+		healthy := c.testReadFromPresto(logger)
 		return healthy, nil
 	})
 	healthy := v.(bool)
