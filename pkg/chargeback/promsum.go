@@ -44,6 +44,8 @@ func (c *Chargeback) triggerPrometheusImporterFromLastTimestamp(ctx context.Cont
 	}
 }
 
+type prometheusImporterFunc func(ctx context.Context, start, end time.Time) error
+
 type prometheusImporterTimeRangeTrigger struct {
 	start, end time.Time
 	errCh      chan error
