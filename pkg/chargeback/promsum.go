@@ -151,7 +151,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration", dataSourceName)
 				importer.UpdateCon***REMOVED***g(cfg)
 			} ***REMOVED*** {
-				importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoConn, c.clock, cfg)
+				importer := prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoQueryer, c.clock, cfg)
 				prometheusImporters[dataSourceName] = importer
 			}
 		}

@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/clock"
 
-	"github.com/operator-framework/operator-metering/pkg/db"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/promquery"
 )
 
@@ -24,7 +24,7 @@ const (
 type PrometheusImporter struct {
 	logger          logrus.FieldLogger
 	promConn        prom.API
-	prestoQueryer   db.Queryer
+	prestoQueryer   presto.ExecQueryer
 	collectHandlers promquery.ResultHandler
 	clock           clock.Clock
 	cfg             Con***REMOVED***g
@@ -46,7 +46,7 @@ type Con***REMOVED***g struct {
 	AllowIncompleteChunks bool
 }
 
-func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer db.Queryer, clock clock.Clock, cfg Con***REMOVED***g) *PrometheusImporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer presto.ExecQueryer, clock clock.Clock, cfg Con***REMOVED***g) *PrometheusImporter {
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,

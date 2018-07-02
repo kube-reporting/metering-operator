@@ -39,6 +39,7 @@ import (
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const (
@@ -79,10 +80,10 @@ type Chargeback struct {
 	chargebackClient cbClientset.Interface
 	kubeClient       corev1.CoreV1Interface
 
-	prestoConn  db.Queryer
-	prestoDB    *sql.DB
-	hiveQueryer *hiveQueryer
-	promConn    prom.API
+	prestoConn    *sql.DB
+	prestoQueryer presto.ExecQueryer
+	hiveQueryer   *hiveQueryer
+	promConn      prom.API
 
 	scheduledReportRunner *scheduledReportRunner
 
@@ -281,11 +282,12 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		c.prestoDB, err = c.newPrestoConn(stopCh)
+		c.prestoConn, err = c.newPrestoConn(stopCh)
 		if err != nil {
 			return err
 		}
-		c.prestoConn = db.New(c.prestoDB, c.logger, c.cfg.LogDMLQueries)
+		prestoDB := db.New(c.prestoConn, c.logger, c.cfg.LogDMLQueries)
+		c.prestoQueryer = presto.NewDB(prestoDB)
 		return nil
 	})
 	g.Go(func() error {
@@ -298,7 +300,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	defer c.prestoDB.Close()
+	defer c.prestoConn.Close()
 	defer c.hiveQueryer.closeHiveConnection()
 
 	transportCon***REMOVED***g, err := c.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
@@ -340,7 +342,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		prestoTables:            c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace),
 	}
 
-	apiRouter := newRouter(c.logger, c.prestoConn, c.rand, c.triggerPrometheusImporterForTimeRange, listers)
+	apiRouter := newRouter(c.logger, c.prestoQueryer, c.rand, c.triggerPrometheusImporterForTimeRange, listers)
 	apiRouter.HandleFunc("/ready", c.readinessHandler)
 	apiRouter.HandleFunc("/healthy", c.healthinessHandler)
 
