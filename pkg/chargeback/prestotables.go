@@ -61,7 +61,7 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 }
 
 func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
-	prestoTableResourceName := prestoTableResourceNameFromKind("datasource", datasource.Name)
+	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", datasource.Name)
 	prestoTable, err := c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
@@ -73,14 +73,15 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	}
 	prestoTable = prestoTable.DeepCopy()
 
+	source := datasource.Spec.AWSBilling.Source
+	if source == nil {
+		return fmt.Errorf("datasource %q: improperly con***REMOVED***gured datasource, source is empty", datasource.Name)
+	}
+
 	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
 
 	// Fetch the billing manifests
-	manifestRetriever, err := aws.NewManifestRetriever(datasource.Spec.AWSBilling.Source.Bucket, datasource.Spec.AWSBilling.Source.Pre***REMOVED***x)
-	if err != nil {
-		return err
-	}
-
+	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Pre***REMOVED***x)
 	manifests, err := manifestRetriever.RetrieveManifests()
 	if err != nil {
 		return err
