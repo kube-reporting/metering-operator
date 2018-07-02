@@ -26,6 +26,7 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${AWS_SECRET_ACCESS_KEY:=}"
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
+: "${AWS_BILLING_BUCKET_REGION:=}"
 : "${METERING_CREATE_PULL_SECRET:=true}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${TERMINATION_GRACE_PERIOD_SECONDS:=0}"
@@ -54,6 +55,7 @@ spec:
         enabled: ${ENABLE_AWS_BILLING}
         bucket: "${AWS_BILLING_BUCKET}"
         prefix: "${AWS_BILLING_BUCKET_PREFIX}"
+        region: "${AWS_BILLING_BUCKET_REGION}"
       awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
       awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 

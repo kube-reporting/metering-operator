@@ -36,6 +36,7 @@ type AWSBillingDataSource struct {
 }
 
 type S3Bucket struct {
+	Region string `json:"region"`
 	Bucket string `json:"bucket"`
 	Prefix string `json:"prefix"`
 }

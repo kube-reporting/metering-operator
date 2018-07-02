@@ -142,10 +142,7 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return fmt.Errorf("datasource %q: improperly configured datasource, source is empty", dataSource.Name)
 	}
 
-	manifestRetriever, err := aws.NewManifestRetriever(source.Bucket, source.Prefix)
-	if err != nil {
-		return err
-	}
+	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Prefix)
 
 	manifests, err := manifestRetriever.RetrieveManifests()
 	if err != nil {
