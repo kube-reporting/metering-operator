@@ -53,7 +53,7 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	if deleteExistingData {
 		logger.Debugf("deleting any preexisting rows in %s", tableName)
-		err = presto.DeleteFrom(c.prestoConn, tableName)
+		err = presto.DeleteFrom(c.prestoQueryer, tableName)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't empty table %s of preexisting rows: %v", tableName, err)
 		}
@@ -61,14 +61,14 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	// Run the report
 	logger.Debugf("running report generation query")
-	err = presto.ExecuteInsertQuery(c.prestoConn, tableName, query)
+	err = presto.InsertInto(c.prestoQueryer, tableName, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")
 		return nil, fmt.Errorf("Failed to execute %s usage report: %v", reportName, err)
 	}
 
 	prestoColumns := generatePrestoColumns(generationQuery)
-	results, err := presto.GetRows(c.prestoConn, tableName, prestoColumns)
+	results, err := presto.GetRows(c.prestoQueryer, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("getting usage report FAILED!")
 		return nil, fmt.Errorf("Failed to get usage report results: %v", err)
