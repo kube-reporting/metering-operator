@@ -21,7 +21,6 @@ import (
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/db"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
@@ -40,7 +39,7 @@ type server struct {
 	logger log.FieldLogger
 
 	rand          *rand.Rand
-	queryer       db.Queryer
+	queryer       presto.ExecQueryer
 	collectorFunc prometheusImporterFunc
 	listers       meteringListers
 }
@@ -53,7 +52,7 @@ func (l *requestLogger) Print(v ...interface{}) {
 	l.FieldLogger.Info(v...)
 }
 
-func newRouter(logger log.FieldLogger, queryer db.Queryer, rand *rand.Rand, collectorFunc prometheusImporterFunc, listers meteringListers) chi.Router {
+func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Rand, collectorFunc prometheusImporterFunc, listers meteringListers) chi.Router {
 	router := chi.NewRouter()
 
 	logger = logger.WithField("component", "api")
