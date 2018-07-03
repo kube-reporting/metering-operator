@@ -95,7 +95,7 @@ func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
 	}
 	// Hive does not support timezones, and now() returns a
 	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
-	err = presto.ExecuteInsertQuery(c.prestoConn, tableName, "VALUES (cast(now() AS TIMESTAMP))")
+	err = presto.InsertInto(c.prestoQueryer, tableName, "VALUES (cast(now() AS TIMESTAMP))")
 	if err != nil {
 		logger.WithError(err).Debugf("cannot insert into Presto table %s", tableName)
 		return false
