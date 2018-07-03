@@ -1,6 +1,8 @@
 package presto
 
-import "github.com/operator-framework/operator-metering/pkg/db"
+import (
+	"github.com/operator-framework/operator-metering/pkg/db"
+)
 
 type Queryer interface {
 	Query(query string) ([]Row, error)
