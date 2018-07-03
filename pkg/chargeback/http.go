@@ -28,6 +28,10 @@ import (
 
 var ErrReportIsRunning = errors.New("the report is still running")
 
+const (
+	APIV1ReportsGetEndpoint = "/api/v1/reports/get"
+)
+
 type meteringListers struct {
 	reports                 listers.ReportNamespaceLister
 	scheduledReports        listers.ScheduledReportNamespaceLister
@@ -67,7 +71,7 @@ func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Ra
 		listers:       listers,
 	}
 
-	router.HandleFunc("/api/v1/reports/get", srv.getReportHandler)
+	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportHandler)
 	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2FullHandler)
 	router.HandleFunc("/api/v2/reports/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
@@ -279,6 +283,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
+
 func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	buf := &bytes.Buffer{}
 	csvWriter := csv.NewWriter(buf)
