@@ -29,7 +29,7 @@ func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
 	}
 	defer c.queues.reportGenerationQueryQueue.Done(obj)
 
-	logger = logger.WithFields(c.newLogIdentifier())
+	logger = logger.WithFields(newLogIdentifier(c.rand))
 	if key, ok := c.getKeyFromQueueObj(logger, "ReportGenerationQuery", obj, c.queues.reportGenerationQueryQueue); ok {
 		err := c.syncReportGenerationQuery(logger, key)
 		c.handleErr(logger, err, "ReportGenerationQuery", key, c.queues.reportGenerationQueryQueue)

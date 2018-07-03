@@ -1,8 +1,10 @@
 package chargeback
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
 
@@ -69,9 +71,41 @@ func randomString(rand *rand.Rand, size int) string {
 	return string(b)
 }
 
-func (c *Chargeback) newLogIdentifier() logrus.Fields {
+func newLogIdentifier(r *rand.Rand) logrus.Fields {
 	return logrus.Fields{
-		"logID": randomString(c.rand, logIdentifierLength),
+		"logID": randomString(r, logIdentifierLength),
+	}
+}
+
+func newRequestLogger(logger logrus.FieldLogger, r *http.Request, rand *rand.Rand) logrus.FieldLogger {
+	return logger.WithFields(logrus.Fields{
+		"method": r.Method,
+		"url":    r.URL.String(),
+	}).WithFields(newLogIdentifier(rand))
+}
+
+type errorResponse struct {
+	Error string `json:"error"`
+}
+
+func writeErrorResponse(logger logrus.FieldLogger, w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
+	msg := fmt.Sprintf(message, args...)
+	writeResponseWithBody(logger, w, status, errorResponse{Error: msg})
+}
+
+// writeResponseWithBody attempts to marshal an arbitrary thing to JSON then write
+// it to the http.ResponseWriter
+func writeResponseWithBody(logger logrus.FieldLogger, w http.ResponseWriter, code int, resp interface{}) {
+	enc, err := json.Marshal(resp)
+	if err != nil {
+		logger.WithError(err).Error("failed JSON-encoding HTTP response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	if _, err = w.Write(enc); err != nil {
+		logger.WithError(err).Error("failed writing HTTP response")
 	}
 }
 

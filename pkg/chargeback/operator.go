@@ -1,6 +1,7 @@
 package chargeback
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io"
@@ -17,6 +18,7 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/singleflight"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -97,6 +99,10 @@ type Chargeback struct {
 	prometheusImporterDeletedDataSourceQueue     chan string
 	prometheusImporterTriggerFromLastTimestampCh chan struct{}
 	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
+
+	// ensures only at most a single testRead query is running against Presto
+	// at one time
+	healthCheckSingleFlight singleflight.Group
 }
 
 func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
@@ -262,13 +268,10 @@ func (qs queues) ShutdownQueues() {
 }
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
+	var wg sync.WaitGroup
 	c.logger.Info("starting Chargeback operator")
 
 	go c.informers.Start(stopCh)
-
-	c.logger.Infof("starting HTTP server")
-	httpSrv := newServer(c, c.logger)
-	go httpSrv.start()
 
 	c.logger.Infof("setting up DB connections")
 
@@ -329,6 +332,37 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
+	c.logger.Infof("starting HTTP server")
+	listers := meteringListers{
+		reports:                 c.informers.Chargeback().V1alpha1().Reports().Lister().Reports(c.cfg.Namespace),
+		scheduledReports:        c.informers.Chargeback().V1alpha1().ScheduledReports().Lister().ScheduledReports(c.cfg.Namespace),
+		reportGenerationQueries: c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace),
+		prestoTables:            c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace),
+	}
+
+	apiRouter := newRouter(c.logger, c.prestoConn, c.rand, c.triggerPrometheusImporterForTimeRange, listers)
+	apiRouter.HandleFunc("/ready", c.readinessHandler)
+	apiRouter.HandleFunc("/healthy", c.healthinessHandler)
+
+	httpServer := &http.Server{
+		Addr:    ":8080",
+		Handler: apiRouter,
+	}
+	pprofServer := newPprofServer()
+
+	// start the HTTP servers
+	wg.Add(2)
+	go func() {
+		c.logger.Infof("HTTP API server started")
+		c.logger.WithError(httpServer.ListenAndServe()).Info("HTTP API server exited")
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("pprof server started")
+		c.logger.WithError(pprofServer.ListenAndServe()).Info("pprof server exited")
+		wg.Done()
+	}()
+
 	// Poll until we can write to presto
 	c.logger.Info("testing ability to write to Presto")
 	err = wait.PollUntil(time.Second*5, func() (bool, error) {
@@ -359,8 +393,6 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	if err != nil {
 		return fmt.Errorf("error creating lock %v", err)
 	}
-
-	var wg sync.WaitGroup
 
 	stopWorkersCh := make(chan struct{})
 	lostLeaderCh := make(chan struct{})
@@ -404,7 +436,25 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
-	httpSrv.stop()
+
+	// stop our running http servers
+	wg.Add(2)
+	go func() {
+		c.logger.Infof("stopping HTTP API server")
+		err := httpServer.Shutdown(context.TODO())
+		if err != nil {
+			c.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
+		}
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("stopping pprof server")
+		err := pprofServer.Shutdown(context.TODO())
+		if err != nil {
+			c.logger.WithError(err).Warnf("got an error shutting down pprof server")
+		}
+		wg.Done()
+	}()
 
 	// shutdown queues so that they get drained, and workers can begin their
 	// shutdown
