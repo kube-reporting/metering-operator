@@ -9,9 +9,11 @@
 # generated which are used as the target, otherwise it will print nothing,
 # and you will need to run ./hack/update-codegen.sh manually.
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-GENERATED_DIR=$(realpath "${DIR}/../pkg/generated")
-OUTPUT=$(***REMOVED***nd "$GENERATED_DIR" -type f -name '*.go')
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="$SCRIPT_DIR/.."
+DIRS=("${ROOT_DIR}/pkg/generated" "${ROOT_DIR}/pkg/presto/mock")
 
-echo "$OUTPUT"
-
+for DIR in "${DIRS[@]}"; do
+    OUTPUT=$(***REMOVED***nd "$(realpath ${DIR})" -type f -name '*.go')
+    echo "$OUTPUT"
+done
