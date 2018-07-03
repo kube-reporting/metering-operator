@@ -37,7 +37,7 @@ func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
 	}
 	defer c.queues.scheduledReportQueue.Done(obj)
 
-	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
+	logger = logger.WithFields(newLogIdenti***REMOVED***er(c.rand))
 	if key, ok := c.getKeyFromQueueObj(logger, "ScheduledReport", obj, c.queues.scheduledReportQueue); ok {
 		err := c.syncScheduledReport(logger, key)
 		c.handleErr(logger, err, "ScheduledReport", obj, c.queues.scheduledReportQueue)

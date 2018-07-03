@@ -40,7 +40,7 @@ func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
 	}
 	defer c.queues.reportDataSourceQueue.Done(obj)
 
-	logger = logger.WithFields(c.newLogIdenti***REMOVED***er())
+	logger = logger.WithFields(newLogIdenti***REMOVED***er(c.rand))
 	if key, ok := c.getKeyFromQueueObj(logger, "ReportDataSource", obj, c.queues.reportDataSourceQueue); ok {
 		err := c.syncReportDataSource(logger, key)
 		c.handleErr(logger, err, "ReportDataSource", key, c.queues.reportDataSourceQueue)
