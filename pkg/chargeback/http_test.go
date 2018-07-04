@@ -3,6 +3,7 @@ package chargeback
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -51,6 +52,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		noCreatePrestoTable bool
 
 		expectedStatusCode int
+		expectAPIError     bool
 
 		queryerPrepareFunc func(*mockpresto.MockExecQueryer) []presto.Row
 	}{
@@ -98,6 +100,28 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				return result
 			},
 			expectedStatusCode: http.StatusOK,
+		},
+		"report-***REMOVED***nished-db-errored": {
+			reportStatus: v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished},
+			prestoQueryColumns: []v1alpha1.ReportGenerationQueryColumn{
+				{
+					Name: "timestamp",
+					Type: "timestamp",
+				},
+			},
+			prestoTableColumns: []hive.Column{
+				{
+					Name: "timestamp",
+					Type: "timestamp",
+				},
+			},
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+				dbErr := errors.New("mock database had an error")
+				mock.EXPECT().Query(gomock.Any()).Return(nil, dbErr)
+				return nil
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectAPIError:     true,
 		},
 	}
 
@@ -186,17 +210,25 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			resp, err := server.Client().Get(***REMOVED***nalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
-			body, _ := ioutil.ReadAll(resp.Body)
-			if !assert.Equal(t, tt.expectedStatusCode, resp.StatusCode, "Expected http status code to match") {
-				t.Logf("response body: %s", string(body))
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err, "expected read all of resp.Body to succeed")
+
+			assert.Equal(t, tt.expectedStatusCode, resp.StatusCode, "Expected http status code to match")
+			t.Logf("response body: %s", string(body))
+
+			if tt.expectAPIError {
+				var errResp errorResponse
+				err = json.Unmarshal(body, &errResp)
+				assert.NoError(t, err, "expected unmarshal to not error")
+				assert.Contains(t, errResp.Error, "failed to perform presto query", "expected error to contain message about presto query failing")
+			} ***REMOVED*** {
+				var results []presto.Row
+				err = json.Unmarshal(body, &results)
+				assert.NoError(t, err, "expected unmarshal to not error")
+				// TODO(chance): check more than the results length matching
+				assert.Len(t, results, len(expectedResults), "expected API results length to match expected results length")
 			}
 
-			var results []presto.Row
-			err = json.Unmarshal(body, &results)
-			assert.NoError(t, err, "expected unmarshal to not error")
-
-			// TODO(chance): check more than the results length matching
-			assert.Len(t, results, len(expectedResults), "expected API results length to match expected results length")
 		})
 	}
 }
