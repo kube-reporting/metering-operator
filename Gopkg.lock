@@ -137,6 +137,16 @@
   revision = "66deaeb636dff1ac7d938ce666d090556056a4b0"
 
 [[projects]]
+  name = "github.com/golang/mock"
+  packages = [
+    "gomock",
+    "mockgen",
+    "mockgen/model"
+  ]
+  revision = "c34cdb4725f4c3844d095133c6e40e448b86589b"
+  version = "v1.1.1"
+
+[[projects]]
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -303,10 +313,10 @@
   version = "v0.0.2"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
-  version = "v1.0.1"
+  revision = "3ebe029320b2676d667ae88da602a5f854788a8a"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -620,6 +630,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3be9f868b0d1e9429ac632dbc8bde26e3feb6cffc734c5225e26ae483f343d49"
+  inputs-digest = "d6b7ac342afb913990ebb2e67346447661b3be91d0edf345b0a3641393521522"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -205,7 +205,7 @@ fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: k8s-verify-codegen metering-manifests fmt
+ci-validate: verify-codegen metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
@@ -224,7 +224,7 @@ $(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
 
 build-chargeback:
 	@:$(call check_defined, CHARGEBACK_BIN_LOCATION, Path to output binary location)
-	$(MAKE) k8s-update-codegen
+	$(MAKE) update-codegen
 	mkdir -p $(dir $@)
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(CHARGEBACK_BIN_LOCATION) $(CHARGEBACK_GO_PKG)
 
@@ -254,7 +254,7 @@ metering-manifests:
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift thrift-gen \
-	k8s-update-codegen k8s-verify-codegen \
+	update-codegen verify-codegen \
 	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
@@ -266,12 +266,12 @@ metering-manifests:
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm
 
-k8s-update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
+update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
 
 $(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
 
-k8s-verify-codegen:
+verify-codegen:
 	./hack/verify-codegen.sh
 
 # The results of these targets get vendored, but the targets exist for
