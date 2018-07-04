@@ -19,11 +19,12 @@ set -o nounset
 set -o pipefail
 
 SCRIPT_PACKAGE=github.com/operator-framework/operator-metering
-SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
+SCRIPT_ROOT="$(realpath $(dirname ${BASH_SOURCE[0]})/..)"
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo k8s.io/code-generator)}
 
 set -x
 
+# generate kubernetes client
 ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
     "${SCRIPT_PACKAGE}/pkg/generated" "${SCRIPT_PACKAGE}/pkg/apis" \
     chargeback:v1alpha1 \
@@ -35,3 +36,9 @@ ${GOPATH}/bin/defaulter-gen \
     --input-dirs "${SCRIPT_PACKAGE}/pkg/apis/chargeback/v1alpha1" \
     -O zz_generated.defaults \
     --go-header-***REMOVED***le ${SCRIPT_ROOT}/hack/boilerplate.go.txt
+
+# generate mocks
+go build -v -o "$SCRIPT_ROOT/vendor/mockgen" "./vendor/github.com/golang/mock/mockgen"
+"$SCRIPT_ROOT/vendor/mockgen" -package mockpresto -source "./pkg/presto/db.go" -destination "./pkg/presto/mock/mock.go"
+gofmt -w ./pkg/presto/mock/mock.go
+
