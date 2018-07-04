@@ -33,6 +33,7 @@ var ErrReportIsRunning = errors.New("the report is still running")
 
 const (
 	APIV1ReportsGetEndpoint = "/api/v1/reports/get"
+	APIV2Reports            = "/api/v2/reports"
 )
 
 type meteringListers struct {
