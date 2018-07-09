@@ -167,6 +167,11 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			expectedStatusCode: http.StatusInternalServerError,
 			expectedAPIError:   "failed to perform presto query",
 		},
+		"non-existent-report": {
+			reportName:         "doesnt-exist",
+			expectedStatusCode: http.StatusNotFound,
+			expectedAPIError:   "not found",
+		},
 	}
 
 	for testName, tt := range tests {
