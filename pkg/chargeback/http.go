@@ -17,6 +17,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
@@ -226,8 +227,13 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	// Get the current report to make sure it's in a finished state
 	report, err := srv.listers.reports.Get(name)
 	if err != nil {
+		code := http.StatusInternalServerError
+		if k8serrors.IsNotFound(err) {
+			code = http.StatusNotFound
+		}
+
 		logger.WithError(err).Errorf("error getting report: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		writeErrorResponse(logger, w, r, code, "error getting report: %v", err)
 		return
 	}
 	switch report.Status.Phase {
