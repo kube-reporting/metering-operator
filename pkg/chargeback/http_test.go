@@ -129,11 +129,22 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		tt := tt
 		testName := testName
 		t.Run(testName, func(t *testing.T) {
+			// manually create indexers which implement the lister interfaces
+			// needed for meteringListers. Since a cache.Indexer is a
+			// cache.Store, it's basically just a key-value store that we can
+			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
+			listers := meteringListers{
+				reports:                 listers.NewReportLister(reportIndexer).Reports(namespace),
+				reportGenerationQueries: listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer).ReportGenerationQueries(namespace),
+				prestoTables:            listers.NewPrestoTableLister(prestoTableIndexer).PrestoTables(namespace),
+			}
+
 			if !tt.noCreateReport {
+				// create a report for testing with
 				report := &v1alpha1.Report{
 					ObjectMeta: meta.ObjectMeta{
 						Name:      testName,
@@ -150,6 +161,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				reportIndexer.Add(report)
 			}
 			if !tt.noCreateQuery {
+				// create a reportGenerationQuery for testing with
 				reportGenerationQuery := &v1alpha1.ReportGenerationQuery{
 					ObjectMeta: meta.ObjectMeta{
 						Name:      tt.queryName,
@@ -162,6 +174,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				reportGenerationQueryIndexer.Add(reportGenerationQuery)
 			}
 			if !tt.noCreatePrestoTable {
+				// create a prestoTable for testing with
 				prestoTable := &v1alpha1.PrestoTable{
 					ObjectMeta: meta.ObjectMeta{
 						Name:      prestoTableResourceNameFromKind("report", testName),
@@ -176,22 +189,26 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				prestoTableIndexer.Add(prestoTable)
 			}
 
-			listers := meteringListers{
-				reports:                 listers.NewReportLister(reportIndexer).Reports(namespace),
-				reportGenerationQueries: listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer).ReportGenerationQueries(namespace),
-				prestoTables:            listers.NewPrestoTableLister(prestoTableIndexer).PrestoTables(namespace),
-			}
-
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
+			// setup our mock queryer so we can test without a real database
 			queryer := mockpresto.NewMockExecQueryer(ctrl)
-			expectedResults := tt.queryerPrepareFunc(queryer)
-			router := newRouter(testLogger, queryer, testRand, noopPrometheusImporterFunc, listers)
 
+			// expectedResults is what our mock queryer will return. since the
+			// v1 results endpoint just serializes the slice of rows returned
+			// from the DB, this is also what we expect the HTTP api to return
+			expectedResults := tt.queryerPrepareFunc(queryer)
+
+			// setup a test server suitable for making API calls against
+			router := newRouter(testLogger, queryer, testRand, noopPrometheusImporterFunc, listers)
 			server := httptest.NewServer(router)
 			defer server.Close()
 
+			// set up the query parameters for our API call.
+			// we hardcode format to JSON because validating CSV output is a
+			// bit trickier than JSON
+			// the name of the report is the same name as the sub test name
 			params := url.Values{
 				"format": []string{"json"},
 				"name":   []string{testName},
@@ -206,16 +223,21 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// ***REMOVED***nal string URL
 			***REMOVED***nalURL := endpointURL.String()
 
-			// query the endpoint
+			// query the API
 			resp, err := server.Client().Get(***REMOVED***nalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
+			// read the body from the response. it shouldn't be empty, even if
+			// the response had a non-2xx code
 			body, err := ioutil.ReadAll(resp.Body)
 			require.NoError(t, err, "expected read all of resp.Body to succeed")
 
 			assert.Equal(t, tt.expectedStatusCode, resp.StatusCode, "Expected http status code to match")
 			t.Logf("response body: %s", string(body))
 
+			// if tt.expectAPIError is true, then this test is testing the
+			// error response from the API, otherwise it's testing the results
+			// come back with the correct number of items
 			if tt.expectAPIError {
 				var errResp errorResponse
 				err = json.Unmarshal(body, &errResp)
@@ -228,7 +250,6 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				// TODO(chance): check more than the results length matching
 				assert.Len(t, results, len(expectedResults), "expected API results length to match expected results length")
 			}
-
 		})
 	}
 }
