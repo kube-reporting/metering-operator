@@ -394,7 +394,7 @@ func writeResultsResponse(logger log.FieldLogger, format string, columns []api.R
 				return
 			}
 		}
-		writeResponseWithBody(logger, w, http.StatusOK, newResults)
+		writeResponseAsJSON(logger, w, http.StatusOK, newResults)
 		return
 	case "csv":
 		writeResultsResponseAsCSV(logger, columns, results, w, r)
@@ -462,7 +462,7 @@ func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, co
 	}
 
 	if format == "json" {
-		writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
+		writeResponseAsJSON(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
 		return
 	}
 	writeResultsResponse(logger, format, filteredColumns, results, w, r)
@@ -500,7 +500,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
 }
 
 type StorePromsumDataRequest []*prestostore.PrometheusMetric
@@ -524,7 +524,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
 }
 
 func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -561,5 +561,5 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, results)
+	writeResponseAsJSON(logger, w, http.StatusOK, results)
 }

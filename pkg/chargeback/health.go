@@ -20,7 +20,7 @@ func (c *Chargeback) readinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(c.logger, r, c.rand)
 	if !c.isInitialized() {
 		logger.Debugf("not ready: operator is not yet initialized")
-		writeResponseWithBody(logger, w, http.StatusInternalServerError,
+		writeResponseAsJSON(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
 				Details: "not initialized",
@@ -28,7 +28,7 @@ func (c *Chargeback) readinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !c.testReadFromPrestoSingleFlight(logger) {
-		writeResponseWithBody(logger, w, http.StatusInternalServerError,
+		writeResponseAsJSON(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not ready",
 				Details: "cannot read from PrestoDB",
@@ -36,7 +36,7 @@ func (c *Chargeback) readinessHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+	writeResponseAsJSON(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
 
 // healthinessHandler is the health check for the metering operator. If this
@@ -44,14 +44,14 @@ func (c *Chargeback) readinessHandler(w http.ResponseWriter, r *http.Request) {
 func (c *Chargeback) healthinessHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(c.logger, r, c.rand)
 	if !c.testWriteToPrestoSingleFlight(logger) {
-		writeResponseWithBody(logger, w, http.StatusInternalServerError,
+		writeResponseAsJSON(logger, w, http.StatusInternalServerError,
 			statusResponse{
 				Status:  "not healthy",
 				Details: "cannot write to PrestoDB",
 			})
 		return
 	}
-	writeResponseWithBody(logger, w, http.StatusOK, statusResponse{Status: "ok"})
+	writeResponseAsJSON(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
 
 func (c *Chargeback) testWriteToPrestoSingleFlight(logger logrus.FieldLogger) bool {
