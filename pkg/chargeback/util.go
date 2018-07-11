@@ -90,12 +90,12 @@ type errorResponse struct {
 
 func writeErrorResponse(logger logrus.FieldLogger, w http.ResponseWriter, r *http.Request, status int, message string, args ...interface{}) {
 	msg := fmt.Sprintf(message, args...)
-	writeResponseWithBody(logger, w, status, errorResponse{Error: msg})
+	writeResponseAsJSON(logger, w, status, errorResponse{Error: msg})
 }
 
-// writeResponseWithBody attempts to marshal an arbitrary thing to JSON then write
+// writeResponseAsJSON attempts to marshal an arbitrary thing to JSON then write
 // it to the http.ResponseWriter
-func writeResponseWithBody(logger logrus.FieldLogger, w http.ResponseWriter, code int, resp interface{}) {
+func writeResponseAsJSON(logger logrus.FieldLogger, w http.ResponseWriter, code int, resp interface{}) {
 	enc, err := json.Marshal(resp)
 	if err != nil {
 		logger.WithError(err).Error("failed JSON-encoding HTTP response")

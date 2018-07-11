@@ -1,16 +1,18 @@
 package chargeback
 
 import (
-	"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -100,10 +102,11 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryPar
 		return false
 	}
 	format := r.Form["format"][0]
-	if format == "json" || format == "csv" {
+	switch format {
+	case "json", "csv", "tab", "tabular":
 		return true
 	}
-	writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json")
+	writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json, or tabular")
 	return false
 }
 
@@ -221,7 +224,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
+	writeResultsResponse(logger, format, reportQuery.Spec.Columns, results, w, r)
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
@@ -284,15 +287,25 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	if useNewFormat {
-		srv.writeResultsV2(logger, full, format, reportQuery.Spec.Columns, results, w, r)
+		writeResultsResponseV2(logger, full, format, reportQuery.Spec.Columns, results, w, r)
 	} else {
-		srv.writeResults(logger, format, reportQuery.Spec.Columns, results, w, r)
+		writeResultsResponse(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
 
-func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
-	buf := &bytes.Buffer{}
-	csvWriter := csv.NewWriter(buf)
+func writeResultsResponseAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/csv")
+	err := writeResultsAsCSV(columns, results, w, ',')
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []presto.Row, w io.Writer, delimiter rune) error {
+	csvWriter := csv.NewWriter(w)
+	csvWriter.Comma = delimiter
 
 	// Write headers
 	var keys []string
@@ -302,8 +315,7 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Repor
 		}
 		err := csvWriter.Write(keys)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to write headers")
-			return
+			return err
 		}
 	}
 
@@ -313,9 +325,7 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Repor
 		for i, key := range keys {
 			val, ok := row[key]
 			if !ok {
-				logger.Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
-				writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema, unexpected key: %q", key)
-				return
+				return fmt.Errorf("report results schema doesn't match expected schema, unexpected key: %q", key)
 			}
 			switch v := val.(type) {
 			case string:
@@ -333,24 +343,46 @@ func (srv *server) writeResultsAsCSV(logger log.FieldLogger, columns []api.Repor
 			case nil:
 				vals[i] = ""
 			default:
-				logger.Errorf("error marshalling csv: unknown type %t for value %v", val, val)
-				writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error marshalling csv (see chargeback logs for more details)")
-				return
+				return fmt.Errorf("error marshalling csv: unknown type %t for value %v", val, val)
 			}
 		}
 		err := csvWriter.Write(vals)
 		if err != nil {
-			logger.Errorf("failed to write csv row: %v", err)
-			return
+			return err
 		}
 	}
 
 	csvWriter.Flush()
-	w.Header().Set("Content-Type", "text/csv")
-	w.Write(buf.Bytes())
+	return csvWriter.Error()
 }
 
-func (srv *server) writeResults(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsTabular(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	var padding int = 2
+	paddingStr := r.FormValue("padding")
+	if paddingStr != "" {
+		var err error
+		padding, err = strconv.Atoi(paddingStr)
+		if err != nil {
+			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid padding value %s, err: %s", paddingStr, err)
+			return
+		}
+	}
+	tabWriter := tabwriter.NewWriter(w, 0, 8, padding, '\t', 0)
+	err := writeResultsAsCSV(columns, results, tabWriter, '\t')
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	err = tabWriter.Flush()
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func writeResultsResponse(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		newResults := make([]*orderedmap.OrderedMap, len(results))
@@ -362,10 +394,12 @@ func (srv *server) writeResults(logger log.FieldLogger, format string, columns [
 				return
 			}
 		}
-		writeResponseWithBody(logger, w, http.StatusOK, newResults)
+		writeResponseAsJSON(logger, w, http.StatusOK, newResults)
 		return
 	case "csv":
-		srv.writeResultsAsCSV(logger, columns, results, w, r)
+		writeResultsResponseAsCSV(logger, columns, results, w, r)
+	case "tab", "tabular":
+		writeResultsResponseAsTabular(logger, columns, results, w, r)
 	}
 }
 
@@ -407,7 +441,7 @@ func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerati
 	return results
 }
 
-func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	var filteredColumns []api.ReportGenerationQueryColumn
 	for _, column := range columns {
@@ -418,7 +452,7 @@ func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format stri
 			filteredColumns = append(filteredColumns, column)
 		}
 	}
-	// Remove columns and their values from `input` if full is false and the column's TableHidden is true
+	// Remove columns and their values from `results` if full is false and the column's TableHidden is true
 	for _, row := range results {
 		for _, column := range columnsMap {
 			if columnsMap[column.Name].TableHidden && !full {
@@ -427,14 +461,11 @@ func (srv *server) writeResultsV2(logger log.FieldLogger, full bool, format stri
 		}
 	}
 
-	switch format {
-	case "json":
-		writeResponseWithBody(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
+	if format == "json" {
+		writeResponseAsJSON(logger, w, http.StatusOK, convertsToGetReportResults(results, filteredColumns))
 		return
-
-	case "csv":
-		srv.writeResultsAsCSV(logger, filteredColumns, results, w, r)
 	}
+	writeResultsResponse(logger, format, filteredColumns, results, w, r)
 }
 
 func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w http.ResponseWriter) {
@@ -469,7 +500,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
 }
 
 type StorePromsumDataRequest []*prestostore.PrometheusMetric
@@ -493,7 +524,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, struct{}{})
+	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
 }
 
 func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -530,5 +561,5 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	writeResponseWithBody(logger, w, http.StatusOK, results)
+	writeResponseAsJSON(logger, w, http.StatusOK, results)
 }
