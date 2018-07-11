@@ -107,6 +107,8 @@ type reportSchedule interface {
 func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, error) {
 	var cronSpec string
 	switch reportSched.Period {
+	case cbTypes.ScheduledReportPeriodCron:
+		cronSpec = reportSched.Cron.Expression
 	case cbTypes.ScheduledReportPeriodHourly:
 		sched := reportSched.Hourly
 		if sched == nil {
