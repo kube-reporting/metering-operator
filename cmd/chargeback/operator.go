@@ -53,6 +53,9 @@ func AddCommands() {
 }
 
 func init() {
+	// globally set time to UTC
+	time.Local = time.UTC
+
 	rootCmd.PersistentFlags().StringVar(&logLevelStr, "log-level", log.DebugLevel.String(), "log level")
 	rootCmd.PersistentFlags().BoolVar(&logFullTimestamp, "log-timestamp", true, "log full timestamp if true, otherwise log time since startup")
 	rootCmd.PersistentFlags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
