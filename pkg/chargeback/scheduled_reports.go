@@ -107,6 +107,8 @@ type reportSchedule interface {
 func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, error) {
 	var cronSpec string
 	switch reportSched.Period {
+	case cbTypes.ScheduledReportPeriodCron:
+		cronSpec = reportSched.Cron.Expression
 	case cbTypes.ScheduledReportPeriodHourly:
 		sched := reportSched.Hourly
 		if sched == nil {
@@ -156,7 +158,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 		if err := validateSecond(sched.Second); err != nil {
 			return nil, err
 		}
-		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Second, dow)
+		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Hour, dow)
 	case cbTypes.ScheduledReportPeriodMonthly:
 		sched := reportSched.Monthly
 		if sched == nil {
@@ -178,7 +180,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 		if err := validateSecond(sched.Second); err != nil {
 			return nil, err
 		}
-		cronSpec = fmt.Sprintf("%d %d %d %d * *", sched.Second, sched.Minute, sched.Second, dom)
+		cronSpec = fmt.Sprintf("%d %d %d %d * *", sched.Second, sched.Minute, sched.Hour, dom)
 	default:
 		return nil, fmt.Errorf("invalid ScheduledReport.spec.schedule.period: %s", reportSched.Period)
 	}
@@ -290,7 +292,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
-		now := job.chargeback.clock.Now()
+		now := job.chargeback.clock.Now().UTC()
 		var lastScheduled time.Time
 		lastReportTime := report.Status.LastReportTime
 		if lastReportTime != nil {
@@ -301,11 +303,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			lastScheduled = now
 		}
 
-		reportPeriod, err := getNextReportPeriod(job.schedule, job.report.Spec.Schedule.Period, lastScheduled)
-		if err != nil {
-			logger.WithError(err).Error("to get next report period for scheduledReport")
-			return
-		}
+		reportPeriod := getNextReportPeriod(job.schedule, job.report.Spec.Schedule.Period, lastScheduled)
 
 		loggerWithFields := logger.WithFields(log.Fields{
 			"periodStart": reportPeriod.periodStart,
@@ -313,20 +311,25 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			"period":      job.report.Spec.Schedule.Period,
 		})
 
-		var waitTime, gracePeriod time.Duration
+		var gracePeriod time.Duration
 		if job.report.Spec.GracePeriod != nil {
 			gracePeriod = job.report.Spec.GracePeriod.Duration
+		} ***REMOVED*** {
+			gracePeriod = job.chargeback.getDefaultReportGracePeriod()
+			loggerWithFields.Debugf("ScheduledReport has no gracePeriod con***REMOVED***gured, falling back to defaultGracePeriod: %s", gracePeriod)
 		}
 
+		var waitTime time.Duration
 		nextRunTime := reportPeriod.periodEnd.Add(gracePeriod)
-		if nextRunTime.After(now) {
+		reportGracePeriodUnmet := nextRunTime.After(now)
+		if reportGracePeriodUnmet {
 			waitTime = nextRunTime.Sub(now)
 		}
 
-		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] and has %s until next report period start and will run at %s (gracePeriod: %s)", reportPeriod.periodStart, reportPeriod.periodEnd, waitTime, nextRunTime, gracePeriod)
-		loggerWithFields.Info(waitMsg)
+		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
+		loggerWithFields.Info(waitMsg+". waiting %s", waitTime)
 
-		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodNotFinishedReason, waitMsg)
+		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodWaitingReason, waitMsg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
 		report, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
@@ -468,30 +471,12 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 
 }
 
-func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) (reportPeriod, error) {
-	periodEnd := schedule.Next(lastScheduled)
-	periodStart, err := getPreviousReportDay(periodEnd, period)
-	if err != nil {
-		return reportPeriod{}, err
-	}
+func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) reportPeriod {
+	periodStart := lastScheduled
+	periodEnd := schedule.Next(periodStart)
 	return reportPeriod{
-		periodEnd:   periodEnd.Truncate(time.Millisecond),
-		periodStart: periodStart.Truncate(time.Millisecond),
-	}, nil
-}
-
-func getPreviousReportDay(next time.Time, period cbTypes.ScheduledReportPeriod) (time.Time, error) {
-	switch period {
-	case cbTypes.ScheduledReportPeriodHourly:
-		return next.Add(-time.Hour), nil
-	case cbTypes.ScheduledReportPeriodDaily:
-		return next.AddDate(0, 0, -1), nil
-	case cbTypes.ScheduledReportPeriodWeekly:
-		return next.AddDate(0, 0, -7), nil
-	case cbTypes.ScheduledReportPeriodMonthly:
-		return next.AddDate(0, -1, 0), nil
-	default:
-		return time.Time{}, fmt.Errorf("unknown report period: %s", period)
+		periodEnd:   periodEnd.Truncate(time.Millisecond).UTC(),
+		periodStart: periodStart.Truncate(time.Millisecond).UTC(),
 	}
 }
 

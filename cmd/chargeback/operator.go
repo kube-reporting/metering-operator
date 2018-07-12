@@ -29,9 +29,9 @@ var (
 	// cfg is the con***REMOVED***g for our operator
 	cfg chargeback.Con***REMOVED***g
 
-	logger = log.WithFields(log.Fields{
-		"app": "chargeback-operator",
-	})
+	logLevelStr         string
+	logFullTimestamp    bool
+	logDisableTimestamp bool
 )
 
 var rootCmd = &cobra.Command{
@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "starts the Chargeback operator",
+	Short: "starts the Metering operator",
 	Run:   startChargeback,
 }
 
@@ -53,10 +53,12 @@ func AddCommands() {
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	// globally set time to UTC
+	time.Local = time.UTC
 
-	goflag.CommandLine.Set("logtostderr", "true")
+	rootCmd.PersistentFlags().StringVar(&logLevelStr, "log-level", log.DebugLevel.String(), "log level")
+	rootCmd.PersistentFlags().BoolVar(&logFullTimestamp, "log-timestamp", true, "log full timestamp if true, otherwise log time since startup")
+	rootCmd.PersistentFlags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
 
 	startCmd.Flags().StringVar(&cfg.Kubecon***REMOVED***g, "kubecon***REMOVED***g", "", "use kubecon***REMOVED***g provided instead of detecting defaults")
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
@@ -75,19 +77,25 @@ func init() {
 
 func main() {
 	// ***REMOVED***x https://github.com/kubernetes/kubernetes/issues/17162
+	goflag.CommandLine.Set("logtostderr", "true")
 	goflag.CommandLine.Parse(nil)
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp:    logFullTimestamp,
+		DisableTimestamp: logDisableTimestamp,
+	})
 
 	AddCommands()
 
 	if err := SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK"); err != nil {
-		logger.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
+		log.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
 	}
 	if err := rootCmd.Execute(); err != nil {
-		logger.WithError(err).Fatalf("error executing command: %v", err)
+		log.WithError(err).Fatalf("error executing command: %v", err)
 	}
 }
 
 func startChargeback(cmd *cobra.Command, args []string) {
+	logger := newLogger()
 	if cfg.Namespace == "" {
 		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if err != nil {
@@ -156,4 +164,17 @@ func setupSignals() chan struct{} {
 		close(stopCh)
 	}()
 	return stopCh
+}
+
+func newLogger() log.FieldLogger {
+	logger := log.WithFields(log.Fields{
+		"app": "metering",
+	})
+	logLevel, err := log.ParseLevel(logLevelStr)
+	if err != nil {
+		logger.WithError(err).Fatalf("invalid log level: %s", logLevelStr)
+	}
+	logger.Logger.Level = logLevel
+	return logger
+
 }

@@ -40,6 +40,7 @@ type ScheduledReportSpec struct {
 type ScheduledReportPeriod string
 
 const (
+	ScheduledReportPeriodCron    ScheduledReportPeriod = "cron"
 	ScheduledReportPeriodHourly  ScheduledReportPeriod = "hourly"
 	ScheduledReportPeriodDaily   ScheduledReportPeriod = "daily"
 	ScheduledReportPeriodWeekly  ScheduledReportPeriod = "weekly"
@@ -49,10 +50,15 @@ const (
 type ScheduledReportSchedule struct {
 	Period ScheduledReportPeriod `json:"period"`
 
+	Cron    *ScheduledReportScheduleCron    `json:"cron,omitempty"`
 	Hourly  *ScheduledReportScheduleHourly  `json:"hourly,omitempty"`
 	Daily   *ScheduledReportScheduleDaily   `json:"daily,omitempty"`
 	Weekly  *ScheduledReportScheduleWeekly  `json:"weekly,omitempty"`
 	Monthly *ScheduledReportScheduleMonthly `json:"monthly,omitempty"`
+}
+
+type ScheduledReportScheduleCron struct {
+	Expression string `json:"expression,omitempty"`
 }
 
 type ScheduledReportScheduleHourly struct {
