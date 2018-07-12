@@ -292,7 +292,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
-		now := job.chargeback.clock.Now()
+		now := job.chargeback.clock.Now().UTC()
 		var lastScheduled time.Time
 		lastReportTime := report.Status.LastReportTime
 		if lastReportTime != nil {
@@ -303,11 +303,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			lastScheduled = now
 		}
 
-		reportPeriod, err := getNextReportPeriod(job.schedule, job.report.Spec.Schedule.Period, lastScheduled)
-		if err != nil {
-			logger.WithError(err).Error("to get next report period for scheduledReport")
-			return
-		}
+		reportPeriod := getNextReportPeriod(job.schedule, job.report.Spec.Schedule.Period, lastScheduled)
 
 		loggerWithFields := logger.WithFields(log.Fields{
 			"periodStart": reportPeriod.periodStart,
@@ -475,30 +471,12 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 
 }
 
-func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) (reportPeriod, error) {
-	periodEnd := schedule.Next(lastScheduled)
-	periodStart, err := getPreviousReportDay(periodEnd, period)
-	if err != nil {
-		return reportPeriod{}, err
-	}
+func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) reportPeriod {
+	periodStart := lastScheduled
+	periodEnd := schedule.Next(periodStart)
 	return reportPeriod{
-		periodEnd:   periodEnd.Truncate(time.Millisecond),
-		periodStart: periodStart.Truncate(time.Millisecond),
-	}, nil
-}
-
-func getPreviousReportDay(next time.Time, period cbTypes.ScheduledReportPeriod) (time.Time, error) {
-	switch period {
-	case cbTypes.ScheduledReportPeriodHourly:
-		return next.Add(-time.Hour), nil
-	case cbTypes.ScheduledReportPeriodDaily:
-		return next.AddDate(0, 0, -1), nil
-	case cbTypes.ScheduledReportPeriodWeekly:
-		return next.AddDate(0, 0, -7), nil
-	case cbTypes.ScheduledReportPeriodMonthly:
-		return next.AddDate(0, -1, 0), nil
-	default:
-		return time.Time{}, fmt.Errorf("unknown report period: %s", period)
+		periodEnd:   periodEnd.Truncate(time.Millisecond).UTC(),
+		periodStart: periodStart.Truncate(time.Millisecond).UTC(),
 	}
 }
 
