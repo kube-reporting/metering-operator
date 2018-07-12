@@ -104,11 +104,19 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Name: "timestamp",
 					Type: "timestamp",
 				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
 			}),
 			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
+				},
+				{
+					Name: "foo",
+					Type: "double",
 				},
 			}),
 			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
@@ -125,6 +133,10 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Name: "timestamp",
 					Type: "timestamp",
 				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
 			},
 			),
 			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
@@ -132,11 +144,16 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Name: "timestamp",
 					Type: "timestamp",
 				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
 			}),
 			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
+						"foo":       1.5,
 					},
 				}
 				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
@@ -152,11 +169,19 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Name: "timestamp",
 					Type: "timestamp",
 				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
 			}),
 			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
+				},
+				{
+					Name: "foo",
+					Type: "double",
 				},
 			}),
 			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
