@@ -115,16 +115,30 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("new report discovered")
 	}
 
-	// set the default grace period
-	if report.Spec.GracePeriod == nil {
-		report.Spec.GracePeriod = &defaultGracePeriod
+	logger = logger.WithFields(log.Fields{
+		"reportStart": report.Spec.ReportingStart,
+		"reportEnd":   report.Spec.ReportingEnd,
+	})
+
+	now := c.clock.Now()
+
+	var gracePeriod time.Duration
+	if report.Spec.GracePeriod != nil {
+		gracePeriod = report.Spec.GracePeriod.Duration
+	} else {
+		gracePeriod = c.getDefaultReportGracePeriod()
+		logger.Debugf("Report has no gracePeriod configured, falling back to defaultGracePeriod: %s", gracePeriod)
 	}
 
-	// If we're waiting until the end and we're not past the end time + grace
-	// period, ignore this report
-	if !report.Spec.RunImmediately && report.Spec.ReportingEnd.Add(report.Spec.GracePeriod.Duration).After(c.clock.Now()) {
-		logger.Infof("report %s not past grace period yet, ignoring for now", report.Name)
-		return nil
+	var waitTime time.Duration
+	nextRunTime := report.Spec.ReportingEnd.Add(gracePeriod)
+	reportGracePeriodUnmet := nextRunTime.After(now)
+	waitTime = nextRunTime.Sub(now)
+
+	if report.Spec.RunImmediately {
+		logger.Infof("report configured to run immediately with %s until periodEnd+gracePeriod: %s", waitTime, nextRunTime)
+	} else if reportGracePeriodUnmet {
+		logger.Infof("report %s not past grace period yet, ignoring until %s (%s)", report.Name, nextRunTime, waitTime)
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
@@ -133,11 +147,6 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
-
-	logger = logger.WithFields(log.Fields{
-		"reportStart": report.Spec.ReportingStart,
-		"reportEnd":   report.Spec.ReportingEnd,
-	})
 
 	if valid, err := c.validateGenerationQuery(logger, genQuery, true); err != nil {
 		c.setReportError(logger, report, err, "report is invalid")
