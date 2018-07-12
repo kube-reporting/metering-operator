@@ -197,6 +197,43 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			expectedStatusCode: http.StatusNotFound,
 			expectedAPIError:   "not found",
 		},
+		"mismatched-results-schema-to-table-schema": {
+			reportName: testReportName,
+			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+				{
+					Name: "timestamp",
+					Type: "timestamp",
+				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
+			}),
+			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+				{
+					Name: "timestamp",
+					Type: "timestamp",
+				},
+				{
+					Name: "foo",
+					Type: "double",
+				},
+			}),
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+				result := []presto.Row{
+					{
+						"timestamp": time.Time{},
+						"foo":       1.5,
+						"this_column_doesnt_exist_in_presto_table": "fail",
+					},
+				}
+				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				return result
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedAPIError:   "results schema doesn't match expected schema",
+		},
 	}
 
 	for testName, tt := range tests {
