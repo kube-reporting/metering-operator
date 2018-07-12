@@ -30,15 +30,16 @@ type ResultHandler struct {
 // endTime - startTime isn't perfectly divisible by chunkSize.
 func QueryRangeChunked(ctx context.Context, promConn prom.API, query string, startTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool, handlers ResultHandler) (timeRanges []prom.Range, err error) {
 	timeRangesToProcess := getTimeRanges(startTime, endTime, chunkSize, stepSize, maxTimeRanges, allowIncompleteChunks)
-	if len(timeRangesToProcess) == 0 {
-		return nil, nil
-	}
 
 	if handlers.PreProcessingHandler != nil {
 		err = handlers.PreProcessingHandler(ctx, timeRangesToProcess)
 		if err != nil {
 			return timeRanges, err
 		}
+	}
+
+	if len(timeRangesToProcess) == 0 {
+		return nil, nil
 	}
 
 	for _, timeRange := range timeRangesToProcess {
