@@ -13,12 +13,17 @@ import (
 
 const (
 	// Keep a cap on the number of time ranges we query per reconciliation.
-	// If we get to 2000, it means we're very backlogged, or we have a small
-	// chunkSize and making tons of small queries all one after another will
-	// cause undesired resource spikes, or both.
-	// This will make it take longer to catch up, but should help prevent
-	// memory from exploding when we end up with a ton of time ranges.
-	defaultMaxPromTimeRanges = 2000
+	// If we get to defaultMaxPromTimeRanges, it means we're very backlogged,
+	// or we have a small chunkSize and making tons of small queries all one
+	// after another will cause undesired resource spikes, or both.  This will
+	// make it take longer to catch up, but should help prevent memory from
+	// exploding when we end up with a ton of time ranges.
+
+	// defaultMaxPromTimeRanges is the number of time ranges for 24 hours if we
+	// query in 5 minute chunks (the default).
+	defaultMaxPromTimeRanges = (24 * 60) / 5 // 24 hours, 60 minutes per hour, default chunkSize is 5 minutes
+
+	defaultMaxTimeDuration = 24 * time.Hour
 )
 
 func (c *Chargeback) runPrometheusImporterWorker(stopCh <-chan struct{}) {
@@ -144,7 +149,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				ChunkSize:             c.cfg.PromsumChunkSize,
 				StepSize:              c.cfg.PromsumStepSize,
 				MaxTimeRanges:         defaultMaxPromTimeRanges,
-				AllowIncompleteChunks: true,
+				MaxQueryRangeDuration: defaultMaxTimeDuration,
 			}
 
 			if importer, exists := prometheusImporters[dataSourceName]; exists {
@@ -162,13 +167,13 @@ type importFunc func(context.Context, *prestostore.PrometheusImporter) ([]prom.R
 
 func (c *Chargeback) importPrometheusDataSourceDataFromLastTimestamp(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter) error {
 	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
-		return importer.ImportFromLastTimestamp(ctx)
+		return importer.ImportFromLastTimestamp(ctx, false)
 	})
 }
 
 func (c *Chargeback) importPrometheusDataSourceDataForTimeRange(ctx context.Context, logger logrus.FieldLogger, prometheusImporters map[string]*prestostore.PrometheusImporter, start, end time.Time) error {
 	return c.importPrometheusDataSourceData(ctx, logger, prometheusImporters, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
-		return importer.ImportMetrics(ctx, start, end)
+		return importer.ImportMetrics(ctx, start, end, true)
 	})
 }
 
@@ -188,6 +193,7 @@ func (c *Chargeback) importPrometheusDataSourceData(ctx context.Context, logger 
 	// other importer Go routines to run
 	for dataSourceName, prometheusImporter := range prometheusImporters {
 		prometheusImporter := prometheusImporter
+		dataSourceName := dataSourceName
 		g.Go(func() error {
 			// blocks trying to increment the semaphore (sending on the
 			// channel) or until the context is cancelled
