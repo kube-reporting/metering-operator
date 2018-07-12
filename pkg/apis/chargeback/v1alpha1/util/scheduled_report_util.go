@@ -15,16 +15,16 @@ const (
 	GenerateReportErrorReason = "GenerateReportError"
 
 	// Running scheduledReport conditions:
-	//
+
 	// ScheduledReason is added to a ScheduledReport when it's reached the next
 	// reporting time in it's schedule.
 	ScheduledReason = "Scheduled"
 	// ValidatingScheduledReportReason is added to a ScheduledReport when the
 	// report is having it's ReportGenerationQuery validated
 	ValidatingScheduledReportReason = "ValidatingScheduledReport"
-	// ReportPeriodNotFinishedReason is added to a ScheduledReport when the
-	// report has to wait until the next scheduled reporting time.
-	ReportPeriodNotFinishedReason = "ReportPeriodNotFinished"
+	// ReportPeriodWaitingReason is added to a ScheduledReport when the report
+	// has to wait until the next scheduled reporting time.
+	ReportPeriodWaitingReason = "ReportPeriodNotFinished"
 )
 
 // NewScheduledReportCondition creates a new scheduledReport condition.
