@@ -581,6 +581,14 @@ func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string
 	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
 }
 
+func (c *Chargeback) getDefaultReportGracePeriod() time.Duration {
+	if c.cfg.PromsumInterval > c.cfg.PromsumChunkSize {
+		return c.cfg.PromsumInterval
+	} ***REMOVED*** {
+		return c.cfg.PromsumChunkSize
+	}
+}
+
 func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
