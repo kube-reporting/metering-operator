@@ -315,20 +315,25 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			"period":      job.report.Spec.Schedule.Period,
 		})
 
-		var waitTime, gracePeriod time.Duration
+		var gracePeriod time.Duration
 		if job.report.Spec.GracePeriod != nil {
 			gracePeriod = job.report.Spec.GracePeriod.Duration
+		} ***REMOVED*** {
+			gracePeriod = job.chargeback.getDefaultReportGracePeriod()
+			loggerWithFields.Debugf("ScheduledReport has no gracePeriod con***REMOVED***gured, falling back to defaultGracePeriod: %s", gracePeriod)
 		}
 
+		var waitTime time.Duration
 		nextRunTime := reportPeriod.periodEnd.Add(gracePeriod)
-		if nextRunTime.After(now) {
+		reportGracePeriodUnmet := nextRunTime.After(now)
+		if reportGracePeriodUnmet {
 			waitTime = nextRunTime.Sub(now)
 		}
 
-		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] and has %s until next report period start and will run at %s (gracePeriod: %s)", reportPeriod.periodStart, reportPeriod.periodEnd, waitTime, nextRunTime, gracePeriod)
-		loggerWithFields.Info(waitMsg)
+		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
+		loggerWithFields.Info(waitMsg+". waiting %s", waitTime)
 
-		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodNotFinishedReason, waitMsg)
+		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodWaitingReason, waitMsg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
 		report, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
