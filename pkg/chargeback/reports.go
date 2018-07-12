@@ -179,6 +179,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		report.Spec.Output,
 		genQuery,
 		true,
+		false,
 	)
 	if err != nil {
 		c.setReportError(logger, report, err, "report execution failed")

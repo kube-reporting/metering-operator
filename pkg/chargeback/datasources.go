@@ -120,7 +120,7 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	storage := dataSource.Spec.Promsum.Storage
 	tableName := dataSourceTableName(dataSource.Name)
-	err := c.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns, false)
+	err := c.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns)
 	if err != nil {
 		return err
 	}

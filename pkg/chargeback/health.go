@@ -88,7 +88,7 @@ func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
 	logger = logger.WithField("component", "testWriteToPresto")
 	const tableName = "chargeback_health_check"
-	err := c.createTableForStorageNoCR(logger, nil, tableName, []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}}, false)
+	err := c.createTableForStorageNoCR(logger, nil, tableName, []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}})
 	if err != nil {
 		logger.WithError(err).Debugf("cannot create Presto table %s", tableName)
 		return false

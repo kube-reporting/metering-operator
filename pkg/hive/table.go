@@ -27,14 +27,7 @@ type TableProperties struct {
 	External           bool              `json:"external,omitempty"`
 }
 
-func ExecuteCreateTable(queryer db.Queryer, params TableParameters, properties TableProperties, dropTable bool) error {
-	if dropTable {
-		err := ExecuteDropTable(queryer, params.Name, true)
-		if err != nil {
-			return err
-		}
-	}
-
+func ExecuteCreateTable(queryer db.Queryer, params TableParameters, properties TableProperties) error {
 	query := generateCreateTableSQL(params, properties)
 	_, err := queryer.Query(query)
 	return err

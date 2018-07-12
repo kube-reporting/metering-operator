@@ -74,7 +74,7 @@ func (c *Chargeback) createAWSUsageTable(logger logrus.FieldLogger, dataSource *
 		SerdeRowProperties: awsUsageHiveSerdeProps,
 		External:           true,
 	}
-	return c.createTableWith(logger, dataSource, "ReportDataSource", dataSource.Name, params, properties, false)
+	return c.createTableWith(logger, dataSource, "ReportDataSource", dataSource.Name, params, properties)
 }
 
 // addAWSHivePartition will add a new partition to the given tableName for the time
