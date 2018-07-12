@@ -158,7 +158,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 		if err := validateSecond(sched.Second); err != nil {
 			return nil, err
 		}
-		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Second, dow)
+		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Hour, dow)
 	case cbTypes.ScheduledReportPeriodMonthly:
 		sched := reportSched.Monthly
 		if sched == nil {
@@ -180,7 +180,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 		if err := validateSecond(sched.Second); err != nil {
 			return nil, err
 		}
-		cronSpec = fmt.Sprintf("%d %d %d %d * *", sched.Second, sched.Minute, sched.Second, dom)
+		cronSpec = fmt.Sprintf("%d %d %d %d * *", sched.Second, sched.Minute, sched.Hour, dom)
 	default:
 		return nil, fmt.Errorf("invalid ScheduledReport.spec.schedule.period: %s", reportSched.Period)
 	}
