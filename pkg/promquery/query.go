@@ -95,8 +95,8 @@ func QueryRangeChunked(ctx context.Context, promConn prom.API, query string, sta
 }
 
 func getTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool) []prom.Range {
-	chunkStart := truncateToMinute(beginTime)
-	chunkEnd := truncateToMinute(chunkStart.Add(chunkSize))
+	chunkStart := truncateToSecond(beginTime)
+	chunkEnd := truncateToSecond(chunkStart.Add(chunkSize))
 
 	// don't set a limit if negative or zero
 	disableMax := maxTimeRanges <= 0
@@ -105,7 +105,7 @@ func getTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Durati
 	for i := int64(0); disableMax || (i < maxTimeRanges); i++ {
 		if allowIncompleteChunks {
 			if chunkEnd.After(endTime) {
-				chunkEnd = truncateToMinute(endTime)
+				chunkEnd = truncateToSecond(endTime)
 			}
 			if chunkEnd.Equal(chunkStart) {
 				break
@@ -127,21 +127,21 @@ func getTimeRanges(beginTime, endTime time.Time, chunkSize, stepSize time.Durati
 			Step:  stepSize,
 		})
 
-		if allowIncompleteChunks && chunkEnd.Equal(truncateToMinute(endTime)) {
+		if allowIncompleteChunks && chunkEnd.Equal(truncateToSecond(endTime)) {
 			break
 		}
 
 		// Add the metrics step size to the start time so that we don't
 		// re-query the Previous ranges end time in this range
-		chunkStart = truncateToMinute(chunkEnd.Add(stepSize))
+		chunkStart = truncateToSecond(chunkEnd.Add(stepSize))
 		// Add chunkSize to the end time to get our full chunk. If the chunkEnd
 		// is past the endTime, then this chunk is skipped.
-		chunkEnd = truncateToMinute(chunkStart.Add(chunkSize))
+		chunkEnd = truncateToSecond(chunkStart.Add(chunkSize))
 	}
 
 	return timeRanges
 }
 
-func truncateToMinute(t time.Time) time.Time {
+func truncateToSecond(t time.Time) time.Time {
 	return t.Truncate(time.Minute)
 }
