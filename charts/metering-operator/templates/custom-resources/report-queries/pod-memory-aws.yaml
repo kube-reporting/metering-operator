@@ -1,4 +1,4 @@
-{{- if .Values.config.awsBillingDataSource.enabled -}}
+{{- if index .Values.config.defaultReportDataSources "aws-billing" -}}
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportGenerationQuery
 metadata:
