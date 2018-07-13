@@ -144,7 +144,7 @@ To use S3 for storage, uncomment the `defaultStorage:` section in the example
 Once uncommented, set `awsAccessKeyID` and `awsSecretAccessKey` in the `metering-operator.config` and `presto.config` sections.
 
 To store data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read and write access to the bucket.
-For an example of an IAM policy granting the required permissions see the [aws/read-write.json][aws/read-write.json] file.
+For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) file.
 Replace `operator-metering-data` with the name of your bucket.
 
 Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
@@ -172,7 +172,7 @@ Change the `enabled` value to `true`, and update the `bucket` and `prefix` to th
 Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.config` and `spec.presto.config` sections.
 
 To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
-For an example of an IAM policy granting the required permissions see the [aws/read-only.json][aws/read-only.json] file.
+For an example of an IAM policy granting the required permissions see the [aws/read-only.json](aws/read-only.json) file.
 Replace `operator-metering-data` with the name of your bucket.
 
 This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the metering-operator.
