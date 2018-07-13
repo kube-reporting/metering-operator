@@ -118,17 +118,19 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	storage := dataSource.Spec.Promsum.Storage
-	tableName := dataSourceTableName(dataSource.Name)
-	err := c.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns)
-	if err != nil {
-		return err
-	}
+	if dataSource.TableName == "" {
+		storage := dataSource.Spec.Promsum.Storage
+		tableName := dataSourceTableName(dataSource.Name)
+		err := c.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns)
+		if err != nil {
+			return err
+		}
 
-	err = c.updateDataSourceTableName(logger, dataSource, tableName)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to update ReportDataSource TableName ***REMOVED***eld %q", tableName)
-		return err
+		err = c.updateDataSourceTableName(logger, dataSource, tableName)
+		if err != nil {
+			logger.WithError(err).Errorf("failed to update ReportDataSource TableName ***REMOVED***eld %q", tableName)
+			return err
+		}
 	}
 
 	c.prometheusImporterNewDataSourceQueue <- dataSource
@@ -154,17 +156,19 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return nil
 	}
 
-	tableName := dataSourceTableName(dataSource.Name)
-	logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-	err = c.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
-	if err != nil {
-		return err
-	}
+	if dataSource.TableName == "" {
+		tableName := dataSourceTableName(dataSource.Name)
+		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
+		err = c.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+		if err != nil {
+			return err
+		}
 
-	logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-	err = c.updateDataSourceTableName(logger, dataSource, tableName)
-	if err != nil {
-		return err
+		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
+		err = c.updateDataSourceTableName(logger, dataSource, tableName)
+		if err != nil {
+			return err
+		}
 	}
 
 	c.prestoTablePartitionQueue <- dataSource

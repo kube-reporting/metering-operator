@@ -41,7 +41,14 @@ type S3Bucket struct {
 	Pre***REMOVED***x string `json:"pre***REMOVED***x"`
 }
 
+type PrometheusQueryCon***REMOVED***g struct {
+	QueryInterval *meta.Duration `json:"queryInterval,omitempty"`
+	StepSize      *meta.Duration `json:"stepSize,omitempty"`
+	ChunkSize     *meta.Duration `json:"chunkSize,omitempty"`
+}
+
 type PrometheusMetricsDataSource struct {
-	Query   string              `json:"query"`
-	Storage *StorageLocationRef `json:"storage"`
+	Query       string                 `json:"query"`
+	QueryCon***REMOVED***g *PrometheusQueryCon***REMOVED***g `json:"queryCon***REMOVED***g"`
+	Storage     *StorageLocationRef    `json:"storage"`
 }
