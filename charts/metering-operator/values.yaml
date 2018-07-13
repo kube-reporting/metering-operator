@@ -8,8 +8,6 @@ config:
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
 
-  storageLocationName: null
-
   defaultStorage:
     create: true
     name: "hive-hdfs"
