@@ -13,19 +13,17 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 
 	"github.com/operator-framework/operator-metering/pkg/chargeback"
 )
 
 var (
-	defaultHiveHost         = "hive:10000"
-	defaultPrestoHost       = "presto:8080"
-	defaultPromHost         = "http://prometheus.tectonic-system.svc.cluster.local:9090"
-	defaultPromsumInterval  = time.Minute * 5
-	defaultPromsumStepSize  = time.Minute
-	defaultPromsumChunkSize = time.Minute * 5
-	defaultLeaseDuration    = time.Second * 60
+	defaultHiveHost      = "hive:10000"
+	defaultPrestoHost    = "presto:8080"
+	defaultPromHost      = "http://prometheus.tectonic-system.svc.cluster.local:9090"
+	defaultLeaseDuration = time.Second * 60
 	// cfg is the config for our operator
 	cfg chargeback.Config
 
@@ -56,6 +54,11 @@ func init() {
 	// globally set time to UTC
 	time.Local = time.UTC
 
+	// initialize the pointers before we assign into them below
+	cfg.PrometheusQueryConfig.QueryInterval = new(meta.Duration)
+	cfg.PrometheusQueryConfig.StepSize = new(meta.Duration)
+	cfg.PrometheusQueryConfig.ChunkSize = new(meta.Duration)
+
 	rootCmd.PersistentFlags().StringVar(&logLevelStr, "log-level", log.DebugLevel.String(), "log level")
 	rootCmd.PersistentFlags().BoolVar(&logFullTimestamp, "log-timestamp", true, "log full timestamp if true, otherwise log time since startup")
 	rootCmd.PersistentFlags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
@@ -69,9 +72,9 @@ func init() {
 	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "when enabled, logs report results after creating a report")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data definition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
-	startCmd.Flags().DurationVar(&cfg.PromsumInterval, "promsum-interval", defaultPromsumInterval, "controls how often the operator polls Prometheus for metrics")
-	startCmd.Flags().DurationVar(&cfg.PromsumStepSize, "promsum-step-size", defaultPromsumStepSize, "the query step size for Promethus query. This controls resolution of results")
-	startCmd.Flags().DurationVar(&cfg.PromsumChunkSize, "promsum-chunk-size", defaultPromsumChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.QueryInterval.Duration, "promsum-interval", chargeback.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", chargeback.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.ChunkSize.Duration, "promsum-chunk-size", chargeback.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 }
 

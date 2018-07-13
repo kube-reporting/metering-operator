@@ -48,6 +48,10 @@ const (
 	defaultResyncPeriod = time.Minute
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+
+	DefaultPrometheusQueryInterval  = time.Minute * 5
+	DefaultPrometheusQueryStepSize  = time.Minute
+	DefaultPrometheusQueryChunkSize = time.Minute * 5
 )
 
 type Config struct {
@@ -65,9 +69,7 @@ type Config struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PromsumInterval  time.Duration
-	PromsumStepSize  time.Duration
-	PromsumChunkSize time.Duration
+	PrometheusQueryConfig cbTypes.PrometheusQueryConfig
 
 	LeaderLeaseDuration time.Duration
 }
@@ -582,10 +584,10 @@ func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string
 }
 
 func (c *Chargeback) getDefaultReportGracePeriod() time.Duration {
-	if c.cfg.PromsumInterval > c.cfg.PromsumChunkSize {
-		return c.cfg.PromsumInterval
+	if c.cfg.PrometheusQueryConfig.QueryInterval.Duration > c.cfg.PrometheusQueryConfig.ChunkSize.Duration {
+		return c.cfg.PrometheusQueryConfig.QueryInterval.Duration
 	} else {
-		return c.cfg.PromsumChunkSize
+		return c.cfg.PrometheusQueryConfig.ChunkSize.Duration
 	}
 }
 

@@ -41,7 +41,14 @@ type S3Bucket struct {
 	Prefix string `json:"prefix"`
 }
 
+type PrometheusQueryConfig struct {
+	QueryInterval *meta.Duration `json:"queryInterval,omitempty"`
+	StepSize      *meta.Duration `json:"stepSize,omitempty"`
+	ChunkSize     *meta.Duration `json:"chunkSize,omitempty"`
+}
+
 type PrometheusMetricsDataSource struct {
-	Query   string              `json:"query"`
-	Storage *StorageLocationRef `json:"storage"`
+	Query       string                 `json:"query"`
+	QueryConfig *PrometheusQueryConfig `json:"queryConfig"`
+	Storage     *StorageLocationRef    `json:"storage"`
 }
