@@ -5,18 +5,20 @@ metadata:
 spec:
   metering-operator:
     config:
-      awsBillingDataSource:
-        # Change to false if you wish to enable the AWS Billing Report
-        # datasource, for use with the AWS cost correlation reports.
-        enabled: false
-        # Replace these values with your own
-        bucket: "your-aws-cost-report-bucket"
-        prefix: "path/to/report"
-        region: "your-buckets-region"
       # Replace these with your own AWS credentials
       awsAccessKeyID: "REPLACEME"
       awsSecretAccessKey: "REPLACEME"
 
+      # uncomment the defaultReportDataSources section below to enable aws
+      # billing.
+      # defaultReportDataSources:
+      #   aws-billing:
+      #     spec:
+      #       awsBilling:
+      #         source:
+      #           bucket: "your-aws-cost-report-bucket"
+      #           prefix: "path/to/report"
+      #           region: "your-buckets-region"
 
       # If you want to use S3 for storage of reports, and collected metrics,
       # uncomment the section below, and set awsAccessKeyID and awsSecretAccessKey

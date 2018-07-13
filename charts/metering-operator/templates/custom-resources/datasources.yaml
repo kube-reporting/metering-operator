@@ -1,0 +1,14 @@
+{{- range $name, $body := .Values.config.defaultReportDataSources }}
+---
+apiVersion: chargeback.coreos.com/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "{{ $name }}"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" $ }}
+{{- end }}
+spec:
+{{ toYaml $body.spec | indent 2 }}
+{{- end }}
+

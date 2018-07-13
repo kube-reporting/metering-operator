@@ -22,12 +22,11 @@ const (
 
 // PrometheusImporter imports Prometheus metrics into Presto tables
 type PrometheusImporter struct {
-	logger          logrus.FieldLogger
-	promConn        prom.API
-	prestoQueryer   presto.ExecQueryer
-	collectHandlers promquery.ResultHandler
-	clock           clock.Clock
-	cfg             Config
+	logger        logrus.FieldLogger
+	promConn      prom.API
+	prestoQueryer presto.ExecQueryer
+	clock         clock.Clock
+	cfg           Config
 
 	// importLock ensures only one import is running at a time, protecting the
 	// lastTimestamp and metrics fields
@@ -35,6 +34,7 @@ type PrometheusImporter struct {
 
 	//lastTimestamp is the lastTimestamp stored for this PrometheusImporter
 	lastTimestamp *time.Time
+	metricsCount  int
 }
 
 type Config struct {
@@ -50,98 +50,94 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQ
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
+		"chunkSize": cfg.ChunkSize,
+		"stepSize":  cfg.StepSize,
 	})
 
-	originalLogger := logger
-	var metricsCount int
-
-	preProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
-		// reset logger and counter before we begin processing
-		logger = originalLogger
-		metricsCount = 0
-
-		if len(timeRanges) == 0 {
-			logger.Infof("no time ranges to query yet for table %s", cfg.PrestoTableName)
-		} else {
-			begin := timeRanges[0].Start.UTC()
-			end := timeRanges[len(timeRanges)-1].End.UTC()
-			logger = logger.WithFields(logrus.Fields{
-				"rangeBegin": begin,
-			})
-			logger.Debugf("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
-		}
-		return nil
-	}
-
-	preQueryHandler := func(ctx context.Context, timeRange prom.Range) error {
-		queryBegin := timeRange.Start.UTC()
-		queryEnd := timeRange.End.UTC()
-		logger = logger.WithFields(logrus.Fields{
-			"queryBegin": queryBegin,
-			"queryEnd":   queryEnd,
-		})
-
-		logger.Debugf("querying Prometheus using range %s to %s", timeRange.Start, timeRange.End)
-		return nil
-	}
-
-	postQueryHandler := func(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
-		queryBegin := timeRange.Start.UTC()
-		queryEnd := timeRange.End.UTC()
-
-		metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
-		if len(metrics) != 0 {
-			metricsBegin := metrics[0].Timestamp
-			metricsEnd := metrics[len(metrics)-1].Timestamp
-			metricLogger := logger.WithFields(logrus.Fields{
-				"metricsBegin": metricsBegin,
-				"metricsEnd":   metricsEnd,
-			})
-			metricLogger.Debugf("got %d metrics for time range %s to %s, storing them into Presto into table %s", len(metrics), queryBegin, queryEnd, cfg.PrestoTableName)
-			err := StorePrometheusMetrics(ctx, prestoQueryer, cfg.PrestoTableName, metrics)
-			if err != nil {
-				return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
-					cfg.PrestoTableName, queryBegin, queryEnd, err)
-			}
-			metricLogger.Debugf("stored %d metrics for time range into Presto table %s successfully", len(metrics), cfg.PrestoTableName)
-		} else {
-			logger.Debugf("got 0 metrics for time range %s to %s", queryBegin, queryEnd)
-		}
-		metricsCount += len(metrics)
-		return nil
-	}
-
-	postProcessingHandler := func(_ context.Context, timeRanges []prom.Range) error {
-		if len(timeRanges) != 0 {
-			begin := timeRanges[0].Start.UTC()
-			end := timeRanges[len(timeRanges)-1].End.UTC()
-			logger.Infof("stored a total of %d metrics for data between %s and %s into %s", metricsCount, begin, end, cfg.PrestoTableName)
-		} else {
-			logger.Infof("no time ranges processed for %s", cfg.PrestoTableName)
-		}
-		return nil
-	}
-
-	collectHandlers := promquery.ResultHandler{
-		PreProcessingHandler:  preProcessingHandler,
-		PreQueryHandler:       preQueryHandler,
-		PostQueryHandler:      postQueryHandler,
-		PostProcessingHandler: postProcessingHandler,
-	}
-
 	return &PrometheusImporter{
-		logger:          logger,
-		promConn:        promConn,
-		prestoQueryer:   prestoQueryer,
-		collectHandlers: collectHandlers,
-		clock:           clock,
-		cfg:             cfg,
+		logger:        logger,
+		promConn:      promConn,
+		prestoQueryer: prestoQueryer,
+		clock:         clock,
+		cfg:           cfg,
 	}
+}
+
+func (c *PrometheusImporter) preProcessingHandler(_ context.Context, timeRanges []prom.Range) error {
+	// reset counter before we begin processing
+	c.metricsCount = 0
+
+	if len(timeRanges) == 0 {
+		c.logger.Infof("no time ranges to query yet for table %s", c.cfg.PrestoTableName)
+	} else {
+		begin := timeRanges[0].Start.UTC()
+		end := timeRanges[len(timeRanges)-1].End.UTC()
+		logger := c.logger.WithFields(logrus.Fields{
+			"rangeBegin": begin,
+			"rangeEnd":   end,
+		})
+		logger.Debugf("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
+	}
+	return nil
+}
+
+func (c *PrometheusImporter) preQueryHandler(ctx context.Context, timeRange prom.Range) error {
+	queryBegin := timeRange.Start.UTC()
+	queryEnd := timeRange.End.UTC()
+	logger := c.logger.WithFields(logrus.Fields{
+		"queryBegin": queryBegin,
+		"queryEnd":   queryEnd,
+	})
+
+	logger.Debugf("querying Prometheus using range %s to %s", timeRange.Start, timeRange.End)
+	return nil
+}
+
+func (c *PrometheusImporter) postQueryHandler(ctx context.Context, timeRange prom.Range, matrix model.Matrix) error {
+	queryBegin := timeRange.Start.UTC()
+	queryEnd := timeRange.End.UTC()
+
+	metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
+	if len(metrics) != 0 {
+		metricsBegin := metrics[0].Timestamp
+		metricsEnd := metrics[len(metrics)-1].Timestamp
+		metricLogger := c.logger.WithFields(logrus.Fields{
+			"metricsBegin": metricsBegin,
+			"metricsEnd":   metricsEnd,
+		})
+		metricLogger.Debugf("got %d metrics for time range %s to %s, storing them into Presto into table %s", len(metrics), queryBegin, queryEnd, c.cfg.PrestoTableName)
+		err := StorePrometheusMetrics(ctx, c.prestoQueryer, c.cfg.PrestoTableName, metrics)
+		if err != nil {
+			return fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
+				c.cfg.PrestoTableName, queryBegin, queryEnd, err)
+		}
+		metricLogger.Debugf("stored %d metrics for time range into Presto table %s successfully", len(metrics), c.cfg.PrestoTableName)
+	} else {
+		c.logger.Debugf("got 0 metrics for time range %s to %s", queryBegin, queryEnd)
+	}
+	c.metricsCount += len(metrics)
+	return nil
+}
+
+func (c *PrometheusImporter) postProcessingHandler(_ context.Context, timeRanges []prom.Range) error {
+	if len(timeRanges) != 0 {
+		begin := timeRanges[0].Start.UTC()
+		end := timeRanges[len(timeRanges)-1].End.UTC()
+		c.logger.Infof("stored a total of %d metrics for data between %s and %s into %s", c.metricsCount, begin, end, c.cfg.PrestoTableName)
+	} else {
+		c.logger.Infof("no time ranges processed for %s", c.cfg.PrestoTableName)
+	}
+	return nil
 }
 
 func (c *PrometheusImporter) UpdateConfig(cfg Config) {
 	c.importLock.Lock()
 	c.cfg = cfg
+	c.logger = c.logger.WithFields(logrus.Fields{
+		"tableName": cfg.PrestoTableName,
+		"chunkSize": cfg.ChunkSize,
+		"stepSize":  cfg.StepSize,
+	})
 	c.importLock.Unlock()
 }
 
@@ -154,9 +150,8 @@ func (c *PrometheusImporter) UpdateConfig(cfg Config) {
 // pkg/promquery.
 func (c *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowIncompleteChunks bool) ([]prom.Range, error) {
 	c.importLock.Lock()
-	logger := c.logger
-	logger.Debugf("PrometheusImporter ImportFromLastTimestamp started")
-	defer logger.Debugf("PrometheusImporter ImportFromLastTimestamp finished")
+	c.logger.Debugf("PrometheusImporter ImportFromLastTimestamp started")
+	defer c.logger.Debugf("PrometheusImporter ImportFromLastTimestamp finished")
 	defer c.importLock.Unlock()
 
 	endTime := c.clock.Now().UTC()
@@ -169,7 +164,7 @@ func (c *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowI
 		c.logger.Debugf("lastTimestamp for table %s: isn't known, querying for timestamp", c.cfg.PrestoTableName)
 		c.lastTimestamp, err = getLastTimestampForTable(c.prestoQueryer, c.cfg.PrestoTableName)
 		if err != nil {
-			logger.WithError(err).Errorf("unable to get last timestamp for table %s", c.cfg.PrestoTableName)
+			c.logger.WithError(err).Errorf("unable to get last timestamp for table %s", c.cfg.PrestoTableName)
 			return nil, err
 		}
 	}
@@ -200,28 +195,23 @@ func (c *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowI
 		endTime = startTime.Add(maxChunkDuration)
 	}
 
-	loggerWithFields := logger.WithFields(logrus.Fields{
-		"startTime": startTime,
-		"endTime":   endTime,
-	})
-
-	return c.importMetrics(loggerWithFields, ctx, startTime, endTime, allowIncompleteChunks)
+	return c.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
 }
 
 func (c *PrometheusImporter) ImportMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) ([]prom.Range, error) {
 	c.importLock.Lock()
+	c.logger.Debugf("PrometheusImporter Import started")
+	defer c.logger.Debugf("PrometheusImporter Import finished")
+	defer c.importLock.Unlock()
+
+	return c.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
+}
+
+func (c *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) ([]prom.Range, error) {
 	logger := c.logger.WithFields(logrus.Fields{
 		"startTime": startTime,
 		"endTime":   endTime,
 	})
-	logger.Debugf("PrometheusImporter Import started")
-	defer logger.Debugf("PrometheusImporter Import finished")
-	defer c.importLock.Unlock()
-
-	return c.importMetrics(logger, ctx, startTime, endTime, allowIncompleteChunks)
-}
-
-func (c *PrometheusImporter) importMetrics(logger logrus.FieldLogger, ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) ([]prom.Range, error) {
 	queryRangeDuration := endTime.Sub(startTime)
 	if c.cfg.MaxQueryRangeDuration != 0 && queryRangeDuration > c.cfg.MaxQueryRangeDuration {
 		newEndTime := startTime.Add(c.cfg.MaxQueryRangeDuration)
@@ -229,7 +219,14 @@ func (c *PrometheusImporter) importMetrics(logger logrus.FieldLogger, ctx contex
 		endTime = newEndTime
 	}
 
-	timeRanges, err := promquery.QueryRangeChunked(ctx, c.promConn, c.cfg.PrometheusQuery, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, allowIncompleteChunks, c.collectHandlers)
+	collectHandlers := promquery.ResultHandler{
+		PreProcessingHandler:  c.preProcessingHandler,
+		PreQueryHandler:       c.preQueryHandler,
+		PostQueryHandler:      c.postQueryHandler,
+		PostProcessingHandler: c.postProcessingHandler,
+	}
+
+	timeRanges, err := promquery.QueryRangeChunked(ctx, c.promConn, c.cfg.PrometheusQuery, startTime, endTime, c.cfg.ChunkSize, c.cfg.StepSize, c.cfg.MaxTimeRanges, allowIncompleteChunks, collectHandlers)
 	if err != nil {
 		logger.WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what
