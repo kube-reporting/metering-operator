@@ -165,9 +165,9 @@ Metering is able to correlate cluster usage information with [AWS detailed billi
 To enable AWS billing correlation, first ensure the AWS Cost and Usage Reports
 are enabled. For more information, see [Turning on the AWS Cost and Usage report][enable-aws-billing] in the AWS documentation.
 
-Next, update the `awsBillingDataSource` section in the [custom-values.yaml][example-config] example configuration manifest.
+Next, update the `defaultReportDataSources.aws-billing` section in the [custom-values.yaml][example-config] example configuration manifest.
 
-Change the `enabled` value to `true`, and update the `bucket` and `prefix` to the location of your AWS Detailed billing report.
+Uncomment the entire `defaultReportDataSources` block , and update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report.
 
 Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.config` and `spec.presto.config` sections.
 
