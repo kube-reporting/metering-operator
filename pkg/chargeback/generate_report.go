@@ -9,13 +9,15 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, deleteExistingData bool) ([]presto.Row, error) {
+func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, dropTable, deleteExistingData bool) ([]presto.Row, error) {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
+		"dropTable":          dropTable,
 	})
 	logger.Infof("generating usage report")
 
@@ -46,7 +48,15 @@ func (c *Chargeback) generateReport(logger log.FieldLogger, report runtime.Objec
 		return nil, fmt.Errorf("invalid report kind: %s", reportKind)
 	}
 
-	err = c.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns, deleteExistingData)
+	if dropTable {
+		logger.Debugf("dropping table %s", tableName)
+		err := hive.ExecuteDropTable(c.hiveQueryer, tableName, true)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = c.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns)
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
-func (c *Chargeback) createTableForStorage(logger log.FieldLogger, obj runtime.Object, kind, name string, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column, dropTable bool) error {
+func (c *Chargeback) createTableForStorage(logger log.FieldLogger, obj runtime.Object, kind, name string, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
 	tableProperties, err := c.getHiveTableProperties(logger, storage, kind)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly configured for %s: %s", kind, name)
@@ -23,10 +23,10 @@ func (c *Chargeback) createTableForStorage(logger log.FieldLogger, obj runtime.O
 		Columns:      columns,
 		IgnoreExists: true,
 	}
-	return c.createTableWith(logger, obj, kind, name, tableParams, *tableProperties, dropTable)
+	return c.createTableWith(logger, obj, kind, name, tableParams, *tableProperties)
 }
 
-func (c *Chargeback) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column, dropTable bool) error {
+func (c *Chargeback) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
 	tableProperties, err := c.getHiveTableProperties(logger, storage, tableName)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly configured for %s", tableName)
@@ -40,19 +40,19 @@ func (c *Chargeback) createTableForStorageNoCR(logger log.FieldLogger, storage *
 	if err != nil {
 		return err
 	}
-	return c.createTable(logger, tableParams, newTableProperties, dropTable)
+	return c.createTable(logger, tableParams, newTableProperties)
 }
 
-func (c *Chargeback) createTableWith(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties, dropTable bool) error {
+func (c *Chargeback) createTableWith(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
 	newTableProperties, err := addTableNameToLocation(properties, params.Name)
 	if err != nil {
 		return err
 	}
-	return c.createTableAndCR(logger, obj, kind, name, params, newTableProperties, dropTable)
+	return c.createTableAndCR(logger, obj, kind, name, params, newTableProperties)
 }
 
-func (c *Chargeback) createTableAndCR(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties, dropTable bool) error {
-	err := c.createTable(logger, params, properties, dropTable)
+func (c *Chargeback) createTableAndCR(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
+	err := c.createTable(logger, params, properties)
 	if err != nil {
 		return err
 	}
@@ -67,10 +67,9 @@ func (c *Chargeback) createTableAndCR(logger log.FieldLogger, obj runtime.Object
 	return nil
 }
 
-func (c *Chargeback) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties, dropTable bool) error {
-	logger = logger.WithField("dropTable", dropTable)
+func (c *Chargeback) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties) error {
 	logger.Debugf("Creating table %s with Hive Storage %#v", params.Name, properties)
-	err := hive.ExecuteCreateTable(c.hiveQueryer, params, properties, dropTable)
+	err := hive.ExecuteCreateTable(c.hiveQueryer, params, properties)
 	if err != nil {
 		return fmt.Errorf("couldn't create table: %v", err)
 	}

@@ -286,7 +286,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 		tableName := scheduledReportTableName(job.report.Name)
 		columns := generateHiveColumns(genQuery)
-		err = job.chargeback.createTableForStorage(logger, job.report, "scheduledreport", job.report.Name, job.report.Spec.Output, tableName, columns, false)
+		err = job.chargeback.createTableForStorage(logger, job.report, "scheduledreport", job.report.Name, job.report.Spec.Output, tableName, columns)
 		if err != nil {
 			logger.WithError(err).Error("error creating report table for scheduledReport")
 			return
@@ -306,9 +306,10 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		reportPeriod := getNextReportPeriod(job.schedule, job.report.Spec.Schedule.Period, lastScheduled)
 
 		loggerWithFields := logger.WithFields(log.Fields{
-			"periodStart": reportPeriod.periodStart,
-			"periodEnd":   reportPeriod.periodEnd,
-			"period":      job.report.Spec.Schedule.Period,
+			"periodStart":       reportPeriod.periodStart,
+			"periodEnd":         reportPeriod.periodEnd,
+			"period":            job.report.Spec.Schedule.Period,
+			"overwriteExisting": job.report.Spec.OverwriteExistingData,
 		})
 
 		var gracePeriod time.Duration
@@ -364,6 +365,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				job.report.Spec.Output,
 				genQuery,
 				false,
+				job.report.Spec.OverwriteExistingData,
 			)
 
 			if err != nil {

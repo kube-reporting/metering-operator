@@ -33,6 +33,12 @@ type ScheduledReportSpec struct {
 	// the report
 	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`
 
+	// OverwriteExistingData controls whether or not to delete any existing
+	// data in the report table before the scheduled report runs. Useful for
+	// having a report that is just a snapshot of the most recent data rather
+	// than a log of all runs before it.
+	OverwriteExistingData bool `json:"overwriteExistingData",omitempty`
+
 	// Output is the storage location where results are sent.
 	Output *StorageLocationRef `json:"output,omitempty"`
 }

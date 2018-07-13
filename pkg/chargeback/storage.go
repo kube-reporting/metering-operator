@@ -42,7 +42,7 @@ func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing specified, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Infof("%s storage does not have a spec or storageLocationName set, getting default storage location", kind)
+		logger.Debugf("%s storage does not have a spec or storageLocationName set, getting default storage location", kind)
 		storageLocation, err := c.getDefaultStorageLocation(storageLister)
 		if err != nil {
 			return storageSpec, err
@@ -53,7 +53,7 @@ func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 
 		storageSpec = storageLocation.Spec
 	} else if storage.StorageLocationName != "" { // Specific storage location specified
-		logger.Infof("%s configured to use StorageLocation %s", kind, storage.StorageLocationName)
+		logger.Debugf("%s configured to use StorageLocation %s", kind, storage.StorageLocationName)
 		storageLocation, err := storageLister.StorageLocations(c.cfg.Namespace).Get(storage.StorageLocationName)
 		if err != nil {
 			return storageSpec, err
