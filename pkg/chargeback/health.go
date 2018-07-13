@@ -88,16 +88,16 @@ func (c *Chargeback) testReadFromPresto(logger logrus.FieldLogger) bool {
 func (c *Chargeback) testWriteToPresto(logger logrus.FieldLogger) bool {
 	logger = logger.WithField("component", "testWriteToPresto")
 	const tableName = "chargeback_health_check"
-	err := c.createTableForStorageNoCR(logger, nil, tableName, []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}}, false)
+	err := c.createTableForStorageNoCR(logger, nil, tableName, []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}})
 	if err != nil {
-		logger.WithError(err).Debugf("cannot create Presto table %s", tableName)
+		logger.WithError(err).Errorf("cannot create Presto table %s", tableName)
 		return false
 	}
 	// Hive does not support timezones, and now() returns a
 	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
 	err = presto.InsertInto(c.prestoQueryer, tableName, "VALUES (cast(now() AS TIMESTAMP))")
 	if err != nil {
-		logger.WithError(err).Debugf("cannot insert into Presto table %s", tableName)
+		logger.WithError(err).Errorf("cannot insert into Presto table %s", tableName)
 		return false
 	}
 	return true
