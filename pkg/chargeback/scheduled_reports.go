@@ -354,7 +354,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				return
 			}
 
-			_, err = job.chargeback.generateReport(
+			err = job.chargeback.generateReport(
 				loggerWithFields,
 				job.report,
 				"scheduledreport",
