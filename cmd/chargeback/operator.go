@@ -69,7 +69,6 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
 	startCmd.Flags().StringVar(&cfg.PromHost, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
 	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
-	startCmd.Flags().BoolVar(&cfg.LogReport, "log-report", false, "when enabled, logs report results after creating a report")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data de***REMOVED***nition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration, "promsum-interval", chargeback.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
