@@ -328,7 +328,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		}
 
 		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
-		loggerWithFields.Info(waitMsg+". waiting %s", waitTime)
+		loggerWithFields.Infof(waitMsg+". waiting %s", waitTime)
 
 		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodWaitingReason, waitMsg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
