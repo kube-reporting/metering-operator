@@ -65,7 +65,6 @@ type Config struct {
 	PromHost       string
 	DisablePromsum bool
 
-	LogReport     bool
 	LogDMLQueries bool
 	LogDDLQueries bool
 
