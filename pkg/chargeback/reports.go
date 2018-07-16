@@ -1,7 +1,6 @@
 package chargeback
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -168,7 +167,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	report = newReport
 	tableName := reportTableName(report.Name)
 
-	results, err := c.generateReport(
+	err = c.generateReport(
 		logger,
 		report,
 		"report",
@@ -184,14 +183,6 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	if err != nil {
 		c.setReportError(logger, report, err, "report execution failed")
 		return err
-	}
-	if c.cfg.LogReport {
-		resultsJSON, err := json.MarshalIndent(results, "", " ")
-		if err != nil {
-			logger.WithError(err).Errorf("unable to marshal report into JSON")
-			return nil
-		}
-		logger.Debugf("results: %s", string(resultsJSON))
 	}
 
 	// update status
