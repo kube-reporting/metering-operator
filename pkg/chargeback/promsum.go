@@ -168,51 +168,56 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				importers[dataSourceName] = importer
 			}
 
-			if worker, exists := workers[dataSourceName]; exists {
-				// stop the existing worker from collecting data, and restart
-				// it with updated config
-				if !c.cfg.DisablePromsum {
-					go worker.update(ctx, dataSourceLogger, semaphore, dataSourceName, importer, queryInterval)
+			if !c.cfg.DisablePromsum {
+				worker, workerExists := workers[dataSourceName]
+				if workerExists && worker.queryInterval != queryInterval {
+					// queryInterval changed stop the existing worker from
+					// collecting data, and create it with updated config
+					worker.stop()
+				} else {
+					// config hasn't changed skip the update
+					continue
 				}
-			} else {
-				worker := &prometheusImporterWorker{}
+
+				worker = newPromImportWorker(queryInterval)
 				workers[dataSourceName] = worker
 
-				if !c.cfg.DisablePromsum {
-					// launch a go routine that periodically triggers a collection
-					go worker.start(ctx, dataSourceLogger, semaphore, dataSourceName, importer, queryInterval)
-				}
+				// launch a go routine that periodically triggers a collection
+				go worker.start(ctx, dataSourceLogger, semaphore, dataSourceName, importer)
 			}
 		}
 	}
 }
 
 type prometheusImporterWorker struct {
-	ticker        *time.Ticker
-	queryInterval time.Duration
 	stopCh        chan struct{}
 	doneCh        chan struct{}
+	queryInterval time.Duration
+}
+
+func newPromImportWorker(queryInterval time.Duration) *prometheusImporterWorker {
+	return &prometheusImporterWorker{
+		queryInterval: queryInterval,
+		stopCh:        make(chan struct{}),
+		doneCh:        make(chan struct{}),
+	}
 }
 
 // start begins periodic importing with the configured importer.
-func (w *prometheusImporterWorker) start(ctx context.Context, logger logrus.FieldLogger, semaphore chan struct{}, dataSourceName string, importer *prestostore.PrometheusImporter, queryInterval time.Duration) {
-	w.stopCh = make(chan struct{})
-	w.doneCh = make(chan struct{})
-	w.ticker = time.NewTicker(queryInterval)
+func (w *prometheusImporterWorker) start(ctx context.Context, logger logrus.FieldLogger, semaphore chan struct{}, dataSourceName string, importer *prestostore.PrometheusImporter) {
+	ticker := time.NewTicker(w.queryInterval)
 	defer close(w.doneCh)
+	defer ticker.Stop()
 
-	logger.Infof("Importing data for ReportDataSource %s every %s", dataSourceName, queryInterval)
+	logger.Infof("Importing data for ReportDataSource %s every %s", dataSourceName, w.queryInterval)
 	for {
 		select {
 		case <-w.stopCh:
 			return
-		case _, ok := <-w.ticker.C:
-			// if the ticker has been closed, then we should
-			// stop collecting
+		case _, ok := <-ticker.C:
 			if !ok {
 				return
 			}
-
 			err := importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
 				return importer.ImportFromLastTimestamp(ctx, false)
 			})
@@ -223,14 +228,6 @@ func (w *prometheusImporterWorker) start(ctx context.Context, logger logrus.Fiel
 			return
 		}
 	}
-}
-
-// update stops and restarts the worker if the queryInterval changes.
-func (w *prometheusImporterWorker) update(ctx context.Context, logger logrus.FieldLogger, semaphore chan struct{}, dataSourceName string, importer *prestostore.PrometheusImporter, queryInterval time.Duration) {
-	if queryInterval != w.queryInterval {
-		w.stop()
-	}
-	w.start(ctx, logger, semaphore, dataSourceName, importer, queryInterval)
 }
 
 func (w *prometheusImporterWorker) stop() {
