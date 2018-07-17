@@ -99,7 +99,7 @@ spec:
                         expression { return params.OPENSHIFT }
                     }
                     environment {
-                        KUBECONFIG      = credentials('openshift-chargeback-ci-kubeconfig')
+                        KUBECONFIG      = credentials('openshift-metering-ci-kubeconfig')
                         DEPLOY_PLATFORM = "openshift"
                     }
                     steps {
