@@ -9,9 +9,9 @@ export DEPLOY_PLATFORM=openshift
 if [ "$METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE" == "true" ]; then
     kubectl -n "${METERING_NAMESPACE}" \
         delete clusterrolebinding \
-        metering-namespace-viewer
+        "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME}"
 
     kubectl -n "${METERING_NAMESPACE}" \
         delete clusterrole \
-        metering-namespace-viewer
+        "${METERING_NAMESPACE_VIEWER_ROLE_NAME}"
 ***REMOVED***
