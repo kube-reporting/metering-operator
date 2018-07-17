@@ -32,5 +32,6 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 # clusterrole and clusterrolebinding are created granting access to GET
 # namespaces. This is for granting access to querying the Prometheus API.
 : "${METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=true}"
-: "${METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=false}"
+: "${METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=true}"
+: "${METERING_NAMESPACE_VIEWER_ROLE_NAME:=${METERING_NAMESPACE}-metering-namespace-viewer}"
 : "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME:=${METERING_NAMESPACE}-metering-namespace-viewer}"

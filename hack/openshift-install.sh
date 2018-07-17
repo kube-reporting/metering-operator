@@ -10,7 +10,7 @@ fi
 if [ "$METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE" == "true" ]; then
     kubectl \
         create clusterrole \
-        metering-namespace-viewer \
+        "${METERING_NAMESPACE_VIEWER_ROLE_NAME}" \
         --verb=get \
         --resource=namespaces || true
 
@@ -18,7 +18,7 @@ if [ "$METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE" == "true" ]; then
         create clusterrolebinding \
         "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME}" \
         --clusterrole \
-        metering-namespace-viewer \
+        "${METERING_NAMESPACE_VIEWER_ROLE_NAME}" \
         --serviceaccount \
         "${METERING_NAMESPACE}:metering" || true
 fi
