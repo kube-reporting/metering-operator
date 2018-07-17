@@ -174,7 +174,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 					// queryInterval changed stop the existing worker from
 					// collecting data, and create it with updated config
 					worker.stop()
-				} else {
+				} else if workerExists {
 					// config hasn't changed skip the update
 					continue
 				}
