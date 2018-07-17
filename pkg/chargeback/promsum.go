@@ -174,7 +174,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 					// queryInterval changed stop the existing worker from
 					// collecting data, and create it with updated con***REMOVED***g
 					worker.stop()
-				} ***REMOVED*** {
+				} ***REMOVED*** if workerExists {
 					// con***REMOVED***g hasn't changed skip the update
 					continue
 				}
