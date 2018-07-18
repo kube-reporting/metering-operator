@@ -49,3 +49,9 @@ When committing new dependencies, please use the following guidelines:
   `Gopkg.lock` and `vendor`.' Commit messages should be in the following forms:
   - `Gopkg.toml: Add new dependency $your_new_dependency`
   - `Gopkg.lock,vendor: Add new dependency $your_new_dependency`
+
+### Using images built by Jenkins
+
+If you have a PR or branch being built my Jenkins, you can use the images it's publishing from each build to test out the changes that aren't in master yet.
+For details on the image tag format, please follow the instructions in our [jenkins guide](jenkins.md#using-images-built-by-jenkins).
+

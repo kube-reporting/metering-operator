@@ -177,7 +177,6 @@ Replace `operator-metering-data` with the name of your bucket.
 
 This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the metering-operator.
 
-
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
 [example-config]: ../manifests/metering-config/custom-values.yaml
