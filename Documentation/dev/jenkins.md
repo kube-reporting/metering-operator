@@ -46,6 +46,6 @@ When developing a new feature, it's very common to have a workflow similar to th
 This process is useful when trying to debug an issue causing the e2e deployment or tests to fail.
 
 To do this, it's actually fairly simple.
-Since we push images for every build, all you need to do is follow the [Dev Installation](developer-install.md#Customize-installation) documentation to use a custom image tag.
+Since we push images for every build, all you need to do is follow the [Dev Installation](../manual-install.md#manual-installation) documentation to use a custom image tag.
 We publish multiple image tags for each PR build.
 If you want to use the latest image for a PR, the image tag is `pr-$PR_NUMBER`, just replace `$PR_NUMBER` with your pull-request number.
