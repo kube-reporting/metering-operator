@@ -22,6 +22,9 @@ pipeline {
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
         booleanParam(name: 'TECTONIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
     }
+    triggers {
+        issueCommentTrigger('.*jenkins rebuild.*')
+    }
     options {
         timestamps()
         disableConcurrentBuilds()
