@@ -5,6 +5,10 @@ def skipBuildLabel = (isPullRequest && pullRequest.labels.contains("skip-build")
 def skipE2ELabel = (isPullRequest && pullRequest.labels.contains("skip-e2e"))
 def skipIntegrationLabel = (isPullRequest && pullRequest.labels.contains("skip-integration"))
 
+def skipTectonic = (isPullRequest && pullRequest.labels.contains("skip-tectonic"))
+def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
+def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
+
 pipeline {
     agent none
     parameters {
@@ -55,23 +59,23 @@ pipeline {
                 stage("integration") {
                     when {
                         expression {
-                            return params.INTEGRATION && !(skipBuildLabel || skipIntegrationLabel)
+                            return params.INTEGRATION && !skipIntegrationLabel
                         }
                     }
                     steps {
                         echo "Running metering integration tests"
                         build job: "metering/operator-metering-integration/${env.TARGET_BRANCH}", parameters: [
                             string(name: 'DEPLOY_TAG', value: env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC),
+                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
+                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
+                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                         ]
                     }
                 }
                 stage("e2e") {
                     when {
                         expression {
-                            return params.E2E && !(skipBuildLabel || skipE2ELabel)
+                            return params.E2E && !skipE2ELabel
 
                         }
                     }
@@ -79,9 +83,9 @@ pipeline {
                         echo "Running metering e2e tests"
                         build job: "metering/operator-metering-e2e/${env.TARGET_BRANCH}", parameters: [
                             string(name: 'DEPLOY_TAG', value: env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC),
+                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
+                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
+                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                         ]
                     }
                 }
