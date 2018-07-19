@@ -40,7 +40,16 @@ pipeline {
     }
 
     stages {
+        stage('Setup') {
+            steps {
+                script {
+                    if (isPullRequest) {
+                        echo "Github PR labels: ${pullRequest.labels.join(',')}"
+                    }
+                }
+            }
 
+        }
         stage('Build') {
             when {
                 expression {
