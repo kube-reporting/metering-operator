@@ -3,6 +3,7 @@ def isMasterBranch = env.BRANCH_NAME == "master"
 
 def skipBuildLabel = (isPullRequest && pullRequest.labels.contains("skip-build"))
 def skipE2ELabel = (isPullRequest && pullRequest.labels.contains("skip-e2e"))
+def skipIntegrationLabel = (isPullRequest && pullRequest.labels.contains("skip-integration"))
 
 pipeline {
     agent none
@@ -54,7 +55,7 @@ pipeline {
                 stage("integration") {
                     when {
                         expression {
-                            return params.INTEGRATION && !(skipBuildLabel || skipE2ELabel)
+                            return params.INTEGRATION && !(skipBuildLabel || skipIntegrationLabel)
                         }
                     }
                     steps {
