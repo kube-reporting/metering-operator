@@ -59,8 +59,8 @@ spec:
             OUTPUT_TEST_LOG_STDOUT      = "true"
             OUTPUT_DIR                  = "test_output"
             METERING_CREATE_PULL_SECRET = "true"
-            // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + DEPLOY_TAG
-            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-${pipelineParams.testType}-${env.DEPLOY_TAG}"}"
+            // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + BRANCH_NAME
+            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-${pipelineParams.testType}-${env.BRANCH_NAME}"}"
             SCRIPT                      = "${pipelineParams.testScript}"
             TEST_LOG_FILE               = "${pipelineParams.testType}-tests.log"
             TEST_TAP_FILE               = "${pipelineParams.testType}-tests.tap"
