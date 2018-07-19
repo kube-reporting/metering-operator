@@ -24,14 +24,15 @@ CGO_ENABLED = 0
 
 CHARGEBACK_BIN_OUT = images/chargeback/bin/chargeback
 
-CHARGEBACK_HELM_OPERATOR_IMAGE := quay.io/coreos/chargeback-helm-operator
-CHARGEBACK_IMAGE := quay.io/coreos/chargeback
-HELM_OPERATOR_IMAGE := quay.io/coreos/helm-operator
-HADOOP_IMAGE := quay.io/coreos/chargeback-hadoop
-HIVE_IMAGE := quay.io/coreos/chargeback-hive
-PRESTO_IMAGE := quay.io/coreos/chargeback-presto
-CODEGEN_IMAGE := quay.io/coreosinc/chargeback-codegen
-CHARGEBACK_INTEGRATION_TESTS_IMAGE := quay.io/coreos/chargeback-integration-tests
+DOCKER_BASE_URL := quay.io/coreos
+
+CHARGEBACK_HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
+CHARGEBACK_IMAGE := $(DOCKER_BASE_URL)/chargeback
+HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
+HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
+HIVE_IMAGE := $(DOCKER_BASE_URL)/chargeback-hive
+PRESTO_IMAGE := $(DOCKER_BASE_URL)/chargeback-presto
+CHARGEBACK_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
