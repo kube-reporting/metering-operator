@@ -332,12 +332,12 @@ func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []pres
 				vals[i] = v
 			case []byte:
 				vals[i] = string(v)
-			case uint, uint8, uint16, uint32, uint64,
-				int, int8, int16, int32, int64,
-				float32, float64,
-				complex64, complex128,
-				bool:
-				vals[i] = fmt.Sprintf("%v", v)
+			case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64:
+				vals[i] = fmt.Sprintf("%d", v)
+			case float32, float64, complex64, complex128:
+				vals[i] = fmt.Sprintf("%f", v)
+			case bool:
+				vals[i] = fmt.Sprintf("%t", v)
 			case time.Time:
 				vals[i] = v.String()
 			case nil:
