@@ -6,8 +6,7 @@ set -e
 : "${DEPLOY_TAG:?}"
 
 TMP_DIR="$(mktemp -d)"
-# We set these in here so that when we run integration.sh, which runs e2e-test-runner.sh,
-# they're set to the same ***REMOVED***les for both the deploy-ci.sh script, and the
+# We set these in here so that when we run integration.sh, which runs e2e-test-runner.sh, they're set to the same ***REMOVED***les for both the deploy-ci.sh script, and the
 # cleanup after deploy-ci.sh ***REMOVED***nishes. Without this, the cleanup would use the
 # default ***REMOVED***les, for uninstall rather than the same ***REMOVED***les used for deploy.
 export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
@@ -15,7 +14,7 @@ export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/cust
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
 
-export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-ci.sh}"
+export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-e2e.sh}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
