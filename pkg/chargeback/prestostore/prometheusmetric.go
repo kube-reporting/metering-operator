@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -15,6 +16,13 @@ const (
 	// before Presto will error due to the payload being too large.
 	prestoQueryCap = 1000000
 )
+
+var bufPool = sync.Pool{
+	New: func() interface{} {
+		// capacity prestoQueryCap, length 0
+		return bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
+	},
+}
 
 // PrometheusMetric is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
 type PrometheusMetric struct {
@@ -27,8 +35,9 @@ type PrometheusMetric struct {
 // StorePrometheusMetrics handles storing Prometheus metrics into the speci***REMOVED***ed
 // Presto table.
 func StorePrometheusMetrics(ctx context.Context, execer presto.Execer, tableName string, metrics []*PrometheusMetric) error {
-	// capacity prestoQueryCap, length 0
-	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
+	queryBuf := bufPool.Get().(*bytes.Buffer)
+	queryBuf.Reset()
+	defer bufPool.Put(queryBuf)
 
 	insertStatementLength := len(presto.FormatInsertQuery(tableName, ""))
 	// calculate the queryCap with the "INSERT INTO $table_name" portion
