@@ -27,12 +27,6 @@ type PrometheusMetric struct {
 // StorePrometheusMetrics handles storing Prometheus metrics into the specified
 // Presto table.
 func StorePrometheusMetrics(ctx context.Context, execer presto.Execer, tableName string, metrics []*PrometheusMetric) error {
-	var queryValues []string
-
-	for _, metric := range metrics {
-		metricValue := generatePrometheusMetricSQLValues(metric)
-		queryValues = append(queryValues, metricValue)
-	}
 	// capacity prestoQueryCap, length 0
 	queryBuf := bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
 
@@ -41,7 +35,9 @@ func StorePrometheusMetrics(ctx context.Context, execer presto.Execer, tableName
 	// accounted for
 	queryCap := prestoQueryCap - insertStatementLength
 
-	for _, value := range queryValues {
+	for _, metric := range metrics {
+		metricValue := generatePrometheusMetricSQLValues(metric)
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -61,10 +57,10 @@ func StorePrometheusMetrics(ctx context.Context, execer presto.Execer, tableName
 
 		// There's a character limit of prestoQueryCap on insert
 		// queries, so let's chunk them at that limit.
-		bytesToWrite := len(value)
+		bytesToWrite := len(metricValue)
 		newBufferSize := (bytesToWrite + queryBuf.Len())
 
-		// if writing the current value to the buffer would exceed the
+		// if writing the current metricValue to the buffer would exceed the
 		// prestoQueryCap, preform the insert query, and reset the buffer
 		if newBufferSize > queryCap {
 			err := presto.InsertInto(execer, tableName, queryBuf.String())
@@ -73,7 +69,7 @@ func StorePrometheusMetrics(ctx context.Context, execer presto.Execer, tableName
 			}
 			queryBuf.Reset()
 		} else {
-			queryBuf.WriteString(value)
+			queryBuf.WriteString(metricValue)
 		}
 	}
 	// if the buffer has unwritten values, perform the final insert
