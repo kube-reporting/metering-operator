@@ -21,6 +21,10 @@ const (
 
 	// defaultS3Region is used to make the API call used to determine a bucket's region.
 	defaultS3Region = "us-east-1"
+
+	// maxS3Keys is the maximum amount of keys to be returned by a single S3
+	// list objects API response
+	maxS3Keys = 200
 )
 
 type ManifestRetriever interface {
@@ -55,30 +59,36 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 		prefix += "/"
 	}
 
-	var keys []string
+	var manifests []*Manifest
+	var manifestErr error
 	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
-		keys = append(keys, r.filterObjects(prefix, out.Contents)...)
+		keys := r.filterObjects(prefix, out.Contents)
+
+		for _, key := range keys {
+			manifest, err := retrieveManifest(r.s3API, r.bucket, key)
+			if err != nil {
+				manifestErr = fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
+				return false
+			}
+			manifests = append(manifests, manifest)
+		}
+
 		return true
 	}
 
 	// list all in <report-prefix>/<report-name>/ of bucket
 	err := r.s3API.ListObjectsV2Pages(&s3.ListObjectsV2Input{
-		Bucket: aws.String(r.bucket),
-		Prefix: aws.String(prefix),
+		Bucket:  aws.String(r.bucket),
+		Prefix:  aws.String(prefix),
+		MaxKeys: aws.Int64(maxS3Keys),
 	}, pageFn)
 	if err != nil {
 		return nil, fmt.Errorf("could not list retrieve AWS billing report keys: %v", err)
 	}
-
-	var manifests []*Manifest
-
-	for _, key := range keys {
-		manifest, err := retrieveManifest(r.s3API, r.bucket, key)
-		if err != nil {
-			return nil, fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)
-		}
-		manifests = append(manifests, manifest)
+	if manifestErr != nil {
+		return nil, manifestErr
 	}
+
 	return manifests, nil
 }
 
