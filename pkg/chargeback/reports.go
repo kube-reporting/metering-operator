@@ -138,6 +138,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("report configured to run immediately with %s until periodEnd+gracePeriod: %s", waitTime, nextRunTime)
 	} else if reportGracePeriodUnmet {
 		logger.Infof("report %s not past grace period yet, ignoring until %s (%s)", report.Name, nextRunTime, waitTime)
+		return nil
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
