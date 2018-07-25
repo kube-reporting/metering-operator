@@ -64,20 +64,35 @@ spec:
             resourceFieldRef:
               containerName: metastore
               resource: limits.memory
-{{- if .Values.hive.metastore.storage.create }}
         volumeMounts:
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
-{{- end }}
+        # openshift requires volumeMounts for VOLUMEs in a Dockerfile
+        - name: hive-warehouse
+          mountPath: /user/hive/warehouse
+        - name: namenode-empty
+          mountPath: /hadoop/dfs/name
+        - name: datanode-empty
+          mountPath: /hadoop/dfs/data
         resources:
 {{ toYaml .Values.hive.metastore.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
-{{- if .Values.hive.metastore.storage.create }}
       volumes:
+      # these emptyDir volumes are necessary because Openshift requires VOLUMEs
+      # in a Dockerfile have a corresponding volumeMount
+      - name: hive-warehouse
+        emptyDir: {}
+      - name: namenode-empty
+        emptyDir: {}
+      - name: datanode-empty
+        emptyDir: {}
       - name: hive-metastore-db-data
+{{- if .Values.hive.metastore.storage.create }}
         persistentVolumeClaim:
-            claimName: hive-metastore-db-data
+          claimName: hive-metastore-db-data
+{{- else }}
+        emptyDir: {}
 {{- end }}
