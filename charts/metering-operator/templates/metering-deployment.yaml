@@ -107,6 +107,8 @@ spec:
           containerPort: 8080
         - name: "pprof"
           containerPort: 6060
+        - name: "metrics"
+          containerPort: 8082
         readinessProbe:
 {{ toYaml .Values.readinessProbe | indent 10 }}
         livenessProbe:
