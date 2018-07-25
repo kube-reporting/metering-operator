@@ -16,6 +16,7 @@ import (
 	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/singleflight"
@@ -40,6 +41,7 @@ import (
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus"
 )
 
 const (
@@ -261,6 +263,7 @@ func (c *Chargeback) setupQueues() {
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
 	}
+
 }
 
 func (qs queues) ShutdownQueues() {
@@ -351,13 +354,22 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		Addr:    ":8080",
 		Handler: apiRouter,
 	}
+	promServer := &http.Server{
+		Addr:    ":8082",
+		Handler: promhttp.Handler(),
+	}
 	pprofServer := newPprofServer()
 
 	// start the HTTP servers
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		c.logger.Infof("HTTP API server started")
 		c.logger.WithError(httpServer.ListenAndServe()).Info("HTTP API server exited")
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("Prometheus metrics server started")
+		c.logger.WithError(promServer.ListenAndServe()).Info("Prometheus metrics server exited")
 		wg.Done()
 	}()
 	go func() {
@@ -441,12 +453,20 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
 
 	// stop our running http servers
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		c.logger.Infof("stopping HTTP API server")
 		err := httpServer.Shutdown(context.TODO())
 		if err != nil {
 			c.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
+		}
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("stopping Prometheus metrics server")
+		err := promServer.Shutdown(context.TODO())
+		if err != nil {
+			c.logger.WithError(err).Warnf("got an error shutting down Prometheus metrics server")
 		}
 		wg.Done()
 	}()
