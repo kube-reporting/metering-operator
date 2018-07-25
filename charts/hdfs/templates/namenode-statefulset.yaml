@@ -135,7 +135,12 @@ spec:
         volumeMounts:
         - name: hdfs-namenode-data
           mountPath: /hadoop/dfs/name
+          # we use a subPath to avoid the lost+found directory at the root of
+          # the volume effecting the hdfs formating
           subPath: hadoop/dfs/name
+        # required for openshift
+        - name: datanode-empty
+          mountPath: /hadoop/dfs/data
         resources:
 {{ toYaml .Values.namenode.resources | indent 10 }}
       serviceAccount: hdfs
@@ -143,6 +148,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
 {{- end }}
+      volumes:
+      - name: datanode-empty
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-namenode-data"

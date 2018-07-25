@@ -68,9 +68,30 @@ spec:
             resourceFieldRef:
               containerName: hiveserver2
               resource: limits.memory
+        volumeMounts:
+        # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
+        - name: hive-metastore-db-data
+          mountPath: /var/lib/hive
+        - name: hive-warehouse
+          mountPath: /user/hive/warehouse
+        - name: namenode-empty
+          mountPath: /hadoop/dfs/name
+        - name: datanode-empty
+          mountPath: /hadoop/dfs/data
         resources:
 {{ toYaml .Values.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
+      volumes:
+      # these emptyDir volumes are necessary because Openshift requires VOLUMEs
+      # in a Docker***REMOVED***le have a corresponding volumeMount
+      - name: hive-warehouse
+        emptyDir: {}
+      - name: namenode-empty
+        emptyDir: {}
+      - name: datanode-empty
+        emptyDir: {}
+      - name: hive-metastore-db-data
+        emptyDir: {}
