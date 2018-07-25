@@ -16,6 +16,7 @@ import (
 	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/singleflight"
@@ -40,6 +41,7 @@ import (
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus"
 )
 
 const (
@@ -184,7 +186,7 @@ func (c *Chargeback) setupInformers() {
 	inf.ScheduledReports().Informer()
 }
 func (c *Chargeback) setupQueues() {
-	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Reports")
+	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
 	c.informers.Chargeback().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -200,7 +202,7 @@ func (c *Chargeback) setupQueues() {
 		},
 	})
 
-	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ScheduledReports")
+	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
 	c.informers.Chargeback().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -217,7 +219,7 @@ func (c *Chargeback) setupQueues() {
 		DeleteFunc: c.handleScheduledReportDeleted,
 	})
 
-	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ReportDataSources")
+	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
 	c.informers.Chargeback().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -234,7 +236,7 @@ func (c *Chargeback) setupQueues() {
 		DeleteFunc: c.handleReportDataSourceDeleted,
 	})
 
-	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ReportGenerationQueries")
+	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
 	c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -261,6 +263,7 @@ func (c *Chargeback) setupQueues() {
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
 	}
+
 }
 
 func (qs queues) ShutdownQueues() {
@@ -351,13 +354,22 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		Addr:    ":8080",
 		Handler: apiRouter,
 	}
+	promServer := &http.Server{
+		Addr:    ":8082",
+		Handler: promhttp.Handler(),
+	}
 	pprofServer := newPprofServer()
 
 	// start the HTTP servers
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		c.logger.Infof("HTTP API server started")
 		c.logger.WithError(httpServer.ListenAndServe()).Info("HTTP API server exited")
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("Prometheus metrics server started")
+		c.logger.WithError(promServer.ListenAndServe()).Info("Prometheus metrics server exited")
 		wg.Done()
 	}()
 	go func() {
@@ -441,12 +453,20 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Info("got stop signal, shutting down Chargeback operator")
 
 	// stop our running http servers
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		c.logger.Infof("stopping HTTP API server")
 		err := httpServer.Shutdown(context.TODO())
 		if err != nil {
 			c.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
+		}
+		wg.Done()
+	}()
+	go func() {
+		c.logger.Infof("stopping Prometheus metrics server")
+		err := promServer.Shutdown(context.TODO())
+		if err != nil {
+			c.logger.WithError(err).Warnf("got an error shutting down Prometheus metrics server")
 		}
 		wg.Done()
 	}()
