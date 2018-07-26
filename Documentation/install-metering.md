@@ -88,6 +88,25 @@ RESOURCES:
 ... the rest is omitted for brevity ...
 ```
 
+Next, get the list of pods:
+
+```
+kubectl -n $METERING_NAMESPACE get pods
+```
+
+It may take a 2-3 minutes, but eventually all pods should have a status of `Running`:
+
+```
+NAME                                      READY     STATUS    RESTARTS   AGE
+hdfs-datanode-0                           1/1       Running   0          10m
+hdfs-namenode-0                           1/1       Running   0          10m
+hive-metastore-0                          1/1       Running   0          10m
+hive-server-0                             1/1       Running   0          10m
+metering-5c6c9d6cc5-7pzwv                 1/1       Running   1          10m
+metering-helm-operator-79666787c5-z4d2h   2/2       Running   0          10m
+presto-coordinator-54469ccb68-jfblb       1/1       Running   0          10m
+```
+
 Check the logs of the `metering` deployment for errors:
 
 ```
