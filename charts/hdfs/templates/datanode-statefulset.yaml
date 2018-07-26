@@ -87,6 +87,15 @@ spec:
           limits:
             memory: "50Mi"
             cpu: "50m"
+        volumeMounts:
+        - name: hdfs-datanode-data
+          mountPath: /hadoop/dfs/data
+          # we use a subPath to avoid the lost+found directory at the root of
+          # the volume effecting the hdfs formating
+          subPath: hadoop/dfs/data
+        # required for openshift
+        - name: namenode-empty
+          mountPath: /hadoop/dfs/name
         env:
         - name: NAMENODE_HOST
           valueFrom:
@@ -146,7 +155,12 @@ spec:
         volumeMounts:
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data
+          # we use a subPath to avoid the lost+found directory at the root of
+          # the volume effecting the hdfs formating
           subPath: hadoop/dfs/data
+        # required for openshift
+        - name: namenode-empty
+          mountPath: /hadoop/dfs/name
         livenessProbe:
           exec:
             command:
@@ -162,6 +176,9 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
 {{- end }}
+      volumes:
+      - name: namenode-empty
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-datanode-data"
