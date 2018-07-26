@@ -62,6 +62,90 @@ func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Col
 	return columns
 }
 
+func hiveColumnsToPrestoColumns(columns []hive.Column) ([]presto.Column, error) {
+	var err error
+	newCols := make([]presto.Column, len(columns))
+	for i, col := range columns {
+		newCols[i], err = hiveColumnToPrestoColumn(col)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return newCols, nil
+}
+
+func simpleHiveColumnTypeToPrestoColumnType(colType string) string {
+	switch strings.ToUpper(colType) {
+	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT":
+		return "BIGINT"
+	case "FLOAT", "DOUBLE":
+		return "DOUBLE"
+	case "STRING", "VARCHAR":
+		return "VARCHAR"
+	case "TIMESTAMP":
+		return "TIMESTAMP"
+	case "BOOLEAN":
+		return "BOOLEAN"
+	case "DECIMAL", "NUMERIC", "CHAR":
+		// explicitly not visible to Presto tables according to Presto docs
+		return ""
+	}
+	return ""
+}
+
+func hiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
+	colType := simpleHiveColumnTypeToPrestoColumnType(column.Type)
+	if colType != "" {
+		return presto.Column{
+			Name: column.Name,
+			Type: colType,
+		}, nil
+	} else {
+		colType = strings.ToUpper(column.Type)
+		switch {
+		case strings.Contains(colType, "MAP"):
+			// does not support maps with arrays inside them
+			if strings.Contains(colType, "ARRAY") {
+				return presto.Column{}, fmt.Errorf("cannot convert map containing array into map for Presto, column: %q, type: %q", column.Name, column.Type)
+			}
+			beginMapIndex := strings.Index(colType, "<")
+			endMapIndex := strings.Index(colType, ">")
+			if beginMapIndex == -1 || endMapIndex == -1 {
+				return presto.Column{}, fmt.Errorf("unable to find matching <, > pair for column %q, type: %q", column.Name, column.Type)
+			}
+			if beginMapIndex+1 >= len(colType) {
+				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
+			}
+			mapComponents := colType[beginMapIndex+1 : endMapIndex]
+			mapComponentsSplit := strings.SplitN(mapComponents, ",", 2)
+			if len(mapComponentsSplit) != 2 {
+				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
+			}
+			keyType := mapComponentsSplit[0]
+			valueType := mapComponentsSplit[1]
+
+			prestoKeyType := simpleHiveColumnTypeToPrestoColumnType(keyType)
+			prestoValueType := simpleHiveColumnTypeToPrestoColumnType(valueType)
+			if prestoKeyType == "" {
+				return presto.Column{}, fmt.Errorf("invalid presto map key type: %q", keyType)
+			}
+			if prestoValueType == "" {
+				return presto.Column{}, fmt.Errorf("invalid presto map value type: %q", valueType)
+			}
+			mapColType := fmt.Sprintf("MAP(%s,%s)", prestoKeyType, prestoValueType)
+
+			return presto.Column{
+				Name: column.Name,
+				Type: mapColType,
+			}, nil
+
+		case strings.Contains(colType, "ARRAY"):
+			// currently unsupported
+		}
+	}
+	return presto.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
+}
+
 func randomString(rand *rand.Rand, size int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, size)
