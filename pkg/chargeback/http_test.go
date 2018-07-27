@@ -95,7 +95,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		expectedStatusCode int
 		expectedAPIError   string
 
-		queryerPrepareFunc func(*mockpresto.MockExecQueryer) []presto.Row
+		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
 	}{
 		"report-finished-no-results": {
 			reportName: testReportName,
@@ -120,8 +120,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
-				mock.EXPECT().Query(gomock.Any()).Return(nil, nil)
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
 				return nil
 			},
 			expectedStatusCode: http.StatusOK,
@@ -150,14 +150,14 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1.5,
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusOK,
@@ -185,9 +185,9 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(gomock.Any()).Return(nil, dbErr)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
 				return nil
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -221,7 +221,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
@@ -229,7 +229,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -263,8 +263,13 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
+
+			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
+				var err error
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
 			ctrl := gomock.NewController(t)
@@ -279,7 +284,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// return when there are no errors
 			var expectedResults []presto.Row
 			if tt.queryerPrepareFunc != nil {
-				expectedResults = tt.queryerPrepareFunc(queryer)
+				tableName := reportTableName(tt.reportName)
+				expectedResults = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
@@ -359,7 +365,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 		expectedStatusCode int
 		expectedAPIError   string
 
-		queryerPrepareFunc func(*mockpresto.MockExecQueryer) []presto.Row
+		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
 		expectedResults    *GetReportResults
 	}{
 		"report-finished-with-results": {
@@ -389,14 +395,14 @@ func TestAPIV2ReportsGet(t *testing.T) {
 				},
 			},
 			),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1,
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusOK,
@@ -439,8 +445,8 @@ func TestAPIV2ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
-				mock.EXPECT().Query(gomock.Any()).Return(nil, nil)
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
 				return nil
 			},
 			expectedResults:    &GetReportResults{},
@@ -471,9 +477,9 @@ func TestAPIV2ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(gomock.Any()).Return(nil, dbErr)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
 				return nil
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -509,7 +515,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
@@ -517,7 +523,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -551,8 +557,12 @@ func TestAPIV2ReportsGet(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
+			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
+				var err error
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
 			ctrl := gomock.NewController(t)
@@ -562,8 +572,9 @@ func TestAPIV2ReportsGet(t *testing.T) {
 			queryer := mockpresto.NewMockExecQueryer(ctrl)
 
 			if tt.queryerPrepareFunc != nil {
+				tableName := reportTableName(tt.reportName)
 				// we don't need the DB results to verify results in this test
-				_ = tt.queryerPrepareFunc(queryer)
+				_ = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
@@ -640,7 +651,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		expectedStatusCode int
 		expectedAPIError   string
 
-		queryerPrepareFunc func(*mockpresto.MockExecQueryer) []presto.Row
+		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
 		expectedResults    *GetReportResults
 	}{
 		"report-finished-with-results": {
@@ -670,14 +681,14 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1,
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusOK,
@@ -720,8 +731,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
-				mock.EXPECT().Query(gomock.Any()).Return(nil, nil)
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
 				return nil
 			},
 			expectedResults:    &GetReportResults{},
@@ -752,9 +763,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(gomock.Any()).Return(nil, dbErr)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
 				return nil
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -790,7 +801,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer) []presto.Row {
+			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
 				result := []presto.Row{
 					{
 						"timestamp": time.Time{},
@@ -798,7 +809,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
 				}
-				mock.EXPECT().Query(gomock.Any()).Return(result, nil)
+				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
 				return result
 			},
 			expectedStatusCode: http.StatusInternalServerError,
@@ -832,8 +843,12 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
+			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
+				var err error
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
 			ctrl := gomock.NewController(t)
@@ -843,8 +858,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			queryer := mockpresto.NewMockExecQueryer(ctrl)
 
 			if tt.queryerPrepareFunc != nil {
+				tableName := reportTableName(tt.reportName)
 				// we don't need the DB results to verify results in this test
-				_ = tt.queryerPrepareFunc(queryer)
+				_ = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
