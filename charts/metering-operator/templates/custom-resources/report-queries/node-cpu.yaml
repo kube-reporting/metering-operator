@@ -14,7 +14,7 @@ spec:
     type: string
     unit: kubernetes_node
   - name: labels
-    type: map(varchar, varchar)
+    type: map<string, string>
     tableHidden: true
   - name: node_capacity_cpu_cores
     type: double
@@ -58,7 +58,7 @@ spec:
     type: string
     unit: kubernetes_node
   - name: labels
-    type: map(varchar, varchar)
+    type: map<string, string>
     tableHidden: true
   - name: node_allocatable_cpu_cores
     type: double
