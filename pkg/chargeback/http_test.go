@@ -198,6 +198,11 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			expectedStatusCode: http.StatusNotFound,
 			expectedAPIError:   "not found",
 		},
+		"report-name-not-speci***REMOVED***ed": {
+			reportName:         "",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "the following ***REMOVED***elds are missing or empty: name",
+		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
@@ -342,21 +347,24 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	}
 }
 
-//for v2 endpoints
-func apiReportV2URL(reportName string) string {
+//for v2 endpoints full
+func apiReportV2URLFull(reportName string) string {
 	return path.Join(APIV2Reports, reportName, "full")
 }
 
-func TestAPIV2ReportsGet(t *testing.T) {
+func TestAPIV2ReportsFull(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
+	const testFormat = "?format=json"
 	reportStart := time.Time{}
 	reportEnd := reportStart.AddDate(0, 1, 0)
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
 		reportName   string
+		reportFormat string
+		apiPath      string
 
 		report      *v1alpha1.Report
 		query       *v1alpha1.ReportGenerationQuery
@@ -371,6 +379,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -423,6 +432,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -455,6 +465,7 @@ func TestAPIV2ReportsGet(t *testing.T) {
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -487,12 +498,34 @@ func TestAPIV2ReportsGet(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:         "doesnt-exist",
+			apiPath:            apiReportV2URLFull("doesnt-exist") + testFormat,
 			expectedStatusCode: http.StatusNotFound,
 			expectedAPIError:   "not found",
+		},
+		"report-name-not-speci***REMOVED***ed": {
+			reportName:         "",
+			apiPath:            "/api/v2/reports//full" + testFormat,
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "the following ***REMOVED***elds are missing or empty: name",
+		},
+		"report-format-not-speci***REMOVED***ed": {
+			reportName:         testReportName,
+			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:            apiReportV2URLFull(testReportName),
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "the following ***REMOVED***elds are missing or empty: format",
+		},
+		"report-format-non-existent": {
+			reportName:         testReportName,
+			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:            apiReportV2URLFull(testReportName) + "?format=doesntexist",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "format must be one of: csv, json or tabular",
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -582,22 +615,8 @@ func TestAPIV2ReportsGet(t *testing.T) {
 			server := httptest.NewServer(router)
 			defer server.Close()
 
-			// set up the query parameters for our API call.
-			// we hardcode format to JSON because validating CSV output is a
-			// bit trickier than JSON
-			params := url.Values{
-				"format": []string{"json"},
-			}
-
-			endpointFull := server.URL + apiReportV2URL(tt.reportName)
-			// construct the url object
-			endpointURLFull, err := url.Parse(endpointFull)
-			require.NoError(t, err)
-			endpointURLFull.RawQuery = params.Encode()
-
 			// ***REMOVED***nal string URL
-			***REMOVED***nalURL := endpointURLFull.String()
-
+			***REMOVED***nalURL := server.URL + tt.apiPath
 			resp, err := server.Client().Get(***REMOVED***nalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
@@ -637,12 +656,15 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
+	const testFormat = "?format=json"
 	reportStart := time.Time{}
 	reportEnd := reportStart.AddDate(0, 1, 0)
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
 		reportName   string
+		reportFormat string
+		apiPath      string
 
 		report      *v1alpha1.Report
 		query       *v1alpha1.ReportGenerationQuery
@@ -657,6 +679,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -709,6 +732,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -741,6 +765,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -773,12 +798,34 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:         "doesnt-exist",
+			apiPath:            apiReportV2URLTable("doesnt-exist") + testFormat,
 			expectedStatusCode: http.StatusNotFound,
 			expectedAPIError:   "not found",
+		},
+		"report-name-not-speci***REMOVED***ed": {
+			reportName:         "",
+			apiPath:            "/api/v2/reports//table" + testFormat,
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "the following ***REMOVED***elds are missing or empty: name",
+		},
+		"report-format-not-speci***REMOVED***ed": {
+			reportName:         testReportName,
+			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:            apiReportV2URLTable(testReportName),
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "the following ***REMOVED***elds are missing or empty: format",
+		},
+		"report-format-non-existent": {
+			reportName:         testReportName,
+			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:            apiReportV2URLTable(testReportName) + "?format=doesntexist",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedAPIError:   "format must be one of: csv, json or tabular",
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
 			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -868,22 +915,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			server := httptest.NewServer(router)
 			defer server.Close()
 
-			// set up the query parameters for our API call.
-			// we hardcode format to JSON because validating CSV output is a
-			// bit trickier than JSON
-			params := url.Values{
-				"format": []string{"json"},
-			}
-
-			endpointTable := server.URL + apiReportV2URLTable(tt.reportName)
-			// construct the url object
-			endpointURLTable, err := url.Parse(endpointTable)
-			require.NoError(t, err)
-			endpointURLTable.RawQuery = params.Encode()
-
 			// ***REMOVED***nal string URL
-			***REMOVED***nalURL := endpointURLTable.String()
-
+			***REMOVED***nalURL := server.URL + tt.apiPath
 			resp, err := server.Client().Get(***REMOVED***nalURL)
 			require.NoError(t, err, "expected making http request to not return error")
 
