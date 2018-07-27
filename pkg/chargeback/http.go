@@ -79,6 +79,9 @@ func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Ra
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportHandler)
 	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2FullHandler)
 	router.HandleFunc("/api/v2/reports/{name}/table", srv.getReportV2TableHandler)
+	// The following two routes handle returning a 400 when the name parameter is missing, rather than having a 404 returned.
+	router.HandleFunc("/api/v2/reports//full", srv.getReportV2NameMissingHandler)
+	router.HandleFunc("/api/v2/reports//table", srv.getReportV2NameMissingHandler)
 	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
 	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
@@ -108,7 +111,7 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryPar
 	case "json", "csv", "tab", "tabular":
 		return true
 	}
-	writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json, or tabular")
+	writeErrorResponse(logger, w, r, http.StatusBadRequest, "format must be one of: csv, json or tabular")
 	return false
 }
 
@@ -136,6 +139,14 @@ func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	srv.getReport(logger, name, r.Form["format"][0], true, false, w, r)
+}
+
+func (srv *server) getReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
+	logger := newRequestLogger(srv.logger, r, srv.rand)
+	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
+		return
+	}
+	writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
 }
 
 func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Request) {
