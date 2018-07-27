@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -263,15 +264,6 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	prestoColumns := generatePrestoColumns(reportQuery)
-	tableName := reportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to perform presto query")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
-		return
-	}
-
 	// Get the presto table to get actual columns in table
 	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
@@ -280,9 +272,30 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	columns := prestoTable.State.Parameters.Columns
-	if len(results) > 0 && len(columns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.Parameters.Columns))
+	tableColumns := prestoTable.State.Parameters.Columns
+	queryPrestoColumns := generatePrestoColumns(reportQuery)
+	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
+	if err != nil {
+		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+		return
+	}
+
+	if !reflect.DeepEqual(queryPrestoColumns, prestoColumns) {
+		logger.Warnf("report columns and table columns don't match, ReportGenerationQuery was likely updated after the report ran")
+		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
+	}
+
+	tableName := reportTableName(name)
+	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to perform presto query")
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		return
+	}
+
+	if len(results) > 0 && len(prestoColumns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoColumns))
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
