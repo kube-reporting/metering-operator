@@ -115,7 +115,7 @@ $ kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 
 
 ## Using Operator Metering
 
-For instructions on using Operator Metering, please see [Using Operator Metering][using-metering].
+For instructions on using Operator Metering, please see [using Operator Metering][using-metering].
 
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [using-metering]: using-metering.md
