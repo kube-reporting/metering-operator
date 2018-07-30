@@ -59,7 +59,7 @@ namenode:
           - key: app
             operator: In
             values:
-            - hdfs-datanode
+            - hdfs-namenode
         topologyKey: "kubernetes.io/hostname"
 
   storage:
