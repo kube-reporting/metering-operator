@@ -48,6 +48,12 @@ If you're on GCP use the following instead:
 ansible-playbook playbooks/openshift-metering/gcp-config.yml
 ```
 
+### Verifying Operation and Metering Usage
+
+Once you've installed Metering, make sure you set your `METERING_NAMESPACE` environment variable to `openshift-metering` and then return to the [verifying operation section][verifying-operation] of the main install doc.
+
+After you've verified operation, continue on to [using Operator Metering][using-metering].
+
 ## Uninstall
 
 Uninstall just requires setting `openshift_metering_install` to false, and re-running the `ansible-playbook` command from above:
@@ -59,3 +65,5 @@ openshift_metering_install: false
 [configuring-metering]: metering-config.md
 [openshift-ansible]: https://github.com/openshift/openshift-ansible
 [metering-playbook]: https://github.com/openshift/openshift-ansible/tree/master/playbooks/openshift-metering
+[verifying-operation]: install-metering.md#verifying-operation
+[using-metering]: using-metering.md
