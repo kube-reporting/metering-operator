@@ -11,83 +11,55 @@ Operator Metering is a collection of a few components:
 
 Operator Metering requires the following components:
 
-- A Kubernetes 1.8 cluster.
+- A Kubernetes v1.8 or newer cluster
 - A StorageClass for dynamic volume provisioning. ([See configuring metering][configuring-metering] for more information.)
 - A Prometheus installation within the cluster configured to do Kubernetes cluster-monitoring.
     - The prometheus-operator repository's [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
     - At a minimum, we require kube-state-metrics, node-exporter, and built-in Kubernetes target metrics.
-- 3.5GB Memory and 1.5 CPU Cores (1500 Millicores).
-- At least 1 node with 1.5GB available memory (the highest memory request for a single Operator Metering Pod)
+    - Openshift 3.10 or newer includes monitoring via the [openshift-montoring playbook](https://github.com/openshift/openshift-ansible/tree/master/playbooks/openshift-monitoring).
+- 4GB Memory and 2 CPU Cores available cluster capacity.
+- At least 1 node with 2GB available memory (the highest memory request for a single Operator Metering Pod)
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly configured kubectl to access the Kubernetes cluster.
-- [Operator Lifecycle Manager (OLM)][install-olm] version 0.4.0 or greater. Must be installed using the `upstream` install method.
 
-## Installation
-
-> Requirements: Please make sure that the [Operator Lifecycle Manager][install-olm] is installed in the cluster before running this guide.
-
-First, start by creating your namespace:
-
-```
-export METERING_NAMESPACE=metering
-kubectl create ns $METERING_NAMESPACE
-```
-
-### Configuration
+## Configuration
 
 Before continuing with the installation, please read [Configuring Operator Metering][configuring-metering].
 Some options may not be changed post-install. Be certain to configure these options, if desired, before installation.
 
-If you're not using [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
-
 If you do not wish to modify the Operator Metering configuration, a minimal configuration example that doesn't override anything can be found in [default.yaml][default-config].
 
-### Install Operator Metering with Configuration
+### Prometheus Monitoring Configuration
 
-Installation is a two step process. First, install the Metering Helm operator. Then, install the `Metering` resource that defines the configuration.
+For installs into Openshift, ensuring Prometheus is installed can be done using Ansible. For installs into Tectonic, the manual installation method configures Metering to use the Prometheus that's installed by default into the tectonic-system namespace.
 
-To start, download the [Metering subscription][metering-subscription] and save it as `metering.subscription.yaml`, and download your `Metering` resource and save it as `metering.yaml`.
+If you're not using Openshift or Tectonic, then you will need to use OLM or the manual install method. In this case if you are not using a [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
 
-The subscription is used by the Operator Lifecycle Management and Catalog operators to install CRDs and the Metering Helm operator.
+## Install Methods
 
-Install the subscription into the cluster:
+There are multiple installation methods depending on your Kubernetes platform and the version of Operator Metering you want.
 
-```
-kubectl create -n $METERING_NAMESPACE -f metering.subscription.yaml
-```
+### Ansible via openshift-ansible
 
-This causes the operator-lifecycle-manager (OLM) to create an `InstallPlan` resource named after the `Subscription`.
-The `InstallPlan` references a `ClusterServiceVersion` within it's catalog which describes the Metering Helm operator Deployment, Role, ServiceAccount, and CRD resources that need to be created.
-The OLM operator will read the `ClusterServiceVersion` from it's catalog, and then create a `ClusterServiceVersion` named after our `InstallPlan`.
-Once the `ClusterServiceVersion` exists, the operator creates the deployment containing our Metering Helm operator.
+Using Ansible is the currently recommended approach for installing onto Openshift.
+The [openshift-metering playbook][metering-playbook] is included in the [openshift-ansible repository][openshift-ansible] and can be used to install and configure operator metering on top of Openshift.
+It properly handles installing the Metering with the correct configuration for communicating to Openshift Cluster Monitoring, as well as enables other options for better integration with Openshift.
 
+Read the [Ansible installation guide][ansible-install] for full details on how to use the playbook and what the available parameters are.
 
-To verify this, run the following command:
+### Operator Lifecycle Manager (OLM)
 
-```
-kubectl get -n $METERING_NAMESPACE subscription-v1s,installplan-v1s,clusterserviceversion-v1s
-```
+Using OLM for installation is the recommended approach for installing the most recent packaged release for Kubernetes.
+In the future, using OLM on Openshift will be a supported option.
 
-You should see something like this in the output:
+For instructions on installing using OLM follow the [OLM installation guide][olm-install].
 
-```
-NAME                                                           AGE
-subscription-v1.app.coreos.com/metering-helm-operator.v0.6.0   4m
+### Manual install scripts
 
-NAME                                                                        AGE
-installplan-v1.app.coreos.com/install-metering-helm-operator.v0.6.0-jhrr4   4m
+Manual installation is generally not recommended as it is always changing and relies on a local checkout of the operator-metering git repository.
+The primary use for manual installation is for doing development work or installing an unreleased versions of components.
 
-NAME                                                                    AGE
-clusterserviceversion-v1.app.coreos.com/metering-helm-operator.v0.6.0   4m
-```
-
-**Note: The Subscription, and InstallPlan resources declare an intent to perform an installation once. This means they do not ensure the ClusterServiceVersion exists after creating it the first time, and deleting them will not result in the operator being uninstalled. For details on uninstall, see [Uninstalling Metering](#uninstalling-metering).**
-
-Finally, install the `Metering` resource, which causes the Metering Helm operator to install and configure Metering and its dependencies.
-
-```
-kubectl create -n $METERING_NAMESPACE -f metering.yaml
-```
+For instructions on installing using our manual install scripts follow the [manual installation guide][manual-install].
 
 ## Verifying operation
 
@@ -116,32 +88,42 @@ RESOURCES:
 ... the rest is omitted for brevity ...
 ```
 
+Next, get the list of pods:
+
+```
+kubectl -n $METERING_NAMESPACE get pods
+```
+
+It may take a 2-3 minutes, but eventually all pods should have a status of `Running`:
+
+```
+NAME                                      READY     STATUS    RESTARTS   AGE
+hdfs-datanode-0                           1/1       Running   0          10m
+hdfs-namenode-0                           1/1       Running   0          10m
+hive-metastore-0                          1/1       Running   0          10m
+hive-server-0                             1/1       Running   0          10m
+metering-5c6c9d6cc5-7pzwv                 1/1       Running   1          10m
+metering-helm-operator-79666787c5-z4d2h   2/2       Running   0          10m
+presto-coordinator-54469ccb68-jfblb       1/1       Running   0          10m
+```
+
 Check the logs of the `metering` deployment for errors:
 
 ```
 $ kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
 ```
 
-## Uninstalling Metering
-
-The operator-lifecycle-manager (OLM) operator does not automatically uninstall the operator deployment when you delete a `Subscription` or `InstallPlan` in order to avoid accidental deletions of components when removing a subscription, such as if you no longer want automatic updates.
-This means subscriptions orphan their `ClusterServiceVersions` when deleted, and that we must explicitly delete the `ClusterServiceVersions` it created to do an uninstall.
-
-So perform an uninstall, you must first delete the subscription, and then delete the related `ClusterServiceVersions` as the commands below demonstrate:
-
-```
-kubectl delete -n $METERING_NAMESPACE -f metering.subscription.yaml
-kubectl delete -n $METERING_NAMESPACE clusterserviceversion-v1s -l operator-metering=true
-```
-
 ## Using Operator Metering
 
-For instructions on using Operator Metering, please see [Using Operator Metering][using-metering].
+For instructions on using Operator Metering, please see [using Operator Metering][using-metering].
 
-[install-olm]: https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#install-the-latest-released-version-of-olm-for-upstream-kubernetes
-[metering-subscription]: ../manifests/deploy/generic/alm/metering.subscription.yaml
 [default-config]: ../manifests/metering-config/default.yaml
 [using-metering]: using-metering.md
 [configuring-metering]: metering-config.md
 [configure-prometheus-url]: metering-config.md#prometheus-url
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
+[olm-install]: olm-install.md
+[ansible-install]: ansible-install.md
+[manual-install]: manual-install.md
+[metering-playbook]: https://github.com/openshift/openshift-ansible/tree/master/playbooks/openshift-metering
+[openshift-ansible]: https://github.com/openshift/openshift-ansible
