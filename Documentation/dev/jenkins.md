@@ -41,11 +41,11 @@ When developing a new feature, it's very common to have a workflow similar to th
 - Make changes to the repo
 - Submit a pull-request
 - Wait for the build to push the image
-- Manually install metering with your changes to a Kubernetes cluster to see if they work how you expect
+- Manually install metering with your PR's image tag to a Kubernetes cluster to see if they work how you expect
 
 This process is useful when trying to debug an issue causing the e2e deployment or tests to fail.
 
 To do this, it's actually fairly simple.
-Since we push images for every build, all you need to do is follow the [Dev Installation](developer-install.md#Customize-installation) documentation to use a custom image tag.
+Since we push images for every build, all you need to do is follow the [Dev Installation](developer-guide.md#developer-install) documentation to use a custom image tag.
 We publish multiple image tags for each PR build.
 If you want to use the latest image for a PR, the image tag is `pr-$PR_NUMBER`, just replace `$PR_NUMBER` with your pull-request number.

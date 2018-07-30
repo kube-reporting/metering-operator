@@ -1,8 +1,10 @@
-# Dev Installation
+# Manual Installation
 
-If you want to install metering without ALM, using what's currently in master, ***REMOVED***rst start by cloning the repo.
+If you want to install metering without OLM, using what's currently in master, ***REMOVED***rst start by cloning the repo.
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
+
+## Install
 
 Depending on your Kubernetes platform (regular Kubernetes, Tectonic, or Openshift)
 
@@ -26,6 +28,8 @@ If your using Openshift, use openshift-install.sh:
 $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/openshift-install.sh
 ```
+
+## Uninstall
 
 To uninstall the process is the same, pick the right uninstall script for your platform, and run it.
 
@@ -52,6 +56,7 @@ $ ./hack/openshift-uninstall.sh
 
 ## Customize installation
 
+
 If you wish to customize the installation, such as to modify con***REMOVED***guration
 options, change the image tag or repository, then you can use a custom
 `metering` resource. To start, copy the default metering resource to a
@@ -73,14 +78,12 @@ $ export METERING_CR_FILE=metering-custom.yaml
 ```
 
 Then run the installation script for your platform:
+
 - `./hack/install.sh`
 - `./hack/tectonic-install.sh`
 - `./hack/openshift-install.sh`
 
-### Using images built by Jenkins
-
-If you have a PR or branch being built my Jenkins, you can use the images it's publishing from each build to test out the changes that aren't in master yet.
-For details on the image tag format, please follow the instructions in our [jenkins guide](jenkins.md#using-images-built-by-jenkins).
+For more details on con***REMOVED***guration options, most are documented in the [con***REMOVED***guring metering document][con***REMOVED***guring-metering].
 
 ## Run metering operator locally
 
@@ -119,3 +122,5 @@ make run-chargeback-local
 The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with con***REMOVED***guration set to use these local port-forwards.
 Lastly, the operator automatically uses your `$KUBECONFIG` to connect and authenticate to your cluster and perform Kubernetes API calls.
 
+
+[con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
