@@ -20,10 +20,13 @@ func InsertInto(execer Execer, tableName, query string) error {
 }
 
 func GetRows(queryer Queryer, tableName string, columns []Column) ([]Row, error) {
+	return queryer.Query(GenerateGetRowsSQL(tableName, columns))
+}
+
+func GenerateGetRowsSQL(tableName string, columns []Column) string {
 	columnsSQL := GenerateQuotedColumnsListSQL(columns)
 	orderBySQL := GenerateOrderBySQL(columns)
-	query := fmt.Sprintf("SELECT %s FROM %s ORDER BY %s", columnsSQL, tableName, orderBySQL)
-	return queryer.Query(query)
+	return fmt.Sprintf("SELECT %s FROM %s ORDER BY %s", columnsSQL, tableName, orderBySQL)
 }
 
 func GenerateQuotedColumnsListSQL(columns []Column) string {
