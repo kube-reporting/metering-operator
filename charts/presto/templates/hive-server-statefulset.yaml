@@ -31,7 +31,9 @@ spec:
         hive-common-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-common-con***REMOVED***g.yaml") . | sha256sum }}
         hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
         hive-server-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-server-con***REMOVED***g.yaml") . | sha256sum }}
-        presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
+{{- if .Values.con***REMOVED***g.createAwsCredentialsSecret }}
+        presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hive.annotations }}
 {{ toYaml .Values.hive.annotations | indent 8 }}
 {{- end }}
