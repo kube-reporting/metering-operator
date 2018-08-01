@@ -27,7 +27,9 @@ spec:
       annotations:
         presto-coordinator-config-hash: {{ include (print $.Template.BasePath "/presto-coordinator-config.yaml") . | sha256sum }}
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto-common-config.yaml") . | sha256sum }}
-        presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
+{{- if .Values.config.createAwsCredentialsSecret }}
+        presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.presto.annotations }}
 {{ toYaml .Values.presto.annotations | indent 8 }}
 {{- end }}

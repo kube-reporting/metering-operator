@@ -31,7 +31,9 @@ spec:
         hive-common-configmap-hash: {{ include (print $.Template.BasePath "/hive-common-config.yaml") . | sha256sum }}
         hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
         hive-metastore-configmap-hash: {{ include (print $.Template.BasePath "/hive-metastore-config.yaml") . | sha256sum }}
-        presto-secrets-hash: {{ include (print $.Template.BasePath "/presto-secrets.yaml") . | sha256sum }}
+{{- if .Values.config.createAwsCredentialsSecret }}
+        presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hive.annotations }}
 {{ toYaml .Values.hive.annotations | indent 8 }}
 {{- end }}
