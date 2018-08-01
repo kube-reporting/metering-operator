@@ -5,10 +5,13 @@ import (
 	restclient "k8s.io/client-go/rest"
 )
 
-const chargebackServiceName = "metering"
+const (
+	chargebackServiceName     = "metering"
+	chargebackServicePortName = "http"
+)
 
 func (f *Framework) NewChargebackSVCRequest(endpoint string, query map[string]string) *restclient.Request {
-	wrapper := f.KubeClient.CoreV1().Services(f.Namespace).ProxyGet("", chargebackServiceName, "8080", endpoint, query)
+	wrapper := f.KubeClient.CoreV1().Services(f.Namespace).ProxyGet("", chargebackServiceName, chargebackServicePortName, endpoint, query)
 	return wrapper.(*restclient.Request)
 }
 
@@ -18,7 +21,7 @@ func (f *Framework) NewChargebackSVCPOSTRequest(endpoint string, body interface{
 		Namespace(f.Namespace).
 		Resource("services").
 		SubResource("proxy").
-		Name(net.JoinSchemeNamePort("", chargebackServiceName, "8080")).
+		Name(net.JoinSchemeNamePort("", chargebackServiceName, chargebackServicePortName)).
 		Suf***REMOVED***x(endpoint).
 		Body(body)
 }
