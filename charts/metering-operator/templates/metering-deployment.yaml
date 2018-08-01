@@ -19,7 +19,9 @@ spec:
 {{- end }}
       annotations:
         metering-config-hash: {{ include (print $.Template.BasePath "/metering-config.yaml") . | sha256sum }}
-        metering-secrets-hash: {{ include (print $.Template.BasePath "/metering-secrets.yaml") . | sha256sum }}
+{{- if .Values.config.createAwsCredentialsSecret }}
+        metering-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/metering-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.annotations }}
 {{ toYaml .Values.annotations | indent 8 }}
 {{- end }}
@@ -38,12 +40,12 @@ spec:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: metering-secrets
+              name: "{{ .Values.config.awsCredentialsSecretName }}"
               key: aws-access-key-id
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: metering-secrets
+              name: "{{ .Values.config.awsCredentialsSecretName }}"
               key: aws-secret-access-key
         - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
