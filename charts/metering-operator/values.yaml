@@ -7,6 +7,8 @@ image:
 con***REMOVED***g:
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
+  awsCredentialsSecretName: metering-aws-credentials-secrets
+  createAwsCredentialsSecret: true
 
   defaultStorage:
     create: true

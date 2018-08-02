@@ -2,13 +2,13 @@
 - name: HIVE_CATALOG_hive_s3_aws___access___key
   valueFrom:
     secretKeyRef:
-      name: presto-secrets
+      name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
       key: aws-access-key-id
       optional: true
 - name: HIVE_CATALOG_hive_s3_aws___secret___key
   valueFrom:
     secretKeyRef:
-      name: presto-secrets
+      name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
       key: aws-secret-access-key
       optional: true
 - name: HIVE_CATALOG_hive_metastore_uri
@@ -91,13 +91,13 @@
 - name: CORE_CONF_fs_s3a_access_key
   valueFrom:
     secretKeyRef:
-      name: presto-secrets
+      name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
       key: aws-access-key-id
       optional: true
 - name: CORE_CONF_fs_s3a_secret_key
   valueFrom:
     secretKeyRef:
-      name: presto-secrets
+      name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
       key: aws-secret-access-key
       optional: true
 - name: HIVE_SITE_CONF_hive_metastore_uris
