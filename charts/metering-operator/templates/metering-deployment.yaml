@@ -42,11 +42,13 @@ spec:
             secretKeyRef:
               name: "{{ .Values.config.awsCredentialsSecretName }}"
               key: aws-access-key-id
+              optional: true
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: "{{ .Values.config.awsCredentialsSecretName }}"
               key: aws-secret-access-key
+              optional: true
         - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
             configMapKeyRef:
