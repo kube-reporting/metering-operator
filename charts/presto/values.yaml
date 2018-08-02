@@ -127,4 +127,5 @@ config:
   awsRegion: ""
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
-
+  awsCredentialsSecretName: presto-aws-credentials-secrets
+  createAwsCredentialsSecret: true
