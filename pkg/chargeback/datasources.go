@@ -30,12 +30,9 @@ func (c *Chargeback) runReportDataSourceWorker() {
 }
 
 func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
-	if c.queues.reportDataSourceQueue.ShuttingDown() {
-		logger.Infof("queue is shutting down")
-	}
 	obj, quit := c.queues.reportDataSourceQueue.Get()
 	if quit {
-		logger.Infof("queue is shutting down, exiting worker")
+		logger.Infof("queue is shutting down, exiting ReportDataSource worker")
 		return false
 	}
 	defer c.queues.reportDataSourceQueue.Done(obj)
