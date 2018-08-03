@@ -25,12 +25,9 @@ func (c *Chargeback) runReportWorker() {
 }
 
 func (c *Chargeback) processReport(logger log.FieldLogger) bool {
-	if c.queues.reportQueue.ShuttingDown() {
-		logger.Infof("queue is shutting down")
-	}
 	obj, quit := c.queues.reportQueue.Get()
 	if quit {
-		logger.Infof("queue is shutting down, exiting worker")
+		logger.Infof("queue is shutting down, exiting Report worker")
 		return false
 	}
 	defer c.queues.reportQueue.Done(obj)
