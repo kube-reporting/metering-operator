@@ -19,12 +19,9 @@ func (c *Chargeback) runReportGenerationQueryWorker() {
 }
 
 func (c *Chargeback) processReportGenerationQuery(logger log.FieldLogger) bool {
-	if c.queues.reportGenerationQueryQueue.ShuttingDown() {
-		logger.Infof("queue is shutting down")
-	}
 	obj, quit := c.queues.reportGenerationQueryQueue.Get()
 	if quit {
-		logger.Infof("queue is shutting down, exiting worker")
+		logger.Infof("queue is shutting down, exiting ReportGenerationQuery worker")
 		return false
 	}
 	defer c.queues.reportGenerationQueryQueue.Done(obj)

@@ -27,12 +27,9 @@ func (c *Chargeback) runScheduledReportWorker() {
 }
 
 func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
-	if c.queues.scheduledReportQueue.ShuttingDown() {
-		logger.Infof("queue is shutting down")
-	}
 	obj, quit := c.queues.scheduledReportQueue.Get()
 	if quit {
-		logger.Infof("queue is shutting down, exiting worker")
+		logger.Infof("queue is shutting down, exiting ScheduledReport worker")
 		return false
 	}
 	defer c.queues.scheduledReportQueue.Done(obj)

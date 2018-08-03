@@ -73,6 +73,10 @@ type Con***REMOVED***g struct {
 	PrometheusQueryCon***REMOVED***g cbTypes.PrometheusQueryCon***REMOVED***g
 
 	LeaderLeaseDuration time.Duration
+
+	UseTLS  bool
+	TLSCert string
+	TLSKey  string
 }
 
 type Chargeback struct {
@@ -120,9 +124,18 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Cha
 		logger: logger,
 		clock:  clock,
 	}
+	logger.Debugf("Con***REMOVED***g: %+v", cfg)
+
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return nil, fmt.Errorf("Must set TLS certi***REMOVED***cate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return nil, fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
+	}
 
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
-	logger.Debugf("Con***REMOVED***g: %+v", cfg)
 
 	con***REMOVED***gOverrides := &clientcmd.Con***REMOVED***gOverrides{}
 	var clientCon***REMOVED***g clientcmd.ClientCon***REMOVED***g
@@ -149,10 +162,10 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Cha
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
-	logger.Debugf("setting up Chargeback client...")
+	logger.Debugf("setting up Metering client...")
 	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create Chargeback client: %v", err)
+		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
 	op.setupInformers()
@@ -274,7 +287,7 @@ func (qs queues) ShutdownQueues() {
 
 func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	var wg sync.WaitGroup
-	c.logger.Info("starting Chargeback operator")
+	c.logger.Info("starting Metering operator")
 
 	go c.informers.Start(stopCh)
 
@@ -360,22 +373,36 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	}
 	pprofServer := newPprofServer()
 
+	// buffered big enough to hold the errs of each server.
+	srvErrChan := make(chan error, 3)
 	// start the HTTP servers
 	wg.Add(3)
 	go func() {
-		c.logger.Infof("HTTP API server started")
-		c.logger.WithError(httpServer.ListenAndServe()).Info("HTTP API server exited")
-		wg.Done()
+		defer wg.Done()
+		var srvErr error
+		if c.cfg.UseTLS {
+			c.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
+			srvErr = httpServer.ListenAndServeTLS(c.cfg.TLSCert, c.cfg.TLSKey)
+		} ***REMOVED*** {
+			c.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
+			srvErr = httpServer.ListenAndServe()
+		}
+		c.logger.WithError(srvErr).Info("HTTP API server exited")
+		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
 	}()
 	go func() {
+		defer wg.Done()
 		c.logger.Infof("Prometheus metrics server started")
-		c.logger.WithError(promServer.ListenAndServe()).Info("Prometheus metrics server exited")
-		wg.Done()
+		srvErr := promServer.ListenAndServe()
+		c.logger.WithError(srvErr).Info("Prometheus metrics server exited")
+		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
 	}()
 	go func() {
+		defer wg.Done()
 		c.logger.Infof("pprof server started")
-		c.logger.WithError(pprofServer.ListenAndServe()).Info("pprof server exited")
-		wg.Done()
+		srvErr := pprofServer.ListenAndServe()
+		c.logger.WithError(srvErr).Info("pprof server exited")
+		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
 	// Poll until we can write to presto
@@ -420,16 +447,9 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(leaderStopCh <-chan struct{}) {
 				c.logger.Infof("became leader")
-				// if we stop being leader or get a shutdown signal, stop the
-				// workers
-				go func() {
-					<-leaderStopCh
-					close(stopWorkersCh)
-				}()
-				c.logger.Info("starting Chargeback workers")
+				c.logger.Info("starting Metering workers")
 				c.startWorkers(wg, stopWorkersCh)
-
-				c.logger.Infof("Chargeback workers started, watching for reports...")
+				c.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
 				c.logger.Warn("leader election lost")
@@ -444,13 +464,23 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	c.logger.Infof("starting leader election")
 	go leader.Run()
 
-	// wait for us to lose leadership or for a stop signal to begin shutdown
+	// wait for an shutdown signal to begin shutdown.
+	// if we lose leadership or an error occurs from one of our server
+	// processes exit immediately.
 	select {
 	case <-stopCh:
+		c.logger.Info("got stop signal, shutting down Metering operator")
 	case <-lostLeaderCh:
+		c.logger.Warnf("lost leadership election, forcing shut down of Metering operator")
+		return fmt.Errorf("lost leadership election")
+	case err := <-srvErrChan:
+		c.logger.WithError(err).Error("server process failed, shutting down Metering operator")
+		return fmt.Errorf("server process failed, err: %v", err)
 	}
 
-	c.logger.Info("got stop signal, shutting down Chargeback operator")
+	// if we stop being leader or get a shutdown signal, stop the workers
+	c.logger.Infof("stopping workers and collectors")
+	close(stopWorkersCh)
 
 	// stop our running http servers
 	wg.Add(3)
@@ -485,7 +515,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	// wait for our workers to stop
 	wg.Wait()
-	c.logger.Info("Chargeback workers and collectors stopped")
+	c.logger.Info("Metering workers and collectors stopped")
 	return nil
 }
 
