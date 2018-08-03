@@ -75,6 +75,10 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", chargeback.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.ChunkSize.Duration, "promsum-chunk-size", chargeback.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
+
+	startCmd.Flags().BoolVar(&cfg.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traffix")
+	startCmd.Flags().StringVar(&cfg.TLSCert, "tls-cert", "", "If use-tls is true, specifies the path to the TLS certificate.")
+	startCmd.Flags().StringVar(&cfg.TLSKey, "tls-key", "", "If use-tls is true, specifies the path to the TLS private key.")
 }
 
 func main() {
