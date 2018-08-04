@@ -104,6 +104,15 @@ spec:
             configMapKeyRef:
               name: metering-config
               key: leader-lease-duration
+        - name: CHARGEBACK_USE_TLS
+          valueFrom:
+            configMapKeyRef:
+              name: metering-config
+              key: use-tls
+        - name: CHARGEBACK_TLS_KEY
+          value: "/tls/tls.key"
+        - name: CHARGEBACK_TLS_CERT
+          value: "/tls/tls.crt"
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         ports:
@@ -113,10 +122,25 @@ spec:
           containerPort: 6060
         - name: "metrics"
           containerPort: 8082
+{{- if .Values.config.tls.enabled -}}
+{{- $_ := set .Values.readinessProbe.httpGet "scheme" "HTTPS" -}}
+{{- $_ := set .Values.livenessProbe.httpGet "scheme" "HTTPS" -}}
+{{- end }}
         readinessProbe:
 {{ toYaml .Values.readinessProbe | indent 10 }}
         livenessProbe:
 {{ toYaml .Values.livenessProbe | indent 10 }}
+{{- if .Values.config.tls.enabled }}
+        volumeMounts:
+        - name: tls
+          mountPath: /tls
+{{- end }}
+{{- if .Values.config.tls.enabled }}
+      volumes:
+      - name: tls
+        secret:
+          secretName: {{ .Values.config.tls.secretName }}
+{{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering
