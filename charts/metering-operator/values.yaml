@@ -10,6 +10,13 @@ con***REMOVED***g:
   awsCredentialsSecretName: metering-aws-credentials-secrets
   createAwsCredentialsSecret: true
 
+  tls:
+    enabled: false
+    createSecret: false
+    certi***REMOVED***cateData: null
+    privateKeyData: null
+    secretName: metering-tls-secrets
+
   defaultStorage:
     create: true
     name: "hive-hdfs"
