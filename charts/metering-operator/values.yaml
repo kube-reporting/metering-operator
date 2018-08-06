@@ -118,3 +118,6 @@ livenessProbe:
    path: /healthy
    port: 8080
    scheme: HTTP
+
+annotations: null
+serviceAnnotations: null
