@@ -8,6 +8,7 @@ export METERING_HTTPS_API=${METERING_HTTPS_API:-false}
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+set -x
 go test \
     -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
