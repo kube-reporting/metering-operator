@@ -13,4 +13,3 @@ export DEPLOY_LOG_FILE="${DEPLOY_LOG_FILE:-integration-deploy.log}"
 export TEST_TAP_FILE="${TEST_TAP_FILE:-integration-tests.tap}"
 
 "$ROOT_DIR/hack/e2e-test-runner.sh"
-
