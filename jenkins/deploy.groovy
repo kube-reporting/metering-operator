@@ -130,7 +130,7 @@ def deploy() {
             timeout(15) {
                 sh '''#!/bin/bash -ex
                 cd $METERING_SRC_DIR
-                hack/deploy-ci.sh
+                hack/deploy-continuous-upgrade.sh
                 '''
             }
         }
