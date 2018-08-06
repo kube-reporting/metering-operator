@@ -4,6 +4,10 @@ metadata:
   name: metering
   labels:
     app: metering
+{{- if .Values.serviceAnnotations }}
+  annotations:
+{{ toYaml .Values.serviceAnnotations | indent 4 }}
+{{- end }}
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
