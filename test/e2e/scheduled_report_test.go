@@ -28,7 +28,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 		},
 	}
 
-	periodStart, periodEnd := collectMetricsOnce(t)
+	periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
 
 	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
 

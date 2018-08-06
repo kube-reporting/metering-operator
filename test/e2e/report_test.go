@@ -128,7 +128,7 @@ func TestReportsProduceData(t *testing.T) {
 		},
 	}
 
-	reportStart, reportEnd := collectMetricsOnce(t)
+	reportStart, reportEnd := testFramework.CollectMetricsOnce(t)
 	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
 	for i, test := range tests {

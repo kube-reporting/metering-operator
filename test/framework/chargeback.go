@@ -11,7 +11,7 @@ const (
 )
 
 func (f *Framework) NewChargebackSVCRequest(endpoint string, query map[string]string) *restclient.Request {
-	wrapper := f.KubeClient.CoreV1().Services(f.Namespace).ProxyGet("", chargebackServiceName, chargebackServicePortName, endpoint, query)
+	wrapper := f.KubeClient.CoreV1().Services(f.Namespace).ProxyGet(f.protocol, chargebackServiceName, chargebackServicePortName, endpoint, query)
 	return wrapper.(*restclient.Request)
 }
 
@@ -21,7 +21,7 @@ func (f *Framework) NewChargebackSVCPOSTRequest(endpoint string, body interface{
 		Namespace(f.Namespace).
 		Resource("services").
 		SubResource("proxy").
-		Name(net.JoinSchemeNamePort("", chargebackServiceName, chargebackServicePortName)).
+		Name(net.JoinSchemeNamePort(f.protocol, chargebackServiceName, chargebackServicePortName)).
 		Suffix(endpoint).
 		Body(body)
 }
