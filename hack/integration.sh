@@ -2,7 +2,7 @@
 set -e
 
 : "${KUBECONFIG?}"
-: "${METERING_NAMESPACE:=metering-integration}"
+export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-integration}
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
