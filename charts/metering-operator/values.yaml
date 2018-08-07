@@ -119,5 +119,7 @@ livenessProbe:
    port: 8080
    scheme: HTTP
 
-annotations: null
-serviceAnnotations: null
+service:
+  annotations: {}
+  type: ClusterIP
+  nodePort: null
