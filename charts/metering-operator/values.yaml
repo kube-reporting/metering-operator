@@ -123,3 +123,40 @@ service:
   annotations: {}
   type: ClusterIP
   nodePort: null
+
+route:
+  enabled: false
+  name: metering
+
+authProxy:
+  enabled: false
+  image:
+    repository: openshift/oauth-proxy
+    tag: v1.1.0
+    pullPolicy: Always
+
+  htpasswdSecretName: metering-auth-proxy-htpasswd
+  createHtpasswdSecret: true
+  htpasswdData: ""
+
+  cookieSecretName: metering-auth-proxy-cookie-seed
+  createCookieSecret: true
+  cookieSeed: ""
+
+  createAuthProxyClusterRole: false
+  subjectAccessReviewEnabled: false
+  delegateURLsEnabled: false
+
+  authenticatedEmailsSecretName: metering-auth-proxy-authenticated-emails
+  authenticatedEmailsEnabled: false
+  createAuthenticatedEmailsSecret: true
+  authenticatedEmailsData: ""
+
+
+  resources:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+    limits:
+      memory: "50Mi"
+      cpu: "50m"

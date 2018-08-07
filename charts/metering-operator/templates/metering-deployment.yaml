@@ -22,6 +22,18 @@ spec:
 {{- if .Values.config.createAwsCredentialsSecret }}
         metering-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/metering-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
+{{- if and .Values.config.tls.enabled .Values.config.tls.createSecret }}
+        metering-tls-secrets-hash: {{ include (print $.Template.BasePath "/metering-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.authProxy.enabled .Values.authProxy.createCookieSecret }}
+        metering-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-cookie-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.authProxy.enabled .Values.authProxy.createHtpasswdSecret }}
+        metering-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.authProxy.enabled .Values.authProxy.createAuthenticatedEmailsSecret }}
+        metering-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.annotations }}
 {{ toYaml .Values.annotations | indent 8 }}
 {{- end }}
@@ -104,15 +116,18 @@ spec:
             configMapKeyRef:
               name: metering-config
               key: leader-lease-duration
+{{/* If authProxy is enabled we do not enable TLS on the metering operator since the proxy will do TLS */}}
+{{- if and .Values.config.tls.enabled (not .Values.authProxy.enabled) }}
         - name: CHARGEBACK_USE_TLS
-          valueFrom:
-            configMapKeyRef:
-              name: metering-config
-              key: use-tls
+          value: "true"
         - name: CHARGEBACK_TLS_KEY
           value: "/tls/tls.key"
         - name: CHARGEBACK_TLS_CERT
           value: "/tls/tls.crt"
+{{- else }}
+        - name: CHARGEBACK_USE_TLS
+          value: "false"
+{{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         ports:
@@ -122,7 +137,7 @@ spec:
           containerPort: 6060
         - name: "metrics"
           containerPort: 8082
-{{- if .Values.config.tls.enabled -}}
+{{- if and .Values.config.tls.enabled (not .Values.authProxy.enabled) -}}
 {{- $_ := set .Values.readinessProbe.httpGet "scheme" "HTTPS" -}}
 {{- $_ := set .Values.livenessProbe.httpGet "scheme" "HTTPS" -}}
 {{- end }}
@@ -130,16 +145,75 @@ spec:
 {{ toYaml .Values.readinessProbe | indent 10 }}
         livenessProbe:
 {{ toYaml .Values.livenessProbe | indent 10 }}
-{{- if .Values.config.tls.enabled }}
+{{- if and .Values.config.tls.enabled (not .Values.authProxy.enabled) }}
         volumeMounts:
         - name: tls
           mountPath: /tls
 {{- end }}
-{{- if .Values.config.tls.enabled }}
+{{- if .Values.authProxy.enabled }}
+      - name: metering-auth-proxy
+        image: "{{ .Values.authProxy.image.repository }}:{{ .Values.authProxy.image.tag }}"
+        imagePullPolicy: {{ .Values.authProxy.image.pullPolicy }}
+        args:
+        - -provider=openshift
+        - -https-address=:8081
+        - -http-address=
+        - -upstream=http://localhost:8080
+        - -htpasswd-file=/etc/proxy/htpasswd/auth
+        - -tls-cert=/etc/tls/tls.crt
+        - -tls-key=/etc/tls/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/cookie-secret/cookie-secret-seed
+        - -request-logging=true
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-service-account=metering
+{{- if .Values.authProxy.authenticatedEmailsEnabled }}
+        - -authenticated-emails-file=/etc/proxy/authenticated-emails/emails
+{{- else }}
+        - -email-domain=*
+{{- end }}
+{{- if .Values.authProxy.subjectAccessReviewEnabled }}
+        - '-openshift-sar={"resource": "namespaces", "verb": "get"}'
+{{- end }}
+{{- if .Values.authProxy.delegateURLsEnabled }}
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get"}}'
+{{- end }}
+        ports:
+        - name: auth-proxy
+          containerPort: 8081
+        resources:
+{{ toYaml .Values.authProxy.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: /etc/tls
+          name: tls
+        - mountPath: /etc/proxy/cookie-secret
+          name: cookie-secret
+        - mountPath: /etc/proxy/htpasswd
+          name: htpasswd-secret
+{{- if .Values.authProxy.authenticatedEmailsEnabled  }}
+        - mountPath: /etc/proxy/authenticated-emails
+          name: authenticated-emails-secret
+{{- end }}
+{{- end }}
       volumes:
+{{- if .Values.config.tls.enabled }}
       - name: tls
         secret:
           secretName: {{ .Values.config.tls.secretName }}
+{{- end }}
+{{- if .Values.authProxy.enabled }}
+      - name: cookie-secret
+        secret:
+          secretName: {{ .Values.authProxy.cookieSecretName }}
+      - name: htpasswd-secret
+        secret:
+          secretName: {{ .Values.authProxy.htpasswdSecretName }}
+{{- if .Values.authProxy.authenticatedEmailsEnabled  }}
+      - name: authenticated-emails-secret
+        secret:
+          secretName: {{ .Values.authProxy.authenticatedEmailsSecretName }}
+{{- end }}
 {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
