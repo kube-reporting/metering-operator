@@ -2,7 +2,7 @@
 set -e
 
 : "${KUBECONFIG?}"
-: "${METERING_NAMESPACE:=metering-integration}"
+export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-integration}
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
@@ -13,4 +13,3 @@ export DEPLOY_LOG_FILE="${DEPLOY_LOG_FILE:-integration-deploy.log}"
 export TEST_TAP_FILE="${TEST_TAP_FILE:-integration-tests.tap}"
 
 "$ROOT_DIR/hack/e2e-test-runner.sh"
-

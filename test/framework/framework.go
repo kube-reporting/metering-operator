@@ -3,9 +3,11 @@ package framework
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -18,10 +20,15 @@ type Framework struct {
 	HTTPClient       *http.Client
 	Namespace        string
 	DefaultTimeout   time.Duration
+
+	protocol    string
+	collectOnce sync.Once
+	reportStart time.Time
+	reportEnd   time.Time
 }
 
 // New initializes a test framework and returns it.
-func New(namespace, kubeconfig string) (*Framework, error) {
+func New(namespace, kubeconfig string, httpsAPI bool) (*Framework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("build config from flags failed: err %v", err)
@@ -41,6 +48,10 @@ func New(namespace, kubeconfig string) (*Framework, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
 	}
+	protocol := "http"
+	if httpsAPI {
+		protocol = "https"
+	}
 
 	f := &Framework{
 		KubeClient:       kubeClient,
@@ -48,6 +59,7 @@ func New(namespace, kubeconfig string) (*Framework, error) {
 		HTTPClient:       httpc,
 		Namespace:        namespace,
 		DefaultTimeout:   time.Minute,
+		protocol:         protocol,
 	}
 
 	return f, nil

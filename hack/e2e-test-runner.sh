@@ -30,6 +30,7 @@ source "${ROOT_DIR}/hack/common.sh"
 
 export INSTALL_METHOD
 export METERING_NAMESPACE
+export KUBECONFIG
 
 # this script is run inside the container
 echo "\$KUBECONFIG=$KUBECONFIG"

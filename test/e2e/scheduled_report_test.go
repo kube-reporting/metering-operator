@@ -28,7 +28,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 		},
 	}
 
-	periodStart, periodEnd := collectMetricsOnce(t)
+	periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
 
 	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
 
@@ -78,7 +78,10 @@ func TestScheduledReportsProduceData(t *testing.T) {
 
 				// If the last reportTime is updated, that means this report
 				// has been collected at least once.
-				if newReport.Status.LastReportTime.Time.Equal(report.Status.LastReportTime.Time) {
+				if newReport.Status.LastReportTime == nil {
+					t.Logf("report LastReportTime is unset")
+					return false, nil
+				} else if newReport.Status.LastReportTime.Time.Equal(report.Status.LastReportTime.Time) {
 					t.Logf("report LastReportTime is unchanged: %s", report.Status.LastReportTime.Time.Format(time.RFC3339))
 					return false, nil
 				}

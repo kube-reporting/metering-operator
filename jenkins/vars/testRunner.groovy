@@ -138,6 +138,7 @@ spec:
                             TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/openshift/tests"
                             TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
                             TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
+                            METERING_HTTPS_API                  = "true"
                             DEPLOY_PLATFORM                     = "openshift"
                         }
                         steps {
