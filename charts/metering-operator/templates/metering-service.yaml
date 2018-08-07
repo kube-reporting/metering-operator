@@ -15,10 +15,14 @@ spec:
   selector:
     app: metering
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 8080
+{{- if .Values.authProxy.enabled }}
+    targetPort: auth-proxy
+{{- ***REMOVED*** }}
     targetPort: http
-    name: http
+{{- end }}
 {{- if and (eq (lower .Values.service.type) "nodeport" "loadbalancer") .Values.service.nodePort }}
     nodePort: {{ .Values.service.nodePort }}
 {{- end }}

@@ -2,7 +2,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: metering-admin
+  name: metering-operator
+  labels:
+    app: metering
+{{- block "extraMetadata" . }}
+{{- end }}
 rules:
 - apiGroups: ["chargeback.coreos.com"]
   resources: ["*"]
@@ -43,16 +47,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: metering-admin
+  name: metering-operator
 subjects:
 - kind: ServiceAccount
   name: metering
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: metering
-  labels:
-    app: metering
-{{- block "extraMetadata" . }}
-{{- end }}

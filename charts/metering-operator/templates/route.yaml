@@ -1,0 +1,16 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.route.name }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  port:
+    targetPort: http
+  tls:
+    termination: Reencrypt
+  to:
+    kind: Service
+    name: metering
+{{- end }}
