@@ -1,18 +1,17 @@
-FROM openjdk:8-slim
-
-ENV DEBIAN_FRONTEND noninteractive
+FROM centos:7
 
 RUN \
-    apt-get update \
-    && apt-get install -y --no-install-recommends \
+    yum install -y \
+        java-1.8.0-openjdk \
         curl \
         less  \
         gpg \
         python \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        perl \
+    && yum clean all \
+    && rm -rf /tmp/* /var/tmp/*
 
-# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+ENV JAVA_HOME=/etc/alternatives/jre/
 
 ENV PRESTO_VERSION 0.202
 ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
