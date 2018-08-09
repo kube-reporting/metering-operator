@@ -164,3 +164,14 @@ rbac:
     - patch
     - update
     - watch
+  - apiGroups:
+    - route.openshift.io
+    resources:
+    - routes
+    verbs:
+    - create
+    - get
+    - list
+    - watch
+    - update
+    - delete
