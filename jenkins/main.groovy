@@ -31,7 +31,6 @@ pipeline {
     }
     options {
         timestamps()
-        disableConcurrentBuilds()
         skipDefaultCheckout()
         buildDiscarder(logRotator(
             artifactDaysToKeepStr: '14',
