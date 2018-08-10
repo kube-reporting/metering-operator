@@ -27,7 +27,7 @@ RUN useradd presto -u 1003 -d /opt/presto
 
 # install presto server
 RUN set -x \
-    && curl -fSLs -o /tmp/presto.tar.gz http://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
+    && curl -fSLs -o /tmp/presto.tar.gz https://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
     && mkdir -p /opt/presto \
     && tar -zxf /tmp/presto.tar.gz -C /opt/presto \
     && rm /tmp/presto.tar.gz
