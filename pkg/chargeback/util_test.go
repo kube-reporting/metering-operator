@@ -53,6 +53,19 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 			compareAssertion: assert.Equal,
 			errAssertion:     assert.NoError,
 		},
+		// taken from node-memory-allocatable, the space needs to be handled
+		"map<string, string> to MAP(VARCHAR,VARCHAR)": {
+			hiveColumn: hive.Column{
+				Name: "foo",
+				Type: "map<string, string>",
+			},
+			expectedPrestoColumn: presto.Column{
+				Name: "foo",
+				Type: "MAP(VARCHAR,VARCHAR)",
+			},
+			compareAssertion: assert.Equal,
+			errAssertion:     assert.NoError,
+		},
 		"broken map MAP<> error": {
 			hiveColumn: hive.Column{
 				Name: "foo",
