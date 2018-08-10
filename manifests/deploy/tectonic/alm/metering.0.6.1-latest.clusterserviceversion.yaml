@@ -170,6 +170,17 @@ spec:
             - patch
             - update
             - watch
+          - apiGroups:
+            - route.openshift.io
+            resources:
+            - routes
+            verbs:
+            - create
+            - get
+            - list
+            - watch
+            - update
+            - delete
           serviceAccountName: metering-helm-operator
       deployments:
         - name: metering-helm-operator

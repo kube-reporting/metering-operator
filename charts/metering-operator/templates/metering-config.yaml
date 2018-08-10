@@ -18,4 +18,3 @@ data:
   leader-lease-duration: {{ .Values.config.leaderLeaseDuration | quote }}
   presto-host: {{ .Values.config.prestoHost | quote }}
   hive-host: {{ .Values.config.hiveHost | quote }}
-  use-tls: {{ .Values.config.tls.enabled | quote }}
