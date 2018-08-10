@@ -1,4 +1,4 @@
-def testRunner = evaluate(readTrusted('jenkins/vars/testRunner.groovy'))
+def testRunner = evaluate(readTrusted('jenkins/testRunner.groovy'))
 
 testRunner {
     testScript = "hack/e2e-ci.sh"
