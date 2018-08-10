@@ -117,8 +117,8 @@ func hiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			if len(mapComponentsSplit) != 2 {
 				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
-			keyType := mapComponentsSplit[0]
-			valueType := mapComponentsSplit[1]
+			keyType := strings.TrimSpace(mapComponentsSplit[0])
+			valueType := strings.TrimSpace(mapComponentsSplit[1])
 
 			prestoKeyType := simpleHiveColumnTypeToPrestoColumnType(keyType)
 			prestoValueType := simpleHiveColumnTypeToPrestoColumnType(valueType)
