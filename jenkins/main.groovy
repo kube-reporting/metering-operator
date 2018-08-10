@@ -1,3 +1,7 @@
+@Library('shared-libraries')
+def aborter = new abortPreviousBuilds()
+aborter.abortPreviousBuilds()
+
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
@@ -49,6 +53,7 @@ pipeline {
                     if (isPullRequest) {
                         echo "Github PR labels: ${pullRequest.labels.join(',')}"
                     }
+
                 }
             }
         }
