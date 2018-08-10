@@ -1,6 +1,5 @@
 @Library('shared-libraries')
 def aborter = new abortPreviousBuilds()
-aborter.abortPreviousBuilds()
 
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
@@ -12,6 +11,8 @@ def skipIntegrationLabel = (isPullRequest && pullRequest.labels.contains("skip-i
 def skipTectonic = (isPullRequest && pullRequest.labels.contains("skip-tectonic"))
 def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
 def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
+
+def cancelExistingBuildLabel = (isPullRequest && pullRequest.labels.contains("cancel-existing-builds"))
 
 pipeline {
     agent none
@@ -51,8 +52,10 @@ pipeline {
                 script {
                     if (isPullRequest) {
                         echo "Github PR labels: ${pullRequest.labels.join(',')}"
+                        if (cancelExistingBuildLabel) {
+                            aborter.abortPreviousBuilds()
+                        }
                     }
-
                 }
             }
         }
