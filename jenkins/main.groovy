@@ -67,8 +67,10 @@ pipeline {
                 }
             }
             steps {
-                echo "Building and pushing metering docker images"
-                build job: "metering/operator-metering-build/${env.TARGET_BRANCH}"
+                lock(resource: null, label: "operator-metering-build-${env.TARGET_BRANCH}") {
+                    echo "Building and pushing metering docker images"
+                    build job: "metering/operator-metering-build/${env.TARGET_BRANCH}"
+                }
             }
         }
 
@@ -81,13 +83,15 @@ pipeline {
                         }
                     }
                     steps {
-                        echo "Running metering integration tests"
-                        build job: "metering/operator-metering-integration/${env.TARGET_BRANCH}", parameters: [
-                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
-                        ]
+                        lock(resource: null, label: "operator-metering-integration-${env.TARGET_BRANCH}") {
+                            echo "Running metering integration tests"
+                            build job: "metering/operator-metering-integration/${env.TARGET_BRANCH}", parameters: [
+                                string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
+                                booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
+                                booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
+                                booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
+                            ]
+                        }
                     }
                 }
                 stage("e2e") {
@@ -97,13 +101,15 @@ pipeline {
                         }
                     }
                     steps {
-                        echo "Running metering e2e tests"
-                        build job: "metering/operator-metering-e2e/${env.TARGET_BRANCH}", parameters: [
-                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
-                        ]
+                        lock(resource: null, label: "operator-metering-e2e-${env.TARGET_BRANCH}") {
+                            echo "Running metering e2e tests"
+                            build job: "metering/operator-metering-e2e/${env.TARGET_BRANCH}", parameters: [
+                                string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
+                                booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
+                                booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
+                                booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
+                            ]
+                        }
                     }
                 }
             }
