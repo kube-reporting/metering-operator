@@ -1,7 +1,6 @@
-FROM alpine
+FROM centos:7
 
-RUN apk update
-RUN apk add ca-certi***REMOVED***cates bash
+RUN yum install ca-certi***REMOVED***cates bash
 # add pod data collector binary
 ADD ./bin/chargeback /usr/local/bin/chargeback
 

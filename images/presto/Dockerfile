@@ -1,18 +1,17 @@
-FROM openjdk:8-slim
-
-ENV DEBIAN_FRONTEND noninteractive
+FROM centos:7
 
 RUN \
-    apt-get update \
-    && apt-get install -y --no-install-recommends \
+    yum install -y \
+        java-1.8.0-openjdk \
         curl \
         less  \
         gpg \
         python \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        perl \
+    && yum clean all \
+    && rm -rf /tmp/* /var/tmp/*
 
-# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+ENV JAVA_HOME=/etc/alternatives/jre/
 
 ENV PRESTO_VERSION 0.202
 ENV PRESTO_HOME /opt/presto/presto-server-$PRESTO_VERSION
@@ -28,7 +27,7 @@ RUN useradd presto -u 1003 -d /opt/presto
 
 # install presto server
 RUN set -x \
-    && curl -fSLs -o /tmp/presto.tar.gz http://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
+    && curl -fSLs -o /tmp/presto.tar.gz https://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VERSION/presto-server-$PRESTO_VERSION.tar.gz \
     && mkdir -p /opt/presto \
     && tar -zxf /tmp/presto.tar.gz -C /opt/presto \
     && rm /tmp/presto.tar.gz

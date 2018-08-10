@@ -1,24 +1,24 @@
-FROM openjdk:8-slim
-
-ENV DEBIAN_FRONTEND noninteractive
+FROM centos:7
 
 RUN \
-    apt-get update \
-    && apt-get install -y --no-install-recommends \
+    yum install epel-release -y \
+    && yum install -y \
+        java-1.8.0-openjdk \
         curl \
         less  \
         perl \
         procps \
         net-tools \
-        dnsutils \
+        bind-utils \
+        which \
         jq \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && yum clean all \
+    && rm -rf /tmp/* /var/tmp/*
 
-# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+ENV JAVA_HOME=/etc/alternatives/jre/
 
 ENV HADOOP_VERSION 2.9.1
-ENV HADOOP_URL http://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+ENV HADOOP_URL https://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 # The upstream .mds checksum ***REMOVED***les aren't supported by sha256sum or shasum so
 # this checksum is taken from that ***REMOVED***le and put here manually.
 ENV HADOOP_SHA256_CHECKSUM eed6015a123644d3b4247bac58770e4a8b31340fa62721987430e15a0dd942fc
