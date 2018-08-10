@@ -9,7 +9,7 @@ WORKDIR /opt
 USER root
 # Install Hive
 RUN set -x \
-    && curl -fSLs http://apache.osuosl.org/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xz && mv apache-hive-$HIVE_VERSION-bin hive
+    && curl -fSLs https://apache.osuosl.org/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz | tar -xz && mv apache-hive-$HIVE_VERSION-bin hive
 
 ENV HADOOP_CLASSPATH /opt/hive/hcatalog/share/hcatalog/*:${HADOOP_CLASSPATH}
 ENV HIVE_AUX_JARS_PATH /usr/hdp/current/hive-server2/auxlib
