@@ -39,45 +39,48 @@ metadata:
   name: "${DEPLOY_PLATFORM}-metering"
 spec:
   metering-operator:
-    image:
-      tag: ${DEPLOY_TAG}
+    spec:
+      image:
+        tag: ${DEPLOY_TAG}
 
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 
-    con***REMOVED***g:
-      disablePromsum: ${DISABLE_PROMSUM}
-      awsBillingDataSource:
-        enabled: ${ENABLE_AWS_BILLING}
-        bucket: "${AWS_BILLING_BUCKET}"
-        pre***REMOVED***x: "${AWS_BILLING_BUCKET_PREFIX}"
-        region: "${AWS_BILLING_BUCKET_REGION}"
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
+      con***REMOVED***g:
+        disablePromsum: ${DISABLE_PROMSUM}
+        awsBillingDataSource:
+          enabled: ${ENABLE_AWS_BILLING}
+          bucket: "${AWS_BILLING_BUCKET}"
+          pre***REMOVED***x: "${AWS_BILLING_BUCKET_PREFIX}"
+          region: "${AWS_BILLING_BUCKET_REGION}"
+        awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
+        awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
 
   presto:
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    con***REMOVED***g:
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
-    presto:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-      image:
-        tag: ${DEPLOY_TAG}
-    hive:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-      image:
-        tag: ${DEPLOY_TAG}
+    spec:
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      con***REMOVED***g:
+        awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
+        awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
+      presto:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        image:
+          tag: ${DEPLOY_TAG}
+      hive:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        image:
+          tag: ${DEPLOY_TAG}
 
   hdfs:
-    image:
-      tag: ${DEPLOY_TAG}
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    datanode:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-    namenode:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+    spec:
+      image:
+        tag: ${DEPLOY_TAG}
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      datanode:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+      namenode:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 EOF
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"

@@ -11,7 +11,7 @@ For details on customizing these ***REMOVED***les, read the [common-con***REMOVE
 This document follows the convention of describing nested ***REMOVED***elds in con***REMOVED***guration settings using dots as separators. For example,
 
 ```
-spec.metering-operator.con***REMOVED***g.awsAccessKeyID
+spec.metering-operator.spec.con***REMOVED***g.awsAccessKeyID
 ```
 
 refers to the following YAML structure and value:
@@ -19,8 +19,9 @@ refers to the following YAML structure and value:
 ```
 spec:
   metering-operator:
-    con***REMOVED***g:
-      awsAccessKeyID: "REPLACEME"
+    spec:
+      con***REMOVED***g:
+        awsAccessKeyID: "REPLACEME"
 ```
 
 ## Using a custom con***REMOVED***guration
@@ -45,8 +46,9 @@ Below is an example of con***REMOVED***guring Metering to use the service `prome
 ```
 spec:
   metering-operator:
-    con***REMOVED***g:
-      prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
+    spec:
+      con***REMOVED***g:
+        prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
 > Note: currently we do not support https connections or authentication to Prometheus, but support for it is being developed.
@@ -63,12 +65,13 @@ Using MySQL:
 ```
 spec:
   presto:
-    hive:
-      con***REMOVED***g:
-        dbConnectionURL: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
-        dbConnectionDriver: "com.mysql.jdbc.Driver"
-        dbConnectionUsername: "REPLACEME"
-        dbConnectionPassword: "REPLACEME"
+    spec:
+      hive:
+        con***REMOVED***g:
+          dbConnectionURL: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
+          dbConnectionDriver: "com.mysql.jdbc.Driver"
+          dbConnectionUsername: "REPLACEME"
+          dbConnectionPassword: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `dbConnectionURL`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-con***REMOVED***guration-properties.html).
@@ -78,12 +81,13 @@ Using Postgresql:
 ```
 spec:
   presto:
-    hive:
-      con***REMOVED***g:
-        dbConnectionURL: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
-        dbConnectionDriver: "org.postgresql.Driver"
-        dbConnectionUsername: "REPLACEME"
-        dbConnectionPassword: "REPLACEME"
+    spec:
+      hive:
+        con***REMOVED***g:
+          dbConnectionURL: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
+          dbConnectionDriver: "org.postgresql.Driver"
+          dbConnectionUsername: "REPLACEME"
+          dbConnectionPassword: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `dbConnectionURL`, for more details see [the Postgresql JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).
@@ -121,9 +125,9 @@ To con***REMOVED***gure and specify a `StorageClass` for use in Metering, specif
 
 Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Metering to use the default StorageClass for the cluster.
 
-- `spec.presto.hive.metastore.storage.class`
-- `spec.hdfs.datanode.storage.class`
-- `spec.hdfs.namenode.storage.class`
+- `spec.presto.spec.hive.metastore.storage.class`
+- `spec.hdfs.spec.datanode.storage.class`
+- `spec.hdfs.spec.namenode.storage.class`
 
 ### Manually creating Persistent Volumes
 
@@ -155,7 +159,8 @@ value to `false`.
 ```
 spec:
   hdfs:
-    enabled: false
+    spec:
+      enabled: false
 ```
 
 ### AWS billing correlation
@@ -169,7 +174,7 @@ Next, update the `defaultReportDataSources.aws-billing` section in the [custom-v
 
 Uncomment the entire `defaultReportDataSources` block , and update the `bucket`, `pre***REMOVED***x` and `region` to the location of your AWS Detailed billing report.
 
-Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.con***REMOVED***g` and `spec.presto.con***REMOVED***g` sections.
+Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.spec.con***REMOVED***g` and `spec.presto.spec.con***REMOVED***g` sections.
 
 To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-only.json](aws/read-only.json) ***REMOVED***le.

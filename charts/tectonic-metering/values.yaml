@@ -1,17 +1,20 @@
 metering-operator:
-  con***REMOVED***g:
-    prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
+  spec:
+    con***REMOVED***g:
+      prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"
 presto:
-  presto:
-    securityContext:
-      fsGroup: 0
-  hive:
-    securityContext:
-      fsGroup: 0
+  spec:
+    presto:
+      securityContext:
+        fsGroup: 0
+    hive:
+      securityContext:
+        fsGroup: 0
 
 hdfs:
-  enabled: true
-  con***REMOVED***g:
-    datanodeDataDirPerms: "775"
-  securityContext:
-    fsGroup: 0
+  spec:
+    enabled: true
+    con***REMOVED***g:
+      datanodeDataDirPerms: "775"
+    securityContext:
+      fsGroup: 0
