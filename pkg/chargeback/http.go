@@ -273,7 +273,13 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	tableColumns := prestoTable.State.Parameters.Columns
-	queryPrestoColumns := generatePrestoColumns(reportQuery)
+	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
+	if err != nil {
+		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+		return
+	}
+
 	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
