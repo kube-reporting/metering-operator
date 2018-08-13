@@ -24,29 +24,13 @@ openshift_metering_con***REMOVED***g:
 
 Installing using the openshift-metering playbook will install the metering operator and it's components into the `openshift-metering` namespace.
 
-First, clone openshift-ansible:
-
-```
-git clone https://github.com/openshift/openshift-ansible
-```
-
-Next, set the `openshift_metering_install` variable to true:
-
-```yaml
-openshift_metering_install: true
-```
-
-Finally, run the playbook:
+Installation is just running the install playbook:
 
 ```
 ansible-playbook playbooks/openshift-metering/con***REMOVED***g.yml
 ```
 
-If you're on GCP use the following instead:
-
-```bash
-ansible-playbook playbooks/openshift-metering/gcp-con***REMOVED***g.yml
-```
+To make con***REMOVED***guration changes just re-run the playbook with your updated variables.
 
 ### Verifying Operation and Metering Usage
 
@@ -56,10 +40,10 @@ After you've veri***REMOVED***ed operation, continue on to [using Operator Meter
 
 ## Uninstall
 
-Uninstall just requires setting `openshift_metering_install` to false, and re-running the `ansible-playbook` command from above:
+Uninstall just requires running the uninstall play:
 
 ```yaml
-openshift_metering_install: false
+ansible-playbook playbooks/openshift-metering/uninstall.yml
 ```
 
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
