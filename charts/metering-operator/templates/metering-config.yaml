@@ -7,14 +7,14 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-reports: {{ .Values.con***REMOVED***g.logReports | quote}}
-  log-ddl-queries: {{ .Values.con***REMOVED***g.logDDLQueries | quote}}
-  log-dml-queries: {{ .Values.con***REMOVED***g.logDMLQueries | quote}}
-  disable-promsum: {{ .Values.con***REMOVED***g.disablePromsum | quote}}
-  prometheus-url: {{ required "a valid metering-operator.con***REMOVED***g.prometheusURL must be set" .Values.con***REMOVED***g.prometheusURL | quote}}
-  promsum-poll-interval: {{ .Values.con***REMOVED***g.promsumPollInterval | quote}}
-  promsum-chunk-size: {{ .Values.con***REMOVED***g.promsumChunkSize | quote}}
-  promsum-step-size: {{ .Values.con***REMOVED***g.promsumStepSize | quote}}
-  leader-lease-duration: {{ .Values.con***REMOVED***g.leaderLeaseDuration | quote }}
-  presto-host: {{ .Values.con***REMOVED***g.prestoHost | quote }}
-  hive-host: {{ .Values.con***REMOVED***g.hiveHost | quote }}
+  log-reports: {{ .Values.spec.con***REMOVED***g.logReports | quote}}
+  log-ddl-queries: {{ .Values.spec.con***REMOVED***g.logDDLQueries | quote}}
+  log-dml-queries: {{ .Values.spec.con***REMOVED***g.logDMLQueries | quote}}
+  disable-promsum: {{ .Values.spec.con***REMOVED***g.disablePromsum | quote}}
+  prometheus-url: {{ required "a valid metering-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
+  promsum-poll-interval: {{ .Values.spec.con***REMOVED***g.promsumPollInterval | quote}}
+  promsum-chunk-size: {{ .Values.spec.con***REMOVED***g.promsumChunkSize | quote}}
+  promsum-step-size: {{ .Values.spec.con***REMOVED***g.promsumStepSize | quote}}
+  leader-lease-duration: {{ .Values.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
+  presto-host: {{ .Values.spec.con***REMOVED***g.prestoHost | quote }}
+  hive-host: {{ .Values.spec.con***REMOVED***g.hiveHost | quote }}

@@ -1,21 +1,21 @@
-{{- if .Values.con***REMOVED***g.defaultStorage.create -}}
+{{- if .Values.spec.con***REMOVED***g.defaultStorage.create -}}
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: StorageLocation
 metadata:
-  name: {{ .Values.con***REMOVED***g.defaultStorage.name }}
+  name: {{ .Values.spec.con***REMOVED***g.defaultStorage.name }}
   labels:
     operator-metering: "true"
-{{- if .Values.con***REMOVED***g.defaultStorage.isDefault }}
+{{- if .Values.spec.con***REMOVED***g.defaultStorage.isDefault }}
   annotations:
     storagelocation.chargeback.coreos.com/is-default: "true"
 {{- end }}
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-{{- if eq .Values.con***REMOVED***g.defaultStorage.type "hive" }}
+{{- if eq .Values.spec.con***REMOVED***g.defaultStorage.type "hive" }}
   hive:
-{{ toYaml .Values.con***REMOVED***g.defaultStorage.hive | indent 4 }}
+{{ toYaml .Values.spec.con***REMOVED***g.defaultStorage.hive | indent 4 }}
 {{- ***REMOVED*** }}
-{{ printf "Unsupported defaultStorage.type: '%s'" .Values.con***REMOVED***g.defaultStorage.type | fail }}
+{{ printf "Unsupported defaultStorage.type: '%s'" .Values.spec.con***REMOVED***g.defaultStorage.type | fail }}
 {{- end -}}
 {{- end -}}

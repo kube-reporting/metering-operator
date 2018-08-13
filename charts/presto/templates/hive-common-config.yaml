@@ -5,13 +5,13 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-{{- if .Values.hive.con***REMOVED***g.defaultfs }}
-  default-fs: {{ .Values.hive.con***REMOVED***g.defaultfs | quote}}
+{{- if .Values.spec.hive.con***REMOVED***g.defaultfs }}
+  default-fs: {{ .Values.spec.hive.con***REMOVED***g.defaultfs | quote}}
 {{- end }}
-  db-connection-url: {{ .Values.hive.con***REMOVED***g.dbConnectionURL | quote}}
-  db-connection-driver: {{ .Values.hive.con***REMOVED***g.dbConnectionDriver | quote}}
-  enable-metastore-schema-veri***REMOVED***cation: {{ .Values.hive.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation | quote}}
-  auto-create-metastore-schema: {{ .Values.hive.con***REMOVED***g.autoCreateMetastoreSchema | quote}}
-  default-***REMOVED***le-format: {{ .Values.hive.con***REMOVED***g.defaultFileFormat | quote}}
-  metastore-uris: {{ .Values.hive.con***REMOVED***g.metastoreURIs | quote}}
+  db-connection-url: {{ .Values.spec.hive.con***REMOVED***g.dbConnectionURL | quote}}
+  db-connection-driver: {{ .Values.spec.hive.con***REMOVED***g.dbConnectionDriver | quote}}
+  enable-metastore-schema-veri***REMOVED***cation: {{ .Values.spec.hive.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation | quote}}
+  auto-create-metastore-schema: {{ .Values.spec.hive.con***REMOVED***g.autoCreateMetastoreSchema | quote}}
+  default-***REMOVED***le-format: {{ .Values.spec.hive.con***REMOVED***g.defaultFileFormat | quote}}
+  metastore-uris: {{ .Values.spec.hive.con***REMOVED***g.metastoreURIs | quote}}
 

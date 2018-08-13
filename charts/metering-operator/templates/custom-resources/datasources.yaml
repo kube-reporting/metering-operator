@@ -1,4 +1,4 @@
-{{- range $name, $body := .Values.con***REMOVED***g.defaultReportDataSources }}
+{{- range $name, $body := .Values.spec.con***REMOVED***g.defaultReportDataSources }}
 ---
 apiVersion: chargeback.coreos.com/v1alpha1
 kind: ReportDataSource

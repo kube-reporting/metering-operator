@@ -7,43 +7,43 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.spec.replicas }}
   strategy:
-{{ toYaml .Values.updateStrategy | indent 4 }}
+{{ toYaml .Values.spec.updateStrategy | indent 4 }}
   template:
     metadata:
       labels:
         app: metering
-{{- if .Values.labels }}
-{{ toYaml .Values.labels | indent 8 }}
+{{- if .Values.spec.labels }}
+{{ toYaml .Values.spec.labels | indent 8 }}
 {{- end }}
       annotations:
         metering-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/metering-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if .Values.con***REMOVED***g.createAwsCredentialsSecret }}
+{{- if .Values.spec.con***REMOVED***g.createAwsCredentialsSecret }}
         metering-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/metering-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and .Values.con***REMOVED***g.tls.enabled .Values.con***REMOVED***g.tls.createSecret }}
+{{- if and .Values.spec.con***REMOVED***g.tls.enabled .Values.spec.con***REMOVED***g.tls.createSecret }}
         metering-tls-secrets-hash: {{ include (print $.Template.BasePath "/metering-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if and .Values.authProxy.enabled .Values.authProxy.createCookieSecret }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createCookieSecret }}
         metering-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-cookie-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if and .Values.authProxy.enabled .Values.authProxy.createHtpasswdSecret }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createHtpasswdSecret }}
         metering-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if and .Values.authProxy.enabled .Values.authProxy.createAuthenticatedEmailsSecret }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createAuthenticatedEmailsSecret }}
         metering-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.annotations }}
-{{ toYaml .Values.annotations | indent 8 }}
+{{- if .Values.spec.annotations }}
+{{ toYaml .Values.spec.annotations | indent 8 }}
 {{- end }}
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
       - name: metering
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
         env:
         - name: POD_NAME
           valueFrom:
@@ -52,13 +52,13 @@ spec:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
+              name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
               key: aws-access-key-id
               optional: true
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.con***REMOVED***g.awsCredentialsSecretName }}"
+              name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
               key: aws-secret-access-key
               optional: true
         - name: CHARGEBACK_LOG_DML_QUERIES
@@ -117,7 +117,7 @@ spec:
               name: metering-con***REMOVED***g
               key: leader-lease-duration
 {{/* If authProxy is enabled we do not enable TLS on the metering operator since the proxy will do TLS */}}
-{{- if and .Values.con***REMOVED***g.tls.enabled (not .Values.authProxy.enabled) }}
+{{- if and .Values.spec.con***REMOVED***g.tls.enabled (not .Values.spec.authProxy.enabled) }}
         - name: CHARGEBACK_USE_TLS
           value: "true"
         - name: CHARGEBACK_TLS_KEY
@@ -129,7 +129,7 @@ spec:
           value: "false"
 {{- end }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.spec.resources | indent 10 }}
         ports:
         - name: "http"
           containerPort: 8080
@@ -137,23 +137,23 @@ spec:
           containerPort: 6060
         - name: "metrics"
           containerPort: 8082
-{{- if and .Values.con***REMOVED***g.tls.enabled (not .Values.authProxy.enabled) -}}
-{{- $_ := set .Values.readinessProbe.httpGet "scheme" "HTTPS" -}}
-{{- $_ := set .Values.livenessProbe.httpGet "scheme" "HTTPS" -}}
+{{- if and .Values.spec.con***REMOVED***g.tls.enabled (not .Values.spec.authProxy.enabled) -}}
+{{- $_ := set .Values.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
+{{- $_ := set .Values.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
 {{- end }}
         readinessProbe:
-{{ toYaml .Values.readinessProbe | indent 10 }}
+{{ toYaml .Values.spec.readinessProbe | indent 10 }}
         livenessProbe:
-{{ toYaml .Values.livenessProbe | indent 10 }}
-{{- if and .Values.con***REMOVED***g.tls.enabled (not .Values.authProxy.enabled) }}
+{{ toYaml .Values.spec.livenessProbe | indent 10 }}
+{{- if and .Values.spec.con***REMOVED***g.tls.enabled (not .Values.spec.authProxy.enabled) }}
         volumeMounts:
         - name: tls
           mountPath: /tls
 {{- end }}
-{{- if .Values.authProxy.enabled }}
+{{- if .Values.spec.authProxy.enabled }}
       - name: metering-auth-proxy
-        image: "{{ .Values.authProxy.image.repository }}:{{ .Values.authProxy.image.tag }}"
-        imagePullPolicy: {{ .Values.authProxy.image.pullPolicy }}
+        image: "{{ .Values.spec.authProxy.image.repository }}:{{ .Values.spec.authProxy.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.authProxy.image.pullPolicy }}
         args:
         - -provider=openshift
         - -https-address=:8081
@@ -168,22 +168,22 @@ spec:
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -openshift-service-account=metering
-{{- if .Values.authProxy.authenticatedEmailsEnabled }}
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled }}
         - -authenticated-emails-***REMOVED***le=/etc/proxy/authenticated-emails/emails
 {{- ***REMOVED*** }}
         - -email-domain=*
 {{- end }}
-{{- if .Values.authProxy.subjectAccessReviewEnabled }}
+{{- if .Values.spec.authProxy.subjectAccessReviewEnabled }}
         - '-openshift-sar={"resource": "namespaces", "verb": "get"}'
 {{- end }}
-{{- if .Values.authProxy.delegateURLsEnabled }}
+{{- if .Values.spec.authProxy.delegateURLsEnabled }}
         - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get"}}'
 {{- end }}
         ports:
         - name: auth-proxy
           containerPort: 8081
         resources:
-{{ toYaml .Values.authProxy.resources | indent 10 }}
+{{ toYaml .Values.spec.authProxy.resources | indent 10 }}
         volumeMounts:
         - mountPath: /etc/tls
           name: tls
@@ -191,34 +191,34 @@ spec:
           name: cookie-secret
         - mountPath: /etc/proxy/htpasswd
           name: htpasswd-secret
-{{- if .Values.authProxy.authenticatedEmailsEnabled  }}
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled  }}
         - mountPath: /etc/proxy/authenticated-emails
           name: authenticated-emails-secret
 {{- end }}
 {{- end }}
       volumes:
-{{- if .Values.con***REMOVED***g.tls.enabled }}
+{{- if .Values.spec.con***REMOVED***g.tls.enabled }}
       - name: tls
         secret:
-          secretName: {{ .Values.con***REMOVED***g.tls.secretName }}
+          secretName: {{ .Values.spec.con***REMOVED***g.tls.secretName }}
 {{- end }}
-{{- if .Values.authProxy.enabled }}
+{{- if .Values.spec.authProxy.enabled }}
       - name: cookie-secret
         secret:
-          secretName: {{ .Values.authProxy.cookieSecretName }}
+          secretName: {{ .Values.spec.authProxy.cookieSecretName }}
       - name: htpasswd-secret
         secret:
-          secretName: {{ .Values.authProxy.htpasswdSecretName }}
-{{- if .Values.authProxy.authenticatedEmailsEnabled  }}
+          secretName: {{ .Values.spec.authProxy.htpasswdSecretName }}
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled  }}
       - name: authenticated-emails-secret
         secret:
-          secretName: {{ .Values.authProxy.authenticatedEmailsSecretName }}
+          secretName: {{ .Values.spec.authProxy.authenticatedEmailsSecretName }}
 {{- end }}
 {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering
-{{- if .Values.imagePullSecrets }}
+{{- if .Values.spec.imagePullSecrets }}
       imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}

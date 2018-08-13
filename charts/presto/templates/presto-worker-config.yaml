@@ -5,13 +5,13 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.presto.worker.con***REMOVED***g.logLevel | quote }}
-{{- if .Values.presto.worker.con***REMOVED***g.taskConcurrency }}
-  task-concurrency: {{ .Values.presto.worker.con***REMOVED***g.taskConcurrency | quote }}
+  log-level: {{ upper .Values.spec.presto.worker.con***REMOVED***g.logLevel | quote }}
+{{- if .Values.spec.presto.worker.con***REMOVED***g.taskConcurrency }}
+  task-concurrency: {{ .Values.spec.presto.worker.con***REMOVED***g.taskConcurrency | quote }}
 {{- end }}
-{{- if .Values.presto.worker.con***REMOVED***g.taskMaxWorkerThreads }}
-  task-max-worker-threads: {{ .Values.presto.worker.con***REMOVED***g.taskMaxWorkerThreads | quote }}
+{{- if .Values.spec.presto.worker.con***REMOVED***g.taskMaxWorkerThreads }}
+  task-max-worker-threads: {{ .Values.spec.presto.worker.con***REMOVED***g.taskMaxWorkerThreads | quote }}
 {{- end }}
-{{- if .Values.presto.worker.con***REMOVED***g.taskMinDrivers }}
-  task-min-drivers: {{ .Values.presto.worker.con***REMOVED***g.taskMinDrivers | quote }}
+{{- if .Values.spec.presto.worker.con***REMOVED***g.taskMinDrivers }}
+  task-min-drivers: {{ .Values.spec.presto.worker.con***REMOVED***g.taskMinDrivers | quote }}
 {{- end }}
