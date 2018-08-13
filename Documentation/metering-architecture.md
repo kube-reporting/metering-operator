@@ -59,9 +59,9 @@ When the ReportDataSource is created, the metering operator does the following:
 - Checks if this `ReportDataSource` has a table created for it yet, and if not, create the table.
   - The underlying storage for this Presto table is controlled using the `StorageLocation` configuration in `spec.promsum.storage`, which controls what options to use when creating the Presto table, such what Presto connector is used.
 
-Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `promsum` section is specified, does the following:
+Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `promsum` section is specified, does the following to attempt to poll Prometheus metrics for each:
 
-- Check if the table for this ReportDataSource exists, if it doesn't, it will skip the ReportDataSource, until the next poll for all `ReportDataSources` again.
+- Check if the table for this ReportDataSource exists, if it doesn't, it will skip collecting any data, until the next poll for the `ReportDataSource` again.
 - Retrieve the query specified in the `ReportPrometheusQuery` named by the ReportDataSources `spec.promsum.query` field.
 - Execute the Prometheus query against the Prometheus server.
 - After receiving the metrics results, it then stores the data into a Presto table.
@@ -79,9 +79,9 @@ When the ReportDataSource is created, the metering operator does the following:
 - Checks if this `ReportDataSource` has a table created for it yet, and if not, create the table.
   - In the case of an `awsBilling` ReportDataSource, the operator creates the table using Hive. When creating the table, it is configured to point at the S3 Bucket configured in the `spec.awsBilling` section and to read gzipped CSV files (`.csv.gz`, the file format the cost and usage reports are in).
 
-Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `awsBilling` section is specified, does the following:
+Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `awsBilling` section is specified, does the following to configure the table partitions for each:
 
-- Check if the table for this ReportDataSource exists, if it doesn't, it will skip the ReportDataSource, until the next poll for all `ReportDataSources` again.
+- Check if the table for this ReportDataSource exists, if it doesn't, it will skip configuring the partitions of the table ReportDataSource, until the next poll for all `ReportDataSources` again.
 - Scan the configured S3 bucket for the cost usage report JSON manifests. There is a manifest for each billing period, and each manifest contains information about what reports are the most up-to-date for a given billing period.
 - For each manifest, the operator determines which S3 directory contains the most up to date report files for the billing period, and then creates a partition in the table, pointing at the directory containing the cost & usage reports. If the partition already exists for the specified billing period, the operator will remove it and replace it with the more up to date S3 directory.
 
