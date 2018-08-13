@@ -16,35 +16,35 @@ spec:
     matchLabels:
       app: hive
       hive: server
-{{- if .Values.hive.labels }}
-{{ toYaml .Values.hive.labels | indent 6 }}
+{{- if .Values.spec.hive.labels }}
+{{ toYaml .Values.spec.hive.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: hive
         hive: server
-{{- if .Values.hive.labels }}
-{{ toYaml .Values.hive.labels | indent 8 }}
+{{- if .Values.spec.hive.labels }}
+{{ toYaml .Values.spec.hive.labels | indent 8 }}
 {{- end }}
       annotations:
         hive-common-configmap-hash: {{ include (print $.Template.BasePath "/hive-common-config.yaml") . | sha256sum }}
         hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
         hive-server-configmap-hash: {{ include (print $.Template.BasePath "/hive-server-config.yaml") . | sha256sum }}
-{{- if .Values.config.createAwsCredentialsSecret }}
+{{- if .Values.spec.config.createAwsCredentialsSecret }}
         presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.annotations }}
-{{ toYaml .Values.hive.annotations | indent 8 }}
+{{- if .Values.spec.hive.annotations }}
+{{ toYaml .Values.spec.hive.annotations | indent 8 }}
 {{- end }}
     spec:
       securityContext:
-{{ toYaml .Values.hive.securityContext | indent 8 }}
+{{ toYaml .Values.spec.hive.securityContext | indent 8 }}
       containers:
       - name: hiveserver2
         args: ["--service", "hiveserver2"]
-        image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
-        imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
+        image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:
         - name: thrift
           containerPort: 10000
@@ -81,10 +81,10 @@ spec:
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
         resources:
-{{ toYaml .Values.hive.server.resources | indent 10 }}
+{{ toYaml .Values.spec.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.spec.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
       volumes:
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs

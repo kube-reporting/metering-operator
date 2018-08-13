@@ -1,4 +1,4 @@
-{{- if and (or .Values.authProxy.subjectAccessReviewEnabled .Values.authProxy.delegateURLsEnabled) .Values.authProxy.createAuthProxyClusterRole }}
+{{- if and (or .Values.spec.authProxy.subjectAccessReviewEnabled .Values.spec.authProxy.delegateURLsEnabled) .Values.spec.authProxy.createAuthProxyClusterRole }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -8,7 +8,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 rules:
-{{- if .Values.authProxy.subjectAccessReviewEnabled }}
+{{- if .Values.spec.authProxy.subjectAccessReviewEnabled }}
 - apiGroups:
   - authorization.k8s.io
   resources:
@@ -16,7 +16,7 @@ rules:
   verbs:
   - create
 {{- end }}
-{{- if .Values.authProxy.delegateURLsEnabled }}
+{{- if .Values.spec.authProxy.delegateURLsEnabled }}
 - apiGroups:
   - authentication.k8s.io
   resources:

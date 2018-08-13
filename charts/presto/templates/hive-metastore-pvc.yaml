@@ -1,4 +1,4 @@
-{{- if .Values.hive.metastore.storage.create }}
+{{- if .Values.spec.hive.metastore.storage.create }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -10,8 +10,8 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: {{ .Values.hive.metastore.storage.class }}
+  storageClassName: {{ .Values.spec.hive.metastore.storage.class }}
   resources:
     requests:
-      storage: {{ .Values.hive.metastore.storage.size }}
+      storage: {{ .Values.spec.hive.metastore.storage.size }}
 {{- end }}

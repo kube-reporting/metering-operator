@@ -1,8 +1,8 @@
-{{- if .Values.route.enabled }}
+{{- if .Values.spec.route.enabled }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.route.name }}
+  name: {{ .Values.spec.route.name }}
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

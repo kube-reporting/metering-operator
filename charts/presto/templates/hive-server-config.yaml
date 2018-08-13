@@ -5,4 +5,4 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.hive.server.config.logLevel | quote}}
+  log-level: {{ upper .Values.spec.hive.server.config.logLevel | quote}}
