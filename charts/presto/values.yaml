@@ -1,7 +1,4 @@
 presto:
-  labels: {}
-  annotations: {}
-
   image:
     repository: quay.io/coreos/chargeback-presto
     tag: latest
@@ -42,7 +39,6 @@ presto:
         memory: "2048Mi"
         cpu: "1000m"
 
-
   worker:
     replicas: 0
     terminationGracePeriodSeconds: 30
@@ -69,6 +65,9 @@ presto:
       limits:
         memory: "2048Mi"
         cpu: "1000m"
+
+  labels: {}
+  annotations: {}
 
 hive:
   image:
@@ -122,6 +121,9 @@ hive:
       limits:
         memory: "400Mi"
         cpu: "100m"
+
+  labels: {}
+  annotations: {}
 
 con***REMOVED***g:
   awsRegion: ""

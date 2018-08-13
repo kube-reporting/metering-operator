@@ -41,6 +41,9 @@ datanode:
     class: null
     size: "5Gi"
 
+  labels: {}
+  annotations: {}
+
 namenode:
   terminationGracePeriodSeconds: 10
   resources:
@@ -66,3 +69,5 @@ namenode:
     size: "5Gi"
     class: null
 
+  labels: {}
+  annotations: {}

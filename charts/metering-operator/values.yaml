@@ -119,6 +119,9 @@ livenessProbe:
    port: 8080
    scheme: HTTP
 
+labels: {}
+annotations: {}
+
 service:
   annotations: {}
   type: ClusterIP
@@ -151,7 +154,6 @@ authProxy:
   authenticatedEmailsEnabled: false
   createAuthenticatedEmailsSecret: true
   authenticatedEmailsData: ""
-
 
   resources:
     requests:
