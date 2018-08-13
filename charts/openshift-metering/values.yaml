@@ -1,27 +1,30 @@
 metering-operator:
-  config:
-    prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
-    tls:
-      enabled: true
-      createSecret: false
-      secretName: "metering-tls-secrets"
-  service:
-    annotations:
-      "service.alpha.openshift.io/serving-cert-secret-name": "metering-tls-secrets"
-  image:
-    tag: latest
+  spec:
+    config:
+      prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+      tls:
+        enabled: true
+        createSecret: false
+        secretName: "metering-tls-secrets"
+    service:
+      annotations:
+        "service.alpha.openshift.io/serving-cert-secret-name": "metering-tls-secrets"
+    image:
+      tag: latest
 
 presto:
-  presto:
-    securityContext:
-      fsGroup: null
-  hive:
-    securityContext:
-      fsGroup: null
+  spec:
+    presto:
+      securityContext:
+        fsGroup: null
+    hive:
+      securityContext:
+        fsGroup: null
 hdfs:
-  enabled: true
-  config:
-    datanodeDataDirPerms: "775"
+  spec:
+    enabled: true
+    config:
+      datanodeDataDirPerms: "775"
 
-  securityContext:
-    fsGroup: null
+    securityContext:
+      fsGroup: null

@@ -4,18 +4,20 @@ metadata:
   name: "operator-metering"
 spec:
   metering-operator:
-    image:
-      tag: latest
+    spec:
+      image:
+        tag: latest
 
   presto:
-    presto:
-      image:
-        tag: latest
-    hive:
-      image:
-        tag: latest
+    spec:
+      presto:
+        image:
+          tag: latest
+      hive:
+        image:
+          tag: latest
 
   hdfs:
-    image:
-      tag: latest
-
+    spec:
+      image:
+        tag: latest

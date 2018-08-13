@@ -11,7 +11,7 @@ For details on customizing these files, read the [common-configuration-options](
 This document follows the convention of describing nested fields in configuration settings using dots as separators. For example,
 
 ```
-spec.metering-operator.config.awsAccessKeyID
+spec.metering-operator.spec.config.awsAccessKeyID
 ```
 
 refers to the following YAML structure and value:
@@ -19,8 +19,9 @@ refers to the following YAML structure and value:
 ```
 spec:
   metering-operator:
-    config:
-      awsAccessKeyID: "REPLACEME"
+    spec:
+      config:
+        awsAccessKeyID: "REPLACEME"
 ```
 
 ## Using a custom configuration
@@ -45,8 +46,9 @@ Below is an example of configuring Metering to use the service `prometheus` on p
 ```
 spec:
   metering-operator:
-    config:
-      prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
+    spec:
+      config:
+        prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
 > Note: currently we do not support https connections or authentication to Prometheus, but support for it is being developed.
@@ -63,12 +65,13 @@ Using MySQL:
 ```
 spec:
   presto:
-    hive:
-      config:
-        dbConnectionURL: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
-        dbConnectionDriver: "com.mysql.jdbc.Driver"
-        dbConnectionUsername: "REPLACEME"
-        dbConnectionPassword: "REPLACEME"
+    spec:
+      hive:
+        config:
+          dbConnectionURL: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
+          dbConnectionDriver: "com.mysql.jdbc.Driver"
+          dbConnectionUsername: "REPLACEME"
+          dbConnectionPassword: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `dbConnectionURL`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html).
@@ -78,12 +81,13 @@ Using Postgresql:
 ```
 spec:
   presto:
-    hive:
-      config:
-        dbConnectionURL: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
-        dbConnectionDriver: "org.postgresql.Driver"
-        dbConnectionUsername: "REPLACEME"
-        dbConnectionPassword: "REPLACEME"
+    spec:
+      hive:
+        config:
+          dbConnectionURL: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
+          dbConnectionDriver: "org.postgresql.Driver"
+          dbConnectionUsername: "REPLACEME"
+          dbConnectionPassword: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `dbConnectionURL`, for more details see [the Postgresql JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).
@@ -121,9 +125,9 @@ To configure and specify a `StorageClass` for use in Metering, specify the `Stor
 
 Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Metering to use the default StorageClass for the cluster.
 
-- `spec.presto.hive.metastore.storage.class`
-- `spec.hdfs.datanode.storage.class`
-- `spec.hdfs.namenode.storage.class`
+- `spec.presto.spec.hive.metastore.storage.class`
+- `spec.hdfs.spec.datanode.storage.class`
+- `spec.hdfs.spec.namenode.storage.class`
 
 ### Manually creating Persistent Volumes
 
@@ -155,7 +159,8 @@ value to `false`.
 ```
 spec:
   hdfs:
-    enabled: false
+    spec:
+      enabled: false
 ```
 
 ### AWS billing correlation
@@ -169,7 +174,7 @@ Next, update the `defaultReportDataSources.aws-billing` section in the [custom-v
 
 Uncomment the entire `defaultReportDataSources` block , and update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report.
 
-Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.config` and `spec.presto.config` sections.
+Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.spec.config` and `spec.presto.spec.config` sections.
 
 To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-only.json](aws/read-only.json) file.
