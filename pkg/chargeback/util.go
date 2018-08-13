@@ -128,7 +128,7 @@ func hiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			if prestoValueType == "" {
 				return presto.Column{}, fmt.Errorf("invalid presto map value type: %q", valueType)
 			}
-			mapColType := fmt.Sprintf("MAP(%s,%s)", prestoKeyType, prestoValueType)
+			mapColType := fmt.Sprintf("map(%s,%s)", prestoKeyType, prestoValueType)
 
 			return presto.Column{
 				Name: column.Name,
