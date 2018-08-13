@@ -54,12 +54,8 @@ func generateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column 
 	return columns
 }
 
-func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Column {
-	var columns []presto.Column
-	for _, c := range genQuery.Spec.Columns {
-		columns = append(columns, presto.Column{Name: c.Name, Type: c.Type})
-	}
-	return columns
+func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) ([]presto.Column, error) {
+	return hiveColumnsToPrestoColumns(generateHiveColumns(genQuery))
 }
 
 func hiveColumnsToPrestoColumns(columns []hive.Column) ([]presto.Column, error) {
