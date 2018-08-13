@@ -54,12 +54,8 @@ func generateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column 
 	return columns
 }
 
-func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Column {
-	var columns []presto.Column
-	for _, c := range genQuery.Spec.Columns {
-		columns = append(columns, presto.Column{Name: c.Name, Type: c.Type})
-	}
-	return columns
+func generatePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) ([]presto.Column, error) {
+	return hiveColumnsToPrestoColumns(generateHiveColumns(genQuery))
 }
 
 func hiveColumnsToPrestoColumns(columns []hive.Column) ([]presto.Column, error) {
@@ -121,8 +117,8 @@ func hiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			if len(mapComponentsSplit) != 2 {
 				return presto.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
 			}
-			keyType := mapComponentsSplit[0]
-			valueType := mapComponentsSplit[1]
+			keyType := strings.TrimSpace(mapComponentsSplit[0])
+			valueType := strings.TrimSpace(mapComponentsSplit[1])
 
 			prestoKeyType := simpleHiveColumnTypeToPrestoColumnType(keyType)
 			prestoValueType := simpleHiveColumnTypeToPrestoColumnType(valueType)
@@ -132,7 +128,7 @@ func hiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			if prestoValueType == "" {
 				return presto.Column{}, fmt.Errorf("invalid presto map value type: %q", valueType)
 			}
-			mapColType := fmt.Sprintf("MAP(%s,%s)", prestoKeyType, prestoValueType)
+			mapColType := fmt.Sprintf("map(%s,%s)", prestoKeyType, prestoValueType)
 
 			return presto.Column{
 				Name: column.Name,
