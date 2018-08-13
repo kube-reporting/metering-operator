@@ -46,7 +46,8 @@ func GenerateOrderBySQL(columns []Column) string {
 		// ordering. we detect a map column using a best effort approach by
 		// checking if the column type contains the string "map(" , and is
 		// followed by a ")" after that string.
-		if mapIndex := strings.Index(col.Type, "map("); mapIndex != -1 && strings.Index(col.Type, ")") > mapIndex {
+		colType := strings.ToLower(col.Type)
+		if mapIndex := strings.Index(colType, "map("); mapIndex != -1 && strings.Index(colType, ")") > mapIndex {
 			quotedColumns = append(quotedColumns, fmt.Sprintf(`map_entries("%s")`, colName))
 		} ***REMOVED*** {
 			quotedColumns = append(quotedColumns, quoteColumn(col))

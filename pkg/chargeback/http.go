@@ -214,20 +214,39 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	prestoColumns := generatePrestoColumns(reportQuery)
-	tableName := scheduledReportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to perform presto query")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
-		return
-	}
-
 	// Get the presto table to get actual columns in table
 	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
 	if err != nil {
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
+		return
+	}
+
+	tableColumns := prestoTable.State.Parameters.Columns
+	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
+	if err != nil {
+		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+		return
+	}
+
+	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
+	if err != nil {
+		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+		return
+	}
+
+	if !reflect.DeepEqual(queryPrestoColumns, prestoColumns) {
+		logger.Warnf("report columns and table columns don't match, ReportGenerationQuery was likely updated after the report ran")
+		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
+	}
+
+	tableName := scheduledReportTableName(name)
+	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to perform presto query")
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
 		return
 	}
 
@@ -284,7 +303,13 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	tableColumns := prestoTable.State.Parameters.Columns
-	queryPrestoColumns := generatePrestoColumns(reportQuery)
+	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
+	if err != nil {
+		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+		return
+	}
+
 	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
