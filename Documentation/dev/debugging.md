@@ -11,7 +11,7 @@ export METERING_NAMESPACE=your-namespace
 
 ## Get Metering Operator Logs
 
-The command below will follow the logs of the metering-operator.
+The command below will follow the logs of the reporting-operator.
 
 ```
 kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}

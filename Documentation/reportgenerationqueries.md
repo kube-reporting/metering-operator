@@ -3,7 +3,7 @@
 Customizing how Operator Metering generates reports is done using a custom resource called a `ReportGenerationQuery`.
 
 These `ReportGenerationQuery` resources control the SQL queries that can be used to produce a report.
-When writing a [report](report.md) you can specify the query it will use by setting the `spec.generationQuery` field to `metadata.name` of any `ReportGenerationQuery` in the metering-operator's namespace.
+When writing a [report](report.md) you can specify the query it will use by setting the `spec.generationQuery` field to `metadata.name` of any `ReportGenerationQuery` in the reporting-operator's namespace.
 
 ## Fields
 

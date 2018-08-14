@@ -38,7 +38,7 @@ kind: Metering
 metadata:
   name: "${DEPLOY_PLATFORM}-metering"
 spec:
-  metering-operator:
+  reporting-operator:
     spec:
       image:
         tag: ${DEPLOY_TAG}

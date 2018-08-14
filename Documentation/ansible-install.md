@@ -15,7 +15,7 @@ For example:
 
 ```
 openshift_metering_config:
-  metering-operator:
+  reporting-operator:
     config:
       awsAccessKeyID: "REPLACEME"
 ```

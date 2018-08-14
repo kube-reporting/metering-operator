@@ -90,13 +90,13 @@ For more details on configuration options, most are documented in the [configuri
 It's also possible to run the operator locally.
 To simplify this, we've got a few `Makefile` targets to handle the building and running of the operator.
 
-First, we still need to run Presto, Hive, and HDFS in the cluster, and also set metering-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
+First, we still need to run Presto, Hive, and HDFS in the cluster, and also set reporting-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
 
-To do this, update your `metering-custom.yaml` to set `spec.metering-operator.replicas` to `0` like so:
+To do this, update your `metering-custom.yaml` to set `spec.reporting-operator.replicas` to `0` like so:
 
 ```
 spec:
-  metering-operator:
+  reporting-operator:
     replicas: 0
 ```
 

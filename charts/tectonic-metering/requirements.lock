@@ -1,6 +1,6 @@
 dependencies:
-- name: metering-operator
-  repository: file://../metering-operator
+- name: reporting-operator
+  repository: file://../reporting-operator
   version: 0.1.0
 - name: presto
   repository: file://../presto

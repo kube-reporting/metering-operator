@@ -11,14 +11,14 @@ For details on customizing these files, read the [common-configuration-options](
 This document follows the convention of describing nested fields in configuration settings using dots as separators. For example,
 
 ```
-spec.metering-operator.spec.config.awsAccessKeyID
+spec.reporting-operator.spec.config.awsAccessKeyID
 ```
 
 refers to the following YAML structure and value:
 
 ```
 spec:
-  metering-operator:
+  reporting-operator:
     spec:
       config:
         awsAccessKeyID: "REPLACEME"
@@ -39,13 +39,13 @@ The example manifest [custom-values.yaml][example-config] contains the most comm
 ### Prometheus URL
 
 By default, the Metering assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090` within the cluster.
-If your not using [kube-prometheus][kube-prometheus], then you will need to override the `metering-operator.config.prometheusURL` configuration option.
+If your not using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheusURL` configuration option.
 
 Below is an example of configuring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
 ```
 spec:
-  metering-operator:
+  reporting-operator:
     spec:
       config:
         prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
@@ -145,7 +145,7 @@ By default, the data that Metering collects and generates is stored in a single 
 
 To use S3 for storage, uncomment the `defaultStorage:` section in the example
 [custom-values.yaml][example-config] configuration.
-Once uncommented, set `awsAccessKeyID` and `awsSecretAccessKey` in the `metering-operator.config` and `presto.config` sections.
+Once uncommented, set `awsAccessKeyID` and `awsSecretAccessKey` in the `reporting-operator.config` and `presto.config` sections.
 
 To store data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read and write access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) file.
@@ -174,13 +174,13 @@ Next, update the `defaultReportDataSources.aws-billing` section in the [custom-v
 
 Uncomment the entire `defaultReportDataSources` block , and update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report.
 
-Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.metering-operator.spec.config` and `spec.presto.spec.config` sections.
+Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.reporting-operator.spec.config` and `spec.presto.spec.config` sections.
 
 To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-only.json](aws/read-only.json) file.
 Replace `operator-metering-data` with the name of your bucket.
 
-This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the metering-operator.
+This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the reporting-operator.
 
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
