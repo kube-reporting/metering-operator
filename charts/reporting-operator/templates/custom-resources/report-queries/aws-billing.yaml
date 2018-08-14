@@ -1,5 +1,5 @@
 {{- if index .Values.spec.con***REMOVED***g.defaultReportDataSources "aws-billing" -}}
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-billing-data-raw"
@@ -47,7 +47,7 @@ spec:
     AND lineItem_UsageEndDate IS NOT NULL
 
 ---
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-billing-data"
@@ -106,7 +106,7 @@ spec:
         AND (usage_end_date >= timestamp '{| .Report.StartPeriod | prestoTimestamp |}' AND usage_start_date <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}')
 
 ---
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "aws-ec2-cluster-cost"

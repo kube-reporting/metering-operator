@@ -22,7 +22,7 @@ This ***REMOVED***rst example is what the built-in local storage option looks li
 As you can see, it's con***REMOVED***gured to use HDFS and supplies no additional options.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
   name: local
@@ -37,7 +37,7 @@ The example below uses an AWS S3 bucket for storage.
 The pre***REMOVED***x is appended to the bucket name when constructing the path to use.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
   name: example-s3-storage
@@ -50,18 +50,18 @@ metadata:
 
 ## Default StorageLocation
 
-If an annotation `storagelocation.chargeback.coreos.com/is-default` exists and is set to the string "true" on a `StorageLocation` resource, then that resource will be used if a `StorageLocation` is not speci***REMOVED***ed on resources which have a `storage` con***REMOVED***guration option.
+If an annotation `storagelocation.metering.openshift.io/is-default` exists and is set to the string "true" on a `StorageLocation` resource, then that resource will be used if a `StorageLocation` is not speci***REMOVED***ed on resources which have a `storage` con***REMOVED***guration option.
 If more than one resource with the annotation exists, an error will be logged and the operator will consider there to be no default.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
   name: local
   labels:
     operator-metering: "true"
   annotations:
-    storagelocation.chargeback.coreos.com/is-default: "true"
+    storagelocation.metering.openshift.io/is-default: "true"
   spec:
     hive:
       location: "s3a://bucket-name/path/within/bucket"

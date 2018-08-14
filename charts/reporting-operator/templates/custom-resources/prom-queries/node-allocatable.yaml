@@ -1,4 +1,4 @@
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
   name: "node-allocatable-memory-bytes"
@@ -12,7 +12,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
   name: "node-allocatable-cpu-cores"

@@ -33,7 +33,7 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
 ***REMOVED***
 
 cat <<EOF > "$METERING_CR_FILE"
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Metering
 metadata:
   name: "${DEPLOY_PLATFORM}-metering"

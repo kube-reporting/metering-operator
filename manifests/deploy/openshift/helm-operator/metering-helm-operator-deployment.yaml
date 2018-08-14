@@ -27,7 +27,7 @@ spec:
         - name: HELM_RELEASE_CRD_NAME
           value: Metering
         - name: HELM_RELEASE_CRD_API_GROUP
-          value: chargeback.coreos.com
+          value: metering.openshift.io
         - name: HELM_CHART_PATH
           value: /openshift-metering-0.1.0.tgz
         - name: MY_POD_NAME

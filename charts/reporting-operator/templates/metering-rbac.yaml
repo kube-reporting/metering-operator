@@ -8,7 +8,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 rules:
-- apiGroups: ["chargeback.coreos.com"]
+- apiGroups: ["metering.openshift.io"]
   resources: ["*"]
   verbs: ["*"]
 - apiGroups:

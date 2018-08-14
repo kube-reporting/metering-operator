@@ -1,4 +1,4 @@
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-raw"
@@ -48,7 +48,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-raw"
@@ -98,7 +98,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request"
@@ -154,7 +154,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage"
@@ -210,7 +210,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-memory-request"
@@ -258,7 +258,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-memory-usage"
@@ -305,7 +305,7 @@ spec:
     ORDER BY pod_usage_memory_byte_seconds DESC
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-vs-node-memory-allocatable"

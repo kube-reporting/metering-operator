@@ -61,7 +61,7 @@ Now that we have ***REMOVED***gured out the Prometheus query, we need to create 
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportprometheusquery.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
   name: unready-deployment-replicas
@@ -74,7 +74,7 @@ Creating the ReportPrometheusQuery only makes the query available for use, but d
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportdatasource.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
   name: unready-deployment-replicas
@@ -205,7 +205,7 @@ One thing to note is we replaced `FROM datasource_unready_deployment_replicas` w
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -248,7 +248,7 @@ Adding this ***REMOVED***lter to our query and updating our `spec.view.disabled`
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportgenerationquery.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -290,7 +290,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportgen
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-report.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
   name: unready-deployment-replicas
