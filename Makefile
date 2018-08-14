@@ -206,7 +206,7 @@ fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: verify-codegen metering-manifests fmt
+ci-validate: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
@@ -231,6 +231,12 @@ build-chargeback:
 
 images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
+
+CHART_DEPS := images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
+	images/metering-helm-operator/openshift-metering-0.1.0.tgz \
+	images/metering-helm-operator/operator-metering-0.1.0.tgz
+
+all-charts: $(CHART_DEPS)
 
 tectonic-metering-chart: images/metering-helm-operator/tectonic-metering-0.1.0.tgz
 
