@@ -11,7 +11,7 @@ data:
   log-ddl-queries: {{ .Values.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.spec.con***REMOVED***g.logDMLQueries | quote}}
   disable-promsum: {{ .Values.spec.con***REMOVED***g.disablePromsum | quote}}
-  prometheus-url: {{ required "a valid metering-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
+  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
   promsum-poll-interval: {{ .Values.spec.con***REMOVED***g.promsumPollInterval | quote}}
   promsum-chunk-size: {{ .Values.spec.con***REMOVED***g.promsumChunkSize | quote}}
   promsum-step-size: {{ .Values.spec.con***REMOVED***g.promsumStepSize | quote}}

@@ -1,4 +1,4 @@
-metering-operator:
+reporting-operator:
   spec:
     con***REMOVED***g:
       prometheusURL: "http://prometheus.tectonic-system.svc.cluster.local:9090/"

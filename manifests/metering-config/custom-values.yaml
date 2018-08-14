@@ -3,7 +3,7 @@ kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  metering-operator:
+  reporting-operator:
     spec:
       con***REMOVED***g:
         # Replace these with your own AWS credentials
@@ -23,7 +23,7 @@ spec:
 
         # If you want to use S3 for storage of reports, and collected metrics,
         # uncomment the section below, and set awsAccessKeyID and awsSecretAccessKey
-        # for the metering-operator, and presto con***REMOVED***g sections (above and below).
+        # for the reporting-operator, and presto con***REMOVED***g sections (above and below).
         # defaultStorage:
         #   create: true
         #   name: "s3"

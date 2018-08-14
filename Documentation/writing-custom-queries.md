@@ -93,7 +93,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportdat
 ## Viewing the Metrics in Presto
 
 Before we go any further, we should verify that creating the ReportDataSource did what we wanted, and the data is being collected.
-One way to do this is to check the [metering operator logs][metering-operator-logs], and look for logs mentioning our `ReportDataSource` being collected and stored.
+One way to do this is to check the [metering operator logs][reporting-operator-logs], and look for logs mentioning our `ReportDataSource` being collected and stored.
 
 The other way however is to exec into the Presto pod and open up a Presto-cli session which allows us to interactively query Presto.
 Open up a Presto-cli session by following the [Query Presto using presto-cli developer documentation][presto-cli-exec].
@@ -104,7 +104,7 @@ show tables;
 ```
 
 This should give you a list of Database Tables created in Presto, you should see quite a few entries, and among them `datasource_unready_deployment_replicas` should be in the list, if it is not, it's possible the table has not be created yet, or there was an error.
-In this case, you should [check the metering operator logs][metering-operator-logs] for errors.
+In this case, you should [check the metering operator logs][reporting-operator-logs] for errors.
 
 If the table does exist, it may take up to 5 minutes (the default collection interval) before any data exists in the table.
 To check if our data has started getting collected, we can check by issuing a `SELECT` query on our table to see if any rows exist:
@@ -361,7 +361,7 @@ Here's a summary of what we did in this guide:
 [reports]: report.md
 [install-metering]: install-metering.md
 [presto-cli-exec]:  dev/debugging.md#query-presto-using-presto-cli
-[metering-operator-logs]:  dev/debugging.md#get-metering-operator-logs
+[reporting-operator-logs]:  dev/debugging.md#get-reporting-operator-logs
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [using-metering]: using-metering.md
 [datasource-table-schema]: reportdatasources.md#table-schemas

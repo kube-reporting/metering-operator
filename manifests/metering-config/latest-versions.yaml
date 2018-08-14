@@ -3,7 +3,7 @@ kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  metering-operator:
+  reporting-operator:
     spec:
       image:
         tag: latest

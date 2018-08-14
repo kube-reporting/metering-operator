@@ -1,8 +1,8 @@
 ---
 dependencies:
-- name: metering-operator
+- name: reporting-operator
   version: 0.1.0
-  repository: "***REMOVED***le://../metering-operator"
+  repository: "***REMOVED***le://../reporting-operator"
 - name: presto
   version: 0.1.0
   repository: "***REMOVED***le://../presto"

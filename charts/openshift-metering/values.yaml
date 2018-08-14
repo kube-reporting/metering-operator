@@ -1,4 +1,4 @@
-metering-operator:
+reporting-operator:
   spec:
     con***REMOVED***g:
       prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
