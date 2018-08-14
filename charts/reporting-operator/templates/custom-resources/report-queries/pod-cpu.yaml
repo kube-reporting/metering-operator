@@ -1,4 +1,4 @@
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-request-raw"
@@ -48,7 +48,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-usage-raw"
@@ -98,7 +98,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-request"
@@ -154,7 +154,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-usage"
@@ -210,7 +210,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-cpu-request"
@@ -258,7 +258,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-cpu-usage"
@@ -306,7 +306,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-request-vs-node-cpu-allocatable"

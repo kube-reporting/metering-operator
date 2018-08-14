@@ -41,7 +41,7 @@ Below is an example of one of the built-in `ReportDataSource` resources that is 
 This example doesn't specify a `spec.storage` section, which will result in it using the [default StorageLocation resource][default-storage-location].
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
   name: "pod-request-memory-bytes"
@@ -55,7 +55,7 @@ spec:
 This example is a slightly modified version of the one above that does set the `storage` to the `StorageLocation` with a `metadata.name` of "local".
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
   name: "pod-request-memory-bytes-custom-storage-location"

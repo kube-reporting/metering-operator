@@ -6,7 +6,7 @@ cr:
 
 crd:
   create: true
-  apiGroup: chargeback.coreos.com
+  apiGroup: metering.openshift.io
   apiVersion: v1alpha1
 
   plural: meterings
@@ -28,7 +28,7 @@ serviceAccountName: metering-helm-operator
 rbac:
   roleName: metering-helm-operator
   rules:
-  - apiGroups: ["chargeback.coreos.com"]
+  - apiGroups: ["metering.openshift.io"]
     resources: ["*"]
     verbs: ["*"]
   - apiGroups:

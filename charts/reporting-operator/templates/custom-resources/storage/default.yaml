@@ -1,5 +1,5 @@
 {{- if .Values.spec.config.defaultStorage.create -}}
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
   name: {{ .Values.spec.config.defaultStorage.name }}
@@ -7,7 +7,7 @@ metadata:
     operator-metering: "true"
 {{- if .Values.spec.config.defaultStorage.isDefault }}
   annotations:
-    storagelocation.chargeback.coreos.com/is-default: "true"
+    storagelocation.metering.openshift.io/is-default: "true"
 {{- end }}
 {{- block "extraMetadata" . }}
 {{- end }}

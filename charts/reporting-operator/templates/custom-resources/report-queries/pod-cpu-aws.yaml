@@ -1,5 +1,5 @@
 {{- if index .Values.spec.config.defaultReportDataSources "aws-billing" -}}
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-request-aws"
@@ -82,7 +82,7 @@ spec:
     CROSS JOIN aws_billing_sum
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-cpu-usage-aws"

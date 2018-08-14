@@ -1,5 +1,5 @@
 {{- if index .Values.spec.config.defaultReportDataSources "aws-billing" -}}
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-aws"
@@ -83,7 +83,7 @@ spec:
 
 ---
 
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-usage-aws"

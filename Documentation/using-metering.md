@@ -26,7 +26,7 @@ The report should be created in the same namespace as Metering is installed.
 First, create an example report. Save the following into a file called `report.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
   name: namespace-cpu-request

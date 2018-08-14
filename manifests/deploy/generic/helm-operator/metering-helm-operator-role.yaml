@@ -4,7 +4,7 @@ metadata:
   name: metering-helm-operator
 rules:
   - apiGroups:
-    - chargeback.coreos.com
+    - metering.openshift.io
     resources:
     - '*'
     verbs:

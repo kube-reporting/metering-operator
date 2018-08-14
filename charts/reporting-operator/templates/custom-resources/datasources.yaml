@@ -1,6 +1,6 @@
 {{- range $name, $body := .Values.spec.config.defaultReportDataSources }}
 ---
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
   name: "{{ $name }}"
