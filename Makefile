@@ -26,13 +26,13 @@ REPORTING_OP_BIN_OUT = images/chargeback/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
-CHARGEBACK_HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
-CHARGEBACK_IMAGE := $(DOCKER_BASE_URL)/chargeback
+METERING_HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
+REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/chargeback-hive
 PRESTO_IMAGE := $(DOCKER_BASE_URL)/chargeback-presto
-CHARGEBACK_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
+METERING_INTEGRATION_TEST_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
@@ -121,14 +121,14 @@ ifdef DEPLOY_TAG
 endif
 
 DOCKER_TARGETS := \
-	chargeback \
-	chargeback-integration-tests \
+	reporting-operator \
+	metering-integration-tests \
 	hadoop \
 	hive \
 	presto \
 	helm-operator \
-	chargeback-helm-operator
-# These generate new make targets like chargeback-helm-operator-docker-build
+	metering-helm-operator
+# These generate new make targets like metering-helm-operator-docker-build
 # which can be invoked.
 DOCKER_BUILD_TARGETS := $(addsuffix -docker-build, $(DOCKER_TARGETS))
 DOCKER_PUSH_TARGETS := $(addsuffix -docker-push, $(DOCKER_TARGETS))
@@ -137,17 +137,17 @@ DOCKER_PULL_TARGETS := $(addsuffix -docker-pull, $(DOCKER_TARGETS))
 
 # The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
-# The example will be using the chargeback-helm-operator targets as it's example.
+# The example will be using the metering-helm-operator targets as it's example.
 #
 # The pattern/string manipulation below does the following (starting from the inner most expression):
 # 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suffixed value from $(TARGETS)
-# ex: chargeback-helm-operator-docker-build -> chargeback-helm-operator
+# ex: metering-helm-operator-docker-build -> metering-helm-operator
 # 2) Replaces - with _
-# ex: chargeback-helm-operator -> chargeback_helm_operator
+# ex: metering-helm-operator -> metering_helm_operator
 # 3) Uppercases letters
-# ex: chargeback_helm_operator -> CHARGEBACK_HELM_OPERATOR
+# ex: metering_helm_operator -> METERING_HELM_OPERATOR
 # 4) Appends _IMAGE
-# ex: CHARGEBACK_HELM_OPERATOR -> CHARGEBACK_HELM_OPERATOR_IMAGE
+# ex: METERING_HELM_OPERATOR -> METERING_HELM_OPERATOR_IMAGE
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
@@ -167,20 +167,20 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-chargeback-docker-build: images/chargeback/Dockerfile $(REPORTING_OP_BIN_OUT)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
+reporting-operator-docker-build: images/chargeback/Dockerfile $(REPORTING_OP_BIN_OUT)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
-chargeback-integration-tests-docker-build: images/integration-tests/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+metering-integration-tests-docker-build: images/integration-tests/Dockerfile
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TEST_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: \
+metering-helm-operator-docker-build: \
 		images/metering-helm-operator/Dockerfile \
 		helm-operator-docker-build \
 		images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
 		images/metering-helm-operator/openshift-metering-0.1.0.tgz \
 		images/metering-helm-operator/operator-metering-0.1.0.tgz \
 		images/metering-helm-operator/metering-override-values.yaml
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_HELM_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -218,7 +218,7 @@ reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
 .PHONY: run-reporting-operator-local
 run-reporting-operator-local:
 	$(MAKE) reporting-operator-local
-	./hack/run-local-with-port-forward.sh $(CHARGEBACK_ARGS)
+	./hack/run-local-with-port-forward.sh $(REPORTING_OPERATOR_ARGS)
 
 $(REPORTING_OP_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@
@@ -266,8 +266,8 @@ metering-manifests:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-integration-tests-docker-build \
-	build-chargeback reporting-operator-bin reporting-operator-local \
+	metering-integration-tests-docker-build \
+	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-helm-operator/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
