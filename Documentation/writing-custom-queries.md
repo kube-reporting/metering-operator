@@ -121,8 +121,8 @@ presto:default> SELECT * FROM datasource_unready_deployment_replicas LIMIT 10;
 --------+-------------------------+---------------+-------------------------------------------------------------------------
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=alm-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=catalog-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=chargeback-testing, deployment=chargeback}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=chargeback-testing, deployment=chargeback-helm-operator}
+    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=reporting-operator}
+    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=metering-helm-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=container-linux-update-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=default-http-backend}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=default, deployment=etcd-operator}
@@ -325,9 +325,9 @@ This should output a CSV report that looks similar to this:
 
 ```
 period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_replica_unready_seconds
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,chargeback,3420,13.464566929133857
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,chargeback-helm-operator,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,presto,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,reporting-operator,3420,13.464566929133857
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,metering-helm-operator,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,presto,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,etcd-operator,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,example,15240,60
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,test-deploy,15240,60
