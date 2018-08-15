@@ -103,7 +103,7 @@ spec:
 Next, run the install script for your platform (see above).
 
 After running the install script, ***REMOVED***gure out where your Prometheus pod is running.
-By default the `run-chargeback-local` Make***REMOVED***le target assumes that the pod is in the `tectonic-system` namespace and can be queried using the label selector `app=prometheus`.
+By default the `run-reporting-operator-local` Make***REMOVED***le target assumes that the pod is in the `tectonic-system` namespace and can be queried using the label selector `app=prometheus`.
 
 If you're Prometheus is located somewhere, ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus.
 
@@ -116,7 +116,7 @@ export METERING_PROMTHEUS_LABEL_SELECTOR=app=prometheus
 Finally, use the following command to build & run the operator:
 
 ```
-make run-chargeback-local
+make run-reporting-operator-local
 ```
 
 The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with con***REMOVED***guration set to use these local port-forwards.
