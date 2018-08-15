@@ -22,7 +22,7 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-REPORTING_OP_BIN_OUT = images/chargeback/bin/reporting-operator
+REPORTING_OP_BIN_OUT = images/reporting-operator/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
@@ -167,7 +167,7 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-reporting-operator-docker-build: images/chargeback/Docker***REMOVED***le $(REPORTING_OP_BIN_OUT)
+reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le $(REPORTING_OP_BIN_OUT)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
 metering-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
