@@ -12,5 +12,5 @@ spec:
     termination: Reencrypt
   to:
     kind: Service
-    name: metering
+    name: reporting-operator
 {{- end }}
