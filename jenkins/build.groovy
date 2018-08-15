@@ -11,7 +11,7 @@ if (isMasterBranch) {
 
 def podLabel = "operator-metering-build-${isMasterBranch ? 'master' : 'pr'}"
 def maxInstances = isMasterBranch ? 1 : 5
-def idleMin = isMasterBranch ? 15 : 45
+def idleMin = isMasterBranch ? 15 : 60
 
 pipeline {
     agent {
