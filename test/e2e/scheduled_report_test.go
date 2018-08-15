@@ -89,7 +89,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 			})
 			require.NoError(t, err, "expected getting report result to not timeout")
 
-			req := testFramework.NewMeteringSVCRequest("/api/v1/scheduledreports/get", query)
+			req := testFramework.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", query)
 			result := req.Do()
 			resp, err := result.Raw()
 			require.NoError(t, err, "fetching report results should be successful")
