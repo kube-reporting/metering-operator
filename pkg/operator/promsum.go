@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 )
 
 const (
