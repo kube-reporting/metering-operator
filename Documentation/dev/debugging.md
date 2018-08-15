@@ -31,7 +31,7 @@ After the above command you should be given a prompt, where you can run queries.
 presto:default> show tables;
                   Table
 ------------------------------------------
- chargeback_health_check
+ operator_health_check
  datasource_aws_billing
  datasource_node_allocatable_cpu_cores
  datasource_node_allocatable_memory_bytes
@@ -76,7 +76,7 @@ After the above command you should be given a prompt, where you can run queries.
 +-------------------------------------------+
 |                 tab_name                  |
 +-------------------------------------------+
-| chargeback_health_check                   |
+| operator_health_check                     |
 | datasource_aws_billing                    |
 | datasource_node_allocatable_cpu_cores     |
 | datasource_node_allocatable_memory_bytes  |

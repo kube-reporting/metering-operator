@@ -3,7 +3,7 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-: "${CHARGEBACK_BIN:=$ROOT_DIR/chargeback-local}"
+: "${REPORTING_OP_BIN:=$ROOT_DIR/reporting-operator-local}"
 : "${METERING_NAMESPACE:?}"
 
 : "${METERING_PROMETHEUS_NAMESPACE:=tectonic-system}"
@@ -27,9 +27,9 @@ kubectl -n "$METERING_PROMETHEUS_NAMESPACE" port-forward "$PROM" 9993:9090 &
 
 sleep 6
 
-echo Starting chargeback
+echo Starting reporting-operator
 set -x
-"$CHARGEBACK_BIN" \
+"$REPORTING_OP_BIN" \
     start \
     --namespace "$METERING_NAMESPACE" \
     --presto-host "127.0.0.1:9991" \

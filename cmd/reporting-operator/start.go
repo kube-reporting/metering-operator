@@ -33,7 +33,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "chargeback",
+	Use:   "metering",
 	Short: "",
 	RunE: func(cmd *cobra.Command, _ []string) error {
 		return cmd.Help()
