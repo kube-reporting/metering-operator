@@ -32,7 +32,7 @@ HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/chargeback-hive
 PRESTO_IMAGE := $(DOCKER_BASE_URL)/chargeback-presto
-METERING_INTEGRATION_TEST_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
+METERING_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
@@ -171,7 +171,7 @@ reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
 metering-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TEST_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-helm-operator-docker-build: \
 		images/metering-helm-operator/Docker***REMOVED***le \
