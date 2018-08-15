@@ -16,7 +16,7 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
 var (

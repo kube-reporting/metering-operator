@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback"
-	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 )
 
 func (f *Framework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {

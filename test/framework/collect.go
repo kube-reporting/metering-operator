@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
 func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
