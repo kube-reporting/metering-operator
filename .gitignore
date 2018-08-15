@@ -28,9 +28,6 @@ _tmp
 /client-gen
 /lister-gen
 /informer-gen
-tectonic-chargeback-0.1.0.tgz
-/chargeback-custom.yaml
 /metering-custom.yaml
-/chargeback-local
 /vendor/mockgen
 /reporting-operator-local
