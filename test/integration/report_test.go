@@ -254,18 +254,18 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 
 			report := testFramework.NewSimpleReport(name, test.queryName, reportStart, reportEnd)
 
-			err := testFramework.ChargebackClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure report doesn't exist before creating report")
 
 			t.Logf("creating report %s", report.Name)
-			err = testFramework.CreateChargebackReport(report)
+			err = testFramework.CreateMeteringReport(report)
 			require.NoError(t, err, "creating report should succeed")
 
 			defer func() {
 				t.Logf("deleting report %s", report.Name)
-				err := testFramework.ChargebackClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+				err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 				assert.NoError(t, err, "expected delete report to succeed")
 			}()
 
@@ -277,7 +277,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 			var reportResults []map[string]interface{}
 			var reportData []byte
 			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
-				req := testFramework.NewChargebackSVCRequest("/api/v1/reports/get", query)
+				req := testFramework.NewMeteringSVCRequest("/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
 				if err != nil {

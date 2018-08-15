@@ -9,14 +9,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
 
 var (
 	defaultGracePeriod = metav1.Duration{Duration: time.Minute * 5}
 )
 
-func (c *Chargeback) runReportWorker() {
+func (c *Metering) runReportWorker() {
 	logger := c.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
 	for c.processReport(logger) {
@@ -24,7 +24,7 @@ func (c *Chargeback) runReportWorker() {
 	}
 }
 
-func (c *Chargeback) processReport(logger log.FieldLogger) bool {
+func (c *Metering) processReport(logger log.FieldLogger) bool {
 	obj, quit := c.queues.reportQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting Report worker")
@@ -40,7 +40,7 @@ func (c *Chargeback) processReport(logger log.FieldLogger) bool {
 	return true
 }
 
-func (c *Chargeback) syncReport(logger log.FieldLogger, key string) error {
+func (c *Metering) syncReport(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -48,7 +48,7 @@ func (c *Chargeback) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger = logger.WithField("report", name)
-	report, err := c.informers.Chargeback().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
+	report, err := c.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("Report %s does not exist anymore", key)
@@ -67,14 +67,14 @@ func (c *Chargeback) syncReport(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
+func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
 		// If it's started, query the API to get the most up to date resource,
 		// as it's possible it's finished, but we haven't gotten it yet.
-		newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
+		newReport, err := c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 			return nil
 		}
 
-		err = c.informers.Chargeback().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
+		err = c.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
 			// if we cannot update it, don't re queue it
@@ -139,7 +139,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
@@ -156,7 +156,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	logger.Debug("updating report status to started")
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	newReport, err := c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
+	newReport, err := c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
 		return err
@@ -185,7 +185,7 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseFinished
-	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
+	_, err = c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Warnf("failed to update report status to finished for %q", report.Name)
 	} else {
@@ -194,11 +194,11 @@ func (c *Chargeback) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	return nil
 }
 
-func (c *Chargeback) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
+func (c *Metering) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
 	logger.WithField("report", report.Name).WithError(err).Errorf(errMsg)
 	report.Status.Phase = cbTypes.ReportPhaseError
 	report.Status.Output = err.Error()
-	_, err = c.chargebackClient.ChargebackV1alpha1().Reports(report.Namespace).Update(report)
+	_, err = c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}

@@ -5,21 +5,21 @@ import (
 
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
 
-func (f *Framework) CreateChargebackReport(report *chargebackv1alpha1.Report) error {
-	_, err := f.ChargebackClient.Reports(f.Namespace).Create(report)
+func (f *Framework) CreateMeteringReport(report *chargebackv1alpha1.Report) error {
+	_, err := f.MeteringClient.Reports(f.Namespace).Create(report)
 	return err
 }
 
-func (f *Framework) CreateChargebackScheduledReport(report *chargebackv1alpha1.ScheduledReport) error {
-	_, err := f.ChargebackClient.ScheduledReports(f.Namespace).Create(report)
+func (f *Framework) CreateMeteringScheduledReport(report *chargebackv1alpha1.ScheduledReport) error {
+	_, err := f.MeteringClient.ScheduledReports(f.Namespace).Create(report)
 	return err
 }
 
-func (f *Framework) GetChargebackScheduledReport(name string) (*chargebackv1alpha1.ScheduledReport, error) {
-	return f.ChargebackClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
+func (f *Framework) GetMeteringScheduledReport(name string) (*chargebackv1alpha1.ScheduledReport, error) {
+	return f.MeteringClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
 }
 
 func (f *Framework) NewSimpleReport(name, queryName string, start, end time.Time) *chargebackv1alpha1.Report {

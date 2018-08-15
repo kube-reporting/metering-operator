@@ -11,8 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,18 +44,18 @@ func TestScheduledReportsProduceData(t *testing.T) {
 
 			report := testFramework.NewSimpleScheduledReport(name, test.queryName, periodStart)
 
-			err := testFramework.ChargebackClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
+			err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure scheduled report doesn't exist before creating scheduled report")
 
 			t.Logf("creating scheduled report %s", report.Name)
-			err = testFramework.CreateChargebackScheduledReport(report)
+			err = testFramework.CreateMeteringScheduledReport(report)
 			require.NoError(t, err, "creating scheduled report should succeed")
 
 			defer func() {
 				t.Logf("deleting scheduled report %s", report.Name)
-				err := testFramework.ChargebackClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
+				err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 				assert.NoError(t, err, "expected delete scheduled report to succeed")
 			}()
 
@@ -67,7 +67,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 			var reportResults []map[string]interface{}
 			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
 				// poll the status
-				newReport, err := testFramework.GetChargebackScheduledReport(name)
+				newReport, err := testFramework.GetMeteringScheduledReport(name)
 				if err != nil {
 					return false, err
 				}
@@ -89,7 +89,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 			})
 			require.NoError(t, err, "expected getting report result to not timeout")
 
-			req := testFramework.NewChargebackSVCRequest("/api/v1/scheduledreports/get", query)
+			req := testFramework.NewMeteringSVCRequest("/api/v1/scheduledreports/get", query)
 			result := req.Do()
 			resp, err := result.Raw()
 			require.NoError(t, err, "fetching report results should be successful")

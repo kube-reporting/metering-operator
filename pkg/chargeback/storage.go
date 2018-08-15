@@ -3,14 +3,14 @@ package chargeback
 import (
 	"fmt"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	cbListers "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	cbListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
+func (c *Metering) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
 	storageLocations, err := lister.StorageLocations(c.cfg.Namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
@@ -37,8 +37,8 @@ func (c *Chargeback) getDefaultStorageLocation(lister cbListers.StorageLocationL
 
 }
 
-func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (cbTypes.StorageLocationSpec, error) {
-	storageLister := c.informers.Chargeback().V1alpha1().StorageLocations().Lister()
+func (c *Metering) getStorageSpec(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (cbTypes.StorageLocationSpec, error) {
+	storageLister := c.informers.Metering().V1alpha1().StorageLocations().Lister()
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing specified, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
@@ -65,7 +65,7 @@ func (c *Chargeback) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 	return storageSpec, nil
 }
 
-func (c *Chargeback) getHiveTableProperties(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (*hive.TableProperties, error) {
+func (c *Metering) getHiveTableProperties(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (*hive.TableProperties, error) {
 	storageSpec, err := c.getStorageSpec(logger, storage, kind)
 	if err != nil {
 		return nil, err

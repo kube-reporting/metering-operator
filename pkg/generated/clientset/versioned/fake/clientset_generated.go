@@ -4,8 +4,8 @@ package fake
 
 import (
 	clientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
-	fakechargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1/fake"
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	fakemeteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -46,12 +46,12 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 
 var _ clientset.Interface = &Clientset{}
 
-// ChargebackV1alpha1 retrieves the ChargebackV1alpha1Client
-func (c *Clientset) ChargebackV1alpha1() chargebackv1alpha1.ChargebackV1alpha1Interface {
-	return &fakechargebackv1alpha1.FakeChargebackV1alpha1{Fake: &c.Fake}
+// MeteringV1alpha1 retrieves the MeteringV1alpha1Client
+func (c *Clientset) MeteringV1alpha1() meteringv1alpha1.MeteringV1alpha1Interface {
+	return &fakemeteringv1alpha1.FakeMeteringV1alpha1{Fake: &c.Fake}
 }
 
-// Chargeback retrieves the ChargebackV1alpha1Client
-func (c *Clientset) Chargeback() chargebackv1alpha1.ChargebackV1alpha1Interface {
-	return &fakechargebackv1alpha1.FakeChargebackV1alpha1{Fake: &c.Fake}
+// Metering retrieves the MeteringV1alpha1Client
+func (c *Clientset) Metering() meteringv1alpha1.MeteringV1alpha1Interface {
+	return &fakemeteringv1alpha1.FakeMeteringV1alpha1{Fake: &c.Fake}
 }

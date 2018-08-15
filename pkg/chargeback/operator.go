@@ -35,7 +35,7 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
@@ -79,7 +79,7 @@ type Config struct {
 	TLSKey  string
 }
 
-type Chargeback struct {
+type Metering struct {
 	cfg              Config
 	kubeConfig       *rest.Config
 	informers        cbInformers.SharedInformerFactory
@@ -113,8 +113,8 @@ type Chargeback struct {
 	healthCheckSingleFlight singleflight.Group
 }
 
-func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Chargeback, error) {
-	op := &Chargeback{
+func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Metering, error) {
+	op := &Metering{
 		cfg: cfg,
 		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
 		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
@@ -185,9 +185,9 @@ type queues struct {
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 }
 
-func (c *Chargeback) setupInformers() {
+func (c *Metering) setupInformers() {
 	c.informers = cbInformers.NewFilteredSharedInformerFactory(c.chargebackClient, defaultResyncPeriod, c.cfg.Namespace, nil)
-	inf := c.informers.Chargeback().V1alpha1()
+	inf := c.informers.Metering().V1alpha1()
 	// hacks to ensure these informers are created before we call
 	// c.informers.Start()
 	inf.PrestoTables().Informer()
@@ -198,9 +198,9 @@ func (c *Chargeback) setupInformers() {
 	inf.Reports().Informer()
 	inf.ScheduledReports().Informer()
 }
-func (c *Chargeback) setupQueues() {
+func (c *Metering) setupQueues() {
 	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
-	c.informers.Chargeback().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -216,7 +216,7 @@ func (c *Chargeback) setupQueues() {
 	})
 
 	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
-	c.informers.Chargeback().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -233,7 +233,7 @@ func (c *Chargeback) setupQueues() {
 	})
 
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
-	c.informers.Chargeback().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.informers.Metering().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -250,7 +250,7 @@ func (c *Chargeback) setupQueues() {
 	})
 
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
-	c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.informers.Metering().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -285,7 +285,7 @@ func (qs queues) ShutdownQueues() {
 	}
 }
 
-func (c *Chargeback) Run(stopCh <-chan struct{}) error {
+func (c *Metering) Run(stopCh <-chan struct{}) error {
 	var wg sync.WaitGroup
 	c.logger.Info("starting Metering operator")
 
@@ -353,10 +353,10 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 
 	c.logger.Infof("starting HTTP server")
 	listers := meteringListers{
-		reports:                 c.informers.Chargeback().V1alpha1().Reports().Lister().Reports(c.cfg.Namespace),
-		scheduledReports:        c.informers.Chargeback().V1alpha1().ScheduledReports().Lister().ScheduledReports(c.cfg.Namespace),
-		reportGenerationQueries: c.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace),
-		prestoTables:            c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace),
+		reports:                 c.informers.Metering().V1alpha1().Reports().Lister().Reports(c.cfg.Namespace),
+		scheduledReports:        c.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(c.cfg.Namespace),
+		reportGenerationQueries: c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace),
+		prestoTables:            c.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace),
 	}
 
 	apiRouter := newRouter(c.logger, c.prestoQueryer, c.rand, c.triggerPrometheusImporterForTimeRange, listers)
@@ -519,7 +519,7 @@ func (c *Chargeback) Run(stopCh <-chan struct{}) error {
 	return nil
 }
 
-func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
+func (c *Metering) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 	wg.Add(1)
 	go func() {
 		c.logger.Infof("starting PrestoTable worker")
@@ -582,13 +582,13 @@ func (c *Chargeback) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 	}()
 }
 
-func (c *Chargeback) setInitialized() {
+func (c *Metering) setInitialized() {
 	c.initializedMu.Lock()
 	c.initialized = true
 	c.initializedMu.Unlock()
 }
 
-func (c *Chargeback) isInitialized() bool {
+func (c *Metering) isInitialized() bool {
 	c.initializedMu.Lock()
 	initialized := c.initialized
 	c.initializedMu.Unlock()
@@ -603,7 +603,7 @@ func (c *Chargeback) isInitialized() bool {
 // workqueue means the items in the informer cache may actually be
 // more up to date that when the item was initially put onto the
 // workqueue.
-func (c *Chargeback) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
+func (c *Metering) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
 	if key, ok := obj.(string); ok {
 		return key, ok
 	}
@@ -613,7 +613,7 @@ func (c *Chargeback) getKeyFromQueueObj(logger log.FieldLogger, objType string, 
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (c *Metering) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
 	if err == nil {
 		queue.Forget(obj)
 		return
@@ -632,7 +632,7 @@ func (c *Chargeback) handleErr(logger log.FieldLogger, err error, objType string
 	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
 }
 
-func (c *Chargeback) getDefaultReportGracePeriod() time.Duration {
+func (c *Metering) getDefaultReportGracePeriod() time.Duration {
 	if c.cfg.PrometheusQueryConfig.QueryInterval.Duration > c.cfg.PrometheusQueryConfig.ChunkSize.Duration {
 		return c.cfg.PrometheusQueryConfig.QueryInterval.Duration
 	} else {
@@ -640,7 +640,7 @@ func (c *Chargeback) getDefaultReportGracePeriod() time.Duration {
 	}
 }
 
-func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
+func (c *Metering) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
 	// Presto may take longer to start than chargeback, so keep attempting to
 	// connect in a loop in case we were just started and presto is still coming
 	// up.
@@ -664,7 +664,7 @@ func (c *Chargeback) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
 	}
 }
 
-func (c *Chargeback) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
+func (c *Metering) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
 	client, err := promapi.NewClient(promConfig)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)

@@ -26,7 +26,7 @@ const (
 	defaultMaxTimeDuration = 24 * time.Hour
 )
 
-func (c *Chargeback) runPrometheusImporterWorker(stopCh <-chan struct{}) {
+func (c *Metering) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	// run a go routine that waits for the stopCh to be closed and propagates
@@ -47,7 +47,7 @@ type prometheusImporterTimeRangeTrigger struct {
 	errCh      chan error
 }
 
-func (c *Chargeback) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
+func (c *Metering) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
 	errCh := make(chan error)
 	select {
 	case c.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, errCh}:
@@ -57,7 +57,7 @@ func (c *Chargeback) triggerPrometheusImporterForTimeRange(ctx context.Context, 
 	}
 }
 
-func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
+func (c *Metering) startPrometheusImporter(ctx context.Context) {
 	logger := c.logger.WithField("component", "PrometheusImporter")
 	logger.Infof("PrometheusImporter worker started")
 	workers := make(map[string]*prometheusImporterWorker)
@@ -125,7 +125,7 @@ func (c *Chargeback) startPrometheusImporter(ctx context.Context) {
 				"tableName":        tableName,
 			})
 
-			reportPromQuery, err := c.informers.Chargeback().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
+			reportPromQuery, err := c.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
 			if err != nil {
 				c.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
 				continue

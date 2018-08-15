@@ -7,7 +7,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
@@ -21,7 +21,7 @@ var (
 	}
 )
 
-func (c *Chargeback) runReportDataSourceWorker() {
+func (c *Metering) runReportDataSourceWorker() {
 	logger := c.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
 	for c.processReportDataSource(logger) {
@@ -29,7 +29,7 @@ func (c *Chargeback) runReportDataSourceWorker() {
 	}
 }
 
-func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
+func (c *Metering) processReportDataSource(logger log.FieldLogger) bool {
 	obj, quit := c.queues.reportDataSourceQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting ReportDataSource worker")
@@ -45,7 +45,7 @@ func (c *Chargeback) processReportDataSource(logger log.FieldLogger) bool {
 	return true
 }
 
-func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) error {
+func (c *Metering) syncReportDataSource(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -53,7 +53,7 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	}
 
 	logger = logger.WithField("datasource", name)
-	reportDataSource, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
+	reportDataSource, err := c.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
@@ -74,7 +74,7 @@ func (c *Chargeback) syncReportDataSource(logger log.FieldLogger, key string) er
 	return nil
 }
 
-func (c *Chargeback) handleReportDataSourceDeleted(obj interface{}) {
+func (c *Metering) handleReportDataSourceDeleted(obj interface{}) {
 	dataSource, ok := obj.(*cbTypes.ReportDataSource)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -96,7 +96,7 @@ func (c *Chargeback) handleReportDataSourceDeleted(obj interface{}) {
 	c.queues.reportDataSourceQueue.Add(key)
 }
 
-func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (c *Metering) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	dataSource = dataSource.DeepCopy()
 	if dataSource.TableName == "" {
 		logger.Infof("new dataSource discovered")
@@ -114,7 +114,7 @@ func (c *Chargeback) handleReportDataSource(logger log.FieldLogger, dataSource *
 	}
 }
 
-func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (c *Metering) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	if dataSource.TableName == "" {
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := dataSourceTableName(dataSource.Name)
@@ -135,7 +135,7 @@ func (c *Chargeback) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	return nil
 }
 
-func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (c *Metering) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
 		return fmt.Errorf("datasource %q: improperly configured datasource, source is empty", dataSource.Name)
@@ -172,9 +172,9 @@ func (c *Chargeback) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	return nil
 }
 
-func (c *Chargeback) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) error {
+func (c *Metering) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) error {
 	dataSource.TableName = tableName
-	_, err := c.chargebackClient.ChargebackV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+	_, err := c.chargebackClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)
 		return err
@@ -182,7 +182,7 @@ func (c *Chargeback) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 	return nil
 }
 
-func (c *Chargeback) deleteReportDataSourceTable(name string) {
+func (c *Metering) deleteReportDataSourceTable(name string) {
 	tableName := dataSourceTableName(name)
 	err := hive.ExecuteDropTable(c.hiveQueryer, tableName, true)
 	if err != nil {
