@@ -25,7 +25,7 @@ var (
 	defaultPromHost      = "http://prometheus.tectonic-system.svc.cluster.local:9090"
 	defaultLeaseDuration = time.Second * 60
 	// cfg is the config for our operator
-	cfg chargeback.Config
+	cfg operator.Config
 
 	logLevelStr         string
 	logFullTimestamp    bool
@@ -71,9 +71,9 @@ func init() {
 	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data definition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.QueryInterval.Duration, "promsum-interval", chargeback.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", chargeback.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.ChunkSize.Duration, "promsum-chunk-size", chargeback.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.QueryInterval.Duration, "promsum-interval", operator.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", operator.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.ChunkSize.Duration, "promsum-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 
 	startCmd.Flags().BoolVar(&cfg.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traffix")
@@ -122,9 +122,9 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	runChargeback(logger, cfg, signalStopCh)
 }
 
-func runChargeback(logger log.FieldLogger, cfg chargeback.Config, stopCh <-chan struct{}) {
+func runChargeback(logger log.FieldLogger, cfg operator.Config, stopCh <-chan struct{}) {
 	clock := clock.RealClock{}
-	op, err := chargeback.New(logger, cfg, clock)
+	op, err := operator.New(logger, cfg, clock)
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup Chargeback operator")
 	}

@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"context"
@@ -246,7 +246,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
 		return
 	}
 
@@ -326,7 +326,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see chargeback logs for more details): %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
 		return
 	}
 

@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ var (
 const awsUsagePartitionDateStringLayout = "20060102"
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func (c *Metering) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) error {
+func (op *Reporting) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, prefix string, manifests []*aws.Manifest) error {
 	location, err := hive.S3Location(bucket, prefix)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func (c *Metering) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cb
 		SerdeRowProperties: awsUsageHiveSerdeProps,
 		External:           true,
 	}
-	return c.createTableWith(logger, dataSource, "ReportDataSource", dataSource.Name, params, properties)
+	return op.createTableWith(logger, dataSource, "ReportDataSource", dataSource.Name, params, properties)
 }
 
 // addAWSHivePartition will add a new partition to the given tableName for the time
@@ -97,8 +97,8 @@ func dropAWSHivePartition(queryer db.Queryer, tableName, start, end string) erro
 
 // sanetizeAWSColumnForHive removes and replaces invalid characters in AWS
 // billing columns with characters allowed in hive SQL
-func sanetizeAWSColumnForHive(c aws.Column) string {
-	name := fmt.Sprintf("%s_%s", strings.TrimSpace(c.Category), strings.TrimSpace(c.Name))
+func sanetizeAWSColumnForHive(col aws.Column) string {
+	name := fmt.Sprintf("%s_%s", strings.TrimSpace(col.Category), strings.TrimSpace(col.Name))
 	// hive does not allow ':' or '.' in identifiers
 	name = strings.Replace(name, ":", "_", -1)
 	name = strings.Replace(name, ".", "_", -1)

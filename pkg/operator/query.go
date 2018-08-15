@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -10,31 +10,31 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func (c *Metering) runReportGenerationQueryWorker() {
-	logger := c.logger.WithField("component", "reportGenerationQueryWorker")
+func (op *Reporting) runReportGenerationQueryWorker() {
+	logger := op.logger.WithField("component", "reportGenerationQueryWorker")
 	logger.Infof("ReportGenerationQuery worker started")
-	for c.processReportGenerationQuery(logger) {
+	for op.processReportGenerationQuery(logger) {
 
 	}
 }
 
-func (c *Metering) processReportGenerationQuery(logger log.FieldLogger) bool {
-	obj, quit := c.queues.reportGenerationQueryQueue.Get()
+func (op *Reporting) processReportGenerationQuery(logger log.FieldLogger) bool {
+	obj, quit := op.queues.reportGenerationQueryQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting ReportGenerationQuery worker")
 		return false
 	}
-	defer c.queues.reportGenerationQueryQueue.Done(obj)
+	defer op.queues.reportGenerationQueryQueue.Done(obj)
 
-	logger = logger.WithFields(newLogIdentifier(c.rand))
-	if key, ok := c.getKeyFromQueueObj(logger, "ReportGenerationQuery", obj, c.queues.reportGenerationQueryQueue); ok {
-		err := c.syncReportGenerationQuery(logger, key)
-		c.handleErr(logger, err, "ReportGenerationQuery", key, c.queues.reportGenerationQueryQueue)
+	logger = logger.WithFields(newLogIdentifier(op.rand))
+	if key, ok := op.getKeyFromQueueObj(logger, "ReportGenerationQuery", obj, op.queues.reportGenerationQueryQueue); ok {
+		err := op.syncReportGenerationQuery(logger, key)
+		op.handleErr(logger, err, "ReportGenerationQuery", key, op.queues.reportGenerationQueryQueue)
 	}
 	return true
 }
 
-func (c *Metering) syncReportGenerationQuery(logger log.FieldLogger, key string) error {
+func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -43,7 +43,7 @@ func (c *Metering) syncReportGenerationQuery(logger log.FieldLogger, key string)
 
 	logger = logger.WithField("generationQuery", name)
 
-	reportGenerationQuery, err := c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(namespace).Get(name)
+	reportGenerationQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportGenerationQuery %s does not exist anymore", key)
@@ -53,7 +53,7 @@ func (c *Metering) syncReportGenerationQuery(logger log.FieldLogger, key string)
 	}
 
 	logger.Infof("syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
-	err = c.handleReportGenerationQuery(logger, reportGenerationQuery)
+	err = op.handleReportGenerationQuery(logger, reportGenerationQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("error syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
 		return err
@@ -62,7 +62,7 @@ func (c *Metering) syncReportGenerationQuery(logger log.FieldLogger, key string)
 	return nil
 }
 
-func (c *Metering) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
+func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
 	generationQuery = generationQuery.DeepCopy()
 
 	var viewName string
@@ -78,14 +78,14 @@ func (c *Metering) handleReportGenerationQuery(logger log.FieldLogger, generatio
 		viewName = generationQuery.ViewName
 	}
 
-	if valid, err := c.validateGenerationQuery(logger, generationQuery, true); err != nil {
+	if valid, err := op.validateGenerationQuery(logger, generationQuery, true); err != nil {
 		return err
 	} else if !valid {
 		logger.Warnf("cannot create view for reportGenerationQuery, it has uninitialized dependencies")
 		return nil
 	}
 
-	dependentQueries, err := c.getDependentGenerationQueries(generationQuery, true)
+	dependentQueries, err := op.getDependentGenerationQueries(generationQuery, true)
 	if err != nil {
 		return err
 	}
@@ -101,17 +101,17 @@ func (c *Metering) handleReportGenerationQuery(logger log.FieldLogger, generatio
 	}
 
 	query := fmt.Sprintf("CREATE OR REPLACE VIEW %s AS %s", viewName, renderedQuery)
-	_, err = c.prestoConn.Query(query)
+	_, err = op.prestoConn.Query(query)
 	if err != nil {
 		return err
 	}
 
-	return c.updateReportQueryViewName(logger, generationQuery, viewName)
+	return op.updateReportQueryViewName(logger, generationQuery, viewName)
 }
 
-func (c *Metering) updateReportQueryViewName(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, viewName string) error {
+func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, viewName string) error {
 	generationQuery.ViewName = viewName
-	_, err := c.chargebackClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace).Update(generationQuery)
+	_, err := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace).Update(generationQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportGenerationQuery view name for %q", generationQuery.Name)
 		return err
@@ -125,24 +125,24 @@ func (c *Metering) updateReportQueryViewName(logger log.FieldLogger, generationQ
 // return an error. Returns true if there are no invalid dependencies and all
 // dependencies have a viewName or tableName set in the custom resource.
 // Returns false if there is a dependency that is uninitialized.
-func (c *Metering) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, queueUninitialized bool) (bool, error) {
+func (op *Reporting) validateGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, queueUninitialized bool) (bool, error) {
 	// Validate ReportGenerationQuery's that should be views
-	generationQueries, err := c.getDependentGenerationQueries(generationQuery, false)
+	generationQueries, err := op.getDependentGenerationQueries(generationQuery, false)
 	if err != nil {
 		return false, err
 	}
 
 	// Validate dynamic generationQuery dependencies
-	_, err = c.getDependentGenerationQueries(generationQuery, true)
+	_, err = op.getDependentGenerationQueries(generationQuery, true)
 	if err != nil {
 		return false, err
 	}
 
-	dataSources, err := c.getDependentDataSources(generationQuery)
+	dataSources, err := op.getDependentDataSources(generationQuery)
 	if err != nil {
 		return false, err
 	}
-	if uninitializedQueries, err := c.getUninitializedReportGenerationQueries(generationQueries); err != nil {
+	if uninitializedQueries, err := op.getUninitializedReportGenerationQueries(generationQueries); err != nil {
 		return false, err
 	} else if len(uninitializedQueries) > 0 {
 		queriesStr := strings.Join(uninitializedQueries, ", ")
@@ -152,14 +152,14 @@ func (c *Metering) validateGenerationQuery(logger log.FieldLogger, generationQue
 			for _, query := range uninitializedQueries {
 				key, err := cache.MetaNamespaceKeyFunc(query)
 				if err == nil {
-					c.queues.reportGenerationQueryQueue.Add(key)
+					op.queues.reportGenerationQueryQueue.Add(key)
 				}
 			}
 		}
 		return false, nil
 	}
 
-	if uninitializedDataSources := c.getUnitilizedDataSources(dataSources); len(uninitializedDataSources) > 0 {
+	if uninitializedDataSources := op.getUnitilizedDataSources(dataSources); len(uninitializedDataSources) > 0 {
 		dataSourcesStr := strings.Join(uninitializedDataSources, ", ")
 		logger.Warnf("the following datasources for the query do not have their tables created %s", dataSourcesStr)
 		if queueUninitialized {
@@ -167,7 +167,7 @@ func (c *Metering) validateGenerationQuery(logger log.FieldLogger, generationQue
 			for _, dataSource := range uninitializedDataSources {
 				key, err := cache.MetaNamespaceKeyFunc(dataSource)
 				if err == nil {
-					c.queues.reportDataSourceQueue.Add(key)
+					op.queues.reportDataSourceQueue.Add(key)
 				}
 			}
 		}
@@ -176,7 +176,7 @@ func (c *Metering) validateGenerationQuery(logger log.FieldLogger, generationQue
 	return true, nil
 }
 
-func (c *Metering) getUnitilizedDataSources(dataSources []*cbTypes.ReportDataSource) []string {
+func (op *Reporting) getUnitilizedDataSources(dataSources []*cbTypes.ReportDataSource) []string {
 	var uninitializedDataSources []string
 	for _, dataSource := range dataSources {
 		if dataSource.TableName == "" {
@@ -186,7 +186,7 @@ func (c *Metering) getUnitilizedDataSources(dataSources []*cbTypes.ReportDataSou
 	return uninitializedDataSources
 }
 
-func (c *Metering) getUninitializedReportGenerationQueries(generationQueries []*cbTypes.ReportGenerationQuery) ([]string, error) {
+func (op *Reporting) getUninitializedReportGenerationQueries(generationQueries []*cbTypes.ReportGenerationQuery) ([]string, error) {
 	var uninitializedQueries, queriesWithDisabledView []string
 	for _, query := range generationQueries {
 		if query.ViewName == "" {
@@ -204,10 +204,10 @@ func (c *Metering) getUninitializedReportGenerationQueries(generationQueries []*
 	return uninitializedQueries, nil
 }
 
-func (c *Metering) getDependentGenerationQueries(generationQuery *cbTypes.ReportGenerationQuery, dynamicQueries bool) ([]*cbTypes.ReportGenerationQuery, error) {
+func (op *Reporting) getDependentGenerationQueries(generationQuery *cbTypes.ReportGenerationQuery, dynamicQueries bool) ([]*cbTypes.ReportGenerationQuery, error) {
 	queriesAccumulator := make(map[string]*cbTypes.ReportGenerationQuery)
 	const maxDepth = 100
-	err := c.getDependentGenerationQueriesMemoized(generationQuery, 0, maxDepth, queriesAccumulator, dynamicQueries)
+	err := op.getDependentGenerationQueriesMemoized(generationQuery, 0, maxDepth, queriesAccumulator, dynamicQueries)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func (c *Metering) getDependentGenerationQueries(generationQuery *cbTypes.Report
 	return queries, nil
 }
 
-func (c *Metering) getDependentGenerationQueriesMemoized(generationQuery *cbTypes.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*cbTypes.ReportGenerationQuery, dynamicQueries bool) error {
+func (op *Reporting) getDependentGenerationQueriesMemoized(generationQuery *cbTypes.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*cbTypes.ReportGenerationQuery, dynamicQueries bool) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
 	}
@@ -232,11 +232,11 @@ func (c *Metering) getDependentGenerationQueriesMemoized(generationQuery *cbType
 		if _, exists := queriesAccumulator[queryName]; exists {
 			continue
 		}
-		genQuery, err := c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace).Get(queryName)
+		genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(op.cfg.Namespace).Get(queryName)
 		if err != nil {
 			return err
 		}
-		err = c.getDependentGenerationQueriesMemoized(genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
+		err = op.getDependentGenerationQueriesMemoized(genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
 		if err != nil {
 			return err
 		}
@@ -245,10 +245,10 @@ func (c *Metering) getDependentGenerationQueriesMemoized(generationQuery *cbType
 	return nil
 }
 
-func (c *Metering) getDependentDataSources(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportDataSource, error) {
+func (op *Reporting) getDependentDataSources(generationQuery *cbTypes.ReportGenerationQuery) ([]*cbTypes.ReportDataSource, error) {
 	dataSources := make([]*cbTypes.ReportDataSource, len(generationQuery.Spec.DataSources))
 	for i, dataSourceName := range generationQuery.Spec.DataSources {
-		dataSource, err := c.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).Get(dataSourceName)
+		dataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(op.cfg.Namespace).Get(dataSourceName)
 		if err != nil {
 			return nil, err
 		}

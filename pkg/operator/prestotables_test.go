@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"testing"

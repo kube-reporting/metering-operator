@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -71,7 +71,7 @@ func TestScheduledReportsProduceData(t *testing.T) {
 				if err != nil {
 					return false, err
 				}
-				cond := cbutil.GetScheduledReportCondition(newReport.Status, chargebackv1alpha1.ScheduledReportFailure)
+				cond := cbutil.GetScheduledReportCondition(newReport.Status, meteringv1alpha1.ScheduledReportFailure)
 				if cond != nil && cond.Status == v1.ConditionTrue {
 					return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
 				}

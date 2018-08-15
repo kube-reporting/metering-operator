@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -24,8 +24,8 @@ func dataSourceNameToPrestoTableName(name string) string {
 	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
 }
 
-func (c *Metering) runPrestoTableWorker(stopCh <-chan struct{}) {
-	logger := c.logger.WithField("component", "prestoTableWorker")
+func (op *Reporting) runPrestoTableWorker(stopCh <-chan struct{}) {
+	logger := op.logger.WithField("component", "prestoTableWorker")
 	logger.Infof("PrestoTable worker started")
 
 	for {
@@ -33,26 +33,26 @@ func (c *Metering) runPrestoTableWorker(stopCh <-chan struct{}) {
 		case <-stopCh:
 			logger.Infof("PrestoTableWorker exiting")
 			return
-		case <-c.clock.Tick(prestoTableReconcileInterval):
-			datasources, err := c.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
+		case <-op.clock.Tick(prestoTableReconcileInterval):
+			datasources, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(op.cfg.Namespace).List(labels.Everything())
 			if err != nil {
 				logger.WithError(err).Errorf("unable to list datasources")
 				continue
 			}
 			for _, d := range datasources {
 				if d.Spec.AWSBilling != nil {
-					err := c.updateAWSBillingPartitions(logger, d)
+					err := op.updateAWSBillingPartitions(logger, d)
 					if err != nil {
 						logger.WithError(err).Errorf("unable to update partitions for datasource %q", d.Name)
 					}
 				}
 			}
-		case datasource := <-c.prestoTablePartitionQueue:
+		case datasource := <-op.prestoTablePartitionQueue:
 			if datasource.Spec.AWSBilling == nil {
 				logger.Errorf("incorrectly configured datasource sent to the presto table worker: %q", datasource.Name)
 				continue
 			}
-			err := c.updateAWSBillingPartitions(logger, datasource)
+			err := op.updateAWSBillingPartitions(logger, datasource)
 			if err != nil {
 				logger.WithError(err).Errorf("unable to update partitions for datasource %q", datasource.Name)
 			}
@@ -60,13 +60,13 @@ func (c *Metering) runPrestoTableWorker(stopCh <-chan struct{}) {
 	}
 }
 
-func (c *Metering) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
+func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
 	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", datasource.Name)
-	prestoTable, err := c.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName)
+	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace).Get(prestoTableResourceName)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
 	if k8serrors.IsNotFound(err) {
-		prestoTable, err = c.chargebackClient.MeteringV1alpha1().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
+		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(op.cfg.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
 	}
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func (c *Metering) updateAWSBillingPartitions(logger log.FieldLogger, datasource
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
 		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
-		err = dropAWSHivePartition(c.hiveQueryer, tableName, start, end)
+		err = dropAWSHivePartition(op.hiveQueryer, tableName, start, end)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
 			return err
@@ -152,7 +152,7 @@ func (c *Metering) updateAWSBillingPartitions(logger log.FieldLogger, datasource
 		end := p.PartitionSpec["end"]
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
-		err = addAWSHivePartition(c.hiveQueryer, tableName, start, end, p.Location)
+		err = addAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
 			return err
@@ -162,7 +162,7 @@ func (c *Metering) updateAWSBillingPartitions(logger log.FieldLogger, datasource
 
 	prestoTable.State.Partitions = desiredPartitions
 
-	_, err = c.chargebackClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update PrestoTable CR partitions for %q", prestoTable.Name)
 		return err
@@ -240,7 +240,7 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePar
 	}
 }
 
-func (c *Metering) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
+func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
 	accessor := meta.NewAccessor()
 	name, err := accessor.Name(obj)
 	if err != nil {
@@ -298,7 +298,7 @@ func (c *Metering) createPrestoTableCR(obj runtime.Object, apiVersion, kind stri
 		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
-	client := c.chargebackClient.MeteringV1alpha1().PrestoTables(namespace)
+	client := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace)
 	_, err = client.Create(&prestoTableCR)
 	if k8serrors.IsAlreadyExists(err) {
 		if existing, err := client.Get(resourceName, metav1.GetOptions{}); err != nil {

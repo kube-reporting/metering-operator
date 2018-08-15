@@ -11,11 +11,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 )
 
 type Framework struct {
-	MeteringClient chargebackv1alpha1.MeteringV1alpha1Interface
+	MeteringClient meteringv1alpha1.MeteringV1alpha1Interface
 	KubeClient     kubernetes.Interface
 	HTTPClient     *http.Client
 	Namespace      string
@@ -44,7 +44,7 @@ func New(namespace, kubeconfig string, httpsAPI bool) (*Framework, error) {
 		return nil, fmt.Errorf("creating http-client failed: err %v", err)
 	}
 
-	chargebackClient, err := chargebackv1alpha1.NewForConfig(config)
+	meteringClient, err := meteringv1alpha1.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
 	}
@@ -55,7 +55,7 @@ func New(namespace, kubeconfig string, httpsAPI bool) (*Framework, error) {
 
 	f := &Framework{
 		KubeClient:     kubeClient,
-		MeteringClient: chargebackClient,
+		MeteringClient: meteringClient,
 		HTTPClient:     httpc,
 		Namespace:      namespace,
 		DefaultTimeout: time.Minute,
