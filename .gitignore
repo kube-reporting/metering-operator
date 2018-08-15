@@ -33,3 +33,4 @@ tectonic-chargeback-0.1.0.tgz
 /metering-custom.yaml
 /chargeback-local
 /vendor/mockgen
+/reporting-operator-local

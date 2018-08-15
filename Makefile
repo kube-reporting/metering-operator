@@ -5,7 +5,7 @@ include build/check_de***REMOVED***ned.mk
 
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
-CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
+REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
 DOCKER_BUILD_ARGS ?=
 DOCKER_CACHE_FROM_ENABLED =
@@ -22,7 +22,7 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-CHARGEBACK_BIN_OUT = images/chargeback/bin/chargeback
+REPORTING_OP_BIN_OUT = images/chargeback/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
@@ -52,7 +52,7 @@ HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
 JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(CHARGEBACK_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+REPORTING_OPERATOR_GO_FILES := $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
 CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
 
@@ -167,7 +167,7 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
+chargeback-docker-build: images/chargeback/Docker***REMOVED***le $(REPORTING_OP_BIN_OUT)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
 
 chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
@@ -210,24 +210,24 @@ ci-validate: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
-chargeback-bin: $(CHARGEBACK_BIN_OUT)
+reporting-operator-bin: $(REPORTING_OP_BIN_OUT)
 
-chargeback-local: $(CHARGEBACK_GO_FILES)
-	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
+reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
+	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
 
-.PHONY: run-chargeback-local
-run-chargeback-local:
-	$(MAKE) chargeback-local
+.PHONY: run-reporting-operator-local
+run-reporting-operator-local:
+	$(MAKE) reporting-operator-local
 	./hack/run-local-with-port-forward.sh $(CHARGEBACK_ARGS)
 
-$(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
-	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@
+$(REPORTING_OP_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
+	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@
 
-build-chargeback:
-	@:$(call check_de***REMOVED***ned, CHARGEBACK_BIN_LOCATION, Path to output binary location)
+build-reporting-operator:
+	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_LOCATION, Path to output binary location)
 	$(MAKE) update-codegen
 	mkdir -p $(dir $@)
-	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(CHARGEBACK_BIN_LOCATION) $(CHARGEBACK_GO_PKG)
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_LOCATION) $(REPORTING_OPERATOR_PKG)
 
 images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
@@ -267,7 +267,7 @@ metering-manifests:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	chargeback-integration-tests-docker-build \
-	build-chargeback chargeback-bin chargeback-local \
+	build-chargeback reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-helm-operator/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
