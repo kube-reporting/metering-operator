@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -16,31 +16,31 @@ var (
 	defaultGracePeriod = metav1.Duration{Duration: time.Minute * 5}
 )
 
-func (c *Metering) runReportWorker() {
-	logger := c.logger.WithField("component", "reportWorker")
+func (op *Reporting) runReportWorker() {
+	logger := op.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
-	for c.processReport(logger) {
+	for op.processReport(logger) {
 
 	}
 }
 
-func (c *Metering) processReport(logger log.FieldLogger) bool {
-	obj, quit := c.queues.reportQueue.Get()
+func (op *Reporting) processReport(logger log.FieldLogger) bool {
+	obj, quit := op.queues.reportQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting Report worker")
 		return false
 	}
-	defer c.queues.reportQueue.Done(obj)
+	defer op.queues.reportQueue.Done(obj)
 
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(c.rand))
-	if key, ok := c.getKeyFromQueueObj(logger, "report", obj, c.queues.reportQueue); ok {
-		err := c.syncReport(logger, key)
-		c.handleErr(logger, err, "report", obj, c.queues.reportQueue)
+	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
+	if key, ok := op.getKeyFromQueueObj(logger, "report", obj, op.queues.reportQueue); ok {
+		err := op.syncReport(logger, key)
+		op.handleErr(logger, err, "report", obj, op.queues.reportQueue)
 	}
 	return true
 }
 
-func (c *Metering) syncReport(logger log.FieldLogger, key string) error {
+func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -48,7 +48,7 @@ func (c *Metering) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger = logger.WithField("report", name)
-	report, err := c.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
+	report, err := op.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("Report %s does not exist anymore", key)
@@ -58,7 +58,7 @@ func (c *Metering) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger.Infof("syncing report %s", report.GetName())
-	err = c.handleReport(logger, report)
+	err = op.handleReport(logger, report)
 	if err != nil {
 		logger.WithError(err).Errorf("error syncing report %s", report.GetName())
 		return err
@@ -67,14 +67,14 @@ func (c *Metering) syncReport(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
+func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
 		// If it's started, query the API to get the most up to date resource,
 		// as it's possible it's ***REMOVED***nished, but we haven't gotten it yet.
-		newReport, err := c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
+		newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 			return nil
 		}
 
-		err = c.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
+		err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
 			// if we cannot update it, don't re queue it
@@ -95,13 +95,13 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
 			key, err := cache.MetaNamespaceKeyFunc(newReport)
 			if err == nil {
-				c.queues.reportQueue.AddRateLimited(key)
+				op.queues.reportQueue.AddRateLimited(key)
 			}
 			return nil
 		}
 
 		err = fmt.Errorf("unable to determine if report generation succeeded")
-		c.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
+		op.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
 		return nil
 	case cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
@@ -116,13 +116,13 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 		"reportEnd":   report.Spec.ReportingEnd,
 	})
 
-	now := c.clock.Now()
+	now := op.clock.Now()
 
 	var gracePeriod time.Duration
 	if report.Spec.GracePeriod != nil {
 		gracePeriod = report.Spec.GracePeriod.Duration
 	} ***REMOVED*** {
-		gracePeriod = c.getDefaultReportGracePeriod()
+		gracePeriod = op.getDefaultReportGracePeriod()
 		logger.Debugf("Report has no gracePeriod con***REMOVED***gured, falling back to defaultGracePeriod: %s", gracePeriod)
 	}
 
@@ -139,14 +139,14 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	if valid, err := c.validateGenerationQuery(logger, genQuery, true); err != nil {
-		c.setReportError(logger, report, err, "report is invalid")
+	if valid, err := op.validateGenerationQuery(logger, genQuery, true); err != nil {
+		op.setReportError(logger, report, err, "report is invalid")
 		return nil
 	} ***REMOVED*** if !valid {
 		logger.Warnf("cannot start report, it has uninitialized dependencies")
@@ -156,7 +156,7 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 	logger.Debug("updating report status to started")
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	newReport, err := c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
 		return err
@@ -165,7 +165,7 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 	report = newReport
 	tableName := reportTableName(report.Name)
 
-	err = c.generateReport(
+	err = op.generateReport(
 		logger,
 		report,
 		"report",
@@ -179,13 +179,13 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 		false,
 	)
 	if err != nil {
-		c.setReportError(logger, report, err, "report execution failed")
+		op.setReportError(logger, report, err, "report execution failed")
 		return err
 	}
 
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseFinished
-	_, err = c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	_, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Warnf("failed to update report status to ***REMOVED***nished for %q", report.Name)
 	} ***REMOVED*** {
@@ -194,11 +194,11 @@ func (c *Metering) handleReport(logger log.FieldLogger, report *cbTypes.Report) 
 	return nil
 }
 
-func (c *Metering) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
+func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
 	logger.WithField("report", report.Name).WithError(err).Errorf(errMsg)
 	report.Status.Phase = cbTypes.ReportPhaseError
 	report.Status.Output = err.Error()
-	_, err = c.chargebackClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	_, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}

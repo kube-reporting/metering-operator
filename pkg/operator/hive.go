@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -13,8 +13,8 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
-func (c *Metering) createTableForStorage(logger log.FieldLogger, obj runtime.Object, kind, name string, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
-	tableProperties, err := c.getHiveTableProperties(logger, storage, kind)
+func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj runtime.Object, kind, name string, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
+	tableProperties, err := op.getHiveTableProperties(logger, storage, kind)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s: %s", kind, name)
 	}
@@ -23,11 +23,11 @@ func (c *Metering) createTableForStorage(logger log.FieldLogger, obj runtime.Obj
 		Columns:      columns,
 		IgnoreExists: true,
 	}
-	return c.createTableWith(logger, obj, kind, name, tableParams, *tableProperties)
+	return op.createTableWith(logger, obj, kind, name, tableParams, *tableProperties)
 }
 
-func (c *Metering) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
-	tableProperties, err := c.getHiveTableProperties(logger, storage, tableName)
+func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
+	tableProperties, err := op.getHiveTableProperties(logger, storage, tableName)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s", tableName)
 	}
@@ -40,23 +40,23 @@ func (c *Metering) createTableForStorageNoCR(logger log.FieldLogger, storage *cb
 	if err != nil {
 		return err
 	}
-	return c.createTable(logger, tableParams, newTableProperties)
+	return op.createTable(logger, tableParams, newTableProperties)
 }
 
-func (c *Metering) createTableWith(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
+func (op *Reporting) createTableWith(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
 	newTableProperties, err := addTableNameToLocation(properties, params.Name)
 	if err != nil {
 		return err
 	}
-	return c.createTableAndCR(logger, obj, kind, name, params, newTableProperties)
+	return op.createTableAndCR(logger, obj, kind, name, params, newTableProperties)
 }
 
-func (c *Metering) createTableAndCR(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
-	err := c.createTable(logger, params, properties)
+func (op *Reporting) createTableAndCR(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
+	err := op.createTable(logger, params, properties)
 	if err != nil {
 		return err
 	}
-	err = c.createPrestoTableCR(obj, cbTypes.GroupName, kind, params, properties, nil)
+	err = op.createPrestoTableCR(obj, cbTypes.GroupName, kind, params, properties, nil)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
 			logger.Infof("presto table resource already exists")
@@ -67,9 +67,9 @@ func (c *Metering) createTableAndCR(logger log.FieldLogger, obj runtime.Object, 
 	return nil
 }
 
-func (c *Metering) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties) error {
+func (op *Reporting) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties) error {
 	logger.Debugf("Creating table %s with Hive Storage %#v", params.Name, properties)
-	err := hive.ExecuteCreateTable(c.hiveQueryer, params, properties)
+	err := hive.ExecuteCreateTable(op.hiveQueryer, params, properties)
 	if err != nil {
 		return fmt.Errorf("couldn't create table: %v", err)
 	}

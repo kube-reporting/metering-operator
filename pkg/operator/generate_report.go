@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-func (c *Metering) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, dropTable, deleteExistingData bool) error {
+func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, dropTable, deleteExistingData bool) error {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
@@ -21,7 +21,7 @@ func (c *Metering) generateReport(logger log.FieldLogger, report runtime.Object,
 	})
 	logger.Infof("generating usage report")
 
-	dependentQueries, err := c.getDependentGenerationQueries(generationQuery, true)
+	dependentQueries, err := op.getDependentGenerationQueries(generationQuery, true)
 	if err != nil {
 		return fmt.Errorf("unable to get dependent generationQueries for %s, err: %v", generationQuery.Name, err)
 	}
@@ -50,20 +50,20 @@ func (c *Metering) generateReport(logger log.FieldLogger, report runtime.Object,
 
 	if dropTable {
 		logger.Debugf("dropping table %s", tableName)
-		err := hive.ExecuteDropTable(c.hiveQueryer, tableName, true)
+		err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = c.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns)
+	err = op.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns)
 	if err != nil {
 		return err
 	}
 
 	if deleteExistingData {
 		logger.Debugf("deleting any preexisting rows in %s", tableName)
-		err = presto.DeleteFrom(c.prestoQueryer, tableName)
+		err = presto.DeleteFrom(op.prestoQueryer, tableName)
 		if err != nil {
 			return fmt.Errorf("couldn't empty table %s of preexisting rows: %v", tableName, err)
 		}
@@ -71,7 +71,7 @@ func (c *Metering) generateReport(logger log.FieldLogger, report runtime.Object,
 
 	// Run the report
 	logger.Debugf("running report generation query")
-	err = presto.InsertInto(c.prestoQueryer, tableName, query)
+	err = presto.InsertInto(op.prestoQueryer, tableName, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")
 		return fmt.Errorf("Failed to execute %s usage report: %v", reportName, err)

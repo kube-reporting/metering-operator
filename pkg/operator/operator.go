@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"context"
@@ -79,13 +79,13 @@ type Con***REMOVED***g struct {
 	TLSKey  string
 }
 
-type Metering struct {
-	cfg              Con***REMOVED***g
-	kubeCon***REMOVED***g       *rest.Con***REMOVED***g
-	informers        cbInformers.SharedInformerFactory
-	queues           queues
-	chargebackClient cbClientset.Interface
-	kubeClient       corev1.CoreV1Interface
+type Reporting struct {
+	cfg            Con***REMOVED***g
+	kubeCon***REMOVED***g     *rest.Con***REMOVED***g
+	informers      cbInformers.SharedInformerFactory
+	queues         queues
+	meteringClient cbClientset.Interface
+	kubeClient     corev1.CoreV1Interface
 
 	prestoConn    *sql.DB
 	prestoQueryer presto.ExecQueryer
@@ -113,8 +113,8 @@ type Metering struct {
 	healthCheckSingleFlight singleflight.Group
 }
 
-func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Metering, error) {
-	op := &Metering{
+func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Reporting, error) {
+	op := &Reporting{
 		cfg: cfg,
 		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
 		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
@@ -163,7 +163,7 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Met
 	}
 
 	logger.Debugf("setting up Metering client...")
-	op.chargebackClient, err = cbClientset.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
+	op.meteringClient, err = cbClientset.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
@@ -185,11 +185,11 @@ type queues struct {
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 }
 
-func (c *Metering) setupInformers() {
-	c.informers = cbInformers.NewFilteredSharedInformerFactory(c.chargebackClient, defaultResyncPeriod, c.cfg.Namespace, nil)
-	inf := c.informers.Metering().V1alpha1()
+func (op *Reporting) setupInformers() {
+	op.informers = cbInformers.NewFilteredSharedInformerFactory(op.meteringClient, defaultResyncPeriod, op.cfg.Namespace, nil)
+	inf := op.informers.Metering().V1alpha1()
 	// hacks to ensure these informers are created before we call
-	// c.informers.Start()
+	// op.informers.Start()
 	inf.PrestoTables().Informer()
 	inf.StorageLocations().Informer()
 	inf.ReportDataSources().Informer()
@@ -198,9 +198,9 @@ func (c *Metering) setupInformers() {
 	inf.Reports().Informer()
 	inf.ScheduledReports().Informer()
 }
-func (c *Metering) setupQueues() {
+func (op *Reporting) setupQueues() {
 	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
-	c.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	op.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -216,7 +216,7 @@ func (c *Metering) setupQueues() {
 	})
 
 	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
-	c.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	op.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -229,11 +229,11 @@ func (c *Metering) setupQueues() {
 				scheduledReportQueue.Add(key)
 			}
 		},
-		DeleteFunc: c.handleScheduledReportDeleted,
+		DeleteFunc: op.handleScheduledReportDeleted,
 	})
 
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
-	c.informers.Metering().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	op.informers.Metering().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -246,11 +246,11 @@ func (c *Metering) setupQueues() {
 				reportDataSourceQueue.Add(key)
 			}
 		},
-		DeleteFunc: c.handleReportDataSourceDeleted,
+		DeleteFunc: op.handleReportDataSourceDeleted,
 	})
 
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
-	c.informers.Metering().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	op.informers.Metering().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
@@ -264,7 +264,7 @@ func (c *Metering) setupQueues() {
 			}
 		},
 	})
-	c.queues = queues{
+	op.queues = queues{
 		queueList: []workqueue.RateLimitingInterface{
 			reportQueue,
 			scheduledReportQueue,
@@ -285,13 +285,13 @@ func (qs queues) ShutdownQueues() {
 	}
 }
 
-func (c *Metering) Run(stopCh <-chan struct{}) error {
+func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var wg sync.WaitGroup
-	c.logger.Info("starting Metering operator")
+	op.logger.Info("starting Metering operator")
 
-	go c.informers.Start(stopCh)
+	go op.informers.Start(stopCh)
 
-	c.logger.Infof("setting up DB connections")
+	op.logger.Infof("setting up DB connections")
 
 	// Use errgroup to setup both hive and presto connections
 	// at the sametime, waiting for both to be ready before continuing.
@@ -299,17 +299,17 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		c.prestoConn, err = c.newPrestoConn(stopCh)
+		op.prestoConn, err = op.newPrestoConn(stopCh)
 		if err != nil {
 			return err
 		}
-		prestoDB := db.New(c.prestoConn, c.logger, c.cfg.LogDMLQueries)
-		c.prestoQueryer = presto.NewDB(prestoDB)
+		prestoDB := db.New(op.prestoConn, op.logger, op.cfg.LogDMLQueries)
+		op.prestoQueryer = presto.NewDB(prestoDB)
 		return nil
 	})
 	g.Go(func() error {
-		c.hiveQueryer = newHiveQueryer(c.logger, c.clock, c.cfg.HiveHost, c.cfg.LogDDLQueries, stopCh)
-		_, err := c.hiveQueryer.getHiveConnection()
+		op.hiveQueryer = newHiveQueryer(op.logger, op.clock, op.cfg.HiveHost, op.cfg.LogDDLQueries, stopCh)
+		_, err := op.hiveQueryer.getHiveConnection()
 		return err
 	})
 	err := g.Wait()
@@ -317,10 +317,10 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	defer c.prestoConn.Close()
-	defer c.hiveQueryer.closeHiveConnection()
+	defer op.prestoConn.Close()
+	defer op.hiveQueryer.closeHiveConnection()
 
-	transportCon***REMOVED***g, err := c.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
+	transportCon***REMOVED***g, err := op.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
 	if err != nil {
 		return err
 	}
@@ -333,35 +333,35 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 		if err != nil {
 			return err
 		}
-		c.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
 	}
 
-	c.promConn, err = c.newPrometheusConn(promapi.Con***REMOVED***g{
-		Address:      c.cfg.PromHost,
+	op.promConn, err = op.newPrometheusConn(promapi.Con***REMOVED***g{
+		Address:      op.cfg.PromHost,
 		RoundTripper: roundTripper,
 	})
 	if err != nil {
 		return err
 	}
 
-	c.logger.Info("waiting for caches to sync")
-	for t, synced := range c.informers.WaitForCacheSync(stopCh) {
+	op.logger.Info("waiting for caches to sync")
+	for t, synced := range op.informers.WaitForCacheSync(stopCh) {
 		if !synced {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
 	}
 
-	c.logger.Infof("starting HTTP server")
+	op.logger.Infof("starting HTTP server")
 	listers := meteringListers{
-		reports:                 c.informers.Metering().V1alpha1().Reports().Lister().Reports(c.cfg.Namespace),
-		scheduledReports:        c.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(c.cfg.Namespace),
-		reportGenerationQueries: c.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(c.cfg.Namespace),
-		prestoTables:            c.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace),
+		reports:                 op.informers.Metering().V1alpha1().Reports().Lister().Reports(op.cfg.Namespace),
+		scheduledReports:        op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(op.cfg.Namespace),
+		reportGenerationQueries: op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(op.cfg.Namespace),
+		prestoTables:            op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace),
 	}
 
-	apiRouter := newRouter(c.logger, c.prestoQueryer, c.rand, c.triggerPrometheusImporterForTimeRange, listers)
-	apiRouter.HandleFunc("/ready", c.readinessHandler)
-	apiRouter.HandleFunc("/healthy", c.healthinessHandler)
+	apiRouter := newRouter(op.logger, op.prestoQueryer, op.rand, op.triggerPrometheusImporterForTimeRange, listers)
+	apiRouter.HandleFunc("/ready", op.readinessHandler)
+	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
 
 	httpServer := &http.Server{
 		Addr:    ":8080",
@@ -380,35 +380,35 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if c.cfg.UseTLS {
-			c.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
-			srvErr = httpServer.ListenAndServeTLS(c.cfg.TLSCert, c.cfg.TLSKey)
+		if op.cfg.UseTLS {
+			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
+			srvErr = httpServer.ListenAndServeTLS(op.cfg.TLSCert, op.cfg.TLSKey)
 		} ***REMOVED*** {
-			c.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
+			op.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
 			srvErr = httpServer.ListenAndServe()
 		}
-		c.logger.WithError(srvErr).Info("HTTP API server exited")
+		op.logger.WithError(srvErr).Info("HTTP API server exited")
 		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
 	}()
 	go func() {
 		defer wg.Done()
-		c.logger.Infof("Prometheus metrics server started")
+		op.logger.Infof("Prometheus metrics server started")
 		srvErr := promServer.ListenAndServe()
-		c.logger.WithError(srvErr).Info("Prometheus metrics server exited")
+		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
 		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
 	}()
 	go func() {
 		defer wg.Done()
-		c.logger.Infof("pprof server started")
+		op.logger.Infof("pprof server started")
 		srvErr := pprofServer.ListenAndServe()
-		c.logger.WithError(srvErr).Info("pprof server exited")
+		op.logger.WithError(srvErr).Info("pprof server exited")
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
 	// Poll until we can write to presto
-	c.logger.Info("testing ability to write to Presto")
+	op.logger.Info("testing ability to write to Presto")
 	err = wait.PollUntil(time.Second*5, func() (bool, error) {
-		if c.testWriteToPresto(c.logger) {
+		if op.testWriteToPresto(op.logger) {
 			return true, nil
 		}
 		return false, nil
@@ -416,20 +416,20 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 	if err != nil {
 		return err
 	}
-	c.logger.Info("writes to Presto are succeeding")
+	op.logger.Info("writes to Presto are succeeding")
 
-	c.logger.Info("basic initialization completed")
-	c.setInitialized()
+	op.logger.Info("basic initialization completed")
+	op.setInitialized()
 
 	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartLogging(c.logger.Infof)
-	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: c.kubeClient.Events(c.cfg.Namespace)})
-	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: c.cfg.PodName})
+	eventBroadcaster.StartLogging(op.logger.Infof)
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.Namespace)})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.PodName})
 
 	rl, err := resourcelock.New(resourcelock.Con***REMOVED***gMapsResourceLock,
-		c.cfg.Namespace, "chargeback-operator-leader-lease", c.kubeClient,
+		op.cfg.Namespace, "reporting-operator-leader-lease", op.kubeClient,
 		resourcelock.ResourceLockCon***REMOVED***g{
-			Identity:      c.cfg.Hostname,
+			Identity:      op.cfg.Hostname,
 			EventRecorder: eventRecorder,
 		})
 	if err != nil {
@@ -441,18 +441,18 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 
 	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionCon***REMOVED***g{
 		Lock:          rl,
-		LeaseDuration: c.cfg.LeaderLeaseDuration,
-		RenewDeadline: c.cfg.LeaderLeaseDuration / 2,
+		LeaseDuration: op.cfg.LeaderLeaseDuration,
+		RenewDeadline: op.cfg.LeaderLeaseDuration / 2,
 		RetryPeriod:   2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(leaderStopCh <-chan struct{}) {
-				c.logger.Infof("became leader")
-				c.logger.Info("starting Metering workers")
-				c.startWorkers(wg, stopWorkersCh)
-				c.logger.Infof("Metering workers started, watching for reports...")
+				op.logger.Infof("became leader")
+				op.logger.Info("starting Metering workers")
+				op.startWorkers(wg, stopWorkersCh)
+				op.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
-				c.logger.Warn("leader election lost")
+				op.logger.Warn("leader election lost")
 				close(lostLeaderCh)
 			},
 		},
@@ -461,7 +461,7 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("error creating leader elector: %v", err)
 	}
 
-	c.logger.Infof("starting leader election")
+	op.logger.Infof("starting leader election")
 	go leader.Run()
 
 	// wait for an shutdown signal to begin shutdown.
@@ -469,63 +469,63 @@ func (c *Metering) Run(stopCh <-chan struct{}) error {
 	// processes exit immediately.
 	select {
 	case <-stopCh:
-		c.logger.Info("got stop signal, shutting down Metering operator")
+		op.logger.Info("got stop signal, shutting down Metering operator")
 	case <-lostLeaderCh:
-		c.logger.Warnf("lost leadership election, forcing shut down of Metering operator")
+		op.logger.Warnf("lost leadership election, forcing shut down of Metering operator")
 		return fmt.Errorf("lost leadership election")
 	case err := <-srvErrChan:
-		c.logger.WithError(err).Error("server process failed, shutting down Metering operator")
+		op.logger.WithError(err).Error("server process failed, shutting down Metering operator")
 		return fmt.Errorf("server process failed, err: %v", err)
 	}
 
 	// if we stop being leader or get a shutdown signal, stop the workers
-	c.logger.Infof("stopping workers and collectors")
+	op.logger.Infof("stopping workers and collectors")
 	close(stopWorkersCh)
 
 	// stop our running http servers
 	wg.Add(3)
 	go func() {
-		c.logger.Infof("stopping HTTP API server")
+		op.logger.Infof("stopping HTTP API server")
 		err := httpServer.Shutdown(context.TODO())
 		if err != nil {
-			c.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
+			op.logger.WithError(err).Warnf("got an error shutting down HTTP API server")
 		}
 		wg.Done()
 	}()
 	go func() {
-		c.logger.Infof("stopping Prometheus metrics server")
+		op.logger.Infof("stopping Prometheus metrics server")
 		err := promServer.Shutdown(context.TODO())
 		if err != nil {
-			c.logger.WithError(err).Warnf("got an error shutting down Prometheus metrics server")
+			op.logger.WithError(err).Warnf("got an error shutting down Prometheus metrics server")
 		}
 		wg.Done()
 	}()
 	go func() {
-		c.logger.Infof("stopping pprof server")
+		op.logger.Infof("stopping pprof server")
 		err := pprofServer.Shutdown(context.TODO())
 		if err != nil {
-			c.logger.WithError(err).Warnf("got an error shutting down pprof server")
+			op.logger.WithError(err).Warnf("got an error shutting down pprof server")
 		}
 		wg.Done()
 	}()
 
 	// shutdown queues so that they get drained, and workers can begin their
 	// shutdown
-	go c.queues.ShutdownQueues()
+	go op.queues.ShutdownQueues()
 
 	// wait for our workers to stop
 	wg.Wait()
-	c.logger.Info("Metering workers and collectors stopped")
+	op.logger.Info("Metering workers and collectors stopped")
 	return nil
 }
 
-func (c *Metering) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
+func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 	wg.Add(1)
 	go func() {
-		c.logger.Infof("starting PrestoTable worker")
-		c.runPrestoTableWorker(stopCh)
+		op.logger.Infof("starting PrestoTable worker")
+		op.runPrestoTableWorker(stopCh)
 		wg.Done()
-		c.logger.Infof("PrestoTable worker stopped")
+		op.logger.Infof("PrestoTable worker stopped")
 	}()
 
 	threadiness := 2
@@ -534,64 +534,64 @@ func (c *Metering) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 
 		wg.Add(1)
 		go func() {
-			c.logger.Infof("starting ReportDataSource worker #%d", i)
-			wait.Until(c.runReportDataSourceWorker, time.Second, stopCh)
+			op.logger.Infof("starting ReportDataSource worker #%d", i)
+			wait.Until(op.runReportDataSourceWorker, time.Second, stopCh)
 			wg.Done()
-			c.logger.Infof("ReportDataSource worker #%d stopped", i)
+			op.logger.Infof("ReportDataSource worker #%d stopped", i)
 		}()
 
 		wg.Add(1)
 		go func() {
-			c.logger.Infof("starting ReportGenerationQuery worker #%d", i)
-			wait.Until(c.runReportGenerationQueryWorker, time.Second, stopCh)
+			op.logger.Infof("starting ReportGenerationQuery worker #%d", i)
+			wait.Until(op.runReportGenerationQueryWorker, time.Second, stopCh)
 			wg.Done()
-			c.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
+			op.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
 		}()
 
 		wg.Add(1)
 		go func() {
-			c.logger.Infof("starting Report worker #%d", i)
-			wait.Until(c.runReportWorker, time.Second, stopCh)
+			op.logger.Infof("starting Report worker #%d", i)
+			wait.Until(op.runReportWorker, time.Second, stopCh)
 			wg.Done()
-			c.logger.Infof("Report worker #%d stopped", i)
+			op.logger.Infof("Report worker #%d stopped", i)
 		}()
 
 		wg.Add(1)
 		go func() {
-			c.logger.Infof("starting ScheduledReport worker #%d", i)
-			wait.Until(c.runScheduledReportWorker, time.Second, stopCh)
+			op.logger.Infof("starting ScheduledReport worker #%d", i)
+			wait.Until(op.runScheduledReportWorker, time.Second, stopCh)
 			wg.Done()
-			c.logger.Infof("ScheduledReport worker #%d stopped", i)
+			op.logger.Infof("ScheduledReport worker #%d stopped", i)
 		}()
 	}
 
 	wg.Add(1)
 	go func() {
-		c.logger.Debugf("starting ScheduledReportRunner")
-		c.scheduledReportRunner.Run(stopCh)
+		op.logger.Debugf("starting ScheduledReportRunner")
+		op.scheduledReportRunner.Run(stopCh)
 		wg.Done()
-		c.logger.Debugf("ScheduledReportRunner stopped")
+		op.logger.Debugf("ScheduledReportRunner stopped")
 	}()
 
 	wg.Add(1)
 	go func() {
-		c.logger.Debugf("starting PrometheusImport worker")
-		c.runPrometheusImporterWorker(stopCh)
+		op.logger.Debugf("starting PrometheusImport worker")
+		op.runPrometheusImporterWorker(stopCh)
 		wg.Done()
-		c.logger.Debugf("PrometheusImport worker stopped")
+		op.logger.Debugf("PrometheusImport worker stopped")
 	}()
 }
 
-func (c *Metering) setInitialized() {
-	c.initializedMu.Lock()
-	c.initialized = true
-	c.initializedMu.Unlock()
+func (op *Reporting) setInitialized() {
+	op.initializedMu.Lock()
+	op.initialized = true
+	op.initializedMu.Unlock()
 }
 
-func (c *Metering) isInitialized() bool {
-	c.initializedMu.Lock()
-	initialized := c.initialized
-	c.initializedMu.Unlock()
+func (op *Reporting) isInitialized() bool {
+	op.initializedMu.Lock()
+	initialized := op.initialized
+	op.initializedMu.Unlock()
 	return initialized
 }
 
@@ -603,7 +603,7 @@ func (c *Metering) isInitialized() bool {
 // workqueue means the items in the informer cache may actually be
 // more up to date that when the item was initially put onto the
 // workqueue.
-func (c *Metering) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
+func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
 	if key, ok := obj.(string); ok {
 		return key, ok
 	}
@@ -613,7 +613,7 @@ func (c *Metering) getKeyFromQueueObj(logger log.FieldLogger, objType string, ob
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *Metering) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
 	if err == nil {
 		queue.Forget(obj)
 		return
@@ -632,39 +632,39 @@ func (c *Metering) handleErr(logger log.FieldLogger, err error, objType string, 
 	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
 }
 
-func (c *Metering) getDefaultReportGracePeriod() time.Duration {
-	if c.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration > c.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration {
-		return c.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration
+func (op *Reporting) getDefaultReportGracePeriod() time.Duration {
+	if op.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration > op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration {
+		return op.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration
 	} ***REMOVED*** {
-		return c.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
+		return op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
 	}
 }
 
-func (c *Metering) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
-	// Presto may take longer to start than chargeback, so keep attempting to
-	// connect in a loop in case we were just started and presto is still coming
-	// up.
-	connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", c.cfg.PrestoHost)
-	startTime := c.clock.Now()
-	c.logger.Debugf("getting Presto connection")
+func (op *Reporting) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
+	// Presto may take longer to start than reporting-operator, so keep
+	// attempting to connect in a loop in case we were just started and presto
+	// is still coming up.
+	connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
+	startTime := op.clock.Now()
+	op.logger.Debugf("getting Presto connection")
 	for {
 		db, err := sql.Open("presto", connStr)
 		if err == nil {
 			return db, nil
-		} ***REMOVED*** if c.clock.Since(startTime) > maxConnWaitTime {
-			c.logger.Debugf("attempts timed out, failed to get Presto connection")
+		} ***REMOVED*** if op.clock.Since(startTime) > maxConnWaitTime {
+			op.logger.Debugf("attempts timed out, failed to get Presto connection")
 			return nil, fmt.Errorf("failed to connect to presto: %v", err)
 		}
-		c.logger.Debugf("error encountered, backing off and trying again: %v", err)
+		op.logger.Debugf("error encountered, backing off and trying again: %v", err)
 		select {
-		case <-c.clock.Tick(connBackoff):
+		case <-op.clock.Tick(connBackoff):
 		case <-stopCh:
 			return nil, fmt.Errorf("got shutdown signal, closing Presto connection")
 		}
 	}
 }
 
-func (c *Metering) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
+func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
 	client, err := promapi.NewClient(promCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
@@ -747,9 +747,9 @@ func (q *hiveQueryer) closeHiveConnection() {
 }
 
 func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
-	// Hive may take longer to start than chargeback, so keep attempting to
-	// connect in a loop in case we were just started and hive is still coming
-	// up.
+	// Hive may take longer to start than reporting-operator, so keep
+	// attempting to connect in a loop in case we were just started and hive is
+	// still coming up.
 	startTime := q.clock.Now()
 	q.logger.Debugf("getting hive connection")
 	for {

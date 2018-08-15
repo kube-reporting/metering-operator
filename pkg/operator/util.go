@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"encoding/json"
@@ -48,8 +48,8 @@ func truncateToMinute(t time.Time) time.Time {
 
 func generateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
 	var columns []hive.Column
-	for _, c := range genQuery.Spec.Columns {
-		columns = append(columns, hive.Column{Name: c.Name, Type: c.Type})
+	for _, col := range genQuery.Spec.Columns {
+		columns = append(columns, hive.Column{Name: col.Name, Type: col.Type})
 	}
 	return columns
 }

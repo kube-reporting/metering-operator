@@ -28,7 +28,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		// 10 minutes
 		f.reportStart = f.reportEnd.Add(-10 * time.Minute)
 
-		reqParams := chargeback.CollectPromsumDataRequest{
+		reqParams := operator.CollectPromsumDataRequest{
 			StartTime: f.reportStart,
 			EndTime:   f.reportEnd,
 		}

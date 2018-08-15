@@ -1,4 +1,4 @@
-package chargeback
+package operator
 
 import (
 	"context"
@@ -26,7 +26,7 @@ const (
 	defaultMaxTimeDuration = 24 * time.Hour
 )
 
-func (c *Metering) runPrometheusImporterWorker(stopCh <-chan struct{}) {
+func (op *Reporting) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	// run a go routine that waits for the stopCh to be closed and propagates
@@ -37,7 +37,7 @@ func (c *Metering) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 		// everything to return
 		cancel()
 	}()
-	c.startPrometheusImporter(ctx)
+	op.startPrometheusImporter(ctx)
 }
 
 type prometheusImporterFunc func(ctx context.Context, start, end time.Time) error
@@ -47,18 +47,18 @@ type prometheusImporterTimeRangeTrigger struct {
 	errCh      chan error
 }
 
-func (c *Metering) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
+func (op *Reporting) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
 	errCh := make(chan error)
 	select {
-	case c.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, errCh}:
+	case op.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, errCh}:
 		return <-errCh
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-func (c *Metering) startPrometheusImporter(ctx context.Context) {
-	logger := c.logger.WithField("component", "PrometheusImporter")
+func (op *Reporting) startPrometheusImporter(ctx context.Context) {
+	logger := op.logger.WithField("component", "PrometheusImporter")
 	logger.Infof("PrometheusImporter worker started")
 	workers := make(map[string]*prometheusImporterWorker)
 	importers := make(map[string]*prestostore.PrometheusImporter)
@@ -70,7 +70,7 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 
 	defer logger.Infof("PrometheusImporterWorker shutdown")
 
-	if c.cfg.DisablePromsum {
+	if op.cfg.DisablePromsum {
 		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
 	}
 
@@ -79,7 +79,7 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 		case <-ctx.Done():
 			logger.Infof("got shutdown signal, shutting down PrometheusImporters")
 			return
-		case trigger := <-c.prometheusImporterTriggerForTimeRangeCh:
+		case trigger := <-op.prometheusImporterTriggerForTimeRangeCh:
 			// manually triggered import for a speci***REMOVED***c time range, usually from HTTP API
 
 			g, ctx := errgroup.WithContext(ctx)
@@ -99,7 +99,7 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 			}
 			trigger.errCh <- err
 
-		case dataSourceName := <-c.prometheusImporterDeletedDataSourceQueue:
+		case dataSourceName := <-op.prometheusImporterDeletedDataSourceQueue:
 			// if we have a worker for this ReportDataSource then we need to
 			// stop it and remove it from our map
 			if worker, exists := workers[dataSourceName]; exists {
@@ -109,7 +109,7 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 			if _, exists := importers[dataSourceName]; exists {
 				delete(importers, dataSourceName)
 			}
-		case reportDataSource := <-c.prometheusImporterNewDataSourceQueue:
+		case reportDataSource := <-op.prometheusImporterNewDataSourceQueue:
 			if reportDataSource.Spec.Promsum == nil {
 				logger.Error("expected only Promsum ReportDataSources")
 				continue
@@ -125,17 +125,17 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 				"tableName":        tableName,
 			})
 
-			reportPromQuery, err := c.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
+			reportPromQuery, err := op.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
 			if err != nil {
-				c.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
+				op.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
 				continue
 			}
 
 			promQuery := reportPromQuery.Spec.Query
 
-			chunkSize := c.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
-			stepSize := c.cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration
-			queryInterval := c.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration
+			chunkSize := op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
+			stepSize := op.cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration
+			queryInterval := op.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration
 
 			queryConf := reportDataSource.Spec.Promsum.QueryCon***REMOVED***g
 			if queryConf != nil {
@@ -164,11 +164,11 @@ func (c *Metering) startPrometheusImporter(ctx context.Context) {
 				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration", dataSourceName)
 				importer.UpdateCon***REMOVED***g(cfg)
 			} ***REMOVED*** {
-				importer = prestostore.NewPrometheusImporter(dataSourceLogger, c.promConn, c.prestoQueryer, c.clock, cfg)
+				importer = prestostore.NewPrometheusImporter(dataSourceLogger, op.promConn, op.prestoQueryer, op.clock, cfg)
 				importers[dataSourceName] = importer
 			}
 
-			if !c.cfg.DisablePromsum {
+			if !op.cfg.DisablePromsum {
 				worker, workerExists := workers[dataSourceName]
 				if workerExists && worker.queryInterval != queryInterval {
 					// queryInterval changed stop the existing worker from

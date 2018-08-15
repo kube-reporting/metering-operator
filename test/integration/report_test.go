@@ -281,7 +281,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 				result := req.Do()
 				resp, err := result.Raw()
 				if err != nil {
-					return false, fmt.Errorf("error querying chargeback service got error: %v, body: %v", err, string(resp))
+					return false, fmt.Errorf("error querying metering service got error: %v, body: %v", err, string(resp))
 				}
 
 				var statusCode int
