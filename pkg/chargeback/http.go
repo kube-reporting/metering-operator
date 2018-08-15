@@ -22,10 +22,10 @@ import (
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	api "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	api "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/chargeback/prestostore"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )

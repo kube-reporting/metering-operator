@@ -10,12 +10,12 @@ const (
 	chargebackServicePortName = "http"
 )
 
-func (f *Framework) NewChargebackSVCRequest(endpoint string, query map[string]string) *restclient.Request {
+func (f *Framework) NewMeteringSVCRequest(endpoint string, query map[string]string) *restclient.Request {
 	wrapper := f.KubeClient.CoreV1().Services(f.Namespace).ProxyGet(f.protocol, chargebackServiceName, chargebackServicePortName, endpoint, query)
 	return wrapper.(*restclient.Request)
 }
 
-func (f *Framework) NewChargebackSVCPOSTRequest(endpoint string, body interface{}) *restclient.Request {
+func (f *Framework) NewMeteringSVCPOSTRequest(endpoint string, body interface{}) *restclient.Request {
 	return f.KubeClient.CoreV1().RESTClient().
 		Post().
 		Namespace(f.Namespace).

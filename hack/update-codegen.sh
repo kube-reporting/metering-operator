@@ -27,13 +27,13 @@ set -x
 # generate kubernetes client
 ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
     "${SCRIPT_PACKAGE}/pkg/generated" "${SCRIPT_PACKAGE}/pkg/apis" \
-    chargeback:v1alpha1 \
+    metering:v1alpha1 \
     --go-header-***REMOVED***le ${SCRIPT_ROOT}/hack/boilerplate.go.txt
 
 # generate-groups doesn't do defaulters
 echo "Generating defaulters"
 ${GOPATH}/bin/defaulter-gen \
-    --input-dirs "${SCRIPT_PACKAGE}/pkg/apis/chargeback/v1alpha1" \
+    --input-dirs "${SCRIPT_PACKAGE}/pkg/apis/metering/v1alpha1" \
     -O zz_generated.defaults \
     --go-header-***REMOVED***le ${SCRIPT_ROOT}/hack/boilerplate.go.txt
 

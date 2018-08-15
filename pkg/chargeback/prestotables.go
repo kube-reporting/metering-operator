@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -24,7 +24,7 @@ func dataSourceNameToPrestoTableName(name string) string {
 	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
 }
 
-func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
+func (c *Metering) runPrestoTableWorker(stopCh <-chan struct{}) {
 	logger := c.logger.WithField("component", "prestoTableWorker")
 	logger.Infof("PrestoTable worker started")
 
@@ -34,7 +34,7 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 			logger.Infof("PrestoTableWorker exiting")
 			return
 		case <-c.clock.Tick(prestoTableReconcileInterval):
-			datasources, err := c.informers.Chargeback().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
+			datasources, err := c.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(c.cfg.Namespace).List(labels.Everything())
 			if err != nil {
 				logger.WithError(err).Errorf("unable to list datasources")
 				continue
@@ -60,13 +60,13 @@ func (c *Chargeback) runPrestoTableWorker(stopCh <-chan struct{}) {
 	}
 }
 
-func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
+func (c *Metering) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
 	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", datasource.Name)
-	prestoTable, err := c.informers.Chargeback().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName)
+	prestoTable, err := c.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName)
 	// If this came over the work queue, the presto table may not be in the
 	// cache, so check if it exists via the API before erroring out
 	if k8serrors.IsNotFound(err) {
-		prestoTable, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
+		prestoTable, err = c.chargebackClient.MeteringV1alpha1().PrestoTables(c.cfg.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
 	}
 	if err != nil {
 		return err
@@ -162,7 +162,7 @@ func (c *Chargeback) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 
 	prestoTable.State.Partitions = desiredPartitions
 
-	_, err = c.chargebackClient.ChargebackV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	_, err = c.chargebackClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update PrestoTable CR partitions for %q", prestoTable.Name)
 		return err
@@ -240,7 +240,7 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePar
 	}
 }
 
-func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
+func (c *Metering) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
 	accessor := meta.NewAccessor()
 	name, err := accessor.Name(obj)
 	if err != nil {
@@ -298,7 +298,7 @@ func (c *Chargeback) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
-	client := c.chargebackClient.ChargebackV1alpha1().PrestoTables(namespace)
+	client := c.chargebackClient.MeteringV1alpha1().PrestoTables(namespace)
 	_, err = client.Create(&prestoTableCR)
 	if k8serrors.IsAlreadyExists(err) {
 		if existing, err := client.Get(resourceName, metav1.GetOptions{}); err != nil {

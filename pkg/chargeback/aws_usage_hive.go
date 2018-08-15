@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/hive"
@@ -33,7 +33,7 @@ var (
 const awsUsagePartitionDateStringLayout = "20060102"
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
-func (c *Chargeback) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
+func (c *Metering) createAWSUsageTable(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) error {
 	location, err := hive.S3Location(bucket, pre***REMOVED***x)
 	if err != nil {
 		return err

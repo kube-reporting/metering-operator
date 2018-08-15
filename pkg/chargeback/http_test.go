@@ -20,8 +20,8 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/chargeback/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/presto/mock"

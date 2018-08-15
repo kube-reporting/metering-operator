@@ -13,12 +13,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/chargeback/v1alpha1/util"
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
-func (c *Chargeback) runScheduledReportWorker() {
+func (c *Metering) runScheduledReportWorker() {
 	logger := c.logger.WithField("component", "scheduledReportWorker")
 	logger.Infof("ScheduledReport worker started")
 	for c.processScheduledReport(logger) {
@@ -26,7 +26,7 @@ func (c *Chargeback) runScheduledReportWorker() {
 	}
 }
 
-func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
+func (c *Metering) processScheduledReport(logger log.FieldLogger) bool {
 	obj, quit := c.queues.scheduledReportQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting ScheduledReport worker")
@@ -42,7 +42,7 @@ func (c *Chargeback) processScheduledReport(logger log.FieldLogger) bool {
 	return true
 }
 
-func (c *Chargeback) syncScheduledReport(logger log.FieldLogger, key string) error {
+func (c *Metering) syncScheduledReport(logger log.FieldLogger, key string) error {
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -50,7 +50,7 @@ func (c *Chargeback) syncScheduledReport(logger log.FieldLogger, key string) err
 	}
 
 	logger = logger.WithField("scheduledReport", name)
-	scheduledReport, err := c.informers.Chargeback().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
+	scheduledReport, err := c.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
@@ -73,7 +73,7 @@ func (c *Chargeback) syncScheduledReport(logger log.FieldLogger, key string) err
 	return nil
 }
 
-func (c *Chargeback) handleScheduledReportDeleted(obj interface{}) {
+func (c *Metering) handleScheduledReportDeleted(obj interface{}) {
 	report, ok := obj.(*cbTypes.ScheduledReport)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
@@ -184,7 +184,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 	return cron.Parse(cronSpec)
 }
 
-func (c *Chargeback) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
+func (c *Metering) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
 	scheduledReport = scheduledReport.DeepCopy()
 	reportSchedule, err := getSchedule(scheduledReport.Spec.Schedule)
 	if err != nil {
@@ -197,7 +197,7 @@ func (c *Chargeback) handleScheduledReport(logger log.FieldLogger, scheduledRepo
 }
 
 type scheduledReportJob struct {
-	chargeback *Chargeback
+	chargeback *Metering
 	report     *cbTypes.ScheduledReport
 	schedule   reportSchedule
 	once       sync.Once
@@ -205,7 +205,7 @@ type scheduledReportJob struct {
 	doneCh     chan struct{}
 }
 
-func newScheduledReportJob(chargeback *Chargeback, report *cbTypes.ScheduledReport, schedule reportSchedule) *scheduledReportJob {
+func newScheduledReportJob(chargeback *Metering, report *cbTypes.ScheduledReport, schedule reportSchedule) *scheduledReportJob {
 	return &scheduledReportJob{
 		chargeback: chargeback,
 		report:     report,
@@ -241,7 +241,7 @@ type reportPeriod struct {
 }
 
 // start runs a scheduledReportJob according to it's con***REMOVED***gured schedule. It
-// returns nothing because it should never stop unless Chargeback is shutting
+// returns nothing because it should never stop unless Metering is shutting
 // down or the scheduledReport for this job has been deleted.
 func (job *scheduledReportJob) start(logger log.FieldLogger) {
 	// Close doneCh at the end so that stop() can determine when start() has exited.
@@ -250,7 +250,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 	}()
 
 	for {
-		report, err := job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Get(job.report.Name, metav1.GetOptions{})
+		report, err := job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Get(job.report.Name, metav1.GetOptions{})
 		if err != nil {
 			logger.WithError(err).Errorf("unable to get scheduledReport")
 			return
@@ -261,13 +261,13 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ValidatingScheduledReportReason, msg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
-		report, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+		report, err = job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update scheduledReport status")
 			return
 		}
 
-		genQuery, err := job.chargeback.informers.Chargeback().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(job.report.Namespace).Get(job.report.Spec.GenerationQueryName)
+		genQuery, err := job.chargeback.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(job.report.Namespace).Get(job.report.Spec.GenerationQueryName)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to get report generation query")
 			return
@@ -330,7 +330,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodWaitingReason, waitMsg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
-		report, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+		report, err = job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 		if err != nil {
 			loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
 			return
@@ -345,7 +345,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ScheduledReason, runningMsg)
 			cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
-			report, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+			report, err = job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 			if err != nil {
 				loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
 				return
@@ -373,7 +373,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
 				cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
 
-				_, updateErr := job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+				_, updateErr := job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 				if updateErr != nil {
 					loggerWithFields.WithError(updateErr).Errorf("unable to update scheduledReport status")
 				}
@@ -384,7 +384,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			// We generated a report successfully, remove the failure condition
 			cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
 			report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
-			_, err = job.chargeback.chargebackClient.ChargebackV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+			_, err = job.chargeback.chargebackClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 			if err != nil {
 				loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
 				return
@@ -398,10 +398,10 @@ type scheduledReportRunner struct {
 	reports    map[string]*scheduledReportJob
 	jobsChan   chan *scheduledReportJob
 	wg         sync.WaitGroup
-	chargeback *Chargeback
+	chargeback *Metering
 }
 
-func newScheduledReportRunner(chargeback *Chargeback) *scheduledReportRunner {
+func newScheduledReportRunner(chargeback *Metering) *scheduledReportRunner {
 	return &scheduledReportRunner{
 		reports:    make(map[string]*scheduledReportJob),
 		jobsChan:   make(chan *scheduledReportJob),
