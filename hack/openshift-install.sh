@@ -20,7 +20,7 @@ if [ "$METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE" == "true" ]; then
         --clusterrole \
         "${METERING_NAMESPACE_VIEWER_ROLE_NAME}" \
         --serviceaccount \
-        "${METERING_NAMESPACE}:metering" || true
+        "${METERING_NAMESPACE}:reporting-operator" || true
 ***REMOVED***
 
 export DEPLOY_PLATFORM=openshift
