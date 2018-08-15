@@ -1,9 +1,9 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: metering
+  name: reporting-operator
   labels:
-    app: metering
+    app: reporting-operator
 {{- if .Values.spec.service.annotations }}
   annotations:
 {{ toYaml .Values.spec.service.annotations | indent 4 }}
@@ -13,7 +13,7 @@ metadata:
 spec:
   type: "{{ .Values.spec.service.type }}"
   selector:
-    app: metering
+    app: reporting-operator
   ports:
   - name: http
     protocol: TCP
@@ -31,14 +31,14 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: metering-metrics
+  name: reporting-operator-metrics
   labels:
-    app: metering
+    app: reporting-operator
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   selector:
-    app: metering
+    app: reporting-operator
   ports:
   - protocol: TCP
     port: 8082

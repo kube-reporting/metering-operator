@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Con***REMOVED***gMap
 metadata:
-  name: metering-con***REMOVED***g
+  name: reporting-operator-con***REMOVED***g
   labels:
-    app: metering
+    app: reporting-operator
 {{- block "extraMetadata" . }}
 {{- end }}
 data:

@@ -1,9 +1,9 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: metering
+  name: reporting-operator
   labels:
-    app: metering
+    app: reporting-operator
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -13,26 +13,26 @@ spec:
   template:
     metadata:
       labels:
-        app: metering
+        app: reporting-operator
 {{- if .Values.spec.labels }}
 {{ toYaml .Values.spec.labels | indent 8 }}
 {{- end }}
       annotations:
-        metering-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/metering-con***REMOVED***g.yaml") . | sha256sum }}
+        reporting-operator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/reporting-operator-con***REMOVED***g.yaml") . | sha256sum }}
 {{- if .Values.spec.con***REMOVED***g.createAwsCredentialsSecret }}
-        metering-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/metering-aws-credentials-secrets.yaml") . | sha256sum }}
+        reporting-operator-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if and .Values.spec.con***REMOVED***g.tls.enabled .Values.spec.con***REMOVED***g.tls.createSecret }}
-        metering-tls-secrets-hash: {{ include (print $.Template.BasePath "/metering-tls-secrets.yaml") . | sha256sum }}
+        reporting-operator-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createCookieSecret }}
-        metering-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-cookie-secret.yaml") . | sha256sum }}
+        reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
 {{- end }}
 {{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createHtpasswdSecret }}
-        metering-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
+        reporting-operator-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
 {{- end }}
 {{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createAuthenticatedEmailsSecret }}
-        metering-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/metering-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
+        reporting-operator-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.spec.annotations }}
 {{ toYaml .Values.spec.annotations | indent 8 }}
@@ -41,7 +41,7 @@ spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - name: metering
+      - name: reporting-operator
         image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
         imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
         env:
@@ -64,59 +64,59 @@ spec:
         - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: log-dml-queries
         - name: CHARGEBACK_LOG_DDL_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: log-ddl-queries
         - name: CHARGEBACK_LOG_REPORT
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: log-reports
         - name: CHARGEBACK_PROMETHEUS_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: prometheus-url
         - name: CHARGEBACK_PROMSUM_INTERVAL
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: promsum-poll-interval
         - name: CHARGEBACK_PROMSUM_CHUNK_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: promsum-chunk-size
         - name: CHARGEBACK_PROMSUM_STEP_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: promsum-step-size
         - name: CHARGEBACK_DISABLE_PROMSUM
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: disable-promsum
         - name: CHARGEBACK_PRESTO_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: presto-host
         - name: CHARGEBACK_HIVE_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: hive-host
         - name: CHARGEBACK_LEASE_DURATION
           valueFrom:
             con***REMOVED***gMapKeyRef:
-              name: metering-con***REMOVED***g
+              name: reporting-operator-con***REMOVED***g
               key: leader-lease-duration
-{{/* If authProxy is enabled we do not enable TLS on the metering operator since the proxy will do TLS */}}
+{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
 {{- if and .Values.spec.con***REMOVED***g.tls.enabled (not .Values.spec.authProxy.enabled) }}
         - name: CHARGEBACK_USE_TLS
           value: "true"
@@ -151,7 +151,7 @@ spec:
           mountPath: /tls
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
-      - name: metering-auth-proxy
+      - name: reporting-operator-auth-proxy
         image: "{{ .Values.spec.authProxy.image.repository }}:{{ .Values.spec.authProxy.image.tag }}"
         imagePullPolicy: {{ .Values.spec.authProxy.image.pullPolicy }}
         args:
@@ -167,7 +167,7 @@ spec:
         - -request-logging=true
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        - -openshift-service-account=metering
+        - -openshift-service-account=reporting-operator
 {{- if .Values.spec.authProxy.authenticatedEmailsEnabled }}
         - -authenticated-emails-***REMOVED***le=/etc/proxy/authenticated-emails/emails
 {{- ***REMOVED*** }}
@@ -217,7 +217,7 @@ spec:
 {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      serviceAccount: metering
+      serviceAccount: reporting-operator
 {{- if .Values.spec.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
