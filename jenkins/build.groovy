@@ -4,9 +4,9 @@ def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def branchTag = env.BRANCH_NAME.toLowerCase()
 def deployTag = "${branchTag}-${currentBuild.number}"
 
-def dockerBuildArgs = ''
-if (isMasterBranch) {
-    dockerBuildArgs = '--no-cache'
+def dockerBuildArgs = '--no-cache'
+if (isPullRequest) {
+    dockerBuildArgs = ''
 }
 
 def podLabel = "operator-metering-build-${isMasterBranch ? 'master' : 'pr'}"
