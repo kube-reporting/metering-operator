@@ -9,12 +9,12 @@ All of the follow commands assume you've set the `METERING_NAMESPACE` environmen
 export METERING_NAMESPACE=your-namespace
 ```
 
-## Get Metering Operator Logs
+## Get Reporting Operator Logs
 
 The command below will follow the logs of the reporting-operator.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
+kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
 ```
 
 ## Query Presto using presto-cli
