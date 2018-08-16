@@ -78,7 +78,7 @@ spec:
     stages {
         stage('Prepare') {
             environment {
-                DOCKER_CREDS = credentials('quay-coreos-jenkins-push')
+                DOCKER_CREDS = credentials('quay-coreos-metering_ci-push')
             }
             steps {
                 container('docker') {

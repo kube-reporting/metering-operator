@@ -1,7 +1,7 @@
 spec:
   presto:
     image:
-      repository: quay.io/coreos/chargeback-presto
+      repository: quay.io/coreos/metering-presto
       tag: latest
       pullPolicy: Always
 
@@ -72,7 +72,7 @@ spec:
 
   hive:
     image:
-      repository: quay.io/coreos/chargeback-hive
+      repository: quay.io/coreos/metering-hive
       tag: latest
       pullPolicy: Always
 

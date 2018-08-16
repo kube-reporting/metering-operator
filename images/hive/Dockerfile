@@ -1,4 +1,4 @@
-FROM quay.io/coreos/chargeback-hadoop:latest
+FROM quay.io/coreos/metering-hadoop:latest
 
 ENV HIVE_VERSION=2.3.3
 ENV HIVE_HOME=/opt/hive
