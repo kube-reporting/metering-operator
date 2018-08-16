@@ -22,7 +22,7 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-REPORTING_OP_BIN_OUT = images/reporting-operator/bin/reporting-operator
+REPORTING_OPERATOR_BIN_OUT = images/reporting-operator/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
@@ -167,7 +167,7 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le $(REPORTING_OP_BIN_OUT)
+reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le $(REPORTING_OPERATOR_BIN_OUT)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
 metering-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
@@ -210,7 +210,7 @@ ci-validate: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
-reporting-operator-bin: $(REPORTING_OP_BIN_OUT)
+reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 
 reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
@@ -220,7 +220,7 @@ run-reporting-operator-local:
 	$(MAKE) reporting-operator-local
 	./hack/run-local-with-port-forward.sh $(REPORTING_OPERATOR_ARGS)
 
-$(REPORTING_OP_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
+$(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@
 
 build-reporting-operator:
