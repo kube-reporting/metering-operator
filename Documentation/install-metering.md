@@ -107,10 +107,10 @@ metering-operator-79666787c5-z4d2h        2/2       Running   0          10m
 presto-coordinator-54469ccb68-jfblb       1/1       Running   0          10m
 ```
 
-Check the logs of the `metering` deployment for errors:
+Check the logs of the `reporting-operator` pod for errors:
 
 ```
-$ kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
+$ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
 ```
 
 ## Using Operator Metering
