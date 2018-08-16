@@ -26,7 +26,7 @@ REPORTING_OP_BIN_OUT = images/reporting-operator/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
-METERING_HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
+METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
@@ -127,8 +127,8 @@ DOCKER_TARGETS := \
 	hive \
 	presto \
 	helm-operator \
-	metering-helm-operator
-# These generate new make targets like metering-helm-operator-docker-build
+	metering-operator
+# These generate new make targets like metering-operator-docker-build
 # which can be invoked.
 DOCKER_BUILD_TARGETS := $(addsuffix -docker-build, $(DOCKER_TARGETS))
 DOCKER_PUSH_TARGETS := $(addsuffix -docker-push, $(DOCKER_TARGETS))
@@ -137,17 +137,17 @@ DOCKER_PULL_TARGETS := $(addsuffix -docker-pull, $(DOCKER_TARGETS))
 
 # The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
-# The example will be using the metering-helm-operator targets as it's example.
+# The example will be using the metering-operator targets as it's example.
 #
 # The pattern/string manipulation below does the following (starting from the inner most expression):
 # 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suffixed value from $(TARGETS)
-# ex: metering-helm-operator-docker-build -> metering-helm-operator
+# ex: metering-operator-docker-build -> metering-operator
 # 2) Replaces - with _
-# ex: metering-helm-operator -> metering_helm_operator
+# ex: metering-operator -> metering_helm_operator
 # 3) Uppercases letters
 # ex: metering_helm_operator -> METERING_HELM_OPERATOR
 # 4) Appends _IMAGE
-# ex: METERING_HELM_OPERATOR -> METERING_HELM_OPERATOR_IMAGE
+# ex: METERING_HELM_OPERATOR -> METERING_OPERATOR_IMAGE
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
@@ -173,14 +173,14 @@ reporting-operator-docker-build: images/reporting-operator/Dockerfile $(REPORTIN
 metering-integration-tests-docker-build: images/integration-tests/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-helm-operator-docker-build: \
-		images/metering-helm-operator/Dockerfile \
+metering-operator-docker-build: \
+		images/metering-operator/Dockerfile \
 		helm-operator-docker-build \
-		images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
-		images/metering-helm-operator/openshift-metering-0.1.0.tgz \
-		images/metering-helm-operator/operator-metering-0.1.0.tgz \
-		images/metering-helm-operator/metering-override-values.yaml
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_HELM_OPERATOR_IMAGE)
+		images/metering-operator/tectonic-metering-0.1.0.tgz \
+		images/metering-operator/openshift-metering-0.1.0.tgz \
+		images/metering-operator/operator-metering-0.1.0.tgz \
+		images/metering-operator/metering-override-values.yaml
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -229,32 +229,32 @@ build-reporting-operator:
 	mkdir -p $(dir $@)
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_LOCATION) $(REPORTING_OPERATOR_PKG)
 
-images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+images/metering-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-CHART_DEPS := images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
-	images/metering-helm-operator/openshift-metering-0.1.0.tgz \
-	images/metering-helm-operator/operator-metering-0.1.0.tgz
+CHART_DEPS := images/metering-operator/tectonic-metering-0.1.0.tgz \
+	images/metering-operator/openshift-metering-0.1.0.tgz \
+	images/metering-operator/operator-metering-0.1.0.tgz
 
 all-charts: $(CHART_DEPS)
 
-tectonic-metering-chart: images/metering-helm-operator/tectonic-metering-0.1.0.tgz
+tectonic-metering-chart: images/metering-operator/tectonic-metering-0.1.0.tgz
 
-openshift-metering-chart: images/metering-helm-operator/openshift-metering-0.1.0.tgz
+openshift-metering-chart: images/metering-operator/openshift-metering-0.1.0.tgz
 
-operator-metering-chart: images/metering-helm-operator/operator-metering-0.1.0.tgz
+operator-metering-chart: images/metering-operator/operator-metering-0.1.0.tgz
 
-images/metering-helm-operator/tectonic-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+images/metering-operator/tectonic-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell find charts -type f)
 	helm dep update --skip-refresh charts/tectonic-metering
-	helm package --save=false -d images/metering-helm-operator charts/tectonic-metering
+	helm package --save=false -d images/metering-operator charts/tectonic-metering
 
-images/metering-helm-operator/openshift-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+images/metering-operator/openshift-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell find charts -type f)
 	helm dep update --skip-refresh charts/openshift-metering
-	helm package --save=false -d images/metering-helm-operator charts/openshift-metering
+	helm package --save=false -d images/metering-operator charts/openshift-metering
 
-images/metering-helm-operator/operator-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell find charts -type f)
+images/metering-operator/operator-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell find charts -type f)
 	helm dep update --skip-refresh charts/operator-metering
-	helm package --save=false -d images/metering-helm-operator charts/operator-metering
+	helm package --save=false -d images/metering-operator charts/operator-metering
 
 metering-manifests:
 	./hack/create-metering-manifests.sh $(RELEASE_TAG)
@@ -269,7 +269,7 @@ metering-manifests:
 	metering-integration-tests-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
-	images/metering-helm-operator/metering-override-values.yaml \
+	images/metering-operator/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm
 

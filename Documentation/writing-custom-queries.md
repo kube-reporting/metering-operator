@@ -122,7 +122,7 @@ presto:default> SELECT * FROM datasource_unready_deployment_replicas LIMIT 10;
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=alm-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=catalog-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=reporting-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=metering-helm-operator}
+    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=metering-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=container-linux-update-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=default-http-backend}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=default, deployment=etcd-operator}
@@ -326,7 +326,7 @@ This should output a CSV report that looks similar to this:
 ```
 period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_replica_unready_seconds
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,reporting-operator,3420,13.464566929133857
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,metering-helm-operator,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,metering-operator,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,presto,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,etcd-operator,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,example,15240,60
@@ -337,7 +337,7 @@ period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_r
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-dns,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-scheduler,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering,15240,60
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering-helm-operator,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering-operator,0,0
 ...
 ```
 

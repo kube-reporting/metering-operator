@@ -15,15 +15,15 @@ msg "Installing Custom Resource Definitions"
 kube-install \
     "$MANIFESTS_DIR/custom-resource-definitions"
 
-msg "Installing metering-helm-operator service account and RBAC resources"
+msg "Installing metering-operator service account and RBAC resources"
 kube-install \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-rolebinding.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
 
-msg "Installing metering-helm-operator"
+msg "Installing metering-operator"
 kube-install \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"
 
 msg "Installing Metering Resource"
 kube-install \

@@ -91,14 +91,14 @@ ${IMAGE_PULL_SECRET_TEXT:-}
 EOF
 
 cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
-name: metering-helm-operator.v${DEPLOY_TAG}
+name: metering-operator.v${DEPLOY_TAG}
 spec:
   version: ${DEPLOY_TAG}
   labels:
-    alm-status-descriptors: metering-helm-operator.v${DEPLOY_TAG}
-    alm-owner-metering: metering-helm-operator
+    alm-status-descriptors: metering-operator.v${DEPLOY_TAG}
+    alm-owner-metering: metering-operator
   matchLabels:
-    alm-owner-metering: metering-helm-operator
+    alm-owner-metering: metering-operator
 EOF
 
 echo "Creating metering manifests"
