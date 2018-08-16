@@ -1,25 +1,25 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: metering-helm-operator
+  name: metering-operator
   labels:
-    app: metering-helm-operator
+    app: metering-operator
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: metering-helm-operator
+      app: metering-operator
   template:
     metadata:
       labels:
-        app: metering-helm-operator
+        app: metering-operator
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - name: metering-helm-operator
+      - name: metering-operator
         image: "quay.io/coreos/chargeback-helm-operator:0.6.2-latest"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
@@ -93,4 +93,4 @@ spec:
           timeoutSeconds: 1
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      serviceAccount: metering-helm-operator
+      serviceAccount: metering-operator
