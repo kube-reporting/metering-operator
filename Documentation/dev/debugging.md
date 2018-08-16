@@ -9,12 +9,12 @@ All of the follow commands assume you've set the `METERING_NAMESPACE` environmen
 export METERING_NAMESPACE=your-namespace
 ```
 
-## Get Metering Operator Logs
+## Get Reporting Operator Logs
 
-The command below will follow the logs of the metering-operator.
+The command below will follow the logs of the reporting-operator.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
+kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
 ```
 
 ## Query Presto using presto-cli
@@ -31,7 +31,7 @@ After the above command you should be given a prompt, where you can run queries.
 presto:default> show tables;
                   Table
 ------------------------------------------
- chargeback_health_check
+ operator_health_check
  datasource_aws_billing
  datasource_node_allocatable_cpu_cores
  datasource_node_allocatable_memory_bytes
@@ -76,7 +76,7 @@ After the above command you should be given a prompt, where you can run queries.
 +-------------------------------------------+
 |                 tab_name                  |
 +-------------------------------------------+
-| chargeback_health_check                   |
+| operator_health_check                     |
 | datasource_aws_billing                    |
 | datasource_node_allocatable_cpu_cores     |
 | datasource_node_allocatable_memory_bytes  |

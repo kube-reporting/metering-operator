@@ -26,7 +26,7 @@ The report should be created in the same namespace as Metering is installed.
 First, create an example report. Save the following into a file called `report.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
   name: namespace-cpu-request
@@ -79,14 +79,14 @@ points to the Kubernetes service. (See the upstream documentation on
 [Manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes Metering is deployed in the `metering` namespace.
 
 ```
-http://127.0.0.1:8001/api/v1/namespaces/metering/services/metering:http/proxy/api/v1/reports/get?name=[Report Name]&format=[Format]
+http://127.0.0.1:8001/api/v1/namespaces/metering/services/reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&format=[Format]
 ```
 
 For example, the results of a report with the name `namespace-cpu-request` report can be fetched in
 CSV, with the following command:
 
 ```
-$ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/metering:http/proxy/api/v1/reports/get?name=namespace-cpu-request&format=csv"
+$ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/reporting-operator:http/proxy/api/v1/reports/get?name=namespace-cpu-request&format=csv"
 ```
 
 

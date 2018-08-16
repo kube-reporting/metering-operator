@@ -5,7 +5,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.config.logLevel | quote }}
-  default-fs: {{ printf "hdfs://%s:%d" .Values.config.namenodeHost (int .Values.config.namenodePort) | quote}}
-  namenode-host: {{ .Values.config.namenodeHost | quote}}
-  datanode-data-dir-perms: {{ .Values.config.datanodeDataDirPerms | quote}}
+  log-level: {{ upper .Values.spec.config.logLevel | quote }}
+  default-fs: {{ printf "hdfs://%s:%d" .Values.spec.config.namenodeHost (int .Values.spec.config.namenodePort) | quote}}
+  namenode-host: {{ .Values.spec.config.namenodeHost | quote}}
+  datanode-data-dir-perms: {{ .Values.spec.config.datanodeDataDirPerms | quote}}

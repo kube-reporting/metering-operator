@@ -5,7 +5,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  environment: {{ .Values.presto.config.environment | quote }}
-  discovery-uri: {{ .Values.presto.config.discoveryURI | quote }}
-  hive-metastore-uri: {{ .Values.presto.config.hiveMetastoreURI }}
+  environment: {{ .Values.spec.presto.config.environment | quote }}
+  discovery-uri: {{ .Values.spec.presto.config.discoveryURI | quote }}
+  hive-metastore-uri: {{ .Values.spec.presto.config.hiveMetastoreURI }}
 

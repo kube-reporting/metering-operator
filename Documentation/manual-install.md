@@ -90,20 +90,20 @@ For more details on configuration options, most are documented in the [configuri
 It's also possible to run the operator locally.
 To simplify this, we've got a few `Makefile` targets to handle the building and running of the operator.
 
-First, we still need to run Presto, Hive, and HDFS in the cluster, and also set metering-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
+First, we still need to run Presto, Hive, and HDFS in the cluster, and also set reporting-operator replicas to 0 so that our local operator can obtain the leader election lease when we start it.
 
-To do this, update your `metering-custom.yaml` to set `spec.metering-operator.replicas` to `0` like so:
+To do this, update your `metering-custom.yaml` to set `spec.reporting-operator.replicas` to `0` like so:
 
 ```
 spec:
-  metering-operator:
+  reporting-operator:
     replicas: 0
 ```
 
 Next, run the install script for your platform (see above).
 
 After running the install script, figure out where your Prometheus pod is running.
-By default the `run-chargeback-local` Makefile target assumes that the pod is in the `tectonic-system` namespace and can be queried using the label selector `app=prometheus`.
+By default the `run-reporting-operator-local` Makefile target assumes that the pod is in the `tectonic-system` namespace and can be queried using the label selector `app=prometheus`.
 
 If you're Prometheus is located somewhere, else, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus.
 
@@ -116,7 +116,7 @@ export METERING_PROMTHEUS_LABEL_SELECTOR=app=prometheus
 Finally, use the following command to build & run the operator:
 
 ```
-make run-chargeback-local
+make run-reporting-operator-local
 ```
 
 The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with configuration set to use these local port-forwards.

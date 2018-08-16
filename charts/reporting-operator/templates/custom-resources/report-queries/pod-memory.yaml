@@ -1,0 +1,376 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-request-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "pod-request-memory-bytes"
+  columns:
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: pod_request_memory_bytes
+    type: double
+    unit: bytes
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: pod_request_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          element_at(labels, 'node') as node,
+          labels,
+          amount as pod_request_memory_bytes,
+          timeprecision,
+          amount * timeprecision as pod_request_memory_byte_seconds,
+          "timestamp"
+      FROM {| dataSourceTableName "pod-request-memory-bytes" |}
+      WHERE element_at(labels, 'node') IS NOT NULL
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-usage-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "pod-usage-memory-bytes"
+  columns:
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: pod_usage_memory_bytes
+    type: double
+    unit: bytes
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: pod_usage_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          element_at(labels, 'node') as node,
+          labels,
+          amount as pod_usage_memory_bytes,
+          timeprecision,
+          amount * timeprecision as pod_usage_memory_byte_seconds,
+          "timestamp"
+      FROM {| dataSourceTableName "pod-usage-memory-bytes" |}
+      WHERE element_at(labels, 'node') IS NOT NULL
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-request"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-request-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-request-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_request_memory_byte_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-usage"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_usage_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_usage_memory_byte_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-memory-request"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-request-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-request-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_request_memory_byte_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-memory-usage"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_usage_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
+    FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_usage_memory_byte_seconds DESC
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-memory-request-vs-node-memory-allocatable"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-memory-request-raw"
+  - "node-memory-allocatable"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_memory_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: pod_memory_usage_percent
+    type: double
+  query: |
+    WITH node_memory_allocatable AS (
+      SELECT min("timestamp") as node_allocatable_data_start,
+        max("timestamp") as node_allocatable_data_end,
+        sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
+      FROM {| generationQueryViewName "node-memory-allocatable" |}
+        WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+        AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    ), pod_memory_consumption AS (
+      SELECT pod,
+              namespace,
+              node,
+              min("timestamp") as data_start,
+              max("timestamp") as data_end,
+              sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+      FROM {| generationQueryViewName "pod-memory-request-raw" |}
+      WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+      AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+      GROUP BY pod, namespace, node
+    )
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod_memory_consumption.*,
+      pod_memory_consumption.pod_request_memory_byte_seconds / node_memory_allocatable.node_allocatable_memory_byte_seconds as pod_memory_usage_percent
+    FROM pod_memory_consumption
+    CROSS JOIN node_memory_allocatable
+    ORDER BY pod_memory_consumption.pod_request_memory_byte_seconds DESC

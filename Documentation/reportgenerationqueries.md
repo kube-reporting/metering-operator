@@ -3,7 +3,7 @@
 Customizing how Operator Metering generates reports is done using a custom resource called a `ReportGenerationQuery`.
 
 These `ReportGenerationQuery` resources control the SQL queries that can be used to produce a report.
-When writing a [report](report.md) you can specify the query it will use by setting the `spec.generationQuery` field to `metadata.name` of any `ReportGenerationQuery` in the metering-operator's namespace.
+When writing a [report](report.md) you can specify the query it will use by setting the `spec.generationQuery` field to `metadata.name` of any `ReportGenerationQuery` in the reporting-operator's namespace.
 
 ## Fields
 
@@ -58,7 +58,7 @@ The query is not intended to be used by Reports, but instead is intended to be r
 The important things to note with this query is that it's querying a database table containing Prometheus metric data for the `pod-request-memory-bytes` `ReportDataSource`, and it's getting the table name using the `dataSourceTableName` template function.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-raw"
@@ -110,7 +110,7 @@ It summarizes the information exposed in the example above by Kubernetes namespa
 The important things to note with this example is that it's depending on the previous `ReportGenerationQuery` and referencing the database view by using the `generationQueryViewName` template function.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-memory-request"

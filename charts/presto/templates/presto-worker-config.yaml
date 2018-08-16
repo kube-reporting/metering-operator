@@ -5,13 +5,13 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.presto.worker.config.logLevel | quote }}
-{{- if .Values.presto.worker.config.taskConcurrency }}
-  task-concurrency: {{ .Values.presto.worker.config.taskConcurrency | quote }}
+  log-level: {{ upper .Values.spec.presto.worker.config.logLevel | quote }}
+{{- if .Values.spec.presto.worker.config.taskConcurrency }}
+  task-concurrency: {{ .Values.spec.presto.worker.config.taskConcurrency | quote }}
 {{- end }}
-{{- if .Values.presto.worker.config.taskMaxWorkerThreads }}
-  task-max-worker-threads: {{ .Values.presto.worker.config.taskMaxWorkerThreads | quote }}
+{{- if .Values.spec.presto.worker.config.taskMaxWorkerThreads }}
+  task-max-worker-threads: {{ .Values.spec.presto.worker.config.taskMaxWorkerThreads | quote }}
 {{- end }}
-{{- if .Values.presto.worker.config.taskMinDrivers }}
-  task-min-drivers: {{ .Values.presto.worker.config.taskMinDrivers | quote }}
+{{- if .Values.spec.presto.worker.config.taskMinDrivers }}
+  task-min-drivers: {{ .Values.spec.presto.worker.config.taskMinDrivers | quote }}
 {{- end }}

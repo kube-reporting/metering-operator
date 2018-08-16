@@ -31,25 +31,25 @@ helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
     -x "templates/role.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$OUTPUT_DIR/metering-helm-operator-role.yaml"
+    > "$OUTPUT_DIR/metering-operator-role.yaml"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
     -x "templates/rolebinding.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$OUTPUT_DIR/metering-helm-operator-rolebinding.yaml"
+    > "$OUTPUT_DIR/metering-operator-rolebinding.yaml"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
     -x "templates/deployment.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$OUTPUT_DIR/metering-helm-operator-deployment.yaml"
+    > "$OUTPUT_DIR/metering-operator-deployment.yaml"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
     -x "templates/service-account.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$OUTPUT_DIR/metering-helm-operator-service-account.yaml"
+    > "$OUTPUT_DIR/metering-operator-service-account.yaml"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-operator-config
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log-reports: {{ .Values.spec.config.logReports | quote}}
+  log-ddl-queries: {{ .Values.spec.config.logDDLQueries | quote}}
+  log-dml-queries: {{ .Values.spec.config.logDMLQueries | quote}}
+  disable-promsum: {{ .Values.spec.config.disablePromsum | quote}}
+  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" .Values.spec.config.prometheusURL | quote}}
+  promsum-poll-interval: {{ .Values.spec.config.promsumPollInterval | quote}}
+  promsum-chunk-size: {{ .Values.spec.config.promsumChunkSize | quote}}
+  promsum-step-size: {{ .Values.spec.config.promsumStepSize | quote}}
+  leader-lease-duration: {{ .Values.spec.config.leaderLeaseDuration | quote }}
+  presto-host: {{ .Values.spec.config.prestoHost | quote }}
+  hive-host: {{ .Values.spec.config.hiveHost | quote }}

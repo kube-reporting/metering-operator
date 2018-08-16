@@ -1,0 +1,53 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: reporting-operator
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+rules:
+- apiGroups: ["metering.openshift.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: reporting-operator
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reporting-operator
+subjects:
+- kind: ServiceAccount
+  name: reporting-operator

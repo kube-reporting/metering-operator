@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/operator-framework/operator-metering/pkg/chargeback"
+	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
 func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
@@ -28,7 +28,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		// 10 minutes
 		f.reportStart = f.reportEnd.Add(-10 * time.Minute)
 
-		reqParams := chargeback.CollectPromsumDataRequest{
+		reqParams := operator.CollectPromsumDataRequest{
 			StartTime: f.reportStart,
 			EndTime:   f.reportEnd,
 		}
@@ -36,7 +36,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		require.NoError(t, err, "should be able to json encode request parameters")
 		collectEndpoint := "/api/v1/datasources/prometheus/collect"
 		t.Logf("Querying %s, currentTime: %s", collectEndpoint, currentTime)
-		req := f.NewChargebackSVCPOSTRequest(collectEndpoint, body)
+		req := f.NewReportingOperatorSVCPOSTRequest(collectEndpoint, body)
 		result := req.Do()
 		resp, err := result.Raw()
 		t.Logf("Finishing querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(currentTime))

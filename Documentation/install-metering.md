@@ -66,7 +66,7 @@ For instructions on installing using our manual install scripts follow the [manu
 First, wait until the Metering Helm operator deploys all of the Metering components:
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=metering-helm-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-helm-operator
+kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-operator
 ```
 
 When output similar to the following appears, the rest of the Pods should be initializing:
@@ -74,8 +74,8 @@ When output similar to the following appears, the rest of the Pods should be ini
 ```
 Waiting for Tiller to become ready
 Waiting for Tiller to become ready
-Getting pod metering-helm-operator-b5f86788c-ks4zq owner information
-Querying for Deployment metering-helm-operator
+Getting pod metering-operator-b5f86788c-ks4zq owner information
+Querying for Deployment metering-operator
 No values, using default values
 Running helm upgrade for release operator-metering
 Release "operator-metering" has been upgraded. Happy Helming!
@@ -103,14 +103,14 @@ hdfs-namenode-0                           1/1       Running   0          10m
 hive-metastore-0                          1/1       Running   0          10m
 hive-server-0                             1/1       Running   0          10m
 metering-5c6c9d6cc5-7pzwv                 1/1       Running   1          10m
-metering-helm-operator-79666787c5-z4d2h   2/2       Running   0          10m
+metering-operator-79666787c5-z4d2h        2/2       Running   0          10m
 presto-coordinator-54469ccb68-jfblb       1/1       Running   0          10m
 ```
 
-Check the logs of the `metering` deployment for errors:
+Check the logs of the `reporting-operator` pod for errors:
 
 ```
-$ kubectl get pods -n $METERING_NAMESPACE -l app=metering -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
+$ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
 ```
 
 ## Using Operator Metering

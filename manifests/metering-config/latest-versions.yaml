@@ -1,21 +1,23 @@
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  metering-operator:
-    image:
-      tag: latest
+  reporting-operator:
+    spec:
+      image:
+        tag: latest
 
   presto:
-    presto:
-      image:
-        tag: latest
-    hive:
-      image:
-        tag: latest
+    spec:
+      presto:
+        image:
+          tag: latest
+      hive:
+        image:
+          tag: latest
 
   hdfs:
-    image:
-      tag: latest
-
+    spec:
+      image:
+        tag: latest

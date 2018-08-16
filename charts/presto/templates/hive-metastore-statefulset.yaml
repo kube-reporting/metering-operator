@@ -16,35 +16,35 @@ spec:
     matchLabels:
       app: hive
       hive: metastore
-{{- if .Values.hive.labels }}
-{{ toYaml .Values.hive.labels | indent 6 }}
+{{- if .Values.spec.hive.labels }}
+{{ toYaml .Values.spec.hive.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: hive
         hive: metastore
-{{- if .Values.hive.labels }}
-{{ toYaml .Values.hive.labels | indent 8 }}
+{{- if .Values.spec.hive.labels }}
+{{ toYaml .Values.spec.hive.labels | indent 8 }}
 {{- end }}
       annotations:
         hive-common-configmap-hash: {{ include (print $.Template.BasePath "/hive-common-config.yaml") . | sha256sum }}
         hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
         hive-metastore-configmap-hash: {{ include (print $.Template.BasePath "/hive-metastore-config.yaml") . | sha256sum }}
-{{- if .Values.config.createAwsCredentialsSecret }}
+{{- if .Values.spec.config.createAwsCredentialsSecret }}
         presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.hive.annotations }}
-{{ toYaml .Values.hive.annotations | indent 8 }}
+{{- if .Values.spec.hive.annotations }}
+{{ toYaml .Values.spec.hive.annotations | indent 8 }}
 {{- end }}
     spec:
       securityContext:
-{{ toYaml .Values.hive.securityContext | indent 8 }}
+{{ toYaml .Values.spec.hive.securityContext | indent 8 }}
       containers:
       - name: metastore
         args: ["--service", "metastore"]
-        image: "{{ .Values.hive.image.repository }}:{{ .Values.hive.image.tag }}"
-        imagePullPolicy: {{ .Values.hive.image.pullPolicy }}
+        image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:
         - name: meta
           containerPort: 9083
@@ -77,10 +77,10 @@ spec:
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
         resources:
-{{ toYaml .Values.hive.metastore.resources | indent 10 }}
+{{ toYaml .Values.spec.hive.metastore.resources | indent 10 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      terminationGracePeriodSeconds: {{ .Values.hive.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.spec.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
       volumes:
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
@@ -92,7 +92,7 @@ spec:
       - name: datanode-empty
         emptyDir: {}
       - name: hive-metastore-db-data
-{{- if .Values.hive.metastore.storage.create }}
+{{- if .Values.spec.hive.metastore.storage.create }}
         persistentVolumeClaim:
           claimName: hive-metastore-db-data
 {{- else }}

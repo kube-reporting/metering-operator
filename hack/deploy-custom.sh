@@ -33,51 +33,54 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
 fi
 
 cat <<EOF > "$METERING_CR_FILE"
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Metering
 metadata:
   name: "${DEPLOY_PLATFORM}-metering"
 spec:
-  metering-operator:
-    image:
-      tag: ${DEPLOY_TAG}
+  reporting-operator:
+    spec:
+      image:
+        tag: ${DEPLOY_TAG}
 
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 
-    config:
-      disablePromsum: ${DISABLE_PROMSUM}
-      awsBillingDataSource:
-        enabled: ${ENABLE_AWS_BILLING}
-        bucket: "${AWS_BILLING_BUCKET}"
-        prefix: "${AWS_BILLING_BUCKET_PREFIX}"
-        region: "${AWS_BILLING_BUCKET_REGION}"
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
+      config:
+        disablePromsum: ${DISABLE_PROMSUM}
+        awsBillingDataSource:
+          enabled: ${ENABLE_AWS_BILLING}
+          bucket: "${AWS_BILLING_BUCKET}"
+          prefix: "${AWS_BILLING_BUCKET_PREFIX}"
+          region: "${AWS_BILLING_BUCKET_REGION}"
+        awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
+        awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
 
   presto:
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    config:
-      awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
-      awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
-    presto:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-      image:
-        tag: ${DEPLOY_TAG}
-    hive:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-      image:
-        tag: ${DEPLOY_TAG}
+    spec:
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      config:
+        awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
+        awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
+      presto:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        image:
+          tag: ${DEPLOY_TAG}
+      hive:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        image:
+          tag: ${DEPLOY_TAG}
 
   hdfs:
-    image:
-      tag: ${DEPLOY_TAG}
-    ${IMAGE_PULL_SECRET_TEXT:-}
-    datanode:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-    namenode:
-      terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+    spec:
+      image:
+        tag: ${DEPLOY_TAG}
+      ${IMAGE_PULL_SECRET_TEXT:-}
+      datanode:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+      namenode:
+        terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 EOF
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
@@ -88,14 +91,14 @@ ${IMAGE_PULL_SECRET_TEXT:-}
 EOF
 
 cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
-name: metering-helm-operator.v${DEPLOY_TAG}
+name: metering-operator.v${DEPLOY_TAG}
 spec:
   version: ${DEPLOY_TAG}
   labels:
-    alm-status-descriptors: metering-helm-operator.v${DEPLOY_TAG}
-    alm-owner-metering: metering-helm-operator
+    alm-status-descriptors: metering-operator.v${DEPLOY_TAG}
+    alm-owner-metering: metering-operator
   matchLabels:
-    alm-owner-metering: metering-helm-operator
+    alm-owner-metering: metering-operator
 EOF
 
 echo "Creating metering manifests"

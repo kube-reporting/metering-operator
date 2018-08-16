@@ -5,13 +5,13 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-{{- if .Values.hive.config.defaultfs }}
-  default-fs: {{ .Values.hive.config.defaultfs | quote}}
+{{- if .Values.spec.hive.config.defaultfs }}
+  default-fs: {{ .Values.spec.hive.config.defaultfs | quote}}
 {{- end }}
-  db-connection-url: {{ .Values.hive.config.dbConnectionURL | quote}}
-  db-connection-driver: {{ .Values.hive.config.dbConnectionDriver | quote}}
-  enable-metastore-schema-verification: {{ .Values.hive.config.enableMetastoreSchemaVerification | quote}}
-  auto-create-metastore-schema: {{ .Values.hive.config.autoCreateMetastoreSchema | quote}}
-  default-file-format: {{ .Values.hive.config.defaultFileFormat | quote}}
-  metastore-uris: {{ .Values.hive.config.metastoreURIs | quote}}
+  db-connection-url: {{ .Values.spec.hive.config.dbConnectionURL | quote}}
+  db-connection-driver: {{ .Values.spec.hive.config.dbConnectionDriver | quote}}
+  enable-metastore-schema-verification: {{ .Values.spec.hive.config.enableMetastoreSchemaVerification | quote}}
+  auto-create-metastore-schema: {{ .Values.spec.hive.config.autoCreateMetastoreSchema | quote}}
+  default-file-format: {{ .Values.spec.hive.config.defaultFileFormat | quote}}
+  metastore-uris: {{ .Values.spec.hive.config.metastoreURIs | quote}}
 

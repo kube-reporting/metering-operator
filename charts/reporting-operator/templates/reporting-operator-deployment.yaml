@@ -1,0 +1,224 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: reporting-operator
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  replicas: {{ .Values.spec.replicas }}
+  strategy:
+{{ toYaml .Values.spec.updateStrategy | indent 4 }}
+  template:
+    metadata:
+      labels:
+        app: reporting-operator
+{{- if .Values.spec.labels }}
+{{ toYaml .Values.spec.labels | indent 8 }}
+{{- end }}
+      annotations:
+        reporting-operator-config-hash: {{ include (print $.Template.BasePath "/reporting-operator-config.yaml") . | sha256sum }}
+{{- if .Values.spec.config.createAwsCredentialsSecret }}
+        reporting-operator-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.spec.config.tls.enabled .Values.spec.config.tls.createSecret }}
+        reporting-operator-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createCookieSecret }}
+        reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createHtpasswdSecret }}
+        reporting-operator-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.spec.authProxy.enabled .Values.spec.authProxy.createAuthenticatedEmailsSecret }}
+        reporting-operator-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.spec.annotations }}
+{{ toYaml .Values.spec.annotations | indent 8 }}
+{{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: reporting-operator
+        image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
+              key: aws-access-key-id
+              optional: true
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
+              key: aws-secret-access-key
+              optional: true
+        - name: CHARGEBACK_LOG_DML_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: log-dml-queries
+        - name: CHARGEBACK_LOG_DDL_QUERIES
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: log-ddl-queries
+        - name: CHARGEBACK_LOG_REPORT
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: log-reports
+        - name: CHARGEBACK_PROMETHEUS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-url
+        - name: CHARGEBACK_PROMSUM_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: promsum-poll-interval
+        - name: CHARGEBACK_PROMSUM_CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: promsum-chunk-size
+        - name: CHARGEBACK_PROMSUM_STEP_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: promsum-step-size
+        - name: CHARGEBACK_DISABLE_PROMSUM
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: disable-promsum
+        - name: CHARGEBACK_PRESTO_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-host
+        - name: CHARGEBACK_HIVE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-host
+        - name: CHARGEBACK_LEASE_DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: leader-lease-duration
+{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
+{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) }}
+        - name: CHARGEBACK_USE_TLS
+          value: "true"
+        - name: CHARGEBACK_TLS_KEY
+          value: "/tls/tls.key"
+        - name: CHARGEBACK_TLS_CERT
+          value: "/tls/tls.crt"
+{{- else }}
+        - name: CHARGEBACK_USE_TLS
+          value: "false"
+{{- end }}
+        resources:
+{{ toYaml .Values.spec.resources | indent 10 }}
+        ports:
+        - name: "http"
+          containerPort: 8080
+        - name: "pprof"
+          containerPort: 6060
+        - name: "metrics"
+          containerPort: 8082
+{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) -}}
+{{- $_ := set .Values.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
+{{- $_ := set .Values.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
+{{- end }}
+        readinessProbe:
+{{ toYaml .Values.spec.readinessProbe | indent 10 }}
+        livenessProbe:
+{{ toYaml .Values.spec.livenessProbe | indent 10 }}
+{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) }}
+        volumeMounts:
+        - name: tls
+          mountPath: /tls
+{{- end }}
+{{- if .Values.spec.authProxy.enabled }}
+      - name: reporting-operator-auth-proxy
+        image: "{{ .Values.spec.authProxy.image.repository }}:{{ .Values.spec.authProxy.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.authProxy.image.pullPolicy }}
+        args:
+        - -provider=openshift
+        - -https-address=:8081
+        - -http-address=
+        - -upstream=http://localhost:8080
+        - -htpasswd-file=/etc/proxy/htpasswd/auth
+        - -tls-cert=/etc/tls/tls.crt
+        - -tls-key=/etc/tls/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/cookie-secret/cookie-secret-seed
+        - -request-logging=true
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-service-account=reporting-operator
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled }}
+        - -authenticated-emails-file=/etc/proxy/authenticated-emails/emails
+{{- else }}
+        - -email-domain=*
+{{- end }}
+{{- if .Values.spec.authProxy.subjectAccessReviewEnabled }}
+        - '-openshift-sar={"resource": "namespaces", "verb": "get"}'
+{{- end }}
+{{- if .Values.spec.authProxy.delegateURLsEnabled }}
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get"}}'
+{{- end }}
+        ports:
+        - name: auth-proxy
+          containerPort: 8081
+        resources:
+{{ toYaml .Values.spec.authProxy.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: /etc/tls
+          name: tls
+        - mountPath: /etc/proxy/cookie-secret
+          name: cookie-secret
+        - mountPath: /etc/proxy/htpasswd
+          name: htpasswd-secret
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled  }}
+        - mountPath: /etc/proxy/authenticated-emails
+          name: authenticated-emails-secret
+{{- end }}
+{{- end }}
+      volumes:
+{{- if .Values.spec.config.tls.enabled }}
+      - name: tls
+        secret:
+          secretName: {{ .Values.spec.config.tls.secretName }}
+{{- end }}
+{{- if .Values.spec.authProxy.enabled }}
+      - name: cookie-secret
+        secret:
+          secretName: {{ .Values.spec.authProxy.cookieSecretName }}
+      - name: htpasswd-secret
+        secret:
+          secretName: {{ .Values.spec.authProxy.htpasswdSecretName }}
+{{- if .Values.spec.authProxy.authenticatedEmailsEnabled  }}
+      - name: authenticated-emails-secret
+        secret:
+          secretName: {{ .Values.spec.authProxy.authenticatedEmailsSecretName }}
+{{- end }}
+{{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: reporting-operator
+{{- if .Values.spec.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
+{{- end }}

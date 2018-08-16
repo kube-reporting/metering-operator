@@ -15,7 +15,7 @@ var testFramework *framework.Framework
 
 func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
-	ns := flag.String("namespace", "chargeback-ci", "test namespace")
+	ns := flag.String("namespace", "metering-ci", "test namespace")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
 	flag.Parse()
 

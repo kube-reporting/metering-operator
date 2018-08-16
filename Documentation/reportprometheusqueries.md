@@ -15,7 +15,7 @@ All fields that can be controlled on an individual `ReportPrometheusQuery` level
 The example resource below is installed by default when installing Operator Metering.
 
 ```yaml
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
   name: "pod-request-memory-bytes"
