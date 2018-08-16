@@ -57,8 +57,8 @@ if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
     echo "Skipping uninstall"
 ***REMOVED***
 
-until [ "$(kubectl -n $METERING_NAMESPACE get deployments -l app=metering-helm-operator -o json | jq '.items | length' -r)" == "0" ]; do
-    echo 'waiting for metering-helm-operator deployment to be deleted'
+until [ "$(kubectl -n $METERING_NAMESPACE get deployments -l app=metering-operator -o json | jq '.items | length' -r)" == "0" ]; do
+    echo 'waiting for metering-operator deployment to be deleted'
     sleep 5
 done
 
@@ -74,8 +74,8 @@ if [ "$INSTALL_METERING" == "true" ]; then
     echo "Skipping install"
 ***REMOVED***
 
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-helm-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
-    echo 'waiting for metering-helm-operator pods to be ready'
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
+    echo 'waiting for metering-operator pods to be ready'
     sleep 5
 done
 echo "metering helm-operator is ready"

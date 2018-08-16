@@ -13,8 +13,8 @@ if [[ -n "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES-}" && -n "${CUSTOM_ALM_OVERRIDE
     "$ROOT_DIR/hack/create-metering-manifests.sh"
 ***REMOVED***
     if [ $# -lt 2 ]; then
-        echo "Usage: $0 [metering-helm-operator-image-tag] [install-script] [args]"
-        echo "Must specify at least two args, metering-helm-operator image tag, and the install script to run"
+        echo "Usage: $0 [metering-operator-image-tag] [install-script] [args]"
+        echo "Must specify at least two args, metering-operator image tag, and the install script to run"
         exit 1
     ***REMOVED***
 

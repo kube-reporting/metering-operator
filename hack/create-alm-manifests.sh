@@ -13,9 +13,9 @@ if [[ $# -ge 3 ]] ; then
     DEPLOYER_MANIFESTS_DIR=$1
     echo "Deployer manifest directory: $DEPLOYER_MANIFESTS_DIR"
 
-    DEPLOYMENT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
-    RBAC_ROLE_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-role.yaml"
-    RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml"
+    DEPLOYMENT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-deployment.yaml"
+    RBAC_ROLE_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-role.yaml"
+    RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
     for f in "$DEPLOYMENT_MANIFEST" "$RBAC_ROLE_MANIFEST" "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST"; do
         if [ ! -e "$f" ]; then

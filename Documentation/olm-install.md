@@ -47,13 +47,13 @@ You should see something like this in the output:
 
 ```
 NAME                                                           AGE
-subscription-v1.app.coreos.com/metering-helm-operator.v0.6.0   4m
+subscription-v1.app.coreos.com/metering-operator.v0.6.0        4m
 
 NAME                                                                        AGE
-installplan-v1.app.coreos.com/install-metering-helm-operator.v0.6.0-jhrr4   4m
+installplan-v1.app.coreos.com/install-metering-operator.v0.6.0-jhrr4        4m
 
 NAME                                                                    AGE
-clusterserviceversion-v1.app.coreos.com/metering-helm-operator.v0.6.0   4m
+clusterserviceversion-v1.app.coreos.com/metering-operator.v0.6.0        4m
 ```
 
 **Note: The Subscription, and InstallPlan resources declare an intent to perform an installation once. This means they do not ensure the ClusterServiceVersion exists after creating it the ***REMOVED***rst time, and deleting them will not result in the operator being uninstalled. For details on uninstall, see [Uninstalling Metering](#uninstalling-metering).**
