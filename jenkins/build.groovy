@@ -9,9 +9,9 @@ if (isPullRequest) {
     dockerBuildArgs = ''
 }
 
-def podLabel = "operator-metering-build-${isMasterBranch ? 'master' : 'pr'}"
-def maxInstances = isMasterBranch ? 1 : 5
-def idleMin = isMasterBranch ? 15 : 60
+def podLabel = "operator-metering-build-${isPullRequest ? 'pr' : 'master'}"
+def maxInstances = isPullRequest ? 5 : 2
+def idleMin = isPullRequest ? 60: 15
 
 pipeline {
     agent {
