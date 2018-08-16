@@ -8,7 +8,7 @@ spec:
   config:
     awsAccessKeyID: ""
     awsSecretAccessKey: ""
-    awsCredentialsSecretName: metering-aws-credentials-secrets
+    awsCredentialsSecretName: reporting-operator-aws-credentials-secrets
     createAwsCredentialsSecret: true
 
     tls:
@@ -16,7 +16,7 @@ spec:
       createSecret: false
       certificateData: null
       privateKeyData: null
-      secretName: metering-tls-secrets
+      secretName: reporting-operator-tls-secrets
 
     defaultStorage:
       create: true
@@ -139,11 +139,11 @@ spec:
       tag: v1.1.0
       pullPolicy: Always
 
-    htpasswdSecretName: metering-auth-proxy-htpasswd
+    htpasswdSecretName: reporting-operator-auth-proxy-htpasswd
     createHtpasswdSecret: true
     htpasswdData: ""
 
-    cookieSecretName: metering-auth-proxy-cookie-seed
+    cookieSecretName: reporting-operator-auth-proxy-cookie-seed
     createCookieSecret: true
     cookieSeed: ""
 
@@ -151,7 +151,7 @@ spec:
     subjectAccessReviewEnabled: false
     delegateURLsEnabled: false
 
-    authenticatedEmailsSecretName: metering-auth-proxy-authenticated-emails
+    authenticatedEmailsSecretName: reporting-operator-auth-proxy-authenticated-emails
     authenticatedEmailsEnabled: false
     createAuthenticatedEmailsSecret: true
     authenticatedEmailsData: ""

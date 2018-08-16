@@ -5,10 +5,10 @@ reporting-operator:
       tls:
         enabled: true
         createSecret: false
-        secretName: "metering-tls-secrets"
+        secretName: "reporting-operator-tls-secrets"
     service:
       annotations:
-        "service.alpha.openshift.io/serving-cert-secret-name": "metering-tls-secrets"
+        "service.alpha.openshift.io/serving-cert-secret-name": "reporting-operator-tls-secrets"
     image:
       tag: latest
 
