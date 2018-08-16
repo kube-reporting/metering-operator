@@ -159,8 +159,7 @@ value to `false`.
 ```
 spec:
   hdfs:
-    spec:
-      enabled: false
+    enabled: false
 ```
 
 ### AWS billing correlation

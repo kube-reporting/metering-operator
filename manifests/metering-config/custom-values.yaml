@@ -79,8 +79,8 @@ spec:
   # requests. These examples use the defaults.
 
   # hdfs:
+  #   enabled: true
   #   spec:
-  #     enabled: true
   #     datanode:
   #       resources:
   #         requests:
