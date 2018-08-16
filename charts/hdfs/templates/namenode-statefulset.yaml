@@ -67,28 +67,28 @@ spec:
     metadata:
       labels:
         app: hdfs-namenode
-{{- if .Values.namenode.labels }}
-{{ toYaml .Values.namenode.labels | indent 8 }}
+{{- if .Values.spec.namenode.labels }}
+{{ toYaml .Values.spec.namenode.labels | indent 8 }}
 {{- end }}
       annotations:
         hdfs-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/con***REMOVED***gmap.yaml") . | sha256sum }}
-{{- if .Values.namenode.annotations }}
-{{ toYaml .Values.namenode.annotations | indent 8 }}
+{{- if .Values.spec.namenode.annotations }}
+{{ toYaml .Values.spec.namenode.annotations | indent 8 }}
 {{- end }}
     spec:
-      terminationGracePeriodSeconds: {{ .Values.namenode.terminationGracePeriodSeconds }}
-{{- if .Values.securityContext }}
+      terminationGracePeriodSeconds: {{ .Values.spec.namenode.terminationGracePeriodSeconds }}
+{{- if .Values.spec.securityContext }}
       securityContext:
-{{ toYaml .Values.securityContext | indent 8 }}
+{{ toYaml .Values.spec.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.namenode.af***REMOVED***nity }}
+{{- if .Values.spec.namenode.af***REMOVED***nity }}
       af***REMOVED***nity:
-{{ toYaml .Values.namenode.af***REMOVED***nity | indent 8 }}
+{{ toYaml .Values.spec.namenode.af***REMOVED***nity | indent 8 }}
 {{- end }}
       containers:
       - name: hdfs-namenode
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
         args: ["namenode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
@@ -142,11 +142,11 @@ spec:
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
         resources:
-{{ toYaml .Values.namenode.resources | indent 10 }}
+{{ toYaml .Values.spec.namenode.resources | indent 10 }}
       serviceAccount: hdfs
-{{- if .Values.imagePullSecrets }}
+{{- if .Values.spec.imagePullSecrets }}
       imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}
       volumes:
       - name: datanode-empty
@@ -158,7 +158,7 @@ spec:
         app: hdfs-namenode
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ .Values.namenode.storage.class }}
+      storageClassName: {{ .Values.spec.namenode.storage.class }}
       resources:
         requests:
-          storage: {{ .Values.namenode.storage.size }}
+          storage: {{ .Values.spec.namenode.storage.size }}

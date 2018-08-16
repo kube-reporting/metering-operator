@@ -2,7 +2,7 @@
 
 Operator metering is composed of 3 major components:
 
-- `metering-operator`: A Kubernetes operator written in Go that uses custom resources as the way users request reports.
+- `reporting-operator`: A Kubernetes operator written in Go that uses custom resources as the way users request reports.
 - [Presto][presto-overview]: A distributed SQL Database written in Java, designed for doing big data and analytical queries.
 - [Hive][hive-overview]: A data warehousing application the facilitates reading, writing, and managing data already residing in a distributed storage location.
   - Presto has a dependency on Hive, and uses Hive for keeping metadata about the data Presto is working with.
@@ -52,14 +52,14 @@ A `ReportDataSource` instructs the metering operator to create a database table 
 
 #### Promsum ReportDataSources
 
-A `promsum` ReportDataSource con***REMOVED***gures the metering-operator to periodically poll Prometheus for metrics.
+A `promsum` ReportDataSource con***REMOVED***gures the reporting-operator to periodically poll Prometheus for metrics.
 
 When the ReportDataSource is created, the metering operator does the following:
 
 - Checks if this `ReportDataSource` has a table created for it yet, and if not, create the table.
   - The underlying storage for this Presto table is controlled using the `StorageLocation` con***REMOVED***guration in `spec.promsum.storage`, which controls what options to use when creating the Presto table, such what Presto connector is used.
 
-Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `promsum` section is speci***REMOVED***ed, does the following to attempt to poll Prometheus metrics for each:
+Additionally, in the background the reporting-operator is periodically, listing all `ReportDataSources` and if the `promsum` section is speci***REMOVED***ed, does the following to attempt to poll Prometheus metrics for each:
 
 - Check if the table for this ReportDataSource exists, if it doesn't, it will skip collecting any data, until the next poll for the `ReportDataSource` again.
 - Retrieve the query speci***REMOVED***ed in the `ReportPrometheusQuery` named by the ReportDataSources `spec.promsum.query` ***REMOVED***eld.
@@ -68,18 +68,18 @@ Additionally, in the background the metering-operator is periodically, listing a
   - Currently this is done using an `INSERT` query using Presto, but this is subject to change as other `StorageLocations` are added.
 
 Currently all promsum ReportDataSources are collected at the same time in parallel.
-Metric resolution, and poll interval is controlled at a global level on the metering operator via the `Metering` resource's `spec.metering-operator.con***REMOVED***g` section.
+Metric resolution, and poll interval is controlled at a global level on the metering operator via the `Metering` resource's `spec.reporting-operator.con***REMOVED***g` section.
 
 #### AWSBilling ReportDataSources
 
-An `awsBilling` ReportDataSource con***REMOVED***gures the metering-operator to periodically scan the speci***REMOVED***ed AWS S3 bucket for [AWS Cost and Usage reports][AWS-billing].
+An `awsBilling` ReportDataSource con***REMOVED***gures the reporting-operator to periodically scan the speci***REMOVED***ed AWS S3 bucket for [AWS Cost and Usage reports][AWS-billing].
 
 When the ReportDataSource is created, the metering operator does the following:
 
 - Checks if this `ReportDataSource` has a table created for it yet, and if not, create the table.
   - In the case of an `awsBilling` ReportDataSource, the operator creates the table using Hive. When creating the table, it is con***REMOVED***gured to point at the S3 Bucket con***REMOVED***gured in the `spec.awsBilling` section and to read gzipped CSV ***REMOVED***les (`.csv.gz`, the ***REMOVED***le format the cost and usage reports are in).
 
-Additionally, in the background the metering-operator is periodically, listing all `ReportDataSources` and if the `awsBilling` section is speci***REMOVED***ed, does the following to con***REMOVED***gure the table partitions for each:
+Additionally, in the background the reporting-operator is periodically, listing all `ReportDataSources` and if the `awsBilling` section is speci***REMOVED***ed, does the following to con***REMOVED***gure the table partitions for each:
 
 - Check if the table for this ReportDataSource exists, if it doesn't, it will skip con***REMOVED***guring the partitions of the table ReportDataSource, until the next poll for all `ReportDataSources` again.
 - Scan the con***REMOVED***gured S3 bucket for the cost usage report JSON manifests. There is a manifest for each billing period, and each manifest contains information about what reports are the most up-to-date for a given billing period.

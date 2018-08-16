@@ -8,44 +8,44 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  replicas: {{ .Values.presto.worker.replicas }}
+  replicas: {{ .Values.spec.presto.worker.replicas }}
   selector:
     matchLabels:
       app: presto
       presto: worker
-{{- if .Values.presto.labels }}
-{{ toYaml .Values.presto.labels | indent 6 }}
+{{- if .Values.spec.presto.labels }}
+{{ toYaml .Values.spec.presto.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: presto
         presto: worker
-{{- if .Values.presto.labels }}
-{{ toYaml .Values.presto.labels | indent 8 }}
+{{- if .Values.spec.presto.labels }}
+{{ toYaml .Values.spec.presto.labels | indent 8 }}
 {{- end }}
       annotations:
         presto-worker-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-worker-con***REMOVED***g.yaml") . | sha256sum }}
         presto-common-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto-common-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if .Values.con***REMOVED***g.createAwsCredentialsSecret }}
+{{- if .Values.spec.con***REMOVED***g.createAwsCredentialsSecret }}
         presto-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secrets.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.annotations }}
-{{ toYaml .Values.presto.annotations | indent 8 }}
+{{- if .Values.spec.presto.annotations }}
+{{ toYaml .Values.spec.presto.annotations | indent 8 }}
 {{- end }}
     spec:
-{{- if .Values.presto.securityContext }}
+{{- if .Values.spec.presto.securityContext }}
       securityContext:
-{{ toYaml .Values.presto.securityContext | indent 8 }}
+{{ toYaml .Values.spec.presto.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.presto.worker.af***REMOVED***nity }}
+{{- if .Values.spec.presto.worker.af***REMOVED***nity }}
       af***REMOVED***nity:
-{{ toYaml .Values.presto.worker.af***REMOVED***nity | indent 8 }}
+{{ toYaml .Values.spec.presto.worker.af***REMOVED***nity | indent 8 }}
 {{- end }}
       containers:
       - name: presto
-        image: "{{ .Values.presto.image.repository }}:{{ .Values.presto.image.tag }}"
-        imagePullPolicy: {{ .Values.presto.image.pullPolicy }}
+        image: "{{ .Values.spec.presto.image.repository }}:{{ .Values.spec.presto.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.presto.image.pullPolicy }}
         env:
         - name: PRESTO_CONF_discovery___server_enabled
           value: "false"
@@ -65,15 +65,15 @@ spec:
         - name: presto-data
           mountPath: /var/presto/data
         resources:
-{{ toYaml .Values.presto.worker.resources | indent 10 }}
+{{ toYaml .Values.spec.presto.worker.resources | indent 10 }}
       volumes:
       - name: presto-data
         emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
-{{- if .Values.imagePullSecrets }}
+{{- if .Values.spec.imagePullSecrets }}
       imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.presto.worker.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.spec.presto.worker.terminationGracePeriodSeconds }}

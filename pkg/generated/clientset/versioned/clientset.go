@@ -4,7 +4,7 @@ package versioned
 
 import (
 	glog "github.com/golang/glog"
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -12,27 +12,27 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	ChargebackV1alpha1() chargebackv1alpha1.ChargebackV1alpha1Interface
+	MeteringV1alpha1() meteringv1alpha1.MeteringV1alpha1Interface
 	// Deprecated: please explicitly pick a version if possible.
-	Chargeback() chargebackv1alpha1.ChargebackV1alpha1Interface
+	Metering() meteringv1alpha1.MeteringV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	chargebackV1alpha1 *chargebackv1alpha1.ChargebackV1alpha1Client
+	meteringV1alpha1 *meteringv1alpha1.MeteringV1alpha1Client
 }
 
-// ChargebackV1alpha1 retrieves the ChargebackV1alpha1Client
-func (c *Clientset) ChargebackV1alpha1() chargebackv1alpha1.ChargebackV1alpha1Interface {
-	return c.chargebackV1alpha1
+// MeteringV1alpha1 retrieves the MeteringV1alpha1Client
+func (c *Clientset) MeteringV1alpha1() meteringv1alpha1.MeteringV1alpha1Interface {
+	return c.meteringV1alpha1
 }
 
-// Deprecated: Chargeback retrieves the default version of ChargebackClient.
+// Deprecated: Metering retrieves the default version of MeteringClient.
 // Please explicitly pick a version.
-func (c *Clientset) Chargeback() chargebackv1alpha1.ChargebackV1alpha1Interface {
-	return c.chargebackV1alpha1
+func (c *Clientset) Metering() meteringv1alpha1.MeteringV1alpha1Interface {
+	return c.meteringV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -51,7 +51,7 @@ func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.chargebackV1alpha1, err = chargebackv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
+	cs.meteringV1alpha1, err = meteringv1alpha1.NewForCon***REMOVED***g(&con***REMOVED***gShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func NewForCon***REMOVED***g(c *rest.Con***REMOVED***g) (*Clientset, error) {
 // panics if there is an error in the con***REMOVED***g.
 func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
 	var cs Clientset
-	cs.chargebackV1alpha1 = chargebackv1alpha1.NewForCon***REMOVED***gOrDie(c)
+	cs.meteringV1alpha1 = meteringv1alpha1.NewForCon***REMOVED***gOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForCon***REMOVED***gOrDie(c)
 	return &cs
@@ -77,7 +77,7 @@ func NewForCon***REMOVED***gOrDie(c *rest.Con***REMOVED***g) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.chargebackV1alpha1 = chargebackv1alpha1.New(c)
+	cs.meteringV1alpha1 = meteringv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

@@ -5,4 +5,4 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.hive.server.con***REMOVED***g.logLevel | quote}}
+  log-level: {{ upper .Values.spec.hive.server.con***REMOVED***g.logLevel | quote}}

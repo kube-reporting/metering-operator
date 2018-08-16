@@ -1,133 +1,134 @@
-presto:
-  image:
-    repository: quay.io/coreos/chargeback-presto
-    tag: latest
-    pullPolicy: Always
+spec:
+  presto:
+    image:
+      repository: quay.io/coreos/chargeback-presto
+      tag: latest
+      pullPolicy: Always
 
-  securityContext:
-    runAsNonRoot: true
+    securityContext:
+      runAsNonRoot: true
+
+    con***REMOVED***g:
+      discoveryURI: http://presto:8080
+      environment: production
+      hiveMetastoreURI: thrift://hive-metastore:9083
+
+    coordinator:
+      terminationGracePeriodSeconds: 30
+      con***REMOVED***g:
+        logLevel: info
+        nodeSchedulerIncludeCoordinator: true
+        taskMaxWorkerThreads: null
+        taskMinDrivers: null
+
+      af***REMOVED***nity:
+        podAntiAf***REMOVED***nity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - presto
+            topologyKey: "kubernetes.io/hostname"
+
+      resources:
+        requests:
+          memory: "1536Mi"
+          cpu: "300m"
+        limits:
+          memory: "2048Mi"
+          cpu: "1000m"
+
+    worker:
+      replicas: 0
+      terminationGracePeriodSeconds: 30
+      con***REMOVED***g:
+        logLevel: info
+        taskMaxWorkerThreads: null
+        taskMinDrivers: null
+
+      af***REMOVED***nity:
+        podAntiAf***REMOVED***nity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - presto
+            topologyKey: "kubernetes.io/hostname"
+
+      resources:
+        requests:
+          memory: "1536Mi"
+          cpu: "300m"
+        limits:
+          memory: "2048Mi"
+          cpu: "1000m"
+
+    labels: {}
+    annotations: {}
+
+  hive:
+    image:
+      repository: quay.io/coreos/chargeback-hive
+      tag: latest
+      pullPolicy: Always
+
+    con***REMOVED***g:
+      defaultfs: null
+      dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
+      dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
+      dbConnectionUsername: null
+      dbConnectionPassword: null
+      enableMetastoreSchemaVeri***REMOVED***cation: false
+      autoCreateMetastoreSchema: true
+      defaultFileFormat: "orc"
+      defaultCompression: "zlib"
+      metastoreURIs: "thrift://hive-metastore:9083"
+
+    securityContext:
+      runAsNonRoot: true
+
+    terminationGracePeriodSeconds: 30
+
+    metastore:
+      con***REMOVED***g:
+        logLevel: info
+
+      resources:
+        requests:
+          memory: "650Mi"
+          cpu: "100m"
+        limits:
+          memory: "650Mi"
+          cpu: "500m"
+      storage:
+        create: true
+        # Default to null, which means using the default storage class if the
+        # defaultStorageClass admission plugin is turned on (is by default on
+        # Tectonic).
+        class: null
+        size: "5Gi"
+
+    server:
+      con***REMOVED***g:
+        logLevel: info
+      resources:
+        requests:
+          memory: "400Mi"
+          cpu: "100m"
+        limits:
+          memory: "400Mi"
+          cpu: "100m"
+
+    labels: {}
+    annotations: {}
 
   con***REMOVED***g:
-    discoveryURI: http://presto:8080
-    environment: production
-    hiveMetastoreURI: thrift://hive-metastore:9083
-
-  coordinator:
-    terminationGracePeriodSeconds: 30
-    con***REMOVED***g:
-      logLevel: info
-      nodeSchedulerIncludeCoordinator: true
-      taskMaxWorkerThreads: null
-      taskMinDrivers: null
-
-    af***REMOVED***nity:
-      podAntiAf***REMOVED***nity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - presto
-          topologyKey: "kubernetes.io/hostname"
-
-    resources:
-      requests:
-        memory: "1536Mi"
-        cpu: "300m"
-      limits:
-        memory: "2048Mi"
-        cpu: "1000m"
-
-  worker:
-    replicas: 0
-    terminationGracePeriodSeconds: 30
-    con***REMOVED***g:
-      logLevel: info
-      taskMaxWorkerThreads: null
-      taskMinDrivers: null
-
-    af***REMOVED***nity:
-      podAntiAf***REMOVED***nity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - presto
-          topologyKey: "kubernetes.io/hostname"
-
-    resources:
-      requests:
-        memory: "1536Mi"
-        cpu: "300m"
-      limits:
-        memory: "2048Mi"
-        cpu: "1000m"
-
-  labels: {}
-  annotations: {}
-
-hive:
-  image:
-    repository: quay.io/coreos/chargeback-hive
-    tag: latest
-    pullPolicy: Always
-
-  con***REMOVED***g:
-    defaultfs: null
-    dbConnectionURL: "jdbc:derby:;databaseName=/var/lib/hive/data;create=true"
-    dbConnectionDriver: "org.apache.derby.jdbc.EmbeddedDriver"
-    dbConnectionUsername: null
-    dbConnectionPassword: null
-    enableMetastoreSchemaVeri***REMOVED***cation: false
-    autoCreateMetastoreSchema: true
-    defaultFileFormat: "orc"
-    defaultCompression: "zlib"
-    metastoreURIs: "thrift://hive-metastore:9083"
-
-  securityContext:
-    runAsNonRoot: true
-
-  terminationGracePeriodSeconds: 30
-
-  metastore:
-    con***REMOVED***g:
-      logLevel: info
-
-    resources:
-      requests:
-        memory: "650Mi"
-        cpu: "100m"
-      limits:
-        memory: "650Mi"
-        cpu: "500m"
-    storage:
-      create: true
-      # Default to null, which means using the default storage class if the
-      # defaultStorageClass admission plugin is turned on (is by default on
-      # Tectonic).
-      class: null
-      size: "5Gi"
-
-  server:
-    con***REMOVED***g:
-      logLevel: info
-    resources:
-      requests:
-        memory: "400Mi"
-        cpu: "100m"
-      limits:
-        memory: "400Mi"
-        cpu: "100m"
-
-  labels: {}
-  annotations: {}
-
-con***REMOVED***g:
-  awsRegion: ""
-  awsAccessKeyID: ""
-  awsSecretAccessKey: ""
-  awsCredentialsSecretName: presto-aws-credentials-secrets
-  createAwsCredentialsSecret: true
+    awsRegion: ""
+    awsAccessKeyID: ""
+    awsSecretAccessKey: ""
+    awsCredentialsSecretName: presto-aws-credentials-secrets
+    createAwsCredentialsSecret: true

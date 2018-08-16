@@ -10,8 +10,8 @@ import (
 	time "time"
 
 	versioned "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	chargeback "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/chargeback"
 	internalinterfaces "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/internalinterfaces"
+	metering "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/metering"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -109,9 +109,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Chargeback() chargeback.Interface
+	Metering() metering.Interface
 }
 
-func (f *sharedInformerFactory) Chargeback() chargeback.Interface {
-	return chargeback.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Metering() metering.Interface {
+	return metering.New(f, f.namespace, f.tweakListOptions)
 }

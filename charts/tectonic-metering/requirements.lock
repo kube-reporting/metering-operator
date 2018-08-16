@@ -1,6 +1,6 @@
 dependencies:
-- name: metering-operator
-  repository: ***REMOVED***le://../metering-operator
+- name: reporting-operator
+  repository: ***REMOVED***le://../reporting-operator
   version: 0.1.0
 - name: presto
   repository: ***REMOVED***le://../presto
@@ -8,5 +8,5 @@ dependencies:
 - name: hdfs
   repository: ***REMOVED***le://../hdfs
   version: 0.1.0
-digest: sha256:e0c00a169e1babb5af3bd4a1fc37c61960100bd4a2be934c54dfb95d56546caa
-generated: 2018-04-30T09:55:25.902479128-07:00
+digest: sha256:7e12109e54d14614188c60ad166b8883421f34bab3b7de98eed6cc2689395637
+generated: 2018-08-14T12:00:56.216648-07:00

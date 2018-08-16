@@ -5,7 +5,7 @@ include build/check_de***REMOVED***ned.mk
 
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
-CHARGEBACK_GO_PKG := $(GO_PKG)/cmd/chargeback
+REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
 DOCKER_BUILD_ARGS ?=
 DOCKER_CACHE_FROM_ENABLED =
@@ -22,17 +22,17 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-CHARGEBACK_BIN_OUT = images/chargeback/bin/chargeback
+REPORTING_OPERATOR_BIN_OUT = images/reporting-operator/bin/reporting-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
-CHARGEBACK_HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
-CHARGEBACK_IMAGE := $(DOCKER_BASE_URL)/chargeback
+METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
+REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/chargeback-hive
 PRESTO_IMAGE := $(DOCKER_BASE_URL)/chargeback-presto
-CHARGEBACK_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
+METERING_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
@@ -52,7 +52,7 @@ HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
 JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-CHARGEBACK_GO_FILES := $(shell go list -json $(CHARGEBACK_GO_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(CHARGEBACK_GO_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+REPORTING_OPERATOR_GO_FILES := $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 
 CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
 
@@ -121,14 +121,14 @@ ifdef DEPLOY_TAG
 endif
 
 DOCKER_TARGETS := \
-	chargeback \
-	chargeback-integration-tests \
+	reporting-operator \
+	metering-integration-tests \
 	hadoop \
 	hive \
 	presto \
 	helm-operator \
-	chargeback-helm-operator
-# These generate new make targets like chargeback-helm-operator-docker-build
+	metering-operator
+# These generate new make targets like metering-operator-docker-build
 # which can be invoked.
 DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(DOCKER_TARGETS))
 DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(DOCKER_TARGETS))
@@ -137,17 +137,17 @@ DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(DOCKER_TARGETS))
 
 # The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
-# The example will be using the chargeback-helm-operator targets as it's example.
+# The example will be using the metering-operator targets as it's example.
 #
 # The pattern/string manipulation below does the following (starting from the inner most expression):
 # 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suf***REMOVED***xed value from $(TARGETS)
-# ex: chargeback-helm-operator-docker-build -> chargeback-helm-operator
+# ex: metering-operator-docker-build -> metering-operator
 # 2) Replaces - with _
-# ex: chargeback-helm-operator -> chargeback_helm_operator
+# ex: metering-operator -> metering_helm_operator
 # 3) Uppercases letters
-# ex: chargeback_helm_operator -> CHARGEBACK_HELM_OPERATOR
+# ex: metering_helm_operator -> METERING_HELM_OPERATOR
 # 4) Appends _IMAGE
-# ex: CHARGEBACK_HELM_OPERATOR -> CHARGEBACK_HELM_OPERATOR_IMAGE
+# ex: METERING_HELM_OPERATOR -> METERING_OPERATOR_IMAGE
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
@@ -167,20 +167,20 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-chargeback-docker-build: images/chargeback/Docker***REMOVED***le images/chargeback/bin/chargeback
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_IMAGE)
+reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le $(REPORTING_OPERATOR_BIN_OUT)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
-chargeback-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+metering-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-chargeback-helm-operator-docker-build: \
-		images/metering-helm-operator/Docker***REMOVED***le \
+metering-operator-docker-build: \
+		images/metering-operator/Docker***REMOVED***le \
 		helm-operator-docker-build \
-		images/metering-helm-operator/tectonic-metering-0.1.0.tgz \
-		images/metering-helm-operator/openshift-metering-0.1.0.tgz \
-		images/metering-helm-operator/operator-metering-0.1.0.tgz \
-		images/metering-helm-operator/metering-override-values.yaml
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(CHARGEBACK_HELM_OPERATOR_IMAGE)
+		images/metering-operator/tectonic-metering-0.1.0.tgz \
+		images/metering-operator/openshift-metering-0.1.0.tgz \
+		images/metering-operator/operator-metering-0.1.0.tgz \
+		images/metering-operator/metering-override-values.yaml
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -206,49 +206,55 @@ fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: verify-codegen metering-manifests fmt
+ci-validate: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
-chargeback-bin: $(CHARGEBACK_BIN_OUT)
+reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 
-chargeback-local: $(CHARGEBACK_GO_FILES)
-	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
+reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
+	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
 
-.PHONY: run-chargeback-local
-run-chargeback-local:
-	$(MAKE) chargeback-local
-	./hack/run-local-with-port-forward.sh $(CHARGEBACK_ARGS)
+.PHONY: run-reporting-operator-local
+run-reporting-operator-local:
+	$(MAKE) reporting-operator-local
+	./hack/run-local-with-port-forward.sh $(REPORTING_OPERATOR_ARGS)
 
-$(CHARGEBACK_BIN_OUT): $(CHARGEBACK_GO_FILES)
-	$(MAKE) build-chargeback CHARGEBACK_BIN_LOCATION=$@
+$(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
+	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@
 
-build-chargeback:
-	@:$(call check_de***REMOVED***ned, CHARGEBACK_BIN_LOCATION, Path to output binary location)
+build-reporting-operator:
+	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_LOCATION, Path to output binary location)
 	$(MAKE) update-codegen
 	mkdir -p $(dir $@)
-	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(CHARGEBACK_BIN_LOCATION) $(CHARGEBACK_GO_PKG)
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_LOCATION) $(REPORTING_OPERATOR_PKG)
 
-images/metering-helm-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+images/metering-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-tectonic-metering-chart: images/metering-helm-operator/tectonic-metering-0.1.0.tgz
+CHART_DEPS := images/metering-operator/tectonic-metering-0.1.0.tgz \
+	images/metering-operator/openshift-metering-0.1.0.tgz \
+	images/metering-operator/operator-metering-0.1.0.tgz
 
-openshift-metering-chart: images/metering-helm-operator/openshift-metering-0.1.0.tgz
+all-charts: $(CHART_DEPS)
 
-operator-metering-chart: images/metering-helm-operator/operator-metering-0.1.0.tgz
+tectonic-metering-chart: images/metering-operator/tectonic-metering-0.1.0.tgz
 
-images/metering-helm-operator/tectonic-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+openshift-metering-chart: images/metering-operator/openshift-metering-0.1.0.tgz
+
+operator-metering-chart: images/metering-operator/operator-metering-0.1.0.tgz
+
+images/metering-operator/tectonic-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/tectonic-metering
-	helm package --save=false -d images/metering-helm-operator charts/tectonic-metering
+	helm package --save=false -d images/metering-operator charts/tectonic-metering
 
-images/metering-helm-operator/openshift-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+images/metering-operator/openshift-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/openshift-metering
-	helm package --save=false -d images/metering-helm-operator charts/openshift-metering
+	helm package --save=false -d images/metering-operator charts/openshift-metering
 
-images/metering-helm-operator/operator-metering-0.1.0.tgz: images/metering-helm-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
+images/metering-operator/operator-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
 	helm dep update --skip-refresh charts/operator-metering
-	helm package --save=false -d images/metering-helm-operator charts/operator-metering
+	helm package --save=false -d images/metering-operator charts/operator-metering
 
 metering-manifests:
 	./hack/create-metering-manifests.sh $(RELEASE_TAG)
@@ -260,10 +266,10 @@ metering-manifests:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	chargeback-integration-tests-docker-build \
-	build-chargeback chargeback-bin chargeback-local \
+	metering-integration-tests-docker-build \
+	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
-	images/metering-helm-operator/metering-override-values.yaml \
+	images/metering-operator/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm
 

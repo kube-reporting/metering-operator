@@ -1,73 +1,74 @@
-image:
-  repository: quay.io/coreos/chargeback-hadoop
-  tag: latest
-  pullPolicy: Always
+spec:
+  image:
+    repository: quay.io/coreos/chargeback-hadoop
+    tag: latest
+    pullPolicy: Always
 
-con***REMOVED***g:
-  logLevel: "info"
-  namenodeHost: hdfs-namenode-0.hdfs-namenode
-  namenodePort: 8020
-  datanodeDataDirPerms: "770"
+  con***REMOVED***g:
+    logLevel: "info"
+    namenodeHost: hdfs-namenode-0.hdfs-namenode
+    namenodePort: 8020
+    datanodeDataDirPerms: "770"
 
-securityContext:
-  runAsNonRoot: true
+  securityContext:
+    runAsNonRoot: true
 
-datanode:
-  replicas: 1
-  terminationGracePeriodSeconds: 30
-  resources:
-    requests:
-      memory: "250Mi"
-      cpu: "250m"
-    limits:
-      memory: "250Mi"
-      cpu: "250m"
+  datanode:
+    replicas: 1
+    terminationGracePeriodSeconds: 30
+    resources:
+      requests:
+        memory: "250Mi"
+        cpu: "250m"
+      limits:
+        memory: "250Mi"
+        cpu: "250m"
 
-  af***REMOVED***nity:
-    podAntiAf***REMOVED***nity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - hdfs-datanode
-        topologyKey: "kubernetes.io/hostname"
+    af***REMOVED***nity:
+      podAntiAf***REMOVED***nity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - hdfs-datanode
+          topologyKey: "kubernetes.io/hostname"
 
-  storage:
-    # Default to null, which means using the default storage class if the
-    # defaultStorageClass admission plugin is turned on (is by default on
-    # Tectonic).
-    class: null
-    size: "5Gi"
+    storage:
+      # Default to null, which means using the default storage class if the
+      # defaultStorageClass admission plugin is turned on (is by default on
+      # Tectonic).
+      class: null
+      size: "5Gi"
 
-  labels: {}
-  annotations: {}
+    labels: {}
+    annotations: {}
 
-namenode:
-  terminationGracePeriodSeconds: 10
-  resources:
-    requests:
-      memory: "350Mi"
-      cpu: "250m"
-    limits:
-      memory: "350Mi"
-      cpu: "250m"
+  namenode:
+    terminationGracePeriodSeconds: 10
+    resources:
+      requests:
+        memory: "350Mi"
+        cpu: "250m"
+      limits:
+        memory: "350Mi"
+        cpu: "250m"
 
-  af***REMOVED***nity:
-    podAntiAf***REMOVED***nity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - hdfs-namenode
-        topologyKey: "kubernetes.io/hostname"
+    af***REMOVED***nity:
+      podAntiAf***REMOVED***nity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - hdfs-namenode
+          topologyKey: "kubernetes.io/hostname"
 
-  storage:
-    size: "5Gi"
-    class: null
+    storage:
+      size: "5Gi"
+      class: null
 
-  labels: {}
-  annotations: {}
+    labels: {}
+    annotations: {}

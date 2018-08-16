@@ -1,0 +1,21 @@
+{{- if .Values.spec.con***REMOVED***g.defaultStorage.create -}}
+apiVersion: metering.openshift.io/v1alpha1
+kind: StorageLocation
+metadata:
+  name: {{ .Values.spec.con***REMOVED***g.defaultStorage.name }}
+  labels:
+    operator-metering: "true"
+{{- if .Values.spec.con***REMOVED***g.defaultStorage.isDefault }}
+  annotations:
+    storagelocation.metering.openshift.io/is-default: "true"
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+{{- if eq .Values.spec.con***REMOVED***g.defaultStorage.type "hive" }}
+  hive:
+{{ toYaml .Values.spec.con***REMOVED***g.defaultStorage.hive | indent 4 }}
+{{- ***REMOVED*** }}
+{{ printf "Unsupported defaultStorage.type: '%s'" .Values.spec.con***REMOVED***g.defaultStorage.type | fail }}
+{{- end -}}
+{{- end -}}

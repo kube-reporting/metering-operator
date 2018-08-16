@@ -9,15 +9,15 @@ msg "Removing Metering Resource"
 kube-remove \
     "$METERING_CR_FILE"
 
-msg "Removing metering-helm-operator"
+msg "Removing metering-operator"
 kube-remove \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-deployment.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"
 
-msg "Removing metering-helm-operator service account and RBAC resources"
+msg "Removing metering-operator service account and RBAC resources"
 kube-remove \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-rolebinding.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-role.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-helm-operator-service-account.yaml"
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
+    "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then

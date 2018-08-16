@@ -1,0 +1,377 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-request-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "pod-request-cpu-cores"
+  columns:
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: pod_request_cpu_cores
+    type: double
+    unit: cpu_cores
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: pod_request_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          element_at(labels, 'node') as node,
+          labels,
+          amount as pod_request_cpu_cores,
+          timeprecision,
+          amount * timeprecision as pod_request_cpu_core_seconds,
+          "timestamp"
+      FROM {| dataSourceTableName "pod-request-cpu-cores" |}
+      WHERE element_at(labels, 'node') IS NOT NULL
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-usage-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "pod-usage-cpu-cores"
+  columns:
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: pod_usage_cpu_cores
+    type: double
+    unit: cpu_cores
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: pod_usage_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  query: |
+      SELECT labels['pod'] as pod,
+          labels['namespace'] as namespace,
+          element_at(labels, 'node') as node,
+          labels,
+          amount as pod_usage_cpu_cores,
+          timeprecision,
+          amount * timeprecision as pod_usage_cpu_core_seconds,
+          "timestamp"
+      FROM {| dataSourceTableName "pod-usage-cpu-cores" |}
+      WHERE element_at(labels, 'node') IS NOT NULL
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-request"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-cpu-request-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+    FROM {| generationQueryViewName "pod-cpu-request-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-usage"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-cpu-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_usage_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod,
+      namespace,
+      node,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
+    FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace, pod, node
+    ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-cpu-request"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-cpu-request-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+    FROM {| generationQueryViewName "pod-cpu-request-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_request_cpu_core_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "namespace-cpu-usage"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-cpu-usage-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_usage_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  query: |
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
+    FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    GROUP BY namespace
+    ORDER BY pod_usage_cpu_core_seconds DESC
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "pod-cpu-request-vs-node-cpu-allocatable"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "pod-cpu-request-raw"
+  - "node-cpu-allocatable"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: pod
+    type: string
+    unit: kubernetes_pod
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: node
+    type: string
+    unit: kubernetes_node
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
+  - name: pod_request_cpu_core_seconds
+    type: double
+    unit: cpu_core_seconds
+  - name: pod_cpu_usage_percent
+    type: double
+  query: |
+    WITH node_cpu_allocatable AS (
+      SELECT min("timestamp") as node_allocatable_data_start,
+        max("timestamp") as node_allocatable_data_end,
+        sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
+      FROM {| generationQueryViewName "node-cpu-allocatable" |}
+        WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+        AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    ), pod_cpu_consumption AS (
+      SELECT pod,
+              namespace,
+              node,
+              min("timestamp") as data_start,
+              max("timestamp") as data_end,
+              sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+      FROM {| generationQueryViewName "pod-cpu-request-raw" |}
+      WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
+      AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+      GROUP BY pod, namespace, node
+    )
+    SELECT
+      timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
+      timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end,
+      pod_cpu_consumption.*,
+      pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds as pod_cpu_usage_percent
+    FROM pod_cpu_consumption
+    CROSS JOIN node_cpu_allocatable
+    ORDER BY pod_cpu_consumption.pod_request_cpu_core_seconds DESC

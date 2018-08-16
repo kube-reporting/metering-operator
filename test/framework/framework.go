@@ -11,15 +11,15 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	chargebackv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/chargeback/v1alpha1"
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 )
 
 type Framework struct {
-	ChargebackClient chargebackv1alpha1.ChargebackV1alpha1Interface
-	KubeClient       kubernetes.Interface
-	HTTPClient       *http.Client
-	Namespace        string
-	DefaultTimeout   time.Duration
+	MeteringClient meteringv1alpha1.MeteringV1alpha1Interface
+	KubeClient     kubernetes.Interface
+	HTTPClient     *http.Client
+	Namespace      string
+	DefaultTimeout time.Duration
 
 	protocol    string
 	collectOnce sync.Once
@@ -44,7 +44,7 @@ func New(namespace, kubecon***REMOVED***g string, httpsAPI bool) (*Framework, er
 		return nil, fmt.Errorf("creating http-client failed: err %v", err)
 	}
 
-	chargebackClient, err := chargebackv1alpha1.NewForCon***REMOVED***g(con***REMOVED***g)
+	meteringClient, err := meteringv1alpha1.NewForCon***REMOVED***g(con***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
 	}
@@ -54,12 +54,12 @@ func New(namespace, kubecon***REMOVED***g string, httpsAPI bool) (*Framework, er
 	}
 
 	f := &Framework{
-		KubeClient:       kubeClient,
-		ChargebackClient: chargebackClient,
-		HTTPClient:       httpc,
-		Namespace:        namespace,
-		DefaultTimeout:   time.Minute,
-		protocol:         protocol,
+		KubeClient:     kubeClient,
+		MeteringClient: meteringClient,
+		HTTPClient:     httpc,
+		Namespace:      namespace,
+		DefaultTimeout: time.Minute,
+		protocol:       protocol,
 	}
 
 	return f, nil

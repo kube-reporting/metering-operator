@@ -61,7 +61,7 @@ Now that we have ***REMOVED***gured out the Prometheus query, we need to create 
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportprometheusquery.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
   name: unready-deployment-replicas
@@ -74,7 +74,7 @@ Creating the ReportPrometheusQuery only makes the query available for use, but d
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportdatasource.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
   name: unready-deployment-replicas
@@ -93,7 +93,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportdat
 ## Viewing the Metrics in Presto
 
 Before we go any further, we should verify that creating the ReportDataSource did what we wanted, and the data is being collected.
-One way to do this is to check the [metering operator logs][metering-operator-logs], and look for logs mentioning our `ReportDataSource` being collected and stored.
+One way to do this is to check the [metering operator logs][reporting-operator-logs], and look for logs mentioning our `ReportDataSource` being collected and stored.
 
 The other way however is to exec into the Presto pod and open up a Presto-cli session which allows us to interactively query Presto.
 Open up a Presto-cli session by following the [Query Presto using presto-cli developer documentation][presto-cli-exec].
@@ -104,7 +104,7 @@ show tables;
 ```
 
 This should give you a list of Database Tables created in Presto, you should see quite a few entries, and among them `datasource_unready_deployment_replicas` should be in the list, if it is not, it's possible the table has not be created yet, or there was an error.
-In this case, you should [check the metering operator logs][metering-operator-logs] for errors.
+In this case, you should [check the metering operator logs][reporting-operator-logs] for errors.
 
 If the table does exist, it may take up to 5 minutes (the default collection interval) before any data exists in the table.
 To check if our data has started getting collected, we can check by issuing a `SELECT` query on our table to see if any rows exist:
@@ -121,8 +121,8 @@ presto:default> SELECT * FROM datasource_unready_deployment_replicas LIMIT 10;
 --------+-------------------------+---------------+-------------------------------------------------------------------------
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=alm-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=catalog-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=chargeback-testing, deployment=chargeback}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=chargeback-testing, deployment=chargeback-helm-operator}
+    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=reporting-operator}
+    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=metering-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=container-linux-update-operator}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=default-http-backend}
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=default, deployment=etcd-operator}
@@ -205,7 +205,7 @@ One thing to note is we replaced `FROM datasource_unready_deployment_replicas` w
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -248,7 +248,7 @@ Adding this ***REMOVED***lter to our query and updating our `spec.view.disabled`
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportgenerationquery.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -290,7 +290,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportgen
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-report.yaml`:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
   name: unready-deployment-replicas
@@ -318,16 +318,16 @@ Once the Report's status has changed to `Finished` (this can take a few minutes 
 ```
 kubectl proxy &
 sleep 2
-curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/metering:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&format=csv"
+curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&format=csv"
 ```
 
 This should output a CSV report that looks similar to this:
 
 ```
 period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_replica_unready_seconds
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,chargeback,3420,13.464566929133857
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,chargeback-helm-operator,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,chargeback-testing,presto,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,reporting-operator,3420,13.464566929133857
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,metering-operator,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,presto,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,etcd-operator,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,example,15240,60
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,test-deploy,15240,60
@@ -337,7 +337,7 @@ period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_r
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-dns,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-scheduler,0,0
 2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering,15240,60
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering-helm-operator,0,0
+2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering-operator,0,0
 ...
 ```
 
@@ -361,7 +361,7 @@ Here's a summary of what we did in this guide:
 [reports]: report.md
 [install-metering]: install-metering.md
 [presto-cli-exec]:  dev/debugging.md#query-presto-using-presto-cli
-[metering-operator-logs]:  dev/debugging.md#get-metering-operator-logs
+[reporting-operator-logs]:  dev/debugging.md#get-reporting-operator-logs
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [using-metering]: using-metering.md
 [datasource-table-schema]: reportdatasources.md#table-schemas

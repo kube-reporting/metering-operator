@@ -11,7 +11,7 @@ A single `ScheduledReport` resource represents a report which is updated with ne
 The following example scheduled report will contain information on every Pod's CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: ScheduledReport
 metadata:
   name: pod-cpu-request-hourly
@@ -119,7 +119,7 @@ A single `Report` resource represents a report which runs the provided query for
 The following example report will contain information on every Pod's CPU requests over the month of September:
 
 ```
-apiVersion: chargeback.coreos.com/v1alpha1
+apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
   name: pod-cpu-request
@@ -206,7 +206,7 @@ For a complete list of ***REMOVED***elds each report query produces, use `kubect
 kubectl -n $METERING_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
 
 {
-    "apiVersion": "chargeback.coreos.com/v1alpha1",
+    "apiVersion": "metering.openshift.io/v1alpha1",
     "kind": "ReportGenerationQuery",
     "metadata": {
         "name": "namespace-memory-request",

@@ -42,30 +42,30 @@ metadata:
 {{- end }}
 spec:
   serviceName: "hdfs-datanode"
-  replicas: {{ .Values.datanode.replicas }}
+  replicas: {{ .Values.spec.datanode.replicas }}
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
         app: hdfs-datanode
-{{- if .Values.datanode.labels }}
-{{ toYaml .Values.datanode.labels | indent 8 }}
+{{- if .Values.spec.datanode.labels }}
+{{ toYaml .Values.spec.datanode.labels | indent 8 }}
 {{- end }}
       annotations:
         hdfs-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/con***REMOVED***gmap.yaml") . | sha256sum }}
-{{- if .Values.datanode.annotations }}
-{{ toYaml .Values.datanode.annotations | indent 8 }}
+{{- if .Values.spec.datanode.annotations }}
+{{ toYaml .Values.spec.datanode.annotations | indent 8 }}
 {{- end }}
     spec:
-      terminationGracePeriodSeconds: {{ .Values.datanode.terminationGracePeriodSeconds }}
-{{- if .Values.securityContext }}
+      terminationGracePeriodSeconds: {{ .Values.spec.datanode.terminationGracePeriodSeconds }}
+{{- if .Values.spec.securityContext }}
       securityContext:
-{{ toYaml .Values.securityContext | indent 8 }}
+{{ toYaml .Values.spec.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.datanode.af***REMOVED***nity }}
+{{- if .Values.spec.datanode.af***REMOVED***nity }}
       af***REMOVED***nity:
-{{ toYaml .Values.datanode.af***REMOVED***nity | indent 8 }}
+{{ toYaml .Values.spec.datanode.af***REMOVED***nity | indent 8 }}
 {{- end }}
       initContainers:
       # wait-for-namenode exists because for some reason the datanode is unable
@@ -74,8 +74,8 @@ spec:
       # would always be resolvable, because on Openshift, clusterIP services
       # NAT loses sourceIPs, breaking HDFS clustering.
       - name: wait-for-namenode
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
         command:
         - '/bin/bash'
         - '-c'
@@ -104,8 +104,8 @@ spec:
               key: namenode-host
       containers:
       - name: hdfs-datanode
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
         args: ["datanode-entrypoint.sh"]
         env:
         - name: CORE_CONF_fs_defaultFS
@@ -170,11 +170,11 @@ spec:
           failureThreshold: 2
           successThreshold: 1
         resources:
-{{ toYaml .Values.datanode.resources | indent 10 }}
+{{ toYaml .Values.spec.datanode.resources | indent 10 }}
       serviceAccount: hdfs
-{{- if .Values.imagePullSecrets }}
+{{- if .Values.spec.imagePullSecrets }}
       imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 8 }}
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}
       volumes:
       - name: namenode-empty
@@ -186,7 +186,7 @@ spec:
         app: hdfs-datanode
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ .Values.datanode.storage.class }}
+      storageClassName: {{ .Values.spec.datanode.storage.class }}
       resources:
         requests:
-          storage: {{ .Values.datanode.storage.size }}
+          storage: {{ .Values.spec.datanode.storage.size }}

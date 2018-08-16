@@ -1,0 +1,39 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-request-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    sum(kube_pod_container_resource_requests_cpu_cores) by (pod, namespace, node)
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-limit-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    sum(kube_pod_container_resource_limits_cpu_cores) by (pod, namespace, node)
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "pod-usage-cpu-cores"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)

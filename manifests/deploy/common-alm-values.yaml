@@ -1,4 +1,4 @@
-name: metering-helm-operator.vlatest
+name: metering-operator.vlatest
 spec:
   displayName: Metering
   description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
@@ -11,14 +11,14 @@ spec:
   provider:
     name: CoreOS, Inc
   labels:
-    alm-status-descriptors: metering-helm-operator.vlatest
-    alm-owner-metering: metering-helm-operator
+    alm-status-descriptors: metering-operator.vlatest
+    alm-owner-metering: metering-operator
   matchLabels:
-    alm-owner-metering: metering-helm-operator
+    alm-owner-metering: metering-operator
 
 packageName: metering
 channels:
 - name: alpha
-  currentCSV: metering-helm-operator.vlatest
+  currentCSV: metering-operator.vlatest
 
 subscriptionChannel: alpha
