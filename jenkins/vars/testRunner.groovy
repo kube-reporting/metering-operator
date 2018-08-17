@@ -5,6 +5,14 @@ def call(body) {
     body.delegate = pipelineParams
     body()
 
+    def prStatusContext = "jenkins/${pipelineParams.testType}-tests"
+
+    def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
+    if (isPullRequest) {
+        echo 'Setting Github PR status'
+        githubNotify context: prStatusContext, status: 'PENDING', description: 'Build started'
+    }
+
     // The rest is the re-usable declarative pipeline
     pipeline {
         parameters {
@@ -161,6 +169,21 @@ spec:
             always {
                 container('jnlp') {
                     archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", onlyIfSuccessful: false, allowEmptyArchive: true
+                }
+                script {
+                    if (isPullRequest) {
+                        echo 'Updating Github PR status'
+                        def status
+                        def description
+                        if (currentBuild.currentResult ==  "SUCCESS") {
+                            status = "SUCCESS"
+                            description = "All stages succeeded"
+                        } ***REMOVED*** {
+                            status = "FAILURE"
+                            description = "Some stages failed"
+                        }
+                        githubNotify context: prStatusContext, status: status, description: description
+                    }
                 }
             }
         }

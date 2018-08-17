@@ -13,6 +13,13 @@ def podLabel = "operator-metering-build-${isPullRequest ? 'pr' : 'master'}"
 def maxInstances = isPullRequest ? 5 : 2
 def idleMin = isPullRequest ? 60: 15
 
+def prStatusContext = 'jenkins/build'
+
+if (isPullRequest) {
+    echo 'Setting Github PR status'
+    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build started'
+}
+
 pipeline {
     agent {
         kubernetes {
@@ -134,6 +141,11 @@ spec:
                     }
                 }
             }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Test stage passed'
+                }
+            }
         }
 
         stage('Build') {
@@ -152,6 +164,11 @@ spec:
                     }
                 }
             }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
+                }
+            }
         }
 
         stage('Tag') {
@@ -164,6 +181,11 @@ spec:
                             '''
                         }
                     }
+                }
+            }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
                 }
             }
         }
@@ -182,6 +204,30 @@ spec:
                             '''
                         }
                     }
+                }
+            }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Push stage passed'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (isPullRequest) {
+                    echo 'Updating Github PR status'
+                    def status
+                    def description
+                    if (currentBuild.currentResult ==  "SUCCESS") {
+                        status = "SUCCESS"
+                        description = "All stages succeeded"
+                    } ***REMOVED*** {
+                        status = "FAILURE"
+                        description = "Some stages failed"
+                    }
+                    githubNotify context: prStatusContext, status: status, description: description
                 }
             }
         }
