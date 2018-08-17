@@ -8,15 +8,6 @@ GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
 DOCKER_BUILD_ARGS ?=
-DOCKER_CACHE_FROM_ENABLED =
-ifdef BRANCH_TAG
-ifeq ($(BRANCH_TAG_CACHE), true)
-	DOCKER_CACHE_FROM_ENABLED=true
-endif
-ifdef DOCKER_CACHE_FROM_ENABLED
-	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG)
-endif
-endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
@@ -33,11 +24,11 @@ METERING_OPERATOR_DEPENDENCIES := \
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
-	metering-integration-tests \
+	metering-operator \
 	hadoop \
 	hive \
 	presto \
-	metering-operator
+	metering-e2e
 
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
@@ -47,6 +38,7 @@ REBUILD_HELM_OPERATOR ?= true
 
 ifeq ($(REBUILD_HELM_OPERATOR), true)
 	METERING_OPERATOR_DEPENDENCIES += helm-operator-docker-build
+	DOCKER_BUILD_NAMES += helm-operator
 	DOCKER_TAG_NAMES += helm-operator
 	DOCKER_PUSH_NAMES += helm-operator
 endif
@@ -55,13 +47,13 @@ endif
 
 DOCKER_BASE_URL := quay.io/coreos
 
-METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
-REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback
+METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
+REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
-HADOOP_IMAGE := $(DOCKER_BASE_URL)/chargeback-hadoop
-HIVE_IMAGE := $(DOCKER_BASE_URL)/chargeback-hive
-PRESTO_IMAGE := $(DOCKER_BASE_URL)/chargeback-presto
-METERING_INTEGRATION_TESTS_IMAGE := $(DOCKER_BASE_URL)/chargeback-integration-tests
+HADOOP_IMAGE := $(DOCKER_BASE_URL)/metering-hadoop
+HIVE_IMAGE := $(DOCKER_BASE_URL)/metering-hive
+PRESTO_IMAGE := $(DOCKER_BASE_URL)/metering-presto
+METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
@@ -94,9 +86,6 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-ifdef DOCKER_CACHE_FROM_ENABLED
-	docker pull $(IMAGE_NAME):$(BRANCH_TAG) || true
-endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
@@ -191,11 +180,11 @@ docker-pull-all: $(DOCKER_PULL_TARGETS)
 reporting-operator-docker-build: images/reporting-operator/Dockerfile $(REPORTING_OPERATOR_BIN_OUT)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
 
-metering-integration-tests-docker-build: images/integration-tests/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+metering-e2e-docker-build: images/metering-e2e/Dockerfile
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DEPENDENCIES)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) REBUILD_HELM_OPERATOR=$(REBUILD_HELM_OPERATOR)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE)
 
 helm-operator-docker-build: images/helm-operator/Dockerfile $(find -type f images/helm-operator)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -281,7 +270,7 @@ metering-manifests:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	metering-integration-tests-docker-build \
+	metering-e2e-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
 	images/metering-operator/metering-override-values.yaml \

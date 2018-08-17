@@ -19,7 +19,7 @@ crd:
     catalog.app.coreos.com/description: "An instance of Metering"
 
 image:
-  repository: quay.io/coreos/chargeback-helm-operator
+  repository: quay.io/coreos/metering-helm-operator
   tag: latest
   pullPolicy: Always
 

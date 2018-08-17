@@ -1,6 +1,6 @@
 spec:
   image:
-    repository: quay.io/coreos/chargeback-hadoop
+    repository: quay.io/coreos/metering-hadoop
     tag: latest
     pullPolicy: Always
 
