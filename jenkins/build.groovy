@@ -25,7 +25,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    jenkins-k8s: operator-metering-build
+    ${podLabel}: 'true'
 spec:
   containers:
   - name: docker
