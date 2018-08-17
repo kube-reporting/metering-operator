@@ -21,6 +21,7 @@ pipeline {
         booleanParam(name: 'GENERIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a GKE cluster using the generic con***REMOVED***g.')
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
         booleanParam(name: 'TECTONIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
+        booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
     }
     triggers {
         issueCommentTrigger('.*jenkins rebuild.*')
