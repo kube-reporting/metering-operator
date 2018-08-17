@@ -185,7 +185,7 @@ spec:
             }
             post {
                 success {
-                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Tag stage passed'
                 }
             }
         }
