@@ -9,6 +9,13 @@ def skipTectonic = (isPullRequest && pullRequest.labels.contains("skip-tectonic"
 def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
 def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
 
+def prStatusContext = 'jenkins/main'
+
+if (isPullRequest) {
+    echo 'Setting Github PR status'
+    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build started'
+}
+
 pipeline {
     agent none
     parameters {
@@ -99,6 +106,25 @@ pipeline {
                             booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                         ]
                     }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (isPullRequest) {
+                    echo 'Updating Github PR status'
+                    def status
+                    def description
+                    if (currentBuild.currentResult ==  "SUCCESS") {
+                        status = "SUCCESS"
+                        description = "All stages succeeded"
+                    } ***REMOVED*** {
+                        status = "FAILURE"
+                        description = "Some stages failed"
+                    }
+                    githubNotify context: prStatusContext, status: status, description: description
                 }
             }
         }
