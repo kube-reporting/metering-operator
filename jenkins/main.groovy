@@ -71,6 +71,11 @@ pipeline {
                 echo "Building and pushing metering docker images"
                 build job: "metering/operator-metering-build/${env.TARGET_BRANCH}"
             }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
+                }
+            }
         }
 
         stage('Test') {
@@ -106,6 +111,11 @@ pipeline {
                             booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                         ]
                     }
+                }
+            }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'e2e/integration tests stage passed'
                 }
             }
         }
