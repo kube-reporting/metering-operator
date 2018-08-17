@@ -141,6 +141,11 @@ spec:
                     }
                 }
             }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Test stage passed'
+                }
+            }
         }
 
         stage('Build') {
@@ -159,6 +164,11 @@ spec:
                     }
                 }
             }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
+                }
+            }
         }
 
         stage('Tag') {
@@ -171,6 +181,11 @@ spec:
                             '''
                         }
                     }
+                }
+            }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
                 }
             }
         }
@@ -189,6 +204,11 @@ spec:
                             '''
                         }
                     }
+                }
+            }
+            post {
+                success {
+                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Push stage passed'
                 }
             }
         }
