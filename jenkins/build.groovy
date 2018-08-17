@@ -72,7 +72,6 @@ spec:
         PUSH_RELEASE_TAG  = "${isMasterBranch}"
         BRANCH_TAG        = "${branchTag}"
         DEPLOY_TAG        = "${deployTag}"
-        BRANCH_TAG_CACHE  = "${isMasterBranch}"
         DOCKER_BUILD_ARGS = "${dockerBuildArgs}"
     }
     stages {
@@ -144,7 +143,6 @@ spec:
                         ansiColor('xterm') {
                             sh '''#!/bin/bash -ex
                             make docker-build-all -j 2 \
-                                BRANCH_TAG_CACHE=$BRANCH_TAG_CACHE \
                                 REBUILD_HELM_OPERATOR=$REBUILD_HELM_OPERATOR \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
