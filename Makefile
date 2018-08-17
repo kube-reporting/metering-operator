@@ -24,6 +24,35 @@ CGO_ENABLED = 0
 
 REPORTING_OPERATOR_BIN_OUT = images/reporting-operator/bin/reporting-operator
 
+METERING_OPERATOR_DEPENDENCIES := \
+	images/metering-operator/Docker***REMOVED***le \
+	images/metering-operator/tectonic-metering-0.1.0.tgz \
+	images/metering-operator/openshift-metering-0.1.0.tgz \
+	images/metering-operator/operator-metering-0.1.0.tgz \
+	images/metering-operator/metering-override-values.yaml
+
+DOCKER_COMMON_NAMES := \
+	reporting-operator \
+	metering-integration-tests \
+	hadoop \
+	hive \
+	presto \
+	metering-operator
+
+DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
+DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
+DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
+
+REBUILD_HELM_OPERATOR ?= true
+
+ifeq ($(REBUILD_HELM_OPERATOR), true)
+	METERING_OPERATOR_DEPENDENCIES += helm-operator-docker-build
+	DOCKER_TAG_NAMES += helm-operator
+	DOCKER_PUSH_NAMES += helm-operator
+endif
+
+# We append this here so it comes after the helm-operator
+
 DOCKER_BASE_URL := quay.io/coreos
 
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/chargeback-helm-operator
@@ -120,20 +149,12 @@ ifdef DEPLOY_TAG
 	docker push $(IMAGE_NAME):$(DEPLOY_TAG)
 endif
 
-DOCKER_TARGETS := \
-	reporting-operator \
-	metering-integration-tests \
-	hadoop \
-	hive \
-	presto \
-	helm-operator \
-	metering-operator
 # These generate new make targets like metering-operator-docker-build
 # which can be invoked.
-DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(DOCKER_TARGETS))
-DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(DOCKER_TARGETS))
-DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(DOCKER_TARGETS))
-DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(DOCKER_TARGETS))
+DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(DOCKER_BUILD_NAMES))
+DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(DOCKER_PUSH_NAMES))
+DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(DOCKER_TAG_NAMES))
+DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(DOCKER_PUSH_NAMES))
 
 # The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
 # To make it easier to follow, each step will include an example after the evaluation.
@@ -173,16 +194,10 @@ reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le
 metering-integration-tests-docker-build: images/integration-tests/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_INTEGRATION_TESTS_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-operator-docker-build: \
-		images/metering-operator/Docker***REMOVED***le \
-		helm-operator-docker-build \
-		images/metering-operator/tectonic-metering-0.1.0.tgz \
-		images/metering-operator/openshift-metering-0.1.0.tgz \
-		images/metering-operator/operator-metering-0.1.0.tgz \
-		images/metering-operator/metering-override-values.yaml
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE)
+metering-operator-docker-build: $(METERING_OPERATOR_DEPENDENCIES)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) REBUILD_HELM_OPERATOR=$(REBUILD_HELM_OPERATOR)
 
-helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le
+helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le $(***REMOVED***nd -type f images/helm-operator)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
 
 presto-docker-build: images/presto/Docker***REMOVED***le
