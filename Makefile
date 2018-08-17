@@ -8,15 +8,6 @@ GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
 DOCKER_BUILD_ARGS ?=
-DOCKER_CACHE_FROM_ENABLED =
-ifdef BRANCH_TAG
-ifeq ($(BRANCH_TAG_CACHE), true)
-	DOCKER_CACHE_FROM_ENABLED=true
-endif
-ifdef DOCKER_CACHE_FROM_ENABLED
-	DOCKER_BUILD_ARGS += --cache-from $(IMAGE_NAME):$(BRANCH_TAG)
-endif
-endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
@@ -95,9 +86,6 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-ifdef DOCKER_CACHE_FROM_ENABLED
-	docker pull $(IMAGE_NAME):$(BRANCH_TAG) || true
-endif
 	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
