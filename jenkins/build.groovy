@@ -61,6 +61,9 @@ spec:
         ))
     }
 
+    parameters {
+        booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
+    }
     environment {
         GOPATH            = "${env.WORKSPACE}/go"
         METERING_SRC_DIR  = "${env.WORKSPACE}/go/src/github.com/operator-framework/operator-metering"
@@ -86,6 +89,11 @@ spec:
                         userRemoteConfigs: scm.userRemoteConfigs
                     ])
 
+                    script {
+                        // putting this in the environment block above wasn't working, so we use script and just assign to the env global
+                        env.REBUILD_HELM_OPERATOR = "${params.REBUILD_HELM_OPERATOR || (!isPullRequest)}"
+                    }
+
                     sh '''
                     apk update
                     apk add git bash
@@ -96,7 +104,7 @@ spec:
 
                     echo "Installing build dependencies"
                     sh '''#!/bin/bash
-                    set -e
+                    set -ex
                     apk add make go libc-dev curl jq zip python py-pip
                     pip install pyyaml
                     export HELM_VERSION=2.8.0
@@ -137,6 +145,7 @@ spec:
                             sh '''#!/bin/bash -ex
                             make docker-build-all -j 2 \
                                 BRANCH_TAG_CACHE=$BRANCH_TAG_CACHE \
+                                REBUILD_HELM_OPERATOR=$REBUILD_HELM_OPERATOR \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG
