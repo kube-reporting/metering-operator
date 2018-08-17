@@ -29,8 +29,8 @@ metadata:
 spec:
   containers:
   - name: docker
-    image: docker:dind
-    imagePullPolicy: IfNotPresent
+    image: docker:stable-dind
+    imagePullPolicy: Always
     command:
     - 'dockerd-entrypoint.sh'
     args:
