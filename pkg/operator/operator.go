@@ -56,6 +56,24 @@ const (
 	DefaultPrometheusQueryChunkSize = time.Minute * 5
 )
 
+type TLSCon***REMOVED***g struct {
+	UseTLS  bool
+	TLSCert string
+	TLSKey  string
+}
+
+func (cfg *TLSCon***REMOVED***g) Valid() error {
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return fmt.Errorf("Must set TLS certi***REMOVED***cate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
+	}
+	return nil
+}
+
 type Con***REMOVED***g struct {
 	PodName    string
 	Hostname   string
@@ -74,9 +92,8 @@ type Con***REMOVED***g struct {
 
 	LeaderLeaseDuration time.Duration
 
-	UseTLS  bool
-	TLSCert string
-	TLSKey  string
+	APITLSCon***REMOVED***g     TLSCon***REMOVED***g
+	MetricsTLSCon***REMOVED***g TLSCon***REMOVED***g
 }
 
 type Reporting struct {
@@ -126,13 +143,11 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Rep
 	}
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
 
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return nil, fmt.Errorf("Must set TLS certi***REMOVED***cate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return nil, fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
+	if err := cfg.APITLSCon***REMOVED***g.Valid(); err != nil {
+		return nil, err
+	}
+	if err := cfg.MetricsTLSCon***REMOVED***g.Valid(); err != nil {
+		return nil, err
 	}
 
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
@@ -380,9 +395,9 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if op.cfg.UseTLS {
+		if op.cfg.APITLSCon***REMOVED***g.UseTLS {
 			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
-			srvErr = httpServer.ListenAndServeTLS(op.cfg.TLSCert, op.cfg.TLSKey)
+			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSCon***REMOVED***g.TLSCert, op.cfg.APITLSCon***REMOVED***g.TLSKey)
 		} ***REMOVED*** {
 			op.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
 			srvErr = httpServer.ListenAndServe()
@@ -392,8 +407,14 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}()
 	go func() {
 		defer wg.Done()
-		op.logger.Infof("Prometheus metrics server started")
-		srvErr := promServer.ListenAndServe()
+		var srvErr error
+		if op.cfg.MetricsTLSCon***REMOVED***g.UseTLS {
+			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSCon***REMOVED***g.TLSCert, op.cfg.MetricsTLSCon***REMOVED***g.TLSKey)
+		} ***REMOVED*** {
+			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServe()
+		}
 		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
 		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
 	}()
