@@ -302,7 +302,41 @@ func (qs queues) ShutdownQueues() {
 
 func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var wg sync.WaitGroup
+	// buffered big enough to hold the errs of each server we start.
+	srvErrChan := make(chan error, 3)
+
 	op.logger.Info("starting Metering operator")
+
+	promServer := &http.Server{
+		Addr:    ":8082",
+		Handler: promhttp.Handler(),
+	}
+	pprofServer := newPprofServer()
+
+	// start these servers at the beginning some pprof and metrics are
+	// available before the reporting operator is ready
+	op.logger.Info("starting Prometheus metrics & pprof servers")
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		var srvErr error
+		if op.cfg.MetricsTLSCon***REMOVED***g.UseTLS {
+			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSCon***REMOVED***g.TLSCert, op.cfg.MetricsTLSCon***REMOVED***g.TLSKey)
+		} ***REMOVED*** {
+			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServe()
+		}
+		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
+		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
+	}()
+	go func() {
+		defer wg.Done()
+		op.logger.Infof("pprof server started")
+		srvErr := pprofServer.ListenAndServe()
+		op.logger.WithError(srvErr).Info("pprof server exited")
+		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
+	}()
 
 	go op.informers.Start(stopCh)
 
@@ -382,16 +416,9 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		Addr:    ":8080",
 		Handler: apiRouter,
 	}
-	promServer := &http.Server{
-		Addr:    ":8082",
-		Handler: promhttp.Handler(),
-	}
-	pprofServer := newPprofServer()
 
-	// buffered big enough to hold the errs of each server.
-	srvErrChan := make(chan error, 3)
-	// start the HTTP servers
-	wg.Add(3)
+	// start the HTTP API server
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var srvErr error
@@ -404,26 +431,6 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 		op.logger.WithError(srvErr).Info("HTTP API server exited")
 		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
-	}()
-	go func() {
-		defer wg.Done()
-		var srvErr error
-		if op.cfg.MetricsTLSCon***REMOVED***g.UseTLS {
-			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
-			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSCon***REMOVED***g.TLSCert, op.cfg.MetricsTLSCon***REMOVED***g.TLSKey)
-		} ***REMOVED*** {
-			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
-			srvErr = promServer.ListenAndServe()
-		}
-		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
-		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
-	}()
-	go func() {
-		defer wg.Done()
-		op.logger.Infof("pprof server started")
-		srvErr := pprofServer.ListenAndServe()
-		op.logger.WithError(srvErr).Info("pprof server exited")
-		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
 	// Poll until we can write to presto
