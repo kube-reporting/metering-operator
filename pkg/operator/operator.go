@@ -56,6 +56,24 @@ const (
 	DefaultPrometheusQueryChunkSize = time.Minute * 5
 )
 
+type TLSConfig struct {
+	UseTLS  bool
+	TLSCert string
+	TLSKey  string
+}
+
+func (cfg *TLSConfig) Valid() error {
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
+	}
+	return nil
+}
+
 type Config struct {
 	PodName    string
 	Hostname   string
@@ -74,9 +92,8 @@ type Config struct {
 
 	LeaderLeaseDuration time.Duration
 
-	UseTLS  bool
-	TLSCert string
-	TLSKey  string
+	APITLSConfig     TLSConfig
+	MetricsTLSConfig TLSConfig
 }
 
 type Reporting struct {
@@ -126,13 +143,11 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, err
 	}
 	logger.Debugf("Config: %+v", cfg)
 
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return nil, fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return nil, fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
+	if err := cfg.APITLSConfig.Valid(); err != nil {
+		return nil, err
+	}
+	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
+		return nil, err
 	}
 
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
@@ -380,9 +395,9 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if op.cfg.UseTLS {
+		if op.cfg.APITLSConfig.UseTLS {
 			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
-			srvErr = httpServer.ListenAndServeTLS(op.cfg.TLSCert, op.cfg.TLSKey)
+			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSConfig.TLSCert, op.cfg.APITLSConfig.TLSKey)
 		} else {
 			op.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
 			srvErr = httpServer.ListenAndServe()
@@ -392,8 +407,14 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}()
 	go func() {
 		defer wg.Done()
-		op.logger.Infof("Prometheus metrics server started")
-		srvErr := promServer.ListenAndServe()
+		var srvErr error
+		if op.cfg.MetricsTLSConfig.UseTLS {
+			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSConfig.TLSCert, op.cfg.MetricsTLSConfig.TLSKey)
+		} else {
+			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServe()
+		}
 		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
 		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
 	}()
