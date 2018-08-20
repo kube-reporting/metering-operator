@@ -116,34 +116,25 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: leader-lease-duration
-{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
-{{- if and .Values.spec.con***REMOVED***g.tls.enabled (not .Values.spec.authProxy.enabled) }}
-        - name: CHARGEBACK_USE_TLS
-          value: "true"
+{{- if .Values.spec.con***REMOVED***g.tls.enabled }}
         - name: CHARGEBACK_TLS_KEY
           value: "/tls/tls.key"
         - name: CHARGEBACK_TLS_CERT
           value: "/tls/tls.crt"
-        - name: CHARGEBACK_METRICS_USE_TLS
-          value: "true"
         - name: CHARGEBACK_METRICS_TLS_KEY
           value: "/tls/tls.key"
         - name: CHARGEBACK_METRICS_TLS_CERT
           value: "/tls/tls.crt"
-{{- ***REMOVED*** if and .Values.spec.con***REMOVED***g.tls.enabled .Values.spec.authProxy.enabled }}
+        - name: CHARGEBACK_METRICS_USE_TLS
+          value: "true"
+{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
+{{- if .Values.spec.authProxy.enabled }}
         - name: CHARGEBACK_USE_TLS
           value: "false"
-        - name: CHARGEBACK_METRICS_USE_TLS
-          value: "true"
-        - name: CHARGEBACK_METRICS_TLS_KEY
-          value: "/tls/tls.key"
-        - name: CHARGEBACK_METRICS_TLS_CERT
-          value: "/tls/tls.crt"
 {{- ***REMOVED*** }}
         - name: CHARGEBACK_USE_TLS
-          value: "false"
-        - name: CHARGEBACK_METRICS_USE_TLS
-          value: "false"
+          value: "true"
+{{- end }}
 {{- end }}
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
