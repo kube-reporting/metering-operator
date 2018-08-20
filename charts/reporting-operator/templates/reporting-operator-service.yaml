@@ -34,6 +34,7 @@ metadata:
   name: reporting-operator-metrics
   labels:
     app: reporting-operator
+    metrics: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
