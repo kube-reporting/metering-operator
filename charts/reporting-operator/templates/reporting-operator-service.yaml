@@ -35,6 +35,10 @@ metadata:
   labels:
     app: reporting-operator
     metrics: "true"
+{{- if .Values.spec.metricsService.annotations }}
+  annotations:
+{{ toYaml .Values.spec.metricsService.annotations | indent 4 }}
+{{- end }}
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:

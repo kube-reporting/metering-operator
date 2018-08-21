@@ -121,12 +121,6 @@ spec:
           value: "/tls/tls.key"
         - name: CHARGEBACK_TLS_CERT
           value: "/tls/tls.crt"
-        - name: CHARGEBACK_METRICS_TLS_KEY
-          value: "/tls/tls.key"
-        - name: CHARGEBACK_METRICS_TLS_CERT
-          value: "/tls/tls.crt"
-        - name: CHARGEBACK_METRICS_USE_TLS
-          value: "true"
 {{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
 {{- if .Values.spec.authProxy.enabled }}
         - name: CHARGEBACK_USE_TLS
@@ -135,6 +129,14 @@ spec:
         - name: CHARGEBACK_USE_TLS
           value: "true"
 {{- end }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.metricsTLS.enabled }}
+        - name: CHARGEBACK_METRICS_TLS_KEY
+          value: "/metrics-tls/tls.key"
+        - name: CHARGEBACK_METRICS_TLS_CERT
+          value: "/metrics-tls/tls.crt"
+        - name: CHARGEBACK_METRICS_USE_TLS
+          value: "true"
 {{- end }}
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
@@ -155,8 +157,10 @@ spec:
 {{ toYaml .Values.spec.livenessProbe | indent 10 }}
 {{- if .Values.spec.con***REMOVED***g.tls.enabled }}
         volumeMounts:
-        - name: tls
+        - name: api-tls
           mountPath: /tls
+        - name: metrics-tls
+          mountPath: /metrics-tls
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
       - name: reporting-operator-auth-proxy
@@ -194,7 +198,7 @@ spec:
 {{ toYaml .Values.spec.authProxy.resources | indent 10 }}
         volumeMounts:
         - mountPath: /etc/tls
-          name: tls
+          name: api-tls
         - mountPath: /etc/proxy/cookie-secret
           name: cookie-secret
         - mountPath: /etc/proxy/htpasswd
@@ -206,9 +210,14 @@ spec:
 {{- end }}
       volumes:
 {{- if .Values.spec.con***REMOVED***g.tls.enabled }}
-      - name: tls
+      - name: api-tls
         secret:
           secretName: {{ .Values.spec.con***REMOVED***g.tls.secretName }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.metricsTLS.enabled }}
+      - name: metrics-tls
+        secret:
+          secretName: {{ .Values.spec.con***REMOVED***g.metricsTLS.secretName }}
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
       - name: cookie-secret
