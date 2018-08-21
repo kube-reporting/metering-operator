@@ -116,17 +116,27 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: leader-lease-duration
-{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
-{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) }}
-        - name: CHARGEBACK_USE_TLS
-          value: "true"
+{{- if .Values.spec.config.tls.enabled }}
         - name: CHARGEBACK_TLS_KEY
           value: "/tls/tls.key"
         - name: CHARGEBACK_TLS_CERT
           value: "/tls/tls.crt"
-{{- else }}
+{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
+{{- if .Values.spec.authProxy.enabled }}
         - name: CHARGEBACK_USE_TLS
           value: "false"
+{{- else }}
+        - name: CHARGEBACK_USE_TLS
+          value: "true"
+{{- end }}
+{{- end }}
+{{- if .Values.spec.config.metricsTLS.enabled }}
+        - name: CHARGEBACK_METRICS_TLS_KEY
+          value: "/metrics-tls/tls.key"
+        - name: CHARGEBACK_METRICS_TLS_CERT
+          value: "/metrics-tls/tls.crt"
+        - name: CHARGEBACK_METRICS_USE_TLS
+          value: "true"
 {{- end }}
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
@@ -145,10 +155,12 @@ spec:
 {{ toYaml .Values.spec.readinessProbe | indent 10 }}
         livenessProbe:
 {{ toYaml .Values.spec.livenessProbe | indent 10 }}
-{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) }}
+{{- if .Values.spec.config.tls.enabled }}
         volumeMounts:
-        - name: tls
+        - name: api-tls
           mountPath: /tls
+        - name: metrics-tls
+          mountPath: /metrics-tls
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
       - name: reporting-operator-auth-proxy
@@ -186,7 +198,7 @@ spec:
 {{ toYaml .Values.spec.authProxy.resources | indent 10 }}
         volumeMounts:
         - mountPath: /etc/tls
-          name: tls
+          name: api-tls
         - mountPath: /etc/proxy/cookie-secret
           name: cookie-secret
         - mountPath: /etc/proxy/htpasswd
@@ -198,9 +210,14 @@ spec:
 {{- end }}
       volumes:
 {{- if .Values.spec.config.tls.enabled }}
-      - name: tls
+      - name: api-tls
         secret:
           secretName: {{ .Values.spec.config.tls.secretName }}
+{{- end }}
+{{- if .Values.spec.config.metricsTLS.enabled }}
+      - name: metrics-tls
+        secret:
+          secretName: {{ .Values.spec.config.metricsTLS.secretName }}
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
       - name: cookie-secret

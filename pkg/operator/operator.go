@@ -56,6 +56,24 @@ const (
 	DefaultPrometheusQueryChunkSize = time.Minute * 5
 )
 
+type TLSConfig struct {
+	UseTLS  bool
+	TLSCert string
+	TLSKey  string
+}
+
+func (cfg *TLSConfig) Valid() error {
+	if cfg.UseTLS {
+		if cfg.TLSCert == "" {
+			return fmt.Errorf("Must set TLS certificate if TLS is enabled")
+		}
+		if cfg.TLSKey == "" {
+			return fmt.Errorf("Must set TLS private key if TLS is enabled")
+		}
+	}
+	return nil
+}
+
 type Config struct {
 	PodName    string
 	Hostname   string
@@ -74,9 +92,8 @@ type Config struct {
 
 	LeaderLeaseDuration time.Duration
 
-	UseTLS  bool
-	TLSCert string
-	TLSKey  string
+	APITLSConfig     TLSConfig
+	MetricsTLSConfig TLSConfig
 }
 
 type Reporting struct {
@@ -126,13 +143,11 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, err
 	}
 	logger.Debugf("Config: %+v", cfg)
 
-	if cfg.UseTLS {
-		if cfg.TLSCert == "" {
-			return nil, fmt.Errorf("Must set TLS certificate if TLS is enabled")
-		}
-		if cfg.TLSKey == "" {
-			return nil, fmt.Errorf("Must set TLS private key if TLS is enabled")
-		}
+	if err := cfg.APITLSConfig.Valid(); err != nil {
+		return nil, err
+	}
+	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
+		return nil, err
 	}
 
 	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
@@ -287,7 +302,41 @@ func (qs queues) ShutdownQueues() {
 
 func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var wg sync.WaitGroup
+	// buffered big enough to hold the errs of each server we start.
+	srvErrChan := make(chan error, 3)
+
 	op.logger.Info("starting Metering operator")
+
+	promServer := &http.Server{
+		Addr:    ":8082",
+		Handler: promhttp.Handler(),
+	}
+	pprofServer := newPprofServer()
+
+	// start these servers at the beginning some pprof and metrics are
+	// available before the reporting operator is ready
+	op.logger.Info("starting Prometheus metrics & pprof servers")
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		var srvErr error
+		if op.cfg.MetricsTLSConfig.UseTLS {
+			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSConfig.TLSCert, op.cfg.MetricsTLSConfig.TLSKey)
+		} else {
+			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
+			srvErr = promServer.ListenAndServe()
+		}
+		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
+		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
+	}()
+	go func() {
+		defer wg.Done()
+		op.logger.Infof("pprof server started")
+		srvErr := pprofServer.ListenAndServe()
+		op.logger.WithError(srvErr).Info("pprof server exited")
+		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
+	}()
 
 	go op.informers.Start(stopCh)
 
@@ -367,42 +416,21 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		Addr:    ":8080",
 		Handler: apiRouter,
 	}
-	promServer := &http.Server{
-		Addr:    ":8082",
-		Handler: promhttp.Handler(),
-	}
-	pprofServer := newPprofServer()
 
-	// buffered big enough to hold the errs of each server.
-	srvErrChan := make(chan error, 3)
-	// start the HTTP servers
-	wg.Add(3)
+	// start the HTTP API server
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var srvErr error
-		if op.cfg.UseTLS {
+		if op.cfg.APITLSConfig.UseTLS {
 			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
-			srvErr = httpServer.ListenAndServeTLS(op.cfg.TLSCert, op.cfg.TLSKey)
+			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSConfig.TLSCert, op.cfg.APITLSConfig.TLSKey)
 		} else {
 			op.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
 			srvErr = httpServer.ListenAndServe()
 		}
 		op.logger.WithError(srvErr).Info("HTTP API server exited")
 		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
-	}()
-	go func() {
-		defer wg.Done()
-		op.logger.Infof("Prometheus metrics server started")
-		srvErr := promServer.ListenAndServe()
-		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
-		srvErrChan <- fmt.Errorf("Prometheus metrics server error: %v", srvErr)
-	}()
-	go func() {
-		defer wg.Done()
-		op.logger.Infof("pprof server started")
-		srvErr := pprofServer.ListenAndServe()
-		op.logger.WithError(srvErr).Info("pprof server exited")
-		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
 	// Poll until we can write to presto
