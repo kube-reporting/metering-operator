@@ -76,9 +76,13 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration, "promsum-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 
-	startCmd.Flags().BoolVar(&cfg.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traf***REMOVED***x")
-	startCmd.Flags().StringVar(&cfg.TLSCert, "tls-cert", "", "If use-tls is true, speci***REMOVED***es the path to the TLS certi***REMOVED***cate.")
-	startCmd.Flags().StringVar(&cfg.TLSKey, "tls-key", "", "If use-tls is true, speci***REMOVED***es the path to the TLS private key.")
+	startCmd.Flags().BoolVar(&cfg.APITLSCon***REMOVED***g.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traf***REMOVED***x")
+	startCmd.Flags().StringVar(&cfg.APITLSCon***REMOVED***g.TLSCert, "tls-cert", "", "If use-tls is true, speci***REMOVED***es the path to the TLS certi***REMOVED***cate.")
+	startCmd.Flags().StringVar(&cfg.APITLSCon***REMOVED***g.TLSKey, "tls-key", "", "If use-tls is true, speci***REMOVED***es the path to the TLS private key.")
+
+	startCmd.Flags().BoolVar(&cfg.MetricsTLSCon***REMOVED***g.UseTLS, "metrics-use-tls", false, "If true, uses TLS to secure Prometheus Metrics endpoint traf***REMOVED***x")
+	startCmd.Flags().StringVar(&cfg.MetricsTLSCon***REMOVED***g.TLSCert, "metrics-tls-cert", "", "If metrics-use-tls is true, speci***REMOVED***es the path to the TLS certi***REMOVED***cate to use for the Metrics endpoint.")
+	startCmd.Flags().StringVar(&cfg.MetricsTLSCon***REMOVED***g.TLSKey, "metrics-tls-key", "", "If metrics-use-tls is true, speci***REMOVED***es the path to the TLS private key to use for the Metrics endpoint.")
 }
 
 func main() {
