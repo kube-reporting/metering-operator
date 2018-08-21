@@ -16,7 +16,14 @@ spec:
       createSecret: false
       certificateData: null
       privateKeyData: null
-      secretName: reporting-operator-tls-secrets
+      secretName: reporting-operator-api-tls-secrets
+
+    metricsTLS:
+      enabled: false
+      createSecret: false
+      certificateData: null
+      privateKeyData: null
+      secretName: reporting-operator-metrics-tls-secrets
 
     defaultStorage:
       create: true
@@ -127,6 +134,9 @@ spec:
     annotations: {}
     type: ClusterIP
     nodePort: null
+
+  metricsService:
+    annotations: {}
 
   route:
     enabled: false
