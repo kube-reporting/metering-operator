@@ -1,3 +1,6 @@
+def notifyBuild = evaluate readTrusted('jenkins/vars/notifyBuild.groovy')
+
+notifyBuild("STARTED")
 pipeline {
     parameters {
         string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. If unset, uses env.BRANCH_NAME')
@@ -41,6 +44,13 @@ pipeline {
                     booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT),
                     booleanParam(name: 'TECTONIC', value: params.TECTONIC),
                 ]
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                notifyBuild(currentBuild.currentResult)
             }
         }
     }
