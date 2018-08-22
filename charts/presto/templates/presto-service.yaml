@@ -13,10 +13,26 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: 8080
-  - name: prometheus-jmx
-    port: 8082
-    protocol: TCP
-    targetPort: 8082
   selector:
     app: presto
     presto: coordinator
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: presto-metrics
+  labels:
+    app: presto
+    metrics: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  ports:
+  - name: metrics
+    port: 8082
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app: presto
