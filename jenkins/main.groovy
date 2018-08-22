@@ -1,3 +1,4 @@
+def notifyBuild = evaluate readTrusted('jenkins/vars/notifyBuild.groovy')
 def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
 def isMasterBranch = env.BRANCH_NAME == "master"
 
@@ -15,6 +16,7 @@ if (isPullRequest) {
     echo 'Setting Github PR status'
     githubNotify context: prStatusContext, status: 'PENDING', description: 'Build started'
 }
+notifyBuild('STARTED')
 
 pipeline {
     agent none
@@ -136,6 +138,7 @@ pipeline {
                     }
                     githubNotify context: prStatusContext, status: status, description: description
                 }
+                notifyBuild(currentBuild.currentResult)
             }
         }
     }
