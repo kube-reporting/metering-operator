@@ -133,9 +133,9 @@ Uncomment the following sections and replace the `null` in `class: null` value w
 
 Use [custom-storageclass-values.yaml][example-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
 
-- `presto.hive.metastore.storage.size`
-- `hdfs.datanode.storage.size`
-- `hdfs.namenode.storage.size`
+- `presto.spec.hive.metastore.storage.size`
+- `hdfs.spec.datanode.storage.size`
+- `hdfs.spec.namenode.storage.size`
 
 #### Manually creating Persistent Volumes
 
