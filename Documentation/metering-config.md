@@ -129,15 +129,17 @@ Uncomment the following sections and replace the `null` in `class: null` value w
 - `spec.hdfs.spec.datanode.storage.class`
 - `spec.hdfs.spec.namenode.storage.class`
 
-### Manually creating Persistent Volumes
-
-If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity. By default, the PVCs listed above each request 5Gi of storage. This can be adjusted in the same section as adjusting the Storage Class.
+#### Configuring the volume sizes for Metering
 
 Use [custom-storageclass-values.yaml][example-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
 
 - `presto.hive.metastore.storage.size`
 - `hdfs.datanode.storage.size`
 - `hdfs.namenode.storage.size`
+
+#### Manually creating Persistent Volumes
+
+If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity. By default, the PVCs listed above each request 5Gi of storage. This can be adjusted in the same section as adjusting the Storage Class as documented in [Configuring the volume sizes for Metering](#configuring-the-volume-sizes-for-metering).
 
 ### Storing data in S3
 
