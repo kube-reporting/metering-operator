@@ -62,7 +62,7 @@ spec:
         - name: http
           containerPort: 8080
           protocol: TCP
-        - name: prometheus-jmx
+        - name: metrics
           containerPort: 8082
           protocol: TCP
         volumeMounts:
