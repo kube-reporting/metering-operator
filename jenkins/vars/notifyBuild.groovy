@@ -26,9 +26,8 @@ def call(String buildStatus = 'STARTED') {
         channel: '#team-metering-ci',
         color: buildColor,
         message: """
-            |*${env.JOB_NAME} build ${env.BUILD_NUMBER}*
+            |*<${env.BUILD_URL}|${env.JOB_NAME} build ${env.BUILD_NUMBER}>*
             |${buildEmoji} Build ${buildStatus}.
-            |link: ${env.BUILD_URL}
             |branch: ${env.BRANCH_NAME}
             """.stripMargin(),
         tokenCredentialId: 'team-metering-ci-slack-token'
