@@ -61,7 +61,6 @@ spec:
           containerPort: 8082
           protocol: TCP
         volumeMounts:
-        volumeMounts:
         - name: presto-data
           mountPath: /var/presto/data
         resources:
