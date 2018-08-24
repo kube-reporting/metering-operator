@@ -16,8 +16,9 @@ For example:
 ```
 openshift_metering_con***REMOVED***g:
   reporting-operator:
-    con***REMOVED***g:
-      awsAccessKeyID: "REPLACEME"
+    spec:
+      con***REMOVED***g:
+        awsAccessKeyID: "REPLACEME"
 ```
 
 ## Install
