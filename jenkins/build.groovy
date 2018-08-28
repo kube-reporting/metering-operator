@@ -228,6 +228,7 @@ spec:
                         description = "Some stages failed"
                     }
                     githubNotify context: prStatusContext, status: status, description: description
+                    slackSend channel: '#team-metering-ci', tokenCredentialId: 'team-metering-ci-slack-token', color: 'good', message: "<${env.BUILD_URL}|*${env.JOB_NAME} (build ${env.BUILD_NUMBER})*>\n:quay: built & pushed images with tags: ${env.BRANCH_TAG}, ${env.DEPLOY_TAG}"
                 }
             }
         }
