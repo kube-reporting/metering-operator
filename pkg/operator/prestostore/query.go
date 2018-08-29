@@ -58,8 +58,13 @@ func (importer *PrometheusImporter) importFromTimeRange(ctx context.Context, sta
 
 		promLogger.Debugf("querying Prometheus using range %s to %s", timeRange.Start, timeRange.End)
 
+		queryStart := importer.clock.Now()
 		pVal, err := importer.promConn.QueryRange(ctx, importer.cfg.PrometheusQuery, timeRange)
+		queryDuration := importer.clock.Since(queryStart)
+		importer.metricsCollectors.PrometheusQueryDurationHistogram.Observe(float64(queryDuration.Seconds()))
+		importer.metricsCollectors.TotalPrometheusQueriesCounter.Inc()
 		if err != nil {
+			importer.metricsCollectors.FailedPrometheusQueriesCounter.Inc()
 			return nil, fmt.Errorf("failed to perform Prometheus query: %v", err)
 		}
 
@@ -70,6 +75,7 @@ func (importer *PrometheusImporter) importFromTimeRange(ctx context.Context, sta
 
 		metrics := promMatrixToPrometheusMetrics(timeRange, matrix)
 		numMetrics := len(metrics)
+		importer.metricsCollectors.MetricsScrapedCounter.Add(float64(numMetrics))
 
 		// check for cancellation
 		select {
@@ -88,12 +94,18 @@ func (importer *PrometheusImporter) importFromTimeRange(ctx context.Context, sta
 			})
 			logger.Debugf("got %d metrics for time range %s to %s, storing them into Presto into table %s", numMetrics, promQueryBegin, promQueryEnd, importer.cfg.PrestoTableName)
 
+			importer.metricsCollectors.TotalPrometheusQueriesCounter.Inc()
+			prestoStoreBegin := importer.clock.Now()
 			err := StorePrometheusMetrics(ctx, importer.prestoQueryer, importer.cfg.PrestoTableName, metrics)
+			prestoStoreDuration := importer.clock.Since(prestoStoreBegin)
+			importer.metricsCollectors.PrestoStoreDurationHistogram.Observe(float64(prestoStoreDuration.Seconds()))
 			if err != nil {
+				importer.metricsCollectors.FailedPrestoStoresCounter.Inc()
 				return nil, fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
 					importer.cfg.PrestoTableName, promQueryBegin, promQueryEnd, err)
 			}
-			logger.Debugf("stored %d metrics for time range %s to %s into Presto table %s", numMetrics, promQueryBegin, promQueryEnd, importer.cfg.PrestoTableName)
+			logger.Debugf("stored %d metrics for time range %s to %s into Presto table %s (took %s)", numMetrics, promQueryBegin, promQueryEnd, importer.cfg.PrestoTableName, prestoStoreDuration)
+			importer.metricsCollectors.MetricsImportedCounter.Add(float64(numMetrics))
 			metricsCount += numMetrics
 		}
 

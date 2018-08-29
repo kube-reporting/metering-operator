@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/api/meta"
@@ -19,6 +20,21 @@ import (
 )
 
 const prestoTableReconcileInterval = time.Minute
+
+var (
+	awsBillingReportDatasourcePartitionsGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "metering",
+			Name:      "aws_billing_reportdatasource_partitions",
+			Help:      "Current number of partitions in a AWSBilling ReportDataSource table.",
+		},
+		[]string{"reportdatasource", "table_name"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(awsBillingReportDatasourcePartitionsGauge)
+}
 
 func dataSourceNameToPrestoTableName(name string) string {
 	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
@@ -161,6 +177,9 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, datasour
 	}
 
 	prestoTable.State.Partitions = desiredPartitions
+
+	numPartitions := len(desiredPartitionsList)
+	awsBillingReportDatasourcePartitionsGauge.WithLabelValues(datasource.Name, tableName).Set(float64(numPartitions))
 
 	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	if err != nil {
