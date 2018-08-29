@@ -26,6 +26,8 @@ const (
 	defaultMaxPromTimeRanges = (24 * 60) / 5 // 24 hours, 60 minutes per hour, default chunkSize is 5 minutes
 
 	defaultMaxTimeDuration = 24 * time.Hour
+
+	prometheusMetricNamespace = "metering"
 )
 
 var (
@@ -37,7 +39,7 @@ var (
 
 	prometheusReportDatasourceMetricsScrapedCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_metrics_scraped_total",
 			Help:      "Number of Prometheus metrics returned by a PrometheusQuery for a ReportDataSource.",
 		},
@@ -46,7 +48,7 @@ var (
 
 	prometheusReportDatasourceMetricsImportedCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_metrics_imported_total",
 			Help:      "Number of Prometheus ReportDatasource metrics imported.",
 		},
@@ -55,7 +57,7 @@ var (
 
 	prometheusReportDatasourceTotalImportsCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_imports_total",
 			Help:      "Number of Prometheus ReportDatasource metrics imports.",
 		},
@@ -64,7 +66,7 @@ var (
 
 	prometheusReportDatasourceFailedImportsCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_failed_imports_total",
 			Help:      "Number of failed Prometheus ReportDatasource metrics imports.",
 		},
@@ -73,7 +75,7 @@ var (
 
 	prometheusReportDatasourceTotalPrometheusQueriesCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_prometheus_queries_total",
 			Help:      "Number of Prometheus ReportDatasource Prometheus queries made for the ReportDataSource since start up.",
 		},
@@ -82,7 +84,7 @@ var (
 
 	prometheusReportDatasourceFailedPrometheusQueriesCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_failed_prometheus_queries_total",
 			Help:      "Number of failed Prometheus ReportDatasource Prometheus queries made for the ReportDataSource since start up.",
 		},
@@ -91,7 +93,7 @@ var (
 
 	prometheusReportDatasourceTotalPrestoStoresCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_presto_stores_total",
 			Help:      "Number of Prometheus ReportDatasource calls to store all metrics collected into Presto.",
 		},
@@ -100,7 +102,7 @@ var (
 
 	prometheusReportDatasourceFailedPrestoStoresCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_failed_presto_stores_total",
 			Help:      "Number of failed Prometheus ReportDatasource calls to store all metrics collected into Presto.",
 		},
@@ -109,7 +111,7 @@ var (
 
 	prometheusReportDatasourceImportDurationHistogram = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_import_duration_seconds",
 			Help:      "Duration to import Prometheus metrics into Presto.",
 			Buckets:   []float64{30.0, 60.0, 300.0},
@@ -119,7 +121,7 @@ var (
 
 	prometheusReportDatasourcePrometheusQueryDurationHistogram = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_prometheus_query_duration_seconds",
 			Help:      "Duration for a Prometheus query to return metrics to reporting-operator.",
 			Buckets:   []float64{2.0, 10.0, 30.0, 60.0},
@@ -129,7 +131,7 @@ var (
 
 	prometheusReportDatasourcePrestoreStoreDurationHistogram = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_presto_store_duration_seconds",
 			Help:      "Duration to store all metrics fetched into Presto.",
 			Buckets:   []float64{2.0, 10.0, 30.0, 60.0, 300.0},
@@ -139,7 +141,7 @@ var (
 
 	prometheusReportDatasourceRunningImportsGauge = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Namespace: "metering",
+			Namespace: prometheusMetricNamespace,
 			Name:      "prometheus_reportdatasource_running_imports",
 			Help:      "Number of Prometheus ReportDatasource imports currently running.",
 		},
