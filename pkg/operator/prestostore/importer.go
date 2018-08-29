@@ -6,6 +6,7 @@ import (
 	"time"
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -18,6 +19,23 @@ const (
 	maxChunkDuration = 24 * time.Hour
 )
 
+type ImporterMetricsCollectors struct {
+	TotalImportsCounter     prometheus.Counter
+	FailedImportsCounter    prometheus.Counter
+	ImportDurationHistogram prometheus.Observer
+
+	TotalPrometheusQueriesCounter    prometheus.Counter
+	FailedPrometheusQueriesCounter   prometheus.Counter
+	PrometheusQueryDurationHistogram prometheus.Observer
+
+	TotalPrestoStoresCounter     prometheus.Counter
+	FailedPrestoStoresCounter    prometheus.Counter
+	PrestoStoreDurationHistogram prometheus.Observer
+
+	MetricsScrapedCounter  prometheus.Counter
+	MetricsImportedCounter prometheus.Counter
+}
+
 // PrometheusImporter imports Prometheus metrics into Presto tables
 type PrometheusImporter struct {
 	logger        logrus.FieldLogger
@@ -25,6 +43,8 @@ type PrometheusImporter struct {
 	prestoQueryer presto.ExecQueryer
 	clock         clock.Clock
 	cfg           Config
+
+	metricsCollectors ImporterMetricsCollectors
 
 	// importLock ensures only one import is running at a time, protecting the
 	// lastTimestamp and metrics fields
@@ -43,7 +63,7 @@ type Config struct {
 	MaxQueryRangeDuration time.Duration
 }
 
-func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer presto.ExecQueryer, clock clock.Clock, cfg Config) *PrometheusImporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer presto.ExecQueryer, clock clock.Clock, cfg Config, collectors ImporterMetricsCollectors) *PrometheusImporter {
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
@@ -52,11 +72,12 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQ
 	})
 
 	return &PrometheusImporter{
-		logger:        logger,
-		promConn:      promConn,
-		prestoQueryer: prestoQueryer,
-		clock:         clock,
-		cfg:           cfg,
+		logger:            logger,
+		promConn:          promConn,
+		prestoQueryer:     prestoQueryer,
+		clock:             clock,
+		cfg:               cfg,
+		metricsCollectors: collectors,
 	}
 }
 
@@ -148,10 +169,17 @@ func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime
 		endTime = newEndTime
 	}
 
+	importStart := importer.clock.Now()
 	timeRanges, err := importer.importFromTimeRange(ctx, startTime, endTime, allowIncompleteChunks)
+	importDuration := importer.clock.Since(importStart)
+
+	importer.metricsCollectors.TotalImportsCounter.Inc()
+	importer.metricsCollectors.ImportDurationHistogram.Observe(importDuration.Seconds())
+	importer.logger.Debugf("took %s to run import", importDuration)
 
 	if err != nil {
 		logger.WithError(err).Error("error collecting metrics")
+		importer.metricsCollectors.FailedImportsCounter.Inc()
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our importer.lastTimestamp
 		importer.lastTimestamp = nil

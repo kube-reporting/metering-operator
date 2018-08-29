@@ -5,6 +5,7 @@ import (
 	"time"
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
@@ -25,6 +26,139 @@ const (
 
 	defaultMaxTimeDuration = 24 * time.Hour
 )
+
+var (
+	prometheusReportDatasourceLabels = []string{
+		"reportdatasource",
+		"reportprometheusquery",
+		"table_name",
+	}
+
+	prometheusReportDatasourceMetricsScrapedCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_metrics_scraped_total",
+			Help:      "Number of Prometheus metrics returned by a PrometheusQuery for a ReportDataSource.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceMetricsImportedCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_metrics_imported_total",
+			Help:      "Number of Prometheus ReportDatasource metrics imported.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceTotalImportsCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_imports_total",
+			Help:      "Number of Prometheus ReportDatasource metrics imports.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceFailedImportsCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_failed_imports_total",
+			Help:      "Number of failed Prometheus ReportDatasource metrics imports.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceTotalPrometheusQueriesCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_prometheus_queries_total",
+			Help:      "Number of Prometheus ReportDatasource Prometheus queries made for the ReportDataSource since start up.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceFailedPrometheusQueriesCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_failed_prometheus_queries_total",
+			Help:      "Number of failed Prometheus ReportDatasource Prometheus queries made for the ReportDataSource since start up.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceTotalPrestoStoresCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_presto_stores_total",
+			Help:      "Number of Prometheus ReportDatasource calls to store all metrics collected into Presto.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceFailedPrestoStoresCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_failed_presto_stores_total",
+			Help:      "Number of failed Prometheus ReportDatasource calls to store all metrics collected into Presto.",
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceImportDurationHistogram = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_import_duration_seconds",
+			Help:      "Duration to import Prometheus metrics into Presto.",
+			Buckets:   []float64{30.0, 60.0, 300.0},
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourcePrometheusQueryDurationHistogram = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_prometheus_query_duration_seconds",
+			Help:      "Duration for a Prometheus query to return metrics to reporting-operator.",
+			Buckets:   []float64{2.0, 10.0, 30.0, 60.0},
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourcePrestoreStoreDurationHistogram = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_presto_store_duration_seconds",
+			Help:      "Duration to store all metrics fetched into Presto.",
+			Buckets:   []float64{2.0, 10.0, 30.0, 60.0, 300.0},
+		},
+		prometheusReportDatasourceLabels,
+	)
+
+	prometheusReportDatasourceRunningImportsGauge = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: "metering",
+			Name:      "prometheus_reportdatasource_running_imports",
+			Help:      "Number of Prometheus ReportDatasource imports currently running.",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(prometheusReportDatasourceMetricsScrapedCounter)
+	prometheus.MustRegister(prometheusReportDatasourceMetricsImportedCounter)
+	prometheus.MustRegister(prometheusReportDatasourceTotalImportsCounter)
+	prometheus.MustRegister(prometheusReportDatasourceFailedImportsCounter)
+	prometheus.MustRegister(prometheusReportDatasourceTotalPrometheusQueriesCounter)
+	prometheus.MustRegister(prometheusReportDatasourceFailedPrometheusQueriesCounter)
+	prometheus.MustRegister(prometheusReportDatasourceTotalPrestoStoresCounter)
+	prometheus.MustRegister(prometheusReportDatasourceFailedPrestoStoresCounter)
+	prometheus.MustRegister(prometheusReportDatasourceImportDurationHistogram)
+	prometheus.MustRegister(prometheusReportDatasourcePrometheusQueryDurationHistogram)
+	prometheus.MustRegister(prometheusReportDatasourcePrestoreStoreDurationHistogram)
+	prometheus.MustRegister(prometheusReportDatasourceRunningImportsGauge)
+}
 
 func (op *Reporting) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -168,7 +302,47 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
 				importer.UpdateConfig(cfg)
 			} else {
-				importer = prestostore.NewPrometheusImporter(dataSourceLogger, op.promConn, op.prestoQueryer, op.clock, cfg)
+				promLabels := prometheus.Labels{
+					"reportdatasource":      dataSourceName,
+					"reportprometheusquery": reportPromQuery.Name,
+					"table_name":            tableName,
+				}
+
+				totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)
+				failedImportsCounter := prometheusReportDatasourceFailedImportsCounter.With(promLabels)
+
+				totalPrometheusQueriesCounter := prometheusReportDatasourceTotalPrometheusQueriesCounter.With(promLabels)
+				failedPrometheusQueriesCounter := prometheusReportDatasourceFailedPrometheusQueriesCounter.With(promLabels)
+
+				totalPrestoStoresCounter := prometheusReportDatasourceTotalPrestoStoresCounter.With(promLabels)
+				failedPrestoStoresCounter := prometheusReportDatasourceFailedPrestoStoresCounter.With(promLabels)
+
+				promQueryMetricsScrapedCounter := prometheusReportDatasourceMetricsScrapedCounter.With(promLabels)
+				promQueryDurationHistogram := prometheusReportDatasourcePrometheusQueryDurationHistogram.With(promLabels)
+
+				metricsImportedCounter := prometheusReportDatasourceMetricsImportedCounter.With(promLabels)
+				importDurationHistogram := prometheusReportDatasourceImportDurationHistogram.With(promLabels)
+
+				prestoStoreDurationHistogram := prometheusReportDatasourcePrestoreStoreDurationHistogram.With(promLabels)
+
+				metricsCollectors := prestostore.ImporterMetricsCollectors{
+					TotalImportsCounter:     totalImportsCounter,
+					FailedImportsCounter:    failedImportsCounter,
+					ImportDurationHistogram: importDurationHistogram,
+
+					TotalPrometheusQueriesCounter:    totalPrometheusQueriesCounter,
+					FailedPrometheusQueriesCounter:   failedPrometheusQueriesCounter,
+					PrometheusQueryDurationHistogram: promQueryDurationHistogram,
+
+					TotalPrestoStoresCounter:     totalPrestoStoresCounter,
+					FailedPrestoStoresCounter:    failedPrestoStoresCounter,
+					PrestoStoreDurationHistogram: prestoStoreDurationHistogram,
+
+					MetricsScrapedCounter:  promQueryMetricsScrapedCounter,
+					MetricsImportedCounter: metricsImportedCounter,
+				}
+
+				importer = prestostore.NewPrometheusImporter(dataSourceLogger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
 				importers[dataSourceName] = importer
 			}
 
@@ -253,9 +427,11 @@ func importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogg
 	// decrement the semaphore at the end
 	defer func() {
 		dataSourceLogger.Infof("finished import for Prometheus ReportDataSource %s", dataSourceName)
+		prometheusReportDatasourceRunningImportsGauge.Dec()
 		<-semaphore
 	}()
 	dataSourceLogger.Infof("starting import for Prometheus ReportDataSource %s", dataSourceName)
+	prometheusReportDatasourceRunningImportsGauge.Inc()
 	_, err := runImport(ctx, prometheusImporter)
 	return err
 }
