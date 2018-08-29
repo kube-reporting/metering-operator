@@ -42,6 +42,10 @@ spec:
       af***REMOVED***nity:
 {{ toYaml .Values.spec.presto.worker.af***REMOVED***nity | indent 8 }}
 {{- end }}
+{{- if .Values.spec.presto.worker.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.spec.presto.worker.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: presto
         image: "{{ .Values.spec.presto.image.repository }}:{{ .Values.spec.presto.image.tag }}"

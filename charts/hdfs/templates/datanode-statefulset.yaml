@@ -67,6 +67,10 @@ spec:
       af***REMOVED***nity:
 {{ toYaml .Values.spec.datanode.af***REMOVED***nity | indent 8 }}
 {{- end }}
+{{- if .Values.spec.datanode.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.spec.datanode.nodeSelector | indent 8 }}
+{{- end }}
       initContainers:
       # wait-for-namenode exists because for some reason the datanode is unable
       # to connect to the namenode if it starts before the namenode's DNS name
