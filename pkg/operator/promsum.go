@@ -150,6 +150,10 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 				}
 			}
 
+			// round to the nearest second for chunk/step sizes
+			chunkSize = chunkSize.Truncate(time.Second)
+			stepSize = stepSize.Truncate(time.Second)
+
 			cfg := prestostore.Con***REMOVED***g{
 				PrometheusQuery:       promQuery,
 				PrestoTableName:       tableName,
@@ -252,7 +256,6 @@ func importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogg
 		<-semaphore
 	}()
 	dataSourceLogger.Infof("starting import for Prometheus ReportDataSource %s", dataSourceName)
-
 	_, err := runImport(ctx, prometheusImporter)
 	return err
 }

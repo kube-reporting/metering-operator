@@ -1,4 +1,4 @@
-package promquery
+package prestostore
 
 import (
 	"testing"
@@ -103,7 +103,7 @@ func TestGetTimeRanges(t *testing.T) {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
-			timeRanges := getTimeRanges(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxTimeRanges, test.allowIncompleteChunks)
+			timeRanges := getTimeRangesChunked(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxTimeRanges, test.allowIncompleteChunks)
 			assert.Equal(t, test.expectedRanges, timeRanges)
 		})
 	}
