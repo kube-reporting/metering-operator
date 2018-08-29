@@ -92,6 +92,11 @@ spec:
 
 You can pass additional JDBC parameters using the `dbConnectionURL`, for more details see [the Postgresql JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).
 
+### Node Selectors
+
+If you want to run the metering components on speci***REMOVED***c sets of nodes then you can set nodeSelectors on each component to control where each component of metering is scheduled to.
+See [node-selectors.yaml][example-node-selectors-con***REMOVED***g] for an example of setting node selectors for each component.
+
 ### Persistent Volumes
 
 Metering requires at least 1 Persistent Volume to operate. (The example manifest includes 3 by default.) The Persistent Volume Claims (PVCs) are listed below:
@@ -188,5 +193,6 @@ This can be done either pre-install or post-install. Note that disabling it post
 [example-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-values.yaml
 [default-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/default.yaml
 [example-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-storageclass-values.yaml
+[example-node-selectors-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-node-selectors.yaml
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
