@@ -21,6 +21,8 @@ spec:
         taskMaxWorkerThreads: null
         taskMinDrivers: null
 
+      nodeSelector: {}
+
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -47,6 +49,8 @@ spec:
         logLevel: info
         taskMaxWorkerThreads: null
         taskMinDrivers: null
+
+      nodeSelector: {}
 
       affinity:
         podAntiAffinity:
@@ -112,6 +116,8 @@ spec:
         class: null
         size: "5Gi"
 
+      nodeSelector: {}
+
     server:
       config:
         logLevel: info
@@ -122,6 +128,8 @@ spec:
         limits:
           memory: "400Mi"
           cpu: "100m"
+
+      nodeSelector: {}
 
     labels: {}
     annotations: {}

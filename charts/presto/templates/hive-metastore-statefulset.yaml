@@ -40,6 +40,10 @@ spec:
     spec:
       securityContext:
 {{ toYaml .Values.spec.hive.securityContext | indent 8 }}
+{{- if .Values.spec.hive.metastore.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.spec.hive.metastore.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: metastore
         args: ["--service", "metastore"]

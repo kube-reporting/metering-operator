@@ -24,6 +24,9 @@ spec:
         memory: "250Mi"
         cpu: "250m"
 
+
+    nodeSelector: {}
+
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -54,6 +57,8 @@ spec:
       limits:
         memory: "350Mi"
         cpu: "250m"
+
+    nodeSelector: {}
 
     affinity:
       podAntiAffinity:

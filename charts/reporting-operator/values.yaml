@@ -129,6 +129,7 @@ spec:
 
   labels: {}
   annotations: {}
+  nodeSelector: {}
 
   service:
     annotations: {}

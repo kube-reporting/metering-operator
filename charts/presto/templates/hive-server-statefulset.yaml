@@ -40,6 +40,10 @@ spec:
     spec:
       securityContext:
 {{ toYaml .Values.spec.hive.securityContext | indent 8 }}
+{{- if .Values.spec.hive.server.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.spec.hive.server.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: hiveserver2
         args: ["--service", "hiveserver2"]
