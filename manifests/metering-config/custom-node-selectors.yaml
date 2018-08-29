@@ -1,0 +1,35 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      nodeSelector:
+        "node-role.kubernetes.io/infra": "true"
+
+  presto:
+    spec:
+      presto:
+        coordinator:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"
+        worker:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"
+      hive:
+        metastore:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"
+        server:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"
+
+  hdfs:
+    spec:
+      namenode:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
+      datanode:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
