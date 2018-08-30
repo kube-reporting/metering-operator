@@ -41,7 +41,8 @@ import (
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
-	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus"
+	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
+	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
 
 const (
