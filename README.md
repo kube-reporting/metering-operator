@@ -7,13 +7,13 @@ Metering records historical cluster usage, and can generate usage reports showin
 
 ## Project status: alpha
 
-Most major planned features are implemented, however the API is still subject to change.
+Read more about the implemented and planned features in the documentation:
 
-## Getting Started
-
-For installation instructions, please see the [installation](Documentation/install-metering.md) portion of the documentation.
-
-See the above installation guide for links to con***REMOVED***guring and using Chargeback.
+ - [Installation Guide](Documentation/install-metering.md) - install Metering on your Kubernetes cluster
+ - [Usage Guide](Documentation/using-metering.md) - start here to learn how to use the project
+ - [Metering Architecture](Documentation/metering-architecture.md) - understand the system's components
+ - [Con***REMOVED***guration](Documentation/metering-con***REMOVED***g.md) - see the available options for talking to Prometheus, talking to AWS, storing Metering output and more.
+ - [Writing Custom Reports](Documentation/writing-custom-queries.md) - extend or customize reports based on your needs
 
 ## Developers
 
