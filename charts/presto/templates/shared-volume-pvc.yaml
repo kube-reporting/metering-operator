@@ -1,0 +1,15 @@
+{{- if and .Values.spec.con***REMOVED***g.sharedVolume.enabled .Values.spec.con***REMOVED***g.sharedVolume.createPVC }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hive-warehouse-data
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: {{ .Values.spec.con***REMOVED***g.sharedVolume.storage.persistentVolumeClaimStorageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.spec.con***REMOVED***g.sharedVolume.storage.persistentVolumeClaimSize }}
+{{- end }}

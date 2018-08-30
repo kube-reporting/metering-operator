@@ -78,12 +78,18 @@ spec:
         # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
-        - name: hive-warehouse
-          mountPath: /user/hive/warehouse
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
+{{- if .Values.spec.con***REMOVED***g.sharedVolume.enabled }}
+        - name: hive-warehouse-data
+          mountPath: {{ .Values.spec.con***REMOVED***g.sharedVolume.mountPath }}
+{{- end }}
+{{- if or (not .Values.spec.con***REMOVED***g.sharedVolume.enabled) (and .Values.spec.con***REMOVED***g.sharedVolume.enabled (ne .Values.spec.con***REMOVED***g.sharedVolume.mountPath "/user/hive/warehouse") ) }}
+        - name: hive-warehouse-empty
+          mountPath: /user/hive/warehouse
+{{- end }}
         resources:
 {{ toYaml .Values.spec.hive.server.resources | indent 10 }}
       dnsPolicy: ClusterFirst
@@ -93,7 +99,7 @@ spec:
       volumes:
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Docker***REMOVED***le have a corresponding volumeMount
-      - name: hive-warehouse
+      - name: hive-warehouse-empty
         emptyDir: {}
       - name: namenode-empty
         emptyDir: {}
@@ -101,3 +107,8 @@ spec:
         emptyDir: {}
       - name: hive-metastore-db-data
         emptyDir: {}
+{{- if .Values.spec.con***REMOVED***g.sharedVolume.enabled }}
+      - name: hive-warehouse-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.spec.con***REMOVED***g.sharedVolume.persistentVolumeClaimName }}
+{{- end}}
