@@ -21,6 +21,7 @@ def call(body) {
             booleanParam(name: 'GENERIC', defaultValue: false, description: 'If true, run the configured tests against a GKE cluster using the generic config.')
             booleanParam(name: 'OPENSHIFT', defaultValue: false, description: 'If true, run the configured tests against a Openshift cluster using the Openshift config.')
             booleanParam(name: 'TECTONIC', defaultValue: false, description: 'If true, run the configured tests against a Openshift cluster using the Openshift config.')
+            booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the namespace after running tests.')
         }
         agent {
             kubernetes {
@@ -79,6 +80,7 @@ spec:
             // our own, so that if there's a test timeout, we can still capture
             // pod logs
             CLEANUP_METERING            = "false"
+            SKIP_NS_CLEANUP             = "${params.SKIP_NS_CLEANUP}"
             DOCKER_CREDS                = credentials('quay-coreos-jenkins-push')
         }
 
@@ -209,8 +211,12 @@ private def cleanup() {
     container('metering-test-runner') {
         echo "Capturing pod logs"
         sh 'set -e; cd $METERING_SRC_DIR && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $TEST_OUTPUT_PATH/$FINAL_POD_LOGS_LOG_FILE'
-        echo "Deleting namespace ${env.METERING_NAMESPACE}"
-        sh 'set -e; cd $METERING_SRC_DIR && ./hack/delete-ns.sh'
+        if (!env.SKIP_NS_CLEANUP) {
+            echo "Deleting namespace ${env.METERING_NAMESPACE}"
+            sh 'set -e; cd $METERING_SRC_DIR && ./hack/delete-ns.sh'
+        } else {
+            echo 'Skipping namespace cleanup, SKIP_NS_CLEANUP is true'
+        }
     }
 }
 
