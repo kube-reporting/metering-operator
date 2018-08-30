@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rob***REMOVED***g/cron"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
@@ -18,6 +19,44 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
+
+var (
+	scheduledReportPrometheusMetricLabels = []string{"scheduledreport", "reportgenerationquery", "table_name"}
+
+	generateScheduledReportTotalCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_scheduledreports_total",
+			Help:      "Duration to generate a Report.",
+		},
+		scheduledReportPrometheusMetricLabels,
+	)
+
+	generateScheduledReportFailedCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_scheduledreports_failed_total",
+			Help:      "Duration to generate a Report.",
+		},
+		scheduledReportPrometheusMetricLabels,
+	)
+
+	generateScheduledReportDurationHistogram = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_scheduledreport_duration_seconds",
+			Help:      "Duration to generate a ScheduledReport.",
+			Buckets:   []float64{60.0, 300.0, 600.0},
+		},
+		scheduledReportPrometheusMetricLabels,
+	)
+)
+
+func init() {
+	prometheus.MustRegister(generateScheduledReportFailedCounter)
+	prometheus.MustRegister(generateScheduledReportTotalCounter)
+	prometheus.MustRegister(generateScheduledReportDurationHistogram)
+}
 
 func (op *Reporting) runScheduledReportWorker() {
 	logger := op.logger.WithField("component", "scheduledReportWorker")
@@ -250,6 +289,17 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		close(job.doneCh)
 	}()
 
+	tableName := scheduledReportTableName(job.report.Name)
+	metricLabels := prometheus.Labels{
+		"scheduledreport":       job.report.Name,
+		"reportgenerationquery": job.report.Spec.GenerationQueryName,
+		"table_name":            tableName,
+	}
+
+	genReportTotalCounter := generateScheduledReportTotalCounter.With(metricLabels)
+	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
+	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
+
 	for {
 		report, err := job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Get(job.report.Name, metav1.GetOptions{})
 		if err != nil {
@@ -293,7 +343,6 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
-		tableName := scheduledReportTableName(job.report.Name)
 		columns := generateHiveColumns(genQuery)
 		err = job.operator.createTableForStorage(logger, job.report, "scheduledreport", job.report.Name, job.report.Spec.Output, tableName, columns)
 		if err != nil {
@@ -369,7 +418,8 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
 				return
 			}
-
+			genReportTotalCounter.Inc()
+			generateReportStart := job.operator.clock.Now()
 			err = job.operator.generateReport(
 				loggerWithFields,
 				job.report,
@@ -381,8 +431,11 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				genQuery,
 				job.report.Spec.OverwriteExistingData,
 			)
+			generateReportDuration := job.operator.clock.Since(generateReportStart)
+			genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
 
 			if err != nil {
+				genReportFailedCounter.Inc()
 				// update the status to Failed with message containing the
 				// error
 				errMsg := fmt.Sprintf("error occurred while generating report: %s", err)
