@@ -67,11 +67,20 @@ spec:
         volumeMounts:
         - name: presto-data
           mountPath: /var/presto/data
+{{- if .Values.spec.config.sharedVolume.enabled }}
+        - name: hive-warehouse-data
+          mountPath: {{ .Values.spec.config.sharedVolume.mountPath }}
+{{- end }}
         resources:
 {{ toYaml .Values.spec.presto.worker.resources | indent 10 }}
       volumes:
       - name: presto-data
         emptyDir: {}
+{{- if .Values.spec.config.sharedVolume.enabled }}
+      - name: hive-warehouse-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.spec.config.sharedVolume.persistentVolumeClaimName }}
+{{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       serviceAccount: presto
