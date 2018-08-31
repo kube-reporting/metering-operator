@@ -10,23 +10,25 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
+// collectionSize is how much data is going to be scraped from Prometheus and
+// imported
+const collectionSize = 30 * time.Minute
+
 func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 	t.Helper()
 	f.collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTCf for timestamps
 		currentTime := time.Now().UTC()
+		hourAndHalfAgo := currentTime.Add(-90 * time.Minute)
 
 		// store the start/end so that future calls can immediately return the
 		// same reportStart/reportEnd.
 
-		// reportEnd is an hour and 10 minutes ago because Prometheus may not
-		// have collected very recent data, and setting to hour ago ensures
-		// that a scheduledReport created with a LastReportTime of reportEnd
-		// will run immediately.
-		f.reportEnd = currentTime.Add(-(time.Hour + 10*time.Minute))
-		// To make things faster, let's limit the window of collected data to
-		// 10 minutes
-		f.reportStart = f.reportEnd.Add(-10 * time.Minute)
+		// reportEnd is 1.5 hours ago, to ensure data has scraped by Prometheus
+		f.reportEnd = hourAndHalfAgo
+		// reportStart is set to be before reportEnd by the size of the
+		// collection we want to make.
+		f.reportStart = f.reportEnd.Add(-collectionSize)
 
 		reqParams := operator.CollectPromsumDataRequest{
 			StartTime: f.reportStart,
