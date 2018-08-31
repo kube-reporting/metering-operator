@@ -26,12 +26,19 @@ type Report struct {
 }
 
 type ReportSpec struct {
-	// ReportingStart is the beginning period of time that the report will be based on.
-	ReportingStart meta.Time `json:"reportingStart"`
+	// ReportingStart (deprecated: use inputs) is the beginning period of time
+	// that the report will be based on.
+	ReportingStart *meta.Time `json:"reportingStart"`
 
-	// ReportingEnd is the end period of time that the report will be based on.
-	ReportingEnd meta.Time `json:"reportingEnd"`
+	// ReportingEnd (deprecated: use inputs)  is the end period of time that
+	// the report will be based on.
+	ReportingEnd *meta.Time `json:"reportingEnd"`
 
+	// Inputs are the inputs to the ReportGenerationQuery
+	Inputs ReportGenerationQueryInputValues `json:"inputs,omitempty"`
+
+	// GenerationQueryName is the name of the ReportGenerationQuery that this
+	// report should run
 	GenerationQueryName string `json:"generationQuery"`
 
 	// RunImmediately will run the report immediately, ignoring ReportingEnd and
@@ -44,6 +51,9 @@ type ReportSpec struct {
 
 	// Output is the storage location where results are sent.
 	Output *StorageLocationRef `json:"output,omitempty"`
+
+	// ReportingEndInputName allows overriding the default expected input name that maps to the ReportPeriodEnd
+	ReportingEndInputName string `json:"reportingEndInputName,omitempty"`
 }
 
 type ReportStatus struct {

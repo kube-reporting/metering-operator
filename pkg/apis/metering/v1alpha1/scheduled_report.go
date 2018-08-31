@@ -53,6 +53,9 @@ type ScheduledReportSpec struct {
 	// than a log of all runs before it.
 	OverwriteExistingData bool `json:"overwriteExistingData,omitempty"`
 
+	// Inputs are the inputs to the ReportGenerationQuery
+	Inputs ReportGenerationQueryInputValues `json:"inputs,omitempty"`
+
 	// Output is the storage location where results are sent.
 	Output *StorageLocationRef `json:"output,omitempty"`
 }
