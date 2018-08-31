@@ -202,8 +202,15 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 
 			var reportStart, reportEnd time.Time
 
+			_, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
+			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
+
 			for _, dataSource := range test.dataSources {
 				if dataSourceTimes, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
+					// wait for the datasource table to exist
+					_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, test.timeout)
+					require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
+
 					metricsFile, err := os.Open(dataSource.FileName)
 					require.NoError(t, err)
 
@@ -254,7 +261,7 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 
 			report := testFramework.NewSimpleReport(name, test.queryName, reportStart, reportEnd)
 
-			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			err = testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure report doesn't exist before creating report")
