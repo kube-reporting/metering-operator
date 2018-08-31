@@ -21,15 +21,16 @@ When writing a [report](report.md) you can specify the query it will use by sett
 ## Templating
 
 Because much of the type of analysis being done depends on user-input, and because we want to enable users to re-use queries with copying & pasting things around, Operator Metering supports the [go templating language][go-templates] to dynamically generate the SQL statements contained within the `spec.query` ***REMOVED***eld of `ReportGenerationQuery`.
-For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information is exposed within the template context as variables you can use and refeference with various [template functions](#template-functions).
+For example, when generating a report, the query needs to know what time range to consider when producing a report, so this is information is exposed within the template context as variables you can use and reference with various [template functions](#template-functions).
 Most of these functions are for referring to other resources such as `ReportDataSources` or `ReportGenerationQueries` as either tables, views, or sub-queries, and for formatting various types for use within the SQL query.
 
 ### Template variables
 
-- `Report`: This object has two ***REMOVED***elds, `StartPeriod` and `EndPeriod` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `ScheduledReport` the values map to the speci***REMOVED***c period being collected when the `ScheduledReport` runs.
-  - `StartPeriod`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
-  - `EndPeriod`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
+- `Report`: This object has two ***REMOVED***elds, `ReportingStart` and `ReportingEnd` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `ScheduledReport` the values map to the speci***REMOVED***c period being collected when the `ScheduledReport` runs.
+  - `ReportingStart`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
+  - `ReportingEnd`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
 - `DynamicDependentQueries`: This is a list of `ReportGenerationQuery` objects that were listed in the `spec.dynamicReportQueries` ***REMOVED***eld. Generally this list isn't directly referenced in query, but is used indirectly with the `renderReportGenerationQuery` [template function](#template-functions).
+- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report or ScheduledReport's `spec.inputs`. The value currently is always a string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time].
 
 ### Template functions
 
@@ -38,8 +39,11 @@ Below is a list of the available template functions and descriptions on what the
 - `dataSourceTableName`: Takes a one argument, a string representing a `ReportDataSource` name and outputs a string which is the corresponding table name of the `ReportDataSource` speci***REMOVED***ed.
 - `generationQueryViewName`: Takes one argument, a string representing a `ReportGenerationQuery` name and outputs a string which is the corresponding view name of the `ReportGenerationQuery` speci***REMOVED***ed.
 - `renderReportGenerationQuery`: Takes two arguments, a string representing a `ReportGenerationQuery` name, the template context (usually this is just `.` in the template), and returns a string containing the speci***REMOVED***ed `ReportGenerationQuery` in it's rendered form, using the 2nd argument as the context for the template rendering.
-- `prestoTimestamp`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp. Usually this is used on `.Report.StartPeriod` and `.Report.EndPeriod`.
+- `prestoTimestamp`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp. Usually this is used on `.Report.ReportingStart` and `.Report.ReportingEnd`.
 - `billingPeriodFormat`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp that can be used for comparing to `awsBilling` an ReportDataSource's `partition_start` and `partition_stop` columns.
+
+In addition to the above functions, the reporting-operator includes all of the functions from [Sprig - useful template functions for Go templates.
+][sprig].
 
 ## Example ReportGenerationQueries
 
@@ -62,6 +66,8 @@ apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "pod-memory-request-raw"
+  labels:
+    operator-metering: "true"
 spec:
   reportDataSources:
   - "pod-request-memory-bytes"
@@ -76,7 +82,7 @@ spec:
     type: string
     unit: kubernetes_node
   - name: labels
-    type: map(varchar, varchar)
+    type: map<string, string>
     tableHidden: true
   - name: pod_request_memory_bytes
     type: double
@@ -114,12 +120,20 @@ apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
   name: "namespace-memory-request"
+  labels:
+    operator-metering: "true"
 spec:
   reportQueries:
   - "pod-memory-request-raw"
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
   - name: namespace
     type: string
     unit: kubernetes_namespace
@@ -132,14 +146,20 @@ spec:
   - name: pod_request_memory_byte_seconds
     type: double
     unit: byte_seconds
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
   query: |
-    SELECT namespace,
-            min("timestamp") as data_start,
-            max("timestamp") as data_end,
-            sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
+    SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-request-raw" |}
-    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
     ORDER BY pod_request_memory_byte_seconds DESC
 ```
@@ -149,3 +169,4 @@ spec:
 [presto-functions]: https://prestodb.io/docs/current/functions.html
 [go-templates]: https://golang.org/pkg/text/template/
 [go-time]: https://golang.org/pkg/time/#Time
+[sprig]: https://masterminds.github.io/sprig/

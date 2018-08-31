@@ -14,97 +14,22 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/test/framework"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	reportsProduceDataTestCases = []struct {
-		// name is the name of the sub test but also the name of the report.
-		name      string
-		queryName string
-		timeout   time.Duration
-		skip      bool
-	}{
-		{
-			name:      "namespace-cpu-request",
-			queryName: "namespace-cpu-request",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "namespace-cpu-usage",
-			queryName: "namespace-cpu-usage",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "namespace-memory-request",
-			queryName: "namespace-memory-request",
-			timeout:   reportTestTimeout + time.Minute,
-		},
-		{
-			name:      "namespace-memory-usage",
-			queryName: "namespace-memory-usage",
-			timeout:   reportTestTimeout + time.Minute,
-		},
-		{
-			name:      "pod-cpu-request",
-			queryName: "pod-cpu-request",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "pod-cpu-usage",
-			queryName: "pod-cpu-usage",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "pod-memory-request",
-			queryName: "pod-memory-request",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "pod-memory-usage",
-			queryName: "pod-memory-usage",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "pod-memory-request-vs-node-memory-allocatable",
-			queryName: "pod-memory-request-vs-node-memory-allocatable",
-			timeout:   reportTestTimeout + time.Minute,
-		},
-		{
-			name:      "node-cpu-utilization",
-			queryName: "node-cpu-utilization",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "node-memory-utilization",
-			queryName: "node-memory-utilization",
-			timeout:   reportTestTimeout,
-		},
-		{
-			name:      "pod-cpu-request-aws",
-			queryName: "pod-cpu-request-aws",
-			timeout:   reportTestTimeout,
-			skip:      !runAWSBillingTests,
-		},
-		{
-			name:      "pod-memory-request-aws",
-			queryName: "pod-memory-request-aws",
-			timeout:   reportTestTimeout,
-			skip:      !runAWSBillingTests,
-		},
-		{
-			name:      "aws-ec2-cluster-cost",
-			queryName: "aws-ec2-cluster-cost",
-			timeout:   reportTestTimeout,
-			skip:      !runAWSBillingTests,
-		},
-	}
-)
+type reportProducesDataTestCase struct {
+	name          string
+	queryName     string
+	newReportFunc func(name, queryName string, start, end time.Time) *meteringv1alpha1.Report
+	timeout       time.Duration
+	skip          bool
+}
 
-func testReportsProduceData(t *testing.T) {
+func testReportsProduceData(t *testing.T, testFramework *framework.Framework, periodStart, periodEnd time.Time, testCases []reportProducesDataTestCase) {
 	t.Logf("reportStart: %s, reportEnd: %s", periodStart, periodEnd)
-	for i, test := range reportsProduceDataTestCases {
+	for i, test := range testCases {
 		// Fix closure captures
 		test := test
 		i := i
@@ -125,7 +50,7 @@ func testReportsProduceData(t *testing.T) {
 				return
 			}
 
-			report := testFramework.NewSimpleReport(test.name, test.queryName, periodStart, periodEnd)
+			report := test.newReportFunc(test.name, test.queryName, periodStart, periodEnd)
 
 			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			require.Condition(t, func() bool {
