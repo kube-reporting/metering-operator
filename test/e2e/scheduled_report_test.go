@@ -85,7 +85,6 @@ func TestScheduledReportsProduceData(t *testing.T) {
 					t.Logf("report LastReportTime is unchanged: %s", report.Status.LastReportTime.Time.Format(time.RFC3339))
 					return false, nil
 				}
-				t.Logf("report status: %#v", newReport.Status)
 				return true, nil
 			})
 			require.NoError(t, err, "expected getting report result to not timeout")
