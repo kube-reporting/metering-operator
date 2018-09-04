@@ -98,7 +98,7 @@ func (importer *PrometheusImporter) UpdateConfig(cfg Config) {
 // the next time range starting from where it left off if paused or stopped.
 // For more details on how querying Prometheus is done, see the package
 // pkg/promquery.
-func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowIncompleteChunks bool) ([]prom.Range, error) {
+func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
 	importer.importLock.Lock()
 	importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp started")
 	defer importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp finished")
@@ -148,7 +148,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 	return importer.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
 }
 
-func (importer *PrometheusImporter) ImportMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) ([]prom.Range, error) {
+func (importer *PrometheusImporter) ImportMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
 	importer.importLock.Lock()
 	importer.logger.Debugf("PrometheusImporter Import started")
 	defer importer.logger.Debugf("PrometheusImporter Import finished")
@@ -157,7 +157,7 @@ func (importer *PrometheusImporter) ImportMetrics(ctx context.Context, startTime
 	return importer.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
 }
 
-func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) ([]prom.Range, error) {
+func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
 	logger := importer.logger.WithFields(logrus.Fields{
 		"startTime": startTime,
 		"endTime":   endTime,
@@ -170,7 +170,7 @@ func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime
 	}
 
 	importStart := importer.clock.Now()
-	timeRanges, err := importer.importFromTimeRange(ctx, startTime, endTime, allowIncompleteChunks)
+	importResults, err := importer.importFromTimeRange(ctx, startTime, endTime, allowIncompleteChunks)
 	importDuration := importer.clock.Since(importStart)
 
 	importer.metricsCollectors.TotalImportsCounter.Inc()
@@ -183,15 +183,15 @@ func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our importer.lastTimestamp
 		importer.lastTimestamp = nil
-		return timeRanges, err
+		return &importResults, err
 	}
 
-	if len(timeRanges) != 0 {
-		lastTS := timeRanges[len(timeRanges)-1].End
+	if len(importResults.ProcessedTimeRanges) != 0 {
+		lastTS := importResults.ProcessedTimeRanges[len(importResults.ProcessedTimeRanges)-1].End
 		importer.lastTimestamp = &lastTS
 	}
 
-	return timeRanges, nil
+	return &importResults, nil
 }
 
 func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []*PrometheusMetric {

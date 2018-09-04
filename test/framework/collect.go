@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 
 	"github.com/operator-framework/operator-metering/pkg/operator"
@@ -43,6 +44,10 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		resp, err := result.Raw()
 		t.Logf("Finishing querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(currentTime))
 		require.NoErrorf(t, err, "expected no errors triggering data collection, body: %v", string(resp))
+		var collectResp operator.CollectPromsumDataResponse
+		err = json.Unmarshal(resp, &collectResp)
+		require.NoError(t, err, "expected to unmarshal CollectPrometheusData response as JSON")
+		t.Logf("CollectPromsumDataResponse: %s", spew.Sdump(collectResp))
 	})
 	return f.reportStart, f.reportEnd
 }
