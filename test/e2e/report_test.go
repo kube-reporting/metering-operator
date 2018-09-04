@@ -152,10 +152,18 @@ func TestReportsProduceData(t *testing.T) {
 				return
 			}
 
+			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
+			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
+
+			for _, datasourceName := range reportGenQuery.Spec.DataSources {
+				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, datasourceName, time.Second*5, test.timeout)
+				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", datasourceName, test.queryName)
+			}
+
 			report := testFramework.NewSimpleReport(test.name, test.queryName, reportStart, reportEnd)
 
-			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
-			assert.Condition(t, func() bool {
+			err = testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			require.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure report doesn't exist before creating report")
 
