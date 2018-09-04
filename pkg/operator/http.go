@@ -528,6 +528,10 @@ type CollectPromsumDataRequest struct {
 	EndTime   time.Time `json:"endTime"`
 }
 
+type CollectPromsumDataResponse struct {
+	Results []*prometheusImportResults `json:"results"`
+}
+
 func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
@@ -544,13 +548,15 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 
 	logger.Debugf("collecting promsum data between %s and %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	err = srv.collectorFunc(context.Background(), start, end)
+	results, err := srv.collectorFunc(context.Background(), start, end)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
 		return
 	}
 
-	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
+	writeResponseAsJSON(logger, w, http.StatusOK, CollectPromsumDataResponse{
+		Results: results,
+	})
 }
 
 type StorePromsumDataRequest []*prestostore.PrometheusMetric
