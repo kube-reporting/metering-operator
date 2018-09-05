@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -14,39 +13,13 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	reportTestTimeout         = 5 * time.Minute
-	reportTestOutputDirectory string
-	runAWSBillingTests        bool
-)
-
-func init() {
-	if reportTestTimeoutStr := os.Getenv("REPORT_TEST_TIMEOUT"); reportTestTimeoutStr != "" {
-		var err error
-		reportTestTimeout, err = time.ParseDuration(reportTestTimeoutStr)
-		if err != nil {
-			log.Fatalf("Invalid REPORT_TEST_TIMEOUT: %v", err)
-		}
-	}
-	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
-	if reportTestOutputDirectory == "" {
-		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-
-	err := os.MkdirAll(reportTestOutputDirectory, 0777)
-	if err != nil {
-		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
-	}
-
-	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
-}
-
-func TestReportsProduceData(t *testing.T) {
-	tests := []struct {
+	reportsProduceDataTestCases = []struct {
 		// name is the name of the sub test but also the name of the report.
 		name      string
 		queryName string
@@ -127,11 +100,11 @@ func TestReportsProduceData(t *testing.T) {
 			skip:      !runAWSBillingTests,
 		},
 	}
+)
 
-	reportStart, reportEnd := testFramework.CollectMetricsOnce(t)
-	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
-
-	for i, test := range tests {
+func testReportsProduceData(t *testing.T) {
+	t.Logf("reportStart: %s, reportEnd: %s", periodStart, periodEnd)
+	for i, test := range reportsProduceDataTestCases {
 		// Fix closure captures
 		test := test
 		i := i
@@ -152,17 +125,9 @@ func TestReportsProduceData(t *testing.T) {
 				return
 			}
 
-			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
-			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
+			report := testFramework.NewSimpleReport(test.name, test.queryName, periodStart, periodEnd)
 
-			for _, datasourceName := range reportGenQuery.Spec.DataSources {
-				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, datasourceName, time.Second*5, test.timeout)
-				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", datasourceName, test.queryName)
-			}
-
-			report := testFramework.NewSimpleReport(test.name, test.queryName, reportStart, reportEnd)
-
-			err = testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			require.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure report doesn't exist before creating report")
@@ -182,9 +147,27 @@ func TestReportsProduceData(t *testing.T) {
 				"format": "json",
 			}
 
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
+				// poll the status
+				newReport, err := testFramework.GetMeteringReport(report.Name)
+				if err != nil {
+					return false, err
+				}
+				if newReport.Status.Phase == meteringv1alpha1.ReportPhaseError {
+					return false, fmt.Errorf("report is failed, message: %s", newReport.Status.Output)
+				}
+
+				if newReport.Status.TableName == "" {
+					t.Logf("ScheduledReport %s table isn't created yet", report.Name)
+					return false, nil
+				}
+				return true, nil
+			})
+			require.NoError(t, err, "expected getting Report to not timeout")
+
 			var reportResults []map[string]interface{}
 			var reportData []byte
-			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				req := testFramework.NewReportingOperatorSVCRequest("/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
@@ -210,7 +193,7 @@ func TestReportsProduceData(t *testing.T) {
 			require.NoError(t, err, "expected getting report result to not timeout")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
-			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s.json", test.name))
+			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s-report.json", test.name))
 			err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
 			require.NoError(t, err, "expected writing report results to disk not to error")
 		})

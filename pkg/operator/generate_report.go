@@ -9,15 +9,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, storage *cbTypes.StorageLocationRef, generationQuery *cbTypes.ReportGenerationQuery, dropTable, deleteExistingData bool) error {
+func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Object, reportKind, reportName, tableName string, reportStart, reportEnd time.Time, generationQuery *cbTypes.ReportGenerationQuery, deleteExistingData bool) error {
 	logger = logger.WithFields(log.Fields{
 		"reportKind":         reportKind,
 		"deleteExistingData": deleteExistingData,
-		"dropTable":          dropTable,
 	})
 	logger.Infof("generating usage report")
 
@@ -25,8 +23,6 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 	if err != nil {
 		return fmt.Errorf("unable to get dependent generationQueries for %s, err: %v", generationQuery.Name, err)
 	}
-
-	columns := generateHiveColumns(generationQuery)
 
 	templateInfo := &templateInfo{
 		DynamicDependentQueries: dependentQueries,
@@ -46,19 +42,6 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 		// valid
 	default:
 		return fmt.Errorf("invalid report kind: %s", reportKind)
-	}
-
-	if dropTable {
-		logger.Debugf("dropping table %s", tableName)
-		err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = op.createTableForStorage(logger, report, reportKind, reportName, storage, tableName, columns)
-	if err != nil {
-		return err
 	}
 
 	if deleteExistingData {

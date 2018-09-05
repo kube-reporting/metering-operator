@@ -18,6 +18,10 @@ func (f *Framework) CreateMeteringScheduledReport(report *meteringv1alpha1.Sched
 	return err
 }
 
+func (f *Framework) GetMeteringReport(name string) (*meteringv1alpha1.Report, error) {
+	return f.MeteringClient.Reports(f.Namespace).Get(name, meta.GetOptions{})
+}
+
 func (f *Framework) GetMeteringScheduledReport(name string) (*meteringv1alpha1.ScheduledReport, error) {
 	return f.MeteringClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
 }

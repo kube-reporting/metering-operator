@@ -3,7 +3,10 @@ package e2e
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -17,8 +20,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestScheduledReportsProduceData(t *testing.T) {
-	tests := map[string]struct {
+var (
+	scheduledReportsProduceDataTestCases = map[string]struct {
 		queryName string
 		timeout   time.Duration
 	}{
@@ -27,12 +30,11 @@ func TestScheduledReportsProduceData(t *testing.T) {
 			timeout:   reportTestTimeout,
 		},
 	}
+)
 
-	periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
-
+func testScheduledReportsProduceData(t *testing.T) {
 	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
-
-	for name, test := range tests {
+	for name, test := range scheduledReportsProduceDataTestCases {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -64,16 +66,20 @@ func TestScheduledReportsProduceData(t *testing.T) {
 				"format": "json",
 			}
 
-			var reportResults []map[string]interface{}
-			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				// poll the status
-				newReport, err := testFramework.GetMeteringScheduledReport(name)
+				newReport, err := testFramework.GetMeteringScheduledReport(report.Name)
 				if err != nil {
 					return false, err
 				}
 				cond := cbutil.GetScheduledReportCondition(newReport.Status, meteringv1alpha1.ScheduledReportFailure)
 				if cond != nil && cond.Status == v1.ConditionTrue {
 					return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
+				}
+
+				if newReport.Status.TableName == "" {
+					t.Logf("ScheduledReport %s table isn't created yet", report.Name)
+					return false, nil
 				}
 
 				// If the last reportTime is updated, that means this report
@@ -87,21 +93,35 @@ func TestScheduledReportsProduceData(t *testing.T) {
 				}
 				return true, nil
 			})
-			require.NoError(t, err, "expected getting report result to not timeout")
+			require.NoError(t, err, "expected getting ScheduledReport to not timeout")
 
-			req := testFramework.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", query)
-			result := req.Do()
-			resp, err := result.Raw()
-			require.NoError(t, err, "fetching report results should be successful")
+			var reportResults []map[string]interface{}
+			var reportData []byte
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
+				req := testFramework.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", query)
+				result := req.Do()
+				resp, err := result.Raw()
+				require.NoError(t, err, "fetching ScheduledReport results should be successful")
 
-			var statusCode int
-			result.StatusCode(&statusCode)
+				var statusCode int
+				result.StatusCode(&statusCode)
+				if statusCode == http.StatusAccepted {
+					t.Logf("report is still running")
+					return false, nil
+				}
 
-			require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
-
-			err = json.Unmarshal(resp, &reportResults)
-			require.NoError(t, err, "expected to unmarshal response")
+				require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
+				err = json.Unmarshal(resp, &reportResults)
+				require.NoError(t, err, "expected to unmarshal response")
+				reportData = resp
+				return true, nil
+			})
+			require.NoError(t, err, "expected getting ScheduledReport result to not timeout")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
+
+			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s-scheduled-report.json", name))
+			err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
+			require.NoError(t, err, "expected writing report results to disk not to error")
 		})
 	}
 }
