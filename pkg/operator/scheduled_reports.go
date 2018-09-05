@@ -277,7 +277,11 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		reportGenerationQueryLister := job.operator.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
 		reportDataSourceLister := job.operator.informers.Metering().V1alpha1().ReportDataSources().Lister()
 
-		depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, genQuery)
+		depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+			reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
+			reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+			genQuery,
+		)
 		if err != nil {
 			logger.Errorf("failed to get dependencies for ScheduledReport %s, err: %v", job.report.Name, err)
 			return

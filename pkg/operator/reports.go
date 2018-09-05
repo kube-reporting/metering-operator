@@ -149,7 +149,11 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, genQuery)
+	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		genQuery,
+	)
 	if err != nil {
 		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to get dependencies: %v", report.Name, genQuery.Name, err)
 	}

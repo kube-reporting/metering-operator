@@ -20,10 +20,14 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 	})
 	logger.Infof("generating usage report")
 
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, generationQuery)
+	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		generationQuery,
+	)
 	if err != nil {
 		return fmt.Errorf("unable to generateReport for %s %s, ReportGenerationQuery %s, failed to validate dependencies: %v", reportKind, reportName, generationQuery.Name, err)
 	}
