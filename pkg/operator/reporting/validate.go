@@ -57,14 +57,14 @@ type GenerationQueryDependenciesStatus struct {
 	InitializedReportDataSources   []*metering.ReportDataSource
 }
 
-func GetGenerationQueryDependenciesStatus(reportGenerationQueryLister meteringListers.ReportGenerationQueryLister, reportDataSourceLister meteringListers.ReportDataSourceLister, generationQuery *metering.ReportGenerationQuery) (*GenerationQueryDependenciesStatus, error) {
+func GetGenerationQueryDependenciesStatus(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) (*GenerationQueryDependenciesStatus, error) {
 	// Validate ReportGenerationQuery's that should be views
-	dependentQueriesStatus, err := GetDependentGenerationQueries(reportGenerationQueryLister, generationQuery)
+	dependentQueriesStatus, err := GetDependentGenerationQueries(queryGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	dataSources, err := GetDependentDataSources(reportDataSourceLister, generationQuery)
+	dataSources, err := GetDependentDataSources(dataSourceGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -101,12 +101,12 @@ type GetDependentGenerationQueriesStatus struct {
 	DynamicReportGenerationQueries []*metering.ReportGenerationQuery
 }
 
-func GetDependentGenerationQueries(reportGenerationQueryLister meteringListers.ReportGenerationQueryLister, generationQuery *metering.ReportGenerationQuery) (*GetDependentGenerationQueriesStatus, error) {
-	viewQueries, err := GetDependentViewGenerationQueries(reportGenerationQueryLister, generationQuery)
+func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery) (*GetDependentGenerationQueriesStatus, error) {
+	viewQueries, err := GetDependentViewGenerationQueries(queryGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
-	dynamicQueries, err := GetDependentDynamicGenerationQueries(reportGenerationQueryLister, generationQuery)
+	dynamicQueries, err := GetDependentDynamicGenerationQueries(queryGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -116,9 +116,9 @@ func GetDependentGenerationQueries(reportGenerationQueryLister meteringListers.R
 	}, nil
 }
 
-func GetDependentViewGenerationQueries(reportGenerationQueryLister meteringListers.ReportGenerationQueryLister, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, error) {
+func GetDependentViewGenerationQueries(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, error) {
 	viewReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
-	err := GetDependentGenerationQueriesMemoized(reportGenerationQueryLister, generationQuery, 0, maxDepth, viewReportQueriesAccumulator, false)
+	err := GetDependentGenerationQueriesMemoized(queryGetter, generationQuery, 0, maxDepth, viewReportQueriesAccumulator, false)
 	if err != nil {
 		return nil, err
 	}
@@ -130,9 +130,9 @@ func GetDependentViewGenerationQueries(reportGenerationQueryLister meteringListe
 	return viewQueries, nil
 }
 
-func GetDependentDynamicGenerationQueries(reportGenerationQueryLister meteringListers.ReportGenerationQueryLister, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, error) {
+func GetDependentDynamicGenerationQueries(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, error) {
 	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
-	err := GetDependentGenerationQueriesMemoized(reportGenerationQueryLister, generationQuery, 0, maxDepth, dynamicReportQueriesAccumulator, true)
+	err := GetDependentGenerationQueriesMemoized(queryGetter, generationQuery, 0, maxDepth, dynamicReportQueriesAccumulator, true)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,23 @@ func GetDependentDynamicGenerationQueries(reportGenerationQueryLister meteringLi
 	return dynamicQueries, nil
 }
 
-func GetDependentGenerationQueriesMemoized(reportGenerationQueryLister meteringListers.ReportGenerationQueryLister, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*metering.ReportGenerationQuery, dynamicQueries bool) error {
+type reportGenerationQueryGetter interface {
+	getReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error)
+}
+
+type reportGenerationQueryGetterFunc func(string, string) (*metering.ReportGenerationQuery, error)
+
+func (f reportGenerationQueryGetterFunc) getReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error) {
+	return f(namespace, name)
+}
+
+func NewReportGenerationQueryListerGetter(lister meteringListers.ReportGenerationQueryLister) reportGenerationQueryGetter {
+	return reportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
+		return lister.ReportGenerationQueries(namespace).Get(name)
+	})
+}
+
+func GetDependentGenerationQueriesMemoized(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*metering.ReportGenerationQuery, dynamicQueries bool) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
 	}
@@ -158,11 +174,11 @@ func GetDependentGenerationQueriesMemoized(reportGenerationQueryLister meteringL
 		if _, exists := queriesAccumulator[queryName]; exists {
 			continue
 		}
-		genQuery, err := reportGenerationQueryLister.ReportGenerationQueries(generationQuery.Namespace).Get(queryName)
+		genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
 		if err != nil {
 			return err
 		}
-		err = GetDependentGenerationQueriesMemoized(reportGenerationQueryLister, genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
+		err = GetDependentGenerationQueriesMemoized(queryGetter, genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
 		if err != nil {
 			return err
 		}
@@ -171,10 +187,26 @@ func GetDependentGenerationQueriesMemoized(reportGenerationQueryLister meteringL
 	return nil
 }
 
-func GetDependentDataSources(reportDataSourceLister meteringListers.ReportDataSourceLister, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
+type reportDataSourceGetter interface {
+	getReportDataSource(namespace, name string) (*metering.ReportDataSource, error)
+}
+
+type reportDataSourceGetterFunc func(string, string) (*metering.ReportDataSource, error)
+
+func (f reportDataSourceGetterFunc) getReportDataSource(namespace, name string) (*metering.ReportDataSource, error) {
+	return f(namespace, name)
+}
+
+func NewReportDataSourceListerGetter(lister meteringListers.ReportDataSourceLister) reportDataSourceGetter {
+	return reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
+		return lister.ReportDataSources(namespace).Get(name)
+	})
+}
+
+func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
 	dataSources := make([]*metering.ReportDataSource, len(generationQuery.Spec.DataSources))
 	for i, dataSourceName := range generationQuery.Spec.DataSources {
-		dataSource, err := reportDataSourceLister.ReportDataSources(generationQuery.Namespace).Get(dataSourceName)
+		dataSource, err := dataSourceGetter.getReportDataSource(generationQuery.Namespace, dataSourceName)
 		if err != nil {
 			return nil, err
 		}

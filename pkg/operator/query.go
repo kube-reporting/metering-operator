@@ -83,7 +83,11 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
 
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, generationQuery)
+	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		generationQuery,
+	)
 	if err != nil {
 		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to retrieve dependencies: %v", generationQuery.Name, err)
 	}
