@@ -217,6 +217,10 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	// Get the presto table to get actual columns in table
 	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			writeErrorResponse(logger, w, r, http.StatusAccepted, "ScheduledReport is not processed yet")
+			return
+		}
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
 		return
@@ -297,6 +301,10 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	// Get the presto table to get actual columns in table
 	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
+			return
+		}
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
 		return
