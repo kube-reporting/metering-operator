@@ -2,6 +2,7 @@ package operator
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -267,6 +268,13 @@ outerLoop:
 					importers[reportDataSource.Name] = importer
 				}
 			}
+
+			var importersList []string
+			for dataSourceName := range importers {
+				importersList = append(importersList, dataSourceName)
+			}
+
+			logger.Debugf("running on-demand Prometheus ReportDataSource collection with importers for: %s", strings.Join(importersList, ", "))
 
 			var results []*prometheusImportResults
 			resultsCh := make(chan *prometheusImportResults)
