@@ -47,8 +47,9 @@ type ReportSpec struct {
 }
 
 type ReportStatus struct {
-	Phase  ReportPhase `json:"phase,omitempty"`
-	Output string      `json:"output,omitempty"`
+	Phase     ReportPhase `json:"phase,omitempty"`
+	Output    string      `json:"output,omitempty"`
+	TableName string      `json:"table_name"`
 }
 
 type ReportPhase string

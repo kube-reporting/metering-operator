@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
-	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 )
 
@@ -174,20 +175,31 @@ func (op *Reporting) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	op.startPrometheusImporter(ctx)
 }
 
-type prometheusImporterFunc func(ctx context.Context, start, end time.Time) error
+type prometheusImporterFunc func(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error)
+
+type prometheusImportResults struct {
+	ReportDataSource     string `json:"reportDataSource"`
+	MetricsImportedCount int    `json:"metricsImportedCount"`
+}
+
+type prometheusImporterTimeRangeTriggerResult struct {
+	err           error
+	importResults []*prometheusImportResults
+}
 
 type prometheusImporterTimeRangeTrigger struct {
 	start, end time.Time
-	errCh      chan error
+	result     chan prometheusImporterTimeRangeTriggerResult
 }
 
-func (op *Reporting) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) error {
-	errCh := make(chan error)
+func (op *Reporting) triggerPrometheusImporterForTimeRange(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error) {
+	resultCh := make(chan prometheusImporterTimeRangeTriggerResult)
 	select {
-	case op.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, errCh}:
-		return <-errCh
+	case op.prometheusImporterTriggerForTimeRangeCh <- prometheusImporterTimeRangeTrigger{start, end, resultCh}:
+		result := <-resultCh
+		return result.importResults, result.err
 	case <-ctx.Done():
-		return ctx.Err()
+		return nil, ctx.Err()
 	}
 }
 
@@ -208,6 +220,7 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
 	}
 
+outerLoop:
 	for {
 		select {
 		case <-ctx.Done():
@@ -216,23 +229,79 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 		case trigger := <-op.prometheusImporterTriggerForTimeRangeCh:
 			// manually triggered import for a specific time range, usually from HTTP API
 
+			// since we're manually triggered, we should skip using the cache
+			// and ensure we're using the live state of ReportDataSources
+
+			reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(op.cfg.Namespace).List(metav1.ListOptions{})
+			if err != nil {
+				trigger.result <- prometheusImporterTimeRangeTriggerResult{
+					err: err,
+				}
+				continue
+			}
+
+			for _, reportDataSource := range reportDataSources.Items {
+				if reportDataSource.Spec.Promsum == nil {
+					continue
+				}
+
+				reportPromQuery, err := op.meteringClient.MeteringV1alpha1().ReportPrometheusQueries(reportDataSource.Namespace).Get(reportDataSource.Spec.Promsum.Query, metav1.GetOptions{})
+				if err != nil {
+					trigger.result <- prometheusImporterTimeRangeTriggerResult{
+						err: err,
+					}
+					continue outerLoop
+				}
+
+				importer, exists := importers[reportDataSource.Name]
+				if exists {
+					cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+					importer.UpdateConfig(cfg)
+				} else {
+					dataSourceLogger := logger.WithFields(logrus.Fields{
+						"queryName":        reportDataSource.Spec.Promsum.Query,
+						"reportDataSource": reportDataSource.Name,
+						"tableName":        dataSourceTableName(reportDataSource.Name),
+					})
+					importer = op.newPromImporter(dataSourceLogger, reportDataSource, reportPromQuery)
+				}
+			}
+
+			var results []*prometheusImportResults
+			resultsCh := make(chan *prometheusImportResults)
+
+			go func() {
+				for importResults := range resultsCh {
+					results = append(results, importResults)
+				}
+			}()
+
 			g, ctx := errgroup.WithContext(ctx)
 			for dataSourceName, importer := range importers {
 				importer := importer
 				dataSourceName := dataSourceName
 				// collect each dataSource concurrently
 				g.Go(func() error {
-					return importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
+					importResults, err := importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) (*prestostore.PrometheusImportResults, error) {
 						return importer.ImportMetrics(ctx, trigger.start, trigger.end, true)
 					})
+					resultsCh <- &prometheusImportResults{
+						ReportDataSource:     dataSourceName,
+						MetricsImportedCount: len(importResults.Metrics),
+					}
+					return err
 				})
+
 			}
-			err := g.Wait()
+			err = g.Wait()
 			if err != nil {
 				logger.WithError(err).Errorf("PrometheusImporter worker encountered errors while importing data")
 			}
-			trigger.errCh <- err
-
+			close(resultsCh)
+			trigger.result <- prometheusImporterTimeRangeTriggerResult{
+				err:           err,
+				importResults: results,
+			}
 		case dataSourceName := <-op.prometheusImporterDeletedDataSourceQueue:
 			// if we have a worker for this ReportDataSource then we need to
 			// stop it and remove it from our map
@@ -253,101 +322,31 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			queryName := reportDataSource.Spec.Promsum.Query
 			tableName := dataSourceTableName(dataSourceName)
 
-			dataSourceLogger := logger.WithFields(logrus.Fields{
-				"queryName":        queryName,
-				"reportDataSource": dataSourceName,
-				"tableName":        tableName,
-			})
-
 			reportPromQuery, err := op.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
 			if err != nil {
 				op.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
 				continue
 			}
 
-			promQuery := reportPromQuery.Spec.Query
-
-			chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
-			stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
-			queryInterval := op.cfg.PrometheusQueryConfig.QueryInterval.Duration
-
-			queryConf := reportDataSource.Spec.Promsum.QueryConfig
-			if queryConf != nil {
-				if queryConf.ChunkSize != nil {
-					chunkSize = queryConf.ChunkSize.Duration
-				}
-				if queryConf.StepSize != nil {
-					stepSize = queryConf.StepSize.Duration
-				}
-				if queryConf.QueryInterval != nil {
-					queryInterval = queryConf.QueryInterval.Duration
-				}
-			}
-
-			// round to the nearest second for chunk/step sizes
-			chunkSize = chunkSize.Truncate(time.Second)
-			stepSize = stepSize.Truncate(time.Second)
-
-			cfg := prestostore.Config{
-				PrometheusQuery:       promQuery,
-				PrestoTableName:       tableName,
-				ChunkSize:             chunkSize,
-				StepSize:              stepSize,
-				MaxTimeRanges:         defaultMaxPromTimeRanges,
-				MaxQueryRangeDuration: defaultMaxTimeDuration,
-			}
+			dataSourceLogger := logger.WithFields(logrus.Fields{
+				"queryName":        queryName,
+				"reportDataSource": dataSourceName,
+				"tableName":        tableName,
+			})
 
 			importer, exists := importers[dataSourceName]
 			if exists {
 				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
+				cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 				importer.UpdateConfig(cfg)
 			} else {
-				promLabels := prometheus.Labels{
-					"reportdatasource":      dataSourceName,
-					"reportprometheusquery": reportPromQuery.Name,
-					"table_name":            tableName,
-				}
-
-				totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)
-				failedImportsCounter := prometheusReportDatasourceFailedImportsCounter.With(promLabels)
-
-				totalPrometheusQueriesCounter := prometheusReportDatasourceTotalPrometheusQueriesCounter.With(promLabels)
-				failedPrometheusQueriesCounter := prometheusReportDatasourceFailedPrometheusQueriesCounter.With(promLabels)
-
-				totalPrestoStoresCounter := prometheusReportDatasourceTotalPrestoStoresCounter.With(promLabels)
-				failedPrestoStoresCounter := prometheusReportDatasourceFailedPrestoStoresCounter.With(promLabels)
-
-				promQueryMetricsScrapedCounter := prometheusReportDatasourceMetricsScrapedCounter.With(promLabels)
-				promQueryDurationHistogram := prometheusReportDatasourcePrometheusQueryDurationHistogram.With(promLabels)
-
-				metricsImportedCounter := prometheusReportDatasourceMetricsImportedCounter.With(promLabels)
-				importDurationHistogram := prometheusReportDatasourceImportDurationHistogram.With(promLabels)
-
-				prestoStoreDurationHistogram := prometheusReportDatasourcePrestoreStoreDurationHistogram.With(promLabels)
-
-				metricsCollectors := prestostore.ImporterMetricsCollectors{
-					TotalImportsCounter:     totalImportsCounter,
-					FailedImportsCounter:    failedImportsCounter,
-					ImportDurationHistogram: importDurationHistogram,
-
-					TotalPrometheusQueriesCounter:    totalPrometheusQueriesCounter,
-					FailedPrometheusQueriesCounter:   failedPrometheusQueriesCounter,
-					PrometheusQueryDurationHistogram: promQueryDurationHistogram,
-
-					TotalPrestoStoresCounter:     totalPrestoStoresCounter,
-					FailedPrestoStoresCounter:    failedPrestoStoresCounter,
-					PrestoStoreDurationHistogram: prestoStoreDurationHistogram,
-
-					MetricsScrapedCounter:  promQueryMetricsScrapedCounter,
-					MetricsImportedCounter: metricsImportedCounter,
-				}
-
-				importer = prestostore.NewPrometheusImporter(dataSourceLogger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
+				importer = op.newPromImporter(dataSourceLogger, reportDataSource, reportPromQuery)
 				importers[dataSourceName] = importer
 			}
 
 			if !op.cfg.DisablePromsum {
 				worker, workerExists := workers[dataSourceName]
+				queryInterval := op.getQueryIntervalForReportDataSource(reportDataSource)
 				if workerExists && worker.queryInterval != queryInterval {
 					// queryInterval changed stop the existing worker from
 					// collecting data, and create it with updated config
@@ -365,6 +364,94 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			}
 		}
 	}
+}
+
+func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTypes.ReportDataSource) time.Duration {
+	queryConf := reportDataSource.Spec.Promsum.QueryConfig
+	queryInterval := op.cfg.PrometheusQueryConfig.QueryInterval.Duration
+	if queryConf != nil {
+		if queryConf.QueryInterval != nil {
+			queryInterval = queryConf.QueryInterval.Duration
+		}
+	}
+	return queryInterval
+}
+
+func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.Config {
+	dataSourceName := reportDataSource.Name
+	tableName := dataSourceTableName(dataSourceName)
+
+	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
+	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
+
+	queryConf := reportDataSource.Spec.Promsum.QueryConfig
+	if queryConf != nil {
+		if queryConf.ChunkSize != nil {
+			chunkSize = queryConf.ChunkSize.Duration
+		}
+		if queryConf.StepSize != nil {
+			stepSize = queryConf.StepSize.Duration
+		}
+	}
+
+	// round to the nearest second for chunk/step sizes
+	chunkSize = chunkSize.Truncate(time.Second)
+	stepSize = stepSize.Truncate(time.Second)
+
+	return prestostore.Config{
+		PrometheusQuery:       reportPromQuery.Spec.Query,
+		PrestoTableName:       tableName,
+		ChunkSize:             chunkSize,
+		StepSize:              stepSize,
+		MaxTimeRanges:         defaultMaxPromTimeRanges,
+		MaxQueryRangeDuration: defaultMaxTimeDuration,
+	}
+}
+
+func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) *prestostore.PrometheusImporter {
+	cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+
+	promLabels := prometheus.Labels{
+		"reportdatasource":      reportDataSource.Name,
+		"reportprometheusquery": reportPromQuery.Name,
+		"table_name":            cfg.PrestoTableName,
+	}
+
+	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)
+	failedImportsCounter := prometheusReportDatasourceFailedImportsCounter.With(promLabels)
+
+	totalPrometheusQueriesCounter := prometheusReportDatasourceTotalPrometheusQueriesCounter.With(promLabels)
+	failedPrometheusQueriesCounter := prometheusReportDatasourceFailedPrometheusQueriesCounter.With(promLabels)
+
+	totalPrestoStoresCounter := prometheusReportDatasourceTotalPrestoStoresCounter.With(promLabels)
+	failedPrestoStoresCounter := prometheusReportDatasourceFailedPrestoStoresCounter.With(promLabels)
+
+	promQueryMetricsScrapedCounter := prometheusReportDatasourceMetricsScrapedCounter.With(promLabels)
+	promQueryDurationHistogram := prometheusReportDatasourcePrometheusQueryDurationHistogram.With(promLabels)
+
+	metricsImportedCounter := prometheusReportDatasourceMetricsImportedCounter.With(promLabels)
+	importDurationHistogram := prometheusReportDatasourceImportDurationHistogram.With(promLabels)
+
+	prestoStoreDurationHistogram := prometheusReportDatasourcePrestoreStoreDurationHistogram.With(promLabels)
+
+	metricsCollectors := prestostore.ImporterMetricsCollectors{
+		TotalImportsCounter:     totalImportsCounter,
+		FailedImportsCounter:    failedImportsCounter,
+		ImportDurationHistogram: importDurationHistogram,
+
+		TotalPrometheusQueriesCounter:    totalPrometheusQueriesCounter,
+		FailedPrometheusQueriesCounter:   failedPrometheusQueriesCounter,
+		PrometheusQueryDurationHistogram: promQueryDurationHistogram,
+
+		TotalPrestoStoresCounter:     totalPrestoStoresCounter,
+		FailedPrestoStoresCounter:    failedPrestoStoresCounter,
+		PrestoStoreDurationHistogram: prestoStoreDurationHistogram,
+
+		MetricsScrapedCounter:  promQueryMetricsScrapedCounter,
+		MetricsImportedCounter: metricsImportedCounter,
+	}
+
+	return prestostore.NewPrometheusImporter(logger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
 }
 
 type prometheusImporterWorker struct {
@@ -396,7 +483,7 @@ func (w *prometheusImporterWorker) start(ctx context.Context, logger logrus.Fiel
 			if !ok {
 				return
 			}
-			err := importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) ([]prom.Range, error) {
+			_, err := importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) (*prestostore.PrometheusImportResults, error) {
 				return importer.ImportFromLastTimestamp(ctx, false)
 			})
 			if err != nil {
@@ -413,15 +500,15 @@ func (w *prometheusImporterWorker) stop() {
 	<-w.doneCh
 }
 
-type importFunc func(context.Context, *prestostore.PrometheusImporter) ([]prom.Range, error)
+type importFunc func(context.Context, *prestostore.PrometheusImporter) (*prestostore.PrometheusImportResults, error)
 
-func importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogger, semaphore chan struct{}, dataSourceName string, prometheusImporter *prestostore.PrometheusImporter, runImport importFunc) error {
+func importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogger, semaphore chan struct{}, dataSourceName string, prometheusImporter *prestostore.PrometheusImporter, runImport importFunc) (*prestostore.PrometheusImportResults, error) {
 	// blocks trying to increment the semaphore (sending on the
 	// channel) or until the context is cancelled
 	select {
 	case semaphore <- struct{}{}:
 	case <-ctx.Done():
-		return ctx.Err()
+		return nil, ctx.Err()
 	}
 	dataSourceLogger := logger.WithField("reportDataSource", dataSourceName)
 	// decrement the semaphore at the end
@@ -432,6 +519,5 @@ func importPrometheusDataSourceData(ctx context.Context, logger logrus.FieldLogg
 	}()
 	dataSourceLogger.Infof("starting import for Prometheus ReportDataSource %s", dataSourceName)
 	prometheusReportDatasourceRunningImportsGauge.Inc()
-	_, err := runImport(ctx, prometheusImporter)
-	return err
+	return runImport(ctx, prometheusImporter)
 }

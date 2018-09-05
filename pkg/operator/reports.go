@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 var (
@@ -156,14 +157,33 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	logger.Debug("updating report status to started")
 	// update status
 	report.Status.Phase = cbTypes.ReportPhaseStarted
-	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
 		return err
 	}
 
-	report = newReport
 	tableName := reportTableName(report.Name)
+
+	logger.Debugf("dropping table %s", tableName)
+	err = hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	if err != nil {
+		return err
+	}
+
+	columns := generateHiveColumns(genQuery)
+	err = op.createTableForStorage(logger, report, "report", report.Name, report.Spec.Output, tableName, columns)
+	if err != nil {
+		logger.WithError(err).Error("error creating report table for Report")
+		return err
+	}
+
+	report.Status.TableName = tableName
+	report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to update scheduledReport status with tableName")
+		return err
+	}
 
 	err = op.generateReport(
 		logger,
@@ -173,10 +193,8 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		tableName,
 		report.Spec.ReportingStart.Time,
 		report.Spec.ReportingEnd.Time,
-		report.Spec.Output,
 		genQuery,
 		true,
-		false,
 	)
 	if err != nil {
 		op.setReportError(logger, report, err, "report execution failed")

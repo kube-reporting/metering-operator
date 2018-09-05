@@ -17,7 +17,7 @@ func (f *Framework) GetMeteringReportDataSource(name string) (*meteringv1alpha1.
 
 func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportDataSource, error) {
 	var ds *meteringv1alpha1.ReportDataSource
-	return ds, wait.Poll(pollInterval, timeout, func() (bool, error) {
+	return ds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
 		ds, err = f.GetMeteringReportDataSource(name)
 		if err != nil {

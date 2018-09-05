@@ -289,6 +289,13 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
+		report.Status.TableName = tableName
+		report, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
+		if err != nil {
+			logger.WithError(err).Errorf("unable to update scheduledReport status with tableName")
+			return
+		}
+
 		now := job.operator.clock.Now().UTC()
 		var lastScheduled time.Time
 		lastReportTime := report.Status.LastReportTime
@@ -359,9 +366,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 				tableName,
 				reportPeriod.periodStart,
 				reportPeriod.periodEnd,
-				job.report.Spec.Output,
 				genQuery,
-				false,
 				job.report.Spec.OverwriteExistingData,
 			)
 
