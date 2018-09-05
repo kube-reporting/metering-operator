@@ -63,27 +63,50 @@ func TestReportingE2E(t *testing.T) {
 	t.Run("TestReportingProducesResults", func(t *testing.T) {
 		// validate all the ReportDataSources for our tests exist before running
 		// collect
+		readyReportDataSources := make(map[string]struct{})
+		readyReportGenQueries := make(map[string]struct{})
 		for _, test := range reportsProduceDataTestCases {
 			if test.skip {
 				continue
 			}
+			if _, exists := readyReportGenQueries[test.queryName]; exists {
+				continue
+			}
+
+			t.Logf("waiting for ReportGenerationQuery %s to exist", test.queryName)
 			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
 			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
 			for _, datasourceName := range reportGenQuery.Spec.DataSources {
+				if _, exists := readyReportDataSources[datasourceName]; exists {
+					continue
+				}
+				t.Logf("waiting for ReportDataSource %s to exist", datasourceName)
 				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, datasourceName, time.Second*5, test.timeout)
 				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", datasourceName, test.queryName)
+				readyReportDataSources[datasourceName] = struct{}{}
 			}
+			readyReportGenQueries[test.queryName] = struct{}{}
 		}
 
 		for _, test := range scheduledReportsProduceDataTestCases {
+			if _, exists := readyReportGenQueries[test.queryName]; exists {
+				continue
+			}
+			t.Logf("waiting for ReportGenerationQuery %s to exist", test.queryName)
 			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
 			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
 			for _, datasourceName := range reportGenQuery.Spec.DataSources {
+				if _, exists := readyReportDataSources[datasourceName]; exists {
+					continue
+				}
+				t.Logf("waiting for ReportDataSource %s to exist", datasourceName)
 				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, datasourceName, time.Second*5, test.timeout)
 				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", datasourceName, test.queryName)
+				readyReportDataSources[datasourceName] = struct{}{}
 			}
+			readyReportGenQueries[test.queryName] = struct{}{}
 		}
 
 		periodStart, periodEnd = testFramework.CollectMetricsOnce(t)
