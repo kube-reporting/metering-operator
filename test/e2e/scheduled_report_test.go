@@ -64,7 +64,7 @@ func testScheduledReportsProduceData(t *testing.T) {
 			}
 
 			var reportResults []map[string]interface{}
-			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				// poll the status
 				newReport, err := testFramework.GetMeteringScheduledReport(name)
 				if err != nil {
