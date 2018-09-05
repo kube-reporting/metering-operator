@@ -17,7 +17,7 @@ func (f *Framework) GetMeteringReportGenerationQuery(name string) (*meteringv1al
 
 func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportGenerationQuery, error) {
 	var reportQuery *meteringv1alpha1.ReportGenerationQuery
-	return reportQuery, wait.Poll(pollInterval, timeout, func() (bool, error) {
+	return reportQuery, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
 		reportQuery, err = f.GetMeteringReportGenerationQuery(name)
 		if err != nil {
