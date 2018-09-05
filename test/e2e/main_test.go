@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -77,6 +78,7 @@ func TestReportingE2E(t *testing.T) {
 			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
 			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
+			t.Logf("waiting for ReportGenerationQuery %s's ReportDataSources: %s", reportGenQuery.Name, strings.Join(reportGenQuery.Spec.DataSources, ", "))
 			for _, datasourceName := range reportGenQuery.Spec.DataSources {
 				if _, exists := readyReportDataSources[datasourceName]; exists {
 					continue
@@ -97,6 +99,7 @@ func TestReportingE2E(t *testing.T) {
 			reportGenQuery, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
 			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
+			t.Logf("waiting for ReportGenerationQuery %s's ReportDataSources: %s", reportGenQuery.Name, strings.Join(reportGenQuery.Spec.DataSources, ", "))
 			for _, datasourceName := range reportGenQuery.Spec.DataSources {
 				if _, exists := readyReportDataSources[datasourceName]; exists {
 					continue
