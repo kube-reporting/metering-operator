@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 )
 
@@ -281,101 +282,31 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			queryName := reportDataSource.Spec.Promsum.Query
 			tableName := dataSourceTableName(dataSourceName)
 
-			dataSourceLogger := logger.WithFields(logrus.Fields{
-				"queryName":        queryName,
-				"reportDataSource": dataSourceName,
-				"tableName":        tableName,
-			})
-
 			reportPromQuery, err := op.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(reportDataSource.Namespace).Get(queryName)
 			if err != nil {
 				op.logger.WithError(err).Errorf("unable to ReportPrometheusQuery %s for ReportDataSource %s", queryName, dataSourceName)
 				continue
 			}
 
-			promQuery := reportPromQuery.Spec.Query
-
-			chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
-			stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
-			queryInterval := op.cfg.PrometheusQueryConfig.QueryInterval.Duration
-
-			queryConf := reportDataSource.Spec.Promsum.QueryConfig
-			if queryConf != nil {
-				if queryConf.ChunkSize != nil {
-					chunkSize = queryConf.ChunkSize.Duration
-				}
-				if queryConf.StepSize != nil {
-					stepSize = queryConf.StepSize.Duration
-				}
-				if queryConf.QueryInterval != nil {
-					queryInterval = queryConf.QueryInterval.Duration
-				}
-			}
-
-			// round to the nearest second for chunk/step sizes
-			chunkSize = chunkSize.Truncate(time.Second)
-			stepSize = stepSize.Truncate(time.Second)
-
-			cfg := prestostore.Config{
-				PrometheusQuery:       promQuery,
-				PrestoTableName:       tableName,
-				ChunkSize:             chunkSize,
-				StepSize:              stepSize,
-				MaxTimeRanges:         defaultMaxPromTimeRanges,
-				MaxQueryRangeDuration: defaultMaxTimeDuration,
-			}
+			dataSourceLogger := logger.WithFields(logrus.Fields{
+				"queryName":        queryName,
+				"reportDataSource": dataSourceName,
+				"tableName":        tableName,
+			})
 
 			importer, exists := importers[dataSourceName]
 			if exists {
 				dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
+				cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 				importer.UpdateConfig(cfg)
 			} else {
-				promLabels := prometheus.Labels{
-					"reportdatasource":      dataSourceName,
-					"reportprometheusquery": reportPromQuery.Name,
-					"table_name":            tableName,
-				}
-
-				totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)
-				failedImportsCounter := prometheusReportDatasourceFailedImportsCounter.With(promLabels)
-
-				totalPrometheusQueriesCounter := prometheusReportDatasourceTotalPrometheusQueriesCounter.With(promLabels)
-				failedPrometheusQueriesCounter := prometheusReportDatasourceFailedPrometheusQueriesCounter.With(promLabels)
-
-				totalPrestoStoresCounter := prometheusReportDatasourceTotalPrestoStoresCounter.With(promLabels)
-				failedPrestoStoresCounter := prometheusReportDatasourceFailedPrestoStoresCounter.With(promLabels)
-
-				promQueryMetricsScrapedCounter := prometheusReportDatasourceMetricsScrapedCounter.With(promLabels)
-				promQueryDurationHistogram := prometheusReportDatasourcePrometheusQueryDurationHistogram.With(promLabels)
-
-				metricsImportedCounter := prometheusReportDatasourceMetricsImportedCounter.With(promLabels)
-				importDurationHistogram := prometheusReportDatasourceImportDurationHistogram.With(promLabels)
-
-				prestoStoreDurationHistogram := prometheusReportDatasourcePrestoreStoreDurationHistogram.With(promLabels)
-
-				metricsCollectors := prestostore.ImporterMetricsCollectors{
-					TotalImportsCounter:     totalImportsCounter,
-					FailedImportsCounter:    failedImportsCounter,
-					ImportDurationHistogram: importDurationHistogram,
-
-					TotalPrometheusQueriesCounter:    totalPrometheusQueriesCounter,
-					FailedPrometheusQueriesCounter:   failedPrometheusQueriesCounter,
-					PrometheusQueryDurationHistogram: promQueryDurationHistogram,
-
-					TotalPrestoStoresCounter:     totalPrestoStoresCounter,
-					FailedPrestoStoresCounter:    failedPrestoStoresCounter,
-					PrestoStoreDurationHistogram: prestoStoreDurationHistogram,
-
-					MetricsScrapedCounter:  promQueryMetricsScrapedCounter,
-					MetricsImportedCounter: metricsImportedCounter,
-				}
-
-				importer = prestostore.NewPrometheusImporter(dataSourceLogger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
+				importer = op.newPromImporter(dataSourceLogger, reportDataSource, reportPromQuery)
 				importers[dataSourceName] = importer
 			}
 
 			if !op.cfg.DisablePromsum {
 				worker, workerExists := workers[dataSourceName]
+				queryInterval := op.getQueryIntervalForReportDataSource(reportDataSource)
 				if workerExists && worker.queryInterval != queryInterval {
 					// queryInterval changed stop the existing worker from
 					// collecting data, and create it with updated config
@@ -393,6 +324,94 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			}
 		}
 	}
+}
+
+func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTypes.ReportDataSource) time.Duration {
+	queryConf := reportDataSource.Spec.Promsum.QueryConfig
+	queryInterval := op.cfg.PrometheusQueryConfig.QueryInterval.Duration
+	if queryConf != nil {
+		if queryConf.QueryInterval != nil {
+			queryInterval = queryConf.QueryInterval.Duration
+		}
+	}
+	return queryInterval
+}
+
+func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.Config {
+	dataSourceName := reportDataSource.Name
+	tableName := dataSourceTableName(dataSourceName)
+
+	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
+	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
+
+	queryConf := reportDataSource.Spec.Promsum.QueryConfig
+	if queryConf != nil {
+		if queryConf.ChunkSize != nil {
+			chunkSize = queryConf.ChunkSize.Duration
+		}
+		if queryConf.StepSize != nil {
+			stepSize = queryConf.StepSize.Duration
+		}
+	}
+
+	// round to the nearest second for chunk/step sizes
+	chunkSize = chunkSize.Truncate(time.Second)
+	stepSize = stepSize.Truncate(time.Second)
+
+	return prestostore.Config{
+		PrometheusQuery:       reportPromQuery.Spec.Query,
+		PrestoTableName:       tableName,
+		ChunkSize:             chunkSize,
+		StepSize:              stepSize,
+		MaxTimeRanges:         defaultMaxPromTimeRanges,
+		MaxQueryRangeDuration: defaultMaxTimeDuration,
+	}
+}
+
+func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) *prestostore.PrometheusImporter {
+	cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+
+	promLabels := prometheus.Labels{
+		"reportdatasource":      reportDataSource.Name,
+		"reportprometheusquery": reportPromQuery.Name,
+		"table_name":            cfg.PrestoTableName,
+	}
+
+	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)
+	failedImportsCounter := prometheusReportDatasourceFailedImportsCounter.With(promLabels)
+
+	totalPrometheusQueriesCounter := prometheusReportDatasourceTotalPrometheusQueriesCounter.With(promLabels)
+	failedPrometheusQueriesCounter := prometheusReportDatasourceFailedPrometheusQueriesCounter.With(promLabels)
+
+	totalPrestoStoresCounter := prometheusReportDatasourceTotalPrestoStoresCounter.With(promLabels)
+	failedPrestoStoresCounter := prometheusReportDatasourceFailedPrestoStoresCounter.With(promLabels)
+
+	promQueryMetricsScrapedCounter := prometheusReportDatasourceMetricsScrapedCounter.With(promLabels)
+	promQueryDurationHistogram := prometheusReportDatasourcePrometheusQueryDurationHistogram.With(promLabels)
+
+	metricsImportedCounter := prometheusReportDatasourceMetricsImportedCounter.With(promLabels)
+	importDurationHistogram := prometheusReportDatasourceImportDurationHistogram.With(promLabels)
+
+	prestoStoreDurationHistogram := prometheusReportDatasourcePrestoreStoreDurationHistogram.With(promLabels)
+
+	metricsCollectors := prestostore.ImporterMetricsCollectors{
+		TotalImportsCounter:     totalImportsCounter,
+		FailedImportsCounter:    failedImportsCounter,
+		ImportDurationHistogram: importDurationHistogram,
+
+		TotalPrometheusQueriesCounter:    totalPrometheusQueriesCounter,
+		FailedPrometheusQueriesCounter:   failedPrometheusQueriesCounter,
+		PrometheusQueryDurationHistogram: promQueryDurationHistogram,
+
+		TotalPrestoStoresCounter:     totalPrestoStoresCounter,
+		FailedPrestoStoresCounter:    failedPrestoStoresCounter,
+		PrestoStoreDurationHistogram: prestoStoreDurationHistogram,
+
+		MetricsScrapedCounter:  promQueryMetricsScrapedCounter,
+		MetricsImportedCounter: metricsImportedCounter,
+	}
+
+	return prestostore.NewPrometheusImporter(logger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
 }
 
 type prometheusImporterWorker struct {
