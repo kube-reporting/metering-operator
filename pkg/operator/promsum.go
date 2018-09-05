@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
@@ -219,6 +220,7 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
 	}
 
+outerLoop:
 	for {
 		select {
 		case <-ctx.Done():
@@ -226,6 +228,44 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			return
 		case trigger := <-op.prometheusImporterTriggerForTimeRangeCh:
 			// manually triggered import for a specific time range, usually from HTTP API
+
+			// since we're manually triggered, we should skip using the cache
+			// and ensure we're using the live state of ReportDataSources
+
+			reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(op.cfg.Namespace).List(metav1.ListOptions{})
+			if err != nil {
+				trigger.result <- prometheusImporterTimeRangeTriggerResult{
+					err: err,
+				}
+				continue
+			}
+
+			for _, reportDataSource := range reportDataSources.Items {
+				if reportDataSource.Spec.Promsum == nil {
+					continue
+				}
+
+				reportPromQuery, err := op.meteringClient.MeteringV1alpha1().ReportPrometheusQueries(reportDataSource.Namespace).Get(reportDataSource.Spec.Promsum.Query, metav1.GetOptions{})
+				if err != nil {
+					trigger.result <- prometheusImporterTimeRangeTriggerResult{
+						err: err,
+					}
+					continue outerLoop
+				}
+
+				importer, exists := importers[reportDataSource.Name]
+				if exists {
+					cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+					importer.UpdateConfig(cfg)
+				} else {
+					dataSourceLogger := logger.WithFields(logrus.Fields{
+						"queryName":        reportDataSource.Spec.Promsum.Query,
+						"reportDataSource": reportDataSource.Name,
+						"tableName":        dataSourceTableName(reportDataSource.Name),
+					})
+					importer = op.newPromImporter(dataSourceLogger, reportDataSource, reportPromQuery)
+				}
+			}
 
 			var results []*prometheusImportResults
 			resultsCh := make(chan *prometheusImportResults)
@@ -253,7 +293,7 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 				})
 
 			}
-			err := g.Wait()
+			err = g.Wait()
 			if err != nil {
 				logger.WithError(err).Errorf("PrometheusImporter worker encountered errors while importing data")
 			}
