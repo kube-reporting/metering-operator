@@ -68,13 +68,18 @@ func testScheduledReportsProduceData(t *testing.T) {
 
 			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				// poll the status
-				newReport, err := testFramework.GetMeteringScheduledReport(name)
+				newReport, err := testFramework.GetMeteringScheduledReport(report.Name)
 				if err != nil {
 					return false, err
 				}
 				cond := cbutil.GetScheduledReportCondition(newReport.Status, meteringv1alpha1.ScheduledReportFailure)
 				if cond != nil && cond.Status == v1.ConditionTrue {
 					return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
+				}
+
+				if newReport.Status.TableName == "" {
+					t.Logf("ScheduledReport %s table isn't created yet", report.Name)
+					return false, nil
 				}
 
 				// If the last reportTime is updated, that means this report
@@ -88,7 +93,7 @@ func testScheduledReportsProduceData(t *testing.T) {
 				}
 				return true, nil
 			})
-			require.NoError(t, err, "expected getting report result to not timeout")
+			require.NoError(t, err, "expected getting ScheduledReport to not timeout")
 
 			var reportResults []map[string]interface{}
 			var reportData []byte

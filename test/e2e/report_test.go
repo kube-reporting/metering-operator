@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -145,6 +146,24 @@ func testReportsProduceData(t *testing.T) {
 				"name":   test.name,
 				"format": "json",
 			}
+
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
+				// poll the status
+				newReport, err := testFramework.GetMeteringReport(report.Name)
+				if err != nil {
+					return false, err
+				}
+				if newReport.Status.Phase == meteringv1alpha1.ReportPhaseError {
+					return false, fmt.Errorf("report is failed, message: %s", newReport.Status.Output)
+				}
+
+				if newReport.Status.TableName == "" {
+					t.Logf("ScheduledReport %s table isn't created yet", report.Name)
+					return false, nil
+				}
+				return true, nil
+			})
+			require.NoError(t, err, "expected getting Report to not timeout")
 
 			var reportResults []map[string]interface{}
 			var reportData []byte
