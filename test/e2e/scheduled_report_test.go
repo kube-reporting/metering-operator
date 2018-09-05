@@ -3,7 +3,10 @@ package e2e
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -63,7 +66,6 @@ func testScheduledReportsProduceData(t *testing.T) {
 				"format": "json",
 			}
 
-			var reportResults []map[string]interface{}
 			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				// poll the status
 				newReport, err := testFramework.GetMeteringScheduledReport(name)
@@ -88,19 +90,33 @@ func testScheduledReportsProduceData(t *testing.T) {
 			})
 			require.NoError(t, err, "expected getting report result to not timeout")
 
-			req := testFramework.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", query)
-			result := req.Do()
-			resp, err := result.Raw()
-			require.NoError(t, err, "fetching report results should be successful")
+			var reportResults []map[string]interface{}
+			var reportData []byte
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
+				req := testFramework.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", query)
+				result := req.Do()
+				resp, err := result.Raw()
+				require.NoError(t, err, "fetching ScheduledReport results should be successful")
 
-			var statusCode int
-			result.StatusCode(&statusCode)
+				var statusCode int
+				result.StatusCode(&statusCode)
+				if statusCode == http.StatusAccepted {
+					t.Logf("report is still running")
+					return false, nil
+				}
 
-			require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
-
-			err = json.Unmarshal(resp, &reportResults)
-			require.NoError(t, err, "expected to unmarshal response")
+				require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
+				err = json.Unmarshal(resp, &reportResults)
+				require.NoError(t, err, "expected to unmarshal response")
+				reportData = resp
+				return true, nil
+			})
+			require.NoError(t, err, "expected getting ScheduledReport result to not timeout")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
+
+			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s-scheduled-report.json", name))
+			err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
+			require.NoError(t, err, "expected writing report results to disk not to error")
 		})
 	}
 }
