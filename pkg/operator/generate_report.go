@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
@@ -19,13 +20,17 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 	})
 	logger.Infof("generating usage report")
 
-	dependentQueries, err := op.getDependentGenerationQueries(generationQuery, true)
+	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
+	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+
+	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, generationQuery)
 	if err != nil {
-		return fmt.Errorf("unable to get dependent generationQueries for %s, err: %v", generationQuery.Name, err)
+		return fmt.Errorf("unable to generateReport for %s %s, ReportGenerationQuery %s, failed to validate dependencies: %v", reportKind, reportName, generationQuery.Name, err)
 	}
+	validateResults, err := op.validateDependencyStatus(depsStatus)
 
 	templateInfo := &templateInfo{
-		DynamicDependentQueries: dependentQueries,
+		DynamicDependentQueries: validateResults.DynamicReportGenerationQueries,
 		Report: &reportTemplateInfo{
 			StartPeriod: reportStart,
 			EndPeriod:   reportEnd,

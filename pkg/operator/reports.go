@@ -11,6 +11,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
 var (
@@ -146,12 +147,15 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return err
 	}
 
-	if valid, err := op.validateGenerationQuery(logger, genQuery, true); err != nil {
-		op.setReportError(logger, report, err, "report is invalid")
-		return nil
-	} else if !valid {
-		logger.Warnf("cannot start report, it has uninitialized dependencies")
-		return nil
+	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
+	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(reportGenerationQueryLister, reportDataSourceLister, genQuery)
+	if err != nil {
+		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to get dependencies: %v", report.Name, genQuery.Name, err)
+	}
+	_, err = op.validateDependencyStatus(depsStatus)
+	if err != nil {
+		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
 
 	logger.Debug("updating report status to started")
