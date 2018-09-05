@@ -286,11 +286,14 @@ outerLoop:
 					importResults, err := importPrometheusDataSourceData(ctx, logger, semaphore, dataSourceName, importer, func(ctx context.Context, importer *prestostore.PrometheusImporter) (*prestostore.PrometheusImportResults, error) {
 						return importer.ImportMetrics(ctx, trigger.start, trigger.end, true)
 					})
+					if err != nil {
+						return err
+					}
 					resultsCh <- &prometheusImportResults{
 						ReportDataSource:     dataSourceName,
 						MetricsImportedCount: len(importResults.Metrics),
 					}
-					return err
+					return nil
 				})
 
 			}
