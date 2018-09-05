@@ -264,6 +264,7 @@ outerLoop:
 						"tableName":        dataSourceTableName(reportDataSource.Name),
 					})
 					importer = op.newPromImporter(dataSourceLogger, reportDataSource, reportPromQuery)
+					importers[reportDataSource.Name] = importer
 				}
 			}
 
