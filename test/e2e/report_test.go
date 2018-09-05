@@ -148,7 +148,7 @@ func testReportsProduceData(t *testing.T) {
 
 			var reportResults []map[string]interface{}
 			var reportData []byte
-			err = wait.Poll(time.Second*5, test.timeout, func() (bool, error) {
+			err = wait.PollImmediate(time.Second*5, test.timeout, func() (bool, error) {
 				req := testFramework.NewReportingOperatorSVCRequest("/api/v1/reports/get", query)
 				result := req.Do()
 				resp, err := result.Raw()
