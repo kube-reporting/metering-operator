@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestScheduledReportsProduceData(t *testing.T) {
-	tests := map[string]struct {
+var (
+	scheduledReportsProduceDataTestCases = map[string]struct {
 		queryName string
 		timeout   time.Duration
 	}{
@@ -27,12 +27,11 @@ func TestScheduledReportsProduceData(t *testing.T) {
 			timeout:   reportTestTimeout,
 		},
 	}
+)
 
-	periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
-
+func testScheduledReportsProduceData(t *testing.T) {
 	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
-
-	for name, test := range tests {
+	for name, test := range scheduledReportsProduceDataTestCases {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
