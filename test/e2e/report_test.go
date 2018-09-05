@@ -174,7 +174,7 @@ func testReportsProduceData(t *testing.T) {
 			require.NoError(t, err, "expected getting report result to not timeout")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
-			fileName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s.json", test.name))
+			fileName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s-report.json", test.name))
 			err = ioutil.WriteFile(fileName, reportData, os.ModePerm)
 			require.NoError(t, err, "expected writing report results to disk not to error")
 		})
