@@ -306,6 +306,7 @@ outerLoop:
 				err:           err,
 				importResults: results,
 			}
+			close(trigger.result)
 		case dataSourceName := <-op.prometheusImporterDeletedDataSourceQueue:
 			// if we have a worker for this ReportDataSource then we need to
 			// stop it and remove it from our map
