@@ -34,6 +34,8 @@ type ImporterMetricsCollectors struct {
 
 	MetricsScrapedCounter  prometheus.Counter
 	MetricsImportedCounter prometheus.Counter
+
+	ImportsRunningGauge prometheus.Gauge
 }
 
 // PrometheusImporter imports Prometheus metrics into Presto tables
@@ -145,41 +147,9 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 		endTime = startTime.Add(maxChunkDuration)
 	}
 
-	return importer.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
-}
-
-func (importer *PrometheusImporter) ImportMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
-	importer.importLock.Lock()
-	importer.logger.Debugf("PrometheusImporter Import started")
-	defer importer.logger.Debugf("PrometheusImporter Import ***REMOVED***nished")
-	defer importer.importLock.Unlock()
-
-	return importer.importMetrics(ctx, startTime, endTime, allowIncompleteChunks)
-}
-
-func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime, endTime time.Time, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
-	logger := importer.logger.WithFields(logrus.Fields{
-		"startTime": startTime,
-		"endTime":   endTime,
-	})
-	queryRangeDuration := endTime.Sub(startTime)
-	if importer.cfg.MaxQueryRangeDuration != 0 && queryRangeDuration > importer.cfg.MaxQueryRangeDuration {
-		newEndTime := startTime.Add(importer.cfg.MaxQueryRangeDuration)
-		logger.Warnf("time range %s to %s exceeds PrometheusImporter MaxQueryRangeDuration %s, newEndTime: %s", startTime, endTime, importer.cfg.MaxQueryRangeDuration, newEndTime)
-		endTime = newEndTime
-	}
-
-	importStart := importer.clock.Now()
-	importResults, err := importer.importFromTimeRange(ctx, startTime, endTime, allowIncompleteChunks)
-	importDuration := importer.clock.Since(importStart)
-
-	importer.metricsCollectors.TotalImportsCounter.Inc()
-	importer.metricsCollectors.ImportDurationHistogram.Observe(importDuration.Seconds())
-	importer.logger.Debugf("took %s to run import", importDuration)
-
+	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prestoQueryer, importer.metricsCollectors, ctx, startTime, endTime, importer.cfg, allowIncompleteChunks)
 	if err != nil {
-		logger.WithError(err).Error("error collecting metrics")
-		importer.metricsCollectors.FailedImportsCounter.Inc()
+		importer.logger.WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our importer.lastTimestamp
 		importer.lastTimestamp = nil
@@ -190,7 +160,6 @@ func (importer *PrometheusImporter) importMetrics(ctx context.Context, startTime
 		lastTS := importResults.ProcessedTimeRanges[len(importResults.ProcessedTimeRanges)-1].End
 		importer.lastTimestamp = &lastTS
 	}
-
 	return &importResults, nil
 }
 

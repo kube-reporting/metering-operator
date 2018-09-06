@@ -16,6 +16,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
 func (op *Reporting) runScheduledReportWorker() {
@@ -273,11 +274,22 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			return
 		}
 
-		if valid, err := job.operator.validateGenerationQuery(logger, genQuery, true); err != nil {
-			logger.WithError(err).Errorf("invalid report generation query for scheduled report %s", job.report.Name)
+		reportGenerationQueryLister := job.operator.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+		reportDataSourceLister := job.operator.informers.Metering().V1alpha1().ReportDataSources().Lister()
+
+		depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+			reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
+			reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+			genQuery,
+		)
+		if err != nil {
+			logger.Errorf("failed to get dependencies for ScheduledReport %s, err: %v", job.report.Name, err)
 			return
-		} ***REMOVED*** if !valid {
-			logger.Warnf("cannot generate report, it has uninitialized dependencies")
+		}
+
+		_, err = job.operator.validateDependencyStatus(depsStatus)
+		if err != nil {
+			logger.Errorf("failed to validate dependencies for ScheduledReport %s, err: %v", job.report.Name, err)
 			return
 		}
 
