@@ -69,9 +69,16 @@ func TestReportingE2E(t *testing.T) {
 		readyReportGenQueries := make(map[string]struct{})
 		waitTimeout := time.Minute
 
+		// We wait for all ReportDataSources before anything ***REMOVED*** since even if
+		// we don't use them, the collect endpoint will attempt to collect data
+		// for all ReportDataSources
+		_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
+		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
+
+		// below we validate all ReportGenerationQueries and ReportDataSources
+		// that are used by our test cases are initialized
 		queryGetter := reporting.NewReportGenerationQueryClientGetter(testFramework.MeteringClient)
 		dataSourceGetter := reporting.NewReportDataSourceClientGetter(testFramework.MeteringClient)
-
 		for _, test := range reportsProduceDataTestCases {
 			if test.skip {
 				continue
