@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,7 +17,43 @@ import (
 
 var (
 	defaultGracePeriod = metav1.Duration{Duration: time.Minute * 5}
+
+	reportPrometheusMetricLabels = []string{"report", "reportgenerationquery", "table_name"}
+
+	generateReportTotalCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_reports_total",
+			Help:      "Duration to generate a Report.",
+		},
+		reportPrometheusMetricLabels,
+	)
+
+	generateReportFailedCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_reports_failed_total",
+			Help:      "Duration to generate a Report.",
+		},
+		reportPrometheusMetricLabels,
+	)
+
+	generateReportDurationHistogram = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: prometheusMetricNamespace,
+			Name:      "generate_report_duration_seconds",
+			Help:      "Duration to generate a Report.",
+			Buckets:   []float64{60.0, 300.0, 600.0},
+		},
+		reportPrometheusMetricLabels,
+	)
 )
+
+func init() {
+	prometheus.MustRegister(generateReportFailedCounter)
+	prometheus.MustRegister(generateReportTotalCounter)
+	prometheus.MustRegister(generateReportDurationHistogram)
+}
 
 func (op *Reporting) runReportWorker() {
 	logger := op.logger.WithField("component", "reportWorker")
@@ -71,6 +108,17 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
+
+	tableName := reportTableName(report.Name)
+	metricLabels := prometheus.Labels{
+		"report":                report.Name,
+		"reportgenerationquery": report.Spec.GenerationQueryName,
+		"table_name":            tableName,
+	}
+
+	genReportFailedCounter := generateReportFailedCounter.With(metricLabels)
+	genReportTotalCounter := generateReportTotalCounter.With(metricLabels)
+	genReportDurationObserver := generateReportDurationHistogram.With(metricLabels)
 
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
@@ -171,8 +219,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return err
 	}
 
-	tableName := reportTableName(report.Name)
-
 	logger.Debugf("dropping table %s", tableName)
 	err = hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	if err != nil {
@@ -193,6 +239,8 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return err
 	}
 
+	genReportTotalCounter.Inc()
+	generateReportStart := op.clock.Now()
 	err = op.generateReport(
 		logger,
 		report,
@@ -204,7 +252,10 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		genQuery,
 		true,
 	)
+	generateReportDuration := op.clock.Since(generateReportStart)
+	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
 	if err != nil {
+		genReportFailedCounter.Inc()
 		op.setReportError(logger, report, err, "report execution failed")
 		return err
 	}
