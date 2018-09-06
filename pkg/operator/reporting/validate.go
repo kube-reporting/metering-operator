@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	meteringClient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 	meteringListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 )
 
@@ -160,6 +163,12 @@ func NewReportGenerationQueryListerGetter(lister meteringListers.ReportGeneratio
 	})
 }
 
+func NewReportGenerationQueryClientGetter(getter meteringClient.ReportGenerationQueriesGetter) reportGenerationQueryGetter {
+	return reportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
+		return getter.ReportGenerationQueries(namespace).Get(name, metav1.GetOptions{})
+	})
+}
+
 func GetDependentGenerationQueriesMemoized(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*metering.ReportGenerationQuery, dynamicQueries bool) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
@@ -200,6 +209,12 @@ func (f reportDataSourceGetterFunc) getReportDataSource(namespace, name string) 
 func NewReportDataSourceListerGetter(lister meteringListers.ReportDataSourceLister) reportDataSourceGetter {
 	return reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
 		return lister.ReportDataSources(namespace).Get(name)
+	})
+}
+
+func NewReportDataSourceClientGetter(getter meteringClient.ReportDataSourcesGetter) reportDataSourceGetter {
+	return reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
+		return getter.ReportDataSources(namespace).Get(name, metav1.GetOptions{})
 	})
 }
 
