@@ -106,6 +106,15 @@ func (op *Reporting) enqueueReport(report *cbTypes.Report) {
 	op.queues.reportQueue.Add(key)
 }
 
+func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
+	key, err := cache.MetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		return
+	}
+	op.queues.reportQueue.AddRateLimited(key)
+}
+
 func (op *Reporting) addScheduledReport(obj interface{}) {
 	report := obj.(*cbTypes.ScheduledReport)
 	op.logger.Infof("adding ScheduledReport %s", report.Name)

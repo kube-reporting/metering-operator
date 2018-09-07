@@ -143,10 +143,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 		// It's no longer started, requeue it
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
-			key, err := cache.MetaNamespaceKeyFunc(newReport)
-			if err == nil {
-				op.queues.reportQueue.AddRateLimited(key)
-			}
+			op.enqueueReportRateLimited(newReport)
 			return nil
 		}
 
