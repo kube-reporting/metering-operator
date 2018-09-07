@@ -113,28 +113,6 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	return nil
 }
 
-func (op *Reporting) handleScheduledReportDeleted(obj interface{}) {
-	report, ok := obj.(*cbTypes.ScheduledReport)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		report, ok = tombstone.Obj.(*cbTypes.ScheduledReport)
-		if !ok {
-			op.logger.Errorf("Tombstone contained object that is not a ScheduledReport %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithField("scheduledReport", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
-		return
-	}
-	op.queues.scheduledReportQueue.Add(key)
-}
-
 type reportSchedule interface {
 	// Return the next activation time, later than the given time.
 	// Next is invoked initially, and then each time the job runs..
