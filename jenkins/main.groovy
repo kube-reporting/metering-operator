@@ -7,7 +7,6 @@ def skipE2ELabel = (isPullRequest && pullRequest.labels.contains("skip-e2e"))
 def skipIntegrationLabel = (isPullRequest && pullRequest.labels.contains("skip-integration"))
 def skipNsCleanup = (isPullRequest && pullRequest.labels.contains("skip-namespace-cleanup"))
 
-def skipTectonic = (isPullRequest && pullRequest.labels.contains("skip-tectonic"))
 def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
 def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
 
@@ -30,7 +29,6 @@ pipeline {
 
         booleanParam(name: 'GENERIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a GKE cluster using the generic con***REMOVED***g.')
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
-        booleanParam(name: 'TECTONIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
         booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
         booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the e2e/integration namespaces after running tests.')
     }
@@ -96,7 +94,6 @@ pipeline {
                             string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
                             booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
                             booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                             booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
                         ]
                     }
@@ -113,7 +110,6 @@ pipeline {
                             string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
                             booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
                             booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
-                            booleanParam(name: 'TECTONIC', value: params.TECTONIC && !skipTectonic),
                             booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
                         ]
                     }
