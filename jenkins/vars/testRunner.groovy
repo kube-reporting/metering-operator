@@ -20,7 +20,6 @@ def call(body) {
             string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
             booleanParam(name: 'GENERIC', defaultValue: false, description: 'If true, run the con***REMOVED***gured tests against a GKE cluster using the generic con***REMOVED***g.')
             booleanParam(name: 'OPENSHIFT', defaultValue: false, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
-            booleanParam(name: 'TECTONIC', defaultValue: false, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
             booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the namespace after running tests.')
         }
         agent {
@@ -111,32 +110,6 @@ spec:
                             }
                         }
                     }
-
-                    stage('tectonic') {
-                        when {
-                            expression { return params.TECTONIC }
-                        }
-                        environment {
-                            KUBECONFIG                          = credentials('chargeback-ci-kubecon***REMOVED***g')
-                            TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/tectonic/tests"
-                            TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                            TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
-                            DEPLOY_PLATFORM                     = "tectonic"
-                        }
-                        steps {
-                            runTests()
-                        }
-                        post {
-                            always {
-                                echo 'Capturing test TAP output'
-                                step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/${TEST_TAP_FILE}", failIfNoResults: false, planRequired: false])
-                            }
-                            cleanup {
-                                cleanup()
-                            }
-                        }
-                    }
-
 
                     stage('openshift') {
                         when {
