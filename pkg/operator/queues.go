@@ -159,13 +159,21 @@ func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {
-	report := obj.(*cbTypes.ReportDataSource)
-	op.logger.Infof("adding ReportDataSource %s", report.Name)
-	op.enqueueReportDataSource(report)
+	ds := obj.(*cbTypes.ReportDataSource)
+	if ds.DeletionTimestamp != nil {
+		op.deleteReportDataSource(ds)
+		return
+	}
+	op.logger.Infof("adding ReportDataSource %s", ds.Name)
+	op.enqueueReportDataSource(ds)
 }
 
 func (op *Reporting) updateReportDataSource(_, cur interface{}) {
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
+	if curReportDataSource.DeletionTimestamp != nil {
+		op.deleteReportDataSource(curReportDataSource)
+		return
+	}
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }

@@ -120,7 +120,7 @@ type Reporting struct {
 
 	prestoTablePartitionQueue                    chan *cbTypes.ReportDataSource
 	prometheusImporterNewDataSourceQueue         chan *cbTypes.ReportDataSource
-	prometheusImporterDeletedDataSourceQueue     chan string
+	stopPrometheusImporterQueue                  chan *stopPrometheusImporter
 	prometheusImporterTriggerFromLastTimestampCh chan struct{}
 	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
 
@@ -131,14 +131,14 @@ type Reporting struct {
 
 func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, error) {
 	op := &Reporting{
-		cfg:                                          cfg,
+		cfg: cfg,
 		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
 		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
-		prometheusImporterDeletedDataSourceQueue:     make(chan string),
+		stopPrometheusImporterQueue:                  make(chan *stopPrometheusImporter),
 		prometheusImporterTriggerFromLastTimestampCh: make(chan struct{}),
 		prometheusImporterTriggerForTimeRangeCh:      make(chan prometheusImporterTimeRangeTrigger),
-		logger:                                       logger,
-		clock:                                        clock,
+		logger: logger,
+		clock:  clock,
 	}
 	logger.Debugf("Config: %+v", cfg)
 
