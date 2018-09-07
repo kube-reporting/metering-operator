@@ -177,6 +177,11 @@ func (op *Reporting) runPrometheusImporterWorker(stopCh <-chan struct{}) {
 	op.startPrometheusImporter(ctx)
 }
 
+type stopPrometheusImporter struct {
+	ReportDataSource string
+	Done             chan struct{}
+}
+
 type prometheusImporterFunc func(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error)
 
 type prometheusImportResults struct {
@@ -297,16 +302,19 @@ func (op *Reporting) startPrometheusImporter(ctx context.Context) {
 			}
 			close(resultsCh)
 			close(trigger.result)
-		case dataSourceName := <-op.prometheusImporterDeletedDataSourceQueue:
+		case data := <-op.stopPrometheusImporterQueue:
+			op.logger.WithField("reportDataSource", data.ReportDataSource).Infof("stopping and removing any PrometheusImporters for ReportDataSource %s", data.ReportDataSource)
 			// if we have a worker for this ReportDataSource then we need to
 			// stop it and remove it from our map
-			if worker, exists := workers[dataSourceName]; exists {
+			if worker, exists := workers[data.ReportDataSource]; exists {
 				worker.stop()
-				delete(workers, dataSourceName)
+				delete(workers, data.ReportDataSource)
 			}
-			if _, exists := importers[dataSourceName]; exists {
-				delete(importers, dataSourceName)
+			if _, exists := importers[data.ReportDataSource]; exists {
+				delete(importers, data.ReportDataSource)
 			}
+			data.Done <- struct{}{}
+			close(data.Done)
 		case reportDataSource := <-op.prometheusImporterNewDataSourceQueue:
 			if reportDataSource.Spec.Promsum == nil {
 				logger.Error("expected only Promsum ReportDataSources")

@@ -80,6 +80,11 @@ func (op *Reporting) processReport(logger log.FieldLogger) bool {
 }
 
 func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
+	startTime := op.clock.Now()
+	defer func() {
+		logger.Infof("Finished syncing %v %q (%v)", cbTypes.SchemeGroupVersion.WithKind("Report"), key, op.clock.Since(startTime))
+	}()
+
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)

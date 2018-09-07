@@ -19,6 +19,7 @@ type queues struct {
 	scheduledReportQueue       workqueue.RateLimitingInterface
 	reportDataSourceQueue      workqueue.RateLimitingInterface
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
+	prestoTableQueue           workqueue.RateLimitingInterface
 }
 
 func (op *Reporting) setupInformers() {
@@ -40,6 +41,7 @@ func (op *Reporting) setupQueues() {
 	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
+	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
 
 	op.queues = queues{
 		queueList: []workqueue.RateLimitingInterface{
@@ -47,11 +49,13 @@ func (op *Reporting) setupQueues() {
 			scheduledReportQueue,
 			reportDataSourceQueue,
 			reportGenerationQueryQueue,
+			prestoTableQueue,
 		},
 		reportQueue:                reportQueue,
 		scheduledReportQueue:       scheduledReportQueue,
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
+		prestoTableQueue:           prestoTableQueue,
 	}
 }
 
@@ -59,6 +63,7 @@ func (op *Reporting) setupEventHandlers() {
 	op.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addReport,
 		UpdateFunc: op.updateReport,
+		DeleteFunc: op.deleteReport,
 	})
 
 	op.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -77,6 +82,12 @@ func (op *Reporting) setupEventHandlers() {
 		AddFunc:    op.addReportGenerationQuery,
 		UpdateFunc: op.updateReportGenerationQuery,
 	})
+
+	op.informers.Metering().V1alpha1().PrestoTables().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addPrestoTable,
+		UpdateFunc: op.updatePrestoTable,
+		DeleteFunc: op.deletePrestoTable,
+	})
 }
 
 func (qs queues) ShutdownQueues() {
@@ -87,14 +98,45 @@ func (qs queues) ShutdownQueues() {
 
 func (op *Reporting) addReport(obj interface{}) {
 	report := obj.(*cbTypes.Report)
+	if report.DeletionTimestamp != nil {
+		op.deleteReport(report)
+		return
+	}
+
 	op.logger.Infof("adding Report %s", report.Name)
 	op.enqueueReport(report)
 }
 
 func (op *Reporting) updateReport(_, cur interface{}) {
 	curReport := cur.(*cbTypes.Report)
+	if curReport.DeletionTimestamp != nil {
+		op.deleteReport(curReport)
+		return
+	}
 	op.logger.Infof("updating Report %s", curReport.Name)
 	op.enqueueReport(curReport)
+}
+
+func (op *Reporting) deleteReport(obj interface{}) {
+	report, ok := obj.(*cbTypes.Report)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			op.logger.WithField("report", report.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		report, ok = tombstone.Obj.(*cbTypes.Report)
+		if !ok {
+			op.logger.WithField("report", report.Name).Errorf("Tombstone contained object that is not a Report %#v", obj)
+			return
+		}
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		return
+	}
+	op.queues.reportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReport(report *cbTypes.Report) {
@@ -117,12 +159,20 @@ func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
 
 func (op *Reporting) addScheduledReport(obj interface{}) {
 	report := obj.(*cbTypes.ScheduledReport)
+	if report.DeletionTimestamp != nil {
+		op.deleteScheduledReport(report)
+		return
+	}
 	op.logger.Infof("adding ScheduledReport %s", report.Name)
 	op.enqueueScheduledReport(report)
 }
 
 func (op *Reporting) updateScheduledReport(_, cur interface{}) {
 	curScheduledReport := cur.(*cbTypes.ScheduledReport)
+	if curScheduledReport.DeletionTimestamp != nil {
+		op.deleteScheduledReport(curScheduledReport)
+		return
+	}
 	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
 	op.enqueueScheduledReport(curScheduledReport)
 }
@@ -159,13 +209,21 @@ func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {
-	report := obj.(*cbTypes.ReportDataSource)
-	op.logger.Infof("adding ReportDataSource %s", report.Name)
-	op.enqueueReportDataSource(report)
+	ds := obj.(*cbTypes.ReportDataSource)
+	if ds.DeletionTimestamp != nil {
+		op.deleteReportDataSource(ds)
+		return
+	}
+	op.logger.Infof("adding ReportDataSource %s", ds.Name)
+	op.enqueueReportDataSource(ds)
 }
 
 func (op *Reporting) updateReportDataSource(_, cur interface{}) {
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
+	if curReportDataSource.DeletionTimestamp != nil {
+		op.deleteReportDataSource(curReportDataSource)
+		return
+	}
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }
@@ -220,6 +278,57 @@ func (op *Reporting) enqueueReportGenerationQuery(query *cbTypes.ReportGeneratio
 		return
 	}
 	op.queues.reportGenerationQueryQueue.Add(key)
+}
+
+func (op *Reporting) addPrestoTable(obj interface{}) {
+	table := obj.(*cbTypes.PrestoTable)
+	if table.DeletionTimestamp != nil {
+		op.deletePrestoTable(table)
+		return
+	}
+	op.logger.Infof("adding PrestoTable %s", table.Name)
+	op.enqueuePrestoTable(table)
+}
+
+func (op *Reporting) updatePrestoTable(_, cur interface{}) {
+	curPrestoTable := cur.(*cbTypes.PrestoTable)
+	if curPrestoTable.DeletionTimestamp != nil {
+		op.deletePrestoTable(curPrestoTable)
+		return
+	}
+	op.logger.Infof("updating PrestoTable %s", curPrestoTable.Name)
+	op.enqueuePrestoTable(curPrestoTable)
+}
+
+func (op *Reporting) deletePrestoTable(obj interface{}) {
+	prestoTable, ok := obj.(*cbTypes.PrestoTable)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			op.logger.WithField("prestoTable", prestoTable.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		prestoTable, ok = tombstone.Obj.(*cbTypes.PrestoTable)
+		if !ok {
+			op.logger.WithField("prestoTable", prestoTable.Name).Errorf("Tombstone contained object that is not a PrestoTable %#v", obj)
+			return
+		}
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(prestoTable)
+	if err != nil {
+		op.logger.WithField("prestoTable", prestoTable.Name).WithError(err).Errorf("couldn't get key for object: %#v", prestoTable)
+		return
+	}
+	op.queues.prestoTableQueue.Add(key)
+}
+
+func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
+	key, err := cache.MetaNamespaceKeyFunc(table)
+	if err != nil {
+		op.logger.WithField("prestoTable", table.Name).WithError(err).Errorf("couldn't get key for object: %#v", table)
+		return
+	}
+	op.queues.prestoTableQueue.Add(key)
 }
 
 // getKeyFromQueueObj tries to convert the object from the queue into a string,
