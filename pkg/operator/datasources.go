@@ -74,28 +74,6 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	return nil
 }
 
-func (op *Reporting) handleReportDataSourceDeleted(obj interface{}) {
-	dataSource, ok := obj.(*cbTypes.ReportDataSource)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
-		if !ok {
-			op.logger.Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(dataSource)
-	if err != nil {
-		op.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
-		return
-	}
-	op.queues.reportDataSourceQueue.Add(key)
-}
-
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	dataSource = dataSource.DeepCopy()
 	if dataSource.TableName == "" {
