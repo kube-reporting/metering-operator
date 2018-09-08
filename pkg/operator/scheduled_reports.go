@@ -94,13 +94,19 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
-			if job, exists := op.scheduledReportRunner.RemoveJob(name); exists {
-				job.stop(true)
+			if exists := op.scheduledReportRunner.RemoveJob(name); exists {
 				logger.Infof("stopped running jobs for ScheduledReport")
 			}
 			return nil
 		}
 		return err
+	}
+
+	if scheduledReport.DeletionTimestamp != nil {
+		if exists := op.scheduledReportRunner.RemoveJob(name); exists {
+			logger.Infof("stopped running jobs for ScheduledReport")
+		}
+		return op.deleteScheduledReportTable(scheduledReport)
 	}
 
 	logger.Infof("syncing scheduledReport %s", scheduledReport.GetName())
@@ -218,7 +224,6 @@ type scheduledReportJob struct {
 	operator *Reporting
 	report   *cbTypes.ScheduledReport
 	schedule reportSchedule
-	once     sync.Once
 	stopCh   chan struct{}
 	doneCh   chan struct{}
 }
@@ -233,24 +238,13 @@ func newScheduledReportJob(operator *Reporting, report *cbTypes.ScheduledReport,
 	}
 }
 
-func (job *scheduledReportJob) stop(dropTable bool) {
+func (job *scheduledReportJob) stop() {
 	logger := job.operator.logger.WithField("scheduledReport", job.report.Name)
-	job.once.Do(func() {
-		logger.Info("stopping scheduledReport job")
-		close(job.stopCh)
-		// wait for start() to exit
-		logger.Info("waiting for scheduledReport job to finish")
-		<-job.doneCh
-		if dropTable {
-			tableName := scheduledReportTableName(job.report.Name)
-			logger.Infof("deleting scheduledReport table %s", tableName)
-			err := hive.ExecuteDropTable(job.operator.hiveQueryer, tableName, true)
-			if err != nil {
-				job.operator.logger.WithError(err).Error("unable to drop table")
-			}
-			job.operator.logger.Infof("successfully deleted table %s", tableName)
-		}
-	})
+	logger.Info("stopping scheduledReport job")
+	close(job.stopCh)
+	// wait for start() to exit
+	logger.Info("waiting for scheduledReport job to finish")
+	<-job.doneCh
 }
 
 type reportPeriod struct {
@@ -477,14 +471,15 @@ func (runner *scheduledReportRunner) AddJob(job *scheduledReportJob) {
 	runner.jobsChan <- job
 }
 
-func (runner *scheduledReportRunner) RemoveJob(name string) (*scheduledReportJob, bool) {
+func (runner *scheduledReportRunner) RemoveJob(name string) bool {
 	runner.reportsMu.Lock()
 	defer runner.reportsMu.Unlock()
 	job, exists := runner.reports[name]
 	if exists {
+		job.stop()
 		delete(runner.reports, name)
 	}
-	return job, exists
+	return exists
 }
 
 func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *scheduledReportJob) {
@@ -501,21 +496,20 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 	runner.reportsMu.Unlock()
 
 	logger.Info("starting scheduledReport job")
-	defer runner.RemoveJob(job.report.Name)
 	var wg sync.WaitGroup
 	wg.Add(1)
+
+	defer func() {
+		runner.RemoveJob(job.report.Name)
+		wg.Wait()
+		logger.Info("scheduledReport job stopped")
+	}()
+
 	go func() {
 		job.start(logger)
 		wg.Done()
 	}()
-	go func() {
-		// when stop is closed, stop the running job
-		<-stop
-		job.stop(false)
-	}()
-	wg.Wait()
-	logger.Info("scheduledReport job stopped")
-
+	<-stop
 }
 
 func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) reportPeriod {
@@ -545,4 +539,16 @@ func convertDayOfWeek(dow string) (int, error) {
 		return 6, nil
 	}
 	return 0, fmt.Errorf("invalid day of week: %s", dow)
+}
+
+func (op *Reporting) deleteScheduledReportTable(report *cbTypes.ScheduledReport) error {
+	tableName := report.Status.TableName
+	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	logger := op.logger.WithFields(log.Fields{"scheduledReport": report.Name, "tableName": tableName})
+	if err != nil {
+		logger.WithError(err).Error("unable to drop Report table")
+		return err
+	}
+	logger.Infof("successfully deleted table %s", tableName)
+	return nil
 }

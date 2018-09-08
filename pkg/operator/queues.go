@@ -117,12 +117,20 @@ func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
 
 func (op *Reporting) addScheduledReport(obj interface{}) {
 	report := obj.(*cbTypes.ScheduledReport)
+	if report.DeletionTimestamp != nil {
+		op.deleteScheduledReport(report)
+		return
+	}
 	op.logger.Infof("adding ScheduledReport %s", report.Name)
 	op.enqueueScheduledReport(report)
 }
 
 func (op *Reporting) updateScheduledReport(_, cur interface{}) {
 	curScheduledReport := cur.(*cbTypes.ScheduledReport)
+	if curScheduledReport.DeletionTimestamp != nil {
+		op.deleteScheduledReport(curScheduledReport)
+		return
+	}
 	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
 	op.enqueueScheduledReport(curScheduledReport)
 }
