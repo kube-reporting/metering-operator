@@ -48,6 +48,7 @@ const (
 	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
 
+	prestoTableFinalizer = cbTypes.GroupName + "/presto-table"
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 
 	DefaultPrometheusQueryInterval  = time.Minute * 5

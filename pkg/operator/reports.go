@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/kubernetes/kubernetes/pkg/util/slice"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -103,10 +104,15 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 
 	if report.DeletionTimestamp != nil {
 		if report.Status.TableName == "" {
-			// table was never created
-			return nil
+			_, err = op.removeReportFinalizer(report)
+			return err
 		}
-		return op.deleteReportTable(report)
+		err = op.deleteReportTable(report)
+		if err != nil {
+			return err
+		}
+		_, err = op.removeReportFinalizer(report)
+		return err
 	}
 
 	logger.Infof("syncing report %s", report.GetName())
@@ -121,6 +127,14 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
+
+	if reportNeedsFinalizer(report) {
+		var err error
+		report, err = op.addReportFinalizer(report)
+		if err != nil {
+			return err
+		}
+	}
 
 	tableName := reportTableName(report.Name)
 	metricLabels := prometheus.Labels{
@@ -291,6 +305,30 @@ func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Repo
 	}
 }
 
+func (op *Reporting) addReportFinalizer(report *cbTypes.Report) (*cbTypes.Report, error) {
+	report.Finalizers = append(report.Finalizers, prestoTableFinalizer)
+	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	logger := op.logger.WithField("report", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding presto-table finalizer to Report: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("added presto-table finalizer to Report: %s/%s", report.Namespace, report.Name)
+	return newReport, nil
+}
+
+func (op *Reporting) removeReportFinalizer(report *cbTypes.Report) (*cbTypes.Report, error) {
+	report.Finalizers = slice.RemoveString(report.Finalizers, prestoTableFinalizer, nil)
+	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	logger := op.logger.WithField("report", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing presto-table finalizer from Report: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("removedpresto-table finalizer from Report: %s/%s", report.Namespace, report.Name)
+	return newReport, nil
+}
+
 func (op *Reporting) deleteReportTable(report *cbTypes.Report) error {
 	tableName := report.Status.TableName
 	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
@@ -301,4 +339,8 @@ func (op *Reporting) deleteReportTable(report *cbTypes.Report) error {
 	}
 	logger.Infof("successfully deleted table %s", tableName)
 	return nil
+}
+
+func reportNeedsFinalizer(report *cbTypes.Report) bool {
+	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
