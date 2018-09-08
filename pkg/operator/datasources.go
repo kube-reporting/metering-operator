@@ -56,8 +56,14 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataSource %s does not exist anymore.", key)
-			return nil
+			logger.Infof("ReportDataSource %s does not exist anymore, performing cleanup.", key)
+			done := make(chan struct{})
+			op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
+				ReportDataSource: reportDataSource.Name,
+				Done:             done,
+			}
+			// wait for the importer to be stopped
+			<-done
 		}
 		return err
 	}
@@ -71,7 +77,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		}
 		// wait for the importer to be stopped before we delete the table
 		<-done
-		op.deleteReportDataSourceTable(reportDataSource)
+		return op.deleteReportDataSourceTable(reportDataSource)
 	}
 
 	logger.Infof("syncing reportDataSource %s", reportDataSource.GetName())
@@ -170,13 +176,14 @@ func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 	return nil
 }
 
-func (op *Reporting) deleteReportDataSourceTable(reportDataSource *cbTypes.ReportDataSource) {
+func (op *Reporting) deleteReportDataSourceTable(reportDataSource *cbTypes.ReportDataSource) error {
 	tableName := reportDataSource.TableName
 	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": reportDataSource.Name, "tableName": tableName})
 	if err != nil {
 		logger.WithError(err).Error("unable to drop ReportDataSource table")
-		return
+		return err
 	}
 	logger.Infof("successfully deleted table %s", tableName)
+	return nil
 }
