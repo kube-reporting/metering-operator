@@ -80,6 +80,11 @@ func (op *Reporting) processReport(logger log.FieldLogger) bool {
 }
 
 func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
+	startTime := op.clock.Now()
+	defer func() {
+		logger.Infof("Finished syncing %v %q (%v)", cbTypes.SchemeGroupVersion.WithKind("Report"), key, op.clock.Since(startTime))
+	}()
+
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -94,6 +99,14 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 			return nil
 		}
 		return err
+	}
+
+	if report.DeletionTimestamp != nil {
+		if report.Status.TableName == "" {
+			// table was never created
+			return nil
+		}
+		return op.deleteReportTable(report)
 	}
 
 	logger.Infof("syncing report %s", report.GetName())
@@ -276,4 +289,16 @@ func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Repo
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}
+}
+
+func (op *Reporting) deleteReportTable(report *cbTypes.Report) error {
+	tableName := report.Status.TableName
+	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	logger := op.logger.WithFields(log.Fields{"report": report.Name, "tableName": tableName})
+	if err != nil {
+		logger.WithError(err).Error("unable to drop Report table")
+		return err
+	}
+	logger.Infof("successfully deleted table %s", tableName)
+	return nil
 }

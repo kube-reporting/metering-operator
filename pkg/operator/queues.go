@@ -59,6 +59,7 @@ func (op *Reporting) setupEventHandlers() {
 	op.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addReport,
 		UpdateFunc: op.updateReport,
+		DeleteFunc: op.deleteReport,
 	})
 
 	op.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -87,14 +88,45 @@ func (qs queues) ShutdownQueues() {
 
 func (op *Reporting) addReport(obj interface{}) {
 	report := obj.(*cbTypes.Report)
+	if report.DeletionTimestamp != nil {
+		op.deleteReport(report)
+		return
+	}
+
 	op.logger.Infof("adding Report %s", report.Name)
 	op.enqueueReport(report)
 }
 
 func (op *Reporting) updateReport(_, cur interface{}) {
 	curReport := cur.(*cbTypes.Report)
+	if curReport.DeletionTimestamp != nil {
+		op.deleteReport(curReport)
+		return
+	}
 	op.logger.Infof("updating Report %s", curReport.Name)
 	op.enqueueReport(curReport)
+}
+
+func (op *Reporting) deleteReport(obj interface{}) {
+	report, ok := obj.(*cbTypes.Report)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			op.logger.WithField("report", report.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		report, ok = tombstone.Obj.(*cbTypes.Report)
+		if !ok {
+			op.logger.WithField("report", report.Name).Errorf("Tombstone contained object that is not a Report %#v", obj)
+			return
+		}
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		return
+	}
+	op.queues.reportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReport(report *cbTypes.Report) {
