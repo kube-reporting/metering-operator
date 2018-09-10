@@ -27,13 +27,11 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/transport"
-	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
@@ -50,6 +48,7 @@ const (
 	maxConnWaitTime     = time.Minute * 3
 	defaultResyncPeriod = time.Minute
 
+	prestoTableFinalizer = cbTypes.GroupName + "/presto-table"
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 
 	DefaultPrometheusQueryInterval  = time.Minute * 5
@@ -122,7 +121,7 @@ type Reporting struct {
 
 	prestoTablePartitionQueue                    chan *cbTypes.ReportDataSource
 	prometheusImporterNewDataSourceQueue         chan *cbTypes.ReportDataSource
-	prometheusImporterDeletedDataSourceQueue     chan string
+	stopPrometheusImporterQueue                  chan *stopPrometheusImporter
 	prometheusImporterTriggerFromLastTimestampCh chan struct{}
 	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
 
@@ -136,7 +135,7 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, err
 		cfg: cfg,
 		prestoTablePartitionQueue:                    make(chan *cbTypes.ReportDataSource, 1),
 		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
-		prometheusImporterDeletedDataSourceQueue:     make(chan string),
+		stopPrometheusImporterQueue:                  make(chan *stopPrometheusImporter),
 		prometheusImporterTriggerFromLastTimestampCh: make(chan struct{}),
 		prometheusImporterTriggerForTimeRangeCh:      make(chan prometheusImporterTimeRangeTrigger),
 		logger: logger,
@@ -186,119 +185,12 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, err
 
 	op.setupInformers()
 	op.setupQueues()
+	op.setupEventHandlers()
 
 	op.scheduledReportRunner = newScheduledReportRunner(op)
 
 	logger.Debugf("configuring event listeners...")
 	return op, nil
-}
-
-type queues struct {
-	queueList                  []workqueue.RateLimitingInterface
-	reportQueue                workqueue.RateLimitingInterface
-	scheduledReportQueue       workqueue.RateLimitingInterface
-	reportDataSourceQueue      workqueue.RateLimitingInterface
-	reportGenerationQueryQueue workqueue.RateLimitingInterface
-}
-
-func (op *Reporting) setupInformers() {
-	op.informers = cbInformers.NewFilteredSharedInformerFactory(op.meteringClient, defaultResyncPeriod, op.cfg.Namespace, nil)
-	inf := op.informers.Metering().V1alpha1()
-	// hacks to ensure these informers are created before we call
-	// op.informers.Start()
-	inf.PrestoTables().Informer()
-	inf.StorageLocations().Informer()
-	inf.ReportDataSources().Informer()
-	inf.ReportGenerationQueries().Informer()
-	inf.ReportPrometheusQueries().Informer()
-	inf.Reports().Informer()
-	inf.ScheduledReports().Informer()
-}
-func (op *Reporting) setupQueues() {
-	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
-	op.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(obj)
-			if err == nil {
-				reportQueue.Add(key)
-			}
-		},
-		UpdateFunc: func(old, current interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(current)
-			if err == nil {
-				reportQueue.Add(key)
-			}
-		},
-	})
-
-	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
-	op.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(obj)
-			if err == nil {
-				scheduledReportQueue.Add(key)
-			}
-		},
-		UpdateFunc: func(old, current interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(current)
-			if err == nil {
-				scheduledReportQueue.Add(key)
-			}
-		},
-		DeleteFunc: op.handleScheduledReportDeleted,
-	})
-
-	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
-	op.informers.Metering().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(obj)
-			if err == nil {
-				reportDataSourceQueue.Add(key)
-			}
-		},
-		UpdateFunc: func(old, current interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(current)
-			if err == nil {
-				reportDataSourceQueue.Add(key)
-			}
-		},
-		DeleteFunc: op.handleReportDataSourceDeleted,
-	})
-
-	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
-	op.informers.Metering().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(obj)
-			if err == nil {
-				reportGenerationQueryQueue.Add(key)
-			}
-		},
-		UpdateFunc: func(old, current interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(current)
-			if err == nil {
-				reportGenerationQueryQueue.Add(key)
-			}
-		},
-	})
-	op.queues = queues{
-		queueList: []workqueue.RateLimitingInterface{
-			reportQueue,
-			scheduledReportQueue,
-			reportDataSourceQueue,
-			reportGenerationQueryQueue,
-		},
-		reportQueue:                reportQueue,
-		scheduledReportQueue:       scheduledReportQueue,
-		reportDataSourceQueue:      reportDataSourceQueue,
-		reportGenerationQueryQueue: reportGenerationQueryQueue,
-	}
-
-}
-
-func (qs queues) ShutdownQueues() {
-	for _, queue := range qs.queueList {
-		queue.ShutDown()
-	}
 }
 
 func (op *Reporting) Run(stopCh <-chan struct{}) error {
@@ -622,43 +514,6 @@ func (op *Reporting) isInitialized() bool {
 	initialized := op.initialized
 	op.initializedMu.Unlock()
 	return initialized
-}
-
-// getKeyFromQueueObj tries to convert the object from the queue into a string,
-// and if it isn't, it forgets the key from the queue, and logs an error.
-//
-// We expect strings to come off the workqueue. These are of the
-// form namespace/name. We do this as the delayed nature of the
-// workqueue means the items in the informer cache may actually be
-// more up to date that when the item was initially put onto the
-// workqueue.
-func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, obj interface{}, queue workqueue.RateLimitingInterface) (string, bool) {
-	if key, ok := obj.(string); ok {
-		return key, ok
-	}
-	queue.Forget(obj)
-	logger.WithField(objType, obj).Errorf("expected string in work queue but got %#v", obj)
-	return "", false
-}
-
-// handleErr checks if an error happened and makes sure we will retry later.
-func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
-	if err == nil {
-		queue.Forget(obj)
-		return
-	}
-
-	logger = logger.WithField(objType, obj)
-
-	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if queue.NumRequeues(obj) < 5 {
-		logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, obj)
-		queue.AddRateLimited(obj)
-		return
-	}
-
-	queue.Forget(obj)
-	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
 }
 
 func (op *Reporting) getDefaultReportGracePeriod() time.Duration {

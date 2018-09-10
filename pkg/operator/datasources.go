@@ -3,6 +3,7 @@ package operator
 import (
 	"fmt"
 
+	"github.com/kubernetes/kubernetes/pkg/util/slice"
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/cache"
@@ -56,11 +57,32 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
-			op.prometheusImporterDeletedDataSourceQueue <- name
-			op.deleteReportDataSourceTable(name)
-			return nil
+			logger.Infof("ReportDataSource %s does not exist anymore, performing cleanup.", key)
+			done := make(chan struct{})
+			op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
+				ReportDataSource: reportDataSource.Name,
+				Done:             done,
+			}
+			// wait for the importer to be stopped
+			<-done
 		}
+		return err
+	}
+
+	if reportDataSource.DeletionTimestamp != nil {
+		logger.Infof("ReportDataSource is marked for deletion, performing cleanup")
+		done := make(chan struct{})
+		op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
+			ReportDataSource: reportDataSource.Name,
+			Done:             done,
+		}
+		// wait for the importer to be stopped before we delete the table
+		<-done
+		err = op.deleteReportDataSourceTable(reportDataSource)
+		if err != nil {
+			return err
+		}
+		_, err = op.removeReportDataSourceFinalizer(reportDataSource)
 		return err
 	}
 
@@ -72,28 +94,6 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	}
 	logger.Infof("successfully synced reportDataSource %s", reportDataSource.GetName())
 	return nil
-}
-
-func (op *Reporting) handleReportDataSourceDeleted(obj interface{}) {
-	dataSource, ok := obj.(*cbTypes.ReportDataSource)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
-		if !ok {
-			op.logger.Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(dataSource)
-	if err != nil {
-		op.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
-		return
-	}
-	op.queues.reportDataSourceQueue.Add(key)
 }
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
@@ -115,6 +115,14 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if reportDataSourceNeedsFinalizer(dataSource) {
+		var err error
+		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
+		if err != nil {
+			return err
+		}
+	}
+
 	if dataSource.TableName == "" {
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := dataSourceTableName(dataSource.Name)
@@ -182,11 +190,42 @@ func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 	return nil
 }
 
-func (op *Reporting) deleteReportDataSourceTable(name string) {
-	tableName := dataSourceTableName(name)
+func (op *Reporting) deleteReportDataSourceTable(reportDataSource *cbTypes.ReportDataSource) error {
+	tableName := reportDataSource.TableName
 	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	logger := op.logger.WithFields(log.Fields{"reportDataSource": reportDataSource.Name, "tableName": tableName})
 	if err != nil {
-		op.logger.WithError(err).Error("unable to drop ReportDataSource table")
+		logger.WithError(err).Error("unable to drop ReportDataSource table")
+		return err
 	}
-	op.logger.Infof("successfully deleted table %s", tableName)
+	logger.Infof("successfully deleted table %s", tableName)
+	return nil
+}
+
+func (op *Reporting) addReportDataSourceFinalizer(report *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	report.Finalizers = append(report.Finalizers, prestoTableFinalizer)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Update(report)
+	logger := op.logger.WithField("reportDataSource", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding presto-table finalizer to ReportDataSource: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("added presto-table finalizer to ReportDataSource: %s/%s", report.Namespace, report.Name)
+	return newReportDataSource, nil
+}
+
+func (op *Reporting) removeReportDataSourceFinalizer(report *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	report.Finalizers = slice.RemoveString(report.Finalizers, prestoTableFinalizer, nil)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Update(report)
+	logger := op.logger.WithField("reportDataSource", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing presto-table finalizer from ReportDataSource: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("removedpresto-table finalizer from ReportDataSource: %s/%s", report.Namespace, report.Name)
+	return newReportDataSource, nil
+}
+
+func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
+	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }

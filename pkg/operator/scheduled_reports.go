@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubernetes/kubernetes/pkg/util/slice"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
@@ -94,12 +95,23 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
-			if job, exists := op.scheduledReportRunner.RemoveJob(name); exists {
-				job.stop(true)
+			if exists := op.scheduledReportRunner.RemoveJob(name); exists {
 				logger.Infof("stopped running jobs for ScheduledReport")
 			}
 			return nil
 		}
+		return err
+	}
+
+	if scheduledReport.DeletionTimestamp != nil {
+		if exists := op.scheduledReportRunner.RemoveJob(name); exists {
+			logger.Infof("stopped running jobs for ScheduledReport")
+		}
+		err = op.deleteScheduledReportTable(scheduledReport)
+		if err != nil {
+			return err
+		}
+		_, err = op.removeScheduledReportFinalizer(scheduledReport)
 		return err
 	}
 
@@ -111,28 +123,6 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	}
 	logger.Infof("successfully synced scheduledReport %s", scheduledReport.GetName())
 	return nil
-}
-
-func (op *Reporting) handleScheduledReportDeleted(obj interface{}) {
-	report, ok := obj.(*cbTypes.ScheduledReport)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		report, ok = tombstone.Obj.(*cbTypes.ScheduledReport)
-		if !ok {
-			op.logger.Errorf("Tombstone contained object that is not a ScheduledReport %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithField("scheduledReport", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
-		return
-	}
-	op.queues.scheduledReportQueue.Add(key)
 }
 
 type reportSchedule interface {
@@ -226,6 +216,15 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 
 func (op *Reporting) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
 	scheduledReport = scheduledReport.DeepCopy()
+
+	if scheduledReportNeedsFinalizer(scheduledReport) {
+		var err error
+		scheduledReport, err = op.addScheduledReportFinalizer(scheduledReport)
+		if err != nil {
+			return err
+		}
+	}
+
 	reportSchedule, err := getSchedule(scheduledReport.Spec.Schedule)
 	if err != nil {
 		return err
@@ -240,7 +239,6 @@ type scheduledReportJob struct {
 	operator *Reporting
 	report   *cbTypes.ScheduledReport
 	schedule reportSchedule
-	once     sync.Once
 	stopCh   chan struct{}
 	doneCh   chan struct{}
 }
@@ -255,24 +253,13 @@ func newScheduledReportJob(operator *Reporting, report *cbTypes.ScheduledReport,
 	}
 }
 
-func (job *scheduledReportJob) stop(dropTable bool) {
+func (job *scheduledReportJob) stop() {
 	logger := job.operator.logger.WithField("scheduledReport", job.report.Name)
-	job.once.Do(func() {
-		logger.Info("stopping scheduledReport job")
-		close(job.stopCh)
-		// wait for start() to exit
-		logger.Info("waiting for scheduledReport job to finish")
-		<-job.doneCh
-		if dropTable {
-			tableName := scheduledReportTableName(job.report.Name)
-			logger.Infof("deleting scheduledReport table %s", tableName)
-			err := hive.ExecuteDropTable(job.operator.hiveQueryer, tableName, true)
-			if err != nil {
-				job.operator.logger.WithError(err).Error("unable to drop table")
-			}
-			job.operator.logger.Infof("successfully deleted table %s", tableName)
-		}
-	})
+	logger.Info("stopping scheduledReport job")
+	close(job.stopCh)
+	// wait for start() to exit
+	logger.Info("waiting for scheduledReport job to finish")
+	<-job.doneCh
 }
 
 type reportPeriod struct {
@@ -499,14 +486,15 @@ func (runner *scheduledReportRunner) AddJob(job *scheduledReportJob) {
 	runner.jobsChan <- job
 }
 
-func (runner *scheduledReportRunner) RemoveJob(name string) (*scheduledReportJob, bool) {
+func (runner *scheduledReportRunner) RemoveJob(name string) bool {
 	runner.reportsMu.Lock()
 	defer runner.reportsMu.Unlock()
 	job, exists := runner.reports[name]
 	if exists {
+		job.stop()
 		delete(runner.reports, name)
 	}
-	return job, exists
+	return exists
 }
 
 func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *scheduledReportJob) {
@@ -523,21 +511,20 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 	runner.reportsMu.Unlock()
 
 	logger.Info("starting scheduledReport job")
-	defer runner.RemoveJob(job.report.Name)
 	var wg sync.WaitGroup
 	wg.Add(1)
+
+	defer func() {
+		runner.RemoveJob(job.report.Name)
+		wg.Wait()
+		logger.Info("scheduledReport job stopped")
+	}()
+
 	go func() {
 		job.start(logger)
 		wg.Done()
 	}()
-	go func() {
-		// when stop is closed, stop the running job
-		<-stop
-		job.stop(false)
-	}()
-	wg.Wait()
-	logger.Info("scheduledReport job stopped")
-
+	<-stop
 }
 
 func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) reportPeriod {
@@ -567,4 +554,44 @@ func convertDayOfWeek(dow string) (int, error) {
 		return 6, nil
 	}
 	return 0, fmt.Errorf("invalid day of week: %s", dow)
+}
+
+func (op *Reporting) deleteScheduledReportTable(report *cbTypes.ScheduledReport) error {
+	tableName := report.Status.TableName
+	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	logger := op.logger.WithFields(log.Fields{"scheduledReport": report.Name, "tableName": tableName})
+	if err != nil {
+		logger.WithError(err).Error("unable to drop Report table")
+		return err
+	}
+	logger.Infof("successfully deleted table %s", tableName)
+	return nil
+}
+
+func (op *Reporting) addScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
+	report.Finalizers = append(report.Finalizers, prestoTableFinalizer)
+	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	logger := op.logger.WithField("scheduledReport", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding presto-table finalizer to ScheduledReport: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("added presto-table finalizer to ScheduledReport: %s/%s", report.Namespace, report.Name)
+	return newScheduledReport, nil
+}
+
+func (op *Reporting) removeScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
+	report.Finalizers = slice.RemoveString(report.Finalizers, prestoTableFinalizer, nil)
+	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	logger := op.logger.WithField("scheduledReport", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing presto-table finalizer from ScheduledReport: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("removedpresto-table finalizer from ScheduledReport: %s/%s", report.Namespace, report.Name)
+	return newScheduledReport, nil
+}
+
+func scheduledReportNeedsFinalizer(report *cbTypes.ScheduledReport) bool {
+	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
