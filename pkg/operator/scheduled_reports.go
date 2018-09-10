@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubernetes/kubernetes/pkg/util/slice"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
@@ -106,7 +107,12 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 		if exists := op.scheduledReportRunner.RemoveJob(name); exists {
 			logger.Infof("stopped running jobs for ScheduledReport")
 		}
-		return op.deleteScheduledReportTable(scheduledReport)
+		err = op.deleteScheduledReportTable(scheduledReport)
+		if err != nil {
+			return err
+		}
+		_, err = op.removeScheduledReportFinalizer(scheduledReport)
+		return err
 	}
 
 	logger.Infof("syncing scheduledReport %s", scheduledReport.GetName())
@@ -210,6 +216,15 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 
 func (op *Reporting) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
 	scheduledReport = scheduledReport.DeepCopy()
+
+	if scheduledReportNeedsFinalizer(scheduledReport) {
+		var err error
+		scheduledReport, err = op.addScheduledReportFinalizer(scheduledReport)
+		if err != nil {
+			return err
+		}
+	}
+
 	reportSchedule, err := getSchedule(scheduledReport.Spec.Schedule)
 	if err != nil {
 		return err
@@ -551,4 +566,32 @@ func (op *Reporting) deleteScheduledReportTable(report *cbTypes.ScheduledReport)
 	}
 	logger.Infof("successfully deleted table %s", tableName)
 	return nil
+}
+
+func (op *Reporting) addScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
+	report.Finalizers = append(report.Finalizers, prestoTableFinalizer)
+	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	logger := op.logger.WithField("scheduledReport", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding presto-table finalizer to ScheduledReport: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("added presto-table finalizer to ScheduledReport: %s/%s", report.Namespace, report.Name)
+	return newScheduledReport, nil
+}
+
+func (op *Reporting) removeScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
+	report.Finalizers = slice.RemoveString(report.Finalizers, prestoTableFinalizer, nil)
+	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	logger := op.logger.WithField("scheduledReport", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing presto-table finalizer from ScheduledReport: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("removedpresto-table finalizer from ScheduledReport: %s/%s", report.Namespace, report.Name)
+	return newScheduledReport, nil
+}
+
+func scheduledReportNeedsFinalizer(report *cbTypes.ScheduledReport) bool {
+	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
