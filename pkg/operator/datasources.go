@@ -3,6 +3,7 @@ package operator
 import (
 	"fmt"
 
+	"github.com/kubernetes/kubernetes/pkg/util/slice"
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/cache"
@@ -77,7 +78,12 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		}
 		// wait for the importer to be stopped before we delete the table
 		<-done
-		return op.deleteReportDataSourceTable(reportDataSource)
+		err = op.deleteReportDataSourceTable(reportDataSource)
+		if err != nil {
+			return err
+		}
+		_, err = op.removeReportDataSourceFinalizer(reportDataSource)
+		return err
 	}
 
 	logger.Infof("syncing reportDataSource %s", reportDataSource.GetName())
@@ -109,6 +115,14 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if reportDataSourceNeedsFinalizer(dataSource) {
+		var err error
+		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
+		if err != nil {
+			return err
+		}
+	}
+
 	if dataSource.TableName == "" {
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := dataSourceTableName(dataSource.Name)
@@ -186,4 +200,32 @@ func (op *Reporting) deleteReportDataSourceTable(reportDataSource *cbTypes.Repor
 	}
 	logger.Infof("successfully deleted table %s", tableName)
 	return nil
+}
+
+func (op *Reporting) addReportDataSourceFinalizer(report *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	report.Finalizers = append(report.Finalizers, prestoTableFinalizer)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Update(report)
+	logger := op.logger.WithField("reportDataSource", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding presto-table finalizer to ReportDataSource: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("added presto-table finalizer to ReportDataSource: %s/%s", report.Namespace, report.Name)
+	return newReportDataSource, nil
+}
+
+func (op *Reporting) removeReportDataSourceFinalizer(report *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	report.Finalizers = slice.RemoveString(report.Finalizers, prestoTableFinalizer, nil)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Update(report)
+	logger := op.logger.WithField("reportDataSource", report.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing presto-table finalizer from ReportDataSource: %s/%s", report.Namespace, report.Name)
+		return nil, err
+	}
+	logger.Infof("removedpresto-table finalizer from ReportDataSource: %s/%s", report.Namespace, report.Name)
+	return newReportDataSource, nil
+}
+
+func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
+	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
