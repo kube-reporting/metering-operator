@@ -5,7 +5,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -169,20 +168,8 @@ func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
-	client := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace)
-	_, err = client.Create(&prestoTableCR)
-	if k8serrors.IsAlreadyExists(err) {
-		if existing, err := client.Get(resourceName, metav1.GetOptions{}); err != nil {
-			return err
-		} else {
-			prestoTableCR.ResourceVersion = existing.ResourceVersion
-			_, err = client.Update(&prestoTableCR)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
+	return err
 }
 
 func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
