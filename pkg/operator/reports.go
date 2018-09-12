@@ -228,7 +228,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	columns := generateHiveColumns(genQuery)
-	err = op.createTableForStorage(logger, report, "report", report.Name, report.Spec.Output, tableName, columns)
+	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		logger.WithError(err).Error("error creating report table for Report")
 		return err

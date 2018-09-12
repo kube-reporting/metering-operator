@@ -7,23 +7,24 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
-func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj runtime.Object, kind, name string, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
-	tableProperties, err := op.getHiveTableProperties(logger, storage, kind)
+func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
+	tableProperties, err := op.getHiveTableProperties(logger, storage, gvk.Kind)
 	if err != nil {
-		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s: %s", kind, name)
+		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s: %s", gvk, obj.GetName())
 	}
 	tableParams := hive.TableParameters{
 		Name:         tableName,
 		Columns:      columns,
 		IgnoreExists: true,
 	}
-	return op.createTableWith(logger, obj, kind, name, tableParams, *tableProperties)
+	return op.createTableWith(logger, obj, gvk, tableParams, *tableProperties)
 }
 
 func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
@@ -43,25 +44,25 @@ func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *
 	return op.createTable(logger, tableParams, newTableProperties)
 }
 
-func (op *Reporting) createTableWith(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
+func (op *Reporting) createTableWith(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, properties hive.TableProperties) error {
 	newTableProperties, err := addTableNameToLocation(properties, params.Name)
 	if err != nil {
 		return err
 	}
-	return op.createTableAndCR(logger, obj, kind, name, params, newTableProperties)
+	return op.createTableAndCR(logger, obj, gvk, params, newTableProperties)
 }
 
-func (op *Reporting) createTableAndCR(logger log.FieldLogger, obj runtime.Object, kind, name string, params hive.TableParameters, properties hive.TableProperties) error {
+func (op *Reporting) createTableAndCR(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, properties hive.TableProperties) error {
 	err := op.createTable(logger, params, properties)
 	if err != nil {
 		return err
 	}
-	err = op.createPrestoTableCR(obj, cbTypes.GroupName, kind, params, properties, nil)
+	err = op.createPrestoTableCR(obj, gvk, params, properties, nil)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
 			logger.Infof("presto table resource already exists")
 		} ***REMOVED*** {
-			return fmt.Errorf("couldn't create PrestoTable resource for %s: %v", kind, err)
+			return fmt.Errorf("couldn't create PrestoTable resource for %s %s: %v", gvk, obj.GetName(), err)
 		}
 	}
 	return nil

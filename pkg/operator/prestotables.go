@@ -5,9 +5,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -102,27 +101,13 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTy
 	return nil
 }
 
-func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
-	accessor := meta.NewAccessor()
-	name, err := accessor.Name(obj)
-	if err != nil {
-		return err
-	}
-	uid, err := accessor.UID(obj)
-	if err != nil {
-		return err
-	}
-	namespace, err := accessor.Namespace(obj)
-	if err != nil {
-		return err
-	}
-	objLabels, err := accessor.Labels(obj)
-	if err != nil {
-		return err
-	}
-
-	blockOwnerDeletion := true
-	isController := true
+func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
+	apiVersion := gvk.GroupVersion().String()
+	kind := gvk.Kind
+	name := obj.GetName()
+	namespace := obj.GetNamespace()
+	objLabels := obj.GetLabels()
+	ownerRef := metav1.NewControllerRef(obj, gvk)
 
 	resourceName := prestoTableResourceNameFromKind(kind, name)
 	prestoTableCR := cbTypes.PrestoTable{
@@ -135,14 +120,7 @@ func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 			Namespace: namespace,
 			Labels:    objLabels,
 			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         apiVersion,
-					Kind:               kind,
-					Name:               name,
-					UID:                uid,
-					BlockOwnerDeletion: &blockOwnerDeletion,
-					Controller:         &isController,
-				},
+				*ownerRef,
 			},
 			Finalizers: []string{
 				prestoTableFinalizer,
@@ -168,7 +146,7 @@ func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
-	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
+	_, err := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
 	return err
 }
 
