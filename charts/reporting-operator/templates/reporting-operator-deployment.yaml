@@ -105,6 +105,11 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: disable-promsum
+        - name: CHARGEBACK_ENABLE_FINALIZERS
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: enable-***REMOVED***nalizers
         - name: CHARGEBACK_PRESTO_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:
