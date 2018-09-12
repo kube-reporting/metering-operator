@@ -79,10 +79,11 @@ type Con***REMOVED***g struct {
 	Namespace  string
 	Kubecon***REMOVED***g string
 
-	HiveHost       string
-	PrestoHost     string
-	PromHost       string
-	DisablePromsum bool
+	HiveHost         string
+	PrestoHost       string
+	PromHost         string
+	DisablePromsum   bool
+	EnableFinalizers bool
 
 	LogDMLQueries bool
 	LogDDLQueries bool

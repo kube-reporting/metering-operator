@@ -216,7 +216,7 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 func (op *Reporting) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
 	scheduledReport = scheduledReport.DeepCopy()
 
-	if scheduledReportNeedsFinalizer(scheduledReport) {
+	if op.cfg.EnableFinalizers && scheduledReportNeedsFinalizer(scheduledReport) {
 		var err error
 		scheduledReport, err = op.addScheduledReportFinalizer(scheduledReport)
 		if err != nil {
@@ -568,6 +568,9 @@ func (op *Reporting) addScheduledReportFinalizer(report *cbTypes.ScheduledReport
 }
 
 func (op *Reporting) removeScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
+	if !slice.ContainsString(report.ObjectMeta.Finalizers, scheduledReportFinalizer, nil) {
+		return report, nil
+	}
 	report.Finalizers = slice.RemoveString(report.Finalizers, scheduledReportFinalizer, nil)
 	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
 	logger := op.logger.WithField("scheduledReport", report.Name)

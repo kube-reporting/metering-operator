@@ -90,7 +90,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTypes.PrestoTable) error {
 	prestoTable = prestoTable.DeepCopy()
 
-	if prestoTableNeedsFinalizer(prestoTable) {
+	if op.cfg.EnableFinalizers && prestoTableNeedsFinalizer(prestoTable) {
 		var err error
 		prestoTable, err = op.addPrestoTableFinalizer(prestoTable)
 		if err != nil {
@@ -109,6 +109,11 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 	objLabels := obj.GetLabels()
 	ownerRef := metav1.NewControllerRef(obj, gvk)
 
+	var ***REMOVED***nalizers []string
+	if op.cfg.EnableFinalizers {
+		***REMOVED***nalizers = []string{prestoTableFinalizer}
+	}
+
 	resourceName := prestoTableResourceNameFromKind(kind, name)
 	prestoTableCR := cbTypes.PrestoTable{
 		TypeMeta: metav1.TypeMeta{
@@ -122,9 +127,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 			OwnerReferences: []metav1.OwnerReference{
 				*ownerRef,
 			},
-			Finalizers: []string{
-				prestoTableFinalizer,
-			},
+			Finalizers: ***REMOVED***nalizers,
 		},
 		State: cbTypes.PrestoTableState{
 			Parameters: cbTypes.TableParameters(hive.TableParameters{
@@ -163,6 +166,9 @@ func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (
 }
 
 func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
+	if !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil) {
+		return prestoTable, nil
+	}
 	prestoTable.Finalizers = slice.RemoveString(prestoTable.Finalizers, prestoTableFinalizer, nil)
 	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithField("prestoTable", prestoTable.Name)
