@@ -132,7 +132,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	if reportDataSourceNeedsFinalizer(dataSource) {
+	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
 		var err error
 		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
 		if err != nil {
@@ -398,6 +398,9 @@ func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) 
 }
 
 func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	if !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil) {
+		return ds, nil
+	}
 	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithField("reportDataSource", ds.Name)

@@ -79,10 +79,11 @@ type Config struct {
 	Namespace  string
 	Kubeconfig string
 
-	HiveHost       string
-	PrestoHost     string
-	PromHost       string
-	DisablePromsum bool
+	HiveHost         string
+	PrestoHost       string
+	PromHost         string
+	DisablePromsum   bool
+	EnableFinalizers bool
 
 	LogDMLQueries bool
 	LogDDLQueries bool
