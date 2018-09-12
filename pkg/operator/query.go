@@ -68,12 +68,11 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	generationQuery = generationQuery.DeepCopy()
 
 	var viewName string
-	if generationQuery.ViewName == "" {
+	if generationQuery.Spec.View.Disabled {
+		logger.Infof("reportGenerationQuery has spec.view.disabled=true, skipping processing")
+		return nil
+	} else if generationQuery.ViewName == "" {
 		logger.Infof("new reportGenerationQuery discovered")
-		if generationQuery.Spec.View.Disabled {
-			logger.Infof("reportGenerationQuery has spec.view.disabled=true, skipping processing")
-			return nil
-		}
 		viewName = generationQueryViewName(generationQuery.Name)
 	} else {
 		logger.Infof("existing reportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
