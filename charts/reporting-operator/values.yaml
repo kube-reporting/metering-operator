@@ -11,6 +11,22 @@ spec:
     awsCredentialsSecretName: reporting-operator-aws-credentials-secrets
     createAwsCredentialsSecret: true
 
+    prometheusURL: ""
+    prestoHost: "presto:8080"
+    hiveHost: "hive-server:10000"
+
+    promsumPollInterval: "5m"
+    promsumChunkSize: "5m"
+    promsumStepSize: "60s"
+
+    logReports: "false"
+    logDDLQueries: "false"
+    logDMLQueries: "false"
+    disablePromsum: "false"
+    enableFinalizers: "false"
+
+    leaderLeaseDuration: "60s"
+
     tls:
       enabled: false
       createSecret: false
@@ -78,21 +94,6 @@ spec:
         spec:
           promsum:
             query: "node-capacity-cpu-cores"
-
-    prometheusURL: ""
-    prestoHost: "presto:8080"
-    hiveHost: "hive-server:10000"
-
-    promsumPollInterval: "5m"
-    promsumChunkSize: "5m"
-    promsumStepSize: "60s"
-
-    logReports: "false"
-    logDDLQueries: "false"
-    logDMLQueries: "false"
-    disablePromsum: "false"
-
-    leaderLeaseDuration: "60s"
 
   resources:
     requests:

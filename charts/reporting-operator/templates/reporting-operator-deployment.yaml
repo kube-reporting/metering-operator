@@ -105,6 +105,11 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: disable-promsum
+        - name: CHARGEBACK_ENABLE_FINALIZERS
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: enable-finalizers
         - name: CHARGEBACK_PRESTO_HOST
           valueFrom:
             configMapKeyRef:
