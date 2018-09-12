@@ -115,12 +115,6 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	dataSource = dataSource.DeepCopy()
-	if dataSource.TableName == "" {
-		logger.Infof("new dataSource discovered")
-	} ***REMOVED*** {
-		logger.Infof("existing dataSource discovered, tableName: %s", dataSource.TableName)
-	}
-
 	switch {
 	case dataSource.Spec.Promsum != nil:
 		return op.handlePrometheusMetricsDataSource(logger, dataSource)
@@ -140,7 +134,11 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 	}
 
-	if dataSource.TableName == "" {
+	if dataSource.TableName != "" {
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.TableName)
+		return nil
+	} ***REMOVED*** {
+		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := dataSourceTableName(dataSource.Name)
 		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns)
@@ -164,6 +162,13 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
 		return fmt.Errorf("datasource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
+	}
+
+	if dataSource.TableName != "" {
+		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.TableName)
+		return nil
+	} ***REMOVED*** {
+		logger.Infof("new AWSBilling ReportDataSource discovered")
 	}
 
 	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Pre***REMOVED***x)

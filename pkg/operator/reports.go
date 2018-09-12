@@ -159,7 +159,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
 	default:
-
 		logger.Infof("new report discovered")
 	}
 
