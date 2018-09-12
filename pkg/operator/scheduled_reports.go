@@ -330,7 +330,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		}
 
 		columns := generateHiveColumns(genQuery)
-		err = job.operator.createTableForStorage(logger, job.report, "scheduledreport", job.report.Name, job.report.Spec.Output, tableName, columns)
+		err = job.operator.createTableForStorage(logger, job.report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), job.report.Spec.Output, tableName, columns)
 		if err != nil {
 			logger.WithError(err).Error("error creating report table for scheduledReport")
 			return
