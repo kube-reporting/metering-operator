@@ -3,7 +3,7 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-: "${REPORTING_OP_BIN:=$ROOT_DIR/reporting-operator-local}"
+: "${REPORTING_OP_BIN:=$ROOT_DIR/bin/reporting-operator-local}"
 : "${METERING_NAMESPACE:?}"
 
 : "${METERING_PROMETHEUS_NAMESPACE:=tectonic-system}"

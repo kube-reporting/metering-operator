@@ -31,3 +31,4 @@ _tmp
 /metering-custom.yaml
 /vendor/mockgen
 /reporting-operator-local
+bin/*

@@ -1,7 +1,5 @@
-FROM golang:1.10-rc-alpine
+FROM quay.io/coreos/metering-builder:latest as build
 
-RUN apk update && apk add libc-dev git bash jq zip curl make python py-pip
-RUN pip install pyyaml
 VOLUME /out
 
 ENV HELM_VERSION 2.8.0
@@ -33,8 +31,7 @@ RUN curl \
 
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
-RUN mkdir -p /go/src/github.com/coreos-inc
-COPY . /go/src/github.com/operator-framework/operator-metering
-WORKDIR /go/src/github.com/operator-framework/operator-metering
+COPY . $GOPATH/src/github.com/operator-framework/operator-metering
+WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
 
 CMD ["hack/e2e.sh"]
