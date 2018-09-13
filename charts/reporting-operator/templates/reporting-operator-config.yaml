@@ -11,6 +11,7 @@ data:
   log-ddl-queries: {{ .Values.spec.config.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.spec.config.logDMLQueries | quote}}
   disable-promsum: {{ .Values.spec.config.disablePromsum | quote}}
+  enable-finalizers: {{ .Values.spec.config.enableFinalizers | quote}}
   prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" .Values.spec.config.prometheusURL | quote}}
   promsum-poll-interval: {{ .Values.spec.config.promsumPollInterval | quote}}
   promsum-chunk-size: {{ .Values.spec.config.promsumChunkSize | quote}}

@@ -2,14 +2,23 @@ package operator
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/util/slice"
+)
+
+const (
+	reportDataSourceFinalizer = cbTypes.GroupName + "/reportdatasource"
 )
 
 var (
@@ -19,7 +28,20 @@ var (
 		{Name: "timePrecision", Type: "double"},
 		{Name: "labels", Type: "map<string, string>"},
 	}
+
+	awsBillingReportDatasourcePartitionsGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "metering",
+			Name:      "aws_billing_reportdatasource_partitions",
+			Help:      "Current number of partitions in a AWSBilling ReportDataSource table.",
+		},
+		[]string{"reportdatasource", "table_name"},
+	)
 )
+
+func init() {
+	prometheus.MustRegister(awsBillingReportDatasourcePartitionsGauge)
+}
 
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
@@ -56,11 +78,28 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataSource %s does not exist anymore, deleting data associated with it", key)
-			op.prometheusImporterDeletedDataSourceQueue <- name
-			op.deleteReportDataSourceTable(name)
-			return nil
+			logger.Infof("ReportDataSource %s does not exist anymore, performing cleanup.", key)
+			done := make(chan struct{})
+			op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
+				ReportDataSource: reportDataSource.Name,
+				Done:             done,
+			}
+			// wait for the importer to be stopped
+			<-done
 		}
+		return err
+	}
+
+	if reportDataSource.DeletionTimestamp != nil {
+		logger.Infof("ReportDataSource is marked for deletion, performing cleanup")
+		done := make(chan struct{})
+		op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
+			ReportDataSource: reportDataSource.Name,
+			Done:             done,
+		}
+		// wait for the importer to be stopped before we delete the table
+		<-done
+		_, err = op.removeReportDataSourceFinalizer(reportDataSource)
 		return err
 	}
 
@@ -74,36 +113,8 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	return nil
 }
 
-func (op *Reporting) handleReportDataSourceDeleted(obj interface{}) {
-	dataSource, ok := obj.(*cbTypes.ReportDataSource)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
-		if !ok {
-			op.logger.Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(dataSource)
-	if err != nil {
-		op.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
-		return
-	}
-	op.queues.reportDataSourceQueue.Add(key)
-}
-
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	dataSource = dataSource.DeepCopy()
-	if dataSource.TableName == "" {
-		logger.Infof("new dataSource discovered")
-	} else {
-		logger.Infof("existing dataSource discovered, tableName: %s", dataSource.TableName)
-	}
-
 	switch {
 	case dataSource.Spec.Promsum != nil:
 		return op.handlePrometheusMetricsDataSource(logger, dataSource)
@@ -115,15 +126,27 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	if dataSource.TableName == "" {
+	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
+		var err error
+		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
+		if err != nil {
+			return err
+		}
+	}
+
+	if dataSource.TableName != "" {
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.TableName)
+		return nil
+	} else {
+		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := dataSourceTableName(dataSource.Name)
-		err := op.createTableForStorage(logger, dataSource, "ReportDataSource", dataSource.Name, storage, tableName, promsumHiveColumns)
+		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns)
 		if err != nil {
 			return err
 		}
 
-		err = op.updateDataSourceTableName(logger, dataSource, tableName)
+		dataSource, err = op.updateDataSourceTableName(logger, dataSource, tableName)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to update ReportDataSource TableName field %q", tableName)
 			return err
@@ -139,6 +162,13 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
 		return fmt.Errorf("datasource %q: improperly configured datasource, source is empty", dataSource.Name)
+	}
+
+	if dataSource.TableName != "" {
+		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.TableName)
+		return nil
+	} else {
+		logger.Infof("new AWSBilling ReportDataSource discovered")
 	}
 
 	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Prefix)
@@ -162,31 +192,231 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		}
 
 		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
-		err = op.updateDataSourceTableName(logger, dataSource, tableName)
+		dataSource, err = op.updateDataSourceTableName(logger, dataSource, tableName)
 		if err != nil {
 			return err
 		}
 	}
 
-	op.prestoTablePartitionQueue <- dataSource
+	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.TableName)
+	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", dataSource.Name)
+	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
+	if err != nil {
+		// if not found, try for the uncached copy
+		if apierrors.IsNotFound(err) {
+			prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
+	err = op.updateAWSBillingPartitions(logger, gauge, source, prestoTable, manifests)
+	if err != nil {
+		return fmt.Errorf("error updating AWS billing partitions for ReportDataSource %s: %v", dataSource.Name, err)
+	}
+
 	return nil
 }
 
-func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) error {
-	dataSource.TableName = tableName
-	_, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitionsGauge prometheus.Gauge, source *cbTypes.S3Bucket, prestoTable *cbTypes.PrestoTable, manifests []*aws.Manifest) error {
+	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
+	// Fetch the billing manifests
+	if len(manifests) == 0 {
+		logger.Warnf("prestoTable %q has no report manifests in its bucket, the first report has likely not been generated yet", prestoTable.Name)
+		return nil
+	}
+
+	// Compare the manifests list and existing partitions, deleting stale
+	// partitions and creating missing partitions
+	currentPartitions := prestoTable.State.Partitions
+	desiredPartitions, err := getDesiredPartitions(source.Bucket, manifests)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)
 		return err
 	}
+
+	changes := getPartitionChanges(currentPartitions, desiredPartitions)
+
+	currentPartitionsList := make([]string, len(currentPartitions))
+	desiredPartitionsList := make([]string, len(desiredPartitions))
+	toRemovePartitionsList := make([]string, len(changes.toRemovePartitions))
+	toAddPartitionsList := make([]string, len(changes.toAddPartitions))
+	toUpdatePartitionsList := make([]string, len(changes.toUpdatePartitions))
+
+	for i, p := range currentPartitions {
+		currentPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range desiredPartitions {
+		desiredPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toRemovePartitions {
+		toRemovePartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toAddPartitions {
+		toAddPartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+	for i, p := range changes.toUpdatePartitions {
+		toUpdatePartitionsList[i] = fmt.Sprintf("%#v", p)
+	}
+
+	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
+	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
+	logger.Debugf("partitions to remove: [%s]", strings.Join(toRemovePartitionsList, ", "))
+	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
+	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
+
+	var toRemove []cbTypes.TablePartition = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
+	var toAdd []cbTypes.TablePartition = append(changes.toAddPartitions, changes.toUpdatePartitions...)
+	// We do removals then additions so that updates are supported as a combination of remove + add partition
+
+	tableName := prestoTable.State.Parameters.Name
+	for _, p := range toRemove {
+		start := p.PartitionSpec["start"]
+		end := p.PartitionSpec["end"]
+		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
+		err = dropAWSHivePartition(op.hiveQueryer, tableName, start, end)
+		if err != nil {
+			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
+			return err
+		}
+		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", tableName, start, end)
+	}
+
+	for _, p := range toAdd {
+		start := p.PartitionSpec["start"]
+		end := p.PartitionSpec["end"]
+		// This partition doesn't exist in hive. Create it.
+		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
+		err = addAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
+		if err != nil {
+			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
+			return err
+		}
+		logger.Debugf("partition successfully added to presto table %q with range %s-%s", tableName, start, end)
+	}
+
+	prestoTable.State.Partitions = desiredPartitions
+
+	numPartitions := len(desiredPartitionsList)
+	partitionsGauge.Set(float64(numPartitions))
+
+	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to update PrestoTable CR partitions for %q", prestoTable.Name)
+		return err
+	}
+
+	logger.Infof("finished updating partitions for prestoTable %q", prestoTable.Name)
+
 	return nil
 }
 
-func (op *Reporting) deleteReportDataSourceTable(name string) {
-	tableName := dataSourceTableName(name)
-	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
-	if err != nil {
-		op.logger.WithError(err).Error("unable to drop ReportDataSource table")
+func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]cbTypes.TablePartition, error) {
+	desiredPartitions := make([]cbTypes.TablePartition, 0)
+	// Manifests have a one-to-one correlation with hive currentPartitions
+	for _, manifest := range manifests {
+		manifestPath := manifest.DataDirectory()
+		location, err := hive.S3Location(bucket, manifestPath)
+		if err != nil {
+			return nil, err
+		}
+
+		start := billingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
+		end := billingPeriodTimestamp(manifest.BillingPeriod.End.Time)
+		p := cbTypes.TablePartition{
+			Location: location,
+			PartitionSpec: presto.PartitionSpec{
+				"start": start,
+				"end":   end,
+			},
+		}
+		desiredPartitions = append(desiredPartitions, p)
 	}
-	op.logger.Infof("successfully deleted table %s", tableName)
+	return desiredPartitions, nil
+}
+
+type partitionChanges struct {
+	toRemovePartitions []cbTypes.TablePartition
+	toAddPartitions    []cbTypes.TablePartition
+	toUpdatePartitions []cbTypes.TablePartition
+}
+
+func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePartition) partitionChanges {
+	currentPartitionsSet := make(map[string]cbTypes.TablePartition)
+	desiredPartitionsSet := make(map[string]cbTypes.TablePartition)
+
+	for _, p := range currentPartitions {
+		currentPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
+	}
+	for _, p := range desiredPartitions {
+		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
+	}
+
+	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.TablePartition
+
+	for key, partition := range currentPartitionsSet {
+		if _, exists := desiredPartitionsSet[key]; !exists {
+			toRemovePartitions = append(toRemovePartitions, partition)
+		}
+	}
+	for key, partition := range desiredPartitionsSet {
+		if _, exists := currentPartitionsSet[key]; !exists {
+			toAddPartitions = append(toAddPartitions, partition)
+		}
+	}
+	for key, existingPartition := range currentPartitionsSet {
+		if newPartition, exists := desiredPartitionsSet[key]; exists && (newPartition.Location != existingPartition.Location) {
+			// use newPartition so toUpdatePartitions contains the desired partition state
+			toUpdatePartitions = append(toUpdatePartitions, newPartition)
+		}
+	}
+
+	return partitionChanges{
+		toRemovePartitions: toRemovePartitions,
+		toAddPartitions:    toAddPartitions,
+		toUpdatePartitions: toUpdatePartitions,
+	}
+}
+
+func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) (*cbTypes.ReportDataSource, error) {
+	dataSource.TableName = tableName
+	ds, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)
+		return nil, err
+	}
+	return ds, nil
+}
+
+func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
+	logger := op.logger.WithField("reportDataSource", ds.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+		return nil, err
+	}
+	logger.Infof("added %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+	return newReportDataSource, nil
+}
+
+func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+	if !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil) {
+		return ds, nil
+	}
+	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
+	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
+	logger := op.logger.WithField("reportDataSource", ds.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+		return nil, err
+	}
+	logger.Infof("removed %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
+	return newReportDataSource, nil
+}
+
+func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
+	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }

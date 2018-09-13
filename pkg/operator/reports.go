@@ -80,6 +80,11 @@ func (op *Reporting) processReport(logger log.FieldLogger) bool {
 }
 
 func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
+	startTime := op.clock.Now()
+	defer func() {
+		logger.Infof("Finished syncing %v %q (%v)", cbTypes.SchemeGroupVersion.WithKind("Report"), key, op.clock.Since(startTime))
+	}()
+
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.WithError(err).Errorf("invalid resource key :%s", key)
@@ -143,10 +148,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 		// It's no longer started, requeue it
 		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
-			key, err := cache.MetaNamespaceKeyFunc(newReport)
-			if err == nil {
-				op.queues.reportQueue.AddRateLimited(key)
-			}
+			op.enqueueReportRateLimited(newReport)
 			return nil
 		}
 
@@ -157,7 +159,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
 	default:
-
 		logger.Infof("new report discovered")
 	}
 
@@ -226,7 +227,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	columns := generateHiveColumns(genQuery)
-	err = op.createTableForStorage(logger, report, "report", report.Name, report.Spec.Output, tableName, columns)
+	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		logger.WithError(err).Error("error creating report table for Report")
 		return err
