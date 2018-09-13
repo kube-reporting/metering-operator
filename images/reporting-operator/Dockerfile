@@ -1,8 +1,15 @@
-FROM centos:7
+FROM quay.io/coreos/metering-builder:latest as build
+
+COPY . $GOPATH/src/github.com/operator-framework/operator-metering
+WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
+
+RUN make reporting-operator-bin
+
+FROM openshift/origin-base
 
 RUN yum install ca-certi***REMOVED***cates bash
-# add pod data collector binary
-ADD ./bin/reporting-operator /usr/local/bin/reporting-operator
+
+COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/reporting-operator /usr/local/bin/reporting-operator
 
 ENTRYPOINT ["reporting-operator"]
 CMD ["start"]
