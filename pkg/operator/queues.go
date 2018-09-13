@@ -314,6 +314,13 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 			return
 		}
 	}
+	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// worker get the event from the queue that the resource will no longer
+	// exist in our store, so we eagerly drop the table upon seeing the delete
+	// event when ***REMOVED***nalizers are disabled
+	if !op.cfg.EnableFinalizers && prestoTable != nil {
+		_ = op.dropPrestoTable(prestoTable)
+	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(prestoTable)
 	if err != nil {
 		op.logger.WithField("prestoTable", prestoTable.Name).WithError(err).Errorf("couldn't get key for object: %#v", prestoTable)
