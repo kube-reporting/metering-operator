@@ -180,26 +180,15 @@ func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable
 	return newPrestoTable, nil
 }
 
-func (op *Reporting) deletePrestoTableTable(prestoTable *cbTypes.PrestoTable) error {
-	tableName := prestoTable.State.Parameters.Name
-	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
-	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "tableName": tableName})
-	if err != nil {
-		logger.WithError(err).Error("unable to drop PrestoTable table")
-		return err
-	}
-	logger.Infof("successfully deleted table %s", tableName)
-	return nil
-}
-
 func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
 	return prestoTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
 
 func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
 	tableName := prestoTable.State.Parameters.Name
-	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "tableName": tableName})
+	logger.Infof("dropping presto table %s", tableName)
+	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	if err != nil {
 		logger.WithError(err).Error("unable to drop presto table")
 		return err
