@@ -102,7 +102,7 @@ writeReleaseCon***REMOVED***gMapOwnerPatchFile() {
   "metadata": {
     "ownerReferences": [{
       "apiVersion": "$OWNER_API_VERSION",
-      "blockOwnerDeletion": false,
+      "blockOwnerDeletion": true,
       "controller": true,
       "kind": "$OWNER_KIND",
       "name": "$OWNER_NAME",

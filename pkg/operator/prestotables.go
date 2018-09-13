@@ -1,40 +1,23 @@
 package operator
 
 import (
-	"fmt"
 	"strings"
-	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/api/meta"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
-const prestoTableReconcileInterval = time.Minute
-
-var (
-	awsBillingReportDatasourcePartitionsGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Namespace: "metering",
-			Name:      "aws_billing_reportdatasource_partitions",
-			Help:      "Current number of partitions in a AWSBilling ReportDataSource table.",
-		},
-		[]string{"reportdatasource", "table_name"},
-	)
+const (
+	prestoTableFinalizer = cbTypes.GroupName + "/prestotable"
 )
-
-func init() {
-	prometheus.MustRegister(awsBillingReportDatasourcePartitionsGauge)
-}
 
 func dataSourceNameToPrestoTableName(name string) string {
 	return strings.Replace(dataSourceTableName(name), "_", "-", -1)
@@ -44,238 +27,91 @@ func (op *Reporting) runPrestoTableWorker(stopCh <-chan struct{}) {
 	logger := op.logger.WithField("component", "prestoTableWorker")
 	logger.Infof("PrestoTable worker started")
 
-	for {
-		select {
-		case <-stopCh:
-			logger.Infof("PrestoTableWorker exiting")
-			return
-		case <-op.clock.Tick(prestoTableReconcileInterval):
-			datasources, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(op.cfg.Namespace).List(labels.Everything())
-			if err != nil {
-				logger.WithError(err).Errorf("unable to list datasources")
-				continue
-			}
-			for _, d := range datasources {
-				if d.Spec.AWSBilling != nil {
-					err := op.updateAWSBillingPartitions(logger, d)
-					if err != nil {
-						logger.WithError(err).Errorf("unable to update partitions for datasource %q", d.Name)
-					}
-				}
-			}
-		case datasource := <-op.prestoTablePartitionQueue:
-			if datasource.Spec.AWSBilling == nil {
-				logger.Errorf("incorrectly con***REMOVED***gured datasource sent to the presto table worker: %q", datasource.Name)
-				continue
-			}
-			err := op.updateAWSBillingPartitions(logger, datasource)
-			if err != nil {
-				logger.WithError(err).Errorf("unable to update partitions for datasource %q", datasource.Name)
-			}
-		}
+	for op.processPrestoTable(logger) {
+
 	}
+
+}
+func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
+	obj, quit := op.queues.prestoTableQueue.Get()
+	if quit {
+		logger.Infof("queue is shutting down, exiting PrestoTable worker")
+		return false
+	}
+	defer op.queues.prestoTableQueue.Done(obj)
+
+	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
+	if key, ok := op.getKeyFromQueueObj(logger, "PrestoTable", obj, op.queues.prestoTableQueue); ok {
+		err := op.syncPrestoTable(logger, key)
+		op.handleErr(logger, err, "PrestoTable", key, op.queues.prestoTableQueue)
+	}
+	return true
 }
 
-func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, datasource *cbTypes.ReportDataSource) error {
-	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", datasource.Name)
-	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace).Get(prestoTableResourceName)
-	// If this came over the work queue, the presto table may not be in the
-	// cache, so check if it exists via the API before erroring out
-	if k8serrors.IsNotFound(err) {
-		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(op.cfg.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
-	}
+func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
+	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		return err
-	}
-	prestoTable = prestoTable.DeepCopy()
-
-	source := datasource.Spec.AWSBilling.Source
-	if source == nil {
-		return fmt.Errorf("datasource %q: improperly con***REMOVED***gured datasource, source is empty", datasource.Name)
-	}
-
-	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
-
-	// Fetch the billing manifests
-	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Pre***REMOVED***x)
-	manifests, err := manifestRetriever.RetrieveManifests()
-	if err != nil {
-		return err
-	}
-
-	if len(manifests) == 0 {
-		logger.Warnf("prestoTable %q has no report manifests in its bucket, the ***REMOVED***rst report has likely not been generated yet", prestoTable.Name)
+		logger.WithError(err).Errorf("invalid resource key :%s", key)
 		return nil
 	}
 
-	// Compare the manifests list and existing partitions, deleting stale
-	// partitions and creating missing partitions
-	currentPartitions := prestoTable.State.Partitions
-	desiredPartitions, err := getDesiredPartitions(prestoTable, datasource, manifests)
+	logger = logger.WithField("prestoTable", name)
+
+	prestoTableLister := op.informers.Metering().V1alpha1().PrestoTables().Lister()
+	prestoTable, err := prestoTableLister.PrestoTables(namespace).Get(name)
 	if err != nil {
+		if apierrors.IsNotFound(err) {
+			logger.Infof("PrestoTable %s does not exist anymore", key)
+			return nil
+		}
 		return err
 	}
 
-	changes := getPartitionChanges(currentPartitions, desiredPartitions)
-
-	currentPartitionsList := make([]string, len(currentPartitions))
-	desiredPartitionsList := make([]string, len(desiredPartitions))
-	toRemovePartitionsList := make([]string, len(changes.toRemovePartitions))
-	toAddPartitionsList := make([]string, len(changes.toAddPartitions))
-	toUpdatePartitionsList := make([]string, len(changes.toUpdatePartitions))
-
-	for i, p := range currentPartitions {
-		currentPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range desiredPartitions {
-		desiredPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toRemovePartitions {
-		toRemovePartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toAddPartitions {
-		toAddPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toUpdatePartitions {
-		toUpdatePartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-
-	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
-	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
-	logger.Debugf("partitions to remove: [%s]", strings.Join(toRemovePartitionsList, ", "))
-	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
-	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
-
-	var toRemove []cbTypes.TablePartition = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
-	var toAdd []cbTypes.TablePartition = append(changes.toAddPartitions, changes.toUpdatePartitions...)
-	// We do removals then additions so that updates are supported as a combination of remove + add partition
-
-	tableName := prestoTable.State.Parameters.Name
-	for _, p := range toRemove {
-		start := p.PartitionSpec["start"]
-		end := p.PartitionSpec["end"]
-		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
-		err = dropAWSHivePartition(op.hiveQueryer, tableName, start, end)
+	if prestoTable.DeletionTimestamp != nil {
+		logger.Infof("PrestoTable is marked for deletion, performing cleanup")
+		err := op.dropPrestoTable(prestoTable)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
 			return err
 		}
-		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", tableName, start, end)
-	}
-
-	for _, p := range toAdd {
-		start := p.PartitionSpec["start"]
-		end := p.PartitionSpec["end"]
-		// This partition doesn't exist in hive. Create it.
-		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
-		err = addAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
-		if err != nil {
-			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
-			return err
-		}
-		logger.Debugf("partition successfully added to presto table %q with range %s-%s", tableName, start, end)
-	}
-
-	prestoTable.State.Partitions = desiredPartitions
-
-	numPartitions := len(desiredPartitionsList)
-	awsBillingReportDatasourcePartitionsGauge.WithLabelValues(datasource.Name, tableName).Set(float64(numPartitions))
-
-	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to update PrestoTable CR partitions for %q", prestoTable.Name)
+		_, err = op.removePrestoTableFinalizer(prestoTable)
 		return err
 	}
 
-	logger.Infof("***REMOVED***nished updating partitions for prestoTable %q", prestoTable.Name)
+	logger.Infof("syncing prestoTable %s", prestoTable.GetName())
+	err = op.handlePrestoTable(logger, prestoTable)
+	if err != nil {
+		logger.WithError(err).Errorf("error syncing prestoTable %s", prestoTable.GetName())
+		return err
+	}
+	logger.Infof("successfully synced prestoTable %s", prestoTable.GetName())
+	return nil
+}
+
+func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTypes.PrestoTable) error {
+	prestoTable = prestoTable.DeepCopy()
+
+	if op.cfg.EnableFinalizers && prestoTableNeedsFinalizer(prestoTable) {
+		var err error
+		prestoTable, err = op.addPrestoTableFinalizer(prestoTable)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-func getDesiredPartitions(prestoTable *cbTypes.PrestoTable, datasource *cbTypes.ReportDataSource, manifests []*aws.Manifest) ([]cbTypes.TablePartition, error) {
-	desiredPartitions := make([]cbTypes.TablePartition, 0)
-	// Manifests have a one-to-one correlation with hive currentPartitions
-	for _, manifest := range manifests {
-		manifestPath := manifest.DataDirectory()
-		location, err := hive.S3Location(datasource.Spec.AWSBilling.Source.Bucket, manifestPath)
-		if err != nil {
-			return nil, err
-		}
+func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
+	apiVersion := gvk.GroupVersion().String()
+	kind := gvk.Kind
+	name := obj.GetName()
+	namespace := obj.GetNamespace()
+	objLabels := obj.GetLabels()
+	ownerRef := metav1.NewControllerRef(obj, gvk)
 
-		start := billingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
-		end := billingPeriodTimestamp(manifest.BillingPeriod.End.Time)
-		p := cbTypes.TablePartition{
-			Location: location,
-			PartitionSpec: presto.PartitionSpec{
-				"start": start,
-				"end":   end,
-			},
-		}
-		desiredPartitions = append(desiredPartitions, p)
-	}
-	return desiredPartitions, nil
-}
-
-type partitionChanges struct {
-	toRemovePartitions []cbTypes.TablePartition
-	toAddPartitions    []cbTypes.TablePartition
-	toUpdatePartitions []cbTypes.TablePartition
-}
-
-func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePartition) partitionChanges {
-	currentPartitionsSet := make(map[string]cbTypes.TablePartition)
-	desiredPartitionsSet := make(map[string]cbTypes.TablePartition)
-
-	for _, p := range currentPartitions {
-		currentPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
-	}
-	for _, p := range desiredPartitions {
-		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
-	}
-
-	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.TablePartition
-
-	for key, partition := range currentPartitionsSet {
-		if _, exists := desiredPartitionsSet[key]; !exists {
-			toRemovePartitions = append(toRemovePartitions, partition)
-		}
-	}
-	for key, partition := range desiredPartitionsSet {
-		if _, exists := currentPartitionsSet[key]; !exists {
-			toAddPartitions = append(toAddPartitions, partition)
-		}
-	}
-	for key, existingPartition := range currentPartitionsSet {
-		if newPartition, exists := desiredPartitionsSet[key]; exists && (newPartition.Location != existingPartition.Location) {
-			// use newPartition so toUpdatePartitions contains the desired partition state
-			toUpdatePartitions = append(toUpdatePartitions, newPartition)
-		}
-	}
-
-	return partitionChanges{
-		toRemovePartitions: toRemovePartitions,
-		toAddPartitions:    toAddPartitions,
-		toUpdatePartitions: toUpdatePartitions,
-	}
-}
-
-func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind string, params hive.TableParameters, properties hive.TableProperties, partitions []presto.TablePartition) error {
-	accessor := meta.NewAccessor()
-	name, err := accessor.Name(obj)
-	if err != nil {
-		return err
-	}
-	uid, err := accessor.UID(obj)
-	if err != nil {
-		return err
-	}
-	namespace, err := accessor.Namespace(obj)
-	if err != nil {
-		return err
-	}
-	objLabels, err := accessor.Labels(obj)
-	if err != nil {
-		return err
+	var ***REMOVED***nalizers []string
+	if op.cfg.EnableFinalizers {
+		***REMOVED***nalizers = []string{prestoTableFinalizer}
 	}
 
 	resourceName := prestoTableResourceNameFromKind(kind, name)
@@ -289,13 +125,9 @@ func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 			Namespace: namespace,
 			Labels:    objLabels,
 			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion: apiVersion,
-					Kind:       kind,
-					Name:       name,
-					UID:        uid,
-				},
+				*ownerRef,
 			},
+			Finalizers: ***REMOVED***nalizers,
 		},
 		State: cbTypes.PrestoTableState{
 			Parameters: cbTypes.TableParameters(hive.TableParameters{
@@ -317,18 +149,50 @@ func (op *Reporting) createPrestoTableCR(obj runtime.Object, apiVersion, kind st
 		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
 	}
 
-	client := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace)
-	_, err = client.Create(&prestoTableCR)
-	if k8serrors.IsAlreadyExists(err) {
-		if existing, err := client.Get(resourceName, metav1.GetOptions{}); err != nil {
-			return err
-		} ***REMOVED*** {
-			prestoTableCR.ResourceVersion = existing.ResourceVersion
-			_, err = client.Update(&prestoTableCR)
-			if err != nil {
-				return err
-			}
-		}
+	_, err := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
+	return err
+}
+
+func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
+	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
+	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	logger := op.logger.WithField("prestoTable", prestoTable.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+		return nil, err
 	}
+	logger.Infof("added %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+	return newPrestoTable, nil
+}
+
+func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
+	if !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil) {
+		return prestoTable, nil
+	}
+	prestoTable.Finalizers = slice.RemoveString(prestoTable.Finalizers, prestoTableFinalizer, nil)
+	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	logger := op.logger.WithField("prestoTable", prestoTable.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+		return nil, err
+	}
+	logger.Infof("removed %s ***REMOVED***nalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
+	return newPrestoTable, nil
+}
+
+func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
+	return prestoTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
+}
+
+func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
+	tableName := prestoTable.State.Parameters.Name
+	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "tableName": tableName})
+	logger.Infof("dropping presto table %s", tableName)
+	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	if err != nil {
+		logger.WithError(err).Error("unable to drop presto table")
+		return err
+	}
+	logger.Infof("successfully deleted table %s", tableName)
 	return nil
 }
