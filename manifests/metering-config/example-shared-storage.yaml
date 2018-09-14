@@ -1,0 +1,27 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+     con***REMOVED***g:
+       defaultStorage:
+         create: true
+         name: "local-storage"
+         isDefault: true
+         type: "hive"
+         hive:
+           tableProperties:
+             location: "/user/hive/warehouse"
+
+  presto:
+    spec:
+      con***REMOVED***g:
+        sharedVolume:
+          enabled: true
+          storage:
+            persistentVolumeClaimStorageClass: REPLACEME
+
+  hdfs:
+    enabled: false
