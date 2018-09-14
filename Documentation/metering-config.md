@@ -169,6 +169,10 @@ spec:
     enabled: false
 ```
 
+### Using shared volumes for storage
+
+Metering uses HDFS for storage by default, but can use any ReadWriteMany PersistentVolume or StorageClass. To use a ReadWriteMany for storage, modify the [example-shared-storage.yaml][example-shared-storage-config] configuration. Note that our example [example-shared-storage.yaml][example-shared-storage-config] disables HDFS by setting `hdfs.enabled` to false so this is set up to add storage. Configure the `presto.spec.config.sharedVolume.storage.persistentVolumeClaimStorageClass` to a StorageClass with ReadWriteMany access mode. Note: NFS is not recommended to use with Metering.
+
 ### AWS billing correlation
 
 Metering is able to correlate cluster usage information with [AWS detailed billing information][AWS-billing], attaching a dollar amount to resource usage. For clusters running in EC2, this can be enabled by modifying the example [custom-values.yaml][example-config] configuration.

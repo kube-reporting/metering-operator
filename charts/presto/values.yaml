@@ -140,3 +140,12 @@ spec:
     awsSecretAccessKey: ""
     awsCredentialsSecretName: presto-aws-credentials-secrets
     createAwsCredentialsSecret: true
+
+    sharedVolume:
+      enabled: false
+      createPVC: true
+      persistentVolumeClaimName: hive-warehouse-data
+      mountPath: /user/hive/warehouse
+      storage:
+        persistentVolumeClaimStorageClass: null
+        persistentVolumeClaimSize: "5Gi"
