@@ -17,7 +17,7 @@ import (
 func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
 	tableProperties, err := op.getHiveTableProperties(logger, storage, gvk.Kind)
 	if err != nil {
-		return fmt.Errorf("storage incorrectly configured for %s: %s", gvk, obj.GetName())
+		return fmt.Errorf("storage incorrectly configured for %s %s, err: %v", gvk, obj.GetName(), err)
 	}
 	tableParams := hive.TableParameters{
 		Name:         tableName,
@@ -30,7 +30,7 @@ func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Ob
 func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
 	tableProperties, err := op.getHiveTableProperties(logger, storage, tableName)
 	if err != nil {
-		return fmt.Errorf("storage incorrectly configured for %s", tableName)
+		return fmt.Errorf("storage incorrectly configured for %s, err: %v", tableName, err)
 	}
 	tableParams := hive.TableParameters{
 		Name:         tableName,
