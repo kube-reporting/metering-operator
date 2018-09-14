@@ -29,7 +29,7 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 	}
 
 	if len(defaultStorageLocations) > 1 {
-		op.logger.Infof("getDefaultStorageLocation %s default storageLocations found", len(defaultStorageLocations))
+		op.logger.Infof("getDefaultStorageLocation: %d default storageLocations found", len(defaultStorageLocations))
 		return nil, fmt.Errorf("%d defaultStorageLocations were found", len(defaultStorageLocations))
 	}
 
