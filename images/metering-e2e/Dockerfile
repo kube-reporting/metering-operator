@@ -34,4 +34,6 @@ RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 COPY . $GOPATH/src/github.com/operator-framework/operator-metering
 WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
 
+RUN cd gotools/test2json && go build -o ../../bin/test2json main.go
+
 CMD ["hack/e2e.sh"]
