@@ -1,1 +1,3 @@
 tags
+# explicitly skip bin/* because the Docker image should always rebuild it
+bin/*

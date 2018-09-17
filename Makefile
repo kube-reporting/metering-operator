@@ -13,14 +13,8 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-REPORTING_OPERATOR_BIN_OUT = images/reporting-operator/bin/reporting-operator
-
-METERING_OPERATOR_DEPENDENCIES := \
-	images/metering-operator/Docker***REMOVED***le \
-	images/metering-operator/tectonic-metering-0.1.0.tgz \
-	images/metering-operator/openshift-metering-0.1.0.tgz \
-	images/metering-operator/operator-metering-0.1.0.tgz \
-	images/metering-operator/metering-override-values.yaml
+REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
+REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
@@ -36,6 +30,8 @@ DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
 
 REBUILD_HELM_OPERATOR ?= true
 
+METERING_OPERATOR_DEPENDENCIES = images/metering-operator/Docker***REMOVED***le
+
 ifeq ($(REBUILD_HELM_OPERATOR), true)
 	METERING_OPERATOR_DEPENDENCIES += helm-operator-docker-build
 	DOCKER_BUILD_NAMES += helm-operator
@@ -47,6 +43,7 @@ endif
 
 DOCKER_BASE_URL := quay.io/coreos
 
+BUILDER_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-builder
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
@@ -72,8 +69,13 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-REPORTING_OPERATOR_GO_FILES := $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+CHECK_GO_FILES = true
+REPORTING_OPERATOR_GO_FILES =
+
+ifeq ($(CHECK_GO_FILES), true)
+	JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
+	REPORTING_OPERATOR_GO_FILES = $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+endif
 
 CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
 
@@ -177,14 +179,17 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le $(REPORTING_OPERATOR_BIN_OUT)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE)
+metering-builder-docker-build: images/builder/Docker***REMOVED***le
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(BUILDER_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR) USE_LATEST_TAG=true
+
+reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-e2e-docker-build: images/metering-e2e/Docker***REMOVED***le
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DEPENDENCIES)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le $(***REMOVED***nd -type f images/helm-operator)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
@@ -205,6 +210,9 @@ vendor: Gopkg.toml
 test:
 	go test ./pkg/...
 
+test-docker:
+	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make test'
+
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
@@ -214,10 +222,13 @@ ci-validate: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
+ci-validate-docker:
+	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make ci-validate'
+
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 
 reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
-	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@ GOOS=$(shell go env GOOS)
+	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_OUT=$(REPORTING_OPERATOR_BIN_OUT_LOCAL) GOOS=$(shell go env GOOS)
 
 .PHONY: run-reporting-operator-local
 run-reporting-operator-local:
@@ -225,40 +236,44 @@ run-reporting-operator-local:
 	./hack/run-local-with-port-forward.sh $(REPORTING_OPERATOR_ARGS)
 
 $(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
-	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_LOCATION=$@
+	$(MAKE) build-reporting-operator
 
 build-reporting-operator:
-	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_LOCATION, Path to output binary location)
+	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
 	$(MAKE) update-codegen
-	mkdir -p $(dir $@)
-	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_LOCATION) $(REPORTING_OPERATOR_PKG)
+	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 
-images/metering-operator/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+	@mkdir -p bin
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-CHART_DEPS := images/metering-operator/tectonic-metering-0.1.0.tgz \
-	images/metering-operator/openshift-metering-0.1.0.tgz \
-	images/metering-operator/operator-metering-0.1.0.tgz
+CHART_DEPS := bin/tectonic-metering-0.1.0.tgz \
+	bin/openshift-metering-0.1.0.tgz \
+	bin/operator-metering-0.1.0.tgz
 
 all-charts: $(CHART_DEPS)
 
-tectonic-metering-chart: images/metering-operator/tectonic-metering-0.1.0.tgz
+tectonic-metering-chart: bin/tectonic-metering-0.1.0.tgz
 
-openshift-metering-chart: images/metering-operator/openshift-metering-0.1.0.tgz
+openshift-metering-chart: bin/openshift-metering-0.1.0.tgz
 
-operator-metering-chart: images/metering-operator/operator-metering-0.1.0.tgz
+operator-metering-chart: bin/operator-metering-0.1.0.tgz
 
-images/metering-operator/tectonic-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
-	helm dep update --skip-refresh charts/tectonic-metering
-	helm package --save=false -d images/metering-operator charts/tectonic-metering
+bin/tectonic-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
+	@echo "Packaging tectonic-metering chart dependencies"
+	@mkdir -p bin && mkdir -p charts/tectonic-metering/charts && hack/yamltojson < charts/tectonic-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|***REMOVED***le://||' | xargs -I {} helm package --save=false -d charts/tectonic-metering/charts charts/tectonic-metering/{}
+	helm package --save=false -d bin charts/tectonic-metering
 
-images/metering-operator/openshift-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
-	helm dep update --skip-refresh charts/openshift-metering
-	helm package --save=false -d images/metering-operator charts/openshift-metering
+bin/openshift-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
+	@echo "Packaging openshift-metering chart dependencies"
+	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/yamltojson < charts/openshift-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|***REMOVED***le://||' | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
+	helm package --save=false -d bin charts/openshift-metering
 
-images/metering-operator/operator-metering-0.1.0.tgz: images/metering-operator/metering-override-values.yaml $(shell ***REMOVED***nd charts -type f)
-	helm dep update --skip-refresh charts/operator-metering
-	helm package --save=false -d images/metering-operator charts/operator-metering
+bin/operator-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
+	@echo "Packaging operator-metering chart dependencies"
+	@mkdir -p bin && mkdir -p charts/operator-metering/charts && hack/yamltojson < charts/operator-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|***REMOVED***le://||' | xargs -I {} helm package --save=false -d charts/operator-metering/charts charts/operator-metering/{}
+	helm package --save=false -d bin charts/operator-metering
 
 metering-manifests:
 	./hack/create-metering-manifests.sh $(RELEASE_TAG)
@@ -270,10 +285,11 @@ metering-manifests:
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
-	metering-e2e-docker-build \
+	metering-test-docker \
+	metering-e2e-docker-build metering-builder-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart tectonic-metering-chart openshift-metering chart \
-	images/metering-operator/metering-override-values.yaml \
+	bin/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm
 
