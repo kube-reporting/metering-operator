@@ -158,7 +158,7 @@ func testReportsProduceData(t *testing.T) {
 				}
 
 				if newReport.Status.TableName == "" {
-					t.Logf("Report %s table isn't created yet", report.Name)
+					t.Logf("Report %s table isn't created yet, status: %+v", report.Name, newReport.Status)
 					return false, nil
 				}
 				return true, nil
