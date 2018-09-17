@@ -97,14 +97,14 @@ kubectl -n $METERING_NAMESPACE get pods
 It may take a 2-3 minutes, but eventually all pods should have a status of `Running`:
 
 ```
-NAME                                      READY     STATUS    RESTARTS   AGE
-hdfs-datanode-0                           1/1       Running   0          10m
-hdfs-namenode-0                           1/1       Running   0          10m
-hive-metastore-0                          1/1       Running   0          10m
-hive-server-0                             1/1       Running   0          10m
-metering-5c6c9d6cc5-7pzwv                 1/1       Running   1          10m
-metering-operator-79666787c5-z4d2h        2/2       Running   0          10m
-presto-coordinator-54469ccb68-jfblb       1/1       Running   0          10m
+NAME                                  READY     STATUS    RESTARTS   AGE
+hdfs-datanode-0                       1/1       Running   0          9m
+hdfs-namenode-0                       1/1       Running   0          9m
+hive-metastore-0                      1/1       Running   0          9m
+hive-server-0                         1/1       Running   0          9m
+metering-operator-df67bb6cb-6d7vh     2/2       Running   1          11m
+presto-coordinator-7b7b87ff49-bhzgg   1/1       Running   0          9m
+reporting-operator-7cf77b68f9-l6jrd   1/1       Running   1          9m
 ```
 
 Check the logs of the `reporting-operator` pod for errors:
