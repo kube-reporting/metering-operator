@@ -102,28 +102,34 @@ spec:
 
                     sh '''
                     apk update
-                    apk add git bash
+                    apk add bash make git
                     '''
 
                     echo "Authenticating to docker registry"
                     sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW quay.io'
+                }
 
-                    echo "Installing build dependencies"
-                    sh '''#!/bin/bash
-                    set -ex
-                    apk add make go libc-dev curl jq zip python py-pip
-                    pip install pyyaml
-                    export HELM_VERSION=2.8.0
-                    curl \
-                        --silent \
-                        --show-error \
-                        --location \
-                        "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
-                        | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
-                        && chmod +x /usr/local/bin/helm
-                    helm init --client-only --skip-refresh
-                    helm repo remove stable || true
-                    '''
+            }
+        }
+
+        stage('Build builder image') {
+            when {
+                expression {
+                    return true
+                }
+            }
+            steps {
+                dir(env.METERING_SRC_DIR) {
+                    container('docker') {
+                        ansiColor('xterm') {
+                            sh '''
+                            make metering-builder-docker-build \
+                                BRANCH_TAG=$BRANCH_TAG \
+                                DEPLOY_TAG=$DEPLOY_TAG \
+                                CHECK_GO_FILES=false
+                            '''
+                        }
+                    }
                 }
             }
         }
@@ -132,12 +138,11 @@ spec:
             steps {
                 dir(env.METERING_SRC_DIR) {
                     container('docker') {
-                        sh '''#!/bin/bash
-                        set -e
-                        set -o pipefail
-                        make ci-validate
-                        make test
-                        '''
+                        ansiColor('xterm') {
+                            sh 'make metering-e2e-docker-build CHECK_GO_FILES=false'
+                            sh 'make ci-validate-docker CHECK_GO_FILES=false'
+                            sh 'make test-docker CHECK_GO_FILES=false'
+                        }
                     }
                 }
             }
@@ -153,12 +158,13 @@ spec:
                 dir(env.METERING_SRC_DIR) {
                     container('docker') {
                         ansiColor('xterm') {
-                            sh '''#!/bin/bash -ex
-                            make docker-build-all -j 2 \
+                            sh '''
+                            make docker-build-all \
                                 REBUILD_HELM_OPERATOR=$REBUILD_HELM_OPERATOR \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
-                                DEPLOY_TAG=$DEPLOY_TAG
+                                DEPLOY_TAG=$DEPLOY_TAG \
+                                CHECK_GO_FILES=false
                             '''
                         }
                     }
@@ -176,9 +182,7 @@ spec:
                 dir(env.METERING_SRC_DIR) {
                     container('docker') {
                         ansiColor('xterm') {
-                            sh '''#!/bin/bash -ex
-                            make docker-tag-all -j 2
-                            '''
+                            sh 'make docker-tag-all CHECK_GO_FILES=false'
                         }
                     }
                 }
@@ -190,17 +194,42 @@ spec:
             }
         }
 
+        stage('Push builder image') {
+            when {
+                expression {
+                    return true
+                }
+            }
+            steps {
+                dir(env.METERING_SRC_DIR) {
+                    container('docker') {
+                        ansiColor('xterm') {
+                            sh '''
+                            make docker-push IMAGE_NAME=quay.io/coreos/metering-builder \
+                                USE_LATEST_TAG=$USE_LATEST_TAG \
+                                PUSH_RELEASE_TAG=$PUSH_RELEASE_TAG \
+                                BRANCH_TAG=$BRANCH_TAG \
+                                DEPLOY_TAG=$DEPLOY_TAG \
+                                CHECK_GO_FILES=false
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Push') {
             steps {
                 dir(env.METERING_SRC_DIR) {
                     container('docker') {
                         ansiColor('xterm') {
-                            sh '''#!/bin/bash -ex
-                            make docker-push-all -j 2 \
+                            sh '''
+                            make docker-push-all \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 PUSH_RELEASE_TAG=$PUSH_RELEASE_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
-                                DEPLOY_TAG=$DEPLOY_TAG
+                                DEPLOY_TAG=$DEPLOY_TAG \
+                                CHECK_GO_FILES=false
                             '''
                         }
                     }
