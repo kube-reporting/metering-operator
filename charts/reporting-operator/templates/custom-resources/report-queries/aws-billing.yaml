@@ -73,6 +73,8 @@ spec:
     type: string
   - name: partition_stop
     type: string
+  - name: period_percent
+    type: double
   - name: period_start
     type: timestamp
     unit: date
