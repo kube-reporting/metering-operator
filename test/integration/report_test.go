@@ -14,7 +14,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,30 +24,8 @@ const reportComparisionEpsilon = 0.0001
 var (
 	reportTestTimeout         = 5 * time.Minute
 	reportTestOutputDirectory string
-)
 
-func init() {
-	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
-	if reportTestOutputDirectory == "" {
-		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-
-	err := os.MkdirAll(reportTestOutputDirectory, 0777)
-	if err != nil {
-		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
-	}
-}
-
-type testDatasource struct {
-	DatasourceName string
-	FileName       string
-}
-
-func TestReportsProduceCorrectDataForInput(t *testing.T) {
-	if reportTestOutputDirectory == "" {
-		t.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-	tests := map[string]struct {
+	testReportsProduceCorrectDataForInputTestCases = map[string]struct {
 		// name is the name of the sub test but also the name of the report.
 		queryName                    string
 		dataSources                  []testDatasource
@@ -185,13 +162,34 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 			timeout:                      reportTestTimeout,
 		},
 	}
+)
 
-	// For each datasource ***REMOVED***le, keep track
-	dataSourcesSubmitted := make(map[string]struct {
-		metricsStart, metricsEnd time.Time
-	})
+func init() {
+	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
+	if reportTestOutputDirectory == "" {
+		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
+	}
 
-	for name, test := range tests {
+	err := os.MkdirAll(reportTestOutputDirectory, 0777)
+	if err != nil {
+		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
+	}
+}
+
+type testDatasource struct {
+	DatasourceName string
+	FileName       string
+}
+
+func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time) {
+	if reportTestOutputDirectory == "" {
+		t.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
+	}
+
+	require.NotZero(t, reportStart, "reportStart should not be zero")
+	require.NotZero(t, reportEnd, "reportEnd should not be zero")
+
+	for name, test := range testReportsProduceCorrectDataForInputTestCases {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -200,68 +198,11 @@ func TestReportsProduceCorrectDataForInput(t *testing.T) {
 				return
 			}
 
-			var reportStart, reportEnd time.Time
-
-			_, err := testFramework.WaitForMeteringReportGenerationQuery(t, test.queryName, time.Second*5, test.timeout)
-			require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
-
-			for _, dataSource := range test.dataSources {
-				if dataSourceTimes, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
-					// wait for the datasource table to exist
-					_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, test.timeout)
-					require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
-
-					metricsFile, err := os.Open(dataSource.FileName)
-					require.NoError(t, err)
-
-					decoder := json.NewDecoder(metricsFile)
-
-					_, err = decoder.Token()
-					require.NoError(t, err)
-
-					var metrics []*prestostore.PrometheusMetric
-					for decoder.More() {
-						var metric prestostore.PrometheusMetric
-						err = decoder.Decode(&metric)
-						require.NoError(t, err)
-						if reportStart.IsZero() || metric.Timestamp.Before(reportStart) {
-							reportStart = metric.Timestamp
-						}
-						if metric.Timestamp.After(reportEnd) {
-							reportEnd = metric.Timestamp
-						}
-						metrics = append(metrics, &metric)
-						// batch store metrics in amounts of 100
-						if len(metrics) >= 100 {
-							err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
-							require.NoError(t, err)
-							metrics = nil
-						}
-					}
-					// flush any metrics left over
-					if len(metrics) != 0 {
-						err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
-						require.NoError(t, err)
-					}
-
-					dataSourcesSubmitted[dataSource.DatasourceName] = struct{ metricsStart, metricsEnd time.Time }{
-						metricsStart: reportStart,
-						metricsEnd:   reportEnd,
-					}
-				} ***REMOVED*** {
-					reportStart = dataSourceTimes.metricsStart
-					reportEnd = dataSourceTimes.metricsEnd
-				}
-			}
-
-			require.NotZero(t, reportStart, "reportStart should not be zero")
-			require.NotZero(t, reportEnd, "reportEnd should not be zero")
-
 			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
 			report := testFramework.NewSimpleReport(name, test.queryName, reportStart, reportEnd)
 
-			err = testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
+			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
 				return err == nil || errors.IsNotFound(err)
 			}, "failed to ensure report doesn't exist before creating report")
