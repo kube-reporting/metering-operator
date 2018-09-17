@@ -4,7 +4,6 @@ pipeline {
         string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
         booleanParam(name: 'GENERIC', defaultValue: false, description: '')
         booleanParam(name: 'OPENSHIFT', defaultValue: false, description: '')
-        booleanParam(name: 'TECTONIC', defaultValue: false, description: '')
     }
     agent {
         kubernetes {
@@ -67,23 +66,6 @@ spec:
                     environment {
                         KUBECONFIG      = credentials('gke-metering-ci-kubeconfig')
                         DEPLOY_PLATFORM = "generic"
-                    }
-                    steps {
-                        deploy()
-                    }
-                    post {
-                        always {
-                            captureLogs()
-                        }
-                    }
-                }
-                stage('tectonic') {
-                    when {
-                        expression { return params.TECTONIC }
-                    }
-                    environment {
-                        KUBECONFIG      = credentials('chargeback-ci-kubeconfig')
-                        DEPLOY_PLATFORM = "tectonic"
                     }
                     steps {
                         deploy()
