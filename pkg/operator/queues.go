@@ -1,6 +1,8 @@
 package operator
 
 import (
+	"time"
+
 	_ "github.com/prestodb/presto-go-client/presto"
 	log "github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
@@ -155,6 +157,15 @@ func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
 		return
 	}
 	op.queues.reportQueue.AddRateLimited(key)
+}
+
+func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Duration) {
+	key, err := cache.MetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		return
+	}
+	op.queues.reportQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addScheduledReport(obj interface{}) {

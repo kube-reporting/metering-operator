@@ -135,15 +135,14 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		}
 
 		if report.UID != newReport.UID {
-			logger.Warn("started report has different UUID in API than in cache, waiting for resync to process")
-			return nil
+			return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
 		}
 
 		err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
 		if err != nil {
 			logger.WithError(err).Warnf("unable to update report cache with updated report")
 			// if we cannot update it, don't re queue it
-			return nil
+			return err
 		}
 
 		// It's no longer started, requeue it
@@ -186,6 +185,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("report configured to run immediately with %s until periodEnd+gracePeriod: %s", waitTime, nextRunTime)
 	} else if reportGracePeriodUnmet {
 		logger.Infof("report %s not past grace period yet, ignoring until %s (%s)", report.Name, nextRunTime, waitTime)
+		op.enqueueReportAfter(report, waitTime)
 		return nil
 	}
 
