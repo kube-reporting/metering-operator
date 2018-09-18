@@ -132,17 +132,11 @@ func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.Genera
 	deps, err := reporting.ValidateGenerationQueryDependenciesStatus(dependencyStatus)
 	if err != nil {
 		for _, query := range dependencyStatus.UninitializedReportGenerationQueries {
-			key, err := cache.MetaNamespaceKeyFunc(query)
-			if err == nil {
-				op.queues.reportGenerationQueryQueue.Add(key)
-			}
+			op.enqueueReportGenerationQuery(query)
 		}
 
 		for _, dataSource := range dependencyStatus.UninitializedReportDataSources {
-			key, err := cache.MetaNamespaceKeyFunc(dataSource)
-			if err == nil {
-				op.queues.reportDataSourceQueue.Add(key)
-			}
+			op.enqueueReportDataSource(dataSource)
 		}
 		return nil, err
 	}
