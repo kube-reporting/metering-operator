@@ -349,6 +349,31 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 	op.queues.prestoTableQueue.Add(key)
 }
 
+type workerProcessFunc func(logger log.FieldLogger) bool
+
+func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface) bool {
+	obj, quit := queue.Get()
+	if quit {
+		logger.Infof("queue is shutting down, exiting %s worker", objType)
+		return false
+	}
+	defer queue.Done(obj)
+
+	op.runHandler(logger, handlerFunc, objType, obj, queue)
+	return true
+}
+
+type syncHandler func(logger log.FieldLogger, key string) error
+
+func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
+	if key, ok := op.getKeyFromQueueObj(logger, objType, obj, queue); ok {
+		logger.Infof("syncing %s %s", objType, key)
+		err := handlerFunc(logger, key)
+		op.handleErr(logger, err, objType, key, queue)
+	}
+}
+
 // getKeyFromQueueObj tries to convert the object from the queue into a string,
 // and if it isn't, it forgets the key from the queue, and logs an error.
 //
@@ -368,20 +393,21 @@ func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, 
 
 // handleErr checks if an error happened and makes sure we will retry later.
 func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+	logger = logger.WithField(objType, obj)
+
 	if err == nil {
+		logger.Infof("successfully synced %s %q", objType, obj)
 		queue.Forget(obj)
 		return
 	}
 
-	logger = logger.WithField(objType, obj)
-
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if queue.NumRequeues(obj) < 5 {
-		logger.WithError(err).Errorf("Error syncing %s %q, adding back to queue", objType, obj)
+		logger.WithError(err).Errorf("error syncing %s %q, adding back to queue", objType, obj)
 		queue.AddRateLimited(obj)
 		return
 	}
 
 	queue.Forget(obj)
-	logger.WithError(err).Infof("Dropping %s %q out of the queue", objType, obj)
+	logger.WithError(err).Infof("error syncing %s %q, dropping out of the queue", objType, obj)
 }

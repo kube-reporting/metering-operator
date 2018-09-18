@@ -46,25 +46,8 @@ func init() {
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
-	for op.processReportDataSource(logger) {
-
+	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.queues.reportDataSourceQueue) {
 	}
-}
-
-func (op *Reporting) processReportDataSource(logger log.FieldLogger) bool {
-	obj, quit := op.queues.reportDataSourceQueue.Get()
-	if quit {
-		logger.Infof("queue is shutting down, exiting ReportDataSource worker")
-		return false
-	}
-	defer op.queues.reportDataSourceQueue.Done(obj)
-
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
-	if key, ok := op.getKeyFromQueueObj(logger, "ReportDataSource", obj, op.queues.reportDataSourceQueue); ok {
-		err := op.syncReportDataSource(logger, key)
-		op.handleErr(logger, err, "ReportDataSource", key, op.queues.reportDataSourceQueue)
-	}
-	return true
 }
 
 func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) error {
@@ -103,14 +86,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		return err
 	}
 
-	logger.Infof("syncing reportDataSource %s", reportDataSource.GetName())
-	err = op.handleReportDataSource(logger, reportDataSource)
-	if err != nil {
-		logger.WithError(err).Errorf("error syncing reportDataSource %s", reportDataSource.GetName())
-		return err
-	}
-	logger.Infof("successfully synced reportDataSource %s", reportDataSource.GetName())
-	return nil
+	return op.handleReportDataSource(logger, reportDataSource)
 }
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {

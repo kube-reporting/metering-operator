@@ -14,25 +14,8 @@ import (
 func (op *Reporting) runReportGenerationQueryWorker() {
 	logger := op.logger.WithField("component", "reportGenerationQueryWorker")
 	logger.Infof("ReportGenerationQuery worker started")
-	for op.processReportGenerationQuery(logger) {
-
+	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue) {
 	}
-}
-
-func (op *Reporting) processReportGenerationQuery(logger log.FieldLogger) bool {
-	obj, quit := op.queues.reportGenerationQueryQueue.Get()
-	if quit {
-		logger.Infof("queue is shutting down, exiting ReportGenerationQuery worker")
-		return false
-	}
-	defer op.queues.reportGenerationQueryQueue.Done(obj)
-
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
-	if key, ok := op.getKeyFromQueueObj(logger, "ReportGenerationQuery", obj, op.queues.reportGenerationQueryQueue); ok {
-		err := op.syncReportGenerationQuery(logger, key)
-		op.handleErr(logger, err, "ReportGenerationQuery", key, op.queues.reportGenerationQueryQueue)
-	}
-	return true
 }
 
 func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key string) error {
@@ -54,14 +37,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 		return err
 	}
 
-	logger.Infof("syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
-	err = op.handleReportGenerationQuery(logger, reportGenerationQuery)
-	if err != nil {
-		logger.WithError(err).Errorf("error syncing reportGenerationQuery %s", reportGenerationQuery.GetName())
-		return err
-	}
-	logger.Infof("successfully synced reportGenerationQuery %s", reportGenerationQuery.GetName())
-	return nil
+	return op.handleReportGenerationQuery(logger, reportGenerationQuery)
 }
 
 func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
