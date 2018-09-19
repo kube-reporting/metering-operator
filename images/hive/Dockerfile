@@ -4,6 +4,7 @@ ENV HIVE_VERSION=2.3.3
 ENV HIVE_HOME=/opt/hive
 ENV PATH=$HIVE_HOME/bin:$PATH
 
+RUN mkdir -p /opt
 WORKDIR /opt
 
 USER root

@@ -70,6 +70,7 @@ spec:
 
     parameters {
         booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
+        booleanParam(name: 'USE_IMAGEBUILDER', defaultValue: false, description: 'If true, uses github.com/openshift/imagebuilder as the Docker client')
     }
     environment {
         GOPATH            = "${env.WORKSPACE}/go"
@@ -98,12 +99,28 @@ spec:
                     script {
                         // putting this in the environment block above wasn't working, so we use script and just assign to the env global
                         env.REBUILD_HELM_OPERATOR = "${params.REBUILD_HELM_OPERATOR || (!isPullRequest)}"
+                        env.USE_IMAGEBUILDER = "${params.USE_IMAGEBUILDER}"
                     }
 
                     sh '''
                     apk update
                     apk add bash make git
                     '''
+
+                    script {
+                        if (params.USE_IMAGEBUILDER) {
+                            sh '''
+                            apk add go libc-dev
+                            mkdir -p $GOPATH
+                            rm -rf $GOPATH/src/github.com/openshift/imagebuilder /usr/local/bin/imagebuilder
+                            git clone https://github.com/chancez/imagebuilder $GOPATH/src/github.com/openshift/imagebuilder
+                            cd $GOPATH/src/github.com/openshift/imagebuilder
+                            git checkout copy_dockerignore_into_image
+                            go build -o /usr/local/bin/imagebuilder github.com/openshift/imagebuilder/cmd/imagebuilder
+                            chmod +x /usr/local/bin/imagebuilder
+                            '''
+                        }
+                    }
 
                     echo "Authenticating to docker registry"
                     sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW quay.io'

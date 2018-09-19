@@ -21,9 +21,9 @@ ENV HOME /opt/presto
 ENV PROMETHEUS_JMX_EXPORTER_VERSION 0.3.1
 ENV PROMETHEUS_JMX_EXPORTER_JAR jmx_prometheus_javaagent-$PROMETHEUS_JMX_EXPORTER_VERSION.jar
 
-WORKDIR $PRESTO_HOME
-
+RUN mkdir -p $PRESTO_HOME
 RUN useradd presto -u 1003 -d /opt/presto
+WORKDIR $PRESTO_HOME
 
 # install presto server
 RUN set -x \
