@@ -25,7 +25,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 		return nil
 	}
 
-	logger = logger.WithField("generationQuery", name)
+	logger = logger.WithField("ReportGenerationQuery", name)
 
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
 	reportGenerationQuery, err := reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
@@ -45,13 +45,13 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 
 	var viewName string
 	if generationQuery.Spec.View.Disabled {
-		logger.Infof("reportGenerationQuery has spec.view.disabled=true, skipping processing")
+		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping processing")
 		return nil
 	} else if generationQuery.ViewName == "" {
-		logger.Infof("new reportGenerationQuery discovered")
+		logger.Infof("new ReportGenerationQuery discovered")
 		viewName = generationQueryViewName(generationQuery.Name)
 	} else {
-		logger.Infof("existing reportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
+		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
 		viewName = generationQuery.ViewName
 	}
 

@@ -74,7 +74,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 		return nil
 	}
 
-	logger = logger.WithField("report", name)
+	logger = logger.WithField("Report", name)
 	report, err := op.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -249,7 +249,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 }
 
 func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
-	logger.WithField("report", report.Name).WithError(err).Errorf(errMsg)
+	logger.WithField("Report", report.Name).WithError(err).Errorf(errMsg)
 	report.Status.Phase = cbTypes.ReportPhaseError
 	report.Status.Output = err.Error()
 	_, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
