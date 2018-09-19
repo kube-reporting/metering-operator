@@ -30,6 +30,7 @@ pipeline {
         booleanParam(name: 'GENERIC', defaultValue: true, description: 'If true, run the configured tests against a GKE cluster using the generic config.')
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: 'If true, run the configured tests against a Openshift cluster using the Openshift config.')
         booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
+        booleanParam(name: 'USE_IMAGEBUILDER', defaultValue: false, description: 'If true, uses github.com/openshift/imagebuilder as the Docker client when building.')
         booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the e2e/integration namespaces after running tests.')
     }
     triggers {
@@ -71,7 +72,9 @@ pipeline {
             }
             steps {
                 echo "Building and pushing metering docker images"
-                build job: "metering/operator-metering-build/${env.TARGET_BRANCH}"
+                build job: "metering/operator-metering-build/${env.TARGET_BRANCH}", parameters: [
+                    booleanParam(name: 'USE_IMAGEBUILDER', value: params.USE_IMAGEBUILDER),
+                ]
             }
             post {
                 success {
