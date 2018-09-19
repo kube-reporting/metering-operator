@@ -1,5 +1,6 @@
 FROM quay.io/coreos/metering-builder:latest as build
 
+RUN mkdir -p /out
 VOLUME /out
 
 ENV HELM_VERSION 2.8.0
