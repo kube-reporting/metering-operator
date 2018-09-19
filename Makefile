@@ -9,6 +9,14 @@ REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
 DOCKER_BUILD_ARGS ?=
 
+DOCKER_BUILD_CMD = docker build $(DOCKER_BUILD_ARGS)
+
+USE_IMAGEBUILDER ?= false
+
+ifeq ($(USE_IMAGEBUILDER), true)
+	DOCKER_BUILD_CMD = imagebuilder
+endif
+
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
@@ -88,7 +96,7 @@ all: fmt test docker-build-all
 #	make docker-build DOCKERFILE= IMAGE_NAME=
 
 docker-build:
-	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
+	$(DOCKER_BUILD_CMD) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
 ifdef BRANCH_TAG
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
 endif

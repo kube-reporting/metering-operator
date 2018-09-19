@@ -11,6 +11,7 @@ RUN yum clean all && rm -rf /var/cache/yum
 ENV HELM_VERSION 2.6.2
 ENV GOPATH /go
 
+RUN mkdir -p /go/src/k8s.io/helm
 WORKDIR /go/src/k8s.io/helm
 RUN git clone https://github.com/helm/helm.git . && git checkout v${HELM_VERSION}
 
