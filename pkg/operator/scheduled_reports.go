@@ -65,25 +65,8 @@ func init() {
 func (op *Reporting) runScheduledReportWorker() {
 	logger := op.logger.WithField("component", "scheduledReportWorker")
 	logger.Infof("ScheduledReport worker started")
-	for op.processScheduledReport(logger) {
-
+	for op.processResource(logger, op.syncScheduledReport, "ScheduledReport", op.queues.scheduledReportQueue) {
 	}
-}
-
-func (op *Reporting) processScheduledReport(logger log.FieldLogger) bool {
-	obj, quit := op.queues.scheduledReportQueue.Get()
-	if quit {
-		logger.Infof("queue is shutting down, exiting ScheduledReport worker")
-		return false
-	}
-	defer op.queues.scheduledReportQueue.Done(obj)
-
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
-	if key, ok := op.getKeyFromQueueObj(logger, "ScheduledReport", obj, op.queues.scheduledReportQueue); ok {
-		err := op.syncScheduledReport(logger, key)
-		op.handleErr(logger, err, "ScheduledReport", obj, op.queues.scheduledReportQueue)
-	}
-	return true
 }
 
 func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) error {
@@ -114,14 +97,7 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 		return err
 	}
 
-	logger.Infof("syncing scheduledReport %s", scheduledReport.GetName())
-	err = op.handleScheduledReport(logger, scheduledReport)
-	if err != nil {
-		logger.WithError(err).Errorf("error syncing scheduledReport %s", scheduledReport.GetName())
-		return err
-	}
-	logger.Infof("successfully synced scheduledReport %s", scheduledReport.GetName())
-	return nil
+	return op.handleScheduledReport(logger, scheduledReport)
 }
 
 type reportSchedule interface {

@@ -29,9 +29,12 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 		generationQuery,
 	)
 	if err != nil {
-		return fmt.Errorf("unable to generateReport for %s %s, ReportGenerationQuery %s, failed to validate dependencies: %v", reportKind, reportName, generationQuery.Name, err)
+		return fmt.Errorf("unable to generateReport for %s %s, ReportGenerationQuery %s, failed to get dependencies: %v", reportKind, reportName, generationQuery.Name, err)
 	}
 	validateResults, err := op.validateDependencyStatus(depsStatus)
+	if err != nil {
+		return fmt.Errorf("unable to generateReport for %s %s, ReportGenerationQuery %s, failed to validate dependencies: %v", reportKind, reportName, generationQuery.Name, err)
+	}
 
 	templateInfo := &templateInfo{
 		DynamicDependentQueries: validateResults.DynamicReportGenerationQueries,
