@@ -197,7 +197,7 @@ spec:
         stage('Push builder image') {
             when {
                 expression {
-                    return true
+                    return isMaster
                 }
             }
             steps {
