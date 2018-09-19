@@ -55,7 +55,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 		return nil
 	}
 
-	logger = logger.WithField("prestoTable", name)
+	logger = logger.WithField("PrestoTable", name)
 
 	prestoTableLister := op.informers.Metering().V1alpha1().PrestoTables().Lister()
 	prestoTable, err := prestoTableLister.PrestoTables(namespace).Get(name)
@@ -77,13 +77,13 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 		return err
 	}
 
-	logger.Infof("syncing prestoTable %s", prestoTable.GetName())
+	logger.Infof("syncing PrestoTable %s", prestoTable.GetName())
 	err = op.handlePrestoTable(logger, prestoTable)
 	if err != nil {
-		logger.WithError(err).Errorf("error syncing prestoTable %s", prestoTable.GetName())
+		logger.WithError(err).Errorf("error syncing PrestoTable %s", prestoTable.GetName())
 		return err
 	}
-	logger.Infof("successfully synced prestoTable %s", prestoTable.GetName())
+	logger.Infof("successfully synced PrestoTable %s", prestoTable.GetName())
 	return nil
 }
 
@@ -156,7 +156,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
 	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
 	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
-	logger := op.logger.WithField("prestoTable", prestoTable.Name)
+	logger := op.logger.WithField("PrestoTable", prestoTable.Name)
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 		return nil, err
@@ -186,7 +186,7 @@ func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
 
 func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
 	tableName := prestoTable.State.Parameters.Name
-	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "tableName": tableName})
+	logger := op.logger.WithFields(log.Fields{"PrestoTable": prestoTable.Name, "tableName": tableName})
 	logger.Infof("dropping presto table %s", tableName)
 	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	if err != nil {

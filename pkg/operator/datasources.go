@@ -57,7 +57,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		return nil
 	}
 
-	logger = logger.WithField("datasource", name)
+	logger = logger.WithField("ReportDataSource", name)
 	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -97,7 +97,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 	case dataSource.Spec.AWSBilling != nil:
 		return op.handleAWSBillingDataSource(logger, dataSource)
 	default:
-		return fmt.Errorf("datasource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
+		return fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
 	}
 }
 
@@ -137,7 +137,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
-		return fmt.Errorf("datasource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
+		return fmt.Errorf("ReportDataSource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
 	}
 
 	if dataSource.TableName != "" {
@@ -155,7 +155,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	if len(manifests) == 0 {
-		logger.Warnf("datasource %q has no report manifests in it's bucket, the ***REMOVED***rst report has likely not been generated yet", dataSource.Name)
+		logger.Warnf("ReportDataSource %q has no report manifests in it's bucket, the ***REMOVED***rst report has likely not been generated yet", dataSource.Name)
 		return nil
 	}
 
@@ -175,7 +175,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.TableName)
-	prestoTableResourceName := prestoTableResourceNameFromKind("reportdatasource", dataSource.Name)
+	prestoTableResourceName := prestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
 	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
 	if err != nil {
 		// if not found, try for the uncached copy
@@ -201,7 +201,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
 	// Fetch the billing manifests
 	if len(manifests) == 0 {
-		logger.Warnf("prestoTable %q has no report manifests in its bucket, the ***REMOVED***rst report has likely not been generated yet", prestoTable.Name)
+		logger.Warnf("PrestoTable %q has no report manifests in its bucket, the ***REMOVED***rst report has likely not been generated yet", prestoTable.Name)
 		return nil
 	}
 
@@ -369,7 +369,7 @@ func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
-	logger := op.logger.WithField("reportDataSource", ds.Name)
+	logger := op.logger.WithField("ReportDataSource", ds.Name)
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err
@@ -384,7 +384,7 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSourc
 	}
 	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
-	logger := op.logger.WithField("reportDataSource", ds.Name)
+	logger := op.logger.WithField("ReportDataSource", ds.Name)
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err

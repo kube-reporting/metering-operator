@@ -76,7 +76,7 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 		return nil
 	}
 
-	logger = logger.WithField("scheduledReport", name)
+	logger = logger.WithField("ScheduledReport", name)
 	scheduledReport, err := op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -229,11 +229,11 @@ func newScheduledReportJob(operator *Reporting, report *cbTypes.ScheduledReport,
 }
 
 func (job *scheduledReportJob) stop() {
-	logger := job.operator.logger.WithField("scheduledReport", job.report.Name)
-	logger.Info("stopping scheduledReport job")
+	logger := job.operator.logger.WithField("ScheduledReport", job.report.Name)
+	logger.Info("stopping ScheduledReport job")
 	close(job.stopCh)
 	// wait for start() to exit
-	logger.Info("waiting for scheduledReport job to ***REMOVED***nish")
+	logger.Info("waiting for ScheduledReport job to ***REMOVED***nish")
 	<-job.doneCh
 }
 
@@ -270,13 +270,13 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		}
 		report = report.DeepCopy()
 
-		msg := fmt.Sprintf("Validating generationQuery %s", job.report.Spec.GenerationQueryName)
+		msg := fmt.Sprintf("Validating ReportGenerationQuery %s", job.report.Spec.GenerationQueryName)
 		runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ValidatingScheduledReportReason, msg)
 		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
 
 		report, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 		if err != nil {
-			logger.WithError(err).Errorf("unable to update scheduledReport status")
+			logger.WithError(err).Errorf("unable to update ScheduledReport status")
 			return
 		}
 
@@ -308,14 +308,14 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 		columns := generateHiveColumns(genQuery)
 		err = job.operator.createTableForStorage(logger, job.report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), job.report.Spec.Output, tableName, columns)
 		if err != nil {
-			logger.WithError(err).Error("error creating report table for scheduledReport")
+			logger.WithError(err).Error("error creating report table for ScheduledReport")
 			return
 		}
 
 		report.Status.TableName = tableName
 		report, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 		if err != nil {
-			logger.WithError(err).Errorf("unable to update scheduledReport status with tableName")
+			logger.WithError(err).Errorf("unable to update ScheduledReport status with tableName")
 			return
 		}
 
@@ -362,13 +362,13 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 		report, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 		if err != nil {
-			loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
+			loggerWithFields.WithError(err).Errorf("unable to update ScheduledReport status")
 			return
 		}
 
 		select {
 		case <-job.stopCh:
-			loggerWithFields.Info("got stop signal, stopping scheduledReport job")
+			loggerWithFields.Info("got stop signal, stopping ScheduledReport job")
 			return
 		case <-job.operator.clock.After(waitTime):
 			runningMsg := fmt.Sprintf("reached end of last reporting period [%s to %s]", reportPeriod.periodStart, reportPeriod.periodEnd)
@@ -377,7 +377,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 			report, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 			if err != nil {
-				loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
+				loggerWithFields.WithError(err).Errorf("unable to update ScheduledReport status")
 				return
 			}
 			genReportTotalCounter.Inc()
@@ -407,7 +407,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 
 				_, updateErr := job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 				if updateErr != nil {
-					loggerWithFields.WithError(updateErr).Errorf("unable to update scheduledReport status")
+					loggerWithFields.WithError(updateErr).Errorf("unable to update ScheduledReport status")
 				}
 				loggerWithFields.WithError(err).Errorf("error occurred while generating report")
 				return
@@ -418,7 +418,7 @@ func (job *scheduledReportJob) start(logger log.FieldLogger) {
 			report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
 			_, err = job.operator.meteringClient.MeteringV1alpha1().ScheduledReports(job.report.Namespace).Update(report)
 			if err != nil {
-				loggerWithFields.WithError(err).Errorf("unable to update scheduledReport status")
+				loggerWithFields.WithError(err).Errorf("unable to update ScheduledReport status")
 				return
 			}
 		}
@@ -473,7 +473,7 @@ func (runner *scheduledReportRunner) RemoveJob(name string) bool {
 }
 
 func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *scheduledReportJob) {
-	logger := runner.operator.logger.WithField("scheduledReport", job.report.Name)
+	logger := runner.operator.logger.WithField("ScheduledReport", job.report.Name)
 	runner.reportsMu.Lock()
 	_, exists := runner.reports[job.report.Name]
 	if exists {
@@ -485,14 +485,14 @@ func (runner *scheduledReportRunner) handleJob(stop <-chan struct{}, job *schedu
 	runner.reports[job.report.Name] = job
 	runner.reportsMu.Unlock()
 
-	logger.Info("starting scheduledReport job")
+	logger.Info("starting ScheduledReport job")
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	defer func() {
 		runner.RemoveJob(job.report.Name)
 		wg.Wait()
-		logger.Info("scheduledReport job stopped")
+		logger.Info("ScheduledReport job stopped")
 	}()
 
 	go func() {
@@ -534,7 +534,7 @@ func convertDayOfWeek(dow string) (int, error) {
 func (op *Reporting) addScheduledReportFinalizer(report *cbTypes.ScheduledReport) (*cbTypes.ScheduledReport, error) {
 	report.Finalizers = append(report.Finalizers, scheduledReportFinalizer)
 	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-	logger := op.logger.WithField("scheduledReport", report.Name)
+	logger := op.logger.WithField("ScheduledReport", report.Name)
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to ScheduledReport: %s/%s", scheduledReportFinalizer, report.Namespace, report.Name)
 		return nil, err
@@ -549,7 +549,7 @@ func (op *Reporting) removeScheduledReportFinalizer(report *cbTypes.ScheduledRep
 	}
 	report.Finalizers = slice.RemoveString(report.Finalizers, scheduledReportFinalizer, nil)
 	newScheduledReport, err := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-	logger := op.logger.WithField("scheduledReport", report.Name)
+	logger := op.logger.WithField("ScheduledReport", report.Name)
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from ScheduledReport: %s/%s", scheduledReportFinalizer, report.Namespace, report.Name)
 		return nil, err
