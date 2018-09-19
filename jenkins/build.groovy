@@ -112,8 +112,12 @@ spec:
                             sh '''
                             apk add go libc-dev
                             mkdir -p $GOPATH
-                            go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
-                            mv -f $GOPATH/bin/imagebuilder /usr/local/bin/imagebuilder
+                            rm -rf $GOPATH/src/github.com/openshift/imagebuilder /usr/local/bin/imagebuilder
+                            git clone https://github.com/chancez/imagebuilder $GOPATH/src/github.com/openshift/imagebuilder
+                            cd $GOPATH/src/github.com/openshift/imagebuilder
+                            git checkout copy_dockerignore_into_image
+                            go build -o /usr/local/bin/imagebuilder github.com/openshift/imagebuilder/cmd/imagebuilder
+                            chmod +x /usr/local/bin/imagebuilder
                             '''
                         }
                     }
