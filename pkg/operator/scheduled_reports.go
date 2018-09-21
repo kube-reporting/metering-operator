@@ -212,25 +212,50 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	}
 
 	now := op.clock.Now().UTC()
-	var lastScheduled time.Time
-	lastReportTime := report.Status.LastReportTime
-	if lastReportTime != nil {
-		logger = logger.WithField("lastReportTime", lastReportTime.Time)
-		logger.Infof("last report time was %s", lastReportTime.Time)
-		lastScheduled = lastReportTime.Time
-	} else {
-		logger.Infof("no last report time for report, using current time %s", now)
-		lastScheduled = now
+
+	if report.Status.LastReportTime == nil {
+		logger.Infof("no last report time for report, setting lastReportTime to current time %s", now)
+		report.Status.LastReportTime = &metav1.Time{now}
+		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		if err != nil {
+			logger.WithError(err).Errorf("unable to update ScheduledReport status")
+			return err
+		}
 	}
 
-	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastScheduled)
+	lastReportTime := report.Status.LastReportTime.Time
+	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
 
 	logger = logger.WithFields(log.Fields{
+		"lastReportTime":    lastReportTime,
 		"periodStart":       reportPeriod.periodStart,
 		"periodEnd":         reportPeriod.periodEnd,
 		"period":            report.Spec.Schedule.Period,
 		"overwriteExisting": report.Spec.OverwriteExistingData,
 	})
+
+	logger.Infof("last report time was %s", lastReportTime)
+
+	var gracePeriod time.Duration
+	if report.Spec.GracePeriod != nil {
+		gracePeriod = report.Spec.GracePeriod.Duration
+	} else {
+		gracePeriod = op.getDefaultReportGracePeriod()
+		logger.Debugf("ScheduledReport has no gracePeriod configured, falling back to defaultGracePeriod: %s", gracePeriod)
+	}
+
+	nextRunTime := reportPeriod.periodEnd.Add(gracePeriod)
+	reportGracePeriodUnmet := nextRunTime.After(now)
+	waitTime := nextRunTime.Sub(now)
+
+	if isRunningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning); isRunningCond != nil && isRunningCond.Reason == cbutil.ReportPeriodWaitingReason && isRunningCond.Status == v1.ConditionTrue && reportGracePeriodUnmet {
+		// early check to see if an early reconcile occurred and if we're still
+		// just waiting for the next reporting period, in which case, we can
+		// just wait until the report period
+		logger.Debugf("ScheduledReport has a '%s' status with reason: '%s'. next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s, waiting %s", cbTypes.ScheduledReportRunning, isRunningCond.Reason, reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime, waitTime)
+		op.enqueueScheduledReportAfter(report, waitTime)
+		return nil
+	}
 
 	// validate the scheduledReport before anything else to surface issues
 	// before we actually run
@@ -269,19 +294,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	var gracePeriod time.Duration
-	if report.Spec.GracePeriod != nil {
-		gracePeriod = report.Spec.GracePeriod.Duration
-	} else {
-		gracePeriod = op.getDefaultReportGracePeriod()
-		logger.Debugf("ScheduledReport has no gracePeriod configured, falling back to defaultGracePeriod: %s", gracePeriod)
-	}
-
-	nextRunTime := reportPeriod.periodEnd.Add(gracePeriod)
-	reportGracePeriodUnmet := nextRunTime.After(now)
 	if reportGracePeriodUnmet {
-		waitTime := nextRunTime.Sub(now)
-
 		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
 		logger.Infof(waitMsg+". waiting %s", waitTime)
 
@@ -374,11 +387,20 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	// We generated a report successfully, remove the failure condition
 	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
 	report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
-	_, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update ScheduledReport status")
 		return err
 	}
+
+	// determine the next time we need to run and queue the scheduledReport to
+	// be processed at that time
+	reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.LastReportTime.Time)
+	nextRunTime = reportPeriod.periodEnd.Add(gracePeriod)
+	now = op.clock.Now().UTC()
+	waitTime = nextRunTime.Sub(now)
+
+	op.enqueueScheduledReportAfter(report, waitTime)
 	return nil
 }
 
