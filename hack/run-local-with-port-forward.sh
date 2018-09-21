@@ -14,7 +14,7 @@ trap 'jobs -p | xargs kill' EXIT
 
 PRESTO="$(kubectl get pods -n "$METERING_NAMESPACE" -l app=presto,presto=coordinator -o name | cut -d/ -f2)"
 HIVE="$(kubectl get pods -n "$METERING_NAMESPACE" -l app=hive,hive=server -o name | cut -d/ -f2)"
-PROM="$(kubectl get pods -n "$METERING_PROMETHEUS_NAMESPACE" -l "$METERING_PROMTHEUS_LABEL_SELECTOR" -o name | cut -d/ -f2)"
+PROM="$(kubectl get pods -n "$METERING_PROMETHEUS_NAMESPACE" -l "$METERING_PROMTHEUS_LABEL_SELECTOR" -o name | cut -d/ -f2 | head -n1)"
 
 echo Starting presto port-forward
 kubectl -n "$METERING_NAMESPACE" port-forward "$PRESTO" 9991:8080 &
@@ -29,10 +29,13 @@ sleep 6
 
 echo Starting reporting-operator
 set -x
+
 "$REPORTING_OP_BIN" \
     start \
     --namespace "$METERING_NAMESPACE" \
     --presto-host "127.0.0.1:9991" \
     --hive-host "127.0.0.1:9992" \
     --prometheus-host "http://127.0.0.1:9993" \
-    "$@"
+    "$@" &
+
+wait
