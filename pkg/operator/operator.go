@@ -109,8 +109,6 @@ type Reporting struct {
 	hiveQueryer   *hiveQueryer
 	promConn      prom.API
 
-	scheduledReportRunner *scheduledReportRunner
-
 	clock clock.Clock
 	rand  *rand.Rand
 
@@ -184,8 +182,6 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Rep
 	op.setupInformers()
 	op.setupQueues()
 	op.setupEventHandlers()
-
-	op.scheduledReportRunner = newScheduledReportRunner(op)
 
 	logger.Debugf("con***REMOVED***guring event listeners...")
 	return op, nil
@@ -483,14 +479,6 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			op.logger.Infof("ScheduledReport worker #%d stopped", i)
 		}()
 	}
-
-	wg.Add(1)
-	go func() {
-		op.logger.Debugf("starting ScheduledReportRunner")
-		op.scheduledReportRunner.Run(stopCh)
-		wg.Done()
-		op.logger.Debugf("ScheduledReportRunner stopped")
-	}()
 
 	wg.Add(1)
 	go func() {
