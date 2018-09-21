@@ -219,6 +219,15 @@ func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
 	op.queues.scheduledReportQueue.Add(key)
 }
 
+func (op *Reporting) enqueueScheduledReportAfter(report *cbTypes.ScheduledReport, duration time.Duration) {
+	key, err := cache.MetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
+		return
+	}
+	op.queues.scheduledReportQueue.AddAfter(key, duration)
+}
+
 func (op *Reporting) addReportDataSource(obj interface{}) {
 	ds := obj.(*cbTypes.ReportDataSource)
 	if ds.DeletionTimestamp != nil {
