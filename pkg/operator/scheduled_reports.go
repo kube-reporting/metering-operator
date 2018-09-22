@@ -215,10 +215,16 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	now := op.clock.Now().UTC()
 
 	if report.Status.LastReportTime == nil {
-		logger.Infof("no last report time for report, setting lastReportTime to current time %s", now)
-		// we try to align to the nearest minute
-		nearestMinute := now.Truncate(time.Minute)
-		report.Status.LastReportTime = &metav1.Time{nearestMinute}
+		if report.Spec.ReportingStart != nil {
+			logger.Infof("no last report time for report, setting lastReportTime to spec.reportingStart %s", report.Spec.ReportingStart.Time)
+			report.Status.LastReportTime = report.Spec.ReportingStart
+		} ***REMOVED*** {
+			logger.Infof("no last report time for report, setting lastReportTime to current time %s", now)
+			// we try to align to the nearest minute
+			nearestMinute := now.Truncate(time.Minute)
+			report.Status.LastReportTime = &metav1.Time{nearestMinute}
+		}
+
 		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update ScheduledReport status")
