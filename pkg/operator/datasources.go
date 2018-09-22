@@ -46,7 +46,8 @@ func init() {
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
-	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.queues.reportDataSourceQueue) {
+	const maxRequeues = 5
+	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.queues.reportDataSourceQueue, maxRequeues) {
 	}
 }
 
@@ -91,14 +92,24 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
 	dataSource = dataSource.DeepCopy()
+	var err error
 	switch {
 	case dataSource.Spec.Promsum != nil:
-		return op.handlePrometheusMetricsDataSource(logger, dataSource)
+		err = op.handlePrometheusMetricsDataSource(logger, dataSource)
 	case dataSource.Spec.AWSBilling != nil:
-		return op.handleAWSBillingDataSource(logger, dataSource)
+		err = op.handleAWSBillingDataSource(logger, dataSource)
 	default:
-		return fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
+		err = fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
 	}
+	if err != nil {
+		return err
+	}
+
+	if err := op.queueDependentReportGeneratonQueriesForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
+	}
+
+	return nil
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
@@ -112,7 +123,6 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 	if dataSource.TableName != "" {
 		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.TableName)
-		return nil
 	} ***REMOVED*** {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
@@ -142,7 +152,6 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	if dataSource.TableName != "" {
 		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.TableName)
-		return nil
 	} ***REMOVED*** {
 		logger.Infof("new AWSBilling ReportDataSource discovered")
 	}
@@ -395,4 +404,25 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSourc
 
 func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
+}
+
+// queueDependentReportGeneratonQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
+func (op *Reporting) queueDependentReportGeneratonQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(dataSource.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// look at the list ReportDataSource of dependencies
+		for _, dependency := range query.Spec.DataSources {
+			if dependency == dataSource.Name {
+				// this query depends on the generationQuery passed in
+				op.enqueueReportGenerationQuery(query)
+				break
+			}
+		}
+	}
+	return nil
 }

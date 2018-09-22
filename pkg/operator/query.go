@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -14,7 +15,11 @@ import (
 func (op *Reporting) runReportGenerationQueryWorker() {
 	logger := op.logger.WithField("component", "reportGenerationQueryWorker")
 	logger.Infof("ReportGenerationQuery worker started")
-	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue) {
+	// 10 requeues compared to the 5 others have because
+	// ReportGenerationQueries can reference a lot of other resources, and it may
+	// take time for them to all to ***REMOVED***nish setup
+	const maxRequeues = 10
+	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue, maxRequeues) {
 	}
 }
 
@@ -88,7 +93,17 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return err
 	}
 
-	return op.updateReportQueryViewName(logger, generationQuery, viewName)
+	err = op.updateReportQueryViewName(logger, generationQuery, viewName)
+	if err != nil {
+		return err
+	}
+
+	// enqueue any queries depending on this one
+	if err := op.queueDependentReportGeneratonQueriesForQuery(generationQuery); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportGenerationQuery %s", generationQuery.Name)
+	}
+
+	return nil
 }
 
 func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, viewName string) error {
@@ -117,4 +132,30 @@ func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.Genera
 		return nil, err
 	}
 	return deps, nil
+}
+
+// queueDependentReportGeneratonQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
+func (op *Reporting) queueDependentReportGeneratonQueriesForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// don't queue ourself
+		if query.Name == generationQuery.Name {
+			continue
+		}
+		// look at the list of ReportGenerationQuery dependencies
+		depenencyNames := append(query.Spec.ReportQueries, query.Spec.DynamicReportQueries...)
+		for _, dependency := range depenencyNames {
+			if dependency == generationQuery.Name {
+				// this query depends on the generationQuery passed in
+				op.enqueueReportGenerationQuery(query)
+				break
+			}
+		}
+	}
+	return nil
 }
