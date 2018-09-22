@@ -915,6 +915,14 @@ func (in *ScheduledReportScheduleWeekly) DeepCopy() *ScheduledReportScheduleWeek
 func (in *ScheduledReportSpec) DeepCopyInto(out *ScheduledReportSpec) {
 	*out = *in
 	in.Schedule.DeepCopyInto(&out.Schedule)
+	if in.ReportingStart != nil {
+		in, out := &in.ReportingStart, &out.ReportingStart
+		if *in == nil {
+			*out = nil
+		} ***REMOVED*** {
+			*out = (*in).DeepCopy()
+		}
+	}
 	if in.GracePeriod != nil {
 		in, out := &in.GracePeriod, &out.GracePeriod
 		if *in == nil {

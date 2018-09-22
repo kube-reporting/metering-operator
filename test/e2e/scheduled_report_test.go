@@ -44,7 +44,7 @@ func testScheduledReportsProduceData(t *testing.T) {
 				return
 			}
 
-			report := testFramework.NewSimpleScheduledReport(name, test.queryName, periodStart)
+			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &periodStart)
 
 			err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
@@ -86,9 +86,6 @@ func testScheduledReportsProduceData(t *testing.T) {
 				// has been collected at least once.
 				if newReport.Status.LastReportTime == nil {
 					t.Logf("report LastReportTime is unset")
-					return false, nil
-				} ***REMOVED*** if newReport.Status.LastReportTime.Time.Equal(report.Status.LastReportTime.Time) {
-					t.Logf("report LastReportTime is unchanged: %s", report.Status.LastReportTime.Time.Format(time.RFC3339))
 					return false, nil
 				}
 				return true, nil

@@ -41,7 +41,11 @@ func (f *Framework) NewSimpleReport(name, queryName string, start, end time.Time
 	}
 }
 
-func (f *Framework) NewSimpleScheduledReport(name, queryName string, lastReportTime time.Time) *meteringv1alpha1.ScheduledReport {
+func (f *Framework) NewSimpleScheduledReport(name, queryName string, reportingStart *time.Time) *meteringv1alpha1.ScheduledReport {
+	var start *meta.Time
+	if reportingStart != nil {
+		start = &meta.Time{*reportingStart}
+	}
 	return &meteringv1alpha1.ScheduledReport{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
@@ -52,9 +56,7 @@ func (f *Framework) NewSimpleScheduledReport(name, queryName string, lastReportT
 			Schedule: meteringv1alpha1.ScheduledReportSchedule{
 				Period: meteringv1alpha1.ScheduledReportPeriodHourly,
 			},
-		},
-		Status: meteringv1alpha1.ScheduledReportStatus{
-			LastReportTime: &meta.Time{lastReportTime},
+			ReportingStart: start,
 		},
 	}
 }
