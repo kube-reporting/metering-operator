@@ -178,12 +178,24 @@ func (op *Reporting) addScheduledReport(obj interface{}) {
 	op.enqueueScheduledReport(report)
 }
 
-func (op *Reporting) updateScheduledReport(_, cur interface{}) {
+func (op *Reporting) updateScheduledReport(prev, cur interface{}) {
+	prevScheduledReport := prev.(*cbTypes.ScheduledReport)
 	curScheduledReport := cur.(*cbTypes.ScheduledReport)
 	if curScheduledReport.DeletionTimestamp != nil {
 		op.deleteScheduledReport(curScheduledReport)
 		return
 	}
+
+	if curScheduledReport.ResourceVersion == prevScheduledReport.ResourceVersion {
+		// Periodic resyncs will send update events for all known ScheduledReports.
+		// Two different versions of the same scheduledReport will always have
+		// different ResourceVersions.
+
+		// TODO(chance): logging here is probably unnecessary and verbose
+		op.logger.Debugf("ScheduledReport %s is unchanged, skipping update", curScheduledReport.Name)
+		return
+	}
+
 	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
 	op.enqueueScheduledReport(curScheduledReport)
 }
@@ -217,6 +229,15 @@ func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
 		return
 	}
 	op.queues.scheduledReportQueue.Add(key)
+}
+
+func (op *Reporting) enqueueScheduledReportAfter(report *cbTypes.ScheduledReport, duration time.Duration) {
+	key, err := cache.MetaNamespaceKeyFunc(report)
+	if err != nil {
+		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
+		return
+	}
+	op.queues.scheduledReportQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {
