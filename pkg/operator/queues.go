@@ -384,7 +384,7 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 
 type workerProcessFunc func(logger log.FieldLogger) bool
 
-func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface) bool {
+func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface, maxRequeues int) bool {
 	obj, quit := queue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting %s worker", objType)
@@ -392,18 +392,18 @@ func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHan
 	}
 	defer queue.Done(obj)
 
-	op.runHandler(logger, handlerFunc, objType, obj, queue)
+	op.runHandler(logger, handlerFunc, objType, obj, queue, maxRequeues)
 	return true
 }
 
 type syncHandler func(logger log.FieldLogger, key string) error
 
-func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithFields(newLogIdentifier(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, objType, obj, queue); ok {
 		logger.Infof("syncing %s %s", objType, key)
 		err := handlerFunc(logger, key)
-		op.handleErr(logger, err, objType, key, queue)
+		op.handleErr(logger, err, objType, key, queue, maxRequeues)
 	}
 }
 
@@ -425,7 +425,7 @@ func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, 
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithField(objType, obj)
 
 	if err == nil {
@@ -434,8 +434,9 @@ func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string
 		return
 	}
 
-	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if queue.NumRequeues(obj) < 5 {
+	// This controller retries up to maxRequeues times if something goes wrong.
+	// After that, it stops trying.
+	if queue.NumRequeues(obj) < maxRequeues {
 		logger.WithError(err).Errorf("error syncing %s %q, adding back to queue", objType, obj)
 		queue.AddRateLimited(obj)
 		return

@@ -14,7 +14,11 @@ import (
 func (op *Reporting) runReportGenerationQueryWorker() {
 	logger := op.logger.WithField("component", "reportGenerationQueryWorker")
 	logger.Infof("ReportGenerationQuery worker started")
-	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue) {
+	// 10 requeues compared to the 5 others have because
+	// ReportGenerationQueries can reference a lot of other resources, and it may
+	// take time for them to all to finish setup
+	const maxRequeues = 10
+	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue, maxRequeues) {
 	}
 }
 
