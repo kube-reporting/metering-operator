@@ -58,7 +58,8 @@ func init() {
 func (op *Reporting) runReportWorker() {
 	logger := op.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
-	for op.processResource(logger, op.syncReport, "Report", op.queues.reportQueue) {
+	const maxRequeues = 5
+	for op.processResource(logger, op.syncReport, "Report", op.queues.reportQueue, maxRequeues) {
 	}
 }
 

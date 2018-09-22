@@ -43,7 +43,8 @@ func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
 	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, "PrestoTable", obj, op.queues.prestoTableQueue); ok {
 		err := op.syncPrestoTable(logger, key)
-		op.handleErr(logger, err, "PrestoTable", key, op.queues.prestoTableQueue)
+		const maxRequeues = 10
+		op.handleErr(logger, err, "PrestoTable", key, op.queues.prestoTableQueue, maxRequeues)
 	}
 	return true
 }
