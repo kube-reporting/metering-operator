@@ -153,7 +153,6 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	if dataSource.TableName != "" {
 		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.TableName)
-		return nil
 	} else {
 		logger.Infof("new AWSBilling ReportDataSource discovered")
 	}
