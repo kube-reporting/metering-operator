@@ -258,7 +258,10 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 		return
 	}
 
-	if curReportDataSource.ResourceVersion == prevReportDataSource.ResourceVersion {
+	// we allow periodic resyncs to trigger AWSBilling ReportDataSources even
+	// if they're not changed since we currently rely on the resyncs so our
+	// handler can periodically update the partitions on the table
+	if curReportDataSource.Spec.AWSBilling != nil && curReportDataSource.ResourceVersion == prevReportDataSource.ResourceVersion {
 		// Periodic resyncs will send update events for all known ReportDataSources.
 		// Two different versions of the same reportDataSource will always have
 		// different ResourceVersions.
