@@ -25,9 +25,18 @@ type ScheduledReport struct {
 }
 
 type ScheduledReportSpec struct {
+	// GenerationQueryName specifies the ReportGenerationQuery to execute when
+	// the report runs.
 	GenerationQueryName string `json:"generationQuery"`
 
+	// Schedule configures when the report runs.
 	Schedule ScheduledReportSchedule `json:"schedule"`
+
+	// ReportingStart specifies the time this ScheduledReport should start from
+	// instead of the current time.
+	// This is intended for allowing a ScheduledReport to start from the past
+	// and report on data collected before the ScheduledReport was created.
+	ReportingStart *meta.Time `json:"reportingStart,omitempty"`
 
 	// GracePeriod controls how long after each period to wait until running
 	// the report

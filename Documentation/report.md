@@ -101,6 +101,27 @@ For each of these fields, there is a range of valid values:
 - `dayOfWeek` is a string value that expects the day of the week (spelled out).
 - `dayOfMonth` is an integer value between 1-31.
 
+
+### reportingStart
+
+To support running a ScheduledReport against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the ScheduledReport to run according to it's `schedule` starting from `reportingStart` rather than the current time.
+One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time. This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
+
+As an example of how to use this field, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your scheduledReport, you could create a report with the following values:
+
+```
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: pod-cpu-request-hourly
+spec:
+  generationQuery: "pod-cpu-request"
+  gracePeriod: "5m"
+  schedule:
+    period: "hourly"
+  reportingStart: "2018-01-01T00:00:00Z"
+```
+
 ### Scheduled Report Status
 
 The execution of a scheduled report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
