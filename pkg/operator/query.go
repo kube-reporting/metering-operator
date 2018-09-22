@@ -99,8 +99,8 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	}
 
 	// enqueue any queries depending on this one
-	if err := op.queueDependentReportGeneratonQueries(generationQuery); err != nil {
-		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of %s", generationQuery.Name)
+	if err := op.queueDependentReportGeneratonQueriesForQuery(generationQuery); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportGenerationQuery %s", generationQuery.Name)
 	}
 
 	return nil
@@ -134,8 +134,8 @@ func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.Genera
 	return deps, nil
 }
 
-// queueDependentReportGeneratonQueries will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
-func (op *Reporting) queueDependentReportGeneratonQueries(generationQuery *cbTypes.ReportGenerationQuery) error {
+// queueDependentReportGeneratonQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
+func (op *Reporting) queueDependentReportGeneratonQueriesForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
 	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace)
 	queries, err := queryLister.List(metav1.ListOptions{})
 	if err != nil {
@@ -147,7 +147,7 @@ func (op *Reporting) queueDependentReportGeneratonQueries(generationQuery *cbTyp
 		if query.Name == generationQuery.Name {
 			continue
 		}
-		// look at the list of dependencies
+		// look at the list of ReportGenerationQuery dependencies
 		depenencyNames := append(query.Spec.ReportQueries, query.Spec.DynamicReportQueries...)
 		for _, dependency := range depenencyNames {
 			if dependency == generationQuery.Name {
