@@ -123,7 +123,6 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 	if dataSource.TableName != "" {
 		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.TableName)
-		return nil
 	} else {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
