@@ -46,7 +46,7 @@ import (
 const (
 	connBackoff         = time.Second * 15
 	maxConnWaitTime     = time.Minute * 3
-	defaultResyncPeriod = time.Minute
+	defaultResyncPeriod = time.Minute * 15
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
 

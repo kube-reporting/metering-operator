@@ -250,12 +250,27 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 	op.enqueueReportDataSource(ds)
 }
 
-func (op *Reporting) updateReportDataSource(_, cur interface{}) {
+func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
+	prevReportDataSource := prev.(*cbTypes.ReportDataSource)
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
 		op.deleteReportDataSource(curReportDataSource)
 		return
 	}
+
+	// we allow periodic resyncs to trigger AWSBilling ReportDataSources even
+	// if they're not changed since we currently rely on the resyncs so our
+	// handler can periodically update the partitions on the table
+	if curReportDataSource.Spec.AWSBilling != nil && curReportDataSource.ResourceVersion == prevReportDataSource.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportDataSources.
+		// Two different versions of the same reportDataSource will always have
+		// different ResourceVersions.
+
+		// TODO(chance): logging here is probably unnecessary and verbose
+		op.logger.Debugf("ReportDataSource %s is unchanged, skipping update", curReportDataSource.Name)
+		return
+	}
+
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }
@@ -297,8 +312,20 @@ func (op *Reporting) addReportGenerationQuery(obj interface{}) {
 	op.enqueueReportGenerationQuery(report)
 }
 
-func (op *Reporting) updateReportGenerationQuery(_, cur interface{}) {
+func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 	curReportGenerationQuery := cur.(*cbTypes.ReportGenerationQuery)
+	prevReportGenerationQuery := prev.(*cbTypes.ReportGenerationQuery)
+
+	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
+		// Two different versions of the same reportGenerationQuery will always have
+		// different ResourceVersions.
+
+		// TODO(chance): logging here is probably unnecessary and verbose
+		op.logger.Debugf("ReportGenerationQuery %s is unchanged, skipping update", curReportGenerationQuery.Name)
+		return
+	}
+
 	op.logger.Infof("updating ReportGenerationQuery %s", curReportGenerationQuery.Name)
 	op.enqueueReportGenerationQuery(curReportGenerationQuery)
 }
@@ -372,7 +399,7 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 
 type workerProcessFunc func(logger log.FieldLogger) bool
 
-func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface) bool {
+func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHandler, objType string, queue workqueue.RateLimitingInterface, maxRequeues int) bool {
 	obj, quit := queue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting %s worker", objType)
@@ -380,18 +407,18 @@ func (op *Reporting) processResource(logger log.FieldLogger, handlerFunc syncHan
 	}
 	defer queue.Done(obj)
 
-	op.runHandler(logger, handlerFunc, objType, obj, queue)
+	op.runHandler(logger, handlerFunc, objType, obj, queue, maxRequeues)
 	return true
 }
 
 type syncHandler func(logger log.FieldLogger, key string) error
 
-func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (op *Reporting) runHandler(logger log.FieldLogger, handlerFunc syncHandler, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithFields(newLogIdentifier(op.rand))
 	if key, ok := op.getKeyFromQueueObj(logger, objType, obj, queue); ok {
 		logger.Infof("syncing %s %s", objType, key)
 		err := handlerFunc(logger, key)
-		op.handleErr(logger, err, objType, key, queue)
+		op.handleErr(logger, err, objType, key, queue, maxRequeues)
 	}
 }
 
@@ -413,7 +440,7 @@ func (op *Reporting) getKeyFromQueueObj(logger log.FieldLogger, objType string, 
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface) {
+func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string, obj interface{}, queue workqueue.RateLimitingInterface, maxRequeues int) {
 	logger = logger.WithField(objType, obj)
 
 	if err == nil {
@@ -422,8 +449,9 @@ func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string
 		return
 	}
 
-	// This controller retries 5 times if something goes wrong. After that, it stops trying.
-	if queue.NumRequeues(obj) < 5 {
+	// This controller retries up to maxRequeues times if something goes wrong.
+	// After that, it stops trying.
+	if queue.NumRequeues(obj) < maxRequeues {
 		logger.WithError(err).Errorf("error syncing %s %q, adding back to queue", objType, obj)
 		queue.AddRateLimited(obj)
 		return
