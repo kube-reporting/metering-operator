@@ -297,8 +297,20 @@ func (op *Reporting) addReportGenerationQuery(obj interface{}) {
 	op.enqueueReportGenerationQuery(report)
 }
 
-func (op *Reporting) updateReportGenerationQuery(_, cur interface{}) {
+func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 	curReportGenerationQuery := cur.(*cbTypes.ReportGenerationQuery)
+	prevReportGenerationQuery := prev.(*cbTypes.ReportGenerationQuery)
+
+	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
+		// Two different versions of the same reportGenerationQuery will always have
+		// different ResourceVersions.
+
+		// TODO(chance): logging here is probably unnecessary and verbose
+		op.logger.Debugf("ReportGenerationQuery %s is unchanged, skipping update", curReportGenerationQuery.Name)
+		return
+	}
+
 	op.logger.Infof("updating ReportGenerationQuery %s", curReportGenerationQuery.Name)
 	op.enqueueReportGenerationQuery(curReportGenerationQuery)
 }
