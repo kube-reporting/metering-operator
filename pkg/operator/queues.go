@@ -250,12 +250,24 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 	op.enqueueReportDataSource(ds)
 }
 
-func (op *Reporting) updateReportDataSource(_, cur interface{}) {
+func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
+	prevReportDataSource := prev.(*cbTypes.ReportDataSource)
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
 		op.deleteReportDataSource(curReportDataSource)
 		return
 	}
+
+	if curReportDataSource.ResourceVersion == prevReportDataSource.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportDataSources.
+		// Two different versions of the same reportDataSource will always have
+		// different ResourceVersions.
+
+		// TODO(chance): logging here is probably unnecessary and verbose
+		op.logger.Debugf("ReportDataSource %s is unchanged, skipping update", curReportDataSource.Name)
+		return
+	}
+
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }
