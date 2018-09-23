@@ -10,7 +10,7 @@ def call(body) {
     def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
     if (isPullRequest) {
         echo 'Setting Github PR status'
-        githubNotify context: prStatusContext, status: 'PENDING', description: 'Build started'
+        githubNotify context: prStatusContext, status: 'PENDING', description: "${pipelineParams.testType} tests started"
     }
 
     // The rest is the re-usable declarative pipeline
