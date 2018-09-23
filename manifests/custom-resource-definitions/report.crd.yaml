@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   name: reports.metering.openshift.io
   annotations:
-    catalog.app.coreos.com/displayName: "Chargeback Report"
+    catalog.app.coreos.com/displayName: "Metering Report"
     catalog.app.coreos.com/description: "A metering report for a specific time interval"
 spec:
   group: metering.openshift.io
