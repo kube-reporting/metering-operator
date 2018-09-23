@@ -3,8 +3,8 @@ kind: CustomResourceDe***REMOVED***nition
 metadata:
   name: reportprometheusqueries.metering.openshift.io
   annotations:
-    catalog.app.coreos.com/displayName: "Chargeback prometheus query"
-    catalog.app.coreos.com/description: "A Prometheus query by Chargeback to do metering"
+    catalog.app.coreos.com/displayName: "Metering prometheus query"
+    catalog.app.coreos.com/description: "A Prometheus query by Metering to do metering"
 spec:
   group: metering.openshift.io
   version: v1alpha1

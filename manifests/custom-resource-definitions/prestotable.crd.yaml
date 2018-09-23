@@ -3,7 +3,7 @@ kind: CustomResourceDe***REMOVED***nition
 metadata:
   name: prestotables.metering.openshift.io
   annotations:
-    catalog.app.coreos.com/displayName: "Chargeback Presto Table"
+    catalog.app.coreos.com/displayName: "Metering Presto Table"
     catalog.app.coreos.com/description: "A table within PrestoDB"
 spec:
   group: metering.openshift.io
