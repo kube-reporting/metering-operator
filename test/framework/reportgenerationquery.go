@@ -37,6 +37,8 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
+	reportLister := reporting.NewReportClientGetter(f.MeteringClient)
+	scheduledReportLister := reporting.NewScheduledReportClientGetter(f.MeteringClient)
 	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
 
@@ -49,7 +51,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 		reportGenQuery, err := f.WaitForMeteringReportGenerationQuery(t, queryName, pollInterval, timeout)
 		require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
-		depStatus, err := reporting.GetGenerationQueryDependenciesStatus(queryGetter, dataSourceGetter, reportGenQuery)
+		depStatus, err := reporting.GetGenerationQueryDependenciesStatus(queryGetter, dataSourceGetter, reportLister, scheduledReportLister, reportGenQuery)
 		require.NoError(t, err, "should not have errors getting dependent ReportGenerationQueries")
 
 		var uninitializedReportGenerationQueries, uninitializedReportDataSources []string

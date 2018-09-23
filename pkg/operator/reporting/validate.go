@@ -17,13 +17,22 @@ type ReportGenerationQueryDependencies struct {
 	ReportGenerationQueries        []*metering.ReportGenerationQuery
 	DynamicReportGenerationQueries []*metering.ReportGenerationQuery
 	ReportDataSources              []*metering.ReportDataSource
+	Reports                        []*metering.Report
+	ScheduledReports               []*metering.ScheduledReport
 }
 
 func ValidateGenerationQueryDependenciesStatus(depsStatus *GenerationQueryDependenciesStatus) (*ReportGenerationQueryDependencies, error) {
 	// if the speci***REMOVED***ed ReportGenerationQuery depends on other non-dynamic
 	// ReportGenerationQueries, but they have their view disabled, then it's an
 	// invalid con***REMOVED***guration.
-	var queriesViewDisabled, uninitializedQueries, uninitializedDataSources []string
+	var (
+		queriesViewDisabled,
+		uninitializedQueries,
+		uninitializedDataSources,
+		uninitializedReports,
+		uninitializedScheduledReports []string
+	)
+
 	for _, query := range depsStatus.UninitializedReportGenerationQueries {
 		if query.Spec.View.Disabled {
 			queriesViewDisabled = append(queriesViewDisabled, query.Name)
@@ -34,20 +43,40 @@ func ValidateGenerationQueryDependenciesStatus(depsStatus *GenerationQueryDepend
 	for _, ds := range depsStatus.UninitializedReportDataSources {
 		uninitializedDataSources = append(uninitializedDataSources, ds.Name)
 	}
+	for _, report := range depsStatus.UninitializedReports {
+		uninitializedReports = append(uninitializedReports, report.Name)
+	}
+	for _, scheduledReport := range depsStatus.UninitializedScheduledReports {
+		uninitializedScheduledReports = append(uninitializedScheduledReports, scheduledReport.Name)
+	}
+
+	var errs []string
 	if len(queriesViewDisabled) != 0 {
-		return nil, fmt.Errorf("invalid ReportGenerationQuery, references ReportGenerationQueries with spec.view.disabled=true: %s", strings.Join(queriesViewDisabled, ", "))
+		errs = append(errs, fmt.Sprintf("invalid ReportGenerationQuery, references ReportGenerationQueries with spec.view.disabled=true: %s", strings.Join(queriesViewDisabled, ", ")))
 	}
 	if len(uninitializedDataSources) != 0 {
-		return nil, fmt.Errorf("ReportGenerationQuery has uninitialized ReportDataSource dependencies: %s", strings.Join(uninitializedDataSources, ", "))
+		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ReportDataSource dependencies: %s", strings.Join(uninitializedDataSources, ", ")))
 	}
 	if len(uninitializedQueries) != 0 {
-		return nil, fmt.Errorf("ReportGenerationQuery has uninitialized ReportGenerationQuery dependencies: %s", strings.Join(uninitializedQueries, ", "))
+		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ReportGenerationQuery dependencies: %s", strings.Join(uninitializedQueries, ", ")))
+	}
+	if len(uninitializedReports) != 0 {
+		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized Report dependencies: %s", strings.Join(uninitializedReports, ", ")))
+	}
+	if len(uninitializedScheduledReports) != 0 {
+		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ScheduledReport dependencies: %s", strings.Join(uninitializedScheduledReports, ", ")))
+	}
+
+	if len(errs) != 0 {
+		return nil, fmt.Errorf("ReportGenerationQuery dependency validation error: %s", strings.Join(errs, ", "))
 	}
 
 	return &ReportGenerationQueryDependencies{
 		ReportGenerationQueries:        depsStatus.InitializedReportGenerationQueries,
 		DynamicReportGenerationQueries: depsStatus.InitializedDynamicReportGenerationQueries,
 		ReportDataSources:              depsStatus.InitializedReportDataSources,
+		Reports:                        depsStatus.InitializedReports,
+		ScheduledReports:               depsStatus.InitializedScheduledReports,
 	}, nil
 }
 
@@ -56,11 +85,23 @@ type GenerationQueryDependenciesStatus struct {
 	InitializedReportGenerationQueries        []*metering.ReportGenerationQuery
 	InitializedDynamicReportGenerationQueries []*metering.ReportGenerationQuery
 
+	UninitializedReports []*metering.Report
+	InitializedReports   []*metering.Report
+
+	UninitializedScheduledReports []*metering.ScheduledReport
+	InitializedScheduledReports   []*metering.ScheduledReport
+
 	UninitializedReportDataSources []*metering.ReportDataSource
 	InitializedReportDataSources   []*metering.ReportDataSource
 }
 
-func GetGenerationQueryDependenciesStatus(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) (*GenerationQueryDependenciesStatus, error) {
+func GetGenerationQueryDependenciesStatus(
+	queryGetter reportGenerationQueryGetter,
+	dataSourceGetter reportDataSourceGetter,
+	reportGetter reportGetter,
+	scheduledReportGetter scheduledReportGetter,
+	generationQuery *metering.ReportGenerationQuery,
+) (*GenerationQueryDependenciesStatus, error) {
 	// Validate ReportGenerationQuery's that should be views
 	dependentQueriesStatus, err := GetDependentGenerationQueries(queryGetter, generationQuery)
 	if err != nil {
@@ -68,6 +109,16 @@ func GetGenerationQueryDependenciesStatus(queryGetter reportGenerationQueryGette
 	}
 
 	dataSources, err := GetDependentDataSources(dataSourceGetter, generationQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	reports, err := GetDependentReports(reportGetter, generationQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	scheduledReports, err := GetDependentScheduledReports(scheduledReportGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +141,34 @@ func GetGenerationQueryDependenciesStatus(queryGetter reportGenerationQueryGette
 		}
 	}
 
+	var uninitializedReports, initializedReports []*metering.Report
+	for _, report := range reports {
+		if report.Status.TableName == "" {
+			uninitializedReports = append(uninitializedReports, report)
+		} ***REMOVED*** {
+			initializedReports = append(initializedReports, report)
+		}
+	}
+
+	var uninitializedScheduledReports, initializedScheduledReports []*metering.ScheduledReport
+	for _, scheduledReport := range scheduledReports {
+		if scheduledReport.Status.TableName == "" {
+			uninitializedScheduledReports = append(uninitializedScheduledReports, scheduledReport)
+		} ***REMOVED*** {
+			initializedScheduledReports = append(initializedScheduledReports, scheduledReport)
+		}
+	}
+
 	return &GenerationQueryDependenciesStatus{
 		UninitializedReportGenerationQueries:      uninitializedQueries,
 		InitializedReportGenerationQueries:        initializedQueries,
 		InitializedDynamicReportGenerationQueries: dependentQueriesStatus.DynamicReportGenerationQueries,
 		UninitializedReportDataSources:            uninitializedDataSources,
 		InitializedReportDataSources:              initializedDataSources,
+		UninitializedReports:                      uninitializedReports,
+		InitializedReports:                        initializedReports,
+		UninitializedScheduledReports:             uninitializedScheduledReports,
+		InitializedScheduledReports:               initializedScheduledReports,
 	}, nil
 }
 
@@ -228,4 +301,72 @@ func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generation
 		dataSources[i] = dataSource
 	}
 	return dataSources, nil
+}
+
+type reportGetter interface {
+	getReport(namespace, name string) (*metering.Report, error)
+}
+
+type reportGetterFunc func(string, string) (*metering.Report, error)
+
+func (f reportGetterFunc) getReport(namespace, name string) (*metering.Report, error) {
+	return f(namespace, name)
+}
+
+func NewReportListerGetter(lister meteringListers.ReportLister) reportGetter {
+	return reportGetterFunc(func(namespace, name string) (*metering.Report, error) {
+		return lister.Reports(namespace).Get(name)
+	})
+}
+
+func NewReportClientGetter(getter meteringClient.ReportsGetter) reportGetter {
+	return reportGetterFunc(func(namespace, name string) (*metering.Report, error) {
+		return getter.Reports(namespace).Get(name, metav1.GetOptions{})
+	})
+}
+
+func GetDependentReports(reportGetter reportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
+	reports := make([]*metering.Report, len(generationQuery.Spec.Reports))
+	for i, reportName := range generationQuery.Spec.Reports {
+		report, err := reportGetter.getReport(generationQuery.Namespace, reportName)
+		if err != nil {
+			return nil, err
+		}
+		reports[i] = report
+	}
+	return reports, nil
+}
+
+type scheduledReportGetter interface {
+	getScheduledReport(namespace, name string) (*metering.ScheduledReport, error)
+}
+
+type scheduledReportGetterFunc func(string, string) (*metering.ScheduledReport, error)
+
+func (f scheduledReportGetterFunc) getScheduledReport(namespace, name string) (*metering.ScheduledReport, error) {
+	return f(namespace, name)
+}
+
+func NewScheduledReportListerGetter(lister meteringListers.ScheduledReportLister) scheduledReportGetter {
+	return scheduledReportGetterFunc(func(namespace, name string) (*metering.ScheduledReport, error) {
+		return lister.ScheduledReports(namespace).Get(name)
+	})
+}
+
+func NewScheduledReportClientGetter(getter meteringClient.ScheduledReportsGetter) scheduledReportGetter {
+	return scheduledReportGetterFunc(func(namespace, name string) (*metering.ScheduledReport, error) {
+		return getter.ScheduledReports(namespace).Get(name, metav1.GetOptions{})
+	})
+}
+
+func GetDependentScheduledReports(scheduledReportGetter scheduledReportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ScheduledReport, error) {
+	scheduledReports := make([]*metering.ScheduledReport, len(generationQuery.Spec.ScheduledReports))
+	for i, scheduledReportName := range generationQuery.Spec.ScheduledReports {
+		scheduledReport, err := scheduledReportGetter.getScheduledReport(generationQuery.Namespace, scheduledReportName)
+		if err != nil {
+			return nil, err
+		}
+		scheduledReports[i] = scheduledReport
+	}
+	return scheduledReports, nil
 }

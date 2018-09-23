@@ -346,12 +346,16 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
+	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
+	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
 	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
 		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		reporting.NewReportListerGetter(reportLister),
+		reporting.NewScheduledReportListerGetter(scheduledReportLister),
 		genQuery,
 	)
 	if err != nil {
@@ -479,6 +483,10 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
+	if err := op.queueDependentReportGenerationQueriesForScheduledReport(report); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ScheduledReport %s", report.Name)
+	}
+
 	if ***REMOVED***nalRun {
 		return nil
 	}
@@ -552,4 +560,27 @@ func (op *Reporting) removeScheduledReportFinalizer(report *cbTypes.ScheduledRep
 
 func scheduledReportNeedsFinalizer(report *cbTypes.ScheduledReport) bool {
 	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, scheduledReportFinalizer, nil)
+}
+
+// queueDependentReportGenerationQueriesForScheduledReport will queue all
+// ReportGenerationQueries in the namespace which have a dependency on the
+// scheduledReport
+func (op *Reporting) queueDependentReportGenerationQueriesForScheduledReport(scheduledReport *cbTypes.ScheduledReport) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(scheduledReport.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// look at the list Report of dependencies
+		for _, dependency := range query.Spec.ScheduledReports {
+			if dependency == scheduledReport.Name {
+				// this query depends on the Report passed in
+				op.enqueueReportGenerationQuery(query)
+				break
+			}
+		}
+	}
+	return nil
 }
