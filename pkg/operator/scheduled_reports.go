@@ -209,6 +209,26 @@ type reportPeriod struct {
 func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.ScheduledReport) error {
 	now := op.clock.Now().UTC()
 
+	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
+		// already failed, skip processing
+		if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue {
+			return nil
+		}
+
+		err := fmt.Errorf("ScheduledReport spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time)
+
+		failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.InvalidReportingEndReason, err.Error())
+		cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
+		cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
+
+		_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		if updateErr != nil {
+			logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
+			return updateErr
+		}
+		return err
+	}
+
 	if report.Status.LastReportTime == nil {
 		if report.Spec.ReportingStart != nil {
 			logger.Infof("no last report time for report, setting lastReportTime to spec.reportingStart %s", report.Spec.ReportingStart.Time)
@@ -226,16 +246,40 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 			logger.WithError(err).Errorf("unable to update ScheduledReport status")
 			return err
 		}
-	} ***REMOVED*** if isRunningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning); isRunningCond != nil && isRunningCond.Reason == cbutil.ReportPeriodFinishedReason && isRunningCond.Status == v1.ConditionFalse {
-		// if the report's reportingEnd is after the lastReportTime then the
-		// report was updated since it last ***REMOVED***nished and we should consider it
-		// something to be reprocessed
-		if report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
-			logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd, report.Status.LastReportTime.Time)
-		} ***REMOVED*** {
-			// return without processing because the report is complete
-			logger.Infof(isRunningCond.Message)
-			return nil
+	} ***REMOVED*** {
+		if report.Spec.ReportingEnd != nil && report.Spec.ReportingEnd.Time.Before(report.Status.LastReportTime.Time) {
+			// already failed, skip processing
+			if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue {
+				return nil
+			}
+
+			err := fmt.Errorf("ScheduledReport spec.reportingEnd (%s) is set to a time before status.lastReportTime (%s), cannot process", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
+
+			failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.InvalidReportingEndReason, err.Error())
+			cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
+			cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
+
+			_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+			if updateErr != nil {
+				logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
+				return updateErr
+			}
+
+			return err
+		}
+		if isRunningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning); isRunningCond != nil && isRunningCond.Reason == cbutil.ReportPeriodFinishedReason && isRunningCond.Status == v1.ConditionFalse {
+			// if the report's reportingEnd is unset or after the lastReportTime
+			// then the report was updated since it last ***REMOVED***nished and we should
+			// consider it something to be reprocessed
+			if report.Spec.ReportingEnd == nil {
+				logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd is unset: beginning processing of report")
+			} ***REMOVED*** if report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
+				logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd, report.Status.LastReportTime.Time)
+			} ***REMOVED*** {
+				// return without processing because the report is complete
+				logger.Infof(isRunningCond.Message)
+				return nil
+			}
 		}
 	}
 
@@ -247,12 +291,10 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	lastReportTime := report.Status.LastReportTime.Time
 	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
 
-	if report.Spec.ReportingEnd != nil {
-		if reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
-			logger.Debugf("calculated ScheduledReport periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
-			// we need to truncate the reportPeriod to align with the reportingEnd
-			reportPeriod.periodEnd = report.Spec.ReportingEnd.Time
-		}
+	if report.Spec.ReportingEnd != nil && reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
+		logger.Debugf("calculated ScheduledReport periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
+		// we need to truncate the reportPeriod to align with the reportingEnd
+		reportPeriod.periodEnd = report.Spec.ReportingEnd.Time
 	}
 
 	logger = logger.WithFields(log.Fields{
