@@ -284,39 +284,39 @@ spec:
       name: meterings.metering.openshift.io
       version: v1alpha1
     - description: A table within PrestoDB
-      displayName: Chargeback Presto Table
+      displayName: Metering Presto Table
       kind: PrestoTable
       name: prestotables.metering.openshift.io
       version: v1alpha1
     - description: A resource describing a source of data for usage by Report Generation
         Queries
-      displayName: Chargeback data source
+      displayName: Metering data source
       kind: ReportDataSource
       name: reportdatasources.metering.openshift.io
       version: v1alpha1
-    - description: A SQL query used by Chargeback to generate reports
-      displayName: Chargeback generation query
+    - description: A SQL query used by Metering to generate reports
+      displayName: Metering generation query
       kind: ReportGenerationQuery
       name: reportgenerationqueries.metering.openshift.io
       version: v1alpha1
-    - description: A Prometheus query by Chargeback to do metering
-      displayName: Chargeback prometheus query
+    - description: A Prometheus query by Metering to do metering
+      displayName: Metering prometheus query
       kind: ReportPrometheusQuery
       name: reportprometheusqueries.metering.openshift.io
       version: v1alpha1
     - description: A metering report for a speci***REMOVED***c time interval
-      displayName: Chargeback Report
+      displayName: Metering Report
       kind: Report
       name: reports.metering.openshift.io
       version: v1alpha1
     - description: A metering report that runs on a scheduled interval
-      displayName: Chargeback Scheduled Report
+      displayName: Metering Scheduled Report
       kind: ScheduledReport
       name: scheduledreports.metering.openshift.io
       version: v1alpha1
-    - description: Represents a con***REMOVED***gurable storage location for Chargeback to store
-        metering and report data
-      displayName: Chargeback storage location
+    - description: Represents a con***REMOVED***gurable storage location for Metering to store metering
+        and report data
+      displayName: Metering storage location
       kind: StorageLocation
       name: storagelocations.metering.openshift.io
       version: v1alpha1

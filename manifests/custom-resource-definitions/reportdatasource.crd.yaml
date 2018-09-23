@@ -3,7 +3,7 @@ kind: CustomResourceDe***REMOVED***nition
 metadata:
   name: reportdatasources.metering.openshift.io
   annotations:
-    catalog.app.coreos.com/displayName: "Chargeback data source"
+    catalog.app.coreos.com/displayName: "Metering data source"
     catalog.app.coreos.com/description: "A resource describing a source of data for usage by Report Generation Queries"
 spec:
   group: metering.openshift.io
