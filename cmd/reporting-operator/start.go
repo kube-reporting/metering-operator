@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "starts the Metering operator",
-	Run:   startChargeback,
+	Run:   startReporting,
 }
 
 func AddCommands() {
@@ -107,7 +107,7 @@ func main() {
 	}
 }
 
-func startChargeback(cmd *cobra.Command, args []string) {
+func startReporting(cmd *cobra.Command, args []string) {
 	logger := newLogger()
 	if cfg.Namespace == "" {
 		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
@@ -126,19 +126,19 @@ func startChargeback(cmd *cobra.Command, args []string) {
 	}
 
 	signalStopCh := setupSignals()
-	runChargeback(logger, cfg, signalStopCh)
+	runReporting(logger, cfg, signalStopCh)
 }
 
-func runChargeback(logger log.FieldLogger, cfg operator.Con***REMOVED***g, stopCh <-chan struct{}) {
+func runReporting(logger log.FieldLogger, cfg operator.Con***REMOVED***g, stopCh <-chan struct{}) {
 	clock := clock.RealClock{}
 	op, err := operator.New(logger, cfg, clock)
 	if err != nil {
-		logger.WithError(err).Fatal("unable to setup Chargeback operator")
+		logger.WithError(err).Fatal("unable to setup reporting-operator")
 	}
 	if err = op.Run(stopCh); err != nil {
-		logger.WithError(err).Fatal("error occurred while the Chargeback operator was running")
+		logger.WithError(err).Fatal("error occurred while the reporting-operator was running")
 	}
-	logger.Infof("Chargeback operator has stopped")
+	logger.Infof("reporting-operator has stopped")
 }
 
 // SetFlagsFromEnv parses all registered flags in the given flagset,
