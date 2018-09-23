@@ -122,6 +122,31 @@ spec:
   reportingStart: "2018-01-01T00:00:00Z"
 ```
 
+
+### reportingEnd
+
+To configure a ScheduledReport to only run until a specified time, you can set the `spec.reportingEnd` field to an RFC3339 timestamp.
+The value of this field will cause the ScheduledReport to stop running on it's schedule after it has finished generating reporting data for the period covered from it's start time until `reportingEnd`.
+Because a schedule will most likely not align with reportingEnd, the last period in the schedule will be shortened to end at the specified reportingEnd time.
+If left unset, then the ScheduledReport will run forever, or until a `reportingEnd` is set on the ScheduledReport.
+
+For example, if you wanted to create a report that runs once a week for the month of July:
+
+```
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: pod-cpu-request-hourly
+spec:
+  generationQuery: "pod-cpu-request"
+  gracePeriod: "5m"
+  schedule:
+    period: "weekly"
+  reportingStart: "2018-07-01T00:00:00Z"
+  reportingEnd: "2018-07-31T00:00:00Z"
+```
+
+
 ### Scheduled Report Status
 
 The execution of a scheduled report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.

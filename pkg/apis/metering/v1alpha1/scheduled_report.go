@@ -38,6 +38,11 @@ type ScheduledReportSpec struct {
 	// and report on data collected before the ScheduledReport was created.
 	ReportingStart *meta.Time `json:"reportingStart,omitempty"`
 
+	// ReportingEnd specifies the time this ScheduledReport should stop
+	// running. Once a ScheduledReport has reached ReportingEnd, no new results
+	// will be generated.
+	ReportingEnd *meta.Time `json:"reportingEnd,omitempty"`
+
 	// GracePeriod controls how long after each period to wait until running
 	// the report
 	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`

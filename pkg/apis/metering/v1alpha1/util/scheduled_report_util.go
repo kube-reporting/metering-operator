@@ -25,6 +25,9 @@ const (
 	// ReportPeriodWaitingReason is added to a ScheduledReport when the report
 	// has to wait until the next scheduled reporting time.
 	ReportPeriodWaitingReason = "ReportPeriodNotFinished"
+	// ReportPeriodFinishedReason is added to a ScheduledReport when the report
+	// has had it's report processed up until it's reportingEnd.
+	ReportPeriodFinishedReason = "ReportPeriodFinished"
 )
 
 // NewScheduledReportCondition creates a new scheduledReport condition.

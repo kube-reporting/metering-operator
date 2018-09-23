@@ -207,11 +207,6 @@ type reportPeriod struct {
 // hasn't elapsed, runScheduledReport will requeue the resource for a time when
 // the period has elapsed.
 func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.ScheduledReport) error {
-	reportSchedule, err := getSchedule(report.Spec.Schedule)
-	if err != nil {
-		return err
-	}
-
 	now := op.clock.Now().UTC()
 
 	if report.Status.LastReportTime == nil {
@@ -225,15 +220,40 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 			report.Status.LastReportTime = &metav1.Time{nearestMinute}
 		}
 
+		var err error
 		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update ScheduledReport status")
 			return err
 		}
+	} else if isRunningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning); isRunningCond != nil && isRunningCond.Reason == cbutil.ReportPeriodFinishedReason && isRunningCond.Status == v1.ConditionFalse {
+		// if the report's reportingEnd is after the lastReportTime then the
+		// report was updated since it last finished and we should consider it
+		// something to be reprocessed
+		if report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
+			logger.Infof("previously finished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd, report.Status.LastReportTime.Time)
+		} else {
+			// return without processing because the report is complete
+			logger.Infof(isRunningCond.Message)
+			return nil
+		}
+	}
+
+	reportSchedule, err := getSchedule(report.Spec.Schedule)
+	if err != nil {
+		return err
 	}
 
 	lastReportTime := report.Status.LastReportTime.Time
 	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
+
+	if report.Spec.ReportingEnd != nil {
+		if reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
+			logger.Debugf("calculated ScheduledReport periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
+			// we need to truncate the reportPeriod to align with the reportingEnd
+			reportPeriod.periodEnd = report.Spec.ReportingEnd.Time
+		}
+	}
 
 	logger = logger.WithFields(log.Fields{
 		"lastReportTime":    lastReportTime,
@@ -392,24 +412,43 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		logger.WithError(err).Errorf("error occurred while generating report")
 		return err
 	}
-
-	// We generated a report successfully, remove the failure condition
+	// We generated a report successfully, remove any existing failure
+	// conditions that may exist
 	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
+
+	// Update the LastReportTime
 	report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
+
+	// check if we've reached the configured ReportingEnd, and if so, update
+	// the status to indicate the report has finished
+	finalRun := report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time)
+	if finalRun {
+		// update the status to indicate the report doesn't need to run again
+		msg := fmt.Sprintf("ScheduledReport has finished reporting. Report has reached the configured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
+		runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionFalse, cbutil.ReportPeriodFinishedReason, msg)
+		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
+		logger.Infof(msg)
+	}
+
+	// update the report
 	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update ScheduledReport status")
 		return err
 	}
 
-	// determine the next time we need to run and queue the scheduledReport to
-	// be processed at that time
+	if finalRun {
+		return nil
+	}
+
+	// determine how long we have to wait until we should re run this handler,
+	// and then queue the report for that time
+	now = op.clock.Now().UTC()
 	reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.LastReportTime.Time)
 	nextRunTime = reportPeriod.periodEnd.Add(gracePeriod)
-	now = op.clock.Now().UTC()
 	waitTime = nextRunTime.Sub(now)
-
 	op.enqueueScheduledReportAfter(report, waitTime)
+
 	return nil
 }
 
