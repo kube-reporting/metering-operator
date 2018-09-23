@@ -60,12 +60,16 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		viewName = generationQuery.ViewName
 	}
 
+	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
+	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
 	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
 
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
 		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		reporting.NewReportListerGetter(reportLister),
+		reporting.NewScheduledReportListerGetter(scheduledReportLister),
 		generationQuery,
 	)
 	if err != nil {
@@ -99,7 +103,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	}
 
 	// enqueue any queries depending on this one
-	if err := op.queueDependentReportGeneratonQueriesForQuery(generationQuery); err != nil {
+	if err := op.queueDependentReportGenerationQueriesForQuery(generationQuery); err != nil {
 		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportGenerationQuery %s", generationQuery.Name)
 	}
 
@@ -134,8 +138,8 @@ func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.Genera
 	return deps, nil
 }
 
-// queueDependentReportGeneratonQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
-func (op *Reporting) queueDependentReportGeneratonQueriesForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
+// queueDependentReportGenerationQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
+func (op *Reporting) queueDependentReportGenerationQueriesForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
 	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace)
 	queries, err := queryLister.List(metav1.ListOptions{})
 	if err != nil {
