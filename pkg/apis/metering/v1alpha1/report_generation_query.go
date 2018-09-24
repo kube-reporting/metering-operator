@@ -19,10 +19,8 @@ type ReportGenerationQuery struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec ReportGenerationQuerySpec `json:"spec"`
-	// ViewName is the name of the view in Presto for this query, if the view
-	// has been created. If it is empty, the view does not exist.
-	ViewName string `json:"viewName,omitempty"`
+	Spec   ReportGenerationQuerySpec   `json:"spec"`
+	Status ReportGenerationQueryStatus `json:"status"`
 }
 
 type ReportGenerationQuerySpec struct {
@@ -61,3 +59,9 @@ type ReportGenerationQueryInputValue struct {
 }
 
 type ReportGenerationQueryInputValues []ReportGenerationQueryInputValue
+
+type ReportGenerationQueryStatus struct {
+	// ViewName is the name of the view in Presto for this query, if the view
+	// has been created. If it is empty, the view does not exist.
+	ViewName string `json:"viewName,omitempty"`
+}
