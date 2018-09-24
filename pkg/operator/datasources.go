@@ -121,8 +121,8 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 	}
 
-	if dataSource.TableName != "" {
-		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.TableName)
+	if dataSource.Status.TableName != "" {
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.Status.TableName)
 	} ***REMOVED*** {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
@@ -150,8 +150,8 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return fmt.Errorf("ReportDataSource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
 	}
 
-	if dataSource.TableName != "" {
-		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.TableName)
+	if dataSource.Status.TableName != "" {
+		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.Status.TableName)
 	} ***REMOVED*** {
 		logger.Infof("new AWSBilling ReportDataSource discovered")
 	}
@@ -168,7 +168,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return nil
 	}
 
-	if dataSource.TableName == "" {
+	if dataSource.Status.TableName == "" {
 		tableName := dataSourceTableName(dataSource.Name)
 		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
 		err = op.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
@@ -183,7 +183,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		}
 	}
 
-	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.TableName)
+	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.Status.TableName)
 	prestoTableResourceName := prestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
 	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
 	if err != nil {
@@ -366,7 +366,7 @@ func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePar
 }
 
 func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) (*cbTypes.ReportDataSource, error) {
-	dataSource.TableName = tableName
+	dataSource.Status.TableName = tableName
 	ds, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)

@@ -36,7 +36,7 @@ func ValidateGenerationQueryDependenciesStatus(depsStatus *GenerationQueryDepend
 	for _, query := range depsStatus.UninitializedReportGenerationQueries {
 		if query.Spec.View.Disabled {
 			queriesViewDisabled = append(queriesViewDisabled, query.Name)
-		} ***REMOVED*** if query.ViewName == "" {
+		} ***REMOVED*** if query.Status.ViewName == "" {
 			uninitializedQueries = append(uninitializedQueries, query.Name)
 		}
 	}
@@ -125,7 +125,7 @@ func GetGenerationQueryDependenciesStatus(
 
 	var uninitializedDataSources, initializedDataSources []*metering.ReportDataSource
 	for _, dataSource := range dataSources {
-		if dataSource.TableName == "" {
+		if dataSource.Status.TableName == "" {
 			uninitializedDataSources = append(uninitializedDataSources, dataSource)
 		} ***REMOVED*** {
 			initializedDataSources = append(initializedDataSources, dataSource)
@@ -134,7 +134,7 @@ func GetGenerationQueryDependenciesStatus(
 
 	var uninitializedQueries, initializedQueries []*metering.ReportGenerationQuery
 	for _, query := range dependentQueriesStatus.ViewReportGenerationQueries {
-		if query.ViewName == "" {
+		if query.Status.ViewName == "" {
 			uninitializedQueries = append(uninitializedQueries, query)
 		} ***REMOVED*** {
 			initializedQueries = append(initializedQueries, query)

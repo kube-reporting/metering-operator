@@ -19,8 +19,8 @@ type ReportDataSource struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec      ReportDataSourceSpec `json:"spec"`
-	TableName string               `json:"tableName"`
+	Spec   ReportDataSourceSpec   `json:"spec"`
+	Status ReportDataSourceStatus `json:"status"`
 }
 
 type ReportDataSourceSpec struct {
@@ -51,4 +51,8 @@ type PrometheusMetricsDataSource struct {
 	Query       string                 `json:"query"`
 	QueryCon***REMOVED***g *PrometheusQueryCon***REMOVED***g `json:"queryCon***REMOVED***g"`
 	Storage     *StorageLocationRef    `json:"storage"`
+}
+
+type ReportDataSourceStatus struct {
+	TableName string `json:"tableName,omitempty"`
 }

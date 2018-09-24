@@ -59,7 +59,7 @@ type ReportSpec struct {
 type ReportStatus struct {
 	Phase     ReportPhase `json:"phase,omitempty"`
 	Output    string      `json:"output,omitempty"`
-	TableName string      `json:"table_name"`
+	TableName string      `json:"tableName"`
 }
 
 type ReportPhase string
