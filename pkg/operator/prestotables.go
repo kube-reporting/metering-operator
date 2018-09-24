@@ -130,7 +130,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 			},
 			Finalizers: finalizers,
 		},
-		State: cbTypes.PrestoTableState{
+		Status: cbTypes.PrestoTableStatus{
 			Parameters: cbTypes.TableParameters(hive.TableParameters{
 				Name:         params.Name,
 				Columns:      params.Columns,
@@ -147,7 +147,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 		},
 	}
 	for _, partition := range partitions {
-		prestoTableCR.State.Partitions = append(prestoTableCR.State.Partitions, cbTypes.TablePartition(partition))
+		prestoTableCR.Status.Partitions = append(prestoTableCR.Status.Partitions, cbTypes.TablePartition(partition))
 	}
 
 	_, err := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(&prestoTableCR)
@@ -186,7 +186,7 @@ func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
 }
 
 func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
-	tableName := prestoTable.State.Parameters.Name
+	tableName := prestoTable.Status.Parameters.Name
 	logger := op.logger.WithFields(log.Fields{"PrestoTable": prestoTable.Name, "tableName": tableName})
 	logger.Infof("dropping presto table %s", tableName)
 	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)

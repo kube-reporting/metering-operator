@@ -216,7 +216,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 
 	// Compare the manifests list and existing partitions, deleting stale
 	// partitions and creating missing partitions
-	currentPartitions := prestoTable.State.Partitions
+	currentPartitions := prestoTable.Status.Partitions
 	desiredPartitions, err := getDesiredPartitions(source.Bucket, manifests)
 	if err != nil {
 		return err
@@ -256,7 +256,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 	var toAdd []cbTypes.TablePartition = append(changes.toAddPartitions, changes.toUpdatePartitions...)
 	// We do removals then additions so that updates are supported as a combination of remove + add partition
 
-	tableName := prestoTable.State.Parameters.Name
+	tableName := prestoTable.Status.Parameters.Name
 	for _, p := range toRemove {
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
@@ -276,13 +276,13 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
 		err = addAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.State.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
+			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.Status.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
 			return err
 		}
 		logger.Debugf("partition successfully added to presto table %q with range %s-%s", tableName, start, end)
 	}
 
-	prestoTable.State.Partitions = desiredPartitions
+	prestoTable.Status.Partitions = desiredPartitions
 
 	numPartitions := len(desiredPartitionsList)
 	partitionsGauge.Set(float64(numPartitions))
