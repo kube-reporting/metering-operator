@@ -21,6 +21,7 @@ type PrestoTablesGetter interface {
 type PrestoTableInterface interface {
 	Create(*v1alpha1.PrestoTable) (*v1alpha1.PrestoTable, error)
 	Update(*v1alpha1.PrestoTable) (*v1alpha1.PrestoTable, error)
+	UpdateStatus(*v1alpha1.PrestoTable) (*v1alpha1.PrestoTable, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.PrestoTable, error)
@@ -98,6 +99,22 @@ func (c *prestoTables) Update(prestoTable *v1alpha1.PrestoTable) (result *v1alph
 		Namespace(c.ns).
 		Resource("prestotables").
 		Name(prestoTable.Name).
+		Body(prestoTable).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *prestoTables) UpdateStatus(prestoTable *v1alpha1.PrestoTable) (result *v1alpha1.PrestoTable, err error) {
+	result = &v1alpha1.PrestoTable{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("prestotables").
+		Name(prestoTable.Name).
+		SubResource("status").
 		Body(prestoTable).
 		Do().
 		Into(result)

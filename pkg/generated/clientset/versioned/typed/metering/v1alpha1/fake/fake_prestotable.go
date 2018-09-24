@@ -84,6 +84,18 @@ func (c *FakePrestoTables) Update(prestoTable *v1alpha1.PrestoTable) (result *v1
 	return obj.(*v1alpha1.PrestoTable), err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *FakePrestoTables) UpdateStatus(prestoTable *v1alpha1.PrestoTable) (*v1alpha1.PrestoTable, error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewUpdateSubresourceAction(prestotablesResource, "status", c.ns, prestoTable), &v1alpha1.PrestoTable{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.PrestoTable), err
+}
+
 // Delete takes name of the prestoTable and deletes it. Returns an error if one occurs.
 func (c *FakePrestoTables) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.

@@ -226,7 +226,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	tableColumns := prestoTable.State.Parameters.Columns
+	tableColumns := prestoTable.Status.Parameters.Columns
 	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
@@ -254,8 +254,8 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	if len(results) > 0 && len(prestoTable.State.Parameters.Columns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.State.Parameters.Columns))
+	if len(results) > 0 && len(prestoTable.Status.Parameters.Columns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.Status.Parameters.Columns))
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
@@ -310,7 +310,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	tableColumns := prestoTable.State.Parameters.Columns
+	tableColumns := prestoTable.Status.Parameters.Columns
 	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
