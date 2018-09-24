@@ -14,6 +14,11 @@ const (
 	// occurs while generating the report data.
 	GenerateReportErrorReason = "GenerateReportError"
 
+	// InvalidReportingEndReason is added to a ScheduledReport when the
+	// spec.reportingEnd is set to a time before it's lastReportTime or before
+	// spec.reportingStart.
+	InvalidReportingEndReason = "InvalidReportingEnd"
+
 	// Running scheduledReport conditions:
 
 	// ScheduledReason is added to a ScheduledReport when it's reached the next
