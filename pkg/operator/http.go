@@ -260,7 +260,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	writeResultsResponse(logger, format, reportQuery.Spec.Columns, results, w, r)
+	writeResultsResponseV1(logger, format, reportQuery.Spec.Columns, results, w, r)
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
@@ -347,7 +347,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	if useNewFormat {
 		writeResultsResponseV2(logger, full, format, reportQuery.Spec.Columns, results, w, r)
 	} else {
-		writeResultsResponse(logger, format, reportQuery.Spec.Columns, results, w, r)
+		writeResultsResponseV1(logger, format, reportQuery.Spec.Columns, results, w, r)
 	}
 }
 
@@ -499,21 +499,60 @@ func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerati
 	return results
 }
 
-func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV1(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	var filteredColumns []api.ReportGenerationQueryColumn
+
+	// remove tableHidden columns and their values if the format is tabular or CSV
+
+	// filter columns
 	for _, column := range columns {
 		columnsMap[column.Name] = column
 		showColumn := !columnsMap[column.Name].TableHidden
-		// Build a new list of columns if full is false, containing only columns with TableHidden set to false
-		if showColumn || full {
+		if showColumn {
 			filteredColumns = append(filteredColumns, column)
 		}
 	}
-	// Remove columns and their values from `results` if full is false and the column's TableHidden is true
+
+	// filter rows
 	for _, row := range results {
 		for _, column := range columnsMap {
-			if columnsMap[column.Name].TableHidden && !full {
+			if columnsMap[column.Name].TableHidden {
+				delete(row, columnsMap[column.Name].Name)
+			}
+		}
+	}
+
+	writeResultsResponse(logger, format, filteredColumns, results, w, r)
+}
+
+func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	format = strings.ToLower(format)
+	isTableFormat := format == "csv" || format == "tab" || format == "tabular"
+	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
+	var filteredColumns []api.ReportGenerationQueryColumn
+
+	// Remove columns and their values from `results` if full is false and the
+	// column's TableHidden is true or if TableHidden is true and we're
+	// outputting tabular or CSV
+
+	// filter the columns
+	for _, column := range columns {
+		columnsMap[column.Name] = column
+		tableHidden := columnsMap[column.Name].TableHidden
+		// skip using columns if tableHidden is true and we're outputing to
+		// csv/tabular
+		if tableHidden && (isTableFormat || !full) {
+			continue
+		}
+		filteredColumns = append(filteredColumns, column)
+	}
+
+	// filter the rows
+	for _, row := range results {
+		for _, column := range columnsMap {
+			tableHidden := columnsMap[column.Name].TableHidden
+			if tableHidden && (isTableFormat || !full) {
 				delete(row, columnsMap[column.Name].Name)
 			}
 		}
