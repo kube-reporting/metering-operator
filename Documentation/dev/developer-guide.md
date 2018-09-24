@@ -23,6 +23,20 @@ $ brew install python@2
 $ pip2 install pyyaml
 ```
 
+## Building
+
+To build the reporting-operator binary using your local Go:
+
+```
+make reporting-operator-bin
+```
+
+If you want to build docker images locally:
+
+```
+make docker-build-all
+```
+
 ## Go Dependencies
 
 We use [dep](https://golang.github.io/dep/docs/introduction.html) for managing
