@@ -6,6 +6,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Masterminds/sprig"
+
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
@@ -31,7 +33,7 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 		"renderReportGenerationQuery": renderReportGenerationQuery,
 	}
 
-	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Parse(queryTemplate)
+	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(queryTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
