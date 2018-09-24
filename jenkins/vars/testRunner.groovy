@@ -24,7 +24,8 @@ def call(body) {
         }
         agent {
             kubernetes {
-                label "operator-metering-${pipelineParams.testType}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+                cloud 'gke-metering'
+                label "gke-operator-metering-${pipelineParams.testType}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
                 instanceCap 2
                 idleMinutes 0
                 defaultContainer 'jnlp'
