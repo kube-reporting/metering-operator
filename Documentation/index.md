@@ -9,6 +9,7 @@
 - [Troubleshooting](troubleshooting-metering.md)
 - [Writing Custom Queries Guide](writing-custom-queries.md)
 - [Debugging](dev/debugging.md)
+- [Developer Guide](dev/developer-guide.md)
 - [Architecture](metering-architecture.md)
 
 Custom Resources:
