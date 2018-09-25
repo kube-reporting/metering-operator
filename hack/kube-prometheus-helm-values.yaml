@@ -1,0 +1,11 @@
+exporter-kubelets:
+  https: false
+prometheus:
+  fullnameOverride: prometheus-k8s
+  storageSpec:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 40Gi
