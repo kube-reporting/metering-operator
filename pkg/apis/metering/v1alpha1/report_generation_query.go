@@ -26,9 +26,11 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	ReportQueries        []string                      `json:"reportQueries"`
-	DynamicReportQueries []string                      `json:"dynamicReportQueries"`
-	DataSources          []string                      `json:"reportDataSources"`
+	ReportQueries        []string                      `json:"reportQueries,omitempty"`
+	DynamicReportQueries []string                      `json:"dynamicReportQueries,omitempty"`
+	DataSources          []string                      `json:"reportDataSources,omitempty"`
+	Reports              []string                      `json:"reports,omitempty"`
+	ScheduledReports     []string                      `json:"scheduledReports,omitempty"`
 	Query                string                        `json:"query"`
 	Columns              []ReportGenerationQueryColumn `json:"columns"`
 	View                 GenQueryView                  `json:"view"`
@@ -38,7 +40,7 @@ type ReportGenerationQueryColumn struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	TableHidden bool   `json:"tableHidden"`
-	Unit        string `json:"unit"`
+	Unit        string `json:"unit,omitempty"`
 }
 
 type GenQueryView struct {
