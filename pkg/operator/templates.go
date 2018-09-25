@@ -23,6 +23,8 @@ type reportTemplateInfo struct {
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
 		"prestoTimestamp":             presto.Timestamp,
+		"reportTableName":             reportTableName,
+		"scheduledReportTableName":    scheduledReportTableName,
 		"dataSourceTableName":         dataSourceTableName,
 		"generationQueryViewName":     generationQueryViewName,
 		"billingPeriodTimestamp":      billingPeriodTimestamp,

@@ -105,7 +105,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 		return err
 	}
 
-	if err := op.queueDependentReportGeneratonQueriesForDataSource(dataSource); err != nil {
+	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
 		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
 	}
 
@@ -406,8 +406,8 @@ func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }
 
-// queueDependentReportGeneratonQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
-func (op *Reporting) queueDependentReportGeneratonQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
+// queueDependentReportGenerationQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the dataSource
+func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
 	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(dataSource.Namespace)
 	queries, err := queryLister.List(metav1.ListOptions{})
 	if err != nil {
@@ -418,7 +418,7 @@ func (op *Reporting) queueDependentReportGeneratonQueriesForDataSource(dataSourc
 		// look at the list ReportDataSource of dependencies
 		for _, dependency := range query.Spec.DataSources {
 			if dependency == dataSource.Name {
-				// this query depends on the generationQuery passed in
+				// this query depends on the ReportDataSource passed in
 				op.enqueueReportGenerationQuery(query)
 				break
 			}

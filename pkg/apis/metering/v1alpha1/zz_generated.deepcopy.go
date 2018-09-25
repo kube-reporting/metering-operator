@@ -462,6 +462,16 @@ func (in *ReportGenerationQuerySpec) DeepCopyInto(out *ReportGenerationQuerySpec
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.Reports != nil {
+		in, out := &in.Reports, &out.Reports
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.ScheduledReports != nil {
+		in, out := &in.ScheduledReports, &out.ScheduledReports
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.Columns != nil {
 		in, out := &in.Columns, &out.Columns
 		*out = make([]ReportGenerationQueryColumn, len(*in))

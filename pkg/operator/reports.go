@@ -173,11 +173,16 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return err
 	}
 
+	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
+	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
 	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
 	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
 		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
+		reporting.NewReportListerGetter(reportLister),
+		reporting.NewScheduledReportListerGetter(scheduledReportLister),
 		genQuery,
 	)
 	if err != nil {
@@ -246,6 +251,11 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	} else {
 		logger.Infof("finished report %q", report.Name)
 	}
+
+	if err := op.queueDependentReportGenerationQueriesForReport(report); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of Report %s", report.Name)
+	}
+
 	return nil
 }
 
@@ -257,4 +267,25 @@ func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Repo
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update report status to error")
 	}
+}
+
+// queueDependentReportGenerationQueriesForReport will queue all ReportGenerationQueries in the namespace which have a dependency on the Report
+func (op *Reporting) queueDependentReportGenerationQueriesForReport(report *cbTypes.Report) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(report.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// look at the list Report of dependencies
+		for _, dependency := range query.Spec.Reports {
+			if dependency == report.Name {
+				// this query depends on the Report passed in
+				op.enqueueReportGenerationQuery(query)
+				break
+			}
+		}
+	}
+	return nil
 }
