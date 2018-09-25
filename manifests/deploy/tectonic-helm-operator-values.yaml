@@ -1,7 +1,0 @@
-name: metering-operator
-
-cr:
-  create: true
-  name: "tectonic-metering"
-
-chartPath: "/tectonic-metering-0.1.0.tgz"

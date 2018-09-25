@@ -256,22 +256,15 @@ bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.
 	@mkdir -p bin
 	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
 
-CHART_DEPS := bin/tectonic-metering-0.1.0.tgz \
-	bin/openshift-metering-0.1.0.tgz \
+CHART_DEPS := bin/openshift-metering-0.1.0.tgz \
 	bin/operator-metering-0.1.0.tgz
 
 all-charts: $(CHART_DEPS)
-
-tectonic-metering-chart: bin/tectonic-metering-0.1.0.tgz
 
 openshift-metering-chart: bin/openshift-metering-0.1.0.tgz
 
 operator-metering-chart: bin/operator-metering-0.1.0.tgz
 
-bin/tectonic-metering-0.1.0.tgz: $(shell find charts -type f)
-	@echo "Packaging tectonic-metering chart dependencies"
-	@mkdir -p bin && mkdir -p charts/tectonic-metering/charts && hack/yamltojson < charts/tectonic-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|file://||' | xargs -I {} helm package --save=false -d charts/tectonic-metering/charts charts/tectonic-metering/{}
-	helm package --save=false -d bin charts/tectonic-metering
 
 bin/openshift-metering-0.1.0.tgz: $(shell find charts -type f)
 	@echo "Packaging openshift-metering chart dependencies"
@@ -296,7 +289,7 @@ metering-manifests:
 	metering-test-docker \
 	metering-e2e-docker-build metering-builder-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
-	operator-metering-chart tectonic-metering-chart openshift-metering chart \
+	operator-metering-chart penshift-metering chart \
 	bin/metering-override-values.yaml \
 	metering-manifests bill-of-materials.json \
 	install-kube-prometheus-helm
