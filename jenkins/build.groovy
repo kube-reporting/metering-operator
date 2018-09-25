@@ -42,7 +42,7 @@ spec:
     command:
     - 'dockerd-entrypoint.sh'
     args:
-    - '--storage-driver=overlay'
+    - '--storage-driver=overlay2'
     tty: true
     securityContext:
       privileged: true
