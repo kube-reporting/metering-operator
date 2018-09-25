@@ -9,7 +9,7 @@ if (isPullRequest) {
     dockerBuildArgs = ''
 }
 
-def podLabel = "operator-metering-build-${isPullRequest ? 'pr' : 'master'}"
+def podLabel = "gke-operator-metering-build-${isPullRequest ? 'pr' : 'master'}"
 def maxInstances = isPullRequest ? 5 : 2
 def idleMin = isPullRequest ? 60: 15
 
@@ -23,6 +23,7 @@ if (isPullRequest) {
 pipeline {
     agent {
         kubernetes {
+            cloud 'gke-metering'
             label podLabel
             instanceCap maxInstances
             idleMinutes idleMin
@@ -41,7 +42,7 @@ spec:
     command:
     - 'dockerd-entrypoint.sh'
     args:
-    - '--storage-driver=overlay'
+    - '--storage-driver=overlay2'
     tty: true
     securityContext:
       privileged: true
