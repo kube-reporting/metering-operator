@@ -31,9 +31,10 @@ If you do not wish to modify the Operator Metering con***REMOVED***guration, a m
 
 ### Prometheus Monitoring Con***REMOVED***guration
 
-For installs into Openshift, ensuring Prometheus is installed can be done using Ansible. For installs into Tectonic, the manual installation method con***REMOVED***gures Metering to use the Prometheus that's installed by default into the tectonic-system namespace.
+For Openshift 3.11 or later, Prometheus is installed by default through cluster monitoring in the openshift-monitoring namespace.
 
-If you're not using Openshift or Tectonic, then you will need to use OLM or the manual install method. In this case if you are not using a [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL con***REMOVED***g option][con***REMOVED***gure-prometheus-url] before proceeding.
+If you're not using Openshift, then you will need to use OLM or the manual install method.
+In this case if you are not using a [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL con***REMOVED***g option][con***REMOVED***gure-prometheus-url] before proceeding.
 
 ## Install Methods
 

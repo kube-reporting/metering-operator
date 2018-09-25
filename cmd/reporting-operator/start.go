@@ -22,7 +22,7 @@ import (
 var (
 	defaultHiveHost      = "hive:10000"
 	defaultPrestoHost    = "presto:8080"
-	defaultPromHost      = "http://prometheus.tectonic-system.svc.cluster.local:9090"
+	defaultPromHost      = "http://prometheus-k8s.monitoring.svc:9090/"
 	defaultLeaseDuration = time.Second * 60
 	// cfg is the con***REMOVED***g for our operator
 	cfg operator.Con***REMOVED***g

@@ -4,7 +4,7 @@
 # requires 1 argument, the image tag for the helm-operator pod. Additionally,
 # a second optional argument can be provided to override where the manifests
 # should be output, by default it outputs everything into
-# deploy/manifests/{generic,openshift,tectonic} directories.
+# deploy/manifests/{generic,openshift} directories.
 #
 # If both of those environment variables are set, then this script takes no
 # arguments and the environment variables will be used as the paths to ***REMOVED***les
@@ -50,23 +50,6 @@ if [ -n "${CUSTOM_ALM_OVERRIDE_VALUES-}" ]; then
     ALM_OVERRIDE_VALUES_FILE="$TMPDIR/override-alm-values.yaml"
     "$ROOT_DIR/hack/render-alm-override-values.sh" "$IMAGE_TAG" > "$ALM_OVERRIDE_VALUES_FILE"
 ***REMOVED***
-
-# tectonic
-echo "Creating Tectonic deploy manifests"
-"$ROOT_DIR/hack/create-deploy-manifests.sh" \
-    "$MANIFEST_OUTPUT_DIR/tectonic/helm-operator" \
-    "$DEPLOY_MANIFESTS_DIR/common-helm-operator-values.yaml" \
-    "$DEPLOY_MANIFESTS_DIR/tectonic-helm-operator-values.yaml" \
-    "$HELM_OPERATOR_OVERRIDE_VALUES_FILE"
-
-echo
-echo "Creating Tectonic ALM manifests"
-"$ROOT_DIR/hack/create-alm-manifests.sh" \
-    "$MANIFEST_OUTPUT_DIR/tectonic/helm-operator" \
-    "$MANIFEST_OUTPUT_DIR/tectonic/alm" \
-    "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
-    "$DEPLOY_MANIFESTS_DIR/tectonic-alm-values.yaml" \
-    "$ALM_OVERRIDE_VALUES_FILE"
 
 # openshift
 echo
