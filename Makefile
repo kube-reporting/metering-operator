@@ -341,4 +341,4 @@ kube-prometheus-helm-install:
 	helm upgrade --install --namespace monitoring prometheus-operator coreos/prometheus-operator --wait
 	# set https to false on kubelets for GKE and set the fullnameOverride for the
 	# Prometheus resource so our service has a consistent name.
-	helm upgrade --install --namespace monitoring kube-prometheus coreos/kube-prometheus --set 'prometheus.fullnameOverride=prometheus-k8s,exporter-kubelets.https=false' --wait
+	helm upgrade --install --namespace monitoring kube-prometheus coreos/kube-prometheus -f hack/kube-prometheus-helm-values.yaml --wait
