@@ -3,7 +3,7 @@ FROM quay.io/coreos/metering-builder:latest as build
 COPY . $GOPATH/src/github.com/operator-framework/operator-metering
 WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
 
-RUN make reporting-operator-bin
+RUN make reporting-operator-bin RUN_UPDATE_CODEGEN=false CHECK_GO_FILES=false
 
 FROM openshift/origin-base
 

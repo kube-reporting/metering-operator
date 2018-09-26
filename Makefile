@@ -23,6 +23,27 @@ CGO_ENABLED = 0
 
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
+RUN_UPDATE_CODEGEN ?= true
+CHECK_GO_FILES ?= true
+
+REPORTING_OPERATOR_BIN_DEPENDENCIES =
+CODEGEN_SOURCE_GO_FILES =
+CODEGEN_OUTPUT_GO_FILES =
+REPORTING_OPERATOR_GO_FILES =
+
+# Adds all the Go ***REMOVED***les in the repo as a dependency to the build-reporting-operator target
+ifeq ($(CHECK_GO_FILES), true)
+	JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
+	REPORTING_OPERATOR_GO_FILES = $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+endif
+
+# Adds the update-codegen dependency to the build-reporting-operator target
+ifeq ($(RUN_UPDATE_CODEGEN), true)
+	REPORTING_OPERATOR_BIN_DEPENDENCIES += update-codegen
+	CODEGEN_SOURCE_GO_FILES = $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
+	CODEGEN_OUTPUT_GO_FILES = $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
+endif
+
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
@@ -38,7 +59,7 @@ DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
 
 REBUILD_HELM_OPERATOR ?= true
 
-METERING_OPERATOR_DEPENDENCIES = images/metering-operator/Docker***REMOVED***le
+METERING_OPERATOR_DEPENDENCIES =
 
 ifeq ($(REBUILD_HELM_OPERATOR), true)
 	METERING_OPERATOR_DEPENDENCIES += helm-operator-docker-build
@@ -76,18 +97,6 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
-
-CHECK_GO_FILES = true
-REPORTING_OPERATOR_GO_FILES =
-
-ifeq ($(CHECK_GO_FILES), true)
-	JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-	REPORTING_OPERATOR_GO_FILES = $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} ***REMOVED***nd $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
-endif
-
-CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_***REMOVED***les.sh)
-
-CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
 
 # TODO: Add tests
 all: fmt test docker-build-all
@@ -187,16 +196,16 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-metering-builder-docker-build: images/builder/Docker***REMOVED***le
+metering-builder-docker-build: Docker***REMOVED***le.builder
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(BUILDER_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR) USE_LATEST_TAG=true
 
-reporting-operator-docker-build: images/reporting-operator/Docker***REMOVED***le
+reporting-operator-docker-build: Docker***REMOVED***le.reporting-operator
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-e2e-docker-build: images/metering-e2e/Docker***REMOVED***le
+metering-e2e-docker-build: Docker***REMOVED***le.e2e
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-operator-docker-build: $(METERING_OPERATOR_DEPENDENCIES)
+metering-operator-docker-build: Docker***REMOVED***le.metering-operator $(METERING_OPERATOR_DEPENDENCIES)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le $(***REMOVED***nd -type f images/helm-operator)
@@ -246,9 +255,8 @@ run-reporting-operator-local:
 $(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator
 
-build-reporting-operator:
+build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPERATOR_GO_FILES)
 	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
-	$(MAKE) update-codegen
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 
@@ -268,12 +276,12 @@ operator-metering-chart: bin/operator-metering-0.1.0.tgz
 
 bin/openshift-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 	@echo "Packaging openshift-metering chart dependencies"
-	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/yamltojson < charts/openshift-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|***REMOVED***le://||' | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
+	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/extract_helm_dep_repos.py charts/openshift-metering/requirements.yaml | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
 	helm package --save=false -d bin charts/openshift-metering
 
 bin/operator-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 	@echo "Packaging operator-metering chart dependencies"
-	@mkdir -p bin && mkdir -p charts/operator-metering/charts && hack/yamltojson < charts/operator-metering/requirements.yaml | jq '.dependencies[].repository' -r | sed 's|***REMOVED***le://||' | xargs -I {} helm package --save=false -d charts/operator-metering/charts charts/operator-metering/{}
+	@mkdir -p bin && mkdir -p charts/operator-metering/charts && hack/extract_helm_dep_repos.py charts/operator-metering/requirements.yaml | xargs -I {} helm package --save=false -d charts/operator-metering/charts charts/operator-metering/{}
 	helm package --save=false -d bin charts/operator-metering
 
 metering-manifests:
