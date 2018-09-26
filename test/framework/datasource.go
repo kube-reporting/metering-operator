@@ -28,7 +28,7 @@ func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name stri
 			}
 			return false, err
 		}
-		if ds.TableName == "" {
+		if ds.Status.TableName == "" {
 			t.Logf("ReportDataSource %s table is not created yet", name)
 			return false, nil
 		}
@@ -44,7 +44,7 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 		reportDataSources = reportDataSourcesList.Items
 
 		for _, ds := range reportDataSources {
-			if ds.TableName == "" {
+			if ds.Status.TableName == "" {
 				t.Logf("ReportDataSource %s table is not created yet", ds.Name)
 				return false, nil
 			}

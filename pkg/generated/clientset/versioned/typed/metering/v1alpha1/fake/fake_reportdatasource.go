@@ -84,6 +84,18 @@ func (c *FakeReportDataSources) Update(reportDataSource *v1alpha1.ReportDataSour
 	return obj.(*v1alpha1.ReportDataSource), err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *FakeReportDataSources) UpdateStatus(reportDataSource *v1alpha1.ReportDataSource) (*v1alpha1.ReportDataSource, error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewUpdateSubresourceAction(reportdatasourcesResource, "status", c.ns, reportDataSource), &v1alpha1.ReportDataSource{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.ReportDataSource), err
+}
+
 // Delete takes name of the reportDataSource and deletes it. Returns an error if one occurs.
 func (c *FakeReportDataSources) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.

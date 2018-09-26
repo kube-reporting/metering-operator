@@ -70,7 +70,7 @@ func newTestPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1
 			Name:      prestoTableResourceNameFromKind("report", name),
 			Namespace: namespace,
 		},
-		State: v1alpha1.PrestoTableState{
+		Status: v1alpha1.PrestoTableStatus{
 			Parameters: v1alpha1.TableParameters{
 				Columns: columns,
 			},
@@ -273,7 +273,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
 				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
 				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
@@ -594,7 +594,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
 				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
 				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
@@ -894,7 +894,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
 				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.State.Parameters.Columns)
+				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
 				require.NoError(t, err, "test should not contain unsupported hive column types")
 			}
 
