@@ -74,14 +74,14 @@ spec:
         booleanParam(name: 'USE_IMAGEBUILDER', defaultValue: false, description: 'If true, uses github.com/openshift/imagebuilder as the Docker client')
     }
     environment {
-        GOPATH            = "${env.WORKSPACE}/go"
-        METERING_SRC_DIR  = "${env.WORKSPACE}/go/src/github.com/operator-framework/operator-metering"
-        USE_LATEST_TAG    = "${isMasterBranch}"
-        USE_RELEASE_TAG   = "${isMasterBranch}"
-        PUSH_RELEASE_TAG  = "${isMasterBranch}"
-        BRANCH_TAG        = "${branchTag}"
-        DEPLOY_TAG        = "${deployTag}"
-        DOCKER_BUILD_ARGS = "${dockerBuildArgs}"
+        GOPATH                = "${env.WORKSPACE}/go"
+        METERING_SRC_DIR      = "${env.WORKSPACE}/go/src/github.com/operator-framework/operator-metering"
+        USE_LATEST_TAG        = "${isMasterBranch}"
+        USE_DEVEL_LATEST_TAG  = "${isMasterBranch}"
+        PUSH_DEVEL_LATEST_TAG = "${isMasterBranch}"
+        BRANCH_TAG            = "${branchTag}"
+        DEPLOY_TAG            = "${deployTag}"
+        DOCKER_BUILD_ARGS     = "${dockerBuildArgs}"
     }
     stages {
         stage('Prepare') {
@@ -142,6 +142,7 @@ spec:
                         ansiColor('xterm') {
                             sh '''
                             make metering-builder-docker-build \
+                                USE_DEVEL_LATEST_TAG=$USE_DEVEL_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG \
                                 CHECK_GO_FILES=false
@@ -179,6 +180,7 @@ spec:
                             sh '''
                             make docker-build-all \
                                 REBUILD_HELM_OPERATOR=$REBUILD_HELM_OPERATOR \
+                                USE_DEVEL_LATEST_TAG=$USE_DEVEL_LATEST_TAG \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG \
@@ -225,7 +227,7 @@ spec:
                             sh '''
                             make docker-push IMAGE_NAME=quay.io/coreos/metering-builder \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
-                                PUSH_RELEASE_TAG=$PUSH_RELEASE_TAG \
+                                PUSH_DEVEL_LATEST_TAG=$PUSH_DEVEL_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG \
                                 CHECK_GO_FILES=false
@@ -244,7 +246,8 @@ spec:
                             sh '''
                             make docker-push-all \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
-                                PUSH_RELEASE_TAG=$PUSH_RELEASE_TAG \
+                                USE_DEVEL_LATEST_TAG=$USE_DEVEL_LATEST_TAG \
+                                PUSH_DEVEL_LATEST_TAG=$PUSH_DEVEL_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG \
                                 CHECK_GO_FILES=false
