@@ -37,6 +37,20 @@ If you want to build docker images locally:
 make docker-build-all
 ```
 
+## Running local tests
+
+To run unit tests:
+
+```
+make test
+```
+
+To run the validation steps CI does:
+
+```
+make ci-validate
+```
+
 ## Go Dependencies
 
 We use [dep](https://golang.github.io/dep/docs/introduction.html) for managing
