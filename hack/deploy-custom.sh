@@ -2,7 +2,7 @@
 set -e
 
 : "${DEPLOY_TAG:?}"
-: "${DEPLOY_PLATFORM:?must be set to either tectonic, openshift, or generic}"
+: "${DEPLOY_PLATFORM:?must be set to either openshift, or generic}"
 
 TMP_DIR="$(mktemp -d)"
 
