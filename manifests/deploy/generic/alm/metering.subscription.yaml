@@ -1,7 +1,7 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: Subscription-v1
 metadata:
-  name: metering-operator.v0.7.0-latest
+  name: metering-operator.v0.7.0
 spec:
   channel: alpha
   name: metering
