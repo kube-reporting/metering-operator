@@ -33,8 +33,8 @@ func (f *Framework) NewSimpleReport(name, queryName string, start, end time.Time
 			Namespace: f.Namespace,
 		},
 		Spec: meteringv1alpha1.ReportSpec{
-			ReportingStart:      meta.Time{start},
-			ReportingEnd:        meta.Time{end},
+			ReportingStart:      &meta.Time{start},
+			ReportingEnd:        &meta.Time{end},
 			GenerationQueryName: queryName,
 			RunImmediately:      true,
 		},

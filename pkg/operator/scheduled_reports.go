@@ -433,8 +433,9 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		"scheduledreport",
 		report.Name,
 		tableName,
-		reportPeriod.periodStart,
-		reportPeriod.periodEnd,
+		&reportPeriod.periodStart,
+		&reportPeriod.periodEnd,
+		report.Spec.Inputs,
 		genQuery,
 		report.Spec.OverwriteExistingData,
 	)

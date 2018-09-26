@@ -110,7 +110,7 @@ func generatePrometheusMetricSQLValues(metric *PrometheusMetric) string {
 	keyString := "ARRAY[" + strings.Join(keys, ",") + "]"
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
 	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
-		metric.Amount, presto.Timestamp(metric.Timestamp), metric.StepSize.Seconds(), keyString, valString)
+		metric.Amount, metric.Timestamp.Format(presto.TimestampFormat), metric.StepSize.Seconds(), keyString, valString)
 }
 
 func getLastTimestampForTable(queryer presto.Queryer, tableName string) (*time.Time, error) {
@@ -136,7 +136,7 @@ func getLastTimestampForTable(queryer presto.Queryer, tableName string) (*time.T
 func GetPrometheusMetrics(queryer presto.Queryer, tableName string, start, end time.Time) ([]*PrometheusMetric, error) {
 	whereClause := ""
 	if !start.IsZero() {
-		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, presto.Timestamp(start))
+		whereClause += fmt.Sprintf(`WHERE "timestamp" >= timestamp '%s' `, start.Format(presto.TimestampFormat))
 	}
 	if !end.IsZero() {
 		if !start.IsZero() {
@@ -144,7 +144,7 @@ func GetPrometheusMetrics(queryer presto.Queryer, tableName string, start, end t
 		} else {
 			whereClause += " WHERE "
 		}
-		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, presto.Timestamp(end))
+		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, end.Format(presto.TimestampFormat))
 	}
 
 	// we use map_entries for ordering on the labels because maps are

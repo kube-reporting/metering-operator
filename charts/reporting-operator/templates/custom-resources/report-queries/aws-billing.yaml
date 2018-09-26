@@ -81,31 +81,34 @@ spec:
   - name: period_end
     type: timestamp
     unit: date
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
   query: |
         SELECT aws_billing.*,
                CASE
                    -- AWS data covers entire reporting period
-                   WHEN (aws_billing.usage_start_date <= timestamp '{| .Report.StartPeriod | prestoTimestamp |}') AND ( timestamp '{| .Report.EndPeriod | prestoTimestamp |}' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', timestamp '{| .Report.StartPeriod | prestoTimestamp |}', timestamp '{| .Report.EndPeriod | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+                   WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}') AND ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
+                       THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
 
                    -- AWS data covers start to middle
-                   WHEN (aws_billing.usage_start_date <= timestamp '{| .Report.StartPeriod | prestoTimestamp |}')
-                       THEN cast(date_diff('millisecond', timestamp '{| .Report.StartPeriod | prestoTimestamp |}', aws_billing.usage_end_date) as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+                   WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}')
+                       THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', aws_billing.usage_end_date) as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
 
                    -- AWS data covers middle to end
-                   WHEN ( timestamp '{| .Report.EndPeriod | prestoTimestamp |}' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '{| .Report.EndPeriod | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+                   WHEN ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
+                       THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
                    ELSE 1
                END as period_percent,
-               timestamp '{| .Report.StartPeriod| prestoTimestamp |}' AS period_start,
-               timestamp '{| .Report.EndPeriod | prestoTimestamp |}' AS period_end
+               timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+               timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end
         FROM {| generationQueryViewName "aws-ec2-billing-data-raw" |} as aws_billing
 
         -- make sure the partition overlaps with our range
-        WHERE (partition_stop >= '{| .Report.StartPeriod | billingPeriodTimestamp |}' AND partition_start <= '{| .Report.EndPeriod | billingPeriodTimestamp |}')
+        WHERE (partition_stop >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | billingPeriodTimestamp |}' AND partition_start <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | billingPeriodTimestamp |}')
 
         -- make sure lineItem entries overlap with our range
-        AND (usage_end_date >= timestamp '{| .Report.StartPeriod | prestoTimestamp |}' AND usage_start_date <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}')
+        AND (usage_end_date >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AND usage_start_date <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}')
 
 ---
 apiVersion: metering.openshift.io/v1alpha1
@@ -128,6 +131,9 @@ spec:
     type: timestamp
   - name: cluster_cost
     type: double
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
   query: |
     WITH aws_billing_filtered AS (
       {| renderReportGenerationQuery "aws-ec2-billing-data" . |}

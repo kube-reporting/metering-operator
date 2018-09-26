@@ -44,8 +44,8 @@ func newTestReport(name, namespace, testQueryName string, reportStart, reportEnd
 		},
 		Spec: v1alpha1.ReportSpec{
 			GenerationQueryName: testQueryName,
-			ReportingStart:      meta.Time{reportStart},
-			ReportingEnd:        meta.Time{reportEnd},
+			ReportingStart:      &meta.Time{reportStart},
+			ReportingEnd:        &meta.Time{reportEnd},
 			RunImmediately:      true,
 		},
 		Status: reportStatus,

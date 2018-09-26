@@ -20,8 +20,6 @@ var (
 	reportTestTimeout         = 5 * time.Minute
 	reportTestOutputDirectory string
 	runAWSBillingTests        bool
-
-	periodStart, periodEnd time.Time
 )
 
 func init() {
@@ -60,6 +58,104 @@ func TestMain(m *testing.M) {
 }
 
 func TestReportingE2E(t *testing.T) {
+	reportsProduceDataTestCases := []reportProducesDataTestCase{
+		{
+			name:          "namespace-cpu-request",
+			queryName:     "namespace-cpu-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "namespace-cpu-usage",
+			queryName:     "namespace-cpu-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "namespace-memory-request",
+			queryName:     "namespace-memory-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout + time.Minute,
+		},
+		{
+			name:          "namespace-memory-usage",
+			queryName:     "namespace-memory-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout + time.Minute,
+		},
+		{
+			name:          "pod-cpu-request",
+			queryName:     "pod-cpu-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "pod-cpu-usage",
+			queryName:     "pod-cpu-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "pod-memory-request",
+			queryName:     "pod-memory-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "pod-memory-usage",
+			queryName:     "pod-memory-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "pod-memory-request-vs-node-memory-allocatable",
+			queryName:     "pod-memory-request-vs-node-memory-allocatable",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout + time.Minute,
+		},
+		{
+			name:          "node-cpu-utilization",
+			queryName:     "node-cpu-utilization",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "node-memory-utilization",
+			queryName:     "node-memory-utilization",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "pod-cpu-request-aws",
+			queryName:     "pod-cpu-request-aws",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+			skip:          !runAWSBillingTests,
+		},
+		{
+			name:          "pod-memory-request-aws",
+			queryName:     "pod-memory-request-aws",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+			skip:          !runAWSBillingTests,
+		},
+		{
+			name:          "aws-ec2-cluster-cost",
+			queryName:     "aws-ec2-cluster-cost",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+			skip:          !runAWSBillingTests,
+		},
+	}
+
+	scheduledReportsProduceDataTestCases := []scheduledReportProducesDataTestCase{
+		{
+			name:      "namespace-cpu-request-hourly",
+			queryName: "namespace-cpu-request",
+			timeout:   reportTestTimeout,
+		},
+	}
+
 	t.Run("TestReportingProducesResults", func(t *testing.T) {
 		// validate all the ReportDataSources for our tests exist before running
 		// collect
@@ -83,12 +179,16 @@ func TestReportingE2E(t *testing.T) {
 		}
 
 		// validate all ReportGenerationQueries and ReportDataSources that are
-		// used by the test cases are initialized
+		// used by our test cases are initialized
 		testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
 
-		periodStart, periodEnd = testFramework.CollectMetricsOnce(t)
+		periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
 
-		t.Run("TestReportsProduceData", testReportsProduceData)
-		t.Run("TestScheduledReportsProduceData", testScheduledReportsProduceData)
+		t.Run("TestReportsProduceData", func(t *testing.T) {
+			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
+		})
+		t.Run("TestScheduledReportsProduceData", func(t *testing.T) {
+			testScheduledReportsProduceData(t, testFramework, periodStart, periodEnd, scheduledReportsProduceDataTestCases)
+		})
 	})
 }
