@@ -22,7 +22,7 @@ type PrestoTable struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	State PrestoTableState `json:"state"`
+	Status PrestoTableStatus `json:"status"`
 }
 
 type TableParameters hive.TableParameters
@@ -31,7 +31,7 @@ type TableProperties hive.TableProperties
 
 type TablePartition presto.TablePartition
 
-type PrestoTableState struct {
+type PrestoTableStatus struct {
 	Parameters TableParameters  `json:"parameters"`
 	Properties TableProperties  `json:"properties"`
 	Partitions []TablePartition `json:"partitions"`

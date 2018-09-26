@@ -52,12 +52,12 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	if generationQuery.Spec.View.Disabled {
 		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping processing")
 		return nil
-	} else if generationQuery.ViewName == "" {
+	} else if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
 		viewName = generationQueryViewName(generationQuery.Name)
 	} else {
-		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.ViewName)
-		viewName = generationQuery.ViewName
+		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
+		viewName = generationQuery.Status.ViewName
 	}
 
 	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
@@ -111,7 +111,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 }
 
 func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery, viewName string) error {
-	generationQuery.ViewName = viewName
+	generationQuery.Status.ViewName = viewName
 	_, err := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(generationQuery.Namespace).Update(generationQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update ReportGenerationQuery view name for %q", generationQuery.Name)
