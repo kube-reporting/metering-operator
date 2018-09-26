@@ -6,20 +6,13 @@ By default, if it's unset, it will use the `metering` namespace.
 
 ## Install
 
-Depending on your Kubernetes platform (regular Kubernetes, Tectonic, or Openshift)
+Depending on your Kubernetes platform (regular Kubernetes, or Openshift)
 
 For a standard Kubernetes cluster:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/install.sh
-```
-
-If your using Tectonic, use tectonic-install.sh:
-
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/tectonic-install.sh
 ```
 
 If your using Openshift, use openshift-install.sh:
@@ -38,13 +31,6 @@ For a standard Kubernetes cluster:
 ```
 $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/uninstall.sh
-```
-
-If your using Tectonic, use tectonic-uninstall.sh:
-
-```
-$ export METERING_NAMESPACE=metering-$USER
-$ ./hack/tectonic-uninstall.sh
 ```
 
 If your using Openshift, use openshift-uninstall.sh:
@@ -80,7 +66,6 @@ $ export METERING_CR_FILE=metering-custom.yaml
 Then run the installation script for your platform:
 
 - `./hack/install.sh`
-- `./hack/tectonic-install.sh`
 - `./hack/openshift-install.sh`
 
 For more details on con***REMOVED***guration options, most are documented in the [con***REMOVED***guring metering document][con***REMOVED***guring-metering].
@@ -103,13 +88,13 @@ spec:
 Next, run the install script for your platform (see above).
 
 After running the install script, ***REMOVED***gure out where your Prometheus pod is running.
-By default the `run-reporting-operator-local` Make***REMOVED***le target assumes that the pod is in the `tectonic-system` namespace and can be queried using the label selector `app=prometheus`.
+By default the `run-reporting-operator-local` Make***REMOVED***le target assumes that the pod is in the `openshift-monitoring` namespace and can be queried using the label selector `app=prometheus`.
 
 If you're Prometheus is located somewhere, ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus.
 
 Ex (these are the defaults):
 ```
-export METERING_PROMETHEUS_NAMESPACE=tectonic-system
+export METERING_PROMETHEUS_NAMESPACE=openshift-monitoring
 export METERING_PROMTHEUS_LABEL_SELECTOR=app=prometheus
 ```
 

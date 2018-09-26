@@ -6,7 +6,7 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${REPORTING_OP_BIN:=$ROOT_DIR/bin/reporting-operator-local}"
 : "${METERING_NAMESPACE:?}"
 
-: "${METERING_PROMETHEUS_NAMESPACE:=tectonic-system}"
+: "${METERING_PROMETHEUS_NAMESPACE:=openshift-monitoring}"
 : "${METERING_PROMTHEUS_LABEL_SELECTOR:=app=prometheus}"
 
 set -e -o pipefail
