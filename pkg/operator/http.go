@@ -27,10 +27,12 @@ import (
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/util/chiprometheus"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
 )
 
 var ErrReportIsRunning = errors.New("the report is still running")
+var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
 	APIV1ReportsGetEndpoint = "/api/v1/reports/get"
@@ -63,10 +65,10 @@ func (l *requestLogger) Print(v ...interface{}) {
 
 func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Rand, collectorFunc prometheusImporterFunc, listers meteringListers) chi.Router {
 	router := chi.NewRouter()
-
 	logger = logger.WithField("component", "api")
 	requestLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: &requestLogger{logger}})
 	router.Use(requestLogger)
+	router.Use(prometheusMiddleware)
 
 	srv := &server{
 		logger:        logger,
