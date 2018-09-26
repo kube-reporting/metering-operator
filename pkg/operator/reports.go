@@ -138,11 +138,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Infof("new report discovered")
 	}
 
-	logger = logger.WithFields(log.Fields{
-		"reportStart": report.Spec.ReportingStart,
-		"reportEnd":   report.Spec.ReportingEnd,
-	})
-
 	now := op.clock.Now()
 
 	var gracePeriod time.Duration
@@ -153,17 +148,29 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		logger.Debugf("Report has no gracePeriod con***REMOVED***gured, falling back to defaultGracePeriod: %s", gracePeriod)
 	}
 
-	var waitTime time.Duration
-	nextRunTime := report.Spec.ReportingEnd.Add(gracePeriod)
-	reportGracePeriodUnmet := nextRunTime.After(now)
-	waitTime = nextRunTime.Sub(now)
+	var reportingStart, reportingEnd *time.Time
+	if report.Spec.ReportingStart != nil {
+		reportingStart = &report.Spec.ReportingStart.Time
+	}
+	if report.Spec.ReportingEnd != nil {
+		reportingEnd = &report.Spec.ReportingEnd.Time
+	}
 
-	if report.Spec.RunImmediately {
-		logger.Infof("report con***REMOVED***gured to run immediately with %s until periodEnd+gracePeriod: %s", waitTime, nextRunTime)
-	} ***REMOVED*** if reportGracePeriodUnmet {
-		logger.Infof("report %s not past grace period yet, ignoring until %s (%s)", report.Name, nextRunTime, waitTime)
-		op.enqueueReportAfter(report, waitTime)
-		return nil
+	if reportingEnd == nil {
+		logger.Infof("report has no reportingEnd: running immediately")
+	} ***REMOVED*** {
+		var waitTime time.Duration
+		nextRunTime := reportingEnd.Add(gracePeriod)
+		reportGracePeriodUnmet := nextRunTime.After(now)
+		waitTime = nextRunTime.Sub(now)
+
+		if report.Spec.RunImmediately {
+			logger.Infof("report con***REMOVED***gured to run immediately with %s until periodEnd+gracePeriod: %s", waitTime, nextRunTime)
+		} ***REMOVED*** if reportGracePeriodUnmet {
+			logger.Infof("report %s not past grace period yet, ignoring until %s (%s)", report.Name, nextRunTime, waitTime)
+			op.enqueueReportAfter(report, waitTime)
+			return nil
+		}
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
@@ -230,8 +237,9 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		"report",
 		report.Name,
 		tableName,
-		report.Spec.ReportingStart.Time,
-		report.Spec.ReportingEnd.Time,
+		reportingStart,
+		reportingEnd,
+		report.Spec.Inputs,
 		genQuery,
 		true,
 	)

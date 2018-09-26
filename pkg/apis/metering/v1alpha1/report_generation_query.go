@@ -26,14 +26,15 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	ReportQueries        []string                      `json:"reportQueries,omitempty"`
-	DynamicReportQueries []string                      `json:"dynamicReportQueries,omitempty"`
-	DataSources          []string                      `json:"reportDataSources,omitempty"`
-	Reports              []string                      `json:"reports,omitempty"`
-	ScheduledReports     []string                      `json:"scheduledReports,omitempty"`
-	Query                string                        `json:"query"`
-	Columns              []ReportGenerationQueryColumn `json:"columns"`
-	View                 GenQueryView                  `json:"view"`
+	Columns              []ReportGenerationQueryColumn          `json:"columns"`
+	Query                string                                 `json:"query"`
+	View                 GenQueryView                           `json:"view"`
+	ReportQueries        []string                               `json:"reportQueries,omitempty"`
+	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
+	DataSources          []string                               `json:"reportDataSources,omitempty"`
+	Reports              []string                               `json:"reports,omitempty"`
+	ScheduledReports     []string                               `json:"scheduledReports,omitempty"`
+	Inputs               []ReportGenerationQueryInputDe***REMOVED***nition `json:"inputs,omitempty"`
 }
 
 type ReportGenerationQueryColumn struct {
@@ -48,3 +49,15 @@ type GenQueryView struct {
 	// ReportGenerationQuery
 	Disabled bool `json:"disabled"`
 }
+
+type ReportGenerationQueryInputDe***REMOVED***nition struct {
+	Name     string `json:"name"`
+	Required bool   `json:"required"`
+}
+
+type ReportGenerationQueryInputValue struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type ReportGenerationQueryInputValues []ReportGenerationQueryInputValue

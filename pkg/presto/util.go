@@ -1,6 +1,7 @@
 package presto
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -60,8 +61,23 @@ func FormatInsertQuery(target, query string) string {
 	return fmt.Sprintf("INSERT INTO %s %s", target, query)
 }
 
-func Timestamp(date time.Time) string {
-	return date.Format(TimestampFormat)
+func Timestamp(input interface{}) (string, error) {
+	var err error
+	var d time.Time
+	switch v := input.(type) {
+	case time.Time:
+		d = v
+	case *time.Time:
+		if v == nil {
+			return "", errors.New("got nil timestamp")
+		}
+		d = *v
+	case string:
+		d, err = time.Parse(time.RFC3339, v)
+	default:
+		return "", fmt.Errorf("couldn't convert %#v to a Presto timestamp", input)
+	}
+	return d.Format(TimestampFormat), err
 }
 
 func quoteColumn(col Column) string {

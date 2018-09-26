@@ -16,25 +16,21 @@ import (
 
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/test/framework"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	scheduledReportsProduceDataTestCases = map[string]struct {
-		queryName string
-		timeout   time.Duration
-	}{
-		"namespace-cpu-request-hourly": {
-			queryName: "namespace-cpu-request",
-			timeout:   reportTestTimeout,
-		},
-	}
-)
+type scheduledReportProducesDataTestCase struct {
+	name      string
+	queryName string
+	timeout   time.Duration
+}
 
-func testScheduledReportsProduceData(t *testing.T) {
+func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Framework, periodStart, periodEnd time.Time, testCases []scheduledReportProducesDataTestCase) {
 	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
-	for name, test := range scheduledReportsProduceDataTestCases {
+	for _, test := range testCases {
+		name := test.name
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {

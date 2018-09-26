@@ -18,8 +18,9 @@ type templateInfo struct {
 }
 
 type reportTemplateInfo struct {
-	StartPeriod time.Time
-	EndPeriod   time.Time
+	ReportingStart *time.Time
+	ReportingEnd   *time.Time
+	Inputs         map[string]interface{}
 }
 
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
