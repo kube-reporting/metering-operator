@@ -11,10 +11,12 @@ To read more details on how the different ReportDataSources work, read the [mete
 ## Fields
 
 - `promsum`: If this section is present, then the `ReportDataSource` will be configured to periodically poll Prometheus for metrics using the specified `ReportPrometheusQuery`.
- - `query`: The name of the `ReportPrometheusQuery` resource.
- - `storage`: This section controls the `StorageLocation` options, allowing you to control on a per ReportDataSource level, where data is stored.
-   - `storageLocationName`: The name of the `StorageLocation` resource to use.
-   - `spec`: If `storageLocationName` is not set, then this section is used to control the storage location settings. See the [StorageLocation documentation][storage-locations] for details on what can be specified here. Anything valid in a `StorageLocation`'s `spec` is valid here.
+  - `query`: The name of the `ReportPrometheusQuery` resource.
+  - `storage`: This section controls the `StorageLocation` options, allowing you to control on a per ReportDataSource level, where data is stored.
+    - `storageLocationName`: The name of the `StorageLocation` resource to use.
+    - `spec`: If `storageLocationName` is not set, then this section is used to control the storage location settings. See the [StorageLocation documentation][storage-locations] for details on what can be specified here. Anything valid in a `StorageLocation`'s `spec` is valid here.
+  - `prometheusConfig`:
+    - `url`: If present, the URL of the Prometheus instance to scrape for this report
 - `awsBilling`:
   - `source`:
     - `bucket`: Bucket name to store data into.
@@ -66,6 +68,22 @@ spec:
     query: "pod-request-memory-bytes"
     storage:
       storageLocationName: local
+```
+
+If the data to be scraped is on a non-default Prometheus instance:
+
+```
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "pod-request-memory-bytes"
+  labels:
+    operator-metering: "true"
+spec:
+  promsum:
+    query: "pod-request-memory-bytes"
+    prometheusConfig:
+      url: http://custom-prometheus-instance:9090
 ```
 
 [storage-locations]: storagelocations.md

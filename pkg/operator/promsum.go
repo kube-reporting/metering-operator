@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -215,7 +216,18 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 			defer func() {
 				<-semaphore
 			}()
-			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, op.promConn, op.prestoQueryer, metricsCollectors, ctx, start, end, importCfg, true)
+
+			var promConn prom.API
+			if (reportDataSource.Spec.Promsum.PrometheusConfig != nil) && (reportDataSource.Spec.Promsum.PrometheusConfig.URL != "") {
+				promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.Promsum.PrometheusConfig.URL)
+				if err != nil {
+					return err
+				}
+			} else {
+				promConn = op.promConn
+			}
+
+			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prestoQueryer, metricsCollectors, ctx, start, end, importCfg, true)
 			if err != nil {
 				return err
 			}
@@ -282,10 +294,20 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 	}
 }
 
-func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) *prestostore.PrometheusImporter {
+func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) (*prestostore.PrometheusImporter, error) {
 	cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery)
-	return prestostore.NewPrometheusImporter(logger, op.promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors)
+	var promConn prom.API
+	var err error
+	if (reportDataSource.Spec.Promsum.PrometheusConfig != nil) && (reportDataSource.Spec.Promsum.PrometheusConfig.URL != "") {
+		promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.Promsum.PrometheusConfig.URL)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		promConn = op.promConn
+	}
+	return prestostore.NewPrometheusImporter(logger, promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors), nil
 }
 
 func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.ImporterMetricsCollectors {

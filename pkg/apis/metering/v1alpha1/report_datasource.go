@@ -47,10 +47,15 @@ type PrometheusQueryConfig struct {
 	ChunkSize     *meta.Duration `json:"chunkSize,omitempty"`
 }
 
+type PrometheusConnectionConfig struct {
+	URL string `json:"url,omitempty"`
+}
+
 type PrometheusMetricsDataSource struct {
-	Query       string                 `json:"query"`
-	QueryConfig *PrometheusQueryConfig `json:"queryConfig"`
-	Storage     *StorageLocationRef    `json:"storage"`
+	Query            string                      `json:"query"`
+	QueryConfig      *PrometheusQueryConfig      `json:"queryConfig,omitempty"`
+	Storage          *StorageLocationRef         `json:"storage,omitempty"`
+	PrometheusConfig *PrometheusConnectionConfig `json:"prometheusConfig,omitempty"`
 }
 
 type ReportDataSourceStatus struct {

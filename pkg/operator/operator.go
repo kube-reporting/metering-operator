@@ -252,26 +252,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	defer op.prestoConn.Close()
 	defer op.hiveQueryer.closeHiveConnection()
 
-	transportConfig, err := op.kubeConfig.TransportConfig()
-	if err != nil {
-		return err
-	}
-
-	var roundTripper http.RoundTripper
-	if _, err := os.Stat(serviceServingCAFile); err == nil {
-		// use the service serving CA for prometheus
-		transportConfig.TLS.CAFile = serviceServingCAFile
-		roundTripper, err = transport.New(transportConfig)
-		if err != nil {
-			return err
-		}
-		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
-	}
-
-	op.promConn, err = op.newPrometheusConn(promapi.Config{
-		Address:      op.cfg.PromHost,
-		RoundTripper: roundTripper,
-	})
+	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
 	if err != nil {
 		return err
 	}
@@ -428,6 +409,29 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	wg.Wait()
 	op.logger.Info("Metering workers and collectors stopped")
 	return nil
+}
+
+func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
+	transportConfig, err := op.kubeConfig.TransportConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	var roundTripper http.RoundTripper
+	if _, err := os.Stat(serviceServingCAFile); err == nil {
+		// use the service serving CA for prometheus
+		transportConfig.TLS.CAFile = serviceServingCAFile
+		roundTripper, err = transport.New(transportConfig)
+		if err != nil {
+			return nil, err
+		}
+		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	}
+
+	return op.newPrometheusConn(promapi.Config{
+		Address:      url,
+		RoundTripper: roundTripper,
+	})
 }
 
 func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
