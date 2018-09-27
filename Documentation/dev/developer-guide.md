@@ -80,10 +80,14 @@ When committing new dependencies, please use the following guidelines:
 
 ## Developer install
 
-Developers should generally use the [manual-install guide](manual-install.md) as it offers the most flexibility when installing.
+Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
 
 ### Using images built by Jenkins
 
 If you have a PR or branch being built my Jenkins, you can use the images it's publishing from each build to test out the changes that aren't in master yet.
 For details on the image tag format, please follow the instructions in our [jenkins guide](jenkins.md#using-images-built-by-jenkins).
 
+
+# Releasing
+
+See the [release documentation](release.md).
