@@ -20,7 +20,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: metering-operator
-        image: "quay.io/coreos/metering-helm-operator:0.7.1-latest"
+        image: "quay.io/coreos/metering-helm-operator:0.7.1"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
         env:
@@ -29,7 +29,7 @@ spec:
         - name: HELM_RELEASE_CRD_API_GROUP
           value: metering.openshift.io
         - name: HELM_CHART_PATH
-          value: /operator-metering-0.1.0.tgz
+          value: /openshift-metering-0.1.0.tgz
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:
@@ -54,7 +54,7 @@ spec:
             memory: "25Mi"
             cpu: "50m"
       - name: tiller
-        image: "quay.io/coreos/metering-helm-operator:0.7.1-latest"
+        image: "quay.io/coreos/metering-helm-operator:0.7.1"
         args: ["/tiller"]
         imagePullPolicy: Always
         env:

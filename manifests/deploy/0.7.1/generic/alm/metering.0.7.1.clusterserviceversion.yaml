@@ -3,7 +3,7 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: metering-operator.v0.7.0
+  name: metering-operator.v0.7.1
   annotations:
     tectonic-visibility: tectonic-feature
   labels:
@@ -13,7 +13,7 @@ spec:
   displayName: Metering
   description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: [metering metrics reporting coreos]
-  version: 0.7.0
+  version: 0.7.1
   maturity: alpha
   maintainers:
     - email: support@coreos.com
@@ -22,7 +22,7 @@ spec:
     name: CoreOS, Inc
   labels:
     alm-owner-metering: metering-operator
-    alm-status-descriptors: metering-operator.v0.7.0
+    alm-status-descriptors: metering-operator.v0.7.1
   selector:
     matchLabels:
       alm-owner-metering: metering-operator
@@ -222,7 +222,7 @@ spec:
                     value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/metering-helm-operator:0.7.0
+                  image: quay.io/coreos/metering-helm-operator:0.7.1
                   imagePullPolicy: Always
                   name: metering-operator
                   resources:
@@ -241,7 +241,7 @@ spec:
                         fieldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: quay.io/coreos/metering-helm-operator:0.7.0
+                  image: quay.io/coreos/metering-helm-operator:0.7.1
                   imagePullPolicy: Always
                   livenessProbe:
                     failureThreshold: 3
