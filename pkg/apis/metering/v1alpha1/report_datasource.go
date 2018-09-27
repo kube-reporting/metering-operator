@@ -47,10 +47,15 @@ type PrometheusQueryCon***REMOVED***g struct {
 	ChunkSize     *meta.Duration `json:"chunkSize,omitempty"`
 }
 
+type PrometheusConnectionCon***REMOVED***g struct {
+	URL string `json:"url,omitempty"`
+}
+
 type PrometheusMetricsDataSource struct {
-	Query       string                 `json:"query"`
-	QueryCon***REMOVED***g *PrometheusQueryCon***REMOVED***g `json:"queryCon***REMOVED***g"`
-	Storage     *StorageLocationRef    `json:"storage"`
+	Query            string                      `json:"query"`
+	QueryCon***REMOVED***g      *PrometheusQueryCon***REMOVED***g      `json:"queryCon***REMOVED***g,omitempty"`
+	Storage          *StorageLocationRef         `json:"storage,omitempty"`
+	PrometheusCon***REMOVED***g *PrometheusConnectionCon***REMOVED***g `json:"prometheusCon***REMOVED***g,omitempty"`
 }
 
 type ReportDataSourceStatus struct {
