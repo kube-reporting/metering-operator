@@ -16,6 +16,8 @@ set -e
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+load_version_vars
+
 TMPDIR="$(mktemp -d)"
 
 IMAGE_TAG=""
@@ -27,10 +29,13 @@ if [[ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES-}" && -z "${CUSTOM_ALM_OVERRIDE
 fi
 
 # By default, we output into the deploy directory, but this can be overridden
-: "${MANIFEST_OUTPUT_DIR:=$DEPLOY_MANIFESTS_DIR}"
+: "${MANIFEST_OUTPUT_DIR:=${DEPLOY_MANIFESTS_DIR}/${METERING_VERSION}}"
+
 
 echo "Using $MANIFEST_OUTPUT_DIR as output directory"
 echo
+
+mkdir -p "$MANIFEST_OUTPUT_DIR"
 
 trap "rm -rf $TMPDIR" EXIT
 

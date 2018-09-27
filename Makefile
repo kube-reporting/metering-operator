@@ -283,7 +283,8 @@ bin/operator-metering-0.1.0.tgz: $(shell find charts -type f)
 	helm package --save=false -d bin charts/operator-metering
 
 metering-manifests:
-	./hack/create-metering-manifests.sh $(RELEASE_TAG)
+	./hack/create-metering-manifests.sh $(DEVEL_LATEST_TAG)
+	./hack/create-metering-manifests.sh $(RELEASE_VERSION)
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift thrift-gen \
