@@ -233,7 +233,7 @@ spec:
                       cpu: 50m
                       memory: 25Mi
                 - args:
-                  - /tiller
+                  - tiller
                   env:
                   - name: TILLER_NAMESPACE
                     valueFrom:
