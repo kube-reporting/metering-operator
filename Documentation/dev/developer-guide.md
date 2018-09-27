@@ -80,7 +80,13 @@ When committing new dependencies, please use the following guidelines:
 
 ## Developer install
 
-Developers should generally use the [manual-install guide](manual-install.md) as it offers the most flexibility when installing.
+Developers should be familiar using the [manual-install guide](manual-install.md) as it offers the most flexibility when installing. Once familiar, use `./hack/dev-install-wrapper.sh` to wrap the install script and override the version you want to deploy:
+
+Replace `0.7.0-latest` with the version you want to install.
+
+```
+./hack/dev-install-wrapper.sh 0.7.0-latest ./hack/openshift-install.sh # or ./hack/install.sh if not using Openshift.
+```
 
 ### Using images built by Jenkins
 

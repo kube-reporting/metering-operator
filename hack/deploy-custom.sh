@@ -102,8 +102,7 @@ spec:
 EOF
 
 echo "Creating metering manifests"
-export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
-"$ROOT_DIR/hack/create-metering-manifests.sh"
+"$ROOT_DIR/hack/create-metering-manifests.sh" "$CUSTOM_DEPLOY_MANIFESTS_DIR"
 
 echo "Deploying"
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"

@@ -83,13 +83,11 @@ METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
 
 GIT_SHA    := $(shell git rev-parse HEAD)
 GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG := $(shell hack/print-version.sh)
+RELEASE_VERSION := $(shell hack/print-version.sh)
+DEVEL_LATEST_TAG := $(RELEASE_VERSION)-latest
+PUSH_DEVEL_LATEST_TAG = true
 
 PULL_TAG_IMAGE_SOURCE ?= false
-USE_LATEST_TAG ?= false
-USE_RELEASE_TAG = true
-PUSH_RELEASE_TAG = false
-
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
 IMAGE_TAG = $(GIT_SHA)
 TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
@@ -115,8 +113,8 @@ endif
 ifneq ($(GIT_TAG),)
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(GIT_TAG)
 endif
-ifeq ($(USE_RELEASE_TAG), true)
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(RELEASE_TAG)
+ifeq ($(USE_DEVEL_LATEST_TAG), true)
+	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(DEVEL_LATEST_TAG)
 endif
 ifeq ($(USE_LATEST_TAG), true)
 	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=latest
@@ -141,20 +139,20 @@ docker-pull:
 
 docker-push:
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-ifeq ($(PUSH_RELEASE_TAG), true)
-	docker push $(IMAGE_NAME):$(RELEASE_TAG)
-endif
-ifeq ($(USE_LATEST_TAG), true)
-	docker push $(IMAGE_NAME):latest
-endif
-ifneq ($(GIT_TAG),)
-	docker push $(IMAGE_NAME):$(GIT_TAG)
-endif
 ifdef BRANCH_TAG
 	docker push $(IMAGE_NAME):$(BRANCH_TAG)
 endif
 ifdef DEPLOY_TAG
 	docker push $(IMAGE_NAME):$(DEPLOY_TAG)
+endif
+ifneq ($(GIT_TAG),)
+	docker push $(IMAGE_NAME):$(GIT_TAG)
+endif
+ifeq ($(PUSH_DEVEL_LATEST_TAG), true)
+	docker push $(IMAGE_NAME):$(DEVEL_LATEST_TAG)
+endif
+ifeq ($(USE_LATEST_TAG), true)
+	docker push $(IMAGE_NAME):latest
 endif
 
 # These generate new make targets like metering-operator-docker-build
@@ -285,7 +283,7 @@ bin/operator-metering-0.1.0.tgz: $(shell find charts -type f)
 	helm package --save=false -d bin charts/operator-metering
 
 metering-manifests:
-	./hack/create-metering-manifests.sh $(RELEASE_TAG)
+	./hack/create-metering-manifests.sh $(RELEASE_VERSION) $(ROOT_DIR)/manifests/deploy/$(RELEASE_VERSION)
 
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift thrift-gen \
