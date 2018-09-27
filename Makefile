@@ -47,6 +47,7 @@ endif
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
+	helm-operator \
 	metering-operator \
 	hadoop \
 	hive \
@@ -56,19 +57,6 @@ DOCKER_COMMON_NAMES := \
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
-
-REBUILD_HELM_OPERATOR ?= true
-
-METERING_OPERATOR_DEPENDENCIES =
-
-ifeq ($(REBUILD_HELM_OPERATOR), true)
-	METERING_OPERATOR_DEPENDENCIES += helm-operator-docker-build
-	DOCKER_BUILD_NAMES += helm-operator
-	DOCKER_TAG_NAMES += helm-operator
-	DOCKER_PUSH_NAMES += helm-operator
-endif
-
-# We append this here so it comes after the helm-operator
 
 DOCKER_BASE_URL := quay.io/coreos
 
@@ -205,7 +193,7 @@ reporting-operator-docker-build: Docker***REMOVED***le.reporting-operator
 metering-e2e-docker-build: Docker***REMOVED***le.e2e
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-operator-docker-build: Docker***REMOVED***le.metering-operator $(METERING_OPERATOR_DEPENDENCIES)
+metering-operator-docker-build: Docker***REMOVED***le.metering-operator helm-operator-docker-build
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 helm-operator-docker-build: images/helm-operator/Docker***REMOVED***le $(***REMOVED***nd -type f images/helm-operator)

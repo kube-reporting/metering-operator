@@ -70,7 +70,6 @@ spec:
     }
 
     parameters {
-        booleanParam(name: 'REBUILD_HELM_OPERATOR', defaultValue: false, description: 'If true, rebuilds quay.io/coreos/helm-operator, otherwise pulls latest of the image.')
         booleanParam(name: 'USE_IMAGEBUILDER', defaultValue: false, description: 'If true, uses github.com/openshift/imagebuilder as the Docker client')
     }
     environment {
@@ -99,7 +98,6 @@ spec:
 
                     script {
                         // putting this in the environment block above wasn't working, so we use script and just assign to the env global
-                        env.REBUILD_HELM_OPERATOR = "${params.REBUILD_HELM_OPERATOR || (!isPullRequest)}"
                         env.USE_IMAGEBUILDER = "${params.USE_IMAGEBUILDER}"
                     }
 
@@ -178,7 +176,6 @@ spec:
                         ansiColor('xterm') {
                             sh '''
                             make docker-build-all \
-                                REBUILD_HELM_OPERATOR=$REBUILD_HELM_OPERATOR \
                                 USE_LATEST_TAG=$USE_LATEST_TAG \
                                 BRANCH_TAG=$BRANCH_TAG \
                                 DEPLOY_TAG=$DEPLOY_TAG \

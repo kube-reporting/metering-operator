@@ -136,6 +136,7 @@ helmUpgrade() {
     CHART_LOCATION=$2
     helm upgrade \
         --install \
+        --force \
         --namespace "$MY_POD_NAMESPACE" \
         --wait="$HELM_WAIT" \
         --timeout="$HELM_WAIT_TIMEOUT" \
@@ -162,7 +163,6 @@ while true; do
     kubectl \
         --namespace "$MY_POD_NAMESPACE" \
         get "$CRD" \
-        --ignore-not-found \
         -o json > "$HELM_RELEASES_FILE"
 
     if [ -s "$HELM_RELEASES_FILE" ]; then
