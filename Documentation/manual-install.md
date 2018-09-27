@@ -1,6 +1,6 @@
 # Manual Installation
 
-If you want to install metering without OLM, using what's currently in master, first start by cloning the repo.
+If you want to install metering without OLM, using the most recent release, first start by cloning the repo.
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
 
@@ -41,7 +41,6 @@ $ ./hack/openshift-uninstall.sh
 ```
 
 ## Customize installation
-
 
 If you wish to customize the installation, such as to modify configuration
 options, change the image tag or repository, then you can use a custom

@@ -15,6 +15,8 @@ MANIFESTS_DIR="$ROOT_DIR/manifests"
 source "${ROOT_DIR}/hack/lib/util.sh"
 source "${ROOT_DIR}/hack/lib/version.sh"
 
+load_version_vars
+
 : "${CREATE_NAMESPACE:=true}"
 : "${SKIP_DELETE_CRDS:=true}"
 : "${DELETE_PVCS:=false}"
@@ -23,8 +25,8 @@ source "${ROOT_DIR}/hack/lib/version.sh"
 METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 
 : "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
-: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator}"
-: "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/$DEPLOY_PLATFORM/alm}"
+: "${INSTALLER_MANIFESTS_DIR:=$DEPLOY_MANIFESTS_DIR/$METERING_VERSION/$DEPLOY_PLATFORM/helm-operator}"
+: "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/$METERING_VERSION/$DEPLOY_PLATFORM/alm}"
 : "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
 
