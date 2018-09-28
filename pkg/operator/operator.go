@@ -38,6 +38,7 @@ import (
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
@@ -117,10 +118,8 @@ type Reporting struct {
 	initializedMu sync.Mutex
 	initialized   bool
 
-	prometheusImporterNewDataSourceQueue         chan *cbTypes.ReportDataSource
-	stopPrometheusImporterQueue                  chan *stopPrometheusImporter
-	prometheusImporterTriggerFromLastTimestampCh chan struct{}
-	prometheusImporterTriggerForTimeRangeCh      chan prometheusImporterTimeRangeTrigger
+	importersMu sync.Mutex
+	importers   map[string]*prestostore.PrometheusImporter
 
 	// ensures only at most a single testRead query is running against Presto
 	// at one time
@@ -129,13 +128,10 @@ type Reporting struct {
 
 func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Reporting, error) {
 	op := &Reporting{
-		cfg: cfg,
-		prometheusImporterNewDataSourceQueue:         make(chan *cbTypes.ReportDataSource),
-		stopPrometheusImporterQueue:                  make(chan *stopPrometheusImporter),
-		prometheusImporterTriggerFromLastTimestampCh: make(chan struct{}),
-		prometheusImporterTriggerForTimeRangeCh:      make(chan prometheusImporterTimeRangeTrigger),
-		logger: logger,
-		clock:  clock,
+		cfg:       cfg,
+		logger:    logger,
+		clock:     clock,
+		importers: make(map[string]*prestostore.PrometheusImporter),
 	}
 	logger.Debugf("Con***REMOVED***g: %+v", cfg)
 
@@ -295,7 +291,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		prestoTables:            op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace),
 	}
 
-	apiRouter := newRouter(op.logger, op.prestoQueryer, op.rand, op.triggerPrometheusImporterForTimeRange, listers)
+	apiRouter := newRouter(op.logger, op.prestoQueryer, op.rand, op.importPrometheusForTimeRange, listers)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
 	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
 
@@ -443,7 +439,9 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		op.logger.Infof("PrestoTable worker stopped")
 	}()
 
-	threadiness := 2
+	// We have a lot of ReportDataSources and we need to run more workers to
+	// make sure we collect data quickly
+	threadiness := 4
 	for i := 0; i < threadiness; i++ {
 		i := i
 
@@ -454,6 +452,14 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			wg.Done()
 			op.logger.Infof("ReportDataSource worker #%d stopped", i)
 		}()
+	}
+
+	// Reports and ScheduledReports we want to limit the number running
+	// concurrently, and ReportGenerationQueries don't need many workers, so
+	// these resources get less workers.
+	threadiness = 2
+	for i := 0; i < threadiness; i++ {
+		i := i
 
 		wg.Add(1)
 		go func() {
@@ -479,14 +485,6 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			op.logger.Infof("ScheduledReport worker #%d stopped", i)
 		}()
 	}
-
-	wg.Add(1)
-	go func() {
-		op.logger.Debugf("starting PrometheusImport worker")
-		op.runPrometheusImporterWorker(stopCh)
-		wg.Done()
-		op.logger.Debugf("PrometheusImport worker stopped")
-	}()
 }
 
 func (op *Reporting) setInitialized() {
