@@ -65,7 +65,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 			logger.Infof("ReportDataSource %s does not exist anymore, performing cleanup.", key)
 			done := make(chan struct{})
 			op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
-				ReportDataSource: reportDataSource.Name,
+				ReportDataSource: name,
 				Done:             done,
 			}
 			// wait for the importer to be stopped
