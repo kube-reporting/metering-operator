@@ -9,7 +9,7 @@ if (isPullRequest) {
     dockerBuildArgs = ''
 }
 
-def podLabel = "gke-operator-metering-build-${isPullRequest ? 'pr' : 'master'}"
+def podLabel = "gke-operator-metering-build-${branchTag}"
 def maxInstances = isPullRequest ? 5 : 2
 def idleMin = isPullRequest ? 60: 15
 
