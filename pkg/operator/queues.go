@@ -306,6 +306,15 @@ func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
 	op.queues.reportDataSourceQueue.Add(key)
 }
 
+func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, duration time.Duration) {
+	key, err := cache.MetaNamespaceKeyFunc(ds)
+	if err != nil {
+		op.logger.WithField("reportDataSource", ds.Name).WithError(err).Errorf("couldn't get key for object: %#v", ds)
+		return
+	}
+	op.queues.reportDataSourceQueue.AddAfter(key, duration)
+}
+
 func (op *Reporting) addReportGenerationQuery(obj interface{}) {
 	report := obj.(*cbTypes.ReportGenerationQuery)
 	op.logger.Infof("adding ReportGenerationQuery %s", report.Name)

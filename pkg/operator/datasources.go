@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -46,7 +47,7 @@ func init() {
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
-	const maxRequeues = 5
+	const maxRequeues = 10
 	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.queues.reportDataSourceQueue, maxRequeues) {
 	}
 }
@@ -62,27 +63,14 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("ReportDataSource %s does not exist anymore, performing cleanup.", key)
-			done := make(chan struct{})
-			op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
-				ReportDataSource: name,
-				Done:             done,
-			}
-			// wait for the importer to be stopped
-			<-done
+			logger.Infof("ReportDataSource %s does not exist anymore", key)
+			return nil
 		}
 		return err
 	}
 
 	if reportDataSource.DeletionTimestamp != nil {
 		logger.Infof("ReportDataSource is marked for deletion, performing cleanup")
-		done := make(chan struct{})
-		op.stopPrometheusImporterQueue <- &stopPrometheusImporter{
-			ReportDataSource: reportDataSource.Name,
-			Done:             done,
-		}
-		// wait for the importer to be stopped before we delete the table
-		<-done
 		_, err = op.removeReportDataSourceFinalizer(reportDataSource)
 		return err
 	}
@@ -113,6 +101,10 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if dataSource.Spec.Promsum == nil {
+		return fmt.Errorf("%s is not a Promsum ReportDataSource", dataSource.Name)
+	}
+
 	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
 		var err error
 		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
@@ -122,7 +114,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 
 	if dataSource.Status.TableName != "" {
-		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s, skipping processing", dataSource.Status.TableName)
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", dataSource.Status.TableName)
 	} else {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
@@ -139,8 +131,47 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 	}
 
-	op.prometheusImporterNewDataSourceQueue <- dataSource
+	if op.cfg.DisablePromsum {
+		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
+		return nil
+	}
 
+	dataSourceName := dataSource.Name
+	queryName := dataSource.Spec.Promsum.Query
+	tableName := dataSourceTableName(dataSourceName)
+
+	reportPromQuery, err := op.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
+	if err != nil {
+		return fmt.Errorf("unable to get ReportPrometheusQuery %s for ReportDataSource %s, %s", queryName, dataSourceName, err)
+	}
+
+	dataSourceLogger := logger.WithFields(log.Fields{
+		"queryName":        queryName,
+		"reportDataSource": dataSourceName,
+		"tableName":        tableName,
+	})
+
+	op.importersMu.Lock()
+	importer, exists := op.importers[dataSourceName]
+	if exists {
+		dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
+		cfg := op.newPromImporterCfg(dataSource, reportPromQuery)
+		importer.UpdateConfig(cfg)
+	} else {
+		importer = op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery)
+		op.importers[dataSourceName] = importer
+	}
+	op.importersMu.Unlock()
+
+	_, err = importer.ImportFromLastTimestamp(context.Background(), false)
+	if err != nil {
+		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
+	}
+
+	importInterval := op.getQueryIntervalForReportDataSource(dataSource)
+	nextImport := op.clock.Now().Add(importInterval).UTC()
+	logger.Infof("queuing ReportDataSource %s to importing data again in %s at %s", dataSourceName, importInterval, nextImport)
+	op.enqueueReportDataSourceAfter(dataSource, importInterval)
 	return nil
 }
 
