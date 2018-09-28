@@ -65,7 +65,7 @@ spec:
             cpu: "50m"
       - name: tiller
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        args: ["/tiller"]
+        args: ["tiller"]
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: TILLER_NAMESPACE
