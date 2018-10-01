@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -20,6 +21,7 @@ import (
 
 const (
 	reportDataSourceFinalizer = cbTypes.GroupName + "/reportdatasource"
+	partitionUpdateInterval   = 30 * time.Minute
 )
 
 var (
@@ -170,7 +172,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 	importInterval := op.getQueryIntervalForReportDataSource(dataSource)
 	nextImport := op.clock.Now().Add(importInterval).UTC()
-	logger.Infof("queuing ReportDataSource %s to importing data again in %s at %s", dataSourceName, importInterval, nextImport)
+	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSourceName, importInterval, nextImport)
 	op.enqueueReportDataSourceAfter(dataSource, importInterval)
 	return nil
 }
@@ -234,6 +236,10 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return fmt.Errorf("error updating AWS billing partitions for ReportDataSource %s: %v", dataSource.Name, err)
 	}
 
+	nextUpdate := op.clock.Now().Add(partitionUpdateInterval).UTC()
+
+	logger.Infof("queuing AWSBilling ReportDataSource %s to update partitions again in %s at %s", dataSource.Name, partitionUpdateInterval, nextUpdate)
+	op.enqueueReportDataSourceAfter(dataSource, partitionUpdateInterval)
 	return nil
 }
 
