@@ -7,6 +7,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
+  log-level: {{ .Values.spec.con***REMOVED***g.logLevel | quote}}
   log-reports: {{ .Values.spec.con***REMOVED***g.logReports | quote}}
   log-ddl-queries: {{ .Values.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.spec.con***REMOVED***g.logDMLQueries | quote}}
