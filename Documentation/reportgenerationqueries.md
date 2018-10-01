@@ -11,7 +11,8 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `columns`: A list of columns that match the schema of the results of the query. The order of these columns must match the order of the columns returned by the SELECT statement. Columns have 3 fields, `name`, `type`, and `unit`. Each field is covered in more detail below.
   - `name`: This is the name of the column returned in the `SELECT` statement.
   - `type`: This is the [Hive][hive-types] column type. Currently due to implementation details, column types are expressed using hive types. In the future, this will likely be switched to using the Presto native types. This also has an effect that queries with columns containing complex types such as `maps` or `arrays` cannot be used by `Reports` or `ScheduledReports`.
-  - `unit`:
+  - `unit`: Unit refers to the measurement of the column.
+  - `tableHidden`: Takes a Bool the either shows or hides the column. This determines whether the column will be displayed or not in reports.
 - `reportDataSources`: This is a list of `ReportDataSource` resources that this this `ReportGenerationQuery` depends on. These data sources can be referenced as database tables in the `query` using the `dataSourceTableName` template function.
 - `reportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on that have `view.disabled` set to false. Queries in this list can be re-used by querying the database view created, and using `generationQueryViewName` templating function to reference the view by name.
 - `dynamicReportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on, that have `view.disabled` set to true, these are queries that depend on the `.Report` variable. Queries in the list can be re-used by injecting them into the current query using the `renderReportGenerationQuery` template function.
@@ -163,6 +164,18 @@ spec:
     GROUP BY namespace
     ORDER BY pod_request_memory_byte_seconds DESC
 ```
+
+## Modifying Columns For Report Display
+
+You can modify the custom resource to display all columns or to hide or show columns as needed. The full endpoint displays all columns.
+An example report for `namespace-cpu-request` in JSON for the full endpoint would be:
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/full?format=json`
+To use the TableHidden display feature:
+- enter `TableHidden` field in query as true or false
+- run report
+An example report for `namespace-cpu-request` in JSON for the tableHidden endpoint would be:
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/table?format=json`
+
 
 [presto-select]: https://prestodb.io/docs/current/sql/select.html
 [hive-types]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-Overview
