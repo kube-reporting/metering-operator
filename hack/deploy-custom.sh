@@ -27,6 +27,9 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${TERMINATION_GRACE_PERIOD_SECONDS:=0}"
 
+: "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
+: "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
+
 IMAGE_PULL_SECRET_TEXT=""
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     IMAGE_PULL_SECRET_TEXT="imagePullSecrets: [ { name: \"$METERING_PULL_SECRET_NAME\" } ]"
@@ -79,8 +82,12 @@ spec:
       ${IMAGE_PULL_SECRET_TEXT:-}
       datanode:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        storage:
+          size: ${HDFS_DATANODE_STORAGE_SIZE}
       namenode:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
+        storage:
+          size: ${HDFS_NAMENODE_STORAGE_SIZE}
 EOF
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
