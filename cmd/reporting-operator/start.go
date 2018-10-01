@@ -59,9 +59,9 @@ func init() {
 	cfg.PrometheusQueryConfig.StepSize = new(meta.Duration)
 	cfg.PrometheusQueryConfig.ChunkSize = new(meta.Duration)
 
-	rootCmd.PersistentFlags().StringVar(&logLevelStr, "log-level", log.DebugLevel.String(), "log level")
-	rootCmd.PersistentFlags().BoolVar(&logFullTimestamp, "log-timestamp", true, "log full timestamp if true, otherwise log time since startup")
-	rootCmd.PersistentFlags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
+	startCmd.Flags().StringVar(&logLevelStr, "log-level", log.DebugLevel.String(), "log level")
+	startCmd.Flags().BoolVar(&logFullTimestamp, "log-timestamp", true, "log full timestamp if true, otherwise log time since startup")
+	startCmd.Flags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
 
 	startCmd.Flags().StringVar(&cfg.Kubeconfig, "kubeconfig", "", "use kubeconfig provided instead of detecting defaults")
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
@@ -98,6 +98,8 @@ func main() {
 	})
 
 	AddCommands()
+
+	rootCmd.ParseFlags(os.Args[1:])
 
 	if err := SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK"); err != nil {
 		log.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
@@ -187,6 +189,7 @@ func newLogger() log.FieldLogger {
 	if err != nil {
 		logger.WithError(err).Fatalf("invalid log level: %s", logLevelStr)
 	}
+	logger.Infof("setting log level to %s", logLevel.String())
 	logger.Logger.Level = logLevel
 	return logger
 
