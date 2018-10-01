@@ -101,7 +101,7 @@ func main() {
 
 	rootCmd.ParseFlags(os.Args[1:])
 
-	if err := SetFlagsFromEnv(startCmd.Flags(), "CHARGEBACK"); err != nil {
+	if err := SetFlagsFromEnv(startCmd.Flags(), "REPORTING_OPERATOR"); err != nil {
 		log.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
 	}
 	if err := rootCmd.Execute(); err != nil {
