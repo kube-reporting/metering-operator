@@ -65,6 +65,11 @@ spec:
               name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
               key: aws-secret-access-key
               optional: true
+        - name: CHARGEBACK_LOG_LEVEL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: log-level
         - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
             con***REMOVED***gMapKeyRef:
