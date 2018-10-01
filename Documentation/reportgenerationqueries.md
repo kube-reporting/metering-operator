@@ -11,7 +11,8 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `columns`: A list of columns that match the schema of the results of the query. The order of these columns must match the order of the columns returned by the SELECT statement. Columns have 3 ***REMOVED***elds, `name`, `type`, and `unit`. Each ***REMOVED***eld is covered in more detail below.
   - `name`: This is the name of the column returned in the `SELECT` statement.
   - `type`: This is the [Hive][hive-types] column type. Currently due to implementation details, column types are expressed using hive types. In the future, this will likely be switched to using the Presto native types. This also has an effect that queries with columns containing complex types such as `maps` or `arrays` cannot be used by `Reports` or `ScheduledReports`.
-  - `unit`:
+  - `unit`: Unit refers to the unit of measurement of the column.
+  - `tableHidden`: Takes a boolean, when true, hides the column from report results depending on the format and endpoint. See [api docs for details][apiTable].
 - `reportDataSources`: This is a list of `ReportDataSource` resources that this this `ReportGenerationQuery` depends on. These data sources can be referenced as database tables in the `query` using the `dataSourceTableName` template function.
 - `reportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on that have `view.disabled` set to false. Queries in this list can be re-used by querying the database view created, and using `generationQueryViewName` templating function to reference the view by name.
 - `dynamicReportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on, that have `view.disabled` set to true, these are queries that depend on the `.Report` variable. Queries in the list can be re-used by injecting them into the current query using the `renderReportGenerationQuery` template function.
@@ -164,6 +165,20 @@ spec:
     ORDER BY pod_request_memory_byte_seconds DESC
 ```
 
+## Modifying Columns For Report Display
+
+You can modify the ReportGenerationQuery to display all columns or to hide or show columns as needed. The full endpoint displays all columns.
+To query report results using the reporting-operator API for full endpoint the api call is:
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/full?format=json`
+This example is showing the `namespace-cpu-request` query in JSON format.
+
+To use the TableHidden display feature:
+- enter `TableHidden` ***REMOVED***eld in query as true or false. In `node-cpu-capacity` the `labels` tableHidden value is set to `true`.
+- Next run a report.
+To query report results using the reporting-operator API for tableHidden endpoint the api call is:
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/table?format=json`
+
+[apiTable]: api.md#v2-reports-table
 [presto-select]: https://prestodb.io/docs/current/sql/select.html
 [hive-types]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-Overview
 [presto-functions]: https://prestodb.io/docs/current/functions.html
