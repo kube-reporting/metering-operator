@@ -19,6 +19,7 @@ spec:
     promsumChunkSize: "5m"
     promsumStepSize: "60s"
 
+    logLevel: "info"
     logReports: "false"
     logDDLQueries: "false"
     logDMLQueries: "false"

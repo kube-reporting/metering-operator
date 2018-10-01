@@ -65,6 +65,11 @@ spec:
               name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
               key: aws-secret-access-key
               optional: true
+        - name: CHARGEBACK_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: log-level
         - name: CHARGEBACK_LOG_DML_QUERIES
           valueFrom:
             configMapKeyRef:
