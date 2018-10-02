@@ -4,7 +4,9 @@ USER root
 # epel-release is for `jq`
 RUN INSTALL_PKGS="curl bash jq ca-certi***REMOVED***cates socat kubernetes-client" \
     && yum install -y epel-release \
-    && yum install -y $INSTALL_PKGS
+    && yum install -y $INSTALL_PKGS  \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 EXPOSE 44134
 

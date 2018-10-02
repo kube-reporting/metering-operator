@@ -1,5 +1,10 @@
 FROM quay.io/coreos/helm-operator:latest as helm-operator
-FROM quay.io/coreos/metering-builder:latest as build
+FROM openshift/origin-release:golang-1.10 as build
+
+RUN INSTALL_PKGS="python PyYAML" && \
+    yum install -y $INSTALL_PKGS && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
 # we need the helm CLI to build the charts
 COPY --from=helm-operator /usr/local/bin/helm /usr/local/bin/helm
