@@ -15,6 +15,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
@@ -153,20 +154,28 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		"tableName":        tableName,
 	})
 
-	op.importersMu.Lock()
-	importer, exists := op.importers[dataSourceName]
-	if exists {
-		dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
-		cfg := op.newPromImporterCfg(dataSource, reportPromQuery)
-		importer.UpdateConfig(cfg)
-	} else {
+	// wrap in a closure to handle lock and unlock of the mutex
+	importer, err := func() (*prestostore.PrometheusImporter, error) {
+		op.importersMu.Lock()
+		defer op.importersMu.Unlock()
+		importer, exists := op.importers[dataSourceName]
+		if exists {
+			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
+			cfg := op.newPromImporterCfg(dataSource, reportPromQuery)
+			importer.UpdateConfig(cfg)
+			return importer, nil
+		}
+		// don't already have an importer, so create a new one
 		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		op.importers[dataSourceName] = importer
+		return importer, nil
+	}()
+	if err != nil {
+		return err
 	}
-	op.importersMu.Unlock()
 
 	_, err = importer.ImportFromLastTimestamp(context.Background(), false)
 	if err != nil {
