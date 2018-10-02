@@ -108,7 +108,13 @@ spec:
       - name: hive-metastore-db-data
         emptyDir: {}
 {{- if .Values.spec.config.sharedVolume.enabled }}
+{{- if not .Values.spec.config.sharedVolume.useHostPath }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
           claimName: {{ .Values.spec.config.sharedVolume.persistentVolumeClaimName }}
+{{- else }}
+      - name: hive-warehouse-data
+        hostPath:
+          path: {{ .Values.spec.config.sharedVolume.hostPath }}
+{{- end}}
 {{- end}}

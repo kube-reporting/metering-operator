@@ -144,6 +144,8 @@ spec:
     sharedVolume:
       enabled: false
       createPVC: true
+      useHostPath: false
+      hostPath: /hive/data
       persistentVolumeClaimName: hive-warehouse-data
       mountPath: /user/hive/warehouse
       storage:

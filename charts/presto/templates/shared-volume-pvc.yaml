@@ -1,4 +1,4 @@
-{{- if and .Values.spec.config.sharedVolume.enabled .Values.spec.config.sharedVolume.createPVC }}
+{{- if and .Values.spec.config.sharedVolume.enabled .Values.spec.config.sharedVolume.createPVC (not .Values.spec.config.sharedVolume.useHostPath) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
