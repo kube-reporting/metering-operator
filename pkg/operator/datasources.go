@@ -160,7 +160,10 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		cfg := op.newPromImporterCfg(dataSource, reportPromQuery)
 		importer.UpdateCon***REMOVED***g(cfg)
 	} ***REMOVED*** {
-		importer = op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery)
+		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery)
+		if err != nil {
+			return err
+		}
 		op.importers[dataSourceName] = importer
 	}
 	op.importersMu.Unlock()
