@@ -251,26 +251,14 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 }
 
 func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
-	prevReportDataSource := prev.(*cbTypes.ReportDataSource)
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
 		op.deleteReportDataSource(curReportDataSource)
 		return
 	}
 
-	// we allow periodic resyncs to trigger AWSBilling ReportDataSources even
-	// if they're not changed since we currently rely on the resyncs so our
-	// handler can periodically update the partitions on the table
-	if curReportDataSource.Spec.AWSBilling != nil && curReportDataSource.ResourceVersion == prevReportDataSource.ResourceVersion {
-		// Periodic resyncs will send update events for all known ReportDataSources.
-		// Two different versions of the same reportDataSource will always have
-		// different ResourceVersions.
-
-		// TODO(chance): logging here is probably unnecessary and verbose
-		op.logger.Debugf("ReportDataSource %s is unchanged, skipping update", curReportDataSource.Name)
-		return
-	}
-
+	// we allow periodic resyncs to trigger ReportDataSources even
+	// if they're not changed to ensure failed ones eventually get re-tried
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }
