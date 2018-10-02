@@ -60,7 +60,6 @@ DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
 
 DOCKER_BASE_URL := quay.io/coreos
 
-BUILDER_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-builder
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
@@ -184,9 +183,6 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-metering-builder-docker-build: Dockerfile.builder
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(BUILDER_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR) USE_LATEST_TAG=true
-
 reporting-operator-docker-build: Dockerfile.reporting-operator
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
@@ -283,7 +279,7 @@ metering-manifests:
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	metering-test-docker \
-	metering-e2e-docker-build metering-builder-docker-build \
+	metering-e2e-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	operator-metering-chart penshift-metering chart \
 	bin/metering-override-values.yaml \

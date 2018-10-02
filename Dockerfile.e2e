@@ -1,10 +1,7 @@
-FROM quay.io/coreos/metering-builder:latest as build
+FROM openshift/origin-release:golang-1.10 as build
 
-RUN yum -y update && yum clean all
-
-RUN INSTALL_PKGS="jq" && \
-    yum -y install epel-release && \
-    yum -y install $INSTALL_PKGS && \
+RUN INSTALL_PKGS="curl python PyYAML" && \
+    yum install -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
 
