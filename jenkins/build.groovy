@@ -128,28 +128,6 @@ spec:
             }
         }
 
-        stage('Build builder image') {
-            when {
-                expression {
-                    return true
-                }
-            }
-            steps {
-                dir(env.METERING_SRC_DIR) {
-                    container('docker') {
-                        ansiColor('xterm') {
-                            sh '''
-                            make metering-builder-docker-build \
-                                BRANCH_TAG=$BRANCH_TAG \
-                                DEPLOY_TAG=$DEPLOY_TAG \
-                                CHECK_GO_FILES=false
-                            '''
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Test') {
             steps {
                 dir(env.METERING_SRC_DIR) {
@@ -205,30 +183,6 @@ spec:
             post {
                 success {
                     githubNotify context: prStatusContext, status: 'PENDING', description: 'Tag stage passed'
-                }
-            }
-        }
-
-        stage('Push builder image') {
-            when {
-                expression {
-                    return isMasterBranch
-                }
-            }
-            steps {
-                dir(env.METERING_SRC_DIR) {
-                    container('docker') {
-                        ansiColor('xterm') {
-                            sh '''
-                            make docker-push IMAGE_NAME=quay.io/coreos/metering-builder \
-                                USE_LATEST_TAG=$USE_LATEST_TAG \
-                                PUSH_RELEASE_TAG=$PUSH_RELEASE_TAG \
-                                BRANCH_TAG=$BRANCH_TAG \
-                                DEPLOY_TAG=$DEPLOY_TAG \
-                                CHECK_GO_FILES=false
-                            '''
-                        }
-                    }
                 }
             }
         }
