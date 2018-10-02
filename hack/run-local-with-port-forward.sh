@@ -30,8 +30,6 @@ sleep 6
 echo Starting reporting-operator
 set -x
 
-env | grep CHARGEBACK
-
 "$REPORTING_OP_BIN" \
     start \
     --namespace "$METERING_NAMESPACE" \
