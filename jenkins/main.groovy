@@ -6,6 +6,14 @@ def skipBuildLabel = (isPullRequest && pullRequest.labels.contains("skip-build")
 def skipE2ELabel = (isPullRequest && pullRequest.labels.contains("skip-e2e"))
 def skipIntegrationLabel = (isPullRequest && pullRequest.labels.contains("skip-integration"))
 def skipNsCleanup = (isPullRequest && pullRequest.labels.contains("skip-namespace-cleanup"))
+def skipAll = (isPullRequest && pullRequest.labels.contains("skip-all"))
+
+if (skipAll) {
+    echo 'Skipping build and tests, skip-all label is set'
+    skipBuildLabel = true
+    skipE2ELabel = true
+    skipIntegrationLabel = true
+}
 
 def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
 def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
