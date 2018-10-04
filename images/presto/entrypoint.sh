@@ -75,9 +75,12 @@ con***REMOVED***gure "${PRESTO_HOME}/etc/node.properties" presto-node PRESTO_NOD
 
 # add UID to /etc/passwd if missing
 if ! whoami &> /dev/null; then
-  if [ -w /etc/passwd ]; then
-    echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
-  ***REMOVED***
+    if [ -w /etc/passwd ]; then
+        # Remove existing entry with user ***REMOVED***rst
+        sed -i "/${USER_NAME:-presto}:x/d" /etc/passwd
+        # add our user with our current user ID into passwd
+        echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
+    ***REMOVED***
 ***REMOVED***
 
 exec $@
