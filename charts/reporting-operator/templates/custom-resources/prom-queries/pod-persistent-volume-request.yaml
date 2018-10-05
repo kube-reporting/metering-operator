@@ -1,0 +1,11 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "persistentvolumeclaim-request-bytes"
+  label:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
