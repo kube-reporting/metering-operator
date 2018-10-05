@@ -77,6 +77,10 @@ spec:
         spec:
           promsum:
             query: "pod-usage-memory-bytes"
+      persistentvolumeclaim-request-bytes:
+        spec:
+          promsum:
+            query: "persistentvolumeclaim-request-bytes"
 
       node-allocatable-memory-bytes:
         spec:
