@@ -15,6 +15,7 @@
 Custom Resources:
 
 - [Reports](report.md)
+  - [Roll-up Reports](rollup-reports.md)
 - [ReportGenerationQueries](reportgenerationqueries.md)
 - [ReportDataSources](reportdatasources.md)
 - [ReportPrometheusQueries](reportprometheusqueries.md)
