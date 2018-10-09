@@ -297,3 +297,29 @@ A report can have the following states:
 
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
+
+## Roll-up Reports
+
+Report data is stored in the database much like metrics themselves, and can thus be used in aggregated or roll-up reports. A simple use case for a roll-up report is to spread the time required to produce a report over a longer period of time: instead of requiring a monthly report to query and add all data over an entire month, the task can be split into daily reports that each run over a thirtieth of the data.
+
+A custom roll-up report requires a custom generation query. The ReportGenerationQuery processor provides a macro that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query):
+
+```
+# namespace-cpu-usage-aggregated-query.yaml
+inputs:
+- name: AggregatedReportName
+  required: true
+...
+ WHERE {| .Report.Inputs.AggregatedReportName | scheduledReportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+```
+
+```
+# aggregated-report.yaml
+spec:
+  generationQuery: "namespace-cpu-usage-aggregated"
+  inputs:
+  - name: "AggregatedReportName"
+    value: "namespace-cpu-usage-hourly"
+```
+
+For more information on setting up a roll-up report, see the [roll-up report guide](rollup-reports.md).
