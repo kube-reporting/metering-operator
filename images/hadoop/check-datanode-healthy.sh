@@ -1,6 +1,6 @@
 #!/bin/bash
 
-: "${DATANODE_ADDRESS:=127.0.0.1:50075}"
+: "${DATANODE_ADDRESS:=127.0.0.1:9864}"
 
 set -ex
 
