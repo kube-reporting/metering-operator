@@ -90,6 +90,8 @@ Valid values of `period` are listed below, and the options available to set for 
   - `hour`
   - `minute`
   - `second`
+- `cron`
+  - `expression`
 
 Generally, the `hour`, `minute`, `second` fields control when in the day the report runs, and `dayOfWeek`/`dayOfMonth` control what day of the week, or day of month the report runs on, if it's a weekly or monthly report period.
 
@@ -101,6 +103,9 @@ For each of these fields, there is a range of valid values:
 - `dayOfWeek` is a string value that expects the day of the week (spelled out).
 - `dayOfMonth` is an integer value between 1-31.
 
+For cron periods, normal cron expressions are valid:
+
+- `expression: "*/5 * * * *"`
 
 ### reportingStart
 
