@@ -1,7 +1,7 @@
 #!/bin/bash
 
 namedir=/hadoop/dfs/name
-if [ ! -d $namedir ]; then
+if [ ! -d "$namedir" ]; then
   echo "Namenode name directory not found: $namedir"
   exit 2
 ***REMOVED***
@@ -11,9 +11,9 @@ if [ -z "$CLUSTER_NAME" ]; then
   exit 2
 ***REMOVED***
 
-if [ "`ls -A $namedir`" == "" ]; then
+if [ "$(ls -A $namedir)" == "" ]; then
   echo "Formatting namenode name directory: $namedir"
-  $HADOOP_PREFIX/bin/hdfs --con***REMOVED***g $HADOOP_CONF_DIR namenode -format $CLUSTER_NAME
+  hdfs --con***REMOVED***g "$HADOOP_CONF_DIR" namenode -format "$CLUSTER_NAME"
 ***REMOVED***
 
-$HADOOP_PREFIX/bin/hdfs --con***REMOVED***g $HADOOP_CONF_DIR namenode
+exec hdfs --con***REMOVED***g "$HADOOP_CONF_DIR" namenode "$@"

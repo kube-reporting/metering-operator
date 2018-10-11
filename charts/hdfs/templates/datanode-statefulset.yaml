@@ -9,7 +9,7 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - port: 50010
+  - port: 9866
     name: fs
   clusterIP: None
   selector:
@@ -26,7 +26,7 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - port: 50075
+  - port: 9864
     name: web
   selector:
     app: hdfs-datanode
@@ -152,10 +152,12 @@ spec:
         - name: JAVA_MAX_MEM_RATIO
           value: "50"
         ports:
-        - containerPort: 50010
-          name: fs
-        - containerPort: 50075
+        - containerPort: 9864
           name: http
+        - containerPort: 9866
+          name: fs
+        - containerPort: 9867
+          name: ipc
         volumeMounts:
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data

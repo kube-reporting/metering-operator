@@ -9,7 +9,7 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - port: 8020
+  - port: 9820
     name: fs
   clusterIP: None
   selector:
@@ -27,7 +27,7 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - port: 8020
+  - port: 9820
     name: fs
   selector:
     app: hdfs-namenode
@@ -44,7 +44,7 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - port: 50070
+  - port: 9870
     name: web
   selector:
     app: hdfs-namenode
@@ -132,9 +132,9 @@ spec:
         - name: JAVA_MAX_MEM_RATIO
           value: "50"
         ports:
-        - containerPort: 8020
+        - containerPort: 9820
           name: fs
-        - containerPort: 50070
+        - containerPort: 9870
           name: web
         volumeMounts:
         - name: hdfs-namenode-data

@@ -49,7 +49,7 @@ spec:
       type: "hive"
       hive:
         tableProperties:
-          location: "hdfs://hdfs-namenode-proxy:8020/operator_metering/storage/"
+          location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
 
     defaultReportDataSources:
       pod-request-cpu-cores:

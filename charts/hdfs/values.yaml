@@ -7,7 +7,7 @@ spec:
   con***REMOVED***g:
     logLevel: "info"
     namenodeHost: hdfs-namenode-0.hdfs-namenode
-    namenodePort: 8020
+    namenodePort: 9820
     datanodeDataDirPerms: "770"
 
   securityContext:
