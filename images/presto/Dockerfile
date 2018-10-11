@@ -13,7 +13,7 @@ ENV PRESTO_CONF_discovery_uri http://localhost:8080
 
 RUN \
     mkdir -p /var/presto/data && \
-    chown -R 1003:0 /opt/presto /var/presto/data && \
+    chown -R 1003:0 /opt/presto /var/presto/data /etc/passwd && \
     chmod -R 770 /var/presto/data && \
     chmod -R 774 /etc/passwd && \
     chmod -R 775 /opt/presto
