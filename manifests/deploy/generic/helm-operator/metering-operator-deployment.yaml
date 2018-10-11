@@ -20,7 +20,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: metering-operator
-        image: "quay.io/coreos/metering-helm-operator:0.7.1-latest"
+        image: "quay.io/coreos/metering-helm-operator:0.8.0-latest"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
         env:
@@ -54,7 +54,7 @@ spec:
             memory: "25Mi"
             cpu: "50m"
       - name: tiller
-        image: "quay.io/coreos/metering-helm-operator:0.7.1-latest"
+        image: "quay.io/coreos/metering-helm-operator:0.8.0-latest"
         args: ["tiller"]
         imagePullPolicy: Always
         env:
