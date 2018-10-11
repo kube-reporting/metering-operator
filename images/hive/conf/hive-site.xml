@@ -34,6 +34,10 @@
     <value>true</value>
   </property>
   <property>
+    <name>datanucleus.autoStartMechanismMode</name>
+    <value>checked</value>
+  </property>
+  <property>
     <name>hive.metastore.event.db.notification.api.auth</name>
     <value>false</value>
   </property>
