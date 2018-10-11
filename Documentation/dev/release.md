@@ -117,6 +117,7 @@ Bump the `VERSION` ***REMOVED***le to have the `-latest` suf***REMOVED***x:
 
 ```
 echo 0.8.0-latest > VERSION
+git add VERSION
 git commit -m 'VERSION: Bump to version 0.8.0-latest'
 make metering-manifests
 git add manifests
