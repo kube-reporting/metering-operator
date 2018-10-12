@@ -30,10 +30,6 @@
     <value>NOSASL</value>
   </property>
   <property>
-    <name>datanucleus.schema.autoCreateAll</name>
-    <value>true</value>
-  </property>
-  <property>
     <name>datanucleus.autoStartMechanismMode</name>
     <value>checked</value>
   </property>
