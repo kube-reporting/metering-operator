@@ -88,6 +88,11 @@ spec:
       dbConnectionPassword: null
       enableMetastoreSchemaVerification: false
       autoCreateMetastoreSchema: true
+
+      # use to use schematool for creating the schema
+      initSchema: false
+      schemaToolDBType: derby
+
       defaultFileFormat: "orc"
       defaultCompression: "zlib"
       metastoreURIs: "thrift://hive-metastore:9083"
