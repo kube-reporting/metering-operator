@@ -50,16 +50,27 @@ spec:
         image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
         imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         env:
+        - name: HIVE_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: hive-server-config
+              key: log-level
+{{ include "hive-env" . | indent 8 }}
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: limits.memory
         - name: DB_TYPE
           value: "{{ .Values.spec.hive.config.schemaToolDBType }}"
         args: ['schematool', '-dbType', '$(DB_TYPE)', '-initSchema', '--verbose']
         resources:
-          requests:
-            memory: "150Mi"
-            cpu: "10m"
-          limits:
-            memory: "150Mi"
-            cpu: "50m"
+{{ toYaml .Values.spec.hive.metastore.resources | indent 10 }}
         volumeMounts:
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
