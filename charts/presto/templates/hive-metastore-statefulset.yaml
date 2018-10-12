@@ -52,8 +52,7 @@ spec:
         env:
         - name: DB_TYPE
           value: "{{ .Values.spec.hive.config.schemaToolDBType }}"
-        command:
-        - 'schematool -dbType $(DB_TYPE) -initSchema --verbose'
+        command: ['schematool', '-dbType', '$(DB_TYPE)', '-initSchema', '--verbose']
         resources:
           requests:
             memory: "150Mi"
