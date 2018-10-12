@@ -52,7 +52,7 @@ spec:
         env:
         - name: DB_TYPE
           value: "{{ .Values.spec.hive.config.schemaToolDBType }}"
-        command: ['schematool', '-dbType', '$(DB_TYPE)', '-initSchema', '--verbose']
+        args: ['schematool', '-dbType', '$(DB_TYPE)', '-initSchema', '--verbose']
         resources:
           requests:
             memory: "150Mi"
@@ -73,7 +73,7 @@ spec:
 {{- end }}
       containers:
       - name: metastore
-        args: ["--service", "metastore"]
+        args: ["hive", "--service", "metastore"]
         image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
         imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:
