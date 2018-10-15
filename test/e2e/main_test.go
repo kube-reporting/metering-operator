@@ -160,7 +160,7 @@ func TestReportingE2E(t *testing.T) {
 		// validate all the ReportDataSources for our tests exist before running
 		// collect
 		var queries []string
-		waitTimeout := 90 * time.Second
+		waitTimeout := 3 * time.Minute
 
 		// We wait for all ReportDataSources before anything else since even if
 		// we don't use them, the collect endpoint will attempt to collect data
