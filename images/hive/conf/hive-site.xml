@@ -31,7 +31,7 @@
   </property>
   <property>
     <name>datanucleus.autoStartMechanismMode</name>
-    <value>SchemaTable</value>
+    <value>checked</value>
   </property>
   <property>
     <name>hive.metastore.event.db.notification.api.auth</name>
