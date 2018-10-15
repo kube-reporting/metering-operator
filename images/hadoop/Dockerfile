@@ -15,7 +15,7 @@ RUN \
     && yum clean all \
     && rm -rf /tmp/* /var/tmp/*
 
-ENV JAVA_HOME=/etc/alternatives/jre/
+ENV JAVA_HOME=/etc/alternatives/jre
 
 ENV HADOOP_VERSION 3.1.1
 ENV HADOOP_URL https://apache.osuosl.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz

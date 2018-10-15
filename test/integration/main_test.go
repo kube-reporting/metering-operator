@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 func TestReportingIntegration(t *testing.T) {
 	t.Run("TestReportsProduceCorrectData", func(t *testing.T) {
 		var queries []string
-		waitTimeout := time.Minute
+		waitTimeout := 90 * time.Second
 
 		_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
 		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")

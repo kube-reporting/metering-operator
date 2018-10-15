@@ -30,7 +30,15 @@
     <value>NOSASL</value>
   </property>
   <property>
-    <name>datanucleus.schema.autoCreateAll</name>
+    <name>datanucleus.autoStartMechanismMode</name>
+    <value>checked</value>
+  </property>
+  <property>
+    <name>hive.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>hive.metastore.schema.verification</name>
     <value>true</value>
   </property>
 </configuration>

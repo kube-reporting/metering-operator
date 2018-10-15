@@ -46,7 +46,7 @@ spec:
 {{- end }}
       containers:
       - name: hiveserver2
-        args: ["--service", "hiveserver2"]
+        args: ["hive", "--service", "hiveserver2"]
         image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
         imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:

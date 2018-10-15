@@ -1,6 +1,6 @@
 FROM quay.io/coreos/metering-hadoop:latest
 
-ENV HIVE_VERSION=2.3.3
+ENV HIVE_VERSION=3.1.0
 ENV HIVE_HOME=/opt/hive
 ENV PATH=$HIVE_HOME/bin:$PATH
 
@@ -30,7 +30,6 @@ RUN set -x \
 
 # Configure JSON SerDe and AWS Jars
 RUN mkdir -p /usr/hdp/current/hive-server2/auxlib && ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/*aws* /opt/hive/lib
-COPY json-serde-1.3.8-jar-with-dependencies.jar /usr/hdp/current/hive-server2/auxlib
 
 COPY metastore.sh /opt/hive/bin/ext/metastore.sh
 COPY hive-entrypoint.sh /usr/local/bin/hive-entrypoint.sh
