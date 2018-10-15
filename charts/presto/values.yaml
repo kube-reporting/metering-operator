@@ -87,10 +87,10 @@ spec:
       dbConnectionUsername: null
       dbConnectionPassword: null
       enableMetastoreSchemaVerification: false
-      autoCreateMetastoreSchema: true
+      autoCreateMetastoreSchema: false
 
       # use to use schematool for creating the schema
-      initSchema: false
+      initSchema: true
       schemaToolDBType: derby
 
       defaultFileFormat: "orc"
