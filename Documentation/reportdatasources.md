@@ -16,7 +16,7 @@ To read more details on how the different ReportDataSources work, read the [mete
     - `storageLocationName`: The name of the `StorageLocation` resource to use.
     - `spec`: If `storageLocationName` is not set, then this section is used to control the storage location settings. See the [StorageLocation documentation][storage-locations] for details on what can be specified here. Anything valid in a `StorageLocation`'s `spec` is valid here.
   - `prometheusConfig`:
-    - `url`: If present, the URL of the Prometheus instance to scrape for this report
+    - `url`: If present, the URL of the Prometheus instance to scrape for this ReportDataSource.
 - `awsBilling`:
   - `source`:
     - `bucket`: Bucket name to store data into.
