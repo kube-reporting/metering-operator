@@ -1,5 +1,7 @@
 FROM quay.io/coreos/presto:metering-0.212
 
+USER root
+
 RUN yum -y install perl \
     && yum clean all \
     && rm -rf /var/cache/yum
