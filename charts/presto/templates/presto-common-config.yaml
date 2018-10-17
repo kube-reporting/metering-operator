@@ -5,7 +5,56 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  environment: {{ .Values.spec.presto.config.environment | quote }}
-  discovery-uri: {{ .Values.spec.presto.config.discoveryURI | quote }}
-  hive-metastore-uri: {{ .Values.spec.presto.config.hiveMetastoreURI }}
+  entrypoint.sh: |
+    #!/bin/bash
 
+    max_memory() {
+        local memory_limit=$1
+        local ratio=${JAVA_MAX_MEM_RATIO:-50}
+        echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
+    }
+
+    # Check for container memory limits/request and use it to set JVM Heap size.
+    # Defaults to 50% of the limit/request value.
+    if [ -n "$MY_MEM_LIMIT" ]; then
+        export MAX_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
+    elif [ -n "$MY_MEM_REQUEST" ]; then
+        export MAX_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
+    fi
+
+    if [ -z "$MAX_HEAPSIZE" ]; then
+        echo "Unable to automatically set Presto JVM Max Heap Size based on pod request/limits"
+        export MAX_HEAPSIZE=1024
+        echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
+    else
+        echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
+    fi
+
+    # add heapsize to jvm config if not already
+    JVM_CONFIG="${PRESTO_HOME}/etc/jvm.config"
+    if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
+      FLAG="-Xmx${MAX_HEAPSIZE}M"
+      echo "Adding $FLAG to $JVM_CONFIG"
+      echo "$FLAG" >> "$JVM_CONFIG"
+    fi
+
+    # add node id to node config
+    NODE_CONFIG="${PRESTO_HOME}/etc/node.properties"
+    if ! grep -q -F 'node.id' "$NODE_CONFIG"; then
+      NODE_ID="node.id=$MY_NODE_ID"
+      echo "Adding $NODE_ID to $NODE_CONFIG"
+      echo "$NODE_ID" >> "$NODE_CONFIG"
+    fi
+
+    # add UID to /etc/passwd if missing
+    if ! whoami &> /dev/null; then
+        if [ -w /etc/passwd ]; then
+            echo "Adding user ${USER_NAME:-presto} with current UID $(id -u) to /etc/passwd"
+            # Remove existing entry with user first
+            sed -i "/${USER_NAME:-presto}:x/d" /etc/passwd
+            # add our user with our current user ID into passwd
+            echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
+        fi
+    fi
+
+    exec "$@"
