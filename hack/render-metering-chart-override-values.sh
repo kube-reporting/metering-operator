@@ -11,9 +11,6 @@ reporting-operator:
       tag: $1
 presto:
   spec:
-    presto:
-      image:
-        tag: $1
     hive:
       image:
         tag: $1
