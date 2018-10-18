@@ -1,8 +1,8 @@
 spec:
   presto:
     image:
-      repository: quay.io/coreos/metering-presto
-      tag: latest
+      repository: quay.io/coreos/presto
+      tag: metering-0.212
       pullPolicy: Always
 
     securityContext:
@@ -138,8 +138,6 @@ spec:
     awsRegion: ""
     awsAccessKeyID: ""
     awsSecretAccessKey: ""
-    awsCredentialsSecretName: presto-aws-credentials-secrets
-    createAwsCredentialsSecret: true
 
     sharedVolume:
       enabled: false

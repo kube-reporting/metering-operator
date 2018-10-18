@@ -2,17 +2,41 @@ apiVersion: v1
 kind: Con***REMOVED***gMap
 metadata:
   name: presto-coordinator-con***REMOVED***g
+  labels:
+    app: presto
 {{- block "extraMetadata" . }}
 {{- end }}
 data:
-  log-level: {{ upper .Values.spec.presto.coordinator.con***REMOVED***g.logLevel | quote }}
-  node-scheduler-include-coordinator: {{ .Values.spec.presto.coordinator.con***REMOVED***g.nodeSchedulerIncludeCoordinator | quote }}
+  log.properties: |
+    com.facebook.presto={{ upper .Values.spec.presto.coordinator.con***REMOVED***g.logLevel }}
+
+  node.properties: |
+    node.data-dir=/var/presto/data
+    node.environment=production
+
+  con***REMOVED***g.properties: |
+    http-server.http.port=8080
+    jmx.rmiserver.port=8081
+    coordinator=true
+    discovery-server.enabled=true
+    discovery.uri={{ .Values.spec.presto.con***REMOVED***g.discoveryURI }}
+    node-scheduler.include-coordinator={{ .Values.spec.presto.coordinator.con***REMOVED***g.nodeSchedulerIncludeCoordinator }}
 {{- if .Values.spec.presto.coordinator.con***REMOVED***g.taskConcurrency }}
-  task-concurrency: {{ .Values.spec.presto.coordinator.con***REMOVED***g.taskConcurrency | quote }}
+    task.concurrency={{ .Values.spec.presto.coordinator.con***REMOVED***g.taskConcurrency }}
 {{- end }}
 {{- if .Values.spec.presto.coordinator.con***REMOVED***g.taskMaxWorkerThreads }}
-  task-max-worker-threads: {{ .Values.spec.presto.coordinator.con***REMOVED***g.taskMaxWorkerThreads | quote }}
+    task.max-worker-threads: {{ .Values.spec.presto.coordinator.con***REMOVED***g.taskMaxWorkerThreads }}
 {{- end }}
 {{- if .Values.spec.presto.coordinator.con***REMOVED***g.taskMinDrivers }}
-  task-min-drivers: {{ .Values.spec.presto.coordinator.con***REMOVED***g.taskMinDrivers | quote }}
+    task.min-drivers: {{ .Values.spec.presto.coordinator.con***REMOVED***g.taskMinDrivers }}
 {{- end }}
+
+  jvm.con***REMOVED***g: |
+    -server
+    -XX:+UseG1GC
+    -XX:G1HeapRegionSize=32M
+    -XX:+UseGCOverheadLimit
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:OnOutOfMemoryError=kill -9 %p
+    -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml

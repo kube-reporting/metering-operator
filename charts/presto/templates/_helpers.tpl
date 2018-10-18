@@ -1,32 +1,26 @@
+{{- de***REMOVED***ne "presto-hive-catalog-properties" -}}
+connector.name=hive-hadoop2
+hive.allow-drop-table=true
+hive.allow-rename-table=true
+hive.storage-format={{ .Values.spec.hive.con***REMOVED***g.defaultFileFormat | upper }}
+hive.compression-codec=SNAPPY
+hive.hdfs.authentication.type=NONE
+hive.metastore.authentication.type=NONE
+hive.metastore.uri={{ .Values.spec.hive.con***REMOVED***g.metastoreURIs }}
+{{- if .Values.spec.con***REMOVED***g.awsAccessKeyID }}
+hive.s3.aws-access-key={{ .Values.spec.con***REMOVED***g.awsAccessKeyID }}
+{{- end}}
+{{- if .Values.spec.con***REMOVED***g.awsSecretAccessKey }}
+hive.s3.aws-secret-key={{ .Values.spec.con***REMOVED***g.awsSecretAccessKey }}
+{{- end}}
+{{ end }}
+
+{{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}
+connector.name=jmx
+{{ end }}
+
 {{- de***REMOVED***ne "presto-common-env" }}
-- name: HIVE_CATALOG_hive_s3_aws___access___key
-  valueFrom:
-    secretKeyRef:
-      name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
-      key: aws-access-key-id
-      optional: true
-- name: HIVE_CATALOG_hive_s3_aws___secret___key
-  valueFrom:
-    secretKeyRef:
-      name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
-      key: aws-secret-access-key
-      optional: true
-- name: HIVE_CATALOG_hive_metastore_uri
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: presto-common-con***REMOVED***g
-      key: hive-metastore-uri
-- name: PRESTO_CONF_discovery_uri
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: presto-common-con***REMOVED***g
-      key: discovery-uri
-- name: PRESTO_NODE_node_environment
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: presto-common-con***REMOVED***g
-      key: environment
-- name: PRESTO_NODE_node_id
+- name: MY_NODE_ID
   valueFrom:
     ***REMOVED***eldRef:
       ***REMOVED***eldPath: metadata.uid
@@ -55,31 +49,6 @@
 - name: JAVA_MAX_MEM_RATIO
   value: "50"
 {{- end }}
-{{- de***REMOVED***ne "presto-env" }}
-- name: PRESTO_LOG_com_facebook_presto
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: {{ . }}
-      key: log-level
-- name: PRESTO_CONF_task_concurrency
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: {{ . }}
-      key: task-concurrency
-      optional: true
-- name: PRESTO_CONF_task_max___worker___threads
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: {{ . }}
-      key: task-max-worker-threads
-      optional: true
-- name: PRESTO_CONF_task_min___drivers
-  valueFrom:
-    con***REMOVED***gMapKeyRef:
-      name: {{ . }}
-      key: task-min-drivers
-      optional: true
-{{- end }}
 
 {{- de***REMOVED***ne "hive-env" }}
 - name: CORE_CONF_fs_defaultFS
@@ -87,18 +56,6 @@
     con***REMOVED***gMapKeyRef:
       name: hive-common-con***REMOVED***g
       key: default-fs
-      optional: true
-- name: CORE_CONF_fs_s3a_access_key
-  valueFrom:
-    secretKeyRef:
-      name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
-      key: aws-access-key-id
-      optional: true
-- name: CORE_CONF_fs_s3a_secret_key
-  valueFrom:
-    secretKeyRef:
-      name: "{{ .Values.spec.con***REMOVED***g.awsCredentialsSecretName }}"
-      key: aws-secret-access-key
       optional: true
 - name: HIVE_SITE_CONF_hive_metastore_uris
   valueFrom:
