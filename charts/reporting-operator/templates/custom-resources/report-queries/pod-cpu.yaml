@@ -151,7 +151,7 @@ spec:
       sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
     FROM {| generationQueryViewName "pod-cpu-request-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
 
@@ -210,7 +210,7 @@ spec:
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
 
@@ -261,7 +261,7 @@ spec:
       sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
     FROM {| generationQueryViewName "pod-cpu-request-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
     ORDER BY pod_request_cpu_core_seconds DESC
 
@@ -312,7 +312,7 @@ spec:
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
     ORDER BY pod_usage_cpu_core_seconds DESC
 
@@ -366,7 +366,7 @@ spec:
         sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
       FROM {| generationQueryViewName "node-cpu-allocatable" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-        AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+        AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     ), pod_cpu_consumption AS (
       SELECT pod,
               namespace,
@@ -376,7 +376,7 @@ spec:
               sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
       FROM {| generationQueryViewName "pod-cpu-request-raw" |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-      AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+      AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       GROUP BY pod, namespace, node
     )
     SELECT

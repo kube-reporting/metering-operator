@@ -240,10 +240,12 @@ The `WHERE` clause generally for this generally looks the same for all `ReportGe
 
 ```
 WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
-AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+AND "timestamp" < timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
 ```
 
-However, once we begin accessing variables in the `ReportGenerationQuery` this means we have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
+Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classification_of_intervals); that is, should collect data with timestamps equal to or greater than the start time and less than the end time, as seen above.
+
+Once we begin accessing variables in the `ReportGenerationQuery` this means we have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
 Adding this filter to our query and updating our `spec.view.disabled` to true and we get the final version of our ReportGenerationQuery.
 Save the snippet below into a file named `unready-deployment-replicas-reportgenerationquery.yaml`:
 
@@ -274,7 +276,7 @@ spec:
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
     FROM {| dataSourceTableName "unready-deployment-replicas" |}
     WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
     GROUP BY labels['namespace'], labels['deployment']
     ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
 ```
