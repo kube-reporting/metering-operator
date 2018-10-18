@@ -51,7 +51,6 @@ DOCKER_COMMON_NAMES := \
 	metering-operator \
 	hadoop \
 	hive \
-	presto \
 	metering-e2e
 
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
@@ -65,7 +64,6 @@ REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
 HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/metering-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/metering-hive
-PRESTO_IMAGE := $(DOCKER_BASE_URL)/metering-presto
 METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
 
 GIT_SHA    := $(shell git rev-parse HEAD)
@@ -194,9 +192,6 @@ metering-operator-docker-build: Dockerfile.metering-operator helm-operator-docke
 
 helm-operator-docker-build: images/helm-operator/Dockerfile $(find -type f images/helm-operator)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
-
-presto-docker-build: images/presto/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(PRESTO_IMAGE)
 
 hadoop-docker-build: images/hadoop/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true

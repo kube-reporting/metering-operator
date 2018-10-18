@@ -68,8 +68,6 @@ spec:
         awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
       presto:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-        image:
-          tag: ${DEPLOY_TAG}
       hive:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
         image:
