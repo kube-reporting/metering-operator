@@ -18,7 +18,6 @@ data:
     http-server.http.port=8080
     jmx.rmiserver.port=8081
     coordinator=false
-    discovery-server.enabled=false
     discovery.uri={{ .Values.spec.presto.config.discoveryURI }}
     node-scheduler.include-coordinator={{ .Values.spec.presto.coordinator.config.nodeSchedulerIncludeCoordinator }}
 {{- if .Values.spec.presto.coordinator.config.taskConcurrency }}
