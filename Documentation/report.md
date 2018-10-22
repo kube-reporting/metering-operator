@@ -286,6 +286,21 @@ kubectl -n $METERING_NAMESPACE get reportgenerationqueries namespace-memory-requ
 }
 ```
 
+### Inputs
+
+The `inputs` ***REMOVED***eld of a Report `spec` can be used to pass custom values into a `ReportGenerationQuery`.
+
+It is a list of name-value pairs:
+
+```
+spec:
+  inputs:
+  - name: AggregatedReportName
+    value: namespace-cpu-usage-hourly
+```
+
+For an example of how this can be used, see it in action [in a roll-up report](rollup-reports.md#3-create-the-aggregator-report).
+
 ### Report Status
 
 The execution of a report can be tracked using its status ***REMOVED***eld. Any errors occurring during the preparation of a report will be recorded here.
