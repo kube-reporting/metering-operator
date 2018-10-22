@@ -29,7 +29,7 @@ Most of these functions are for referring to other resources such as `ReportData
 
 - `Report`: This object has two fields, `ReportingStart` and `ReportingEnd` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `ScheduledReport` the values map to the specific period being collected when the `ScheduledReport` runs.
   - `ReportingStart`: A [time.Time][go-time] object that is generally used to filter the results of a `SELECT` query using a `WHERE` clause.
-  - `ReportingEnd`: A [time.Time][go-time] object that is generally used to filter the results of a `SELECT` query using a `WHERE` clause.
+  - `ReportingEnd`: A [time.Time][go-time] object that is generally used to filter the results of a `SELECT` query using a `WHERE` clause. Built-in queries select datapoints matching `ReportingStart <= timestamp > ReportingEnd`.
 - `DynamicDependentQueries`: This is a list of `ReportGenerationQuery` objects that were listed in the `spec.dynamicReportQueries` field. Generally this list isn't directly referenced in query, but is used indirectly with the `renderReportGenerationQuery` [template function](#template-functions).
 - `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report or ScheduledReport's `spec.inputs`. The value currently is always a string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time].
 
@@ -160,7 +160,7 @@ spec:
       sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
     FROM {| generationQueryViewName "pod-memory-request-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
     ORDER BY pod_request_memory_byte_seconds DESC
 ```
