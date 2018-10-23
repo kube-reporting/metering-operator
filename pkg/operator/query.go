@@ -19,7 +19,7 @@ func (op *Reporting) runReportGenerationQueryWorker() {
 	// ReportGenerationQueries can reference a lot of other resources, and it may
 	// take time for them to all to ***REMOVED***nish setup
 	const maxRequeues = 10
-	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue, maxRequeues) {
+	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.reportGenerationQueryQueue, maxRequeues) {
 	}
 }
 
@@ -32,7 +32,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 
 	logger = logger.WithField("ReportGenerationQuery", name)
 
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+	reportGenerationQueryLister := op.reportGenerationQueryLister
 	reportGenerationQuery, err := reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -60,10 +60,10 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		viewName = generationQuery.Status.ViewName
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+	reportLister := op.reportLister
+	scheduledReportLister := op.scheduledReportLister
+	reportDataSourceLister := op.reportDataSourceLister
+	reportGenerationQueryLister := op.reportGenerationQueryLister
 
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
 		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),

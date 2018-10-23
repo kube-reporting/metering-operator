@@ -39,20 +39,18 @@ const (
 	APIV2Reports            = "/api/v2/reports"
 )
 
-type meteringListers struct {
-	reports                 listers.ReportNamespaceLister
-	scheduledReports        listers.ScheduledReportNamespaceLister
-	reportGenerationQueries listers.ReportGenerationQueryNamespaceLister
-	prestoTables            listers.PrestoTableNamespaceLister
-}
-
 type server struct {
 	logger log.FieldLogger
 
 	rand          *rand.Rand
 	queryer       presto.ExecQueryer
 	collectorFunc prometheusImporterFunc
-	listers       meteringListers
+
+	namespace                    string
+	reportLister                 listers.ReportLister
+	scheduledReportLister        listers.ScheduledReportLister
+	reportGenerationQuerieLister listers.ReportGenerationQueryLister
+	prestoTableLister            listers.PrestoTableLister
 }
 
 type requestLogger struct {
@@ -63,7 +61,17 @@ func (l *requestLogger) Print(v ...interface{}) {
 	l.FieldLogger.Info(v...)
 }
 
-func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Rand, collectorFunc prometheusImporterFunc, listers meteringListers) chi.Router {
+func newRouter(
+	logger log.FieldLogger,
+	queryer presto.ExecQueryer,
+	rand *rand.Rand,
+	collectorFunc prometheusImporterFunc,
+	namespace string,
+	reportLister listers.ReportLister,
+	scheduledReportLister listers.ScheduledReportLister,
+	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
+	prestoTableLister listers.PrestoTableLister,
+) chi.Router {
 	router := chi.NewRouter()
 	logger = logger.WithField("component", "api")
 	requestLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: &requestLogger{logger}})
@@ -71,11 +79,15 @@ func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Ra
 	router.Use(prometheusMiddleware)
 
 	srv := &server{
-		logger:        logger,
-		rand:          rand,
-		queryer:       queryer,
-		collectorFunc: collectorFunc,
-		listers:       listers,
+		logger:                       logger,
+		rand:                         rand,
+		queryer:                      queryer,
+		collectorFunc:                collectorFunc,
+		namespace:                    namespace,
+		reportLister:                 reportLister,
+		scheduledReportLister:        scheduledReportLister,
+		reportGenerationQuerieLister: reportGenerationQuerieLister,
+		prestoTableLister:            prestoTableLister,
 	}
 
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportHandler)
@@ -194,7 +206,7 @@ func checkForFields(***REMOVED***elds []string, vals url.Values) error {
 
 func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the scheduledReport to make sure it's isn't failed
-	report, err := srv.listers.scheduledReports.Get(name)
+	report, err := srv.scheduledReportLister.ScheduledReports(srv.namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting scheduledReport: %v", err)
@@ -209,7 +221,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		}
 	}
 
-	reportQuery, err := srv.listers.reportGenerationQueries.Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -217,7 +229,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "ScheduledReport is not processed yet")
@@ -266,7 +278,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a ***REMOVED***nished state
-	report, err := srv.listers.reports.Get(name)
+	report, err := srv.reportLister.Reports(srv.namespace).Get(name)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if k8serrors.IsNotFound(err) {
@@ -293,7 +305,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	reportQuery, err := srv.listers.reportGenerationQueries.Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -301,7 +313,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("report", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(prestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")

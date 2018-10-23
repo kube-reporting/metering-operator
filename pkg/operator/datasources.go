@@ -51,7 +51,7 @@ func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
 	const maxRequeues = 10
-	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.queues.reportDataSourceQueue, maxRequeues) {
+	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.reportDataSourceQueue, maxRequeues) {
 	}
 }
 
@@ -63,7 +63,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	}
 
 	logger = logger.WithField("ReportDataSource", name)
-	reportDataSource, err := op.informers.Metering().V1alpha1().ReportDataSources().Lister().ReportDataSources(namespace).Get(name)
+	reportDataSource, err := op.reportDataSourceLister.ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ReportDataSource %s does not exist anymore", key)
@@ -143,7 +143,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	queryName := dataSource.Spec.Promsum.Query
 	tableName := dataSourceTableName(dataSourceName)
 
-	reportPromQuery, err := op.informers.Metering().V1alpha1().ReportPrometheusQueries().Lister().ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
+	reportPromQuery, err := op.reportPrometheusQueryLister.ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
 	if err != nil {
 		return fmt.Errorf("unable to get ReportPrometheusQuery %s for ReportDataSource %s, %s", queryName, dataSourceName, err)
 	}
@@ -230,7 +230,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.Status.TableName)
 	prestoTableResourceName := prestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
-	prestoTable, err := op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
+	prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
 	if err != nil {
 		// if not found, try for the uncached copy
 		if apierrors.IsNotFound(err) {
