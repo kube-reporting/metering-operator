@@ -10,90 +10,12 @@ import (
 	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
 
-type queues struct {
-	queueList                  []workqueue.RateLimitingInterface
-	reportQueue                workqueue.RateLimitingInterface
-	scheduledReportQueue       workqueue.RateLimitingInterface
-	reportDataSourceQueue      workqueue.RateLimitingInterface
-	reportGenerationQueryQueue workqueue.RateLimitingInterface
-	prestoTableQueue           workqueue.RateLimitingInterface
-}
-
-func (op *Reporting) setupInformers() {
-	op.informers = cbInformers.NewFilteredSharedInformerFactory(op.meteringClient, defaultResyncPeriod, op.cfg.Namespace, nil)
-	inf := op.informers.Metering().V1alpha1()
-	// hacks to ensure these informers are created before we call
-	// op.informers.Start()
-	inf.PrestoTables().Informer()
-	inf.StorageLocations().Informer()
-	inf.ReportDataSources().Informer()
-	inf.ReportGenerationQueries().Informer()
-	inf.ReportPrometheusQueries().Informer()
-	inf.Reports().Informer()
-	inf.ScheduledReports().Informer()
-}
-
-func (op *Reporting) setupQueues() {
-	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
-	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
-	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
-	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
-	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
-
-	op.queues = queues{
-		queueList: []workqueue.RateLimitingInterface{
-			reportQueue,
-			scheduledReportQueue,
-			reportDataSourceQueue,
-			reportGenerationQueryQueue,
-			prestoTableQueue,
-		},
-		reportQueue:                reportQueue,
-		scheduledReportQueue:       scheduledReportQueue,
-		reportDataSourceQueue:      reportDataSourceQueue,
-		reportGenerationQueryQueue: reportGenerationQueryQueue,
-		prestoTableQueue:           prestoTableQueue,
-	}
-}
-
-func (op *Reporting) setupEventHandlers() {
-	op.informers.Metering().V1alpha1().Reports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addReport,
-		UpdateFunc: op.updateReport,
-		DeleteFunc: op.deleteReport,
-	})
-
-	op.informers.Metering().V1alpha1().ScheduledReports().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addScheduledReport,
-		UpdateFunc: op.updateScheduledReport,
-		DeleteFunc: op.deleteScheduledReport,
-	})
-
-	op.informers.Metering().V1alpha1().ReportDataSources().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addReportDataSource,
-		UpdateFunc: op.updateReportDataSource,
-		DeleteFunc: op.deleteReportDataSource,
-	})
-
-	op.informers.Metering().V1alpha1().ReportGenerationQueries().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addReportGenerationQuery,
-		UpdateFunc: op.updateReportGenerationQuery,
-	})
-
-	op.informers.Metering().V1alpha1().PrestoTables().Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addPrestoTable,
-		UpdateFunc: op.updatePrestoTable,
-		DeleteFunc: op.deletePrestoTable,
-	})
-}
-
-func (qs queues) ShutdownQueues() {
-	for _, queue := range qs.queueList {
+func (op *Reporting) shutdownQueues() {
+	for _, queue := range op.queueList {
 		queue.ShutDown()
 	}
 }
@@ -138,7 +60,7 @@ func (op *Reporting) deleteReport(obj interface{}) {
 		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	op.queues.reportQueue.Add(key)
+	op.reportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReport(report *cbTypes.Report) {
@@ -147,7 +69,7 @@ func (op *Reporting) enqueueReport(report *cbTypes.Report) {
 		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	op.queues.reportQueue.Add(key)
+	op.reportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
@@ -156,7 +78,7 @@ func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
 		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	op.queues.reportQueue.AddRateLimited(key)
+	op.reportQueue.AddRateLimited(key)
 }
 
 func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Duration) {
@@ -165,7 +87,7 @@ func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Du
 		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	op.queues.reportQueue.AddAfter(key, duration)
+	op.reportQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addScheduledReport(obj interface{}) {
@@ -219,7 +141,7 @@ func (op *Reporting) deleteScheduledReport(obj interface{}) {
 		op.logger.WithField("scheduledReport", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
-	op.queues.scheduledReportQueue.Add(key)
+	op.scheduledReportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
@@ -228,7 +150,7 @@ func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
 		return
 	}
-	op.queues.scheduledReportQueue.Add(key)
+	op.scheduledReportQueue.Add(key)
 }
 
 func (op *Reporting) enqueueScheduledReportAfter(report *cbTypes.ScheduledReport, duration time.Duration) {
@@ -237,7 +159,7 @@ func (op *Reporting) enqueueScheduledReportAfter(report *cbTypes.ScheduledReport
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
 		return
 	}
-	op.queues.scheduledReportQueue.AddAfter(key, duration)
+	op.scheduledReportQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {
@@ -282,7 +204,7 @@ func (op *Reporting) deleteReportDataSource(obj interface{}) {
 		op.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
 		return
 	}
-	op.queues.reportDataSourceQueue.Add(key)
+	op.reportDataSourceQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
@@ -291,7 +213,7 @@ func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
 		op.logger.WithField("reportDataSource", ds.Name).WithError(err).Errorf("couldn't get key for object: %#v", ds)
 		return
 	}
-	op.queues.reportDataSourceQueue.Add(key)
+	op.reportDataSourceQueue.Add(key)
 }
 
 func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, duration time.Duration) {
@@ -300,7 +222,7 @@ func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, 
 		op.logger.WithField("reportDataSource", ds.Name).WithError(err).Errorf("couldn't get key for object: %#v", ds)
 		return
 	}
-	op.queues.reportDataSourceQueue.AddAfter(key, duration)
+	op.reportDataSourceQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addReportGenerationQuery(obj interface{}) {
@@ -333,7 +255,7 @@ func (op *Reporting) enqueueReportGenerationQuery(query *cbTypes.ReportGeneratio
 		op.logger.WithField("reportGenerationQuery", query.Name).WithError(err).Errorf("couldn't get key for object: %#v", query)
 		return
 	}
-	op.queues.reportGenerationQueryQueue.Add(key)
+	op.reportGenerationQueryQueue.Add(key)
 }
 
 func (op *Reporting) addPrestoTable(obj interface{}) {
@@ -382,7 +304,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 		op.logger.WithField("prestoTable", prestoTable.Name).WithError(err).Errorf("couldn't get key for object: %#v", prestoTable)
 		return
 	}
-	op.queues.prestoTableQueue.Add(key)
+	op.prestoTableQueue.Add(key)
 }
 
 func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
@@ -391,7 +313,7 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 		op.logger.WithField("prestoTable", table.Name).WithError(err).Errorf("couldn't get key for object: %#v", table)
 		return
 	}
-	op.queues.prestoTableQueue.Add(key)
+	op.prestoTableQueue.Add(key)
 }
 
 type workerProcessFunc func(logger log.FieldLogger) bool

@@ -59,7 +59,7 @@ func (op *Reporting) runReportWorker() {
 	logger := op.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
 	const maxRequeues = 5
-	for op.processResource(logger, op.syncReport, "Report", op.queues.reportQueue, maxRequeues) {
+	for op.processResource(logger, op.syncReport, "Report", op.reportQueue, maxRequeues) {
 	}
 }
 
@@ -76,7 +76,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger = logger.WithField("Report", name)
-	report, err := op.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
+	report, err := op.reportLister.Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("Report %s does not exist anymore", key)
@@ -120,7 +120,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 				return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
 			}
 
-			err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
+			err = op.reportInformer.Informer().GetIndexer().Update(newReport)
 			if err != nil {
 				logger.WithError(err).Warnf("unable to update report cache with updated report")
 				// if we cannot update it, don't re queue it
@@ -180,22 +180,17 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
 	)
 	if err != nil {

@@ -33,18 +33,18 @@ func (op *Reporting) runPrestoTableWorker(stopCh <-chan struct{}) {
 
 }
 func (op *Reporting) processPrestoTable(logger log.FieldLogger) bool {
-	obj, quit := op.queues.prestoTableQueue.Get()
+	obj, quit := op.prestoTableQueue.Get()
 	if quit {
 		logger.Infof("queue is shutting down, exiting PrestoTable worker")
 		return false
 	}
-	defer op.queues.prestoTableQueue.Done(obj)
+	defer op.prestoTableQueue.Done(obj)
 
 	logger = logger.WithFields(newLogIdentifier(op.rand))
-	if key, ok := op.getKeyFromQueueObj(logger, "PrestoTable", obj, op.queues.prestoTableQueue); ok {
+	if key, ok := op.getKeyFromQueueObj(logger, "PrestoTable", obj, op.prestoTableQueue); ok {
 		err := op.syncPrestoTable(logger, key)
 		const maxRequeues = 10
-		op.handleErr(logger, err, "PrestoTable", key, op.queues.prestoTableQueue, maxRequeues)
+		op.handleErr(logger, err, "PrestoTable", key, op.prestoTableQueue, maxRequeues)
 	}
 	return true
 }
@@ -58,7 +58,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 
 	logger = logger.WithField("PrestoTable", name)
 
-	prestoTableLister := op.informers.Metering().V1alpha1().PrestoTables().Lister()
+	prestoTableLister := op.prestoTableLister
 	prestoTable, err := prestoTableLister.PrestoTables(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {

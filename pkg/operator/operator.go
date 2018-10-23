@@ -27,16 +27,20 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/transport"
+	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
+	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
+	informers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/metering/v1alpha1"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -98,12 +102,36 @@ type Config struct {
 }
 
 type Reporting struct {
-	cfg            Config
-	kubeConfig     *rest.Config
-	informers      cbInformers.SharedInformerFactory
-	queues         queues
+	cfg        Config
+	kubeConfig *rest.Config
+
 	meteringClient cbClientset.Interface
 	kubeClient     corev1.CoreV1Interface
+
+	informerFactory factory.SharedInformerFactory
+
+	prestoTableInformer           informers.PrestoTableInformer
+	reportInformer                informers.ReportInformer
+	reportDataSourceInformer      informers.ReportDataSourceInformer
+	reportGenerationQueryInformer informers.ReportGenerationQueryInformer
+	reportPrometheusQueryInformer informers.ReportPrometheusQueryInformer
+	scheduledReportInformer       informers.ScheduledReportInformer
+	storageLocationInformer       informers.StorageLocationInformer
+
+	prestoTableLister           listers.PrestoTableLister
+	reportLister                listers.ReportLister
+	reportDataSourceLister      listers.ReportDataSourceLister
+	reportGenerationQueryLister listers.ReportGenerationQueryLister
+	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
+	scheduledReportLister       listers.ScheduledReportLister
+	storageLocationLister       listers.StorageLocationLister
+
+	queueList                  []workqueue.RateLimitingInterface
+	reportQueue                workqueue.RateLimitingInterface
+	scheduledReportQueue       workqueue.RateLimitingInterface
+	reportDataSourceQueue      workqueue.RateLimitingInterface
+	reportGenerationQueryQueue workqueue.RateLimitingInterface
+	prestoTableQueue           workqueue.RateLimitingInterface
 
 	prestoConn    *sql.DB
 	prestoQueryer presto.ExecQueryer
@@ -126,23 +154,13 @@ type Reporting struct {
 	healthCheckSingleFlight singleflight.Group
 }
 
-func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, error) {
-	op := &Reporting{
-		cfg:       cfg,
-		logger:    logger,
-		clock:     clock,
-		importers: make(map[string]*prestostore.PrometheusImporter),
-	}
-	logger.Debugf("Config: %+v", cfg)
-
+func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	if err := cfg.APITLSConfig.Valid(); err != nil {
 		return nil, err
 	}
 	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
 		return nil, err
 	}
-
-	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 
 	configOverrides := &clientcmd.ConfigOverrides{}
 	var clientConfig clientcmd.ClientConfig
@@ -158,29 +176,131 @@ func New(logger log.FieldLogger, cfg Config, clock clock.Clock) (*Reporting, err
 	}
 
 	var err error
-	op.kubeConfig, err = clientConfig.ClientConfig()
+	kubeConfig, err := clientConfig.ClientConfig()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get Kubernetes client config: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	op.kubeClient, err = corev1.NewForConfig(op.kubeConfig)
+	kubeClient, err := corev1.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
 	logger.Debugf("setting up Metering client...")
-	op.meteringClient, err = cbClientset.NewForConfig(op.kubeConfig)
+	meteringClient, err := cbClientset.NewForConfig(kubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
-	op.setupInformers()
-	op.setupQueues()
-	op.setupEventHandlers()
+	clock := clock.RealClock{}
+	rand := rand.New(rand.NewSource(clock.Now().Unix()))
+	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, meteringClient)
 
-	logger.Debugf("configuring event listeners...")
 	return op, nil
+}
+
+func newReportingOperator(
+	logger log.FieldLogger,
+	clock clock.Clock,
+	rand *rand.Rand,
+	cfg Config,
+	kubeConfig *rest.Config,
+	kubeClient corev1.CoreV1Interface,
+	meteringClient cbClientset.Interface,
+) *Reporting {
+
+	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, cfg.Namespace, nil)
+
+	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
+	reportInformer := informerFactory.Metering().V1alpha1().Reports()
+	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
+	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
+	reportPrometheusQueryInformer := informerFactory.Metering().V1alpha1().ReportPrometheusQueries()
+	scheduledReportInformer := informerFactory.Metering().V1alpha1().ScheduledReports()
+	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
+
+	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
+	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
+	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
+	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
+	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
+
+	queueList := []workqueue.RateLimitingInterface{
+		reportQueue,
+		scheduledReportQueue,
+		reportDataSourceQueue,
+		reportGenerationQueryQueue,
+		prestoTableQueue,
+	}
+
+	op := &Reporting{
+		logger:         logger,
+		cfg:            cfg,
+		kubeConfig:     kubeConfig,
+		meteringClient: meteringClient,
+		kubeClient:     kubeClient,
+
+		informerFactory: informerFactory,
+
+		prestoTableInformer:           prestoTableInformer,
+		reportInformer:                reportInformer,
+		reportDataSourceInformer:      reportDataSourceInformer,
+		reportGenerationQueryInformer: reportGenerationQueryInformer,
+		reportPrometheusQueryInformer: reportPrometheusQueryInformer,
+		scheduledReportInformer:       scheduledReportInformer,
+		storageLocationInformer:       storageLocationInformer,
+
+		prestoTableLister:           prestoTableInformer.Lister(),
+		reportLister:                reportInformer.Lister(),
+		reportDataSourceLister:      reportDataSourceInformer.Lister(),
+		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
+		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
+		scheduledReportLister:       scheduledReportInformer.Lister(),
+		storageLocationLister:       storageLocationInformer.Lister(),
+
+		queueList:                  queueList,
+		reportQueue:                reportQueue,
+		scheduledReportQueue:       scheduledReportQueue,
+		reportDataSourceQueue:      reportDataSourceQueue,
+		reportGenerationQueryQueue: reportGenerationQueryQueue,
+		prestoTableQueue:           prestoTableQueue,
+
+		rand:      rand,
+		clock:     clock,
+		importers: make(map[string]*prestostore.PrometheusImporter),
+	}
+
+	reportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReport,
+		UpdateFunc: op.updateReport,
+		DeleteFunc: op.deleteReport,
+	})
+
+	scheduledReportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addScheduledReport,
+		UpdateFunc: op.updateScheduledReport,
+		DeleteFunc: op.deleteScheduledReport,
+	})
+
+	reportDataSourceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReportDataSource,
+		UpdateFunc: op.updateReportDataSource,
+		DeleteFunc: op.deleteReportDataSource,
+	})
+
+	reportGenerationQueryInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReportGenerationQuery,
+		UpdateFunc: op.updateReportGenerationQuery,
+	})
+
+	prestoTableInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addPrestoTable,
+		UpdateFunc: op.updatePrestoTable,
+		DeleteFunc: op.deletePrestoTable,
+	})
+
+	return op
 }
 
 func (op *Reporting) Run(stopCh <-chan struct{}) error {
@@ -221,7 +341,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
-	go op.informers.Start(stopCh)
+	go op.informerFactory.Start(stopCh)
 
 	op.logger.Infof("setting up DB connections")
 
@@ -258,21 +378,17 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}
 
 	op.logger.Info("waiting for caches to sync")
-	for t, synced := range op.informers.WaitForCacheSync(stopCh) {
+	for t, synced := range op.informerFactory.WaitForCacheSync(stopCh) {
 		if !synced {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
 	}
 
 	op.logger.Infof("starting HTTP server")
-	listers := meteringListers{
-		reports:                 op.informers.Metering().V1alpha1().Reports().Lister().Reports(op.cfg.Namespace),
-		scheduledReports:        op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(op.cfg.Namespace),
-		reportGenerationQueries: op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(op.cfg.Namespace),
-		prestoTables:            op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace),
-	}
-
-	apiRouter := newRouter(op.logger, op.prestoQueryer, op.rand, op.importPrometheusForTimeRange, listers)
+	apiRouter := newRouter(
+		op.logger, op.prestoQueryer, op.rand, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
+	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
 	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
 
@@ -403,7 +519,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	// shutdown queues so that they get drained, and workers can begin their
 	// shutdown
-	go op.queues.ShutdownQueues()
+	go op.shutdownQueues()
 
 	// wait for our workers to stop
 	wg.Wait()

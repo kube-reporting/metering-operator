@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/clock"
 
 	"github.com/operator-framework/operator-metering/pkg/operator"
 )
@@ -132,8 +131,7 @@ func startReporting(cmd *cobra.Command, args []string) {
 }
 
 func runReporting(logger log.FieldLogger, cfg operator.Config, stopCh <-chan struct{}) {
-	clock := clock.RealClock{}
-	op, err := operator.New(logger, cfg, clock)
+	op, err := operator.New(logger, cfg)
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup reporting-operator")
 	}

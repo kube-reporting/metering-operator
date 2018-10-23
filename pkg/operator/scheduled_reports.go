@@ -65,7 +65,7 @@ func (op *Reporting) runScheduledReportWorker() {
 	logger := op.logger.WithField("component", "scheduledReportWorker")
 	logger.Infof("ScheduledReport worker started")
 	const maxRequeues = 5
-	for op.processResource(logger, op.syncScheduledReport, "ScheduledReport", op.queues.scheduledReportQueue, maxRequeues) {
+	for op.processResource(logger, op.syncScheduledReport, "ScheduledReport", op.scheduledReportQueue, maxRequeues) {
 	}
 }
 
@@ -77,7 +77,7 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	}
 
 	logger = logger.WithField("ScheduledReport", name)
-	scheduledReport, err := op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
+	scheduledReport, err := op.scheduledReportLister.ScheduledReports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
@@ -340,16 +340,16 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
+	reportLister := op.reportLister
+	scheduledReportLister := op.scheduledReportLister
+	reportGenerationQueryLister := op.reportGenerationQueryLister
+	reportDataSourceLister := op.reportDataSourceLister
 
 	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
 		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
