@@ -1,7 +1,7 @@
 FROM openshift/origin-release:golang-1.10 as build
 
-COPY . $GOPATH/src/github.com/operator-framework/operator-metering
-WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
+COPY . /go/src/github.com/operator-framework/operator-metering
+WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 RUN make reporting-operator-bin RUN_UPDATE_CODEGEN=false CHECK_GO_FILES=false
 
