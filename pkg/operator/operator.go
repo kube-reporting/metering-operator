@@ -132,6 +132,8 @@ type Reporting struct {
 	prestoQueryer db.Queryer
 	hiveQueryer   db.Queryer
 
+	reportResultsRepo prestostore.ReportResultsRepo
+
 	promConn prom.API
 
 	clock clock.Clock
@@ -391,12 +393,12 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
-	reportResultsRepo := prestostore.NewReportResultsRepo(op.prestoQueryer)
+	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
 	promMetricsRepo := prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
-		op.logger, op.rand, promMetricsRepo, reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.logger, op.rand, promMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
 		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
