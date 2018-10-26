@@ -11,7 +11,6 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const (
@@ -102,7 +101,7 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	if deleteExistingData {
 		logger.Debugf("deleting any preexisting rows in %s", tableName)
-		err = presto.DeleteFrom(op.prestoQueryer, tableName)
+		err = op.reportResultsRepo.DeleteReportResults(tableName)
 		if err != nil {
 			return fmt.Errorf("couldn't empty table %s of preexisting rows: %v", tableName, err)
 		}
@@ -110,7 +109,7 @@ func (op *Reporting) generateReport(logger log.FieldLogger, report runtime.Objec
 
 	// Run the report
 	logger.Debugf("running report generation query")
-	err = presto.InsertInto(op.prestoQueryer, tableName, query)
+	err = op.reportResultsRepo.StoreReportResults(tableName, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")
 		return fmt.Errorf("Failed to execute %s usage report: %v", reportName, err)
