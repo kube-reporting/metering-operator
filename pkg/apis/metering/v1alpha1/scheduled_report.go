@@ -30,7 +30,7 @@ type ScheduledReportSpec struct {
 	GenerationQueryName string `json:"generationQuery"`
 
 	// Schedule configures when the report runs.
-	Schedule ScheduledReportSchedule `json:"schedule"`
+	Schedule *ScheduledReportSchedule `json:"schedule,omitempty"`
 
 	// ReportingStart specifies the time this ScheduledReport should start from
 	// instead of the current time.

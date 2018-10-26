@@ -101,7 +101,7 @@ type reportSchedule interface {
 	Next(time.Time) time.Time
 }
 
-func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, error) {
+func getSchedule(reportSched *cbTypes.ScheduledReportSchedule) (reportSchedule, error) {
 	var cronSpec string
 	switch reportSched.Period {
 	case cbTypes.ScheduledReportPeriodCron:
@@ -284,13 +284,23 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		}
 	}
 
-	reportSchedule, err := getSchedule(report.Spec.Schedule)
-	if err != nil {
-		return err
-	}
-
 	lastReportTime := report.Status.LastReportTime.Time
-	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
+	var reportPeriod *reportPeriod
+	var reportSchedule reportSchedule
+	var err error
+	if report.Spec.Schedule != nil {
+		reportSchedule, err = getSchedule(report.Spec.Schedule)
+		if err != nil {
+			return err
+		}
+
+		reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
+	} else {
+		reportPeriod, err = getRunOnceReportPeriod(report)
+		if err != nil {
+			return err
+		}
+	}
 
 	if report.Spec.ReportingEnd != nil && reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
 		logger.Debugf("calculated ScheduledReport periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
@@ -499,10 +509,21 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	return nil
 }
 
-func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) reportPeriod {
+func getRunOnceReportPeriod(report *cbTypes.ScheduledReport) (*reportPeriod, error) {
+	if report.Spec.ReportingEnd == nil || report.Spec.ReportingStart == nil {
+		return nil, fmt.Errorf("run-once reports must have both ReportingEnd and ReportingStart")
+	}
+	reportPeriod := &reportPeriod{
+		periodEnd:   report.Spec.ReportingStart.UTC(),
+		periodStart: report.Spec.ReportingEnd.UTC(),
+	}
+	return reportPeriod, nil
+}
+
+func getNextReportPeriod(schedule reportSchedule, period cbTypes.ScheduledReportPeriod, lastScheduled time.Time) *reportPeriod {
 	periodStart := lastScheduled
 	periodEnd := schedule.Next(periodStart)
-	return reportPeriod{
+	return &reportPeriod{
 		periodEnd:   periodEnd.Truncate(time.Millisecond).UTC(),
 		periodStart: periodStart.Truncate(time.Millisecond).UTC(),
 	}
