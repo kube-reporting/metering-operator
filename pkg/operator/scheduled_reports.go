@@ -347,27 +347,16 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	reportLister := op.reportLister
-	scheduledReportLister := op.scheduledReportLister
-	reportGenerationQueryLister := op.reportGenerationQueryLister
-	reportDataSourceLister := op.reportDataSourceLister
-
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
 	if err != nil {
-		logger.Errorf("failed to get dependencies for ScheduledReport %s, err: %v", report.Name, err)
-		return err
-	}
-
-	_, err = reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
-	if err != nil {
-		logger.Errorf("failed to validate dependencies for ScheduledReport %s, err: %v", report.Name, err)
-		return err
+		return fmt.Errorf("unable to run ScheduledReport %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
 
 	if reportGracePeriodUnmet {
@@ -435,6 +424,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		&reportPeriod.periodStart,
 		&reportPeriod.periodEnd,
 		genQuery,
+		queryDependencies.DynamicReportGenerationQueries,
 		report.Spec.Inputs,
 		report.Spec.OverwriteExistingData,
 	)
