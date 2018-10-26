@@ -187,17 +187,14 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return err
 	}
 
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
 		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
 		reporting.NewReportListerGetter(op.reportLister),
 		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
-	if err != nil {
-		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to get dependencies: %v", report.Name, genQuery.Name, err)
-	}
-	_, err = reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
@@ -237,6 +234,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		reportingStart,
 		reportingEnd,
 		genQuery,
+		queryDependencies.DynamicReportGenerationQueries,
 		report.Spec.Inputs,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)

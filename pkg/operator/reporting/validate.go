@@ -23,6 +23,32 @@ type ReportGenerationQueryDependencies struct {
 	ScheduledReports               []*metering.ScheduledReport
 }
 
+func GetAndValidateGenerationQueryDependencies(
+	queryGetter reportGenerationQueryGetter,
+	dataSourceGetter reportDataSourceGetter,
+	reportGetter reportGetter,
+	scheduledReportGetter scheduledReportGetter,
+	generationQuery *metering.ReportGenerationQuery,
+	handler UninitialiedDependendenciesHandler,
+) (*ReportGenerationQueryDependencies, error) {
+
+	depsStatus, err := GetGenerationQueryDependenciesStatus(
+		queryGetter,
+		dataSourceGetter,
+		reportGetter,
+		scheduledReportGetter,
+		generationQuery,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get dependencies for ReportGenerationQuery %s: %v", generationQuery.Name, err)
+	}
+	deps, err := ValidateDependencyStatus(depsStatus, handler)
+	if err != nil {
+		return nil, fmt.Errorf("ReportGenerationQuery dependencies validation failed for ReportGenerationQuery %s: %v", generationQuery.Name, err)
+	}
+	return deps, nil
+}
+
 func ValidateGenerationQueryDependenciesStatus(depsStatus *GenerationQueryDependenciesStatus) (*ReportGenerationQueryDependencies, error) {
 	// if the specified ReportGenerationQuery depends on other non-dynamic
 	// ReportGenerationQueries, but they have their view disabled, then it's an

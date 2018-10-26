@@ -61,28 +61,20 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		viewName = generationQuery.Status.ViewName
 	}
 
-	reportLister := op.reportLister
-	scheduledReportLister := op.scheduledReportLister
-	reportDataSourceLister := op.reportDataSourceLister
-	reportGenerationQueryLister := op.reportGenerationQueryLister
-
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		generationQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
-	if err != nil {
-		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to retrieve dependencies: %v", generationQuery.Name, err)
-	}
-	validateResults, err := reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
 	}
 
 	tmplCtx := &reporting.ReportQueryTemplateContext{
-		DynamicDependentQueries: validateResults.DynamicReportGenerationQueries,
+		DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
 		Report:                  nil,
 	}
 
