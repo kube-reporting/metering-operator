@@ -56,7 +56,7 @@ func (f *Framework) NewSimpleScheduledReport(name, queryName string, reportingSt
 		},
 		Spec: meteringv1alpha1.ScheduledReportSpec{
 			GenerationQueryName: queryName,
-			Schedule: meteringv1alpha1.ScheduledReportSchedule{
+			Schedule: &meteringv1alpha1.ScheduledReportSchedule{
 				Period: meteringv1alpha1.ScheduledReportPeriodHourly,
 			},
 			ReportingStart: start,

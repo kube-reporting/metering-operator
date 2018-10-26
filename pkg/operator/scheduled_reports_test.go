@@ -68,7 +68,7 @@ func TestGetNextReportPeriod(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			apiSched := v1alpha1.ScheduledReportSchedule{
+			apiSched := &v1alpha1.ScheduledReportSchedule{
 				Period: test.period,
 				// Normally only one is set, but we simply use a zero value
 				// for each to make it easier in tests.
@@ -85,7 +85,7 @@ func TestGetNextReportPeriod(t *testing.T) {
 
 			for _, expectedReportPeriod := range test.expectReportPeriods {
 				reportPeriod := getNextReportPeriod(schedule, test.period, lastScheduled)
-				assert.Equal(t, expectedReportPeriod, reportPeriod)
+				assert.Equal(t, &expectedReportPeriod, reportPeriod)
 				lastScheduled = expectedReportPeriod.periodEnd
 			}
 
