@@ -1,11 +1,12 @@
 package operator
 
 import (
+	"github.com/sirupsen/logrus"
+
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/sirupsen/logrus"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 // CreateAWSUsageTable instantiates a new external Hive table for AWS Billing/Usage reports stored in S3.
@@ -24,8 +25,8 @@ func (op *Reporting) createAWSUsageTable(logger logrus.FieldLogger, dataSource *
 	seen := make(map[string]struct{})
 	for _, manifest := range manifests {
 		for _, c := range manifest.Columns {
-			name := reporting.SanetizeAWSColumnForHive(c)
-			colType := reporting.AWSColumnToHiveColumnType(c)
+			name := reportingutil.SanetizeAWSColumnForHive(c)
+			colType := reportingutil.AWSColumnToHiveColumnType(c)
 
 			if _, exists := seen[name]; !exists {
 				seen[name] = struct{}{}
@@ -40,14 +41,14 @@ func (op *Reporting) createAWSUsageTable(logger logrus.FieldLogger, dataSource *
 	params := hive.TableParameters{
 		Name:         tableName,
 		Columns:      columns,
-		Partitions:   reporting.AWSUsageHivePartitions,
+		Partitions:   reportingutil.AWSUsageHivePartitions,
 		IgnoreExists: true,
 	}
 	properties := hive.TableProperties{
 		Location:           location,
 		FileFormat:         "text***REMOVED***le",
-		SerdeFormat:        reporting.AWSUsageHiveSerde,
-		SerdeRowProperties: reporting.AWSUsageHiveSerdeProps,
+		SerdeFormat:        reportingutil.AWSUsageHiveSerde,
+		SerdeRowProperties: reportingutil.AWSUsageHiveSerdeProps,
 		External:           true,
 	}
 	return op.createTableWith(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), params, properties)

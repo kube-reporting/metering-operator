@@ -17,15 +17,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
 var (
@@ -69,48 +68,6 @@ func (f *fakeReportResultsGetter) GetReportResults(tableName string, columns []p
 	return f.results, f.err
 }
 
-func newTestReport(name, namespace, testQueryName string, reportStart, reportEnd time.Time, reportStatus v1alpha1.ReportStatus) *v1alpha1.Report {
-	return &v1alpha1.Report{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.ReportSpec{
-			GenerationQueryName: testQueryName,
-			ReportingStart:      &meta.Time{reportStart},
-			ReportingEnd:        &meta.Time{reportEnd},
-			RunImmediately:      true,
-		},
-		Status: reportStatus,
-	}
-}
-
-func newTestReportGenQuery(name, namespace string, columns []v1alpha1.ReportGenerationQueryColumn) *v1alpha1.ReportGenerationQuery {
-	return &v1alpha1.ReportGenerationQuery{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.ReportGenerationQuerySpec{
-			Columns: columns,
-		},
-	}
-}
-
-func newTestPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1.PrestoTable {
-	return &v1alpha1.PrestoTable{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      reporting.PrestoTableResourceNameFromKind("report", name),
-			Namespace: namespace,
-		},
-		Status: v1alpha1.PrestoTableStatus{
-			Parameters: v1alpha1.TableParameters{
-				Columns: columns,
-			},
-		},
-	}
-}
-
 func TestAPIV1ReportsGet(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
@@ -134,8 +91,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	}{
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -145,7 +102,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -162,8 +119,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -174,7 +131,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -203,8 +160,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -214,7 +171,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -248,8 +205,8 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -259,7 +216,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -409,9 +366,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	}{
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -423,7 +380,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -459,9 +416,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -473,7 +430,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -490,9 +447,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -504,7 +461,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -539,7 +496,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-not-speci***REMOVED***ed": {
 			reportName:            testReportName,
-			report:                newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:               apiReportV2URLFull(testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
@@ -548,7 +505,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:               apiReportV2URLFull(testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
@@ -557,9 +514,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -571,7 +528,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -697,9 +654,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	}{
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -712,7 +669,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -749,9 +706,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -763,7 +720,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -780,9 +737,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -794,7 +751,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -829,7 +786,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-not-speci***REMOVED***ed": {
 			reportName:            testReportName,
-			report:                newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:               apiReportV2URLTable(testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
@@ -838,7 +795,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:               apiReportV2URLTable(testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
@@ -847,9 +804,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -861,7 +818,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",

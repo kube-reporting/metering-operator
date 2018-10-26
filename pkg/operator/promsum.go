@@ -12,7 +12,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 const (
@@ -203,7 +203,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 			dataSourceLogger := logger.WithFields(logrus.Fields{
 				"queryName":        reportDataSource.Spec.Promsum.Query,
 				"reportDataSource": reportDataSource.Name,
-				"tableName":        reporting.DataSourceTableName(reportDataSource.Name),
+				"tableName":        reportingutil.DataSourceTableName(reportDataSource.Name),
 			})
 			importCfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery)
@@ -266,7 +266,7 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTyp
 
 func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.Con***REMOVED***g {
 	dataSourceName := reportDataSource.Name
-	tableName := reporting.DataSourceTableName(dataSourceName)
+	tableName := reportingutil.DataSourceTableName(dataSourceName)
 
 	chunkSize := op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration
@@ -315,7 +315,7 @@ func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.
 	promLabels := prometheus.Labels{
 		"reportdatasource":      reportDataSource.Name,
 		"reportprometheusquery": reportPromQuery.Name,
-		"table_name":            reporting.DataSourceTableName(reportDataSource.Name),
+		"table_name":            reportingutil.DataSourceTableName(reportDataSource.Name),
 	}
 
 	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)

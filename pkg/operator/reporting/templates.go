@@ -9,6 +9,7 @@ import (
 	"github.com/Masterminds/sprig"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
@@ -26,11 +27,11 @@ type ReportTemplateInfo struct {
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
 		"prestoTimestamp":             presto.Timestamp,
-		"reportTableName":             ReportTableName,
-		"scheduledReportTableName":    ScheduledReportTableName,
-		"dataSourceTableName":         DataSourceTableName,
-		"generationQueryViewName":     GenerationQueryViewName,
-		"billingPeriodTimestamp":      BillingPeriodTimestamp,
+		"reportTableName":             reportingutil.ReportTableName,
+		"scheduledReportTableName":    reportingutil.ScheduledReportTableName,
+		"dataSourceTableName":         reportingutil.DataSourceTableName,
+		"generationQueryViewName":     reportingutil.GenerationQueryViewName,
+		"billingPeriodTimestamp":      reportingutil.BillingPeriodTimestamp,
 		"renderReportGenerationQuery": renderReportGenerationQuery,
 	}
 

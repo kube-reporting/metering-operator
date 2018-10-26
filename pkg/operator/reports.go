@@ -13,6 +13,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 var (
@@ -91,7 +92,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
-	tableName := reporting.ReportTableName(report.Name)
+	tableName := reportingutil.ReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -215,7 +216,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return fmt.Errorf("unable to drop table %s before creating for report %s: %v", tableName, report.Name, err)
 	}
 
-	columns := reporting.GenerateHiveColumns(genQuery)
+	columns := reportingutil.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		return fmt.Errorf("unable to create table %s for report %s: %v", tableName, report.Name, err)

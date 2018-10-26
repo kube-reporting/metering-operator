@@ -10,6 +10,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 func (op *Reporting) runReportGenerationQueryWorker() {
@@ -54,7 +55,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return nil
 	} ***REMOVED*** if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
-		viewName = reporting.GenerationQueryViewName(generationQuery.Name)
+		viewName = reportingutil.GenerationQueryViewName(generationQuery.Name)
 	} ***REMOVED*** {
 		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
 		viewName = generationQuery.Status.ViewName
