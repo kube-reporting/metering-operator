@@ -39,6 +39,4 @@ ${GOPATH}/bin/defaulter-gen \
 
 # generate mocks
 go build -v -o "$SCRIPT_ROOT/vendor/mockgen" "./vendor/github.com/golang/mock/mockgen"
-"$SCRIPT_ROOT/vendor/mockgen" -package mockpresto -source "./pkg/presto/db.go" -destination "./pkg/presto/mock/mock.go"
-gofmt -w ./pkg/presto/mock/mock.go
 

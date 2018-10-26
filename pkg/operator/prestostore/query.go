@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/db"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ type PrometheusImportResults struct {
 // that's incomplete, and if there are multiple chunks, whether or not the
 // final chunk up to the endTime will be included even if the duration of
 // endTime - startTime isn't perfectly divisible by chunkSize.
-func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prestoQueryer presto.ExecQueryer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Config, allowIncompleteChunks bool) (PrometheusImportResults, error) {
+func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prestoQueryer db.Queryer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Config, allowIncompleteChunks bool) (PrometheusImportResults, error) {
 	metricsCollectors.ImportsRunningGauge.Inc()
 
 	logger = logger.WithFields(logrus.Fields{
