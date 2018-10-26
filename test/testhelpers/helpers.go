@@ -10,7 +10,14 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
-func NewReport(name, namespace, testQueryName string, reportStart, reportEnd time.Time, reportStatus v1alpha1.ReportStatus) *v1alpha1.Report {
+func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, reportStatus v1alpha1.ReportStatus) *v1alpha1.Report {
+	var start, end *meta.Time
+	if reportStart != nil {
+		start = &meta.Time{*reportStart}
+	}
+	if reportEnd != nil {
+		end = &meta.Time{*reportEnd}
+	}
 	return &v1alpha1.Report{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
@@ -18,11 +25,33 @@ func NewReport(name, namespace, testQueryName string, reportStart, reportEnd tim
 		},
 		Spec: v1alpha1.ReportSpec{
 			GenerationQueryName: testQueryName,
-			ReportingStart:      &meta.Time{reportStart},
-			ReportingEnd:        &meta.Time{reportEnd},
+			ReportingStart:      start,
+			ReportingEnd:        end,
 			RunImmediately:      true,
 		},
 		Status: reportStatus,
+	}
+}
+
+func NewScheduledReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status v1alpha1.ScheduledReportStatus) *v1alpha1.ScheduledReport {
+	var start, end *meta.Time
+	if reportStart != nil {
+		start = &meta.Time{*reportStart}
+	}
+	if reportEnd != nil {
+		end = &meta.Time{*reportEnd}
+	}
+	return &v1alpha1.ScheduledReport{
+		ObjectMeta: meta.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: v1alpha1.ScheduledReportSpec{
+			GenerationQueryName: testQueryName,
+			ReportingStart:      start,
+			ReportingEnd:        end,
+		},
+		Status: status,
 	}
 }
 
@@ -34,6 +63,15 @@ func NewReportGenerationQuery(name, namespace string, columns []v1alpha1.ReportG
 		},
 		Spec: v1alpha1.ReportGenerationQuerySpec{
 			Columns: columns,
+		},
+	}
+}
+
+func NewReportDataSource(name, namespace string) *v1alpha1.ReportDataSource {
+	return &v1alpha1.ReportDataSource{
+		ObjectMeta: meta.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
 		},
 	}
 }

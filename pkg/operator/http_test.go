@@ -72,8 +72,9 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportName string
@@ -344,8 +345,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
 	const testFormat = "?format=json"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
@@ -632,8 +634,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
 	const testFormat = "?format=json"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
