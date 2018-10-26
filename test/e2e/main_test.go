@@ -114,6 +114,12 @@ func TestReportingE2E(t *testing.T) {
 			timeout:       reportTestTimeout + time.Minute,
 		},
 		{
+			name:          "persistentvolumeclaim-request",
+			queryName:     "persistentvolumeclaim-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout + time.Minute,
+		},
+		{
 			name:          "node-cpu-utilization",
 			queryName:     "node-cpu-utilization",
 			newReportFunc: testFramework.NewSimpleReport,
