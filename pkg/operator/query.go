@@ -54,7 +54,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return nil
 	} else if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
-		viewName = generationQueryViewName(generationQuery.Name)
+		viewName = reporting.GenerationQueryViewName(generationQuery.Name)
 	} else {
 		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
 		viewName = generationQuery.Status.ViewName
@@ -75,18 +75,17 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	if err != nil {
 		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to retrieve dependencies: %v", generationQuery.Name, err)
 	}
-	validateResults, err := op.validateDependencyStatus(depsStatus)
+	validateResults, err := reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
 	}
 
-	templateInfo := &templateInfo{
+	tmplCtx := &reporting.ReportQueryTemplateContext{
 		DynamicDependentQueries: validateResults.DynamicReportGenerationQueries,
 		Report:                  nil,
 	}
 
-	qr := queryRenderer{templateInfo: templateInfo}
-	renderedQuery, err := qr.Render(generationQuery.Spec.Query)
+	renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, tmplCtx)
 	if err != nil {
 		return err
 	}
@@ -120,22 +119,11 @@ func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generatio
 	return nil
 }
 
-// validateDependencyStatus runs
-// reporting.ValidateGenerationQueryDependenciesStatus and requeues any
-// uninitialized dependencies
-func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.GenerationQueryDependenciesStatus) (*reporting.ReportGenerationQueryDependencies, error) {
-	deps, err := reporting.ValidateGenerationQueryDependenciesStatus(dependencyStatus)
-	if err != nil {
-		for _, query := range dependencyStatus.UninitializedReportGenerationQueries {
-			op.enqueueReportGenerationQuery(query)
-		}
-
-		for _, dataSource := range dependencyStatus.UninitializedReportDataSources {
-			op.enqueueReportDataSource(dataSource)
-		}
-		return nil, err
+func (op *Reporting) uninitialiedDependendenciesHandler() reporting.UninitialiedDependendenciesHandler {
+	return reporting.UninitialiedDependendenciesHandler{
+		HandleUninitializedReportGenerationQuery: op.enqueueReportGenerationQuery,
+		HandleUninitializedReportDataSource:      op.enqueueReportDataSource,
 	}
-	return deps, nil
 }
 
 // queueDependentReportGenerationQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery

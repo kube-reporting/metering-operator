@@ -16,6 +16,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
@@ -121,7 +122,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	} else {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
-		tableName := dataSourceTableName(dataSource.Name)
+		tableName := reporting.DataSourceTableName(dataSource.Name)
 		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns)
 		if err != nil {
 			return err
@@ -141,7 +142,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 	dataSourceName := dataSource.Name
 	queryName := dataSource.Spec.Promsum.Query
-	tableName := dataSourceTableName(dataSourceName)
+	tableName := reporting.DataSourceTableName(dataSourceName)
 
 	reportPromQuery, err := op.reportPrometheusQueryLister.ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
 	if err != nil {
@@ -214,7 +215,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	if dataSource.Status.TableName == "" {
-		tableName := dataSourceTableName(dataSource.Name)
+		tableName := reporting.DataSourceTableName(dataSource.Name)
 		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 		err = op.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Prefix, manifests)
 		if err != nil {
@@ -229,7 +230,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.Status.TableName)
-	prestoTableResourceName := prestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
+	prestoTableResourceName := reporting.PrestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
 	prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
 	if err != nil {
 		// if not found, try for the uncached copy
@@ -310,7 +311,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
 		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
-		err = dropAWSHivePartition(op.hiveQueryer, tableName, start, end)
+		err = reporting.DropAWSHivePartition(op.hiveQueryer, tableName, start, end)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
 			return err
@@ -323,7 +324,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 		end := p.PartitionSpec["end"]
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
-		err = addAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
+		err = reporting.AddAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.Status.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
 			return err
@@ -357,8 +358,8 @@ func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]cbTypes.T
 			return nil, err
 		}
 
-		start := billingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
-		end := billingPeriodTimestamp(manifest.BillingPeriod.End.Time)
+		start := reporting.BillingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
+		end := reporting.BillingPeriodTimestamp(manifest.BillingPeriod.End.Time)
 		p := cbTypes.TablePartition{
 			Location: location,
 			PartitionSpec: presto.PartitionSpec{

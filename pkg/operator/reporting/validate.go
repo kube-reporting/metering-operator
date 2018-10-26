@@ -2,7 +2,9 @@ package reporting
 
 import (
 	"fmt"
+	"sort"
 	"strings"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -369,4 +371,69 @@ func GetDependentScheduledReports(scheduledReportGetter scheduledReportGetter, g
 		scheduledReports[i] = scheduledReport
 	}
 	return scheduledReports, nil
+}
+
+type UninitialiedDependendenciesHandler struct {
+	HandleUninitializedReportGenerationQuery func(*metering.ReportGenerationQuery)
+	HandleUninitializedReportDataSource      func(*metering.ReportDataSource)
+}
+
+// ValidateDependencyStatus runs ValidateGenerationQueryDependenciesStatus and
+// runs the specified handler functions to handle any
+// UninitializedReportGenerationQueries or UninitializedReportDataSources
+func ValidateDependencyStatus(dependencyStatus *GenerationQueryDependenciesStatus, handler UninitialiedDependendenciesHandler) (*ReportGenerationQueryDependencies, error) {
+	deps, err := ValidateGenerationQueryDependenciesStatus(dependencyStatus)
+	if err != nil {
+		for _, query := range dependencyStatus.UninitializedReportGenerationQueries {
+			handler.HandleUninitializedReportGenerationQuery(query)
+		}
+
+		for _, dataSource := range dependencyStatus.UninitializedReportDataSources {
+			handler.HandleUninitializedReportDataSource(dataSource)
+		}
+		return nil, err
+	}
+	return deps, nil
+}
+
+func ValidateReportGenerationQueryInputs(generationQuery *metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue) (map[string]interface{}, error) {
+	var givenInputs, missingInputs, expectedInputs []string
+	reportQueryInputs := make(map[string]interface{})
+	for _, v := range inputs {
+		// currently inputs can only have string values, but we want to support
+		// other types in the future.
+		// To support overriding the default ReportingStart and ReportingEnd
+		// using inputs, we have to treat them specially and turn them into
+		// time.Time objects before passing to the template context.
+		if v.Name == ReportingStartInputName || v.Name == ReportingEndInputName {
+			tVal, err := time.Parse(time.RFC3339, v.Value)
+			if err != nil {
+				return nil, fmt.Errorf("inputs Name: %s is not a valid timestamp: %s, must be RFC3339 formatted, err: %s", v.Name, v.Value, err)
+			}
+			reportQueryInputs[v.Name] = tVal
+		} else {
+			reportQueryInputs[v.Name] = v.Value
+		}
+		givenInputs = append(givenInputs, v.Name)
+	}
+
+	// now validate the inputs match what the query is expecting
+	for _, input := range generationQuery.Spec.Inputs {
+		expectedInputs = append(expectedInputs, input.Name)
+		// If the input isn't required than don't include it in the missing
+		if !input.Required {
+			continue
+		}
+		if _, ok := reportQueryInputs[input.Name]; !ok {
+			missingInputs = append(missingInputs, input.Name)
+		}
+	}
+
+	if len(missingInputs) != 0 {
+		sort.Strings(expectedInputs)
+		sort.Strings(givenInputs)
+		return nil, fmt.Errorf("unable to validate ReportGenerationQuery %s inputs: requires %s as inputs, got %s", generationQuery.Name, strings.Join(expectedInputs, ","), strings.Join(givenInputs, ","))
+	}
+
+	return reportQueryInputs, nil
 }

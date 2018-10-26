@@ -12,6 +12,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
 const (
@@ -202,7 +203,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 			dataSourceLogger := logger.WithFields(logrus.Fields{
 				"queryName":        reportDataSource.Spec.Promsum.Query,
 				"reportDataSource": reportDataSource.Name,
-				"tableName":        dataSourceTableName(reportDataSource.Name),
+				"tableName":        reporting.DataSourceTableName(reportDataSource.Name),
 			})
 			importCfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery)
@@ -265,7 +266,7 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTyp
 
 func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.Config {
 	dataSourceName := reportDataSource.Name
-	tableName := dataSourceTableName(dataSourceName)
+	tableName := reporting.DataSourceTableName(dataSourceName)
 
 	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
@@ -314,7 +315,7 @@ func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.
 	promLabels := prometheus.Labels{
 		"reportdatasource":      reportDataSource.Name,
 		"reportprometheusquery": reportPromQuery.Name,
-		"table_name":            dataSourceTableName(reportDataSource.Name),
+		"table_name":            reporting.DataSourceTableName(reportDataSource.Name),
 	}
 
 	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)

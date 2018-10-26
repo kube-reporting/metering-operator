@@ -1,4 +1,4 @@
-package operator
+package reporting
 
 import (
 	"fmt"
@@ -117,7 +117,7 @@ func TestHiveColumnToPrestoColumn(t *testing.T) {
 		testName := testName
 		tt := tt
 		t.Run(testName, func(t *testing.T) {
-			prestoColumn, err := hiveColumnToPrestoColumn(tt.hiveColumn)
+			prestoColumn, err := HiveColumnToPrestoColumn(tt.hiveColumn)
 			tt.errAssertion(t, err)
 			if tt.expectedErr != nil {
 				tt.compareAssertion(t, tt.expectedErr, err)

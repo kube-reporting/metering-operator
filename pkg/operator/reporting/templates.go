@@ -1,4 +1,4 @@
-package operator
+package reporting
 
 import (
 	"bytes"
@@ -12,12 +12,12 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-type templateInfo struct {
-	Report                  *reportTemplateInfo
+type ReportQueryTemplateContext struct {
+	Report                  *ReportTemplateInfo
 	DynamicDependentQueries []*cbTypes.ReportGenerationQuery
 }
 
-type reportTemplateInfo struct {
+type ReportTemplateInfo struct {
 	ReportingStart *time.Time
 	ReportingEnd   *time.Time
 	Inputs         map[string]interface{}
@@ -26,11 +26,11 @@ type reportTemplateInfo struct {
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
 		"prestoTimestamp":             presto.Timestamp,
-		"reportTableName":             reportTableName,
-		"scheduledReportTableName":    scheduledReportTableName,
-		"dataSourceTableName":         dataSourceTableName,
-		"generationQueryViewName":     generationQueryViewName,
-		"billingPeriodTimestamp":      billingPeriodTimestamp,
+		"reportTableName":             ReportTableName,
+		"scheduledReportTableName":    ScheduledReportTableName,
+		"dataSourceTableName":         DataSourceTableName,
+		"generationQueryViewName":     GenerationQueryViewName,
+		"billingPeriodTimestamp":      BillingPeriodTimestamp,
 		"renderReportGenerationQuery": renderReportGenerationQuery,
 	}
 
@@ -41,42 +41,38 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	return tmpl, nil
 }
 
-type queryRenderer struct {
-	templateInfo *templateInfo
-}
-
-func (qr queryRenderer) Render(query string) (string, error) {
+func RenderQuery(query string, tmplCtx *ReportQueryTemplateContext) (string, error) {
 	tmpl, err := newQueryTemplate(query)
 	if err != nil {
 		return "", err
 	}
-	return qr.renderTemplate(tmpl)
+	return renderTemplate(tmpl, tmplCtx)
 }
 
-func (qr queryRenderer) renderTemplate(tmpl *template.Template) (string, error) {
+func renderTemplate(tmpl *template.Template, tmplCtx *ReportQueryTemplateContext) (string, error) {
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, qr.templateInfo)
+	err := tmpl.Execute(&buf, tmplCtx)
 	if err != nil {
 		return "", fmt.Errorf("error executing template: %v", err)
 	}
 	return buf.String(), nil
 }
 
-func renderReportGenerationQuery(generationQueryName string, templateInfo *templateInfo) (string, error) {
+func renderReportGenerationQuery(queryName string, tmplCtx *ReportQueryTemplateContext) (string, error) {
 	var query string
-	for _, q := range templateInfo.DynamicDependentQueries {
-		if q.Name == generationQueryName {
+	for _, q := range tmplCtx.DynamicDependentQueries {
+		if q.Name == queryName {
 			query = q.Spec.Query
 			break
 		}
 	}
 	if query == "" {
-		return "", fmt.Errorf("unknown generationQuery %s", generationQueryName)
+		return "", fmt.Errorf("unknown ReportGenerationQuery %s", queryName)
 	}
-	qr := queryRenderer{templateInfo: templateInfo}
-	renderedQuery, err := qr.Render(query)
+
+	renderedQuery, err := RenderQuery(query, tmplCtx)
 	if err != nil {
-		return "", fmt.Errorf("unable to render query %s, err: %v", generationQueryName, err)
+		return "", fmt.Errorf("unable to render query %s, err: %v", queryName, err)
 	}
 	return renderedQuery, nil
 }
