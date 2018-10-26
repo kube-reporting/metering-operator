@@ -363,7 +363,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	_, err = op.validateDependencyStatus(depsStatus)
+	_, err = reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		logger.Errorf("failed to validate dependencies for ScheduledReport %s, err: %v", report.Name, err)
 		return err
@@ -400,7 +400,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		}
 	}
 
-	tableName := scheduledReportTableName(report.Name)
+	tableName := reporting.ScheduledReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"scheduledreport":       report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -411,7 +411,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
 
-	columns := generateHiveColumns(genQuery)
+	columns := reporting.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		logger.WithError(err).Error("error creating report table for scheduledReport")
@@ -427,16 +427,14 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.generateReport(
+	err = op.generateScheduledReport(
 		logger,
-		report,
-		"scheduledreport",
 		report.Name,
 		tableName,
 		&reportPeriod.periodStart,
 		&reportPeriod.periodEnd,
-		report.Spec.Inputs,
 		genQuery,
+		report.Spec.Inputs,
 		report.Spec.OverwriteExistingData,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)

@@ -24,6 +24,7 @@ import (
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
@@ -99,7 +100,7 @@ func newTestReportGenQuery(name, namespace string, columns []v1alpha1.ReportGene
 func newTestPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1.PrestoTable {
 	return &v1alpha1.PrestoTable{
 		ObjectMeta: meta.ObjectMeta{
-			Name:      prestoTableResourceNameFromKind("report", name),
+			Name:      reporting.PrestoTableResourceNameFromKind("report", name),
 			Namespace: namespace,
 		},
 		Status: v1alpha1.PrestoTableStatus{

@@ -91,7 +91,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
-	tableName := reportTableName(report.Name)
+	tableName := reporting.ReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -196,7 +196,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	if err != nil {
 		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to get dependencies: %v", report.Name, genQuery.Name, err)
 	}
-	_, err = op.validateDependencyStatus(depsStatus)
+	_, err = reporting.ValidateDependencyStatus(depsStatus, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
@@ -215,7 +215,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 		return fmt.Errorf("unable to drop table %s before creating for report %s: %v", tableName, report.Name, err)
 	}
 
-	columns := generateHiveColumns(genQuery)
+	columns := reporting.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		return fmt.Errorf("unable to create table %s for report %s: %v", tableName, report.Name, err)
@@ -231,15 +231,12 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	generateReportStart := op.clock.Now()
 	err = op.generateReport(
 		logger,
-		report,
-		"report",
 		report.Name,
 		tableName,
 		reportingStart,
 		reportingEnd,
-		report.Spec.Inputs,
 		genQuery,
-		true,
+		report.Spec.Inputs,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
