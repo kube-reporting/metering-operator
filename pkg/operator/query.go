@@ -112,8 +112,8 @@ func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generatio
 	return nil
 }
 
-func (op *Reporting) uninitialiedDependendenciesHandler() reporting.UninitialiedDependendenciesHandler {
-	return reporting.UninitialiedDependendenciesHandler{
+func (op *Reporting) uninitialiedDependendenciesHandler() *reporting.UninitialiedDependendenciesHandler {
+	return &reporting.UninitialiedDependendenciesHandler{
 		HandleUninitializedReportGenerationQuery: op.enqueueReportGenerationQuery,
 		HandleUninitializedReportDataSource:      op.enqueueReportDataSource,
 	}
