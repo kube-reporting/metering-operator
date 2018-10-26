@@ -77,7 +77,7 @@ func (op *Reporting) testReadFromPrestoSingleFlight(logger logrus.FieldLogger) b
 }
 
 func (op *Reporting) testReadFromPresto(logger logrus.FieldLogger) bool {
-	_, err := presto.ExecuteSelect(op.prestoConn, "SELECT * FROM system.runtime.nodes")
+	_, err := presto.ExecuteSelect(op.prestoQueryer, "SELECT * FROM system.runtime.nodes")
 	if err != nil {
 		logger.WithError(err).Debugf("cannot query Presto system.runtime.nodes table")
 		return false

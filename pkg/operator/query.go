@@ -92,7 +92,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	}
 
 	query := fmt.Sprintf("CREATE OR REPLACE VIEW %s AS %s", viewName, renderedQuery)
-	_, err = op.prestoConn.Query(query)
+	_, err = op.prestoQueryer.Query(query)
 	if err != nil {
 		return err
 	}

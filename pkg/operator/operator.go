@@ -2,15 +2,11 @@ package operator
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	"io"
 	"math/rand"
-	"net"
 	"net/http"
 	"os"
 	"sync"
-	"syscall"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -50,7 +46,7 @@ import (
 
 const (
 	connBackoff         = time.Second * 15
-	maxConnWaitTime     = time.Minute * 3
+	maxConnRetries      = 3
 	defaultResyncPeriod = time.Minute * 15
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
@@ -133,10 +129,10 @@ type Reporting struct {
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 	prestoTableQueue           workqueue.RateLimitingInterface
 
-	prestoConn    *sql.DB
-	prestoQueryer presto.ExecQueryer
-	hiveQueryer   *hiveQueryer
-	promConn      prom.API
+	prestoQueryer db.Queryer
+	hiveQueryer   db.Queryer
+
+	promConn prom.API
 
 	clock clock.Clock
 	rand  *rand.Rand
@@ -343,6 +339,13 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	go op.informerFactory.Start(stopCh)
 
+	shutdownCtx, cancel := context.WithCancel(context.Background())
+	// wait for stopChn to be closed, then cancel our context
+	go func() {
+		<-stopCh
+		cancel()
+	}()
+
 	op.logger.Infof("setting up DB connections")
 
 	// Use errgroup to setup both hive and presto connections
@@ -351,26 +354,30 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		op.prestoConn, err = op.newPrestoConn(stopCh)
+		connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
+		prestoConn, err := presto.NewPrestoConnWithRetry(shutdownCtx, op.logger, connStr, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
 		}
-		prestoDB := db.New(op.prestoConn, op.logger, op.cfg.LogDMLQueries)
-		op.prestoQueryer = presto.NewDB(prestoDB)
+		op.prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
 		return nil
 	})
 	g.Go(func() error {
-		op.hiveQueryer = newHiveQueryer(op.logger, op.clock, op.cfg.HiveHost, op.cfg.LogDDLQueries, stopCh)
-		_, err := op.hiveQueryer.getHiveConnection()
-		return err
+		var err error
+		hiveQueryer := hive.NewReconnectingQueryer(shutdownCtx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+		if err != nil {
+			return err
+		}
+		op.hiveQueryer = db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+		return nil
 	})
 	err := g.Wait()
 	if err != nil {
 		return err
 	}
 
-	defer op.prestoConn.Close()
-	defer op.hiveQueryer.closeHiveConnection()
+	defer op.prestoQueryer.Close()
+	defer op.hiveQueryer.Close()
 
 	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
 	if err != nil {
@@ -384,9 +391,12 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
+	reportResultsRepo := prestostore.NewReportResultsRepo(op.prestoQueryer)
+	promMetricsRepo := prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
+
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
-		op.logger, op.prestoQueryer, op.rand, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.logger, op.rand, promMetricsRepo, reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
 		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
@@ -628,147 +638,10 @@ func (op *Reporting) getDefaultReportGracePeriod() time.Duration {
 	}
 }
 
-func (op *Reporting) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
-	// Presto may take longer to start than reporting-operator, so keep
-	// attempting to connect in a loop in case we were just started and presto
-	// is still coming up.
-	connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
-	startTime := op.clock.Now()
-	op.logger.Debugf("getting Presto connection")
-	for {
-		db, err := sql.Open("presto", connStr)
-		if err == nil {
-			return db, nil
-		} ***REMOVED*** if op.clock.Since(startTime) > maxConnWaitTime {
-			op.logger.Debugf("attempts timed out, failed to get Presto connection")
-			return nil, fmt.Errorf("failed to connect to presto: %v", err)
-		}
-		op.logger.Debugf("error encountered, backing off and trying again: %v", err)
-		select {
-		case <-op.clock.Tick(connBackoff):
-		case <-stopCh:
-			return nil, fmt.Errorf("got shutdown signal, closing Presto connection")
-		}
-	}
-}
-
 func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
 	client, err := promapi.NewClient(promCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-type hiveQueryer struct {
-	hiveHost   string
-	logger     log.FieldLogger
-	logQueries bool
-
-	clock    clock.Clock
-	mu       sync.Mutex
-	hiveConn *hive.Connection
-	stopCh   <-chan struct{}
-}
-
-func newHiveQueryer(logger log.FieldLogger, clock clock.Clock, hiveHost string, logQueries bool, stopCh <-chan struct{}) *hiveQueryer {
-	return &hiveQueryer{
-		clock:      clock,
-		hiveHost:   hiveHost,
-		logger:     logger,
-		logQueries: logQueries,
-	}
-}
-
-func (q *hiveQueryer) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	const maxRetries = 3
-	for retries := 0; retries < maxRetries; retries++ {
-		hiveConn, err := q.getHiveConnection()
-		if err != nil {
-			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.WithError(err).Debugf("error occurred while getting connection, attempting to create new connection and retry")
-				q.closeHiveConnection()
-				continue
-			}
-			// We don't close the connection here because we got an error while
-			// getting it
-			return nil, err
-		}
-		rows, err := hiveConn.Query(query)
-		if err != nil {
-			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.WithError(err).Debugf("error occurred while making query, attempting to create new connection and retry")
-				q.closeHiveConnection()
-				continue
-			}
-			// We don't close the connection here because we got a good
-			// connection, and made the query, but the query itself had an
-			// error.
-			return nil, err
-		}
-		return rows, nil
-	}
-
-	// We've tries 3 times, so close any connection and return an error
-	q.closeHiveConnection()
-	return nil, fmt.Errorf("unable to create new hive connection after existing hive connection closed")
-}
-
-func (q *hiveQueryer) getHiveConnection() (*hive.Connection, error) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
-	var err error
-	if q.hiveConn == nil {
-		q.hiveConn, err = q.newHiveConn()
-	}
-	return q.hiveConn, err
-}
-
-func (q *hiveQueryer) closeHiveConnection() {
-	q.mu.Lock()
-	if q.hiveConn != nil {
-		q.hiveConn.Close()
-	}
-	// Discard our connection so we create a new one in getHiveConnection
-	q.hiveConn = nil
-	q.mu.Unlock()
-}
-
-func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
-	// Hive may take longer to start than reporting-operator, so keep
-	// attempting to connect in a loop in case we were just started and hive is
-	// still coming up.
-	startTime := q.clock.Now()
-	q.logger.Debugf("getting hive connection")
-	for {
-		select {
-		case <-q.stopCh:
-			// check stopCh once before connecting in case the last select loop
-			// was on a tick and we got a cancellation since then
-			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
-		default:
-			// try connecting again
-		}
-		hive, err := hive.Connect(q.hiveHost)
-		if err == nil {
-			hive.SetLogQueries(q.logQueries)
-			return hive, nil
-		} ***REMOVED*** if q.clock.Since(startTime) > maxConnWaitTime {
-			q.logger.WithError(err).Error("attempts timed out, failed to get hive connection")
-			return nil, err
-		}
-		q.logger.WithError(err).Debugf("error encountered when connecting to hive, backing off and trying again")
-		select {
-		case <-q.clock.Tick(connBackoff):
-		case <-q.stopCh:
-			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
-		}
-	}
-}
-
-func isErrBrokenPipe(err error) bool {
-	if netErr, ok := err.(*net.OpError); ok {
-		return netErr.Err == syscall.EPIPE
-	}
-	return false
 }

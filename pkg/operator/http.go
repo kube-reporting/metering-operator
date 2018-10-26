@@ -43,8 +43,10 @@ type server struct {
 	logger log.FieldLogger
 
 	rand          *rand.Rand
-	queryer       presto.ExecQueryer
 	collectorFunc prometheusImporterFunc
+
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+	reportResultsGetter   prestostore.ReportResultsGetter
 
 	namespace                    string
 	reportLister                 listers.ReportLister
@@ -63,8 +65,9 @@ func (l *requestLogger) Print(v ...interface{}) {
 
 func newRouter(
 	logger log.FieldLogger,
-	queryer presto.ExecQueryer,
 	rand *rand.Rand,
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo,
+	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	namespace string,
 	reportLister listers.ReportLister,
@@ -81,8 +84,9 @@ func newRouter(
 	srv := &server{
 		logger:                       logger,
 		rand:                         rand,
-		queryer:                      queryer,
 		collectorFunc:                collectorFunc,
+		prometheusMetricsRepo:        prometheusMetricsRepo,
+		reportResultsGetter:          reportResultsGetter,
 		namespace:                    namespace,
 		reportLister:                 reportLister,
 		scheduledReportLister:        scheduledReportLister,
@@ -261,7 +265,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	tableName := scheduledReportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
@@ -345,7 +349,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	tableName := reportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
@@ -635,7 +639,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = prestostore.StorePrometheusMetrics(context.Background(), srv.queryer, dataSourceTableName(name), []*prestostore.PrometheusMetric(req))
+	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), dataSourceTableName(name), []*prestostore.PrometheusMetric(req))
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
@@ -672,7 +676,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	results, err := prestostore.GetPrometheusMetrics(srv.queryer, datasourceTable, startTime, endTime)
+	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(datasourceTable, startTime, endTime)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return

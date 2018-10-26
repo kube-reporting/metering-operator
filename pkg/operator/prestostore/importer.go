@@ -2,16 +2,17 @@ package prestostore
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
+	"github.com/operator-framework/operator-metering/pkg/db"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/clock"
-
-	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const (
@@ -42,7 +43,7 @@ type ImporterMetricsCollectors struct {
 type PrometheusImporter struct {
 	logger        logrus.FieldLogger
 	promConn      prom.API
-	prestoQueryer presto.ExecQueryer
+	prestoQueryer db.Queryer
 	clock         clock.Clock
 	cfg           Con***REMOVED***g
 
@@ -65,7 +66,7 @@ type Con***REMOVED***g struct {
 	MaxQueryRangeDuration time.Duration
 }
 
-func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer presto.ExecQueryer, clock clock.Clock, cfg Con***REMOVED***g, collectors ImporterMetricsCollectors) *PrometheusImporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer db.Queryer, clock clock.Clock, cfg Con***REMOVED***g, collectors ImporterMetricsCollectors) *PrometheusImporter {
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
@@ -183,4 +184,24 @@ func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []
 		}
 	}
 	return metrics
+}
+
+func getLastTimestampForTable(queryer db.Queryer, tableName string) (*time.Time, error) {
+	// Get the most recent timestamp in the table for this query
+	getLastTimestampQuery := fmt.Sprintf(`
+				SELECT "timestamp"
+				FROM %s
+				ORDER BY "timestamp" DESC
+				LIMIT 1`, tableName)
+
+	results, err := presto.ExecuteSelect(queryer, getLastTimestampQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error getting last timestamp for table %s, maybe table doesn't exist yet? %v", tableName, err)
+	}
+
+	if len(results) != 0 {
+		ts := results[0]["timestamp"].(time.Time)
+		return &ts, nil
+	}
+	return nil, nil
 }
