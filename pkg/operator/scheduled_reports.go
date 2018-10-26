@@ -16,6 +16,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
@@ -400,7 +401,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		}
 	}
 
-	tableName := reporting.ScheduledReportTableName(report.Name)
+	tableName := reportingutil.ScheduledReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"scheduledreport":       report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -411,7 +412,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
 
-	columns := reporting.GenerateHiveColumns(genQuery)
+	columns := reportingutil.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		logger.WithError(err).Error("error creating report table for scheduledReport")

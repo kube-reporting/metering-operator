@@ -11,7 +11,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
-	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
@@ -21,7 +21,7 @@ const (
 )
 
 func dataSourceNameToPrestoTableName(name string) string {
-	return strings.Replace(reporting.DataSourceTableName(name), "_", "-", -1)
+	return strings.Replace(reportingutil.DataSourceTableName(name), "_", "-", -1)
 }
 
 func (op *Reporting) runPrestoTableWorker(stopCh <-chan struct{}) {
@@ -116,7 +116,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 		finalizers = []string{prestoTableFinalizer}
 	}
 
-	resourceName := reporting.PrestoTableResourceNameFromKind(kind, name)
+	resourceName := reportingutil.PrestoTableResourceNameFromKind(kind, name)
 	prestoTableCR := cbTypes.PrestoTable{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PrestoTable",
