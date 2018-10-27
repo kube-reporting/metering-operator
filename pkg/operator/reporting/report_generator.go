@@ -16,24 +16,22 @@ const (
 )
 
 type ReportGenerator interface {
-	GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue) error
+	GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error
 }
 
 type reportGenerator struct {
-	logger             log.FieldLogger
-	reportResultsRepo  prestostore.ReportResultsRepo
-	deleteExistingData bool
+	logger            log.FieldLogger
+	reportResultsRepo prestostore.ReportResultsRepo
 }
 
-func NewReportGenerator(logger log.FieldLogger, reportResultsRepo prestostore.ReportResultsRepo, deleteExistingData bool) *reportGenerator {
+func NewReportGenerator(logger log.FieldLogger, reportResultsRepo prestostore.ReportResultsRepo) *reportGenerator {
 	return &reportGenerator{
-		logger:             logger,
-		reportResultsRepo:  reportResultsRepo,
-		deleteExistingData: deleteExistingData,
+		logger:            logger,
+		reportResultsRepo: reportResultsRepo,
 	}
 }
 
-func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue) error {
+func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error {
 	logger := g.logger.WithFields(log.Fields{
 		"tableName":             tableName,
 		"reportGenerationQuery": generationQuery.Name,
@@ -58,7 +56,7 @@ func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEn
 		return err
 	}
 
-	if g.deleteExistingData {
+	if deleteExistingData {
 		logger.Debugf("deleting any preexisting rows in %s", tableName)
 		err = g.reportResultsRepo.DeleteReportResults(tableName)
 		if err != nil {
