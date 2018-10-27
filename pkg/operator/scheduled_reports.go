@@ -417,9 +417,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.generateScheduledReport(
-		logger,
-		report.Name,
+	err = op.reportGenerator.GenerateReport(
 		tableName,
 		&reportPeriod.periodStart,
 		&reportPeriod.periodEnd,
@@ -445,8 +443,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 			logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
 			return updateErr
 		}
-		logger.WithError(err).Errorf("error occurred while generating report")
-		return err
+		return fmt.Errorf("failed to generateReport for ScheduledReport %s, err: %v", report.Name, err)
 	}
 	// We generated a report successfully, remove any existing failure
 	// conditions that may exist

@@ -227,22 +227,21 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.generateReport(
-		logger,
-		report.Name,
+	err = op.reportGenerator.GenerateReport(
 		tableName,
 		reportingStart,
 		reportingEnd,
 		genQuery,
 		queryDependencies.DynamicReportGenerationQueries,
 		report.Spec.Inputs,
+		true,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
 	if err != nil {
 		genReportFailedCounter.Inc()
 		op.setReportError(logger, report, err, "report execution failed")
-		return err
+		return fmt.Errorf("failed to generateReport for Report %s, err: %v", report.Name, err)
 	}
 
 	// update status
