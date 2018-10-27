@@ -228,7 +228,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 				promConn = op.promConn
 			}
 
-			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prestoQueryer, metricsCollectors, ctx, start, end, importCfg, true)
+			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, ctx, start, end, importCfg, true)
 			if err != nil {
 				return err
 			}
@@ -308,7 +308,8 @@ func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource
 	} ***REMOVED*** {
 		promConn = op.promConn
 	}
-	return prestostore.NewPrometheusImporter(logger, promConn, op.prestoQueryer, op.clock, cfg, metricsCollectors), nil
+
+	return prestostore.NewPrometheusImporter(logger, promConn, op.prometheusMetricsRepo, op.clock, cfg, metricsCollectors), nil
 }
 
 func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.ImporterMetricsCollectors {

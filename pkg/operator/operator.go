@@ -133,8 +133,9 @@ type Reporting struct {
 	prestoQueryer db.Queryer
 	hiveQueryer   db.Queryer
 
-	reportResultsRepo prestostore.ReportResultsRepo
-	reportGenerator   reporting.ReportGenerator
+	reportResultsRepo     prestostore.ReportResultsRepo
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+	reportGenerator       reporting.ReportGenerator
 
 	promConn prom.API
 
@@ -397,11 +398,11 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
-	promMetricsRepo := prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
-		op.logger, op.rand, promMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
 		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)

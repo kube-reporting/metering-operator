@@ -42,9 +42,14 @@ type PrometheusMetricsGetter interface {
 	GetPrometheusMetrics(tableName string, start, end time.Time) ([]*PrometheusMetric, error)
 }
 
+type PrometheusMetricTimestampTracker interface {
+	GetLastTimestampForTable(tableName string) (*time.Time, error)
+}
+
 type PrometheusMetricsRepo interface {
 	PrometheusMetricsGetter
 	PrometheusMetricsStorer
+	PrometheusMetricTimestampTracker
 }
 
 type prometheusMetricRepo struct {
@@ -63,6 +68,26 @@ func (r *prometheusMetricRepo) StorePrometheusMetrics(ctx context.Context, table
 
 func (r *prometheusMetricRepo) GetPrometheusMetrics(tableName string, start, end time.Time) ([]*PrometheusMetric, error) {
 	return GetPrometheusMetrics(r.queryer, tableName, start, end)
+}
+
+func (r *prometheusMetricRepo) GetLastTimestampForTable(tableName string) (*time.Time, error) {
+	// Get the most recent timestamp in the table for this query
+	getLastTimestampQuery := fmt.Sprintf(`
+				SELECT "timestamp"
+				FROM %s
+				ORDER BY "timestamp" DESC
+				LIMIT 1`, tableName)
+
+	results, err := presto.ExecuteSelect(r.queryer, getLastTimestampQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error getting last timestamp for table %s, maybe table doesn't exist yet? %v", tableName, err)
+	}
+
+	if len(results) != 0 {
+		ts := results[0]["timestamp"].(time.Time)
+		return &ts, nil
+	}
+	return nil, nil
 }
 
 // PrometheusMetric is a receipt of a usage determined by a query within a speci***REMOVED***c time range.
