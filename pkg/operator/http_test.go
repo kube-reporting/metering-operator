@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path"
+	"sort"
 	"testing"
 	"time"
 
@@ -46,6 +47,11 @@ func (f *fakePrometheusMetricsRepo) StorePrometheusMetrics(ctx context.Context, 
 		return f.err
 	}
 	f.metrics[tableName] = append(f.metrics[tableName], metrics...)
+
+	// sort metrics we store by timestamp
+	sort.Slice(f.metrics[tableName], func(i, j int) bool {
+		return f.metrics[tableName][i].Timestamp.Before(f.metrics[tableName][j].Timestamp)
+	})
 	return nil
 }
 
@@ -55,6 +61,13 @@ func (f *fakePrometheusMetricsRepo) GetPrometheusMetrics(tableName string, start
 	}
 	if metrics, ok := f.metrics[tableName]; ok {
 		return metrics, nil
+	}
+	return nil, fmt.Errorf("table %s not found", tableName)
+}
+
+func (f *fakePrometheusMetricsRepo) GetLastTimestampForTable(tableName string) (*time.Time, error) {
+	if metrics, ok := f.metrics[tableName]; ok {
+		return &metrics[len(metrics)-1].Timestamp, nil
 	}
 	return nil, fmt.Errorf("table %s not found", tableName)
 }
