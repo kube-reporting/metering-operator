@@ -29,6 +29,17 @@ func GetRows(queryer db.Queryer, tableName string, columns []Column) ([]Row, err
 	return ExecuteSelect(queryer, GenerateGetRowsSQL(tableName, columns))
 }
 
+func CreateView(queryer db.Queryer, viewName string, query string, replace bool) error {
+	fullQuery := "CREATE"
+	if replace {
+		fullQuery += " OR REPLACE"
+	}
+	fullQuery += " VIEW %s AS %s"
+	finalQuery := fmt.Sprintf(fullQuery, viewName, query)
+	_, err := queryer.Query(finalQuery)
+	return err
+}
+
 func GenerateGetRowsSQL(tableName string, columns []Column) string {
 	columnsSQL := GenerateQuotedColumnsListSQL(columns)
 	orderBySQL := GenerateOrderBySQL(columns)
