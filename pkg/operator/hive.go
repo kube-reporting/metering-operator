@@ -13,6 +13,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
@@ -97,14 +98,27 @@ type TableManager interface {
 	DropTable(tableName string, ignoreNotExists bool) error
 }
 
-type tableManager struct {
+type AWSTablePartitionManager interface {
+	AddPartition(tableName, start, end, location string) error
+	DropPartition(tableName, start, end string) error
+}
+
+type hiveTableManager struct {
 	queryer db.Queryer
 }
 
-func (m *tableManager) CreateTable(params hive.TableParameters, properties hive.TableProperties) error {
+func (m *hiveTableManager) CreateTable(params hive.TableParameters, properties hive.TableProperties) error {
 	return hive.ExecuteCreateTable(m.queryer, params, properties)
 }
 
-func (m *tableManager) DropTable(tableName string, ignoreNotExists bool) error {
+func (m *hiveTableManager) DropTable(tableName string, ignoreNotExists bool) error {
 	return hive.ExecuteDropTable(m.queryer, tableName, ignoreNotExists)
+}
+
+func (m *hiveTableManager) AddPartition(tableName, start, end, location string) error {
+	return reportingutil.AddAWSHivePartition(m.queryer, tableName, start, end, location)
+}
+
+func (m *hiveTableManager) DropPartition(tableName, start, end string) error {
+	return reportingutil.DropAWSHivePartition(m.queryer, tableName, start, end)
 }
