@@ -120,13 +120,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 				return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
 			}
 
-			err = op.reportInformer.Informer().GetIndexer().Update(newReport)
-			if err != nil {
-				logger.WithError(err).Warnf("unable to update report cache with updated report")
-				// if we cannot update it, don't re queue it
-				return err
-			}
-
 			// It's no longer started, requeue it
 			if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
 				op.enqueueReportRateLimited(newReport)
