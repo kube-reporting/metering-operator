@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,6 +14,12 @@ import (
 const (
 	ReportingStartInputName = "ReportingStart"
 	ReportingEndInputName   = "ReportingEnd"
+)
+
+var (
+	errInvalidTableName                 = errors.New("tableName cannot be empty")
+	errInvalidReportGenerationQueryName = errors.New("reportGenerationQuery cannot be empty")
+	errEmptyQueryField                  = errors.New("ReportGenerationQuery spec.query cannot be empty")
 )
 
 type ReportGenerator interface {
@@ -32,6 +39,19 @@ func NewReportGenerator(logger log.FieldLogger, reportResultsRepo prestostore.Re
 }
 
 func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error {
+	if generationQuery == nil {
+		panic("GenerateReport: must specify generationQuery")
+	}
+	if tableName == "" {
+		return errInvalidTableName
+	}
+	if generationQuery.Name == "" {
+		return errInvalidReportGenerationQueryName
+	}
+	if generationQuery.Spec.Query == "" {
+		return errEmptyQueryField
+	}
+
 	logger := g.logger.WithFields(log.Fields{
 		"tableName":             tableName,
 		"reportGenerationQuery": generationQuery.Name,
