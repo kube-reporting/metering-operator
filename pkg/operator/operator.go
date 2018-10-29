@@ -136,6 +136,7 @@ type Reporting struct {
 	reportResultsRepo     prestostore.ReportResultsRepo
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportGenerator       reporting.ReportGenerator
+	prestoViewCreator     PrestoViewCreator
 
 	promConn prom.API
 
@@ -399,6 +400,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
 	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
+	op.prestoViewCreator = &prestoViewCreator{queryer: op.prestoQueryer}
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
