@@ -11,7 +11,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
@@ -208,7 +207,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger.Debugf("dropping table %s", tableName)
-	err = hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	err = op.tableManager.DropTable(tableName, true)
 	if err != nil {
 		return fmt.Errorf("unable to drop table %s before creating for report %s: %v", tableName, report.Name, err)
 	}

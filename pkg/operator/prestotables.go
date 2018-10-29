@@ -190,7 +190,7 @@ func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
 	tableName := prestoTable.Status.Parameters.Name
 	logger := op.logger.WithFields(log.Fields{"PrestoTable": prestoTable.Name, "tableName": tableName})
 	logger.Infof("dropping presto table %s", tableName)
-	err := hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	err := op.tableManager.DropTable(tableName, true)
 	if err != nil {
 		logger.WithError(err).Error("unable to drop presto table")
 		return err

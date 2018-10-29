@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
@@ -70,7 +71,7 @@ func (op *Reporting) createTableAndCR(logger log.FieldLogger, obj metav1.Object,
 
 func (op *Reporting) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties) error {
 	logger.Debugf("Creating table %s with Hive Storage %#v", params.Name, properties)
-	err := hive.ExecuteCreateTable(op.hiveQueryer, params, properties)
+	err := op.tableManager.CreateTable(params, properties)
 	if err != nil {
 		return fmt.Errorf("couldn't create table: %v", err)
 	}
@@ -89,4 +90,21 @@ func addTableNameToLocation(tableProperties hive.TableProperties, tableName stri
 	u.Path = path.Join(u.Path, tableName)
 	tableProperties.Location = u.String()
 	return tableProperties, nil
+}
+
+type TableManager interface {
+	CreateTable(params hive.TableParameters, properties hive.TableProperties) error
+	DropTable(tableName string, ignoreNotExists bool) error
+}
+
+type tableManager struct {
+	queryer db.Queryer
+}
+
+func (m *tableManager) CreateTable(params hive.TableParameters, properties hive.TableProperties) error {
+	return hive.ExecuteCreateTable(m.queryer, params, properties)
+}
+
+func (m *tableManager) DropTable(tableName string, ignoreNotExists bool) error {
+	return hive.ExecuteDropTable(m.queryer, tableName, ignoreNotExists)
 }
