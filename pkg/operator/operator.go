@@ -15,7 +15,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/sync/singleflight"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -141,6 +140,9 @@ type Reporting struct {
 	tableManager             TableManager
 	awsTablePartitionManager AWSTablePartitionManager
 
+	testWriteToPrestoFunc  func() bool
+	testReadFromPrestoFunc func() bool
+
 	promConn prom.API
 
 	clock clock.Clock
@@ -153,10 +155,6 @@ type Reporting struct {
 
 	importersMu sync.Mutex
 	importers   map[string]*prestostore.PrometheusImporter
-
-	// ensures only at most a single testRead query is running against Presto
-	// at one time
-	healthCheckSingleFlight singleflight.Group
 }
 
 func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Reporting, error) {
@@ -408,6 +406,19 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	op.tableManager = hiveTableManager
 	op.awsTablePartitionManager = hiveTableManager
 
+	tableProperties, err := op.getHiveTableProperties(op.logger, nil, "health_check")
+	if err != nil {
+		return fmt.Errorf("no default storage con***REMOVED***gured, unable to setup health checker: %v", err)
+	}
+
+	prestoHealthChecker := NewPrestoHealthChecker(op.logger, op.prestoQueryer, hiveTableManager, *tableProperties)
+	op.testWriteToPrestoFunc = func() bool {
+		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
+	}
+	op.testReadFromPrestoFunc = func() bool {
+		return prestoHealthChecker.TestReadFromPrestoSingleFlight()
+	}
+
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
 		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
@@ -440,7 +451,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	// Poll until we can write to presto
 	op.logger.Info("testing ability to write to Presto")
 	err = wait.PollUntil(time.Second*5, func() (bool, error) {
-		if op.testWriteToPresto(op.logger) {
+		if op.testWriteToPrestoFunc() {
 			return true, nil
 		}
 		return false, nil
