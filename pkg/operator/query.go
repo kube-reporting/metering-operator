@@ -9,8 +9,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 func (op *Reporting) runReportGenerationQueryWorker() {
@@ -83,8 +85,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return err
 	}
 
-	query := fmt.Sprintf("CREATE OR REPLACE VIEW %s AS %s", viewName, renderedQuery)
-	_, err = op.prestoQueryer.Query(query)
+	err = op.prestoViewCreator.CreateView(viewName, renderedQuery)
 	if err != nil {
 		return err
 	}
@@ -143,4 +144,16 @@ func (op *Reporting) queueDependentReportGenerationQueriesForQuery(generationQue
 		}
 	}
 	return nil
+}
+
+type PrestoViewCreator interface {
+	CreateView(viewName, query string) error
+}
+
+type prestoViewCreator struct {
+	queryer db.Queryer
+}
+
+func (c *prestoViewCreator) CreateView(viewName, query string) error {
+	return presto.CreateView(c.queryer, viewName, query, true)
 }
