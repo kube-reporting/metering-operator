@@ -137,8 +137,8 @@ type Reporting struct {
 	reportGenerator       reporting.ReportGenerator
 
 	prestoViewCreator        PrestoViewCreator
-	tableManager             TableManager
-	awsTablePartitionManager AWSTablePartitionManager
+	tableManager             reporting.TableManager
+	awsTablePartitionManager reporting.AWSTablePartitionManager
 
 	testWriteToPrestoFunc  func() bool
 	testReadFromPrestoFunc func() bool
@@ -398,11 +398,12 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
-	hiveTableManager := &hiveTableManager{queryer: op.hiveQueryer}
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
 	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
 	op.prestoViewCreator = &prestoViewCreator{queryer: op.prestoQueryer}
+
+	hiveTableManager := reporting.NewHiveTableManager(op.hiveQueryer)
 	op.tableManager = hiveTableManager
 	op.awsTablePartitionManager = hiveTableManager
 
@@ -411,7 +412,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
 	}
 
-	prestoHealthChecker := NewPrestoHealthChecker(op.logger, op.prestoQueryer, hiveTableManager, *tableProperties)
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, op.prestoQueryer, hiveTableManager, *tableProperties)
 	op.testWriteToPrestoFunc = func() bool {
 		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
 	}
