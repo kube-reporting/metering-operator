@@ -239,8 +239,8 @@ We can use these variables in a `WHERE` clause within our query to ***REMOVED***
 The `WHERE` clause generally for this generally looks the same for all `ReportGenerationQueries` that expect to be used by a Report:
 
 ```
-WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
-AND "timestamp" < timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
 ```
 
 Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, should collect data with timestamps equal to or greater than the start time and less than the end time, as seen above.
@@ -275,8 +275,8 @@ spec:
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
     FROM {| dataSourceTableName "unready-deployment-replicas" |}
-    WHERE "timestamp" >= timestamp '{|.Report.StartPeriod | prestoTimestamp |}'
-    AND "timestamp" < timestamp '{| .Report.EndPeriod | prestoTimestamp |}'
+    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY labels['namespace'], labels['deployment']
     ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
 ```
