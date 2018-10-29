@@ -129,9 +129,6 @@ type Reporting struct {
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 	prestoTableQueue           workqueue.RateLimitingInterface
 
-	prestoQueryer db.Queryer
-	hiveQueryer   db.Queryer
-
 	reportResultsRepo     prestostore.ReportResultsRepo
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportGenerator       reporting.ReportGenerator
@@ -355,6 +352,11 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	op.logger.Infof("setting up DB connections")
 
+	var (
+		prestoQueryer db.Queryer
+		hiveQueryer   db.Queryer
+	)
+
 	// Use errgroup to setup both hive and presto connections
 	// at the sametime, waiting for both to be ready before continuing.
 	// if either errors, we return the first error
@@ -366,16 +368,16 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		if err != nil {
 			return err
 		}
-		op.prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
+		prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
 		return nil
 	})
 	g.Go(func() error {
 		var err error
-		hiveQueryer := hive.NewReconnectingQueryer(shutdownCtx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+		reconnectingHiveQueryer := hive.NewReconnectingQueryer(shutdownCtx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
 		}
-		op.hiveQueryer = db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+		hiveQueryer = db.NewLoggingQueryer(reconnectingHiveQueryer, op.logger, op.cfg.LogDDLQueries)
 		return nil
 	})
 	err := g.Wait()
@@ -383,8 +385,8 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		return err
 	}
 
-	defer op.prestoQueryer.Close()
-	defer op.hiveQueryer.Close()
+	defer prestoQueryer.Close()
+	defer hiveQueryer.Close()
 
 	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
 	if err != nil {
@@ -398,12 +400,12 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
-	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
+	op.reportResultsRepo = prestostore.NewReportResultsRepo(prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
-	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
-	op.prestoViewCreator = &prestoViewCreator{queryer: op.prestoQueryer}
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer)
+	op.prestoViewCreator = &prestoViewCreator{queryer: prestoQueryer}
 
-	hiveTableManager := reporting.NewHiveTableManager(op.hiveQueryer)
+	hiveTableManager := reporting.NewHiveTableManager(hiveQueryer)
 	op.tableManager = hiveTableManager
 	op.awsTablePartitionManager = hiveTableManager
 
@@ -412,7 +414,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
 	}
 
-	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, op.prestoQueryer, hiveTableManager, *tableProperties)
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, *tableProperties)
 	op.testWriteToPrestoFunc = func() bool {
 		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
 	}
