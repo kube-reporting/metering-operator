@@ -34,7 +34,6 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
-	informers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions/metering/v1alpha1"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
@@ -105,14 +104,6 @@ type Reporting struct {
 	kubeClient     corev1.CoreV1Interface
 
 	informerFactory factory.SharedInformerFactory
-
-	prestoTableInformer           informers.PrestoTableInformer
-	reportInformer                informers.ReportInformer
-	reportDataSourceInformer      informers.ReportDataSourceInformer
-	reportGenerationQueryInformer informers.ReportGenerationQueryInformer
-	reportPrometheusQueryInformer informers.ReportPrometheusQueryInformer
-	scheduledReportInformer       informers.ScheduledReportInformer
-	storageLocationInformer       informers.StorageLocationInformer
 
 	prestoTableLister           listers.PrestoTableLister
 	reportLister                listers.ReportLister
@@ -242,14 +233,6 @@ func newReportingOperator(
 		kubeClient:     kubeClient,
 
 		informerFactory: informerFactory,
-
-		prestoTableInformer:           prestoTableInformer,
-		reportInformer:                reportInformer,
-		reportDataSourceInformer:      reportDataSourceInformer,
-		reportGenerationQueryInformer: reportGenerationQueryInformer,
-		reportPrometheusQueryInformer: reportPrometheusQueryInformer,
-		scheduledReportInformer:       scheduledReportInformer,
-		storageLocationInformer:       storageLocationInformer,
 
 		prestoTableLister:           prestoTableInformer.Lister(),
 		reportLister:                reportInformer.Lister(),
