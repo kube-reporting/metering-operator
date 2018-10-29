@@ -97,6 +97,12 @@ You can pass additional JDBC parameters using the `dbConnectionURL`, for more de
 If you want to run the metering components on specific sets of nodes then you can set nodeSelectors on each component to control where each component of metering is scheduled to.
 See [node-selectors.yaml][example-node-selectors-config] for an example of setting node selectors for each component.
 
+
+### Image repositories and tags
+
+You can override the image repositories and versions to test pre-releases or to deploy an image built by our CI for PRs or testing.
+See [latest-versions.yaml][latest-versions] for an example of setting the repository and image tag for each component to use.
+
 ### Persistent Volumes
 
 Metering requires at least 1 Persistent Volume to operate. (The example manifest includes 3 by default.) The Persistent Volume Claims (PVCs) are listed below:
@@ -195,6 +201,7 @@ This can be done either pre-install or post-install. Note that disabling it post
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [enable-aws-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html
 [example-config]: ../manifests/metering-config/custom-values.yaml
+[latest-versions]: ../manifests/metering-config/latest-versions.yaml
 [default-config]: ../manifests/metering-config/default.yaml
 [example-storage-config]: ../manifests/metering-config/custom-storageclass-values.yaml
 [example-node-selectors-config]: ../manifests/metering-config/custom-node-selectors.yaml
