@@ -137,8 +137,9 @@ type Reporting struct {
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportGenerator       reporting.ReportGenerator
 
-	prestoViewCreator PrestoViewCreator
-	tableManager      TableManager
+	prestoViewCreator        PrestoViewCreator
+	tableManager             TableManager
+	awsTablePartitionManager AWSTablePartitionManager
 
 	promConn prom.API
 
@@ -399,11 +400,13 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
+	hiveTableManager := &hiveTableManager{queryer: op.hiveQueryer}
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(op.prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
 	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(op.prestoQueryer)
 	op.prestoViewCreator = &prestoViewCreator{queryer: op.prestoQueryer}
-	op.tableManager = &tableManager{queryer: op.hiveQueryer}
+	op.tableManager = hiveTableManager
+	op.awsTablePartitionManager = hiveTableManager
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(

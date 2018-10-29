@@ -311,7 +311,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
 		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
-		err = reportingutil.DropAWSHivePartition(op.hiveQueryer, tableName, start, end)
+		err = op.awsTablePartitionManager.DropPartition(tableName, start, end)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
 			return err
@@ -324,7 +324,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 		end := p.PartitionSpec["end"]
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
-		err = reportingutil.AddAWSHivePartition(op.hiveQueryer, tableName, start, end, p.Location)
+		err = op.awsTablePartitionManager.AddPartition(tableName, start, end, p.Location)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.Status.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
 			return err
