@@ -38,7 +38,8 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
 		collectEndpoint := "/api/v1/datasources/prometheus/collect"
-		t.Logf("querying %s, currentTime: %s", collectEndpoint, currentTime)
+		t.Logf("currentTime: %s", currentTime)
+		t.Logf("querying %s, with startTime: %s endTime: %s", collectEndpoint, f.reportStart, f.reportEnd)
 		req := f.NewReportingOperatorSVCPOSTRequest(collectEndpoint, body)
 		result := req.Do()
 		resp, err := result.Raw()

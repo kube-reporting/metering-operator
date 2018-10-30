@@ -60,7 +60,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 				if _, exists := readyReportGenQueries[query.Name]; exists {
 					return
 				}
-				t.Logf("waiting for ReportGenerationQuery %s to exist", query.Name)
+				t.Logf("%s dependencies: waiting for ReportGenerationQuery %s to exist", queryName, query.Name)
 				_, err := f.WaitForMeteringReportGenerationQuery(t, query.Name, pollInterval, timeout)
 				require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 				readyReportGenQueries[query.Name] = struct{}{}
@@ -69,7 +69,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 				if _, exists := readyReportDataSources[ds.Name]; exists {
 					return
 				}
-				t.Logf("waiting for ReportDataSource %s to exist", ds.Name)
+				t.Logf("%s dependencies: waiting for ReportDataSource %s to exist", queryName, ds.Name)
 				_, err := f.WaitForMeteringReportDataSourceTable(t, ds.Name, pollInterval, timeout)
 				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", ds.Name, queryName)
 				readyReportDataSources[ds.Name] = struct{}{}
