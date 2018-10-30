@@ -29,6 +29,10 @@ func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name stri
 			}
 			return false, err
 		}
+		if !reportQuery.Spec.View.Disabled && reportQuery.Status.ViewName == "" {
+			t.Logf("ReportGenerationQuery %s view is not created yet", name)
+			return false, nil
+		}
 		return true, nil
 	})
 }
