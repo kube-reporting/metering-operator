@@ -10,29 +10,33 @@ import (
 
 type Queryer interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
+	Close() error
 }
 
-type db struct {
+type loggingQueryer struct {
+	queryer    Queryer
 	logger     log.FieldLogger
 	logQueries bool
-
-	db *sql.DB
 }
 
-func New(sqlDB *sql.DB, logger log.FieldLogger, logQueries bool) *db {
-	return &db{
-		db:         sqlDB,
+func NewLoggingQueryer(queryer Queryer, logger log.FieldLogger, logQueries bool) *loggingQueryer {
+	return &loggingQueryer{
+		queryer:    queryer,
 		logger:     logger,
 		logQueries: logQueries,
 	}
 }
 
-func (db *db) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	if db.logQueries {
+func (loggingQueryer *loggingQueryer) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if loggingQueryer.logQueries {
 		margs := argsString(args...)
-		db.logger.Debugf("QUERY: %s [%s]", query, margs)
+		loggingQueryer.logger.Debugf("QUERY: %s [%s]", query, margs)
 	}
-	return db.db.Query(query, args...)
+	return loggingQueryer.queryer.Query(query, args...)
+}
+
+func (loggingQueryer *loggingQueryer) Close() error {
+	return loggingQueryer.queryer.Close()
 }
 
 // argsString pretty prints arguments passed into it for logging query

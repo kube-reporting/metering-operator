@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	_ "github.com/prestodb/presto-go-client/presto"
+
+	"github.com/operator-framework/operator-metering/pkg/db"
 )
 
 const (
@@ -12,16 +16,28 @@ const (
 	TimestampFormat = "2006-01-02 15:04:05.000"
 )
 
-func DeleteFrom(execer Execer, tableName string) error {
-	return execer.Exec(fmt.Sprintf("DELETE FROM %s", tableName))
+func DeleteFrom(queryer db.Queryer, tableName string) error {
+	_, err := queryer.Query(fmt.Sprintf("DELETE FROM %s", tableName))
+	return err
 }
 
-func InsertInto(execer Execer, tableName, query string) error {
-	return execer.Exec(FormatInsertQuery(tableName, query))
+func InsertInto(queryer db.Queryer, tableName, query string) error {
+	return execQuery(queryer, FormatInsertQuery(tableName, query))
 }
 
-func GetRows(queryer Queryer, tableName string, columns []Column) ([]Row, error) {
-	return queryer.Query(GenerateGetRowsSQL(tableName, columns))
+func GetRows(queryer db.Queryer, tableName string, columns []Column) ([]Row, error) {
+	return ExecuteSelect(queryer, GenerateGetRowsSQL(tableName, columns))
+}
+
+func CreateView(queryer db.Queryer, viewName string, query string, replace bool) error {
+	fullQuery := "CREATE"
+	if replace {
+		fullQuery += " OR REPLACE"
+	}
+	fullQuery += " VIEW %s AS %s"
+	finalQuery := fmt.Sprintf(fullQuery, viewName, query)
+	_, err := queryer.Query(finalQuery)
+	return err
 }
 
 func GenerateGetRowsSQL(tableName string, columns []Column) string {
@@ -82,4 +98,80 @@ func Timestamp(input interface{}) (string, error) {
 
 func quoteColumn(col Column) string {
 	return `"` + col.Name + `"`
+}
+
+type Row map[string]interface{}
+
+type Column struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type PartitionSpec map[string]string
+
+type TablePartition struct {
+	Location      string        `json:"location"`
+	PartitionSpec PartitionSpec `json:"partitionSpec"`
+}
+
+// ExecuteSelectQuery performs the query on the table target. It's expected
+// target has the correct schema.
+func ExecuteSelect(queryer db.Queryer, query string) ([]Row, error) {
+	rows, err := queryer.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	cols, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	var results []Row
+	for rows.Next() {
+		// Create a slice of interface{}'s to represent each column,
+		// and a second slice to contain pointers to each item in the columns slice.
+		columns := make([]interface{}, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		// Scan the result into the column pointers...
+		if err := rows.Scan(columnPointers...); err != nil {
+			return nil, err
+		}
+
+		// Create our map, and retrieve the value for each column from the pointers slice,
+		// storing it in the map with the name of the column as the key.
+		m := make(map[string]interface{})
+		for i, colName := range cols {
+			val := columnPointers[i].(*interface{})
+			m[colName] = *val
+		}
+		results = append(results, Row(m))
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func execQuery(queryer db.Queryer, query string) error {
+	rows, err := queryer.Query(query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	// Must call rows.Next() in order for errors to be populated correctly
+	// because Query() only submits the query, and doesn't handle
+	// success/failure. Next() is the method which inspects the submitted
+	// queries status and causes errors to get stored in the sql.Rows object.
+	for rows.Next() {
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("presto SQL error: %v", err)
+	}
+	return nil
 }

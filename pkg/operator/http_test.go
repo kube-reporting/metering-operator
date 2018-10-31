@@ -4,27 +4,28 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"path"
+	"sort"
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
-	"github.com/operator-framework/operator-metering/pkg/presto/mock"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
 var (
@@ -36,54 +37,57 @@ var (
 	testLogger = logrus.New()
 )
 
-func newTestReport(name, namespace, testQueryName string, reportStart, reportEnd time.Time, reportStatus v1alpha1.ReportStatus) *v1alpha1.Report {
-	return &v1alpha1.Report{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.ReportSpec{
-			GenerationQueryName: testQueryName,
-			ReportingStart:      &meta.Time{reportStart},
-			ReportingEnd:        &meta.Time{reportEnd},
-			RunImmediately:      true,
-		},
-		Status: reportStatus,
-	}
+type fakePrometheusMetricsRepo struct {
+	metrics map[string][]*prestostore.PrometheusMetric
+	err     error
 }
 
-func newTestReportGenQuery(name, namespace string, columns []v1alpha1.ReportGenerationQueryColumn) *v1alpha1.ReportGenerationQuery {
-	return &v1alpha1.ReportGenerationQuery{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.ReportGenerationQuerySpec{
-			Columns: columns,
-		},
+func (f *fakePrometheusMetricsRepo) StorePrometheusMetrics(ctx context.Context, tableName string, metrics []*prestostore.PrometheusMetric) error {
+	if f.err != nil {
+		return f.err
 	}
+	f.metrics[tableName] = append(f.metrics[tableName], metrics...)
+
+	// sort metrics we store by timestamp
+	sort.Slice(f.metrics[tableName], func(i, j int) bool {
+		return f.metrics[tableName][i].Timestamp.Before(f.metrics[tableName][j].Timestamp)
+	})
+	return nil
 }
 
-func newTestPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1.PrestoTable {
-	return &v1alpha1.PrestoTable{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      prestoTableResourceNameFromKind("report", name),
-			Namespace: namespace,
-		},
-		Status: v1alpha1.PrestoTableStatus{
-			Parameters: v1alpha1.TableParameters{
-				Columns: columns,
-			},
-		},
+func (f *fakePrometheusMetricsRepo) GetPrometheusMetrics(tableName string, start, end time.Time) ([]*prestostore.PrometheusMetric, error) {
+	if f.err != nil {
+		return nil, f.err
 	}
+	if metrics, ok := f.metrics[tableName]; ok {
+		return metrics, nil
+	}
+	return nil, fmt.Errorf("table %s not found", tableName)
+}
+
+func (f *fakePrometheusMetricsRepo) GetLastTimestampForTable(tableName string) (*time.Time, error) {
+	if metrics, ok := f.metrics[tableName]; ok {
+		return &metrics[len(metrics)-1].Timestamp, nil
+	}
+	return nil, fmt.Errorf("table %s not found", tableName)
+}
+
+type fakeReportResultsGetter struct {
+	results []presto.Row
+	err     error
+}
+
+func (f *fakeReportResultsGetter) GetReportResults(tableName string, columns []presto.Column) ([]presto.Row, error) {
+	return f.results, f.err
 }
 
 func TestAPIV1ReportsGet(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportName string
@@ -94,13 +98,15 @@ func TestAPIV1ReportsGet(t *testing.T) {
 
 		expectedStatusCode int
 		expectedAPIError   string
+		expectedResults    []presto.Row
 
-		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
+		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -110,7 +116,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -120,16 +126,15 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
-				return nil
-			},
-			expectedStatusCode: http.StatusOK,
+			expectedResults:       nil,
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusOK,
 		},
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -140,7 +145,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -150,22 +155,27 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			expectedResults: []presto.Row{
+				{
+					"timestamp": time.Time{},
+					"foo":       1.5,
+				},
+			},
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1.5,
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusOK,
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusOK,
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -175,7 +185,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -185,28 +195,32 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
-				return nil
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: nil,
+				err:     errors.New("mock database had an error"),
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "failed to perform presto query",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "failed to perform presto query",
 		},
 		"non-existent-report": {
-			reportName:         "doesnt-exist",
-			expectedStatusCode: http.StatusNotFound,
-			expectedAPIError:   "not found",
+			reportName:            "doesnt-exist",
+			expectedStatusCode:    http.StatusNotFound,
+			expectedAPIError:      "not found",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-name-not-specified": {
-			reportName:         "",
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "the following fields are missing or empty: name",
+			reportName:            "",
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "the following fields are missing or empty: name",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -216,7 +230,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -226,19 +240,25 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			expectedResults: []presto.Row{
+				{
+					"timestamp": time.Time{},
+					"foo":       1.5,
+					"this_column_doesnt_exist_in_presto_table": "fail",
+				},
+			},
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1.5,
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "results schema doesn't match expected schema",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "results schema doesn't match expected schema",
 		},
 	}
 
@@ -251,14 +271,14 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			listers := meteringListers{
-				reports:                 listers.NewReportLister(reportIndexer).Reports(namespace),
-				reportGenerationQueries: listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer).ReportGenerationQueries(namespace),
-				prestoTables:            listers.NewPrestoTableLister(prestoTableIndexer).PrestoTables(namespace),
-			}
+			reportLister := listers.NewReportLister(reportIndexer)
+			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
+			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
@@ -268,33 +288,14 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
-
-			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
-				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
-				require.NoError(t, err, "test should not contain unsupported hive column types")
-			}
-
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			// setup our mock queryer so we can test without a real database
-			queryer := mockpresto.NewMockExecQueryer(ctrl)
-
-			// expectedResults is what our mock queryer will return. since the
-			// v1 results endpoint just serializes the slice of rows returned
-			// from the DB, this is also what we expect the HTTP api to
-			// return when there are no errors
-			var expectedResults []presto.Row
-			if tt.queryerPrepareFunc != nil {
-				tableName := reportTableName(tt.reportName)
-				expectedResults = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, queryer, testRand, noopPrometheusImporterFunc, listers)
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+			)
 			server := httptest.NewServer(router)
 			defer server.Close()
 
@@ -341,7 +342,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				err = json.Unmarshal(body, &results)
 				assert.NoError(t, err, "expected unmarshal to not error")
 				// TODO(chance): check more than the results length matching
-				assert.Len(t, results, len(expectedResults), "expected API results length to match expected results length")
+				assert.Len(t, results, len(tt.expectedResults), "expected API results length to match expected results length")
 			}
 		})
 	}
@@ -357,8 +358,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
 	const testFormat = "?format=json"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
@@ -372,15 +374,16 @@ func TestAPIV2ReportsFull(t *testing.T) {
 
 		expectedStatusCode int
 		expectedAPIError   string
-
-		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
 		expectedResults    *GetReportResults
+
+		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -391,9 +394,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					Type:        "double",
 					TableHidden: false,
 				},
-			},
-			),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			}),
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -402,19 +404,17 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					Name: "foo",
 					Type: "double",
 				},
-			},
-			),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			}),
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1,
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusOK,
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusOK,
 			expectedResults: &GetReportResults{
 				Results: []ReportResultEntry{
 					{
@@ -431,9 +431,9 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -445,7 +445,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -455,18 +455,16 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
-				return nil
-			},
-			expectedResults:    &GetReportResults{},
-			expectedStatusCode: http.StatusOK,
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedResults:       &GetReportResults{},
+			expectedStatusCode:    http.StatusOK,
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -478,7 +476,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -488,45 +486,52 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
-				return nil
+			reportResultsGetter: &fakeReportResultsGetter{
+				err: errors.New("mock database had an error"),
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "failed to perform presto query",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "failed to perform presto query",
 		},
 		"non-existent-report": {
-			reportName:         "doesnt-exist",
-			apiPath:            apiReportV2URLFull("doesnt-exist") + testFormat,
-			expectedStatusCode: http.StatusNotFound,
-			expectedAPIError:   "not found",
+			reportName:            "doesnt-exist",
+			apiPath:               apiReportV2URLFull("doesnt-exist") + testFormat,
+			expectedStatusCode:    http.StatusNotFound,
+			expectedAPIError:      "not found",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-name-not-specified": {
-			reportName:         "",
-			apiPath:            "/api/v2/reports//full" + testFormat,
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "the following fields are missing or empty: name",
+			reportName:            "",
+			apiPath:               "/api/v2/reports//full" + testFormat,
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "the following fields are missing or empty: name",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-format-not-specified": {
-			reportName:         testReportName,
-			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:            apiReportV2URLFull(testReportName),
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "the following fields are missing or empty: format",
+			reportName:            testReportName,
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:               apiReportV2URLFull(testReportName),
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "the following fields are missing or empty: format",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-format-non-existent": {
-			reportName:         testReportName,
-			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:            apiReportV2URLFull(testReportName) + "?format=doesntexist",
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "format must be one of: csv, json or tabular",
+			reportName:            testReportName,
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:               apiReportV2URLFull(testReportName) + "?format=doesntexist",
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "format must be one of: csv, json or tabular",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -538,7 +543,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -548,19 +553,18 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1.5,
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "results schema doesn't match expected schema",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "results schema doesn't match expected schema",
 		},
 	}
 
@@ -573,14 +577,14 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			listers := meteringListers{
-				reports:                 listers.NewReportLister(reportIndexer).Reports(namespace),
-				reportGenerationQueries: listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer).ReportGenerationQueries(namespace),
-				prestoTables:            listers.NewPrestoTableLister(prestoTableIndexer).PrestoTables(namespace),
-			}
+			reportLister := listers.NewReportLister(reportIndexer)
+			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
+			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
@@ -590,28 +594,14 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
-			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
-				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
-				require.NoError(t, err, "test should not contain unsupported hive column types")
-			}
-
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			// setup our mock queryer so we can test without a real database
-			queryer := mockpresto.NewMockExecQueryer(ctrl)
-
-			if tt.queryerPrepareFunc != nil {
-				tableName := reportTableName(tt.reportName)
-				// we don't need the DB results to verify results in this test
-				_ = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, queryer, testRand, noopPrometheusImporterFunc, listers)
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+			)
 			server := httptest.NewServer(router)
 			defer server.Close()
 
@@ -657,8 +647,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
 	const testFormat = "?format=json"
-	reportStart := time.Time{}
-	reportEnd := reportStart.AddDate(0, 1, 0)
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
 		reportStatus v1alpha1.ReportStatus
@@ -672,15 +663,16 @@ func TestAPIV2ReportsTable(t *testing.T) {
 
 		expectedStatusCode int
 		expectedAPIError   string
-
-		queryerPrepareFunc func(queryer *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row
 		expectedResults    *GetReportResults
+
+		prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+		reportResultsGetter   prestostore.ReportResultsGetter
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -693,7 +685,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -704,17 +696,16 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1,
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusOK,
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusOK,
 			expectedResults: &GetReportResults{
 				Results: []ReportResultEntry{
 					{
@@ -731,9 +722,9 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -745,7 +736,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -755,18 +746,16 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, nil)
-				return nil
-			},
-			expectedResults:    &GetReportResults{},
-			expectedStatusCode: http.StatusOK,
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedResults:       &GetReportResults{},
+			expectedStatusCode:    http.StatusOK,
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -778,7 +767,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -788,45 +777,52 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				dbErr := errors.New("mock database had an error")
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(nil, dbErr)
-				return nil
+			reportResultsGetter: &fakeReportResultsGetter{
+				err: errors.New("mock database had an error"),
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "failed to perform presto query",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "failed to perform presto query",
 		},
 		"non-existent-report": {
-			reportName:         "doesnt-exist",
-			apiPath:            apiReportV2URLTable("doesnt-exist") + testFormat,
-			expectedStatusCode: http.StatusNotFound,
-			expectedAPIError:   "not found",
+			reportName:            "doesnt-exist",
+			apiPath:               apiReportV2URLTable("doesnt-exist") + testFormat,
+			expectedStatusCode:    http.StatusNotFound,
+			expectedAPIError:      "not found",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-name-not-specified": {
-			reportName:         "",
-			apiPath:            "/api/v2/reports//table" + testFormat,
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "the following fields are missing or empty: name",
+			reportName:            "",
+			apiPath:               "/api/v2/reports//table" + testFormat,
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "the following fields are missing or empty: name",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-format-not-specified": {
-			reportName:         testReportName,
-			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:            apiReportV2URLTable(testReportName),
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "the following fields are missing or empty: format",
+			reportName:            testReportName,
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:               apiReportV2URLTable(testReportName),
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "the following fields are missing or empty: format",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"report-format-non-existent": {
-			reportName:         testReportName,
-			report:             newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:            apiReportV2URLTable(testReportName) + "?format=doesntexist",
-			expectedStatusCode: http.StatusBadRequest,
-			expectedAPIError:   "format must be one of: csv, json or tabular",
+			reportName:            testReportName,
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			apiPath:               apiReportV2URLTable(testReportName) + "?format=doesntexist",
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedAPIError:      "format must be one of: csv, json or tabular",
+			reportResultsGetter:   &fakeReportResultsGetter{},
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     newTestReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
 			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
-			query: newTestReportGenQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -838,7 +834,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: newTestPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -848,19 +844,18 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			queryerPrepareFunc: func(mock *mockpresto.MockExecQueryer, tableName string, expectedColumns []presto.Column) []presto.Row {
-				result := []presto.Row{
+			reportResultsGetter: &fakeReportResultsGetter{
+				results: []presto.Row{
 					{
 						"timestamp": time.Time{},
 						"foo":       1.5,
 						"this_column_doesnt_exist_in_presto_table": "fail",
 					},
-				}
-				mock.EXPECT().Query(presto.GenerateGetRowsSQL(tableName, expectedColumns)).Return(result, nil)
-				return result
+				},
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedAPIError:   "results schema doesn't match expected schema",
+			prometheusMetricsRepo: &fakePrometheusMetricsRepo{},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedAPIError:      "results schema doesn't match expected schema",
 		},
 	}
 
@@ -873,14 +868,14 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			listers := meteringListers{
-				reports:                 listers.NewReportLister(reportIndexer).Reports(namespace),
-				reportGenerationQueries: listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer).ReportGenerationQueries(namespace),
-				prestoTables:            listers.NewPrestoTableLister(prestoTableIndexer).PrestoTables(namespace),
-			}
+			reportLister := listers.NewReportLister(reportIndexer)
+			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
+			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
@@ -890,28 +885,14 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			if tt.query != nil {
 				reportGenerationQueryIndexer.Add(tt.query)
 			}
-			var expectedColumns []presto.Column
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
-				var err error
-				expectedColumns, err = hiveColumnsToPrestoColumns(tt.prestoTable.Status.Parameters.Columns)
-				require.NoError(t, err, "test should not contain unsupported hive column types")
-			}
-
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			// setup our mock queryer so we can test without a real database
-			queryer := mockpresto.NewMockExecQueryer(ctrl)
-
-			if tt.queryerPrepareFunc != nil {
-				tableName := reportTableName(tt.reportName)
-				// we don't need the DB results to verify results in this test
-				_ = tt.queryerPrepareFunc(queryer, tableName, expectedColumns)
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, queryer, testRand, noopPrometheusImporterFunc, listers)
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+			)
 			server := httptest.NewServer(router)
 			defer server.Close()
 

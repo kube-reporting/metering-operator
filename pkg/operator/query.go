@@ -9,7 +9,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/db"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
+	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 func (op *Reporting) runReportGenerationQueryWorker() {
@@ -19,7 +22,7 @@ func (op *Reporting) runReportGenerationQueryWorker() {
 	// ReportGenerationQueries can reference a lot of other resources, and it may
 	// take time for them to all to finish setup
 	const maxRequeues = 10
-	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.queues.reportGenerationQueryQueue, maxRequeues) {
+	for op.processResource(logger, op.syncReportGenerationQuery, "ReportGenerationQuery", op.reportGenerationQueryQueue, maxRequeues) {
 	}
 }
 
@@ -32,7 +35,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 
 	logger = logger.WithField("ReportGenerationQuery", name)
 
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
+	reportGenerationQueryLister := op.reportGenerationQueryLister
 	reportGenerationQuery, err := reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -54,45 +57,35 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return nil
 	} else if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
-		viewName = generationQueryViewName(generationQuery.Name)
+		viewName = reportingutil.GenerationQueryViewName(generationQuery.Name)
 	} else {
 		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
 		viewName = generationQuery.Status.ViewName
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		generationQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
-	if err != nil {
-		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to retrieve dependencies: %v", generationQuery.Name, err)
-	}
-	validateResults, err := op.validateDependencyStatus(depsStatus)
 	if err != nil {
 		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
 	}
 
-	templateInfo := &templateInfo{
-		DynamicDependentQueries: validateResults.DynamicReportGenerationQueries,
+	tmplCtx := &reporting.ReportQueryTemplateContext{
+		DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
 		Report:                  nil,
 	}
 
-	qr := queryRenderer{templateInfo: templateInfo}
-	renderedQuery, err := qr.Render(generationQuery.Spec.Query)
+	renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, tmplCtx)
 	if err != nil {
 		return err
 	}
 
-	query := fmt.Sprintf("CREATE OR REPLACE VIEW %s AS %s", viewName, renderedQuery)
-	_, err = op.prestoConn.Query(query)
+	err = op.prestoViewCreator.CreateView(viewName, renderedQuery)
 	if err != nil {
 		return err
 	}
@@ -120,22 +113,11 @@ func (op *Reporting) updateReportQueryViewName(logger log.FieldLogger, generatio
 	return nil
 }
 
-// validateDependencyStatus runs
-// reporting.ValidateGenerationQueryDependenciesStatus and requeues any
-// uninitialized dependencies
-func (op *Reporting) validateDependencyStatus(dependencyStatus *reporting.GenerationQueryDependenciesStatus) (*reporting.ReportGenerationQueryDependencies, error) {
-	deps, err := reporting.ValidateGenerationQueryDependenciesStatus(dependencyStatus)
-	if err != nil {
-		for _, query := range dependencyStatus.UninitializedReportGenerationQueries {
-			op.enqueueReportGenerationQuery(query)
-		}
-
-		for _, dataSource := range dependencyStatus.UninitializedReportDataSources {
-			op.enqueueReportDataSource(dataSource)
-		}
-		return nil, err
+func (op *Reporting) uninitialiedDependendenciesHandler() *reporting.UninitialiedDependendenciesHandler {
+	return &reporting.UninitialiedDependendenciesHandler{
+		HandleUninitializedReportGenerationQuery: op.enqueueReportGenerationQuery,
+		HandleUninitializedReportDataSource:      op.enqueueReportDataSource,
 	}
-	return deps, nil
 }
 
 // queueDependentReportGenerationQueriesForQuery will queue all ReportGenerationQueries in the namespace which have a dependency on the generationQuery
@@ -162,4 +144,16 @@ func (op *Reporting) queueDependentReportGenerationQueriesForQuery(generationQue
 		}
 	}
 	return nil
+}
+
+type PrestoViewCreator interface {
+	CreateView(viewName, query string) error
+}
+
+type prestoViewCreator struct {
+	queryer db.Queryer
+}
+
+func (c *prestoViewCreator) CreateView(viewName, query string) error {
+	return presto.CreateView(c.queryer, viewName, query, true)
 }

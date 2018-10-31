@@ -11,7 +11,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="$SCRIPT_DIR/.."
-DIRS=("${ROOT_DIR}/pkg/generated" "${ROOT_DIR}/pkg/presto/mock")
+DIRS=("${ROOT_DIR}/pkg/generated" "./pkg/operator/prestostore/mock")
 
 for DIR in "${DIRS[@]}"; do
     OUTPUT=$(find "$(realpath ${DIR})" -type f -name '*.go')

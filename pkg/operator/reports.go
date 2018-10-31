@@ -11,8 +11,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 var (
@@ -59,7 +59,7 @@ func (op *Reporting) runReportWorker() {
 	logger := op.logger.WithField("component", "reportWorker")
 	logger.Infof("Report worker started")
 	const maxRequeues = 5
-	for op.processResource(logger, op.syncReport, "Report", op.queues.reportQueue, maxRequeues) {
+	for op.processResource(logger, op.syncReport, "Report", op.reportQueue, maxRequeues) {
 	}
 }
 
@@ -76,7 +76,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 	}
 
 	logger = logger.WithField("Report", name)
-	report, err := op.informers.Metering().V1alpha1().Reports().Lister().Reports(namespace).Get(name)
+	report, err := op.reportLister.Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("Report %s does not exist anymore", key)
@@ -91,7 +91,7 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
 	report = report.DeepCopy()
 
-	tableName := reportTableName(report.Name)
+	tableName := reportingutil.ReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -118,13 +118,6 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 			if report.UID != newReport.UID {
 				return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
-			}
-
-			err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
-			if err != nil {
-				logger.WithError(err).Warnf("unable to update report cache with updated report")
-				// if we cannot update it, don't re queue it
-				return err
 			}
 
 			// It's no longer started, requeue it
@@ -180,28 +173,20 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger = logger.WithField("generationQuery", report.Spec.GenerationQueryName)
-	genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
-	if err != nil {
-		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to get dependencies: %v", report.Name, genQuery.Name, err)
-	}
-	_, err = op.validateDependencyStatus(depsStatus)
 	if err != nil {
 		return fmt.Errorf("unable to run Report %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
@@ -215,12 +200,12 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	}
 
 	logger.Debugf("dropping table %s", tableName)
-	err = hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
+	err = op.tableManager.DropTable(tableName, true)
 	if err != nil {
 		return fmt.Errorf("unable to drop table %s before creating for report %s: %v", tableName, report.Name, err)
 	}
 
-	columns := generateHiveColumns(genQuery)
+	columns := reportingutil.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		return fmt.Errorf("unable to create table %s for report %s: %v", tableName, report.Name, err)
@@ -234,16 +219,13 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.generateReport(
-		logger,
-		report,
-		"report",
-		report.Name,
+	err = op.reportGenerator.GenerateReport(
 		tableName,
 		reportingStart,
 		reportingEnd,
-		report.Spec.Inputs,
 		genQuery,
+		queryDependencies.DynamicReportGenerationQueries,
+		report.Spec.Inputs,
 		true,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)
@@ -251,7 +233,7 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	if err != nil {
 		genReportFailedCounter.Inc()
 		op.setReportError(logger, report, err, "report execution failed")
-		return err
+		return fmt.Errorf("failed to generateReport for Report %s, err: %v", report.Name, err)
 	}
 
 	// update status

@@ -38,16 +38,21 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
 		collectEndpoint := "/api/v1/datasources/prometheus/collect"
-		t.Logf("Querying %s, currentTime: %s", collectEndpoint, currentTime)
+		t.Logf("currentTime: %s", currentTime)
+		t.Logf("querying %s, with startTime: %s endTime: %s", collectEndpoint, f.reportStart, f.reportEnd)
 		req := f.NewReportingOperatorSVCPOSTRequest(collectEndpoint, body)
 		result := req.Do()
 		resp, err := result.Raw()
-		t.Logf("Finishing querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(currentTime))
+		t.Logf("finished querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(currentTime))
 		require.NoErrorf(t, err, "expected no errors triggering data collection, body: %v", string(resp))
 		var collectResp operator.CollectPromsumDataResponse
 		err = json.Unmarshal(resp, &collectResp)
 		require.NoError(t, err, "expected to unmarshal CollectPrometheusData response as JSON")
 		t.Logf("CollectPromsumDataResponse: %s", spew.Sdump(collectResp))
+		require.NotEmpty(t, collectResp.Results, "expected multiple import results")
+		for _, result := range collectResp.Results {
+			require.NotZerof(t, result.MetricsImportedCount, "expected metric import count for ReportDataSource %s to not be zero", result.ReportDataSource)
+		}
 	})
 	return f.reportStart, f.reportEnd
 }

@@ -70,7 +70,7 @@ func (op *Reporting) createTableAndCR(logger log.FieldLogger, obj metav1.Object,
 
 func (op *Reporting) createTable(logger log.FieldLogger, params hive.TableParameters, properties hive.TableProperties) error {
 	logger.Debugf("Creating table %s with Hive Storage %#v", params.Name, properties)
-	err := hive.ExecuteCreateTable(op.hiveQueryer, params, properties)
+	err := op.tableManager.CreateTable(params, properties)
 	if err != nil {
 		return fmt.Errorf("couldn't create table: %v", err)
 	}

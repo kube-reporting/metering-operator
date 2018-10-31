@@ -26,6 +26,7 @@ import (
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/chiprometheus"
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
@@ -39,20 +40,20 @@ const (
 	APIV2Reports            = "/api/v2/reports"
 )
 
-type meteringListers struct {
-	reports                 listers.ReportNamespaceLister
-	scheduledReports        listers.ScheduledReportNamespaceLister
-	reportGenerationQueries listers.ReportGenerationQueryNamespaceLister
-	prestoTables            listers.PrestoTableNamespaceLister
-}
-
 type server struct {
 	logger log.FieldLogger
 
 	rand          *rand.Rand
-	queryer       presto.ExecQueryer
 	collectorFunc prometheusImporterFunc
-	listers       meteringListers
+
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+	reportResultsGetter   prestostore.ReportResultsGetter
+
+	namespace                    string
+	reportLister                 listers.ReportLister
+	scheduledReportLister        listers.ScheduledReportLister
+	reportGenerationQuerieLister listers.ReportGenerationQueryLister
+	prestoTableLister            listers.PrestoTableLister
 }
 
 type requestLogger struct {
@@ -63,7 +64,18 @@ func (l *requestLogger) Print(v ...interface{}) {
 	l.FieldLogger.Info(v...)
 }
 
-func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Rand, collectorFunc prometheusImporterFunc, listers meteringListers) chi.Router {
+func newRouter(
+	logger log.FieldLogger,
+	rand *rand.Rand,
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo,
+	reportResultsGetter prestostore.ReportResultsGetter,
+	collectorFunc prometheusImporterFunc,
+	namespace string,
+	reportLister listers.ReportLister,
+	scheduledReportLister listers.ScheduledReportLister,
+	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
+	prestoTableLister listers.PrestoTableLister,
+) chi.Router {
 	router := chi.NewRouter()
 	logger = logger.WithField("component", "api")
 	requestLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: &requestLogger{logger}})
@@ -71,11 +83,16 @@ func newRouter(logger log.FieldLogger, queryer presto.ExecQueryer, rand *rand.Ra
 	router.Use(prometheusMiddleware)
 
 	srv := &server{
-		logger:        logger,
-		rand:          rand,
-		queryer:       queryer,
-		collectorFunc: collectorFunc,
-		listers:       listers,
+		logger:                       logger,
+		rand:                         rand,
+		collectorFunc:                collectorFunc,
+		prometheusMetricsRepo:        prometheusMetricsRepo,
+		reportResultsGetter:          reportResultsGetter,
+		namespace:                    namespace,
+		reportLister:                 reportLister,
+		scheduledReportLister:        scheduledReportLister,
+		reportGenerationQuerieLister: reportGenerationQuerieLister,
+		prestoTableLister:            prestoTableLister,
 	}
 
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportHandler)
@@ -194,7 +211,7 @@ func checkForFields(fields []string, vals url.Values) error {
 
 func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
 	// Get the scheduledReport to make sure it's isn't failed
-	report, err := srv.listers.scheduledReports.Get(name)
+	report, err := srv.scheduledReportLister.ScheduledReports(srv.namespace).Get(name)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting scheduledReport: %v", err)
@@ -209,7 +226,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		}
 	}
 
-	reportQuery, err := srv.listers.reportGenerationQueries.Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -217,7 +234,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("scheduledreport", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("scheduledreport", report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "ScheduledReport is not processed yet")
@@ -229,14 +246,14 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	tableColumns := prestoTable.Status.Parameters.Columns
-	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
+	queryPrestoColumns, err := reportingutil.GeneratePrestoColumns(reportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
 		return
 	}
 
-	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
+	prestoColumns, err := reportingutil.HiveColumnsToPrestoColumns(tableColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
@@ -248,8 +265,8 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := scheduledReportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	tableName := reportingutil.ScheduledReportTableName(name)
+	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
@@ -266,7 +283,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a finished state
-	report, err := srv.listers.reports.Get(name)
+	report, err := srv.reportLister.Reports(srv.namespace).Get(name)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if k8serrors.IsNotFound(err) {
@@ -293,7 +310,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		return
 	}
 
-	reportQuery, err := srv.listers.reportGenerationQueries.Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -301,7 +318,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.listers.prestoTables.Get(prestoTableResourceNameFromKind("report", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
@@ -313,14 +330,14 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	tableColumns := prestoTable.Status.Parameters.Columns
-	queryPrestoColumns, err := generatePrestoColumns(reportQuery)
+	queryPrestoColumns, err := reportingutil.GeneratePrestoColumns(reportQuery)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
 		return
 	}
 
-	prestoColumns, err := hiveColumnsToPrestoColumns(tableColumns)
+	prestoColumns, err := reportingutil.HiveColumnsToPrestoColumns(tableColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
@@ -332,8 +349,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := reportTableName(name)
-	results, err := presto.GetRows(srv.queryer, tableName, prestoColumns)
+	tableName := reportingutil.ReportTableName(name)
+	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
@@ -623,7 +640,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = prestostore.StorePrometheusMetrics(context.Background(), srv.queryer, dataSourceTableName(name), []*prestostore.PrometheusMetric(req))
+	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(name), []*prestostore.PrometheusMetric(req))
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
@@ -642,7 +659,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	datasourceTable := dataSourceTableName(name)
+	datasourceTable := reportingutil.DataSourceTableName(name)
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 	var startTime, endTime time.Time
@@ -660,7 +677,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	results, err := prestostore.GetPrometheusMetrics(srv.queryer, datasourceTable, startTime, endTime)
+	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(datasourceTable, startTime, endTime)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return

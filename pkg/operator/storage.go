@@ -38,7 +38,7 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 }
 
 func (op *Reporting) getStorageSpec(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (cbTypes.StorageLocationSpec, error) {
-	storageLister := op.informers.Metering().V1alpha1().StorageLocations().Lister()
+	storageLister := op.storageLocationLister
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing specified, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
