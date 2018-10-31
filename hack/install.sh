@@ -15,15 +15,19 @@ msg "Installing Custom Resource Definitions"
 kube-install \
     "$MANIFESTS_DIR/custom-resource-definitions"
 
-msg "Installing metering-operator service account and RBAC resources"
-kube-install \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
+if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
+    echo "\$SKIP_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
+else
+    msg "Installing metering-operator service account and RBAC resources"
+    kube-install \
+        "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml" \
+        "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
+        "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
 
-msg "Installing metering-operator"
-kube-install \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"
+    msg "Installing metering-operator"
+    kube-install \
+        "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"
+fi
 
 msg "Installing Metering Resource"
 kube-install \
