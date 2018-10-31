@@ -40,7 +40,19 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 				return
 			}
 
-			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &periodStart)
+			// reportStart needs to be at least 1 hour and 5 minutes ago
+			// because NewSimpleScheduledReport produces hourly reports, and it
+			// won't run unless we set reportingStart in the past by the period
+			// (1 hour) + the default gracePeriod (5 minutes).
+			// to do this, we set reportStart to 1.5 hours back if it isn't
+			// already
+			now := time.Now().UTC()
+			hourAndAHalf := time.Hour + 30*time.Minute
+			reportStart := periodStart
+			if now.Sub(reportStart) < hourAndAHalf {
+				reportStart = now.Add(-hourAndAHalf)
+			}
+			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &reportStart)
 
 			err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
