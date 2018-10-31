@@ -20,6 +20,7 @@ endif
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
+COVERAGE_OUTFILE := coverage.out
 
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
@@ -204,7 +205,7 @@ vendor: Gopkg.toml
 	dep ensure -v
 
 test:
-	go test ./pkg/...
+	go test -coverprofile=$(COVERAGE_OUTFILE) ./pkg/...
 
 test-docker:
 	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make test'
