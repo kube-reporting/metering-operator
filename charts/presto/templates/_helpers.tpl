@@ -51,6 +51,18 @@ connector.name=jmx
 {{- end }}
 
 {{- define "hive-env" }}
+- name: CORE_CONF_fs_s3a_access_key
+  valueFrom:
+    secretKeyRef:
+      name: hive-common-secrets
+      key: aws-access-key-id
+      optional: true
+- name: CORE_CONF_fs_s3a_secret_key
+  valueFrom:
+    secretKeyRef:
+      name: hive-common-secrets
+      key: aws-secret-access-key
+      optional: true
 - name: CORE_CONF_fs_defaultFS
   valueFrom:
     configMapKeyRef:
