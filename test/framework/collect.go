@@ -20,13 +20,13 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 	f.collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTCf for timestamps
 		currentTime := time.Now().UTC()
-		hourAndHalfAgo := currentTime.Add(-90 * time.Minute)
+		***REMOVED***veMinutesAgo := currentTime.Add(-5 * time.Minute)
 
 		// store the start/end so that future calls can immediately return the
 		// same reportStart/reportEnd.
 
-		// reportEnd is 1.5 hours ago, to ensure data has scraped by Prometheus
-		f.reportEnd = hourAndHalfAgo
+		// reportEnd is 5 minutes, to ensure data has scraped by Prometheus
+		f.reportEnd = ***REMOVED***veMinutesAgo
 		// reportStart is set to be before reportEnd by the size of the
 		// collection we want to make.
 		f.reportStart = f.reportEnd.Add(-collectionSize)
