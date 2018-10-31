@@ -10,8 +10,6 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/clock"
-
-	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
 const (
@@ -40,11 +38,11 @@ type ImporterMetricsCollectors struct {
 
 // PrometheusImporter imports Prometheus metrics into Presto tables
 type PrometheusImporter struct {
-	logger        logrus.FieldLogger
-	promConn      prom.API
-	prestoQueryer presto.ExecQueryer
-	clock         clock.Clock
-	cfg           Con***REMOVED***g
+	logger                logrus.FieldLogger
+	promConn              prom.API
+	prometheusMetricsRepo PrometheusMetricsRepo
+	clock                 clock.Clock
+	cfg                   Con***REMOVED***g
 
 	metricsCollectors ImporterMetricsCollectors
 
@@ -65,18 +63,17 @@ type Con***REMOVED***g struct {
 	MaxQueryRangeDuration time.Duration
 }
 
-func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prestoQueryer presto.ExecQueryer, clock clock.Clock, cfg Con***REMOVED***g, collectors ImporterMetricsCollectors) *PrometheusImporter {
+func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometheusMetricsRepo PrometheusMetricsRepo, clock clock.Clock, cfg Con***REMOVED***g, collectors ImporterMetricsCollectors) *PrometheusImporter {
 	logger = logger.WithFields(logrus.Fields{
 		"component": "PrometheusImporter",
 		"tableName": cfg.PrestoTableName,
 		"chunkSize": cfg.ChunkSize,
 		"stepSize":  cfg.StepSize,
 	})
-
 	return &PrometheusImporter{
-		logger:            logger,
-		promConn:          promConn,
-		prestoQueryer:     prestoQueryer,
+		logger:                logger,
+		promConn:              promConn,
+		prometheusMetricsRepo: prometheusMetricsRepo,
 		clock:             clock,
 		cfg:               cfg,
 		metricsCollectors: collectors,
@@ -114,7 +111,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 	if importer.lastTimestamp == nil {
 		var err error
 		importer.logger.Debugf("lastTimestamp for table %s: isn't known, querying for timestamp", importer.cfg.PrestoTableName)
-		importer.lastTimestamp, err = getLastTimestampForTable(importer.prestoQueryer, importer.cfg.PrestoTableName)
+		importer.lastTimestamp, err = importer.prometheusMetricsRepo.GetLastTimestampForTable(importer.cfg.PrestoTableName)
 		if err != nil {
 			importer.logger.WithError(err).Errorf("unable to get last timestamp for table %s", importer.cfg.PrestoTableName)
 			return nil, err
@@ -147,7 +144,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 		endTime = startTime.Add(maxChunkDuration)
 	}
 
-	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prestoQueryer, importer.metricsCollectors, ctx, startTime, endTime, importer.cfg, allowIncompleteChunks)
+	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, importer.cfg, allowIncompleteChunks)
 	if err != nil {
 		importer.logger.WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what

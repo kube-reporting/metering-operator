@@ -16,6 +16,7 @@ import (
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
@@ -65,7 +66,7 @@ func (op *Reporting) runScheduledReportWorker() {
 	logger := op.logger.WithField("component", "scheduledReportWorker")
 	logger.Infof("ScheduledReport worker started")
 	const maxRequeues = 5
-	for op.processResource(logger, op.syncScheduledReport, "ScheduledReport", op.queues.scheduledReportQueue, maxRequeues) {
+	for op.processResource(logger, op.syncScheduledReport, "ScheduledReport", op.scheduledReportQueue, maxRequeues) {
 	}
 }
 
@@ -77,7 +78,7 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 	}
 
 	logger = logger.WithField("ScheduledReport", name)
-	scheduledReport, err := op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(namespace).Get(name)
+	scheduledReport, err := op.scheduledReportLister.ScheduledReports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Infof("ScheduledReport %s does not exist anymore, stopping and removing any running jobs for ScheduledReport", name)
@@ -340,33 +341,22 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	genQuery, err := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to get report generation query")
 		return err
 	}
 
-	reportLister := op.informers.Metering().V1alpha1().Reports().Lister()
-	scheduledReportLister := op.informers.Metering().V1alpha1().ScheduledReports().Lister()
-	reportGenerationQueryLister := op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister()
-	reportDataSourceLister := op.informers.Metering().V1alpha1().ReportDataSources().Lister()
-
-	depsStatus, err := reporting.GetGenerationQueryDependenciesStatus(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(reportDataSourceLister),
-		reporting.NewReportListerGetter(reportLister),
-		reporting.NewScheduledReportListerGetter(scheduledReportLister),
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
+		op.uninitialiedDependendenciesHandler(),
 	)
 	if err != nil {
-		logger.Errorf("failed to get dependencies for ScheduledReport %s, err: %v", report.Name, err)
-		return err
-	}
-
-	_, err = op.validateDependencyStatus(depsStatus)
-	if err != nil {
-		logger.Errorf("failed to validate dependencies for ScheduledReport %s, err: %v", report.Name, err)
-		return err
+		return fmt.Errorf("unable to run ScheduledReport %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
 	}
 
 	if reportGracePeriodUnmet {
@@ -400,7 +390,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		}
 	}
 
-	tableName := scheduledReportTableName(report.Name)
+	tableName := reportingutil.ScheduledReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"scheduledreport":       report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -411,7 +401,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
 
-	columns := generateHiveColumns(genQuery)
+	columns := reportingutil.GenerateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
 	if err != nil {
 		logger.WithError(err).Error("error creating report table for scheduledReport")
@@ -427,16 +417,13 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.generateReport(
-		logger,
-		report,
-		"scheduledreport",
-		report.Name,
+	err = op.reportGenerator.GenerateReport(
 		tableName,
 		&reportPeriod.periodStart,
 		&reportPeriod.periodEnd,
-		report.Spec.Inputs,
 		genQuery,
+		queryDependencies.DynamicReportGenerationQueries,
+		report.Spec.Inputs,
 		report.Spec.OverwriteExistingData,
 	)
 	generateReportDuration := op.clock.Since(generateReportStart)
@@ -456,8 +443,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 			logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
 			return updateErr
 		}
-		logger.WithError(err).Errorf("error occurred while generating report")
-		return err
+		return fmt.Errorf("failed to generateReport for ScheduledReport %s, err: %v", report.Name, err)
 	}
 	// We generated a report successfully, remove any existing failure
 	// conditions that may exist

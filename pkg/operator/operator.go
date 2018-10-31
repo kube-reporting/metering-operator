@@ -2,15 +2,11 @@ package operator
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	"io"
 	"math/rand"
-	"net"
 	"net/http"
 	"os"
 	"sync"
-	"syscall"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -19,7 +15,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/sync/singleflight"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -27,18 +22,22 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/transport"
+	"k8s.io/client-go/util/workqueue"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
-	cbInformers "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
+	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
@@ -46,7 +45,7 @@ import (
 
 const (
 	connBackoff         = time.Second * 15
-	maxConnWaitTime     = time.Minute * 3
+	maxConnRetries      = 3
 	defaultResyncPeriod = time.Minute * 15
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
@@ -98,17 +97,41 @@ type Con***REMOVED***g struct {
 }
 
 type Reporting struct {
-	cfg            Con***REMOVED***g
-	kubeCon***REMOVED***g     *rest.Con***REMOVED***g
-	informers      cbInformers.SharedInformerFactory
-	queues         queues
+	cfg        Con***REMOVED***g
+	kubeCon***REMOVED***g *rest.Con***REMOVED***g
+
 	meteringClient cbClientset.Interface
 	kubeClient     corev1.CoreV1Interface
 
-	prestoConn    *sql.DB
-	prestoQueryer presto.ExecQueryer
-	hiveQueryer   *hiveQueryer
-	promConn      prom.API
+	informerFactory factory.SharedInformerFactory
+
+	prestoTableLister           listers.PrestoTableLister
+	reportLister                listers.ReportLister
+	reportDataSourceLister      listers.ReportDataSourceLister
+	reportGenerationQueryLister listers.ReportGenerationQueryLister
+	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
+	scheduledReportLister       listers.ScheduledReportLister
+	storageLocationLister       listers.StorageLocationLister
+
+	queueList                  []workqueue.RateLimitingInterface
+	reportQueue                workqueue.RateLimitingInterface
+	scheduledReportQueue       workqueue.RateLimitingInterface
+	reportDataSourceQueue      workqueue.RateLimitingInterface
+	reportGenerationQueryQueue workqueue.RateLimitingInterface
+	prestoTableQueue           workqueue.RateLimitingInterface
+
+	reportResultsRepo     prestostore.ReportResultsRepo
+	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
+	reportGenerator       reporting.ReportGenerator
+
+	prestoViewCreator        PrestoViewCreator
+	tableManager             reporting.TableManager
+	awsTablePartitionManager reporting.AWSTablePartitionManager
+
+	testWriteToPrestoFunc  func() bool
+	testReadFromPrestoFunc func() bool
+
+	promConn prom.API
 
 	clock clock.Clock
 	rand  *rand.Rand
@@ -120,29 +143,15 @@ type Reporting struct {
 
 	importersMu sync.Mutex
 	importers   map[string]*prestostore.PrometheusImporter
-
-	// ensures only at most a single testRead query is running against Presto
-	// at one time
-	healthCheckSingleFlight singleflight.Group
 }
 
-func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Reporting, error) {
-	op := &Reporting{
-		cfg:       cfg,
-		logger:    logger,
-		clock:     clock,
-		importers: make(map[string]*prestostore.PrometheusImporter),
-	}
-	logger.Debugf("Con***REMOVED***g: %+v", cfg)
-
+func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Reporting, error) {
 	if err := cfg.APITLSCon***REMOVED***g.Valid(); err != nil {
 		return nil, err
 	}
 	if err := cfg.MetricsTLSCon***REMOVED***g.Valid(); err != nil {
 		return nil, err
 	}
-
-	op.rand = rand.New(rand.NewSource(clock.Now().Unix()))
 
 	con***REMOVED***gOverrides := &clientcmd.Con***REMOVED***gOverrides{}
 	var clientCon***REMOVED***g clientcmd.ClientCon***REMOVED***g
@@ -158,29 +167,123 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g, clock clock.Clock) (*Rep
 	}
 
 	var err error
-	op.kubeCon***REMOVED***g, err = clientCon***REMOVED***g.ClientCon***REMOVED***g()
+	kubeCon***REMOVED***g, err := clientCon***REMOVED***g.ClientCon***REMOVED***g()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get Kubernetes client con***REMOVED***g: %v", err)
 	}
 
 	logger.Debugf("setting up Kubernetes client...")
-	op.kubeClient, err = corev1.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
+	kubeClient, err := corev1.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Kubernetes client: %v", err)
 	}
 
 	logger.Debugf("setting up Metering client...")
-	op.meteringClient, err = cbClientset.NewForCon***REMOVED***g(op.kubeCon***REMOVED***g)
+	meteringClient, err := cbClientset.NewForCon***REMOVED***g(kubeCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
-	op.setupInformers()
-	op.setupQueues()
-	op.setupEventHandlers()
+	clock := clock.RealClock{}
+	rand := rand.New(rand.NewSource(clock.Now().Unix()))
+	op := newReportingOperator(logger, clock, rand, cfg, kubeCon***REMOVED***g, kubeClient, meteringClient)
 
-	logger.Debugf("con***REMOVED***guring event listeners...")
 	return op, nil
+}
+
+func newReportingOperator(
+	logger log.FieldLogger,
+	clock clock.Clock,
+	rand *rand.Rand,
+	cfg Con***REMOVED***g,
+	kubeCon***REMOVED***g *rest.Con***REMOVED***g,
+	kubeClient corev1.CoreV1Interface,
+	meteringClient cbClientset.Interface,
+) *Reporting {
+
+	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, cfg.Namespace, nil)
+
+	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
+	reportInformer := informerFactory.Metering().V1alpha1().Reports()
+	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
+	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
+	reportPrometheusQueryInformer := informerFactory.Metering().V1alpha1().ReportPrometheusQueries()
+	scheduledReportInformer := informerFactory.Metering().V1alpha1().ScheduledReports()
+	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
+
+	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
+	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
+	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
+	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
+	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
+
+	queueList := []workqueue.RateLimitingInterface{
+		reportQueue,
+		scheduledReportQueue,
+		reportDataSourceQueue,
+		reportGenerationQueryQueue,
+		prestoTableQueue,
+	}
+
+	op := &Reporting{
+		logger:         logger,
+		cfg:            cfg,
+		kubeCon***REMOVED***g:     kubeCon***REMOVED***g,
+		meteringClient: meteringClient,
+		kubeClient:     kubeClient,
+
+		informerFactory: informerFactory,
+
+		prestoTableLister:           prestoTableInformer.Lister(),
+		reportLister:                reportInformer.Lister(),
+		reportDataSourceLister:      reportDataSourceInformer.Lister(),
+		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
+		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
+		scheduledReportLister:       scheduledReportInformer.Lister(),
+		storageLocationLister:       storageLocationInformer.Lister(),
+
+		queueList:                  queueList,
+		reportQueue:                reportQueue,
+		scheduledReportQueue:       scheduledReportQueue,
+		reportDataSourceQueue:      reportDataSourceQueue,
+		reportGenerationQueryQueue: reportGenerationQueryQueue,
+		prestoTableQueue:           prestoTableQueue,
+
+		rand:      rand,
+		clock:     clock,
+		importers: make(map[string]*prestostore.PrometheusImporter),
+	}
+
+	reportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReport,
+		UpdateFunc: op.updateReport,
+		DeleteFunc: op.deleteReport,
+	})
+
+	scheduledReportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addScheduledReport,
+		UpdateFunc: op.updateScheduledReport,
+		DeleteFunc: op.deleteScheduledReport,
+	})
+
+	reportDataSourceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReportDataSource,
+		UpdateFunc: op.updateReportDataSource,
+		DeleteFunc: op.deleteReportDataSource,
+	})
+
+	reportGenerationQueryInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReportGenerationQuery,
+		UpdateFunc: op.updateReportGenerationQuery,
+	})
+
+	prestoTableInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addPrestoTable,
+		UpdateFunc: op.updatePrestoTable,
+		DeleteFunc: op.deletePrestoTable,
+	})
+
+	return op
 }
 
 func (op *Reporting) Run(stopCh <-chan struct{}) error {
@@ -221,9 +324,21 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
-	go op.informers.Start(stopCh)
+	go op.informerFactory.Start(stopCh)
+
+	shutdownCtx, cancel := context.WithCancel(context.Background())
+	// wait for stopChn to be closed, then cancel our context
+	go func() {
+		<-stopCh
+		cancel()
+	}()
 
 	op.logger.Infof("setting up DB connections")
+
+	var (
+		prestoQueryer db.Queryer
+		hiveQueryer   db.Queryer
+	)
 
 	// Use errgroup to setup both hive and presto connections
 	// at the sametime, waiting for both to be ready before continuing.
@@ -231,26 +346,30 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		op.prestoConn, err = op.newPrestoConn(stopCh)
+		connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
+		prestoConn, err := presto.NewPrestoConnWithRetry(shutdownCtx, op.logger, connStr, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
 		}
-		prestoDB := db.New(op.prestoConn, op.logger, op.cfg.LogDMLQueries)
-		op.prestoQueryer = presto.NewDB(prestoDB)
+		prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
 		return nil
 	})
 	g.Go(func() error {
-		op.hiveQueryer = newHiveQueryer(op.logger, op.clock, op.cfg.HiveHost, op.cfg.LogDDLQueries, stopCh)
-		_, err := op.hiveQueryer.getHiveConnection()
-		return err
+		var err error
+		reconnectingHiveQueryer := hive.NewReconnectingQueryer(shutdownCtx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+		if err != nil {
+			return err
+		}
+		hiveQueryer = db.NewLoggingQueryer(reconnectingHiveQueryer, op.logger, op.cfg.LogDDLQueries)
+		return nil
 	})
 	err := g.Wait()
 	if err != nil {
 		return err
 	}
 
-	defer op.prestoConn.Close()
-	defer op.hiveQueryer.closeHiveConnection()
+	defer prestoQueryer.Close()
+	defer hiveQueryer.Close()
 
 	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
 	if err != nil {
@@ -258,21 +377,39 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}
 
 	op.logger.Info("waiting for caches to sync")
-	for t, synced := range op.informers.WaitForCacheSync(stopCh) {
+	for t, synced := range op.informerFactory.WaitForCacheSync(stopCh) {
 		if !synced {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
 	}
 
-	op.logger.Infof("starting HTTP server")
-	listers := meteringListers{
-		reports:                 op.informers.Metering().V1alpha1().Reports().Lister().Reports(op.cfg.Namespace),
-		scheduledReports:        op.informers.Metering().V1alpha1().ScheduledReports().Lister().ScheduledReports(op.cfg.Namespace),
-		reportGenerationQueries: op.informers.Metering().V1alpha1().ReportGenerationQueries().Lister().ReportGenerationQueries(op.cfg.Namespace),
-		prestoTables:            op.informers.Metering().V1alpha1().PrestoTables().Lister().PrestoTables(op.cfg.Namespace),
+	op.reportResultsRepo = prestostore.NewReportResultsRepo(prestoQueryer)
+	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer)
+	op.prestoViewCreator = &prestoViewCreator{queryer: prestoQueryer}
+
+	hiveTableManager := reporting.NewHiveTableManager(hiveQueryer)
+	op.tableManager = hiveTableManager
+	op.awsTablePartitionManager = hiveTableManager
+
+	tableProperties, err := op.getHiveTableProperties(op.logger, nil, "health_check")
+	if err != nil {
+		return fmt.Errorf("no default storage con***REMOVED***gured, unable to setup health checker: %v", err)
 	}
 
-	apiRouter := newRouter(op.logger, op.prestoQueryer, op.rand, op.importPrometheusForTimeRange, listers)
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, *tableProperties)
+	op.testWriteToPrestoFunc = func() bool {
+		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
+	}
+	op.testReadFromPrestoFunc = func() bool {
+		return prestoHealthChecker.TestReadFromPrestoSingleFlight()
+	}
+
+	op.logger.Infof("starting HTTP server")
+	apiRouter := newRouter(
+		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
+	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
 	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
 
@@ -300,7 +437,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	// Poll until we can write to presto
 	op.logger.Info("testing ability to write to Presto")
 	err = wait.PollUntil(time.Second*5, func() (bool, error) {
-		if op.testWriteToPresto(op.logger) {
+		if op.testWriteToPrestoFunc() {
 			return true, nil
 		}
 		return false, nil
@@ -403,7 +540,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	// shutdown queues so that they get drained, and workers can begin their
 	// shutdown
-	go op.queues.ShutdownQueues()
+	go op.shutdownQueues()
 
 	// wait for our workers to stop
 	wg.Wait()
@@ -512,147 +649,10 @@ func (op *Reporting) getDefaultReportGracePeriod() time.Duration {
 	}
 }
 
-func (op *Reporting) newPrestoConn(stopCh <-chan struct{}) (*sql.DB, error) {
-	// Presto may take longer to start than reporting-operator, so keep
-	// attempting to connect in a loop in case we were just started and presto
-	// is still coming up.
-	connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
-	startTime := op.clock.Now()
-	op.logger.Debugf("getting Presto connection")
-	for {
-		db, err := sql.Open("presto", connStr)
-		if err == nil {
-			return db, nil
-		} ***REMOVED*** if op.clock.Since(startTime) > maxConnWaitTime {
-			op.logger.Debugf("attempts timed out, failed to get Presto connection")
-			return nil, fmt.Errorf("failed to connect to presto: %v", err)
-		}
-		op.logger.Debugf("error encountered, backing off and trying again: %v", err)
-		select {
-		case <-op.clock.Tick(connBackoff):
-		case <-stopCh:
-			return nil, fmt.Errorf("got shutdown signal, closing Presto connection")
-		}
-	}
-}
-
 func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOVED***g) (prom.API, error) {
 	client, err := promapi.NewClient(promCon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
-}
-
-type hiveQueryer struct {
-	hiveHost   string
-	logger     log.FieldLogger
-	logQueries bool
-
-	clock    clock.Clock
-	mu       sync.Mutex
-	hiveConn *hive.Connection
-	stopCh   <-chan struct{}
-}
-
-func newHiveQueryer(logger log.FieldLogger, clock clock.Clock, hiveHost string, logQueries bool, stopCh <-chan struct{}) *hiveQueryer {
-	return &hiveQueryer{
-		clock:      clock,
-		hiveHost:   hiveHost,
-		logger:     logger,
-		logQueries: logQueries,
-	}
-}
-
-func (q *hiveQueryer) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	const maxRetries = 3
-	for retries := 0; retries < maxRetries; retries++ {
-		hiveConn, err := q.getHiveConnection()
-		if err != nil {
-			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.WithError(err).Debugf("error occurred while getting connection, attempting to create new connection and retry")
-				q.closeHiveConnection()
-				continue
-			}
-			// We don't close the connection here because we got an error while
-			// getting it
-			return nil, err
-		}
-		rows, err := hiveConn.Query(query)
-		if err != nil {
-			if err == io.EOF || isErrBrokenPipe(err) {
-				q.logger.WithError(err).Debugf("error occurred while making query, attempting to create new connection and retry")
-				q.closeHiveConnection()
-				continue
-			}
-			// We don't close the connection here because we got a good
-			// connection, and made the query, but the query itself had an
-			// error.
-			return nil, err
-		}
-		return rows, nil
-	}
-
-	// We've tries 3 times, so close any connection and return an error
-	q.closeHiveConnection()
-	return nil, fmt.Errorf("unable to create new hive connection after existing hive connection closed")
-}
-
-func (q *hiveQueryer) getHiveConnection() (*hive.Connection, error) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
-	var err error
-	if q.hiveConn == nil {
-		q.hiveConn, err = q.newHiveConn()
-	}
-	return q.hiveConn, err
-}
-
-func (q *hiveQueryer) closeHiveConnection() {
-	q.mu.Lock()
-	if q.hiveConn != nil {
-		q.hiveConn.Close()
-	}
-	// Discard our connection so we create a new one in getHiveConnection
-	q.hiveConn = nil
-	q.mu.Unlock()
-}
-
-func (q *hiveQueryer) newHiveConn() (*hive.Connection, error) {
-	// Hive may take longer to start than reporting-operator, so keep
-	// attempting to connect in a loop in case we were just started and hive is
-	// still coming up.
-	startTime := q.clock.Now()
-	q.logger.Debugf("getting hive connection")
-	for {
-		select {
-		case <-q.stopCh:
-			// check stopCh once before connecting in case the last select loop
-			// was on a tick and we got a cancellation since then
-			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
-		default:
-			// try connecting again
-		}
-		hive, err := hive.Connect(q.hiveHost)
-		if err == nil {
-			hive.SetLogQueries(q.logQueries)
-			return hive, nil
-		} ***REMOVED*** if q.clock.Since(startTime) > maxConnWaitTime {
-			q.logger.WithError(err).Error("attempts timed out, failed to get hive connection")
-			return nil, err
-		}
-		q.logger.WithError(err).Debugf("error encountered when connecting to hive, backing off and trying again")
-		select {
-		case <-q.clock.Tick(connBackoff):
-		case <-q.stopCh:
-			return nil, fmt.Errorf("got shutdown signal, closing hive connection")
-		}
-	}
-}
-
-func isErrBrokenPipe(err error) bool {
-	if netErr, ok := err.(*net.OpError); ok {
-		return netErr.Err == syscall.EPIPE
-	}
-	return false
 }
