@@ -70,7 +70,7 @@ Then run the installation script for your platform:
 
 For more details on con***REMOVED***guration options, most are documented in the [con***REMOVED***guring metering document][con***REMOVED***guring-metering].
 
-## Run metering operator locally
+## Run reporting operator locally
 
 It's also possible to run the operator locally.
 To simplify this, we've got a few `Make***REMOVED***le` targets to handle the building and running of the operator.
@@ -107,5 +107,35 @@ make run-reporting-operator-local
 The above command builds the operator for your local OS (by default it only builds for Linux), uses kubectl port-forward to make Prometheus, Presto, and Hive available locally for your operator to communicate with, and then starts the operator with con***REMOVED***guration set to use these local port-forwards.
 Lastly, the operator automatically uses your `$KUBECONFIG` to connect and authenticate to your cluster and perform Kubernetes API calls.
 
+## Run metering operator locally
+
+The metering operator is the top-level operator which deploys other components using helm charts.
+It's possible to also run this locally so you can iterate on charts and test them with the metering-operator before they're built and pushed to Quay for CI.
+
+To run it locally you need to have the following:
+
+- A connection to a docker daemon.
+- Your `$KUBECONFIG` environment variable must be set and accessible to your Docker daemon.
+- Your `$METERING_NAMESPACE` environment variable must be set, and unless `$LOCAL_METERING_OPERATOR_RUN_INSTALL` to `true`, the namespace must already exist.
+
+This will just build and run the metering-operator docker image, which will watch for `Metering` resources in the namespace speci***REMOVED***ed by `$METERING_NAMESPACE`, using your `$KUBECONFIG` to communicate with the API server.
+
+```
+make run-metering-operator-local
+```
+
+If you want to also create the namespace using the install scripts you can do that manually and set `$SKIP_METERING_OPERATOR_DEPLOYMENT` to `true`:
+
+```
+export SKIP_METERING_OPERATOR_DEPLOYMENT=true
+./hack/openshift-install.sh
+```
+
+Or you can set `$LOCAL_METERING_OPERATOR_RUN_INSTALL` to `true` and run the same make command as above:
+
+```
+export LOCAL_METERING_OPERATOR_RUN_INSTALL=true
+make run-metering-operator-local
+```
 
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
