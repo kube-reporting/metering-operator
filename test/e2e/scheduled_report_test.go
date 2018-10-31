@@ -47,7 +47,7 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 			// to do this, we set reportStart to 1.5 hours back if it isn't
 			// already
 			reportStart := periodStart
-			reportEnd := periodEnd
+			reportEnd := periodEnd.Truncate(time.Minute)
 			if reportEnd.Sub(reportStart) < time.Hour {
 				reportStart = reportEnd.Add(-time.Hour)
 			}
@@ -91,9 +91,14 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 				}
 
 				// If the last reportTime is updated, that means this report
-				// has been collected at least once.
+				// has been run at least once.
 				if newReport.Status.LastReportTime == nil {
 					t.Logf("report LastReportTime is unset")
+					return false, nil
+				}
+				t.Logf("report LastReportTime: %s", newReport.Status.LastReportTime)
+				if !(newReport.Status.LastReportTime.Time.After(reportEnd) || newReport.Status.LastReportTime.Time.Equal(reportEnd)) {
+					t.Logf("LastReportTime %s newReport.Status.LastReportTime is not >= reportEnd %s", newReport.Status.LastReportTime, reportEnd)
 					return false, nil
 				}
 				return true, nil
@@ -119,9 +124,13 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 				err = json.Unmarshal(resp, &reportResults)
 				require.NoError(t, err, "expected to unmarshal response")
 				reportData = resp
+				if len(reportResults) == 0 {
+					t.Logf("ScheduledReport %s has 0 results", report.Name)
+					return false, nil
+				}
 				return true, nil
 			})
-			require.NoError(t, err, "expected getting ScheduledReport result to not timeout")
+			require.NoError(t, err, "expected ScheduledReport to have 1 row of results before timing out")
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
 			***REMOVED***leName := path.Join(reportTestOutputDirectory, fmt.Sprintf("%s-scheduled-report.json", name))
