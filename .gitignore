@@ -32,3 +32,4 @@ _tmp
 /vendor/mockgen
 /reporting-operator-local
 bin/*
+coverage.out
