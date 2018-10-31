@@ -221,6 +221,11 @@ ci-validate: verify-codegen all-charts metering-manifests fmt
 ci-validate-docker:
 	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make ci-validate'
 
+
+.PHONY: run-metering-operator-local
+run-metering-operator-local: metering-operator-docker-build
+	./hack/run-metering-operator-local.sh
+
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 
 reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
