@@ -104,33 +104,39 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 
 	switch report.Status.Phase {
 	case cbTypes.ReportPhaseStarted:
-		// If it's started, query the API to get the most up to date resource,
-		// as it's possible it's ***REMOVED***nished, but we haven't gotten it yet.
-		newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
-		if err != nil {
-			return err
-		}
+		if report.Status.TableName == "" {
+			// this report hasn't had it's table created yet so we failed
+			// before we actually generated.
+			logger.Debugf("found existing started report %s, with tableName unset", report.Name)
+		} ***REMOVED*** {
+			// If it's started, query the API to get the most up to date resource,
+			// as it's possible it's ***REMOVED***nished, but we haven't gotten it yet.
+			newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Get(report.Name, metav1.GetOptions{})
+			if err != nil {
+				return err
+			}
 
-		if report.UID != newReport.UID {
-			return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
-		}
+			if report.UID != newReport.UID {
+				return fmt.Errorf("started report has different UUID in API than in cache, skipping processing until next reconcile")
+			}
 
-		err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
-		if err != nil {
-			logger.WithError(err).Warnf("unable to update report cache with updated report")
-			// if we cannot update it, don't re queue it
-			return err
-		}
+			err = op.informers.Metering().V1alpha1().Reports().Informer().GetIndexer().Update(newReport)
+			if err != nil {
+				logger.WithError(err).Warnf("unable to update report cache with updated report")
+				// if we cannot update it, don't re queue it
+				return err
+			}
 
-		// It's no longer started, requeue it
-		if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
-			op.enqueueReportRateLimited(newReport)
+			// It's no longer started, requeue it
+			if newReport.Status.Phase != cbTypes.ReportPhaseStarted {
+				op.enqueueReportRateLimited(newReport)
+				return nil
+			}
+
+			err = fmt.Errorf("unable to determine if report generation succeeded")
+			op.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
 			return nil
 		}
-
-		err = fmt.Errorf("unable to determine if report generation succeeded")
-		op.setReportError(logger, report, err, "found already started report, report generation likely failed while processing")
-		return nil
 	case cbTypes.ReportPhaseFinished, cbTypes.ReportPhaseError:
 		logger.Infof("ignoring report %s, status: %s", report.Name, report.Status.Phase)
 		return nil
@@ -205,28 +211,25 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	report.Status.Phase = cbTypes.ReportPhaseStarted
 	report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to update report status to started for %q", report.Name)
-		return err
+		return fmt.Errorf("failed to update report status to started for %q", report.Name)
 	}
 
 	logger.Debugf("dropping table %s", tableName)
 	err = hive.ExecuteDropTable(op.hiveQueryer, tableName, true)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to drop table %s before creating for report %s: %v", tableName, report.Name, err)
 	}
 
 	columns := generateHiveColumns(genQuery)
 	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns)
 	if err != nil {
-		logger.WithError(err).Error("error creating report table for Report")
-		return err
+		return fmt.Errorf("unable to create table %s for report %s: %v", tableName, report.Name, err)
 	}
 
 	report.Status.TableName = tableName
 	report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	if err != nil {
-		logger.WithError(err).Errorf("unable to update scheduledReport status with tableName")
-		return err
+		return fmt.Errorf("failed to update report %s status.tableName to %s: %v", report.Name, tableName, err)
 	}
 
 	genReportTotalCounter.Inc()
@@ -267,8 +270,8 @@ func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report
 	return nil
 }
 
-func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string) {
-	logger.WithField("Report", report.Name).WithError(err).Errorf(errMsg)
+func (op *Reporting) setReportError(logger log.FieldLogger, report *cbTypes.Report, err error, errMsg string, errMsgArgs ...interface{}) {
+	logger.WithField("Report", report.Name).WithError(err).Errorf(errMsg, errMsgArgs...)
 	report.Status.Phase = cbTypes.ReportPhaseError
 	report.Status.Output = err.Error()
 	_, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
