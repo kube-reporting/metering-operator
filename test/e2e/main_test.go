@@ -78,6 +78,12 @@ func TestReportingE2E(t *testing.T) {
 			timeout:       reportTestTimeout + time.Minute,
 		},
 		{
+			name:          "namespace-persistentvolumeclaim-request",
+			queryName:     "namespace-persistentvolumeclaim-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout + time.Minute,
+		},
+		{
 			name:          "namespace-memory-usage",
 			queryName:     "namespace-memory-usage",
 			newReportFunc: testFramework.NewSimpleReport,
