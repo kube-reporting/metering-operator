@@ -22,6 +22,7 @@ if [ "$LOCAL_METERING_OPERATOR_RUN_INSTALL" == "true" ]; then
 docker run \
     -it \
     --rm \
+    -u 0:0 \
     -v "$KUBECONFIG:/kubecon***REMOVED***g" \
     -e KUBECONFIG=/kubecon***REMOVED***g \
     -e HELM_RELEASE_CRD_NAME="Metering" \
