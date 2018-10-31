@@ -17,6 +17,7 @@ source "${ROOT_DIR}/hack/lib/version.sh"
 
 : "${CREATE_NAMESPACE:=true}"
 : "${SKIP_DELETE_CRDS:=true}"
+: "${SKIP_METERING_OPERATOR_DEPLOYMENT:=false}"
 : "${DELETE_PVCS:=false}"
 
 : "${DEPLOY_PLATFORM:=generic}"
