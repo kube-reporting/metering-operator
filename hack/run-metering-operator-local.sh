@@ -21,6 +21,7 @@ fi
 
 docker run \
     -it \
+    --rm \
     -v "$KUBECONFIG:/kubeconfig" \
     -e KUBECONFIG=/kubeconfig \
     -e HELM_RELEASE_CRD_NAME="Metering" \
