@@ -355,7 +355,31 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		op.uninitialiedDependendenciesHandler(),
 	)
 	if err != nil {
-		return fmt.Errorf("unable to run ScheduledReport %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
+		// wrapped the error with more information
+		err = fmt.Errorf("unable to run ScheduledReport %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
+
+		// avoid continously triggering an update cycle if we're already failed
+		// validation
+		if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue && isFailureCond.Reason == cbutil.FailedValidationReason {
+			logger.Warnf("ScheduledReport %s failed validation last reconcile, skipping updating status", report.Name)
+		} ***REMOVED*** {
+			// update the status to indicate the query failed validation
+			failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.FailedValidationReason, err.Error())
+			cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
+			cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
+
+			// store updateErr so we can log it and return the wrapped error
+			_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+			if err != nil {
+				logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
+				return err
+			}
+		}
+		return err
+	}
+	// if it was previously failed validation, remove the status
+	if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue && isFailureCond.Reason == cbutil.FailedValidationReason {
+		cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
 	}
 
 	if reportGracePeriodUnmet {
