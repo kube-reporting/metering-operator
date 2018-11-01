@@ -306,7 +306,7 @@ spec:
 Next, let's create the report and let the operator generate the results:
 
 ```
-kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportgenerationquery.yaml
+kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-report.yaml
 ```
 
 Taking a report may take a while, but you can check on the report's status by reading the `status` field from output of the command below:
