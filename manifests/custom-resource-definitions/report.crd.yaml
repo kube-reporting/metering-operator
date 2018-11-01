@@ -12,3 +12,16 @@ spec:
   names:
     plural: reports
     kind: Report
+  additionalPrinterColumns:
+  - name: Query
+    type: string
+    JSONPath: .spec.generationQuery
+  - name: Table Name
+    type: string
+    JSONPath: .status.tableName
+  - name: Phase
+    type: string
+    JSONPath: .status.phase
+  - name: Age
+    type: date
+    JSONPath: .metadata.creationTimestamp

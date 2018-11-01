@@ -13,3 +13,13 @@ spec:
     plural: reportgenerationqueries
     singular: reportgenerationquery
     kind: ReportGenerationQuery
+  additionalPrinterColumns:
+  - name: View Disabled
+    type: string
+    JSONPath: .spec.view.disabled
+  - name: View Name
+    type: string
+    JSONPath: .status.viewName
+  - name: Age
+    type: date
+    JSONPath: .metadata.creationTimestamp
