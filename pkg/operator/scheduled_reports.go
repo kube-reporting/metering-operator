@@ -391,6 +391,16 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	}
 
 	tableName := reportingutil.ScheduledReportTableName(report.Name)
+	// if tableName isn't set, this report is still new and we should make sure
+	// no tables exist already in case of a previously failed cleanup.
+	if report.Status.TableName == "" {
+		logger.Debugf("dropping table %s", tableName)
+		err = op.tableManager.DropTable(tableName, true)
+		if err != nil {
+			return fmt.Errorf("unable to drop table %s before creating for ScheduledReport %s: %v", tableName, report.Name, err)
+		}
+	}
+
 	metricLabels := prometheus.Labels{
 		"scheduledreport":       report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
