@@ -399,6 +399,20 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		if err != nil {
 			return fmt.Errorf("unable to drop table %s before creating for ScheduledReport %s: %v", tableName, report.Name, err)
 		}
+
+		columns := reportingutil.GenerateHiveColumns(genQuery)
+		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
+		if err != nil {
+			logger.WithError(err).Error("error creating report table for scheduledReport")
+			return err
+		}
+
+		report.Status.TableName = tableName
+		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		if err != nil {
+			logger.WithError(err).Errorf("unable to update ScheduledReport status with tableName")
+			return err
+		}
 	}
 
 	metricLabels := prometheus.Labels{
@@ -410,20 +424,6 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	genReportTotalCounter := generateScheduledReportTotalCounter.With(metricLabels)
 	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
-
-	columns := reportingutil.GenerateHiveColumns(genQuery)
-	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
-	if err != nil {
-		logger.WithError(err).Error("error creating report table for scheduledReport")
-		return err
-	}
-
-	report.Status.TableName = tableName
-	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-	if err != nil {
-		logger.WithError(err).Errorf("unable to update ScheduledReport status with tableName")
-		return err
-	}
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
