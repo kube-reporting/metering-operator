@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"reflect"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -31,12 +32,26 @@ func (op *Reporting) addReport(obj interface{}) {
 	op.enqueueReport(report)
 }
 
-func (op *Reporting) updateReport(_, cur interface{}) {
+func (op *Reporting) updateReport(prev, cur interface{}) {
+	prevReport := prev.(*cbTypes.Report)
 	curReport := cur.(*cbTypes.Report)
 	if curReport.DeletionTimestamp != nil {
 		op.deleteReport(curReport)
 		return
 	}
+
+	if curReport.ResourceVersion == prevReport.ResourceVersion {
+		// Periodic resyncs will send update events for all known Reports.
+		// Two different versions of the same scheduledReport will always have
+		// different ResourceVersions.
+
+		op.logger.Debugf("Report %s resourceVersion is unchanged, skipping update", curReport.Name)
+		return
+	}
+	if reflect.DeepEqual(prevReport.Spec, curReport.Spec) {
+		op.logger.Debugf("Report %s spec is unchanged, skipping update", curReport.Name)
+	}
+
 	op.logger.Infof("updating Report %s", curReport.Name)
 	op.enqueueReport(curReport)
 }
@@ -112,10 +127,12 @@ func (op *Reporting) updateScheduledReport(prev, cur interface{}) {
 		// Periodic resyncs will send update events for all known ScheduledReports.
 		// Two different versions of the same scheduledReport will always have
 		// different ResourceVersions.
-
-		// TODO(chance): logging here is probably unnecessary and verbose
-		op.logger.Debugf("ScheduledReport %s is unchanged, skipping update", curScheduledReport.Name)
+		op.logger.Debugf("ScheduledReport %s resourceVersion is unchanged, skipping update", curScheduledReport.Name)
 		return
+	}
+
+	if reflect.DeepEqual(prevScheduledReport.Spec, curScheduledReport.Spec) {
+		op.logger.Debugf("ScheduledReport %s spec is unchanged, skipping update", curScheduledReport.Name)
 	}
 
 	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
@@ -239,10 +256,11 @@ func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
 		// Two different versions of the same reportGenerationQuery will always have
 		// different ResourceVersions.
-
-		// TODO(chance): logging here is probably unnecessary and verbose
-		op.logger.Debugf("ReportGenerationQuery %s is unchanged, skipping update", curReportGenerationQuery.Name)
+		op.logger.Debugf("ReportGenerationQuery resourceVersion %s is unchanged, skipping update", curReportGenerationQuery.Name)
 		return
+	}
+	if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
+		op.logger.Debugf("ReportGenerationQuery %s spec is unchanged, skipping update", curReportGenerationQuery.Name)
 	}
 
 	op.logger.Infof("updating ReportGenerationQuery %s", curReportGenerationQuery.Name)
