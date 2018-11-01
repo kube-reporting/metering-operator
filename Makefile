@@ -48,7 +48,6 @@ endif
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
-	helm-operator \
 	metering-operator \
 	hadoop \
 	hive \
@@ -62,7 +61,6 @@ DOCKER_BASE_URL := quay.io/coreos
 
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
-HELM_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/helm-operator
 HADOOP_IMAGE := $(DOCKER_BASE_URL)/metering-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/metering-hive
 METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
@@ -188,11 +186,8 @@ reporting-operator-docker-build: Dockerfile.reporting-operator
 metering-e2e-docker-build: Dockerfile.e2e
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-operator-docker-build: Dockerfile.metering-operator helm-operator-docker-build
+metering-operator-docker-build: Dockerfile.metering-operator
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
-
-helm-operator-docker-build: images/helm-operator/Dockerfile $(find -type f images/helm-operator)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HELM_OPERATOR_IMAGE) USE_LATEST_TAG=true
 
 hadoop-docker-build: images/hadoop/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
