@@ -13,3 +13,10 @@ spec:
     plural: reportdatasources
     singular: reportdatasource
     kind: ReportDataSource
+  additionalPrinterColumns:
+  - name: Table Name
+    type: string
+    JSONPath: .status.tableName
+  - name: Age
+    type: date
+    JSONPath: .metadata.creationTimestamp
