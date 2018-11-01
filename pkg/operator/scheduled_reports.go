@@ -391,6 +391,30 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	}
 
 	tableName := reportingutil.ScheduledReportTableName(report.Name)
+	// if tableName isn't set, this report is still new and we should make sure
+	// no tables exist already in case of a previously failed cleanup.
+	if report.Status.TableName == "" {
+		logger.Debugf("dropping table %s", tableName)
+		err = op.tableManager.DropTable(tableName, true)
+		if err != nil {
+			return fmt.Errorf("unable to drop table %s before creating for ScheduledReport %s: %v", tableName, report.Name, err)
+		}
+
+		columns := reportingutil.GenerateHiveColumns(genQuery)
+		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
+		if err != nil {
+			logger.WithError(err).Error("error creating report table for scheduledReport")
+			return err
+		}
+
+		report.Status.TableName = tableName
+		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		if err != nil {
+			logger.WithError(err).Errorf("unable to update ScheduledReport status with tableName")
+			return err
+		}
+	}
+
 	metricLabels := prometheus.Labels{
 		"scheduledreport":       report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
@@ -400,20 +424,6 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	genReportTotalCounter := generateScheduledReportTotalCounter.With(metricLabels)
 	genReportFailedCounter := generateScheduledReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateScheduledReportDurationHistogram.With(metricLabels)
-
-	columns := reportingutil.GenerateHiveColumns(genQuery)
-	err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
-	if err != nil {
-		logger.WithError(err).Error("error creating report table for scheduledReport")
-		return err
-	}
-
-	report.Status.TableName = tableName
-	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-	if err != nil {
-		logger.WithError(err).Errorf("unable to update ScheduledReport status with tableName")
-		return err
-	}
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
