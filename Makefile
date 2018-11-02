@@ -49,7 +49,6 @@ endif
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
 	metering-operator \
-	hadoop \
 	hive \
 	metering-e2e
 
@@ -61,7 +60,6 @@ DOCKER_BASE_URL := quay.io/coreos
 
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
-HADOOP_IMAGE := $(DOCKER_BASE_URL)/metering-hadoop
 HIVE_IMAGE := $(DOCKER_BASE_URL)/metering-hive
 METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
 
@@ -189,10 +187,7 @@ metering-e2e-docker-build: Dockerfile.e2e
 metering-operator-docker-build: Dockerfile.metering-operator
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-hadoop-docker-build: images/hadoop/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HADOOP_IMAGE) USE_LATEST_TAG=true
-
-hive-docker-build: images/hive/Dockerfile hadoop-docker-build
+hive-docker-build: images/hive/Dockerfile
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
