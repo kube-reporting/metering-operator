@@ -13,6 +13,9 @@ spec:
     plural: reportdatasources
     singular: reportdatasource
     kind: ReportDataSource
+    shortNames:
+    - datasource
+    - datasources
   additionalPrinterColumns:
   - name: Table Name
     type: string

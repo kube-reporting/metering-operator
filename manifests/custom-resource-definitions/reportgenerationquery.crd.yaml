@@ -13,6 +13,8 @@ spec:
     plural: reportgenerationqueries
     singular: reportgenerationquery
     kind: ReportGenerationQuery
+    shortNames:
+    - rgq
   additionalPrinterColumns:
   - name: View Disabled
     type: string
