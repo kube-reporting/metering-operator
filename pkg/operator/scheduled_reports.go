@@ -86,13 +86,14 @@ func (op *Reporting) syncScheduledReport(logger log.FieldLogger, key string) err
 		}
 		return err
 	}
+	sr := scheduledReport.DeepCopy()
 
 	if scheduledReport.DeletionTimestamp != nil {
-		_, err = op.removeScheduledReportFinalizer(scheduledReport)
+		_, err = op.removeScheduledReportFinalizer(sr)
 		return err
 	}
 
-	return op.handleScheduledReport(logger, scheduledReport)
+	return op.handleScheduledReport(logger, sr)
 }
 
 type reportSchedule interface {
@@ -185,8 +186,6 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 }
 
 func (op *Reporting) handleScheduledReport(logger log.FieldLogger, scheduledReport *cbTypes.ScheduledReport) error {
-	scheduledReport = scheduledReport.DeepCopy()
-
 	if op.cfg.EnableFinalizers && scheduledReportNeedsFinalizer(scheduledReport) {
 		var err error
 		scheduledReport, err = op.addScheduledReportFinalizer(scheduledReport)

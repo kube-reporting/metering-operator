@@ -68,30 +68,29 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 		}
 		return err
 	}
+	pt := prestoTable.DeepCopy()
 
-	if prestoTable.DeletionTimestamp != nil {
+	if pt.DeletionTimestamp != nil {
 		logger.Infof("PrestoTable is marked for deletion, performing cleanup")
-		err := op.dropPrestoTable(prestoTable)
+		err := op.dropPrestoTable(pt)
 		if err != nil {
 			return err
 		}
-		_, err = op.removePrestoTableFinalizer(prestoTable)
+		_, err = op.removePrestoTableFinalizer(pt)
 		return err
 	}
 
-	logger.Infof("syncing PrestoTable %s", prestoTable.GetName())
-	err = op.handlePrestoTable(logger, prestoTable)
+	logger.Infof("syncing PrestoTable %s", pt.GetName())
+	err = op.handlePrestoTable(logger, pt)
 	if err != nil {
-		logger.WithError(err).Errorf("error syncing PrestoTable %s", prestoTable.GetName())
+		logger.WithError(err).Errorf("error syncing PrestoTable %s", pt.GetName())
 		return err
 	}
-	logger.Infof("successfully synced PrestoTable %s", prestoTable.GetName())
+	logger.Infof("successfully synced PrestoTable %s", pt.GetName())
 	return nil
 }
 
 func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTypes.PrestoTable) error {
-	prestoTable = prestoTable.DeepCopy()
-
 	if op.cfg.EnableFinalizers && prestoTableNeedsFinalizer(prestoTable) {
 		var err error
 		prestoTable, err = op.addPrestoTableFinalizer(prestoTable)

@@ -79,11 +79,12 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		return err
 	}
 
-	return op.handleReportDataSource(logger, reportDataSource)
+	// Deep-copy otherwise we are mutating our cache
+	ds := reportDataSource.DeepCopy()
+	return op.handleReportDataSource(logger, ds)
 }
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	dataSource = dataSource.DeepCopy()
 	var err error
 	switch {
 	case dataSource.Spec.Promsum != nil:
