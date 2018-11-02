@@ -1,4 +1,7 @@
-FROM quay.io/coreos/helm-operator:latest as helm-operator
+# build image needs the helm-cli from the helm image
+FROM quay.io/coreos/helm:metering-v2.8.2 as helm
+
+# build image builds our charts
 FROM openshift/origin-release:golang-1.10 as build
 
 RUN INSTALL_PKGS="python PyYAML" && \
@@ -7,7 +10,7 @@ RUN INSTALL_PKGS="python PyYAML" && \
     rm -rf /var/cache/yum
 
 # we need the helm CLI to build the charts
-COPY --from=helm-operator /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 
 COPY . $GOPATH/src/github.com/operator-framework/operator-metering
 WORKDIR $GOPATH/src/github.com/operator-framework/operator-metering
@@ -17,11 +20,31 @@ RUN make \
     bin/operator-metering-0.1.0.tgz \
     bin/metering-override-values.yaml
 
-FROM quay.io/coreos/helm-operator:latest
+# metering-helm-operator is below
+FROM quay.io/coreos/helm:metering-v2.8.2
+
+USER root
+# epel-release is for `jq`
+RUN INSTALL_PKGS="curl bash jq ca-certi***REMOVED***cates socat kubernetes-client" \
+    && yum install -y epel-release \
+    && yum install -y $INSTALL_PKGS  \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+
+EXPOSE 44134
+ENV HELM_HOST 127.0.0.1:44134
+
+ENV HOME /tmp
+ENV EXTRA_VALUES_FILE /metering-override-values.yaml
+
+CMD ["run-operator.sh"]
+USER 2001
+
+COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
+COPY images/helm-operator/get_owner.sh /usr/local/bin/get_owner.sh
 
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/openshift-metering-0.1.0.tgz /
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/operator-metering-0.1.0.tgz /
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/metering-override-values.yaml /
 
-ENV EXTRA_VALUES_FILE /metering-override-values.yaml
 
