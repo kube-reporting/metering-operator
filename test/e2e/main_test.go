@@ -152,6 +152,12 @@ func TestReportingE2E(t *testing.T) {
 			skip:          !runAWSBillingTests,
 		},
 		{
+			name:          "cluster-persistentvolumeclaim-request",
+			queryName:     "cluster-persistentvolumeclaim-request",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
 			name:          "aws-ec2-cluster-cost",
 			queryName:     "aws-ec2-cluster-cost",
 			newReportFunc: testFramework.NewSimpleReport,
