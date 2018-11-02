@@ -85,12 +85,11 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 		return err
 	}
 
-	return op.handleReport(logger, report)
+	r := report.DeepCopy()
+	return op.handleReport(logger, r)
 }
 
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
-	report = report.DeepCopy()
-
 	tableName := reportingutil.ReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
