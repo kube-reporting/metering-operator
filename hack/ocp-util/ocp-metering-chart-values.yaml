@@ -1,20 +1,20 @@
 reporting-operator:
   spec:
     image:
-      repository: registry.access.redhat.com/openshift/ose-metering-reporting-operator
+      repository: registry.access.redhat.com/openshift4/ose-metering-reporting-operator
       tag: v4.0
 presto:
   spec:
     presto:
       image:
-        repository: registry.access.redhat.com/openshift/ose-presto
+        repository: registry.access.redhat.com/openshift4/ose-presto
         tag: v4.0
     hive:
       image:
-        repository: registry.access.redhat.com/openshift/ose-hive
+        repository: registry.access.redhat.com/openshift4/ose-hive
         tag: v4.0
 hdfs:
   spec:
     image:
-      repository: registry.access.redhat.com/openshift/ose-hadoop
+      repository: registry.access.redhat.com/openshift4/ose-hadoop
       tag: v4.0
