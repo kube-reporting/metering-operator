@@ -28,9 +28,8 @@ spec:
 {{ toYaml .Values.spec.hive.labels | indent 8 }}
 {{- end }}
       annotations:
-        hive-common-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-common-con***REMOVED***g.yaml") . | sha256sum }}
-        hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
-        hive-metastore-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-metastore-con***REMOVED***g.yaml") . | sha256sum }}
+        hive-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-con***REMOVED***gmap.yaml") . | sha256sum }}
+        hive-scripts-hash: {{ include (print $.Template.BasePath "/hive-scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
 {{- if .Values.spec.hive.annotations }}
 {{ toYaml .Values.spec.hive.annotations | indent 8 }}
 {{- end }}
@@ -43,7 +42,8 @@ spec:
 {{- end }}
       containers:
       - name: metastore
-        args: ["--service", "metastore"]
+        command: ["/hive-scripts/entrypoint.sh"]
+        args: ["/opt/hive/bin/hive", "--service", "metastore"]
         image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
         imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:
@@ -52,10 +52,7 @@ spec:
           protocol: TCP
         env:
         - name: HIVE_LOGLEVEL
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: hive-server-con***REMOVED***g
-              key: log-level
+          value: {{ upper .Values.spec.hive.metastore.con***REMOVED***g.logLevel | quote}}
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
@@ -68,6 +65,14 @@ spec:
               containerName: metastore
               resource: limits.memory
         volumeMounts:
+        - name: hive-con***REMOVED***g
+          mountPath: /hive-con***REMOVED***g
+        - name: hive-scripts
+          mountPath: /hive-scripts
+{{- if .Values.spec.hive.con***REMOVED***g.useHdfsCon***REMOVED***gMap }}
+        - name: hdfs-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+{{- end }}
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
         # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
@@ -90,6 +95,18 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.spec.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
       volumes:
+      - name: hive-con***REMOVED***g
+        con***REMOVED***gMap:
+          name: hive-con***REMOVED***g
+      - name: hive-scripts
+        con***REMOVED***gMap:
+          name: hive-scripts
+          defaultMode: 0555
+{{- if .Values.spec.hive.con***REMOVED***g.useHdfsCon***REMOVED***gMap }}
+      - name: hdfs-con***REMOVED***g
+        con***REMOVED***gMap:
+          name: {{ .Values.spec.hive.con***REMOVED***g.hdfsCon***REMOVED***gMapName }}
+{{- end }}
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Docker***REMOVED***le have a corresponding volumeMount
       - name: hive-warehouse-empty
