@@ -129,6 +129,8 @@ Go to https://github.com/operator-framework/operator-metering/releases and click
 
 In the text box, enter your release tag, eg: `0.8.0`.
 
+Set the title `Metering $version` to eg: `Metering 0.8.0`.
+
 You can leave the description empty, as it should just use our git tag's message.
 
 Check  "this is a pre-release".
