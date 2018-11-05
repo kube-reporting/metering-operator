@@ -8,10 +8,3 @@ spec:
       image:
         repository: quay.io/coreos/metering-reporting-operator
         tag: latest
-
-  presto:
-    spec:
-      hive:
-        image:
-          repository: quay.io/coreos/metering-hive
-          tag: latest

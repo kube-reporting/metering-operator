@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: hive-metastore-config
-{{- block "extraMetadata" . }}
-{{- end }}
-data:
-  log-level: {{ upper .Values.spec.hive.metastore.config.logLevel | quote}}

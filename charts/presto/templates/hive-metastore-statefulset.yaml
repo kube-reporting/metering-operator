@@ -28,9 +28,8 @@ spec:
 {{ toYaml .Values.spec.hive.labels | indent 8 }}
 {{- end }}
       annotations:
-        hive-common-configmap-hash: {{ include (print $.Template.BasePath "/hive-common-config.yaml") . | sha256sum }}
-        hive-common-secret-hash: {{ include (print $.Template.BasePath "/hive-common-secrets.yaml") . | sha256sum }}
-        hive-metastore-configmap-hash: {{ include (print $.Template.BasePath "/hive-metastore-config.yaml") . | sha256sum }}
+        hive-configmap-hash: {{ include (print $.Template.BasePath "/hive-configmap.yaml") . | sha256sum }}
+        hive-scripts-hash: {{ include (print $.Template.BasePath "/hive-scripts-configmap.yaml") . | sha256sum }}
 {{- if .Values.spec.hive.annotations }}
 {{ toYaml .Values.spec.hive.annotations | indent 8 }}
 {{- end }}
@@ -43,7 +42,8 @@ spec:
 {{- end }}
       containers:
       - name: metastore
-        args: ["--service", "metastore"]
+        command: ["/hive-scripts/entrypoint.sh"]
+        args: ["/opt/hive/bin/hive", "--service", "metastore"]
         image: "{{ .Values.spec.hive.image.repository }}:{{ .Values.spec.hive.image.tag }}"
         imagePullPolicy: {{ .Values.spec.hive.image.pullPolicy }}
         ports:
@@ -52,10 +52,7 @@ spec:
           protocol: TCP
         env:
         - name: HIVE_LOGLEVEL
-          valueFrom:
-            configMapKeyRef:
-              name: hive-server-config
-              key: log-level
+          value: {{ upper .Values.spec.hive.metastore.config.logLevel | quote}}
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
@@ -68,6 +65,14 @@ spec:
               containerName: metastore
               resource: limits.memory
         volumeMounts:
+        - name: hive-config
+          mountPath: /hive-config
+        - name: hive-scripts
+          mountPath: /hive-scripts
+{{- if .Values.spec.hive.config.useHdfsConfigMap }}
+        - name: hdfs-config
+          mountPath: /hadoop-config
+{{- end }}
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
         # openshift requires volumeMounts for VOLUMEs in a Dockerfile
@@ -90,6 +95,18 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.spec.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
       volumes:
+      - name: hive-config
+        configMap:
+          name: hive-config
+      - name: hive-scripts
+        configMap:
+          name: hive-scripts
+          defaultMode: 0555
+{{- if .Values.spec.hive.config.useHdfsConfigMap }}
+      - name: hdfs-config
+        configMap:
+          name: {{ .Values.spec.hive.config.hdfsConfigMapName }}
+{{- end }}
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Dockerfile have a corresponding volumeMount
       - name: hive-warehouse-empty

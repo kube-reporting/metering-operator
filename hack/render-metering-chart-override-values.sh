@@ -9,9 +9,4 @@ reporting-operator:
   spec:
     image:
       tag: $1
-presto:
-  spec:
-    hive:
-      image:
-        tag: $1
 EOF
