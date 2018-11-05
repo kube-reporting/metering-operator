@@ -64,3 +64,18 @@ func (f *Framework) NewSimpleScheduledReport(name, queryName string, reportingSt
 		},
 	}
 }
+
+func (f *Framework) RunOnceScheduledReport(name, queryName string, reportingStart *time.Time, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport {
+	return &meteringv1alpha1.ScheduledReport{
+		ObjectMeta: meta.ObjectMeta{
+			Name:      name,
+			Namespace: f.Namespace,
+		},
+		Spec: meteringv1alpha1.ScheduledReportSpec{
+			GenerationQueryName: queryName,
+			// empty Schedule meaning this report is a runonce
+			ReportingStart: &meta.Time{*reportingStart},
+			ReportingEnd:   &meta.Time{*reportingEnd},
+		},
+	}
+}

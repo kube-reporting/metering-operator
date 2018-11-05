@@ -168,9 +168,16 @@ func TestReportingE2E(t *testing.T) {
 
 	scheduledReportsProduceDataTestCases := []scheduledReportProducesDataTestCase{
 		{
-			name:      "namespace-cpu-request-hourly",
-			queryName: "namespace-cpu-request",
-			timeout:   reportTestTimeout,
+			name:                   "namespace-cpu-request-hourly",
+			queryName:              "namespace-cpu-request",
+			newScheduledReportFunc: testFramework.NewSimpleScheduledReport,
+			timeout:                reportTestTimeout,
+		},
+		{
+			name:                   "namespace-cpu-request-runonce",
+			queryName:              "namespace-cpu-request",
+			newScheduledReportFunc: testFramework.RunOnceScheduledReport,
+			timeout:                reportTestTimeout,
 		},
 	}
 

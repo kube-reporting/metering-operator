@@ -22,9 +22,10 @@ import (
 )
 
 type scheduledReportProducesDataTestCase struct {
-	name      string
-	queryName string
-	timeout   time.Duration
+	name                   string
+	queryName              string
+	timeout                time.Duration
+	newScheduledReportFunc func(name, queryName string, reportingStart *time.Time, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport
 }
 
 func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Framework, periodStart, periodEnd time.Time, testCases []scheduledReportProducesDataTestCase) {
@@ -52,7 +53,7 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 				reportStart = reportEnd.Add(-time.Hour)
 			}
 			t.Logf("scheduledReport reportingStart: %s, reportingEnd: %s", reportStart, reportEnd)
-			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &reportStart, &reportEnd)
+			report := test.newScheduledReportFunc(name, test.queryName, &reportStart, &reportEnd)
 
 			err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
