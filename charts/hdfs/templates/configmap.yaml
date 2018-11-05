@@ -6,6 +6,151 @@ metadata:
 {{- end }}
 data:
   log-level: {{ upper .Values.spec.config.logLevel | quote }}
-  default-fs: {{ printf "hdfs://%s:%d" .Values.spec.config.namenodeHost (int .Values.spec.config.namenodePort) | quote}}
-  namenode-host: {{ .Values.spec.config.namenodeHost | quote}}
-  datanode-data-dir-perms: {{ .Values.spec.config.datanodeDataDirPerms | quote}}
+  namenode-host: {{ .Values.spec.config.namenodeHost }}
+  hdfs-site.xml: |
+    <configuration>
+      <property>
+        <name>dfs.permissions.enabled</name>
+        <value>false</value>
+      </property>
+      <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:///hadoop/dfs/name</value>
+      </property>
+      <property>
+        <name>dfs.namenode.rpc-bind-host</name>
+        <value>0.0.0.0</value>
+      </property>
+      <property>
+        <name>dfs.namenode.servicerpc-bind-host</name>
+        <value>0.0.0.0</value>
+      </property>
+      <property>
+        <name>dfs.namenode.http-bind-host</name>
+        <value>0.0.0.0</value>
+      </property>
+      <property>
+        <name>dfs.namenode.https-bind-host</name>
+        <value>0.0.0.0</value>
+      </property>
+      <property>
+        <name>dfs.client.use.datanode.hostname</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>dfs.datanode.use.datanode.hostname</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:///hadoop/dfs/data</value>
+      </property>
+      <property>
+        <name>dfs.datanode.data.dir.perm</name>
+        <value>{{ .Values.spec.config.datanodeDataDirPerms }}</value>
+      </property>
+    </configuration>
+  core-site.xml: |
+    <configuration>
+      <property>
+        <name>hadoop.proxyuser.hue.hosts</name>
+        <value>*</value>
+      </property>
+      <property>
+        <name>hadoop.proxyuser.hue.groups</name>
+        <value>*</value>
+      </property>
+      <property>
+        <name>hadoop.http.staticuser.user</name>
+        <value>root</value>
+      </property>
+      <property>
+          <name>fs.defaultFS</name>
+          <value>{{ .Values.spec.config.defaultFS }}</value>
+      </property>
+    </configuration>
+  entrypoint.sh: |
+    #!/bin/bash -e
+
+    max_memory() {
+        local memory_limit=$1
+        local ratio=${JAVA_MAX_MEM_RATIO:-50}
+        echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
+    }
+
+    # Check for container memory limits/request and use it to set JVM Heap size.
+    # Defaults to 50% of the limit/request value.
+    if [ -n "$MY_MEM_LIMIT" ]; then
+        export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
+    elif [ -n "$MY_MEM_REQUEST" ]; then
+        export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
+    fi
+
+    if [ -z "$HADOOP_HEAPSIZE" ]; then
+        echo "Unable to automatically set HADOOP_HEAPSIZE"
+    else
+        echo "Setting HADOOP_HEAPSIZE to ${HADOOP_HEAPSIZE}M"
+    fi
+
+    # add UID to /etc/passwd if missing
+    if ! whoami &> /dev/null; then
+      if [ -w /etc/passwd ]; then
+        echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /etc/passwd
+      fi
+    fi
+
+    # symlink our configuration files to the correct location
+    ln -s -f /hadoop-config/core-site.xml /etc/hadoop/core-site.xml
+    ln -s -f /hadoop-config/hdfs-site.xml /etc/hadoop/hdfs-site.xml
+
+    exec $@
+  namenode-entrypoint.sh: |
+    #!/bin/bash
+
+    namedir=/hadoop/dfs/name
+    if [ ! -d "$namedir" ]; then
+      echo "Namenode name directory not found: $namedir"
+      exit 2
+    fi
+
+    if [ -z "$CLUSTER_NAME" ]; then
+      echo "Cluster name not specified"
+      exit 2
+    fi
+
+    if [ "$(ls -A $namedir)" == "" ]; then
+      echo "Formatting namenode name directory: $namedir"
+      hdfs --config "$HADOOP_CONF_DIR" namenode -format "$CLUSTER_NAME"
+    fi
+
+    exec hdfs --config "$HADOOP_CONF_DIR" namenode "$@"
+  datanode-entrypoint.sh: |
+    #!/bin/bash
+
+    datadir=/hadoop/dfs/data
+    if [ ! -d "$datadir" ]; then
+      echo "Datanode data directory not found: $datadir"
+      exit 2
+    fi
+
+    exec hdfs --config "$HADOOP_CONF_DIR" datanode "$@"
+
+
+  check-datanode-healthy.sh: |
+    #!/bin/bash
+
+    : "${DATANODE_ADDRESS:=127.0.0.1:9864}"
+
+    set -ex
+
+    if [ "$(curl "$DATANODE_ADDRESS/jmx?qry=Hadoop:service=DataNode,name=DataNodeInfo" | jq '.beans[0].NamenodeAddresses' -r | jq 'to_entries | map(.value) | all')" == "true" ]; then
+        echo "Name node addresses all have addresses, healthy"
+        exit 0
+    else
+        echo "found null namenode addresses in JMX metrics, unhealthy"
+        exit 1
+    fi

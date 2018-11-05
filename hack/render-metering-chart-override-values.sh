@@ -14,8 +14,4 @@ presto:
     hive:
       image:
         tag: $1
-hdfs:
-  spec:
-    image:
-      tag: $1
 EOF
