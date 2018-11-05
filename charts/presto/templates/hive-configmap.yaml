@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: hive-con***REMOVED***g
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  hive-site.xml: |
+    <con***REMOVED***guration>
+      <property>
+        <name>hive.server2.enable.doAs</name>
+        <value>false</value>
+      </property>
+      <property>
+        <name>hive.server2.use.SSL</name>
+        <value>false</value>
+      </property>
+      <property>
+        <name>hive.server2.authentication</name>
+        <value>NOSASL</value>
+      </property>
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.metastoreURIs }}</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.dbConnectionURL }}</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.dbConnectionDriver }}</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.dbConnectionUsername }}</value>
+      </property>
+      <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.dbConnectionPassword }}</value>
+      </property>
+      <property>
+        <name>datanucleus.schema.autoCreateAll</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.autoCreateMetastoreSchema }}</value>
+      </property>
+      <property>
+        <name>hive.metastore.schema.veri***REMOVED***cation</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
+      </property>
+      <property>
+        <name>hive.default.***REMOVED***leformat</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.defaultFileFormat }}</value>
+      </property>
+    </con***REMOVED***guration>
+
+
+  hive-log4j2.properties: |
+    status = INFO
+    name = HiveLog4j2
+    packages = org.apache.hadoop.hive.ql.log
+
+    # list of properties
+    property.hive.log.level = INFO
+    property.hive.root.logger = console
+    property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
+    property.hive.log.***REMOVED***le = hive.log
+
+    # list of all appenders
+    appenders = console
+
+    # console appender
+    appender.console.type = Console
+    appender.console.name = console
+    appender.console.target = SYSTEM_ERR
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} [%t]: %p %c{2}: %m%n
+
+    # list of all loggers
+    loggers = NIOServerCnxn, ClientCnxnSocketNIO, DataNucleus, Datastore, JPOX
+
+    logger.NIOServerCnxn.name = org.apache.zookeeper.server.NIOServerCnxn
+    logger.NIOServerCnxn.level = WARN
+
+    logger.ClientCnxnSocketNIO.name = org.apache.zookeeper.ClientCnxnSocketNIO
+    logger.ClientCnxnSocketNIO.level = WARN
+
+    logger.DataNucleus.name = DataNucleus
+    logger.DataNucleus.level = ERROR
+
+    logger.Datastore.name = Datastore
+    logger.Datastore.level = ERROR
+
+    logger.JPOX.name = JPOX
+    logger.JPOX.level = ERROR
+
+    # root logger
+    rootLogger.level = ${sys:hive.log.level}
+    rootLogger.appenderRefs = root
+    rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
+
+  hive-exec-log4j2.properties: |
+    status = INFO
+    name = HiveLog4j2
+    packages = org.apache.hadoop.hive.ql.log
+
+    # list of properties
+    property.hive.log.level = INFO
+    property.hive.root.logger = console
+    property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
+    property.hive.log.***REMOVED***le = hive.log
+
+    # list of all appenders
+    appenders = console
+
+    # console appender
+    appender.console.type = Console
+    appender.console.name = console
+    appender.console.target = SYSTEM_ERR
+    appender.console.layout.type = PatternLayout
+    appender.console.layout.pattern = %d{yy/MM/dd HH:mm:ss} [%t]: %p %c{2}: %m%n
+
+    # list of all loggers
+    loggers = NIOServerCnxn, ClientCnxnSocketNIO, DataNucleus, Datastore, JPOX
+
+    logger.NIOServerCnxn.name = org.apache.zookeeper.server.NIOServerCnxn
+    logger.NIOServerCnxn.level = WARN
+
+    logger.ClientCnxnSocketNIO.name = org.apache.zookeeper.ClientCnxnSocketNIO
+    logger.ClientCnxnSocketNIO.level = WARN
+
+    logger.DataNucleus.name = DataNucleus
+    logger.DataNucleus.level = ERROR
+
+    logger.Datastore.name = Datastore
+    logger.Datastore.level = ERROR
+
+    logger.JPOX.name = JPOX
+    logger.JPOX.level = ERROR
+
+    # root logger
+    rootLogger.level = ${sys:hive.log.level}
+    rootLogger.appenderRefs = root
+    rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
+
