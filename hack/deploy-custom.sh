@@ -70,8 +70,6 @@ spec:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
       hive:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
-        image:
-          tag: ${DEPLOY_TAG}
 
   hdfs:
     spec:
