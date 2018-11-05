@@ -78,6 +78,12 @@ git push origin release-0.8
 
 After the team is con***REMOVED***dent that the release is ready and has no outstanding issues that are blocking it, then use `git tag -s` to tag the release, sign the tag, and provide any information about the release in the description.
 
+First fetch the latest tags:
+
+```
+git fetch origin --tags
+```
+
 To see what has changed between a release, use git log:
 
 ```
