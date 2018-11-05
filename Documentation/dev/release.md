@@ -170,3 +170,11 @@ make metering-manifests
 git add manifests
 git commit -m 'manifests: Regenerate manifests for 0.8.0-latest'
 ```
+
+Finally push your changes (replace `chancez` with your forks remote repository name):
+
+```
+git push chancez bump_release
+```
+
+And lastly create a pull-request to have the PR reviewed before it gets merged into master.
