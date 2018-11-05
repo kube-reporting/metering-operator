@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hive-scripts
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  entrypoint.sh: |
+    #!/bin/bash -e
+
+    max_memory() {
+        local memory_limit=$1
+        local ratio=${JAVA_MAX_MEM_RATIO:-50}
+        echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
+    }
+
+    # Check for container memory limits/request and use it to set JVM Heap size.
+    # Defaults to 50% of the limit/request value.
+    if [ -n "$MY_MEM_LIMIT" ]; then
+        export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
+    elif [ -n "$MY_MEM_REQUEST" ]; then
+        export HADOOP_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
+    fi
+
+    if [ -z "$HADOOP_HEAPSIZE" ]; then
+        echo "Unable to automatically set HADOOP_HEAPSIZE"
+    else
+        echo "Setting HADOOP_HEAPSIZE to ${HADOOP_HEAPSIZE}M"
+    fi
+
+    # add UID to /etc/passwd if missing
+    if ! whoami &> /dev/null; then
+      if [ -w /etc/passwd ]; then
+        echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /etc/passwd
+      fi
+    fi
+
+    # symlink our configuration files to the correct location
+    if [ -f /hadoop-config/core-site.xml ]; then
+      ln -s -f /hadoop-config/core-site.xml /etc/hadoop/core-site.xml
+    else
+      echo "/hadoop-config/core-site.xml doesnt exist, skipping symlink"
+    fi
+    if [ -f /hadoop-config/hdfs-site.xml ]; then
+      ln -s -f /hadoop-config/hdfs-site.xml /etc/hadoop/hdfs-site.xml
+    else
+      echo "/hadoop-config/hdfs-site.xml doesnt exist, skipping symlink"
+    fi
+    ln -s -f /hive-config/hive-site.xml $HIVE_HOME/conf/hive-site.xml
+    ln -s -f /hive-config/hive-log4j2.properties $HIVE_HOME/conf/hive-log4j2.properties
+    ln -s -f /hive-config/hive-exec-log4j2.properties $HIVE_HOME/conf/hive-exec-log4j2.properties
+
+    export HIVE_LOGLEVEL="${HIVE_LOGLEVEL:-INFO}"
+    export HIVE_METASTORE_HADOOP_OPTS=" -Dhive.log.level=${HIVE_LOGLEVEL} "
+    export HIVE_OPTS="$HIVE_OPTS --hiveconf hive.root.logger=${HIVE_LOGLEVEL},console "
+
+    exec $@

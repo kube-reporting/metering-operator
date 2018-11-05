@@ -76,8 +76,8 @@ spec:
 
   hive:
     image:
-      repository: quay.io/coreos/metering-hive
-      tag: latest
+      repository: quay.io/coreos/hive
+      tag: metering-2.3.3
       pullPolicy: Always
 
     config:
@@ -91,6 +91,8 @@ spec:
       defaultFileFormat: "orc"
       defaultCompression: "zlib"
       metastoreURIs: "thrift://hive-metastore:9083"
+      useHdfsConfigMap: true
+      hdfsConfigMapName: hdfs-config
 
     securityContext:
       runAsNonRoot: true

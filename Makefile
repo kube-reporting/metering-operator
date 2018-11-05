@@ -49,7 +49,6 @@ endif
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
 	metering-operator \
-	hive \
 	metering-e2e
 
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
@@ -60,7 +59,6 @@ DOCKER_BASE_URL := quay.io/coreos
 
 METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
 REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
-HIVE_IMAGE := $(DOCKER_BASE_URL)/metering-hive
 METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
 
 GIT_SHA    := $(shell git rev-parse HEAD)
@@ -186,9 +184,6 @@ metering-e2e-docker-build: Dockerfile.e2e
 
 metering-operator-docker-build: Dockerfile.metering-operator
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
-
-hive-docker-build: images/hive/Dockerfile
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(HIVE_IMAGE)
 
 # Update dependencies
 vendor: Gopkg.toml
