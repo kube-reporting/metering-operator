@@ -44,13 +44,11 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 		}
 		return err
 	}
-
-	return op.handleReportGenerationQuery(logger, reportGenerationQuery)
+	q := reportGenerationQuery.DeepCopy()
+	return op.handleReportGenerationQuery(logger, q)
 }
 
 func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
-	generationQuery = generationQuery.DeepCopy()
-
 	var viewName string
 	if generationQuery.Spec.View.Disabled {
 		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping processing")
