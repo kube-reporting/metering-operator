@@ -1,13 +1,14 @@
 spec:
   image:
-    repository: quay.io/coreos/metering-hadoop
-    tag: latest
+    repository: quay.io/coreos/hadoop
+    tag: metering-3.1.1
     pullPolicy: Always
 
   con***REMOVED***g:
     logLevel: "info"
     namenodeHost: hdfs-namenode-0.hdfs-namenode
     namenodePort: 9820
+    defaultFS: "hdfs://hdfs-namenode-0.hdfs-namenode:9820"
     datanodeDataDirPerms: "770"
 
   securityContext:

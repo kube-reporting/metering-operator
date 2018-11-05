@@ -93,13 +93,9 @@ spec:
       - name: hdfs-namenode
         image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
         imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
-        args: ["namenode-entrypoint.sh"]
+        command: ["/hadoop-con***REMOVED***g/entrypoint.sh"]
+        args: ["/hadoop-con***REMOVED***g/namenode-entrypoint.sh"]
         env:
-        - name: CORE_CONF_fs_defaultFS
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: hdfs-con***REMOVED***g
-              key: default-fs
         - name: CLUSTER_NAME
           value: hdfs-k8s
         - name: HADOOP_LOGLEVEL
@@ -137,6 +133,8 @@ spec:
         - containerPort: 9870
           name: web
         volumeMounts:
+        - name: hdfs-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
         - name: hdfs-namenode-data
           mountPath: /hadoop/dfs/name
           # we use a subPath to avoid the lost+found directory at the root of
@@ -153,6 +151,10 @@ spec:
 {{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}
       volumes:
+      - name: hdfs-con***REMOVED***g
+        con***REMOVED***gMap:
+          name: hdfs-con***REMOVED***g
+          defaultMode: 0555
       - name: datanode-empty
         emptyDir: {}
   volumeClaimTemplates:

@@ -75,8 +75,6 @@ spec:
 
   hdfs:
     spec:
-      image:
-        tag: ${DEPLOY_TAG}
       ${IMAGE_PULL_SECRET_TEXT:-}
       datanode:
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}

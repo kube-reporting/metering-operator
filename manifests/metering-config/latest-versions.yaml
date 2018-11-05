@@ -11,17 +11,7 @@ spec:
 
   presto:
     spec:
-      presto:
-        image:
-          repository: quay.io/coreos/presto
-          tag: latest
       hive:
         image:
           repository: quay.io/coreos/metering-hive
           tag: latest
-
-  hdfs:
-    spec:
-      image:
-        repository: quay.io/coreos/metering-hadoop
-        tag: latest

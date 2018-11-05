@@ -110,18 +110,9 @@ spec:
       - name: hdfs-datanode
         image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
         imagePullPolicy: {{ .Values.spec.image.pullPolicy }}
-        args: ["datanode-entrypoint.sh"]
+        command: ["/hadoop-con***REMOVED***g/entrypoint.sh"]
+        args: ["/hadoop-con***REMOVED***g/datanode-entrypoint.sh"]
         env:
-        - name: CORE_CONF_fs_defaultFS
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: hdfs-con***REMOVED***g
-              key: default-fs
-        - name: HDFS_CONF_dfs_datanode_data_dir_perm
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: hdfs-con***REMOVED***g
-              key: datanode-data-dir-perms
         - name: HADOOP_LOGLEVEL
           valueFrom:
             con***REMOVED***gMapKeyRef:
@@ -159,6 +150,8 @@ spec:
         - containerPort: 9867
           name: ipc
         volumeMounts:
+        - name: hdfs-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data
           # we use a subPath to avoid the lost+found directory at the root of
@@ -169,8 +162,7 @@ spec:
           mountPath: /hadoop/dfs/name
         livenessProbe:
           exec:
-            command:
-            - check-datanode-healthy.sh
+            command: ["/hadoop-con***REMOVED***g/check-datanode-healthy.sh" ]
           initialDelaySeconds: 90
           periodSeconds: 30
           failureThreshold: 2
@@ -183,6 +175,10 @@ spec:
 {{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
 {{- end }}
       volumes:
+      - name: hdfs-con***REMOVED***g
+        con***REMOVED***gMap:
+          name: hdfs-con***REMOVED***g
+          defaultMode: 0555
       - name: namenode-empty
         emptyDir: {}
   volumeClaimTemplates:
