@@ -48,6 +48,32 @@ unset METERING_CR_FILE
 ./hack/dev-install-wrapper.sh release-0.8 ./hack/openshift-install.sh
 ```
 
+### Pulling in changes into a release branch
+
+If a release branch has issues and needs a bug ***REMOVED***x or something ***REMOVED*** added to it before it can be released we have two potions
+
+- Git merge
+- Git cherry-pick
+
+If the change we need merged shortly after the release branch was made and the master branch doesn't contain major changes, than we can do a git merge:
+
+```
+git checkout release-0.8
+git fetch origin master
+git merge origin/master
+git push origin release-0.8
+```
+
+If there's been a lot of work on master and we want to extract individual changes, than we will use `git cherry-pick` to pull individual changes into the release branch.
+
+For example if master has a commit `12345` that is a merge commit containing a change you need, you would cherry-pick it into your release branch like so (passing the correct value to -m):
+
+```
+git checkout release-0.8
+git cherry-pick 12345 -x -m 1
+git push origin release-0.8
+```
+
 ## Tagging the release
 
 After the team is con***REMOVED***dent that the release is ready and has no outstanding issues that are blocking it, then use `git tag -s` to tag the release, sign the tag, and provide any information about the release in the description.
