@@ -13,3 +13,5 @@ spec:
     plural: reportprometheusqueries
     singular: reportprometheusquery
     kind: ReportPrometheusQuery
+    shortNames:
+    - rpq
