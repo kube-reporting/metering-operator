@@ -116,7 +116,7 @@ Then select your version in the list of versions, it should take you to a job pa
 
 Your URL should look like https://jenkins.prod.coreos.systems/job/metering/job/operator-metering-main/view/tags/job/0.8.0/
 
-Finally, click `Build With Parameters` on the left of the page, leave the defaults and click the `Build` button.
+Finally, click `Build Now` or `Build With Parameters` on the left of the page, leave the defaults and click the `Build` button.
 
 Wait for the build to finish, and once it's done the release images and been pushed and the tag exists on Github.
 
