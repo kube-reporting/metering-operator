@@ -41,6 +41,13 @@ After we have a passing build in Jenkins, do any extra verification like you wou
 Images built will be named after the branch (ex: `release-0.8`).
 You will need to override the helm operator image tag, as well as the image tag for each other component if you wish to test these before the final release is tagged and built.
 
+For example:
+
+```
+unset METERING_CR_FILE
+./hack/dev-install-wrapper.sh release-0.8 ./hack/openshift-install.sh
+```
+
 ## Tagging the release
 
 After the team is confident that the release is ready and has no outstanding issues that are blocking it, then use `git tag -s` to tag the release, sign the tag, and provide any information about the release in the description.
