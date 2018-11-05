@@ -1,5 +1,5 @@
-#! package-manifest: ../../catalog_resources/components/metering.0.8.0-latest.clusterserviceversion.yaml
+#! package-manifest: ../../catalog_resources/components/metering.0.9.0.clusterserviceversion.yaml
 packageName: metering
 channels:
-- currentCSV: metering-operator.v0.8.0-latest
+- currentCSV: metering-operator.v0.9.0
   name: alpha
