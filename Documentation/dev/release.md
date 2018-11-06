@@ -41,9 +41,54 @@ After we have a passing build in Jenkins, do any extra verification like you wou
 Images built will be named after the branch (ex: `release-0.8`).
 You will need to override the helm operator image tag, as well as the image tag for each other component if you wish to test these before the final release is tagged and built.
 
+For example:
+
+```
+unset METERING_CR_FILE
+./hack/dev-install-wrapper.sh release-0.8 ./hack/openshift-install.sh
+```
+
+### Pulling in changes into a release branch
+
+If a release branch has issues and needs a bug fix or something else added to it before it can be released we have two potions
+
+- Git merge
+- Git cherry-pick
+
+If the change we need merged shortly after the release branch was made and the master branch doesn't contain major changes, than we can do a git merge:
+
+```
+git checkout release-0.8
+git fetch origin master
+git merge origin/master
+git push origin release-0.8
+```
+
+If there's been a lot of work on master and we want to extract individual changes, than we will use `git cherry-pick` to pull individual changes into the release branch.
+
+For example if master has a commit `12345` that is a merge commit containing a change you need, you would cherry-pick it into your release branch like so (passing the correct value to -m):
+
+```
+git checkout release-0.8
+git cherry-pick 12345 -x -m 1
+git push origin release-0.8
+```
+
 ## Tagging the release
 
 After the team is confident that the release is ready and has no outstanding issues that are blocking it, then use `git tag -s` to tag the release, sign the tag, and provide any information about the release in the description.
+
+First fetch the latest tags:
+
+```
+git fetch origin --tags
+```
+
+To see what has changed between a release, use git log:
+
+```
+git log --oneline release-0.7..release-0.8
+```
 
 See previous release tags for examples of a good message to put into the git tag:
 
@@ -71,7 +116,7 @@ Then select your version in the list of versions, it should take you to a job pa
 
 Your URL should look like https://jenkins.prod.coreos.systems/job/metering/job/operator-metering-main/view/tags/job/0.8.0/
 
-Finally, click `Build With Parameters` on the left of the page, leave the defaults and click the `Build` button.
+Finally, click `Build Now` or `Build With Parameters` on the left of the page, leave the defaults and click the `Build` button.
 
 Wait for the build to finish, and once it's done the release images and been pushed and the tag exists on Github.
 
@@ -83,6 +128,8 @@ The last step for finalizing the release is to create a Github Release from our 
 Go to https://github.com/operator-framework/operator-metering/releases and click the "Draft a new release" button at the top right.
 
 In the text box, enter your release tag, eg: `0.8.0`.
+
+Set the title `Metering $version` to eg: `Metering 0.8.0`.
 
 You can leave the description empty, as it should just use our git tag's message.
 
@@ -123,3 +170,11 @@ make metering-manifests
 git add manifests
 git commit -m 'manifests: Regenerate manifests for 0.8.0-latest'
 ```
+
+Finally push your changes (replace `chancez` with your forks remote repository name):
+
+```
+git push chancez bump_release
+```
+
+And lastly create a pull-request to have the PR reviewed before it gets merged into master.
