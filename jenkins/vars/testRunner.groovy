@@ -6,7 +6,7 @@ def call(body) {
     body()
 
     def commonPre***REMOVED***x = "${pipelineParams.deployPlatform}-${pipelineParams.testType}"
-    def branchPre***REMOVED***x = "${commonPre***REMOVED***x}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+    def branchPre***REMOVED***x = "${commonPre***REMOVED***x}-${params.DEPLOY_TAG ?: env.BRANCH_NAME.toLowerCase()}"
     def defaultNamespace = "metering-ci2-${branchPre***REMOVED***x}"
     def prStatusContext = "jenkins/${commonPre***REMOVED***x}"
 
@@ -26,7 +26,7 @@ def call(body) {
         agent {
             kubernetes {
                 cloud 'gke-metering'
-                label "gke-operator-metering-${commonPre***REMOVED***x}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+                label "gke-operator-metering-${branchPre***REMOVED***x}"
                 instanceCap 2
                 idleMinutes 0
                 defaultContainer 'jnlp'
@@ -72,11 +72,6 @@ spec:
             // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + BRANCH_NAME
             METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: defaultNamespace}"
             SCRIPT                      = "${pipelineParams.testScript}"
-            TEST_LOG_FILE               = "${pipelineParams.testType}-tests.log"
-            TEST_TAP_FILE               = "${pipelineParams.testType}-tests.tap"
-            DEPLOY_LOG_FILE             = "${pipelineParams.testType}-deploy.log"
-            DEPLOY_POD_LOGS_LOG_FILE    = "${pipelineParams.testType}-pod.log"
-            FINAL_POD_LOGS_LOG_FILE     = "${pipelineParams.testType}-pod-***REMOVED***nal-descriptions.log"
             // we set CLEANUP_METERING to false and instead handle cleanup on
             // our own, so that if there's a test timeout, we can still capture
             // pod logs
@@ -87,20 +82,20 @@ spec:
         stages {
             stage('Run Tests') {
                 environment {
-                    KUBECONFIG                          = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
-                    TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/${commonPre***REMOVED***x}-tests"
-                    TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                    TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
-                    DEPLOY_PLATFORM                     = "${pipelineParams.deployPlatform}"
-                    METERING_HTTPS_API                  = "${pipelineParams.meteringHttpsAPI ?: false}"
+                    KUBECONFIG                   = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
+                    TEST_OUTPUT_DIR              = "${env.OUTPUT_DIR}/${commonPre***REMOVED***x}-tests"
+                    TEST_OUTPUT_PATH             = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
+                    FINAL_POD_LOGS_LOG_FILE_PATH = "${env.TEST_OUTPUT_PATH}/logs/***REMOVED***nal-pod-descriptions-logs.log"
+                    DEPLOY_PLATFORM              = "${pipelineParams.deployPlatform}"
+                    METERING_HTTPS_API           = "${pipelineParams.meteringHttpsAPI ?: false}"
                 }
                 steps {
-                    runTests()
+                    runScript()
                 }
                 post {
                     always {
                         echo 'Capturing test TAP output'
-                        step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/${TEST_TAP_FILE}", failIfNoResults: false, planRequired: false])
+                        step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/**/*.tap", failIfNoResults: false, planRequired: false])
                     }
                     cleanup {
                         cleanup()
@@ -133,13 +128,12 @@ spec:
     }
 }
 
-private def runTests() {
+private def runScript() {
     container('metering-test-runner') {
         ansiColor('xterm') {
             timeout(15) {
                 sh '''#!/bin/bash -ex
                 cd $METERING_SRC_DIR
-                mkdir -p $TEST_OUTPUT_PATH $TEST_RESULT_REPORT_OUTPUT_DIRECTORY
                 $SCRIPT
                 '''
             }
@@ -150,7 +144,7 @@ private def runTests() {
 private def cleanup() {
     container('metering-test-runner') {
         echo "Capturing pod logs"
-        sh 'set -e; cd $METERING_SRC_DIR && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $TEST_OUTPUT_PATH/$FINAL_POD_LOGS_LOG_FILE'
+        sh 'set -e; cd $METERING_SRC_DIR && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $FINAL_POD_LOGS_LOG_FILE_PATH'
         echo "Deleting namespace ${env.METERING_NAMESPACE}"
         if (!params.SKIP_NS_CLEANUP) {
             sh 'set -e; cd $METERING_SRC_DIR && ./hack/delete-ns.sh'
