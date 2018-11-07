@@ -5,7 +5,10 @@ def call(body) {
     body.delegate = pipelineParams
     body()
 
-    def prStatusContext = "jenkins/${pipelineParams.testType}-tests"
+    def commonPrefix = "${pipelineParams.deployPlatform}-${pipelineParams.testType}"
+    def branchPrefix = "${commonPrefix}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+    def defaultNamespace = "metering-ci2-${branchPrefix}"
+    def prStatusContext = "jenkins/${commonPrefix}"
 
     def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
     if (isPullRequest) {
@@ -18,14 +21,12 @@ def call(body) {
         parameters {
             string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor. If unset, uses env.BRANCH_NAME')
             string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
-            booleanParam(name: 'GENERIC', defaultValue: false, description: 'If true, run the configured tests against a GKE cluster using the generic config.')
-            booleanParam(name: 'OPENSHIFT', defaultValue: false, description: 'If true, run the configured tests against a Openshift cluster using the Openshift config.')
             booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the namespace after running tests.')
         }
         agent {
             kubernetes {
                 cloud 'gke-metering'
-                label "gke-operator-metering-${pipelineParams.testType}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+                label "gke-operator-metering-${commonPrefix}-${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
                 instanceCap 2
                 idleMinutes 0
                 defaultContainer 'jnlp'
@@ -34,7 +35,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    jenkins-k8s: operator-metering-${pipelineParams.testType}
+    jenkins-k8s: metering-${commonPrefix}
 spec:
   containers:
   - name: metering-test-runner
@@ -69,13 +70,13 @@ spec:
             OUTPUT_DIR                  = "test_output"
             METERING_CREATE_PULL_SECRET = "true"
             // use the OVERRIDE_NAMESPACE if specified, otherwise set namespace to prefix + BRANCH_NAME
-            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: "metering-ci2-${pipelineParams.testType}-${env.BRANCH_NAME}"}"
+            METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: defaultNamespace}"
             SCRIPT                      = "${pipelineParams.testScript}"
             TEST_LOG_FILE               = "${pipelineParams.testType}-tests.log"
             TEST_TAP_FILE               = "${pipelineParams.testType}-tests.tap"
             DEPLOY_LOG_FILE             = "${pipelineParams.testType}-deploy.log"
             DEPLOY_POD_LOGS_LOG_FILE    = "${pipelineParams.testType}-pod.log"
-            FINAL_POD_LOGS_LOG_FILE     = "${pipelineParams.testType}-final-pod.log"
+            FINAL_POD_LOGS_LOG_FILE     = "${pipelineParams.testType}-pod-final-descriptions.log"
             // we set CLEANUP_METERING to false and instead handle cleanup on
             // our own, so that if there's a test timeout, we can still capture
             // pod logs
@@ -85,57 +86,24 @@ spec:
 
         stages {
             stage('Run Tests') {
-                parallel {
-
-                    stage('generic') {
-                        when {
-                            expression { return params.GENERIC }
-                        }
-                        environment {
-                            KUBECONFIG                          = credentials('gke-metering-ci-kubeconfig')
-                            TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/generic/tests"
-                            TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                            TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
-                            DEPLOY_PLATFORM                     = "generic"
-                        }
-                        steps {
-                            runTests()
-                        }
-                        post {
-                            always {
-                                echo 'Capturing test TAP output'
-                                step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/${TEST_TAP_FILE}", failIfNoResults: false, planRequired: false])
-                            }
-                            cleanup {
-                                cleanup()
-                            }
-                        }
+                environment {
+                    KUBECONFIG                          = credentials("${pipelineParams.kubeconfigCredentialsID}")
+                    TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/${commonPrefix}-tests"
+                    TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
+                    TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
+                    DEPLOY_PLATFORM                     = "${pipelineParams.deployPlatform}"
+                    METERING_HTTPS_API                  = "${pipelineParams.meteringHttpsAPI ?: false}"
+                }
+                steps {
+                    runTests()
+                }
+                post {
+                    always {
+                        echo 'Capturing test TAP output'
+                        step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/${TEST_TAP_FILE}", failIfNoResults: false, planRequired: false])
                     }
-
-                    stage('openshift') {
-                        when {
-                            expression { return params.OPENSHIFT }
-                        }
-                        environment {
-                            KUBECONFIG                          = credentials('openshift-metering-ci-kubeconfig')
-                            TEST_OUTPUT_DIR                     = "${env.OUTPUT_DIR}/openshift/tests"
-                            TEST_OUTPUT_PATH                    = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                            TEST_RESULT_REPORT_OUTPUT_DIRECTORY = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}/reports"
-                            METERING_HTTPS_API                  = "true"
-                            DEPLOY_PLATFORM                     = "openshift"
-                        }
-                        steps {
-                            runTests()
-                        }
-                        post {
-                            always {
-                                echo 'Capturing test TAP output'
-                                step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/${TEST_TAP_FILE}", failIfNoResults: false, planRequired: false])
-                            }
-                            cleanup {
-                                cleanup()
-                            }
-                        }
+                    cleanup {
+                        cleanup()
                     }
                 }
             }
@@ -166,7 +134,6 @@ spec:
 }
 
 private def runTests() {
-    echo "Running metering e2e tests"
     container('metering-test-runner') {
         ansiColor('xterm') {
             timeout(15) {
