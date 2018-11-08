@@ -37,6 +37,8 @@ If you want to build docker images locally:
 make docker-build-all
 ```
 
+If you want to build OCP images locally see [the Building OCP images document](ocp-images.md).
+
 ## Running local tests
 
 To run unit tests:

@@ -7,14 +7,53 @@ include build/check_defined.mk
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
-DOCKER_BUILD_ARGS ?=
+DOCKER_BASE_URL := quay.io/coreos
 
+METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
+REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
+METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
+
+GIT_SHA    := $(shell git rev-parse HEAD)
+GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+RELEASE_TAG := $(shell hack/print-version.sh)
+
+# by default we build using docker, and assume building an image uses typical
+# docker args and flags (-t, -f, and the build context positional arg.)
 DOCKER_BUILD_CMD = docker build $(DOCKER_BUILD_ARGS)
 
+# extra arguments that can be passed to docker build
+DOCKER_BUILD_ARGS ?=
+
+# use https://github.com/openshift/imagebuilder as our docker client
 USE_IMAGEBUILDER ?= false
+# if this is an OCP build, this enables rhel dockerfiles
+OCP_BUILD ?= false
 
 ifeq ($(USE_IMAGEBUILDER), true)
 	DOCKER_BUILD_CMD = imagebuilder
+ifeq ($(OCP_BUILD), true)
+	# used to enable RHEL repos that have the packages we need
+	REPO_MNT = $(ROOT_DIR)/hack/ocp-util/redhat.repo:/etc/yum.repos.d/redhat.repo
+	# used to disable subscription-manager in the docker builds
+	SUB_MGR_MNT = $(ROOT_DIR)/hack/ocp-util/subscription-manager.conf:/etc/yum/pluginconf.d/subscription-manager.conf
+	DOCKER_BUILD_CMD = imagebuilder -mount $(REPO_MNT) -mount $(SUB_MGR_MNT)
+endif
+endif
+
+# default Dockerfiles
+METERING_OPERATOR_DOCKERFILE := Dockerfile.metering-operator
+REPORTING_OPERATOR_DOCKERFILE := Dockerfile.reporting-operator
+
+# override our Dockerfiles to rhel dockerfiles
+ifeq ($(OCP_BUILD), true)
+	METERING_OPERATOR_IMAGE := registry.access.redhat.com/ose-metering-helm-operator
+	REPORTING_OPERATOR_IMAGE := registry.access.redhat.com/ose-metering-reporting-operator
+
+	METERING_OPERATOR_DOCKERFILE = Dockerfile.metering-operator.rhel
+	REPORTING_OPERATOR_DOCKERFILE = Dockerfile.reporting-operator.rhel
+	RENDER_METERING_CHART_VALUES_CMD=cat ./hack/ocp-util/ocp-metering-chart-values.yaml
+else
+	RENDER_METERING_CHART_VALUES_CMD=./hack/render-metering-chart-override-values.sh $(RELEASE_TAG)
 endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
@@ -35,16 +74,15 @@ REPORTING_OPERATOR_GO_FILES =
 # Adds all the Go files in the repo as a dependency to the build-reporting-operator target
 ifeq ($(CHECK_GO_FILES), true)
 	JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-	REPORTING_OPERATOR_GO_FILES = $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} find $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+	REPORTING_OPERATOR_GO_FILES := $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} find $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
 endif
 
 # Adds the update-codegen dependency to the build-reporting-operator target
 ifeq ($(RUN_UPDATE_CODEGEN), true)
 	REPORTING_OPERATOR_BIN_DEPENDENCIES += update-codegen
-	CODEGEN_SOURCE_GO_FILES = $(shell $(ROOT_DIR)/hack/codegen_source_files.sh)
-	CODEGEN_OUTPUT_GO_FILES = $(shell $(ROOT_DIR)/hack/codegen_output_files.sh)
+	CODEGEN_SOURCE_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_source_files.sh)
+	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_files.sh)
 endif
-
 
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
@@ -54,16 +92,6 @@ DOCKER_COMMON_NAMES := \
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
-
-DOCKER_BASE_URL := quay.io/coreos
-
-METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
-REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
-METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
-
-GIT_SHA    := $(shell git rev-parse HEAD)
-GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG := $(shell hack/print-version.sh)
 
 PULL_TAG_IMAGE_SOURCE ?= false
 USE_LATEST_TAG ?= false
@@ -176,13 +204,13 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
-reporting-operator-docker-build: Dockerfile.reporting-operator
+reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-e2e-docker-build: Dockerfile.e2e
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-operator-docker-build: Dockerfile.metering-operator
+metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 # Update dependencies
@@ -230,9 +258,9 @@ build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPE
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 
-bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
+bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh ./hack/ocp-util/ocp-metering-chart-values.yaml
 	@mkdir -p bin
-	./hack/render-metering-chart-override-values.sh $(RELEASE_TAG) > $@
+	$(RENDER_METERING_CHART_VALUES_CMD) > bin/metering-override-values.yaml
 
 CHART_DEPS := bin/openshift-metering-0.1.0.tgz \
 	bin/operator-metering-0.1.0.tgz
