@@ -1,0 +1,185 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "cluster-cpu-capacity-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "node-cpu-capacity-raw"
+  columns:
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: cpu_cores
+    type: double
+  - name: cpu_core_seconds
+    type: double
+  - name: node_count
+    type: double
+  query: |
+    SELECT
+      "timestamp",
+      sum(node_capacity_cpu_cores) as cpu_cores,
+      sum(node_capacity_cpu_core_seconds) as cpu_core_seconds,
+      count(*) AS node_count
+    FROM {| generationQueryViewName "node-cpu-capacity-raw" |}
+    GROUP BY "timestamp"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "cluster-cpu-capacity"
+  labels:
+    operator-metering: "true"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "cluster-cpu-capacity-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: total_cluster_capacity_cpu_core_hours
+    type: double
+    unit: cpu_core_hours
+  - name: avg_cluster_capacity_cpu_cores
+    type: double
+    unit: cpu_cores
+  - name: avg_node_count
+    type: double
+    unit: cpu_cores
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  - name: AggregatedReportName
+  query: |
+    {|/* Default values */|}
+    {|- $inputs := dict "from" (generationQueryViewName "cluster-cpu-capacity-raw") "start" "timestamp"  "end" "timestamp" -|}
+    {|/* Handle aggregating a sub-report */|}
+    {|- if .Report.Inputs.AggregatedReportName -|}
+    {|- $_ := set $inputs "from" (.Report.Inputs.AggregatedReportName | scheduledReportTableName) -|}
+    {|- $_ := set $inputs "start" "period_start" -|}
+    {|- $_ := set $inputs "end" "period_end" -|}
+    {|- end -|}
+    SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    {|- if .Report.Inputs.AggregatedReportName -|}
+      sum(total_cluster_capacity_cpu_core_hours) as total_cluster_capacity_cpu_core_hours,
+      avg(avg_cluster_capacity_cpu_cores) as avg_cluster_capacity_cpu_cores,
+      avg(avg_node_count) AS avg_node_count
+    {|- ***REMOVED*** |}
+      sum(cpu_core_seconds) / 60 / 60 as total_cluster_capacity_cpu_core_hours,
+      avg(cpu_cores) as avg_cluster_capacity_cpu_cores,
+      avg(node_count) AS avg_node_count
+    {|- end |}
+    FROM {| $inputs.from |}
+    WHERE "{| $inputs.start |}"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "{| $inputs.end |}"  < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "cluster-memory-capacity-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "node-memory-capacity-raw"
+  columns:
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: memory_bytes
+    type: double
+  - name: memory_byte_seconds
+    type: double
+  - name: node_count
+    type: double
+  query: |
+    SELECT
+      "timestamp",
+      sum(node_capacity_memory_bytes) as memory_bytes,
+      sum(node_capacity_memory_byte_seconds) as memory_byte_seconds,
+      count(*) AS node_count
+    FROM {| generationQueryViewName "node-memory-capacity-raw" |}
+    GROUP BY "timestamp"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "cluster-memory-capacity"
+  labels:
+    operator-metering: "true"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "cluster-memory-capacity-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: total_cluster_capacity_memory_byte_hours
+    type: double
+    unit: memory_byte_hours
+  - name: avg_cluster_capacity_memory_bytes
+    type: double
+    unit: memory_bytes
+  - name: avg_node_count
+    type: double
+    unit: memory_bytes
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  - name: AggregatedReportName
+  query: |
+    {|/* Default values */|}
+    {|- $inputs := dict "from" (generationQueryViewName "cluster-memory-capacity-raw") "start" "timestamp"  "end" "timestamp" -|}
+    {|/* Handle aggregating a sub-report */|}
+    {|- if .Report.Inputs.AggregatedReportName -|}
+    {|- $_ := set $inputs "from" (.Report.Inputs.AggregatedReportName | scheduledReportTableName) -|}
+    {|- $_ := set $inputs "start" "period_start" -|}
+    {|- $_ := set $inputs "end" "period_end" -|}
+    {|- end |}
+    SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    {|- if .Report.Inputs.AggregatedReportName |}
+      sum(total_cluster_capacity_memory_byte_hours) as total_cluster_capacity_memory_byte_hours,
+      avg(avg_cluster_capacity_memory_bytes) as avg_cluster_capacity_memory_bytes,
+      avg(avg_node_count) AS avg_node_count
+    {|- ***REMOVED*** |}
+      sum(memory_byte_seconds) / 60 / 60 as total_cluster_capacity_memory_byte_hours,
+      avg(memory_bytes) as avg_cluster_capacity_memory_bytes,
+      avg(node_count) AS avg_node_count
+    {|- end |}
+    FROM {| $inputs.from |}
+    WHERE "{| $inputs.start |}"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "{| $inputs.end |}"  < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
