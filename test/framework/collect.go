@@ -15,7 +15,7 @@ import (
 // imported
 const collectionSize = 30 * time.Minute
 
-func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
+func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, operator.CollectPromsumDataResponse) {
 	t.Helper()
 	f.collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTCf for timestamps
@@ -50,9 +50,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time) {
 		require.NoError(t, err, "expected to unmarshal CollectPrometheusData response as JSON")
 		t.Logf("CollectPromsumDataResponse: %s", spew.Sdump(collectResp))
 		require.NotEmpty(t, collectResp.Results, "expected multiple import results")
-		for _, result := range collectResp.Results {
-			require.NotZerof(t, result.MetricsImportedCount, "expected metric import count for ReportDataSource %s to not be zero", result.ReportDataSource)
-		}
+		f.collectPromsumDataResponse = collectResp
 	})
-	return f.reportStart, f.reportEnd
+	return f.reportStart, f.reportEnd, f.collectPromsumDataResponse
 }

@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
 type Framework struct {
@@ -21,10 +22,11 @@ type Framework struct {
 	Namespace      string
 	DefaultTimeout time.Duration
 
-	protocol    string
-	collectOnce sync.Once
-	reportStart time.Time
-	reportEnd   time.Time
+	protocol                   string
+	collectOnce                sync.Once
+	reportStart                time.Time
+	reportEnd                  time.Time
+	collectPromsumDataResponse operator.CollectPromsumDataResponse
 }
 
 // New initializes a test framework and returns it.
