@@ -19,6 +19,10 @@ const (
 	// spec.reportingStart.
 	InvalidReportingEndReason = "InvalidReportingEnd"
 
+	// FailedValidationReason is added to a ScheduledReport when the it's
+	// ReportGenerationQuery or it's dependencies aren't ready
+	FailedValidationReason = "FailedValidation"
+
 	// Running scheduledReport conditions:
 
 	// ScheduledReason is added to a ScheduledReport when it's reached the next
