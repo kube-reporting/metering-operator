@@ -92,34 +92,58 @@ pipeline {
 
         stage('Test') {
             parallel {
-                stage("integration") {
+                stage("openshift-integration") {
                     when {
                         expression {
-                            return params.INTEGRATION && !skipIntegrationLabel
+                            return params.INTEGRATION && !skipIntegrationLabel && !skipOpenshift
                         }
                     }
                     steps {
                         echo "Running metering integration tests"
-                        build job: "metering/operator-metering-integration/${env.TARGET_BRANCH}", parameters: [
+                        build job: "metering/operator-metering-openshift-integration/${env.TARGET_BRANCH}", parameters: [
                             string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
                             booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
                         ]
                     }
                 }
-                stage("e2e") {
+                stage("openshift-e2e") {
                     when {
                         expression {
-                            return params.E2E && !skipE2ELabel
+                            return params.E2E && !skipE2ELabel && !skipOpenshift
                         }
                     }
                     steps {
-                        echo "Running metering e2e tests"
-                        build job: "metering/operator-metering-e2e/${env.TARGET_BRANCH}", parameters: [
+                        echo "Running metering openshift e2e tests"
+                        build job: "metering/operator-metering-openshift-e2e/${env.TARGET_BRANCH}", parameters: [
                             string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'GENERIC', value: params.GENERIC && !skipGke),
-                            booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT && !skipOpenshift),
+                            booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
+                        ]
+                    }
+                }
+                stage("gke-integration") {
+                    when {
+                        expression {
+                            return params.INTEGRATION && !skipIntegrationLabel && !skipGke
+                        }
+                    }
+                    steps {
+                        echo "Running metering gke integration tests"
+                        build job: "metering/operator-metering-gke-integration/${env.TARGET_BRANCH}", parameters: [
+                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
+                            booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
+                        ]
+                    }
+                }
+                stage("gke-e2e") {
+                    when {
+                        expression {
+                            return params.E2E && !skipE2ELabel && !skipGke
+                        }
+                    }
+                    steps {
+                        echo "Running metering gke e2e tests"
+                        build job: "metering/operator-metering-gke-e2e/${env.TARGET_BRANCH}", parameters: [
+                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
                             booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
                         ]
                     }
