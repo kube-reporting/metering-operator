@@ -193,7 +193,7 @@ func GetDependentViewGenerationQueries(queryGetter reportGenerationQueryGetter, 
 		viewQueries = append(viewQueries, query)
 	}
 	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourcesAccumulator))
-	for _, ds := range dataSources {
+	for _, ds := range dataSourcesAccumulator {
 		dataSources = append(dataSources, ds)
 	}
 
@@ -214,7 +214,7 @@ func GetDependentDynamicGenerationQueries(queryGetter reportGenerationQueryGette
 	}
 
 	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourcesAccumulator))
-	for _, ds := range dataSources {
+	for _, ds := range dataSourcesAccumulator {
 		dataSources = append(dataSources, ds)
 	}
 
@@ -345,7 +345,7 @@ func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generation
 		return nil, err
 	}
 	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourceAccumulator))
-	for _, ds := range dataSources {
+	for _, ds := range dataSourceAccumulator {
 		dataSources = append(dataSources, ds)
 	}
 	return dataSources, nil
