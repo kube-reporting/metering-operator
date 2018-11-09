@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
+	"github.com/operator-framework/operator-metering/pkg/operator"
 	"github.com/operator-framework/operator-metering/test/framework"
 )
 
@@ -200,7 +201,12 @@ func TestReportingE2E(t *testing.T) {
 		// used by our test cases are initialized
 		testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
 
-		periodStart, periodEnd := testFramework.CollectMetricsOnce(t)
+		var periodStart, periodEnd time.Time
+		var collectResp operator.CollectPromsumDataResponse
+		t.Run("TestMetricsCollection", func(t *testing.T) {
+			periodStart, periodEnd, collectResp = testFramework.CollectMetricsOnce(t)
+			testFramework.RequireReportDataSourcesForQueryHaveData(t, queries, collectResp)
+		})
 
 		t.Run("TestReportsProduceData", func(t *testing.T) {
 			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
