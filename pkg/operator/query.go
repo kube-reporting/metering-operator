@@ -51,8 +51,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
 	var viewName string
 	if generationQuery.Spec.View.Disabled {
-		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping processing")
-		return nil
+		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping view creation")
 	} ***REMOVED*** if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
 		viewName = reportingutil.GenerationQueryViewName(generationQuery.Name)
@@ -70,27 +69,28 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		op.uninitialiedDependendenciesHandler(),
 	)
 	if err != nil {
-		return fmt.Errorf("unable to create view for ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
+		return fmt.Errorf("unable to validate ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
 	}
 
-	tmplCtx := &reporting.ReportQueryTemplateContext{
-		DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
-		Report:                  nil,
-	}
+	if viewName != "" {
+		tmplCtx := &reporting.ReportQueryTemplateContext{
+			DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
+			Report:                  nil,
+		}
+		renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, tmplCtx)
+		if err != nil {
+			return err
+		}
 
-	renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, tmplCtx)
-	if err != nil {
-		return err
-	}
+		err = op.prestoViewCreator.CreateView(viewName, renderedQuery)
+		if err != nil {
+			return fmt.Errorf("error creating view %s for ReportGenerationQuery %s: %v", viewName, generationQuery.Name, err)
+		}
 
-	err = op.prestoViewCreator.CreateView(viewName, renderedQuery)
-	if err != nil {
-		return err
-	}
-
-	err = op.updateReportQueryViewName(logger, generationQuery, viewName)
-	if err != nil {
-		return err
+		err = op.updateReportQueryViewName(logger, generationQuery, viewName)
+		if err != nil {
+			return err
+		}
 	}
 
 	// enqueue any queries depending on this one
