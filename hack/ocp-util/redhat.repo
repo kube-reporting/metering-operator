@@ -1,0 +1,25 @@
+# RedHat-Base.repo
+#
+[rhel-7-server-rpms]
+name=Red Hat - $releasever -
+baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/
+gpgcheck=0
+enabled=1
+
+[rhel-7-server-extra-rpms]
+name=Red Hat Extras - $releasever -
+baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/7/7Server/x86_64/extras/os/
+gpgcheck=0
+enabled=1
+
+[rhel-7-server-optional-rpms]
+name=Red Hat Optional - $releasever -
+baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/7/7Server/x86_64/optional/os/
+gpgcheck=0
+enabled=1
+
+[rhel-7-server-ose-4.0-rpms]
+name=Red Hat OCP 4.0
+enabled=1
+gpgcheck=0
+baseurl=http://download-node-02.eng.bos.redhat.com/rcm-guest/puddles/RHAOS/AtomicOpenShift/4.0/building/x86_64/os/
