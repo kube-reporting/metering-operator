@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/operator"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
@@ -81,5 +82,29 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 		// the uninitialized dependencies don't become ready in the handler
 		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, scheduledReportGetter, reportGenQuery, depHandler)
 		readyReportGenQueries[queryName] = struct{}{}
+	}
+}
+
+func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPromsumDataResponse) {
+	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
+	scheduledReportGetter := reporting.NewScheduledReportClientGetter(f.MeteringClient)
+	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
+	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
+
+	metricsImportedForDS := make(map[string]int)
+	for _, res := range collectResp.Results {
+		metricsImportedForDS[res.ReportDataSource] = res.MetricsImportedCount
+	}
+
+	for _, queryName := range queries {
+		query, err := f.GetMeteringReportGenerationQuery(queryName)
+		require.NoError(t, err, "ReportGenerationQuery should exist")
+		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, scheduledReportGetter, query)
+		require.NoError(t, err, "Getting ReportGenerationQuery dependencies should succeed")
+
+		for _, dataSource := range deps.ReportDataSources {
+			metricsImported := metricsImportedForDS[dataSource.Name]
+			require.NotZerof(t, metricsImported, "expected metric import count for ReportDataSource %s to not be zero", dataSource.Name)
+		}
 	}
 }
