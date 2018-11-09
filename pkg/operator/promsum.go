@@ -2,6 +2,7 @@ package operator
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -230,7 +231,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 
 			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, ctx, start, end, importCfg, true)
 			if err != nil {
-				return err
+				return fmt.Errorf("error importing Prometheus data for ReportDataSource %s: %v", reportDataSource.Name, err)
 			}
 			resultsCh <- &prometheusImportResults{
 				ReportDataSource:     reportDataSource.Name,
