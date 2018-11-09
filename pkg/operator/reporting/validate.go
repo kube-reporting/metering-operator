@@ -140,6 +140,10 @@ func GetGenerationQueryDependencies(
 	scheduledReportGetter scheduledReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
 ) (*ReportGenerationQueryDependencies, error) {
+	dataSourceDeps, err := GetDependentDataSources(dataSourceGetter, generationQuery)
+	if err != nil {
+		return nil, err
+	}
 	viewQueries, viewQueriesDataSources, err := GetDependentViewGenerationQueries(queryGetter, dataSourceGetter, generationQuery)
 	if err != nil {
 		return nil, err
@@ -149,16 +153,23 @@ func GetGenerationQueryDependencies(
 		return nil, err
 	}
 
+	allDataSources := [][]*metering.ReportDataSource{
+		dataSourceDeps,
+		viewQueriesDataSources,
+		dynamicQueriesDataSources,
+	}
+
 	// deduplicate the list of ReportDataSources
 	seen := make(map[string]struct{})
-	allDs := append(viewQueriesDataSources, dynamicQueriesDataSources...)
 	var dataSources []*metering.ReportDataSource
-	for _, ds := range allDs {
-		if _, exists := seen[ds.Name]; exists {
-			continue
+	for _, dsList := range allDataSources {
+		for _, ds := range dsList {
+			if _, exists := seen[ds.Name]; exists {
+				continue
+			}
+			dataSources = append(dataSources, ds)
+			seen[ds.Name] = struct{}{}
 		}
-		dataSources = append(dataSources, ds)
-		seen[ds.Name] = struct{}{}
 	}
 
 	reports, err := GetDependentReports(reportGetter, generationQuery)
