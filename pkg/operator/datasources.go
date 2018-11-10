@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -134,6 +135,13 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			logger.WithError(err).Errorf("failed to update ReportDataSource TableName ***REMOVED***eld %q", tableName)
 			return err
 		}
+
+		// instead of immediately importing, return early after creating the
+		// table, to allow other tables to be created if a bunch of
+		// ReportDataSources are created at once. 2-5 seconds is good enough
+		// since we'll be blocked by other ReportDataSources when redelivered.
+		op.enqueueReportDataSourceAfter(dataSource, wait.Jitter(2*time.Second, 2.5))
+		return nil
 	}
 
 	if op.cfg.DisablePromsum {
