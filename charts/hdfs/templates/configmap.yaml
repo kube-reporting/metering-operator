@@ -53,6 +53,14 @@ data:
         <name>dfs.datanode.data.dir.perm</name>
         <value>{{ .Values.spec.config.datanodeDataDirPerms }}</value>
       </property>
+      <property>
+        <name>dfs.replication</name>
+        <value>{{ .Values.spec.config.replicationFactor }}</value>
+      </property>
+      <property>
+        <name>net.topology.script.file.name</name>
+        <value>/hadoop-config/topology-configuration.sh</value>
+      </property>
     </configuration>
   core-site.xml: |
     <configuration>
@@ -154,3 +162,70 @@ data:
         echo "found null namenode addresses in JMX metrics, unhealthy"
         exit 1
     fi
+
+  topology-configuration.sh: |
+    #!/bin/bash
+    # taken from https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/RackAwareness.html
+    # With this network topology, we are treating each datanode as a rack by using
+    # the podIP as the rack name.
+    # 1) 'echo $@' will echo all ARGV values to xargs.
+    # 2) 'xargs' will enforce that we print a single argv value per line
+    # 3) 'printf' will add the '/rack-' prefix to the podIP.
+    echo $@ | xargs -n1 printf '/rack-%s\n'
+
+  fix-under-replicated-files.sh: |
+    #!/bin/bash
+    # based on
+    # https://community.hortonworks.com/articles/4427/fix-under-replicated-blocks-in-hdfs-manually.html
+    #
+    # this script is intended to be run manually after changing the
+    # dfs.replication value or after scaling up hdfs datanodes and forcing
+    # under replicated files to have the correct replication value.
+    # takes two arguments, the replication factor, and optionally true/false
+    # to indicate if it should wait for each file to replicate.
+    set -e
+    REPLICATION_FACTOR="$1"
+    WAIT="$2"
+    if [ -z "$REPLICATION_FACTOR" ]; then
+      echo "Usage: $0 replication_factor [wait=true/false]"
+      exit 1
+    fi
+    rm -f /tmp/under_replicated_files
+    touch /tmp/under_replicated_files
+    echo "Running hdfs fsck to check for under replicated files"
+    hdfs fsck / > /tmp/fsck.log
+    # example output:
+    # /operator_metering/storage/datasource_node_allocatable_cpu_cores/20181016_210834_02359_srzkh_40207cb6-56fb-4aad-9428-acb203250be8:  Under replicated BP-27232867-172.16.2.102-1539711209651:blk_1073742397_1573. Target Replicas is 3 but found 1 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+    # /operator_metering/storage/scheduled_report_namespace_cpu_usage_daily/20181111_035359_00063_yihp2_885f5ff5-45dc-4a3e-acb1-0a39f7aff8ab:  Replica placement policy is violated for BP-27232867-172.16.2.102-1539711209651:blk_1073843950_103126. Block should be additionally replicated on 1 more rack(s). Total number of racks in the cluster: 3
+    UNDER_REP_REGEX='^(.*):[[:space:]]+Under replicated.*Target Replicas is ([0-9]+) but found ([0-9]) live.*'
+    NEEDS_REP_REGEX='^(.*):[[:space:]]+Replica placement policy is violated.*'
+    echo "Checking for files under replicated files. Replication factor: $REPLICATION_FACTOR"
+    while read line; do
+      if [[ $line =~ $UNDER_REP_REGEX ]]; then
+        HDFS_FILE="${BASH_REMATCH[1]}"
+        FILE_REP="${BASH_REMATCH[2]}"
+        LIVE_REPS="${BASH_REMATCH[3]}"
+        # first check if the replication factor is set correct for the file
+        if [ "$FILE_REP" != "$REPLICATION_FACTOR" ]; then
+          echo "$HDFS_FILE" >> /tmp/under_replicated_files
+        fi
+      # check for files which have replication set to the correct value but
+      # don't actually have the target number of replicas.
+      elif [[ "$WAIT" == "true" && $line =~ $NEEDS_REP_REGEX ]]; then
+          HDFS_FILE="${BASH_REMATCH[1]}"
+          echo "$HDFS_FILE" >> /tmp/under_replicated_files
+      fi
+    done < /tmp/fsck.log
+
+    # setup args for hdfs fs command
+    ARGS=(-setrep)
+    if [ "$WAIT" == "true" ]; then
+      ARGS+=(-w)
+    fi
+    ARGS+=($REPLICATION_FACTOR)
+    echo "Running hdfs fs to set replication"
+    while read hdfsfile; do
+      echo "Fixing $hdfsfile :"
+      hadoop fs "${ARGS[@]}" "$hdfsfile"
+    done < /tmp/under_replicated_files
+    echo "Done"
