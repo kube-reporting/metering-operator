@@ -73,6 +73,12 @@ func (cfg *TLSConfig) Valid() error {
 	return nil
 }
 
+type PrometheusConfig struct {
+	Address       string
+	SkipTLSVerify bool
+	BearerToken   string
+}
+
 type Config struct {
 	PodName    string
 	Hostname   string
@@ -81,7 +87,6 @@ type Config struct {
 
 	HiveHost         string
 	PrestoHost       string
-	PromHost         string
 	DisablePromsum   bool
 	EnableFinalizers bool
 
@@ -94,6 +99,7 @@ type Config struct {
 
 	APITLSConfig     TLSConfig
 	MetricsTLSConfig TLSConfig
+	PrometheusConfig PrometheusConfig
 }
 
 type Reporting struct {
@@ -371,7 +377,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	defer prestoQueryer.Close()
 	defer hiveQueryer.Close()
 
-	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
+	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusConfig.Address)
 	if err != nil {
 		return err
 	}
@@ -549,20 +555,27 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 }
 
 func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	transportConfig, err := op.kubeConfig.TransportConfig()
+	kubeTransportConfig, err := op.kubeConfig.TransportConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	var roundTripper http.RoundTripper
+	transportConfig := *kubeTransportConfig
+
 	if _, err := os.Stat(serviceServingCAFile); err == nil {
 		// use the service serving CA for prometheus
 		transportConfig.TLS.CAFile = serviceServingCAFile
-		roundTripper, err = transport.New(transportConfig)
-		if err != nil {
-			return nil, err
-		}
 		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	}
+
+	transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
+	if op.cfg.PrometheusConfig.BearerToken != "" {
+		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
+	}
+
+	roundTripper, err := transport.New(&transportConfig)
+	if err != nil {
+		return nil, err
 	}
 
 	return op.newPrometheusConn(promapi.Config{
