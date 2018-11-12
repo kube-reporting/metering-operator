@@ -36,8 +36,6 @@ metadata:
   name: "cluster-cpu-capacity"
   labels:
     operator-metering: "true"
-  labels:
-    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -63,31 +61,26 @@ spec:
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
-  - name: AggregatedReportName
+  - name: ClusterCpuCapacityReportName
   query: |
-    {|/* Default values */|}
-    {|- $inputs := dict "from" (generationQueryViewName "cluster-cpu-capacity-raw") "start" "timestamp"  "end" "timestamp" -|}
-    {|/* Handle aggregating a sub-report */|}
-    {|- if .Report.Inputs.AggregatedReportName -|}
-    {|- $_ := set $inputs "from" (.Report.Inputs.AggregatedReportName | scheduledReportTableName) -|}
-    {|- $_ := set $inputs "start" "period_start" -|}
-    {|- $_ := set $inputs "end" "period_end" -|}
-    {|- end -|}
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-    {|- if .Report.Inputs.AggregatedReportName -|}
+    {|- if .Report.Inputs.ClusterCpuCapacityReportName |}
       sum(total_cluster_capacity_cpu_core_hours) as total_cluster_capacity_cpu_core_hours,
       avg(avg_cluster_capacity_cpu_cores) as avg_cluster_capacity_cpu_cores,
       avg(avg_node_count) AS avg_node_count
+      FROM {| .Report.Inputs.ClusterCpuCapacityReportName | scheduledReportTableName |}
+      WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+      AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- else |}
       sum(cpu_core_seconds) / 60 / 60 as total_cluster_capacity_cpu_core_hours,
       avg(cpu_cores) as avg_cluster_capacity_cpu_cores,
       avg(node_count) AS avg_node_count
+      FROM {| generationQueryViewName "cluster-cpu-capacity-raw" |}
+      WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+      AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- end |}
-    FROM {| $inputs.from |}
-    WHERE "{| $inputs.start |}"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "{| $inputs.end |}"  < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
 
 ---
 
@@ -129,8 +122,6 @@ metadata:
   name: "cluster-memory-capacity"
   labels:
     operator-metering: "true"
-  labels:
-    operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -156,28 +147,23 @@ spec:
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
-  - name: AggregatedReportName
+  - name: ClusterMemoryCapacityReportName
   query: |
-    {|/* Default values */|}
-    {|- $inputs := dict "from" (generationQueryViewName "cluster-memory-capacity-raw") "start" "timestamp"  "end" "timestamp" -|}
-    {|/* Handle aggregating a sub-report */|}
-    {|- if .Report.Inputs.AggregatedReportName -|}
-    {|- $_ := set $inputs "from" (.Report.Inputs.AggregatedReportName | scheduledReportTableName) -|}
-    {|- $_ := set $inputs "start" "period_start" -|}
-    {|- $_ := set $inputs "end" "period_end" -|}
-    {|- end |}
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-    {|- if .Report.Inputs.AggregatedReportName |}
+    {|- if .Report.Inputs.ClusterMemoryCapacityReportName |}
       sum(total_cluster_capacity_memory_byte_hours) as total_cluster_capacity_memory_byte_hours,
       avg(avg_cluster_capacity_memory_bytes) as avg_cluster_capacity_memory_bytes,
       avg(avg_node_count) AS avg_node_count
+      FROM {| .Report.Inputs.ClusterMemoryCapacityReportName | scheduledReportTableName |}
+      WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+      AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- else |}
       sum(memory_byte_seconds) / 60 / 60 as total_cluster_capacity_memory_byte_hours,
       avg(memory_bytes) as avg_cluster_capacity_memory_bytes,
       avg(node_count) AS avg_node_count
+      FROM {| generationQueryViewName "cluster-memory-capacity-raw" |}
+      WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+      AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- end |}
-    FROM {| $inputs.from |}
-    WHERE "{| $inputs.start |}"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "{| $inputs.end |}"  < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
