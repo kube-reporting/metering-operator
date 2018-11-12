@@ -84,7 +84,6 @@ spec:
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY node, resource_id
-    ORDER BY node, resource_id ASC, node_capacity_cpu_core_seconds DESC
 
 ---
 
@@ -173,7 +172,6 @@ spec:
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY node, resource_id
-    ORDER BY node, resource_id ASC, node_allocatable_cpu_core_seconds DESC
 
 ---
 
