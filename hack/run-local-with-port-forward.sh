@@ -7,23 +7,26 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_NAMESPACE:?}"
 
 : "${METERING_PROMETHEUS_NAMESPACE:=openshift-monitoring}"
-: "${METERING_PROMTHEUS_LABEL_SELECTOR:=app=prometheus}"
+: "${METERING_PROMETHEUS_SVC:=prometheus-k8s}"
+: "${METERING_PROMETHEUS_SVC_PORT:=9091}"
+: "${METERING_PROMETHEUS_SCHEME:=https}"
 
 set -e -o pipefail
 trap 'jobs -p | xargs kill' EXIT
 
-PRESTO="$(kubectl get pods -n "$METERING_NAMESPACE" -l app=presto,presto=coordinator -o name | cut -d/ -f2)"
-HIVE="$(kubectl get pods -n "$METERING_NAMESPACE" -l app=hive,hive=server -o name | cut -d/ -f2)"
-PROM="$(kubectl get pods -n "$METERING_PROMETHEUS_NAMESPACE" -l "$METERING_PROMTHEUS_LABEL_SELECTOR" -o name | cut -d/ -f2 | head -n1)"
 
 echo Starting presto port-forward
-kubectl -n "$METERING_NAMESPACE" port-forward "$PRESTO" 9991:8080 &
+kubectl -n "$METERING_NAMESPACE" \
+    port-forward "svc/presto" 9991:8080 &
 
 echo Starting hive port-forward
-kubectl -n "$METERING_NAMESPACE" port-forward "$HIVE" 9992:10000 &
+kubectl -n "$METERING_NAMESPACE" \
+    port-forward "svc/hive-server" 9992:10000 &
 
 echo Starting Prometheus port-forward
-kubectl -n "$METERING_PROMETHEUS_NAMESPACE" port-forward "$PROM" 9993:9090 &
+kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
+    port-forward "svc/${METERING_PROMETHEUS_SVC}" \
+    9993:"${METERING_PROMETHEUS_SVC_PORT}" &
 
 sleep 6
 
@@ -35,7 +38,7 @@ set -x
     --namespace "$METERING_NAMESPACE" \
     --presto-host "127.0.0.1:9991" \
     --hive-host "127.0.0.1:9992" \
-    --prometheus-host "http://127.0.0.1:9993" \
+    --prometheus-host "${METERING_PROMETHEUS_SCHEME}://127.0.0.1:9993" \
     "$@" &
 
 wait
