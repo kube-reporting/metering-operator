@@ -2,6 +2,7 @@ package reporting
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"text/template"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/Masterminds/sprig"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
@@ -26,13 +28,14 @@ type ReportTemplateInfo struct {
 
 func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
-		"prestoTimestamp":             presto.Timestamp,
-		"reportTableName":             reportingutil.ReportTableName,
-		"scheduledReportTableName":    reportingutil.ScheduledReportTableName,
-		"dataSourceTableName":         reportingutil.DataSourceTableName,
-		"generationQueryViewName":     reportingutil.GenerationQueryViewName,
-		"billingPeriodTimestamp":      reportingutil.BillingPeriodTimestamp,
-		"renderReportGenerationQuery": renderReportGenerationQuery,
+		"prestoTimestamp":                 PrestoTimestamp,
+		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
+		"reportTableName":                 reportingutil.ReportTableName,
+		"scheduledReportTableName":        reportingutil.ScheduledReportTableName,
+		"dataSourceTableName":             reportingutil.DataSourceTableName,
+		"generationQueryViewName":         reportingutil.GenerationQueryViewName,
+		"billingPeriodTimestamp":          reportingutil.BillingPeriodTimestamp,
+		"renderReportGenerationQuery":     renderReportGenerationQuery,
 	}
 
 	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(queryTemplate)
@@ -76,4 +79,31 @@ func renderReportGenerationQuery(queryName string, tmplCtx *ReportQueryTemplateC
 		return "", fmt.Errorf("unable to render query %s, err: %v", queryName, err)
 	}
 	return renderedQuery, nil
+}
+
+func TimestampFormat(input interface{}, format string) (string, error) {
+	var err error
+	var d time.Time
+	switch v := input.(type) {
+	case time.Time:
+		d = v
+	case *time.Time:
+		if v == nil {
+			return "", errors.New("got nil timestamp")
+		}
+		d = *v
+	case string:
+		d, err = time.Parse(time.RFC3339, v)
+	default:
+		return "", fmt.Errorf("couldn't convert %#v to a Presto timestamp", input)
+	}
+	return d.Format(format), err
+}
+
+func PrometheusMetricPartitionFormat(input interface{}) (string, error) {
+	return TimestampFormat(input, prestostore.PrometheusMetricTimestampPartitionFormat)
+}
+
+func PrestoTimestamp(input interface{}) (string, error) {
+	return TimestampFormat(input, presto.TimestampFormat)
 }
