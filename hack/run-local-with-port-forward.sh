@@ -30,6 +30,12 @@ kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
 
 sleep 6
 
+ARGS=("$@")
+
+if [ "$METERING_PROMETHEUS_SCHEME" == "https" ]; then
+    ARGS+=(--prometheus-skip-tls-verify)
+***REMOVED***
+
 echo Starting reporting-operator
 set -x
 
@@ -39,6 +45,6 @@ set -x
     --presto-host "127.0.0.1:9991" \
     --hive-host "127.0.0.1:9992" \
     --prometheus-host "${METERING_PROMETHEUS_SCHEME}://127.0.0.1:9993" \
-    "$@" &
+    "${ARGS[@]}" &
 
 wait
