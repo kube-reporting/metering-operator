@@ -106,6 +106,9 @@ func getSchedule(reportSched cbTypes.ScheduledReportSchedule) (reportSchedule, e
 	var cronSpec string
 	switch reportSched.Period {
 	case cbTypes.ScheduledReportPeriodCron:
+		if reportSched.Cron == nil || reportSched.Cron.Expression == "" {
+			return nil, fmt.Errorf("spec.schedule.cron.expression must be specified!")
+		}
 		return cron.ParseStandard(reportSched.Cron.Expression)
 	case cbTypes.ScheduledReportPeriodHourly:
 		sched := reportSched.Hourly
