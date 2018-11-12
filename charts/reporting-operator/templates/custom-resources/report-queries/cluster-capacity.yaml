@@ -60,7 +60,6 @@ spec:
     unit: cpu_cores
   - name: avg_node_count
     type: double
-    unit: cpu_cores
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
@@ -154,7 +153,6 @@ spec:
     unit: memory_bytes
   - name: avg_node_count
     type: double
-    unit: memory_bytes
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
