@@ -14,7 +14,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
-func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
+func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns, partitions []hive.Column) error {
 	tableProperties, err := op.getHiveTableProperties(logger, storage, gvk.Kind)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly configured for %s %s, err: %v", gvk, obj.GetName(), err)
@@ -22,6 +22,7 @@ func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Ob
 	tableParams := hive.TableParameters{
 		Name:         tableName,
 		Columns:      columns,
+		Partitions:   partitions,
 		IgnoreExists: true,
 	}
 	return op.createTableWith(logger, obj, gvk, tableParams, *tableProperties)
