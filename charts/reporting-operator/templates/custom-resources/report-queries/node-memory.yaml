@@ -31,6 +31,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -38,7 +40,8 @@ spec:
           split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
           amount * timeprecision as node_capacity_memory_byte_seconds,
-          "timestamp"
+          "timestamp",
+          dt
       FROM {| dataSourceTableName "node-capacity-memory-bytes" |}
 
 ---
@@ -84,6 +87,8 @@ spec:
     FROM {| generationQueryViewName "node-memory-capacity-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 
 ---
@@ -121,6 +126,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   query: |
       SELECT labels['node'] as node,
           labels,
@@ -128,7 +135,8 @@ spec:
           split_part(split_part(element_at(labels, 'provider_id'), ':///', 2), '/', 2) as resource_id,
           timeprecision,
           amount * timeprecision as node_allocatable_memory_byte_seconds,
-          "timestamp"
+          "timestamp",
+          dt
       FROM {| dataSourceTableName "node-allocatable-memory-bytes" |}
 
 ---
@@ -174,6 +182,8 @@ spec:
     FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 
 ---
@@ -232,6 +242,8 @@ spec:
       FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+        AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+        AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     ), pod_memory_consumption AS (
       SELECT min("timestamp") as pod_usage_data_start,
         max("timestamp") as pod_usage_data_end,
@@ -239,6 +251,8 @@ spec:
       FROM {| generationQueryViewName "pod-memory-request-raw" |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+      AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+      AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
