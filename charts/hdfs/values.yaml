@@ -10,6 +10,7 @@ spec:
     namenodePort: 9820
     defaultFS: "hdfs://hdfs-namenode-0.hdfs-namenode:9820"
     datanodeDataDirPerms: "770"
+    replicationFactor: 3
 
   securityContext:
     runAsNonRoot: true
@@ -50,7 +51,7 @@ spec:
     annotations: {}
 
   namenode:
-    terminationGracePeriodSeconds: 10
+    terminationGracePeriodSeconds: 30
     resources:
       requests:
         memory: "350Mi"

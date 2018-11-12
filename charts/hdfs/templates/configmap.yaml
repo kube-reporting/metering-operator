@@ -53,6 +53,14 @@ data:
         <name>dfs.datanode.data.dir.perm</name>
         <value>{{ .Values.spec.con***REMOVED***g.datanodeDataDirPerms }}</value>
       </property>
+      <property>
+        <name>dfs.replication</name>
+        <value>{{ .Values.spec.con***REMOVED***g.replicationFactor }}</value>
+      </property>
+      <property>
+        <name>net.topology.script.***REMOVED***le.name</name>
+        <value>/hadoop-con***REMOVED***g/topology-con***REMOVED***guration.sh</value>
+      </property>
     </con***REMOVED***guration>
   core-site.xml: |
     <con***REMOVED***guration>
@@ -154,3 +162,70 @@ data:
         echo "found null namenode addresses in JMX metrics, unhealthy"
         exit 1
     ***REMOVED***
+
+  topology-con***REMOVED***guration.sh: |
+    #!/bin/bash
+    # taken from https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/RackAwareness.html
+    # With this network topology, we are treating each datanode as a rack by using
+    # the podIP as the rack name.
+    # 1) 'echo $@' will echo all ARGV values to xargs.
+    # 2) 'xargs' will enforce that we print a single argv value per line
+    # 3) 'printf' will add the '/rack-' pre***REMOVED***x to the podIP.
+    echo $@ | xargs -n1 printf '/rack-%s\n'
+
+  ***REMOVED***x-under-replicated-***REMOVED***les.sh: |
+    #!/bin/bash
+    # based on
+    # https://community.hortonworks.com/articles/4427/***REMOVED***x-under-replicated-blocks-in-hdfs-manually.html
+    #
+    # this script is intended to be run manually after changing the
+    # dfs.replication value or after scaling up hdfs datanodes and forcing
+    # under replicated ***REMOVED***les to have the correct replication value.
+    # takes two arguments, the replication factor, and optionally true/false
+    # to indicate if it should wait for each ***REMOVED***le to replicate.
+    set -e
+    REPLICATION_FACTOR="$1"
+    WAIT="$2"
+    if [ -z "$REPLICATION_FACTOR" ]; then
+      echo "Usage: $0 replication_factor [wait=true/false]"
+      exit 1
+    ***REMOVED***
+    rm -f /tmp/under_replicated_***REMOVED***les
+    touch /tmp/under_replicated_***REMOVED***les
+    echo "Running hdfs fsck to check for under replicated ***REMOVED***les"
+    hdfs fsck / > /tmp/fsck.log
+    # example output:
+    # /operator_metering/storage/datasource_node_allocatable_cpu_cores/20181016_210834_02359_srzkh_40207cb6-56fb-4aad-9428-acb203250be8:  Under replicated BP-27232867-172.16.2.102-1539711209651:blk_1073742397_1573. Target Replicas is 3 but found 1 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+    # /operator_metering/storage/scheduled_report_namespace_cpu_usage_daily/20181111_035359_00063_yihp2_885f5ff5-45dc-4a3e-acb1-0a39f7aff8ab:  Replica placement policy is violated for BP-27232867-172.16.2.102-1539711209651:blk_1073843950_103126. Block should be additionally replicated on 1 more rack(s). Total number of racks in the cluster: 3
+    UNDER_REP_REGEX='^(.*):[[:space:]]+Under replicated.*Target Replicas is ([0-9]+) but found ([0-9]) live.*'
+    NEEDS_REP_REGEX='^(.*):[[:space:]]+Replica placement policy is violated.*'
+    echo "Checking for ***REMOVED***les under replicated ***REMOVED***les. Replication factor: $REPLICATION_FACTOR"
+    while read line; do
+      if [[ $line =~ $UNDER_REP_REGEX ]]; then
+        HDFS_FILE="${BASH_REMATCH[1]}"
+        FILE_REP="${BASH_REMATCH[2]}"
+        LIVE_REPS="${BASH_REMATCH[3]}"
+        # ***REMOVED***rst check if the replication factor is set correct for the ***REMOVED***le
+        if [ "$FILE_REP" != "$REPLICATION_FACTOR" ]; then
+          echo "$HDFS_FILE" >> /tmp/under_replicated_***REMOVED***les
+        ***REMOVED***
+      # check for ***REMOVED***les which have replication set to the correct value but
+      # don't actually have the target number of replicas.
+      elif [[ "$WAIT" == "true" && $line =~ $NEEDS_REP_REGEX ]]; then
+          HDFS_FILE="${BASH_REMATCH[1]}"
+          echo "$HDFS_FILE" >> /tmp/under_replicated_***REMOVED***les
+      ***REMOVED***
+    done < /tmp/fsck.log
+
+    # setup args for hdfs fs command
+    ARGS=(-setrep)
+    if [ "$WAIT" == "true" ]; then
+      ARGS+=(-w)
+    ***REMOVED***
+    ARGS+=($REPLICATION_FACTOR)
+    echo "Running hdfs fs to set replication"
+    while read hdfs***REMOVED***le; do
+      echo "Fixing $hdfs***REMOVED***le :"
+      hadoop fs "${ARGS[@]}" "$hdfs***REMOVED***le"
+    done < /tmp/under_replicated_***REMOVED***les
+    echo "Done"
