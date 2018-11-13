@@ -73,6 +73,12 @@ func (cfg *TLSCon***REMOVED***g) Valid() error {
 	return nil
 }
 
+type PrometheusCon***REMOVED***g struct {
+	Address       string
+	SkipTLSVerify bool
+	BearerToken   string
+}
+
 type Con***REMOVED***g struct {
 	PodName    string
 	Hostname   string
@@ -81,7 +87,6 @@ type Con***REMOVED***g struct {
 
 	HiveHost         string
 	PrestoHost       string
-	PromHost         string
 	DisablePromsum   bool
 	EnableFinalizers bool
 
@@ -94,6 +99,7 @@ type Con***REMOVED***g struct {
 
 	APITLSCon***REMOVED***g     TLSCon***REMOVED***g
 	MetricsTLSCon***REMOVED***g TLSCon***REMOVED***g
+	PrometheusCon***REMOVED***g PrometheusCon***REMOVED***g
 }
 
 type Reporting struct {
@@ -371,7 +377,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	defer prestoQueryer.Close()
 	defer hiveQueryer.Close()
 
-	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PromHost)
+	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusCon***REMOVED***g.Address)
 	if err != nil {
 		return err
 	}
@@ -549,20 +555,27 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 }
 
 func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	transportCon***REMOVED***g, err := op.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
+	kubeTransportCon***REMOVED***g, err := op.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
 	if err != nil {
 		return nil, err
 	}
 
-	var roundTripper http.RoundTripper
+	transportCon***REMOVED***g := *kubeTransportCon***REMOVED***g
+
 	if _, err := os.Stat(serviceServingCAFile); err == nil {
 		// use the service serving CA for prometheus
 		transportCon***REMOVED***g.TLS.CAFile = serviceServingCAFile
-		roundTripper, err = transport.New(transportCon***REMOVED***g)
-		if err != nil {
-			return nil, err
-		}
 		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	}
+
+	transportCon***REMOVED***g.TLS.Insecure = op.cfg.PrometheusCon***REMOVED***g.SkipTLSVerify
+	if op.cfg.PrometheusCon***REMOVED***g.BearerToken != "" {
+		transportCon***REMOVED***g.BearerToken = op.cfg.PrometheusCon***REMOVED***g.BearerToken
+	}
+
+	roundTripper, err := transport.New(&transportCon***REMOVED***g)
+	if err != nil {
+		return nil, err
 	}
 
 	return op.newPrometheusConn(promapi.Con***REMOVED***g{
