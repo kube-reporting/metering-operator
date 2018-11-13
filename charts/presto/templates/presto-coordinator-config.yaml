@@ -38,5 +38,5 @@ data:
     -XX:+UseGCOverheadLimit
     -XX:+ExplicitGCInvokesConcurrent
     -XX:+HeapDumpOnOutOfMemoryError
-    -XX:OnOutOfMemoryError=kill -9 %p
+    -XX:+ExitOnOutOfMemoryError
     -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml
