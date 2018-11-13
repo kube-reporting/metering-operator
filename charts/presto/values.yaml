@@ -11,6 +11,7 @@ spec:
     config:
       discoveryURI: http://presto:8080
       environment: production
+      # maxQueryLength: 1000000
       hiveMetastoreURI: thrift://hive-metastore:9083
 
     coordinator:
