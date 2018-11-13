@@ -2,6 +2,7 @@ reporting-operator:
   spec:
     con***REMOVED***g:
       prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+      maxQueryLength: "10000000"
       tls:
         enabled: true
         createSecret: false
@@ -22,6 +23,8 @@ reporting-operator:
 presto:
   spec:
     presto:
+      con***REMOVED***g:
+        maxQueryLength: "10000000"
       securityContext:
         fsGroup: null
     hive:
