@@ -20,6 +20,15 @@ spec:
   - name: Table Name
     type: string
     JSONPath: .status.tableName
+  - name: Earliest Metric
+    type: string
+    JSONPath: .status.prometheusMetricImportStatus.earliestImportedMetricTime
+  - name: Newest Metric
+    type: string
+    JSONPath: .status.prometheusMetricImportStatus.newestImportedMetricTime
+  - name: Last Import Time
+    type: string
+    JSONPath: .status.prometheusMetricImportStatus.lastImportTime
   - name: Age
     type: date
     JSONPath: .metadata.creationTimestamp

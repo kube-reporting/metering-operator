@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -49,10 +50,13 @@ const (
 	defaultResyncPeriod = time.Minute * 15
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+	prestoUsername       = "reporting-operator"
 
-	DefaultPrometheusQueryInterval  = time.Minute * 5
-	DefaultPrometheusQueryStepSize  = time.Minute
-	DefaultPrometheusQueryChunkSize = time.Minute * 5
+	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
+	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
+	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
+	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
+	DefaultPrometheusDataSourceMaxBackfillImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
 )
 
 type TLSConfig struct {
@@ -80,7 +84,6 @@ type PrometheusConfig struct {
 }
 
 type Config struct {
-	PodName    string
 	Hostname   string
 	Namespace  string
 	Kubeconfig string
@@ -95,7 +98,10 @@ type Config struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PrometheusQueryConfig cbTypes.PrometheusQueryConfig
+	PrometheusQueryConfig                         cbTypes.PrometheusQueryConfig
+	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
+	PrometheusDataSourceMaxBackfillImportDuration time.Duration
+	PrometheusDataSourceGlobalImportFromTime      *time.Time
 
 	LeaderLeaseDuration time.Duration
 
@@ -160,6 +166,8 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	if err := cfg.MetricsTLSConfig.Valid(); err != nil {
 		return nil, err
 	}
+
+	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
 
 	configOverrides := &clientcmd.ConfigOverrides{}
 	var clientConfig clientcmd.ClientConfig
@@ -354,7 +362,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
+		connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
 		prestoConn, err := presto.NewPrestoConnWithRetry(shutdownCtx, op.logger, connStr, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
@@ -466,7 +474,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(op.logger.Infof)
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.Namespace)})
-	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.PodName})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
 		op.cfg.Namespace, "reporting-operator-leader-lease", op.kubeClient,
