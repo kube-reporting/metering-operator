@@ -66,7 +66,9 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
-	startCmd.Flags().StringVar(&cfg.PromHost, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
+	startCmd.Flags().StringVar(&cfg.PrometheusConfig.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
+	startCmd.Flags().BoolVar(&cfg.PrometheusConfig.SkipTLSVerify, "prometheus-skip-tls-verify", false, "Skip TLS verification")
+	startCmd.Flags().StringVar(&cfg.PrometheusConfig.BearerToken, "prometheus-bearer-token", "", "Bearer token to authenticate against Prometheus.")
 
 	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
