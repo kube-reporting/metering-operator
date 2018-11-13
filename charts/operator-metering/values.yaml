@@ -2,9 +2,12 @@ reporting-operator:
   spec:
     config:
       prometheusURL: "http://prometheus-k8s.monitoring.svc:9090/"
+      prestoMaxQueryLength: "10000000"
 presto:
   spec:
     presto:
+      config:
+        maxQueryLength: "10000000"
       securityContext:
         fsGroup: 0
     hive:
