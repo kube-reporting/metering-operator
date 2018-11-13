@@ -104,6 +104,18 @@ data:
         echo "Setting HADOOP_HEAPSIZE to ${HADOOP_HEAPSIZE}M"
     fi
 
+    # Set garbage collection settings
+    export GC_SETTINGS="-XX:+UseG1GC -XX:G1HeapRegionSize=32M -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps"
+    # Set JMX options
+    export JMX_OPTIONS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1026"
+    # Set garbage collection logs
+    export GC_SETTINGS="${GC_SETTINGS} -Xloggc:${HADOOP_LOG_DIR}/gc-rm.log-$(date +'%Y%m%d%H%M')"
+
+    # set name node options
+    export HDFS_NAMENODE_OPTS="${HDFS_NAMENODE_OPTS} -Dhadoop.security.logger=INFO,RFAS ${GC_SETTINGS} ${JMX_OPTIONS}"
+    # set datanode options
+    export HDFS_DATANODE_OPTS="${HDFS_DATANODE_OPTS} -Dhadoop.security.logger=ERROR,RFAS ${GC_SETTINGS} ${JMX_OPTIONS}"
+
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then
       if [ -w /etc/passwd ]; then
