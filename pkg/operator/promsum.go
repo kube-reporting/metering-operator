@@ -17,19 +17,6 @@ import (
 )
 
 const (
-	// Keep a cap on the number of time ranges we query per reconciliation.
-	// If we get to defaultMaxPromTimeRanges, it means we're very backlogged,
-	// or we have a small chunkSize and making tons of small queries all one
-	// after another will cause undesired resource spikes, or both.  This will
-	// make it take longer to catch up, but should help prevent memory from
-	// exploding when we end up with a ton of time ranges.
-
-	// defaultMaxPromTimeRanges is the number of time ranges for 24 hours if we
-	// query in 5 minute chunks (the default).
-	defaultMaxPromTimeRanges = (24 * 60) / 5 // 24 hours, 60 minutes per hour, default chunkSize is 5 minutes
-
-	defaultMaxTimeDuration = 24 * time.Hour
-
 	prometheusMetricNamespace = "metering"
 )
 
@@ -207,6 +194,9 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 				"tableName":        reportingutil.DataSourceTableName(reportDataSource.Name),
 			})
 			importCfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+			// ignore any global ImportFrom con***REMOVED***guration since this is an
+			// on-demand import
+			importCfg.ImportFromTime = nil
 			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery)
 
 			select {
@@ -286,18 +276,32 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 	chunkSize = chunkSize.Truncate(time.Second)
 	stepSize = stepSize.Truncate(time.Second)
 
+	// Keep a cap on the number of time ranges we query per reconciliation.
+	// If we get to defaultMaxPromTimeRanges, it means we're very backlogged,
+	// or we have a small chunkSize and making tons of small queries all one
+	// after another will cause undesired resource spikes, or both.  This will
+	// make it take longer to catch up, but should help prevent memory from
+	// exploding when we end up with a ton of time ranges.
+
+	// defaultMaxPromTimeRanges is the max number of Prometheus queries and the
+	// max amount of StorePrometheusMetrics calls (roughly equivalent to presto
+	// queries) we make in a single import. We set it to the number of queries
+	// it would take to chunk up our MaxQueryRangeDuration.
+	defaultMaxPromTimeRanges := int64(op.cfg.PrometheusDataSourceMaxQueryRangeDuration / chunkSize)
+
 	return prestostore.Con***REMOVED***g{
-		PrometheusQuery:       reportPromQuery.Spec.Query,
-		PrestoTableName:       tableName,
-		ChunkSize:             chunkSize,
-		StepSize:              stepSize,
-		MaxTimeRanges:         defaultMaxPromTimeRanges,
-		MaxQueryRangeDuration: defaultMaxTimeDuration,
+		PrometheusQuery:           reportPromQuery.Spec.Query,
+		PrestoTableName:           tableName,
+		ChunkSize:                 chunkSize,
+		StepSize:                  stepSize,
+		MaxTimeRanges:             defaultMaxPromTimeRanges,
+		MaxQueryRangeDuration:     op.cfg.PrometheusDataSourceMaxQueryRangeDuration,
+		MaxBack***REMOVED***llImportDuration: op.cfg.PrometheusDataSourceMaxBack***REMOVED***llImportDuration,
+		ImportFromTime:            op.cfg.PrometheusDataSourceGlobalImportFromTime,
 	}
 }
 
-func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) (*prestostore.PrometheusImporter, error) {
-	cfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
+func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery, cfg prestostore.Con***REMOVED***g) (*prestostore.PrometheusImporter, error) {
 	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery)
 	var promConn prom.API
 	var err error

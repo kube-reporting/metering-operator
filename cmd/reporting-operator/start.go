@@ -24,7 +24,8 @@ var (
 	defaultPromHost      = "http://prometheus-k8s.monitoring.svc:9090/"
 	defaultLeaseDuration = time.Second * 60
 	// cfg is the con***REMOVED***g for our operator
-	cfg operator.Con***REMOVED***g
+	cfg                            operator.Con***REMOVED***g
+	prometheusDataSourceImportFrom string
 
 	logLevelStr         string
 	logFullTimestamp    bool
@@ -80,6 +81,10 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration, "promsum-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().IntVar(&cfg.PrestoMaxQueryLength, "presto-max-query-length", 0, "If a non-zero positive value, speci***REMOVED***es the max length a Presto query can be. This is used to control buffer sizes used for queries.")
 
+	startCmd.Flags().DurationVar(&cfg.PrometheusDataSourceMaxQueryRangeDuration, "prometheus-datasource-max-query-range-duration", operator.DefaultPrometheusDataSourceMaxQueryRangeDuration, "If non-zero speci***REMOVED***es the maximum duration of time to query from Prometheus. When back***REMOVED***lling, this value is used for the ChunkSize when querying Prometheus.")
+	startCmd.Flags().DurationVar(&cfg.PrometheusDataSourceMaxBack***REMOVED***llImportDuration, "prometheus-datasource-max-import-back***REMOVED***ll-duration", operator.DefaultPrometheusDataSourceMaxBack***REMOVED***llImportDuration, "If non-zero speci***REMOVED***es the maximum duration of time before the current to look back for data when back***REMOVED***lling. Has no effect if prometheus-datasource-import-from is set.")
+	startCmd.Flags().StringVar(&prometheusDataSourceImportFrom, "prometheus-datasource-import-from", "", "If non-empty, expects an RFC3339 timestamp indicating when Prometheus ReportDataSource data should be back***REMOVED***lled from.")
+
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 
 	startCmd.Flags().BoolVar(&cfg.APITLSCon***REMOVED***g.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traf***REMOVED***x")
@@ -107,6 +112,7 @@ func main() {
 	if err := SetFlagsFromEnv(startCmd.Flags(), "REPORTING_OPERATOR"); err != nil {
 		log.WithError(err).Fatalf("error setting flags from environment variables: %v", err)
 	}
+
 	if err := rootCmd.Execute(); err != nil {
 		log.WithError(err).Fatalf("error executing command: %v", err)
 	}
@@ -122,12 +128,18 @@ func startReporting(cmd *cobra.Command, args []string) {
 		cfg.Namespace = string(namespace)
 	}
 
-	cfg.PodName = os.Getenv("POD_NAME")
-
 	var err error
 	cfg.Hostname, err = os.Hostname()
 	if err != nil {
 		logger.Fatalf("unable to get hostname, err: %s", err)
+	}
+
+	if prometheusDataSourceImportFrom != "" {
+		importFrom, err := time.Parse(time.RFC3339, prometheusDataSourceImportFrom)
+		if err != nil {
+			log.WithError(err).Fatalf("Invalid RFC3339 timestamp for --prometheus-datasource-import-from, %s: %v", prometheusDataSourceImportFrom, err)
+		}
+		cfg.PrometheusDataSourceGlobalImportFromTime = &importFrom
 	}
 
 	signalStopCh := setupSignals()

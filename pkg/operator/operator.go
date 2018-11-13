@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -49,10 +50,13 @@ const (
 	defaultResyncPeriod = time.Minute * 15
 
 	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+	prestoUsername       = "reporting-operator"
 
-	DefaultPrometheusQueryInterval  = time.Minute * 5
-	DefaultPrometheusQueryStepSize  = time.Minute
-	DefaultPrometheusQueryChunkSize = time.Minute * 5
+	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
+	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
+	DefaultPrometheusQueryChunkSize                      = 5 * time.Minute  // the default value for how much data we will insert into Presto per Prometheus query.
+	DefaultPrometheusDataSourceMaxQueryRangeDuration     = 10 * time.Minute // how much data we will query from Prometheus at once
+	DefaultPrometheusDataSourceMaxBack***REMOVED***llImportDuration = 2 * time.Hour    // how far we will query for backlogged data.
 )
 
 type TLSCon***REMOVED***g struct {
@@ -80,7 +84,6 @@ type PrometheusCon***REMOVED***g struct {
 }
 
 type Con***REMOVED***g struct {
-	PodName    string
 	Hostname   string
 	Namespace  string
 	Kubecon***REMOVED***g string
@@ -95,7 +98,10 @@ type Con***REMOVED***g struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PrometheusQueryCon***REMOVED***g cbTypes.PrometheusQueryCon***REMOVED***g
+	PrometheusQueryCon***REMOVED***g                         cbTypes.PrometheusQueryCon***REMOVED***g
+	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
+	PrometheusDataSourceMaxBack***REMOVED***llImportDuration time.Duration
+	PrometheusDataSourceGlobalImportFromTime      *time.Time
 
 	LeaderLeaseDuration time.Duration
 
@@ -160,6 +166,8 @@ func New(logger log.FieldLogger, cfg Con***REMOVED***g) (*Reporting, error) {
 	if err := cfg.MetricsTLSCon***REMOVED***g.Valid(); err != nil {
 		return nil, err
 	}
+
+	logger.Debugf("con***REMOVED***g: %s", spew.Sprintf("%+v", cfg))
 
 	con***REMOVED***gOverrides := &clientcmd.Con***REMOVED***gOverrides{}
 	var clientCon***REMOVED***g clientcmd.ClientCon***REMOVED***g
@@ -354,7 +362,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		var err error
-		connStr := fmt.Sprintf("http://root@%s?catalog=hive&schema=default", op.cfg.PrestoHost)
+		connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
 		prestoConn, err := presto.NewPrestoConnWithRetry(shutdownCtx, op.logger, connStr, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
@@ -466,7 +474,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(op.logger.Infof)
 	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.Namespace)})
-	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.PodName})
+	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.Con***REMOVED***gMapsResourceLock,
 		op.cfg.Namespace, "reporting-operator-leader-lease", op.kubeClient,

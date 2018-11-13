@@ -59,5 +59,12 @@ type PrometheusMetricsDataSource struct {
 }
 
 type ReportDataSourceStatus struct {
-	TableName string `json:"tableName,omitempty"`
+	TableName                    string                        `json:"tableName,omitempty"`
+	PrometheusMetricImportStatus *PrometheusMetricImportStatus `json:"prometheusMetricImportStatus,omitempty"`
+}
+
+type PrometheusMetricImportStatus struct {
+	LastImportTime             *meta.Time `json:"lastImportTime,omitempty"`
+	EarliestImportedMetricTime *meta.Time `json:"earliestImportedMetricTime,omitempty"`
+	NewestImportedMetricTime   *meta.Time `json:"newestImportedMetricTime,omitempty"`
 }
