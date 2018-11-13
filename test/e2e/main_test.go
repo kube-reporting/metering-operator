@@ -171,6 +171,18 @@ func TestReportingE2E(t *testing.T) {
 			timeout:       reportTestTimeout,
 		},
 		{
+			name:          "cluster-cpu-usage",
+			queryName:     "cluster-cpu-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
+			name:          "cluster-memory-usage",
+			queryName:     "cluster-memory-usage",
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+		},
+		{
 			name:          "aws-ec2-cluster-cost",
 			queryName:     "aws-ec2-cluster-cost",
 			newReportFunc: testFramework.NewSimpleReport,
