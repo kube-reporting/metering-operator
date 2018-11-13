@@ -90,6 +90,8 @@ type Con***REMOVED***g struct {
 	DisablePromsum   bool
 	EnableFinalizers bool
 
+	PrestoMaxQueryLength int
+
 	LogDMLQueries bool
 	LogDDLQueries bool
 
@@ -389,9 +391,14 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		}
 	}
 
+	var prestoQueryBufferPool *sync.Pool
+	if op.cfg.PrestoMaxQueryLength > 0 {
+		bufferPool := prestostore.NewBufferPool(op.cfg.PrestoMaxQueryLength)
+		prestoQueryBufferPool = &bufferPool
+	}
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(prestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
-	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer)
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer, prestoQueryBufferPool)
 	op.prestoViewCreator = &prestoViewCreator{queryer: prestoQueryer}
 
 	hiveTableManager := reporting.NewHiveTableManager(hiveQueryer)

@@ -115,6 +115,11 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: enable-***REMOVED***nalizers
+        - name: REPORTING_OPERATOR_PRESTO_MAX_QUERY_LENGTH
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: presto-max-query-length
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
             con***REMOVED***gMapKeyRef:

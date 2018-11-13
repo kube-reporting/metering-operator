@@ -19,6 +19,8 @@ spec:
     promsumChunkSize: "5m"
     promsumStepSize: "60s"
 
+    prestoMaxQueryLength: "0"
+
     logLevel: "info"
     logReports: "false"
     logDDLQueries: "false"
