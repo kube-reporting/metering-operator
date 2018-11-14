@@ -13,12 +13,12 @@ spec:
       environment: production
       # maxQueryLength: 1000000
       hiveMetastoreURI: thrift://hive-metastore:9083
+      nodeSchedulerIncludeCoordinator: true
 
     coordinator:
       terminationGracePeriodSeconds: 30
       config:
         logLevel: info
-        nodeSchedulerIncludeCoordinator: true
         taskMaxWorkerThreads: null
         taskMinDrivers: null
 
