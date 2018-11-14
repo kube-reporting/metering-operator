@@ -34,6 +34,9 @@ var (
 		{Name: "timePrecision", Type: "double"},
 		{Name: "labels", Type: "map<string, string>"},
 	}
+	promsumHivePartitions = []hive.Column{
+		{Name: "dt", Type: "string"},
+	}
 
 	awsBillingReportDatasourcePartitionsGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -125,7 +128,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := reportingutil.DataSourceTableName(dataSource.Name)
-		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns)
+		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns, promsumHivePartitions)
 		if err != nil {
 			return err
 		}
