@@ -21,3 +21,6 @@ data:
   presto-host: {{ .Values.spec.con***REMOVED***g.prestoHost | quote }}
   hive-host: {{ .Values.spec.con***REMOVED***g.hiveHost | quote }}
   presto-max-query-length: {{ .Values.spec.con***REMOVED***g.prestoMaxQueryLength | quote }}
+  prometheus-datasource-max-query-range-duration: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceMaxQueryRangeDuration | quote }}
+  prometheus-datasource-max-import-back***REMOVED***ll-duration: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceMaxImportBack***REMOVED***llDuration | quote }}
+  prometheus-datasource-import-from: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceImportFrom | quote }}
