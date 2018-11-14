@@ -568,7 +568,11 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
 	}
 
-	transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
+	if op.cfg.PrometheusConfig.SkipTLSVerify {
+		transportConfig.TLS.Insecure = op.cfg.PrometheusConfig.SkipTLSVerify
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
+	}
 	if op.cfg.PrometheusConfig.BearerToken != "" {
 		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
 	}
