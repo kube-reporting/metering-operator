@@ -19,7 +19,10 @@ spec:
     promsumChunkSize: "5m"
     promsumStepSize: "60s"
 
-    prestoMaxQueryLength: "0"
+    prestoMaxQueryLength: null
+    prometheusDatasourceMaxQueryRangeDuration: null
+    prometheusDatasourceMaxImportBackfillDuration: null
+    prometheusDatasourceImportFrom: null
 
     logLevel: "info"
     logReports: "false"
