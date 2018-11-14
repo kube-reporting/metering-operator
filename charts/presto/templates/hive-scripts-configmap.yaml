@@ -50,8 +50,16 @@ data:
     ln -s -f /hive-con***REMOVED***g/hive-log4j2.properties $HIVE_HOME/conf/hive-log4j2.properties
     ln -s -f /hive-con***REMOVED***g/hive-exec-log4j2.properties $HIVE_HOME/conf/hive-exec-log4j2.properties
 
+    # Set garbage collection settings
+    export GC_SETTINGS="-XX:+UseG1GC -XX:G1HeapRegionSize=32M -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps"
+    # Set JMX options
+    export JMX_OPTIONS="-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1026"
+    # Set garbage collection logs
+    export GC_SETTINGS="${GC_SETTINGS} -Xloggc:${HADOOP_LOG_DIR}/gc-rm.log-$(date +'%Y%m%d%H%M')"
+
     export HIVE_LOGLEVEL="${HIVE_LOGLEVEL:-INFO}"
+    export HADOOP_OPTS="${HADOOP_OPTS} ${GC_SETTINGS} ${JMX_OPTIONS}"
     export HIVE_METASTORE_HADOOP_OPTS=" -Dhive.log.level=${HIVE_LOGLEVEL} "
-    export HIVE_OPTS="$HIVE_OPTS --hiveconf hive.root.logger=${HIVE_LOGLEVEL},console "
+    export HIVE_OPTS="${HIVE_OPTS} --hiveconf hive.root.logger=${HIVE_LOGLEVEL},console "
 
     exec $@
