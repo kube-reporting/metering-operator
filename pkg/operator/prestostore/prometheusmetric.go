@@ -147,7 +147,7 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 		newBufferSize := (bytesToWrite + queryBuf.Len())
 
 		// if writing the current metricValue to the buffer would exceed the
-		// bufferCapacity, preform the insert query, and reset the buffer
+		// bufferCapacity, perform the insert query, and reset the buffer
 		if newBufferSize > queryCap {
 			err := presto.InsertInto(queryer, tableName, queryBuf.String())
 			if err != nil {
