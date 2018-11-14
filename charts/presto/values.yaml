@@ -21,6 +21,24 @@ spec:
         logLevel: info
         taskMaxWorkerThreads: null
         taskMinDrivers: null
+        jvm:
+          G1HeapRegionSize: null
+          parallelGCThreads: null
+          concGCThreads: null
+          permSize: null
+          maxGcPauseMillis: 200
+          initiatingHeapOccupancyPercent: null
+          # use 50% of our memory limit by default for java heap size
+          percentMemoryLimitAsHeap: "50"
+          extraFlags: []
+
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "2"
+        limits:
+          memory: "2Gi"
+          cpu: "2"
 
       nodeSelector: {}
 
@@ -34,14 +52,6 @@ spec:
                 values:
                 - presto
             topologyKey: "kubernetes.io/hostname"
-
-      resources:
-        requests:
-          memory: "1536Mi"
-          cpu: "300m"
-        limits:
-          memory: "2048Mi"
-          cpu: "1000m"
 
     worker:
       replicas: 0
@@ -50,6 +60,23 @@ spec:
         logLevel: info
         taskMaxWorkerThreads: null
         taskMinDrivers: null
+        jvm:
+          G1HeapRegionSize: null
+          parallelGCThreads: null
+          concGCThreads: null
+          permSize: null
+          maxGcPauseMillis: null
+          initiatingHeapOccupancyPercent: null
+          percentMemoryLimitAsHeap: "50"
+          extraFlags: []
+
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "2"
+        limits:
+          memory: "2Gi"
+          cpu: "2"
 
       nodeSelector: {}
 
@@ -63,14 +90,6 @@ spec:
                 values:
                 - presto
             topologyKey: "kubernetes.io/hostname"
-
-      resources:
-        requests:
-          memory: "1536Mi"
-          cpu: "300m"
-        limits:
-          memory: "2048Mi"
-          cpu: "1000m"
 
     labels: {}
     annotations: {}
