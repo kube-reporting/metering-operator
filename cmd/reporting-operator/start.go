@@ -78,6 +78,8 @@ func init() {
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.QueryInterval.Duration, "promsum-interval", operator.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", operator.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.ChunkSize.Duration, "promsum-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
+	startCmd.Flags().IntVar(&cfg.PrestoMaxQueryLength, "presto-max-query-length", 0, "If a non-zero positive value, specifies the max length a Presto query can be. This is used to control buffer sizes used for queries.")
+
 	startCmd.Flags().DurationVar(&cfg.LeaderLeaseDuration, "lease-duration", defaultLeaseDuration, "controls how much time elapses before declaring leader")
 
 	startCmd.Flags().BoolVar(&cfg.APITLSConfig.UseTLS, "use-tls", false, "If true, uses TLS to secure HTTP API traffix")

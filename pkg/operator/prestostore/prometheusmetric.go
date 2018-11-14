@@ -13,18 +13,14 @@ import (
 )
 
 const (
-	// prestoQueryCap is the maximum payload size a single SQL statement can contain
-	// before Presto will error due to the payload being too large.
-	prestoQueryCap = 1000000
+	// defaultPrestoQueryCap is the default maximum payload size a single SQL
+	// statement can contain before Presto will error due to the payload being
+	// too large.
+	defaultPrestoQueryCap = 1000000
 )
 
 var (
-	bufPool = sync.Pool{
-		New: func() interface{} {
-			// capacity prestoQueryCap, length 0
-			return bytes.NewBuffer(make([]byte, 0, prestoQueryCap))
-		},
-	}
+	defaultQueryBufferPool = NewBufferPool(defaultPrestoQueryCap)
 
 	promsumColumns = []presto.Column{
 		{Name: "amount", Type: "double"},
@@ -33,6 +29,15 @@ var (
 		{Name: "labels", Type: "map(varchar, varchar)"},
 	}
 )
+
+func NewBufferPool(capacity int) sync.Pool {
+	return sync.Pool{
+		New: func() interface{} {
+			return bytes.NewBuffer(make([]byte, 0, capacity))
+		},
+	}
+
+}
 
 type PrometheusMetricsStorer interface {
 	StorePrometheusMetrics(ctx context.Context, tableName string, metrics []*PrometheusMetric) error
@@ -53,17 +58,25 @@ type PrometheusMetricsRepo interface {
 }
 
 type prometheusMetricRepo struct {
-	queryer db.Queryer
+	queryer         db.Queryer
+	queryBufferPool sync.Pool
 }
 
-func NewPrometheusMetricsRepo(queryer db.Queryer) *prometheusMetricRepo {
+func NewPrometheusMetricsRepo(queryer db.Queryer, queryBufferPool *sync.Pool) *prometheusMetricRepo {
+	if queryBufferPool == nil {
+		queryBufferPool = &defaultQueryBufferPool
+	}
 	return &prometheusMetricRepo{
-		queryer: queryer,
+		queryer:         queryer,
+		queryBufferPool: *queryBufferPool,
 	}
 }
 
 func (r *prometheusMetricRepo) StorePrometheusMetrics(ctx context.Context, tableName string, metrics []*PrometheusMetric) error {
-	return StorePrometheusMetrics(ctx, r.queryer, tableName, metrics)
+	queryBuf := r.queryBufferPool.Get().(*bytes.Buffer)
+	queryBuf.Reset()
+	defer r.queryBufferPool.Put(queryBuf)
+	return StorePrometheusMetricsWithBuffer(queryBuf, ctx, r.queryer, tableName, metrics)
 }
 
 func (r *prometheusMetricRepo) GetPrometheusMetrics(tableName string, start, end time.Time) ([]*PrometheusMetric, error) {
@@ -98,17 +111,15 @@ type PrometheusMetric struct {
 	Timestamp time.Time         `json:"timestamp"`
 }
 
-// StorePrometheusMetrics handles storing Prometheus metrics into the specified
-// Presto table.
-func StorePrometheusMetrics(ctx context.Context, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
-	queryBuf := bufPool.Get().(*bytes.Buffer)
-	queryBuf.Reset()
-	defer bufPool.Put(queryBuf)
+// storePrometheusMetricsWithBuffer handles storing Prometheus metrics into the
+// specified Presto table.
+func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Context, queryer db.Queryer, tableName string, metrics []*PrometheusMetric) error {
+	bufferCapacity := queryBuf.Cap()
 
 	insertStatementLength := len(presto.FormatInsertQuery(tableName, ""))
 	// calculate the queryCap with the "INSERT INTO $table_name" portion
 	// accounted for
-	queryCap := prestoQueryCap - insertStatementLength
+	queryCap := bufferCapacity - insertStatementLength
 
 	for _, metric := range metrics {
 		metricValue := generatePrometheusMetricSQLValues(metric)
@@ -130,13 +141,13 @@ func StorePrometheusMetrics(ctx context.Context, queryer db.Queryer, tableName s
 			queryBuf.WriteString(",")
 		}
 
-		// There's a character limit of prestoQueryCap on insert
+		// There's a character limit of bufferCapacity on insert
 		// queries, so let's chunk them at that limit.
 		bytesToWrite := len(metricValue)
 		newBufferSize := (bytesToWrite + queryBuf.Len())
 
 		// if writing the current metricValue to the buffer would exceed the
-		// prestoQueryCap, preform the insert query, and reset the buffer
+		// bufferCapacity, perform the insert query, and reset the buffer
 		if newBufferSize > queryCap {
 			err := presto.InsertInto(queryer, tableName, queryBuf.String())
 			if err != nil {

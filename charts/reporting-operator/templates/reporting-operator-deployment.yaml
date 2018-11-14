@@ -115,6 +115,11 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: enable-finalizers
+        - name: REPORTING_OPERATOR_PRESTO_MAX_QUERY_LENGTH
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-max-query-length
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
             configMapKeyRef:

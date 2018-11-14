@@ -20,6 +20,9 @@ data:
     coordinator=false
     discovery.uri={{ .Values.spec.presto.config.discoveryURI }}
     node-scheduler.include-coordinator={{ .Values.spec.presto.coordinator.config.nodeSchedulerIncludeCoordinator }}
+{{- if .Values.spec.presto.config.maxQueryLength }}
+    query.max-length={{ .Values.spec.presto.config.maxQueryLength }}
+{{- end }}
 {{- if .Values.spec.presto.coordinator.config.taskConcurrency }}
     task.concurrency={{ .Values.spec.presto.coordinator.config.taskConcurrency }}
 {{- end }}
