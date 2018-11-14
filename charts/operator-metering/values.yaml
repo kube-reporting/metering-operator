@@ -2,9 +2,12 @@ reporting-operator:
   spec:
     con***REMOVED***g:
       prometheusURL: "http://prometheus-k8s.monitoring.svc:9090/"
+      prestoMaxQueryLength: "10000000"
 presto:
   spec:
     presto:
+      con***REMOVED***g:
+        maxQueryLength: "10000000"
       securityContext:
         fsGroup: 0
     hive:

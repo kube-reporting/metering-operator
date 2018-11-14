@@ -20,3 +20,4 @@ data:
   leader-lease-duration: {{ .Values.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
   presto-host: {{ .Values.spec.con***REMOVED***g.prestoHost | quote }}
   hive-host: {{ .Values.spec.con***REMOVED***g.hiveHost | quote }}
+  presto-max-query-length: {{ .Values.spec.con***REMOVED***g.prestoMaxQueryLength | quote }}
