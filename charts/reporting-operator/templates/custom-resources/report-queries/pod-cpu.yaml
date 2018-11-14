@@ -34,6 +34,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   query: |
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
@@ -42,7 +44,8 @@ spec:
           amount as pod_request_cpu_cores,
           timeprecision,
           amount * timeprecision as pod_request_cpu_core_seconds,
-          "timestamp"
+          "timestamp",
+          dt
       FROM {| dataSourceTableName "pod-request-cpu-cores" |}
       WHERE element_at(labels, 'node') IS NOT NULL
 
@@ -84,6 +87,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   query: |
       SELECT labels['pod'] as pod,
           labels['namespace'] as namespace,
@@ -92,7 +97,8 @@ spec:
           amount as pod_usage_cpu_cores,
           timeprecision,
           amount * timeprecision as pod_usage_cpu_core_seconds,
-          "timestamp"
+          "timestamp",
+          dt
       FROM {| dataSourceTableName "pod-usage-cpu-cores" |}
       WHERE element_at(labels, 'node') IS NOT NULL
 
@@ -152,6 +158,8 @@ spec:
     FROM {| generationQueryViewName "pod-cpu-request-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
 
@@ -211,6 +219,8 @@ spec:
     FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
 
@@ -262,6 +272,8 @@ spec:
     FROM {| generationQueryViewName "pod-cpu-request-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
     ORDER BY pod_request_cpu_core_seconds DESC
 
@@ -313,6 +325,8 @@ spec:
     FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
     ORDER BY pod_usage_cpu_core_seconds DESC
 
@@ -367,6 +381,8 @@ spec:
       FROM {| generationQueryViewName "node-cpu-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+        AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+        AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     ), pod_cpu_consumption AS (
       SELECT pod,
               namespace,
@@ -377,6 +393,8 @@ spec:
       FROM {| generationQueryViewName "pod-cpu-request-raw" |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+      AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+      AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
       GROUP BY pod, namespace, node
     )
     SELECT

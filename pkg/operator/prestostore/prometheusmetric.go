@@ -177,6 +177,8 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 // column "timestamp" type: "timestamp"
 // column "timePrecision" type: "double"
 // column "labels" type: "map<string, string>"
+// the following columns are partition columns:
+// column "dt" type: "string"
 func generatePrometheusMetricSQLValues(metric *PrometheusMetric) string {
 	var keys []string
 	var vals []string
@@ -186,8 +188,16 @@ func generatePrometheusMetricSQLValues(metric *PrometheusMetric) string {
 	}
 	keyString := "ARRAY[" + strings.Join(keys, ",") + "]"
 	valString := "ARRAY[" + strings.Join(vals, ",") + "]"
-	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s))",
-		metric.Amount, metric.Timestamp.Format(presto.TimestampFormat), metric.StepSize.Seconds(), keyString, valString)
+	dt := PrometheusMetricTimestampPartition(metric.Timestamp)
+	return fmt.Sprintf("(%f,timestamp '%s',%f,map(%s,%s),'%s')",
+		metric.Amount, metric.Timestamp.Format(presto.TimestampFormat), metric.StepSize.Seconds(), keyString, valString, dt,
+	)
+}
+
+const PrometheusMetricTimestampPartitionFormat = "2006-01-02"
+
+func PrometheusMetricTimestampPartition(t time.Time) string {
+	return t.UTC().Format(PrometheusMetricTimestampPartitionFormat)
 }
 
 func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.Time) ([]*PrometheusMetric, error) {

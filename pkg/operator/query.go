@@ -50,11 +50,13 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 
 func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generationQuery *cbTypes.ReportGenerationQuery) error {
 	var viewName string
+	createView := false
 	if generationQuery.Spec.View.Disabled {
 		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping view creation")
 	} else if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
 		viewName = reportingutil.GenerationQueryViewName(generationQuery.Name)
+		createView = true
 	} else {
 		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
 		viewName = generationQuery.Status.ViewName
@@ -72,7 +74,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		return fmt.Errorf("unable to validate ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
 	}
 
-	if viewName != "" {
+	if createView {
 		tmplCtx := &reporting.ReportQueryTemplateContext{
 			DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
 			Report:                  nil,

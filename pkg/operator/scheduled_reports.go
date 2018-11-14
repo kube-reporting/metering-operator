@@ -427,7 +427,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		}
 
 		columns := reportingutil.GenerateHiveColumns(genQuery)
-		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns)
+		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("ScheduledReport"), report.Spec.Output, tableName, columns, nil)
 		if err != nil {
 			logger.WithError(err).Error("error creating report table for scheduledReport")
 			return err
