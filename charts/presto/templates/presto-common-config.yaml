@@ -30,12 +30,24 @@ data:
         echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
     ***REMOVED***
 
-    # add heapsize to jvm con***REMOVED***g if not already
-    JVM_CONFIG="${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
-    if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
-      FLAG="-Xmx${MAX_HEAPSIZE}M"
-      echo "Adding $FLAG to $JVM_CONFIG"
-      echo "$FLAG" >> "$JVM_CONFIG"
+    # set min to max to avoid pauses caused by heap expansion
+    export MIN_HEAPSIZE="$MAX_HEAPSIZE"
+
+    if [ -n "$MAX_HEAPSIZE" ]; then
+      # add heapsize to jvm con***REMOVED***g if not already
+      JVM_CONFIG="${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
+      if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
+        FLAG="-Xmx${MAX_HEAPSIZE}M"
+        echo "Adding $FLAG to $JVM_CONFIG"
+        echo "$FLAG" >> "$JVM_CONFIG"
+      ***REMOVED***
+    ***REMOVED***
+    if [ -n "$MIN_HEAPSIZE" ]; then
+      if ! grep -q -F 'Xms' "$JVM_CONFIG"; then
+        FLAG="-Xms${MIN_HEAPSIZE}M"
+        echo "Adding $FLAG to $JVM_CONFIG"
+        echo "$FLAG" >> "$JVM_CONFIG"
+      ***REMOVED***
     ***REMOVED***
 
     # add node id to node con***REMOVED***g

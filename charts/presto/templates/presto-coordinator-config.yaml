@@ -17,10 +17,11 @@ data:
   con***REMOVED***g.properties: |
     http-server.http.port=8080
     jmx.rmiserver.port=8081
+    jmx.rmiregistry.port=8081
     coordinator=true
     discovery-server.enabled=true
     discovery.uri={{ .Values.spec.presto.con***REMOVED***g.discoveryURI }}
-    node-scheduler.include-coordinator={{ .Values.spec.presto.coordinator.con***REMOVED***g.nodeSchedulerIncludeCoordinator }}
+    node-scheduler.include-coordinator={{ .Values.spec.presto.con***REMOVED***g.nodeSchedulerIncludeCoordinator }}
 {{- if .Values.spec.presto.con***REMOVED***g.maxQueryLength }}
     query.max-length={{ .Values.spec.presto.con***REMOVED***g.maxQueryLength }}
 {{- end }}
@@ -37,9 +38,36 @@ data:
   jvm.con***REMOVED***g: |
     -server
     -XX:+UseG1GC
-    -XX:G1HeapRegionSize=32M
     -XX:+UseGCOverheadLimit
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.G1HeapRegionSize }}
+    -XX:G1HeapRegionSize={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.G1HeapRegionSize }}
+{{- end }}
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.parallelGCThreads }}
+    -XX:ParallelGCThreads={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.parallelGCThreads }}
+{{- end }}
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.concGCThreads }}
+    -XX:ConcGCThreads={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.concGCThreads }}
+{{- end }}
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.permSize }}
+    -XX:PermSize={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.permSize }}
+{{- end }}
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.maxGcPauseMillis }}
+    -XX:MaxGCPauseMillis={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.maxGcPauseMillis }}
+{{- end }}
+{{- if .Values.spec.presto.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
+    -XX:InitiatingHeapOccupancyPercent={{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
+{{- end }}
+{{- range .Values.spec.presto.coordinator.con***REMOVED***g.jvm.extraFlags }}
+    {{ . }}
+{{- end }}
     -XX:+ExplicitGCInvokesConcurrent
     -XX:+HeapDumpOnOutOfMemoryError
     -XX:+ExitOnOutOfMemoryError
     -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml
+    -Dcom.sun.management.jmxremote
+    -Dcom.sun.management.jmxremote.local.only=false
+    -Dcom.sun.management.jmxremote.ssl=false
+    -Dcom.sun.management.jmxremote.authenticate=false
+    -Dcom.sun.management.jmxremote.port=8081
+    -Dcom.sun.management.jmxremote.rmi.port=8081
+    -Djava.rmi.server.hostname=127.0.0.1
