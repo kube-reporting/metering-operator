@@ -46,8 +46,6 @@ connector.name=jmx
     resourceFieldRef:
       containerName: presto
       resource: limits.memory
-- name: JAVA_MAX_MEM_RATIO
-  value: "50"
 {{- end }}
 
 {{- define "hive-env" }}

@@ -17,8 +17,8 @@ Operator Metering requires the following components:
     - The prometheus-operator repository's [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
     - At a minimum, we require kube-state-metrics, node-exporter, and built-in Kubernetes target metrics.
     - Openshift 3.10 or newer includes monitoring via the [openshift-montoring playbook](https://github.com/openshift/openshift-ansible/tree/master/playbooks/openshift-monitoring).
-- 4GB Memory and 2 CPU Cores available cluster capacity.
-- At least 1 node with 2GB available memory (the highest memory request for a single Operator Metering Pod)
+- 4GB Memory and 4 CPU Cores available cluster capacity.
+- Minimum resources needed for the largest single pod is 2 GB of memory and 2 CPU cores.
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly configured kubectl to access the Kubernetes cluster.
 
