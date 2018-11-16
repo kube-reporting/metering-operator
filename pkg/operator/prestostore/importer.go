@@ -12,11 +12,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 )
 
-const (
-	// cap the maximum importer.cfg.ChunkSize
-	maxChunkDuration = 24 * time.Hour
-)
-
 type ImporterMetricsCollectors struct {
 	TotalImportsCounter     prometheus.Counter
 	FailedImportsCounter    prometheus.Counter
@@ -50,17 +45,19 @@ type PrometheusImporter struct {
 	// lastTimestamp and metrics fields
 	importLock sync.Mutex
 
-	//lastTimestamp is the lastTimestamp stored for this PrometheusImporter
+	// lastTimestamp is the lastTimestamp stored for this PrometheusImporter
 	lastTimestamp *time.Time
 }
 
 type Config struct {
-	PrometheusQuery       string
-	PrestoTableName       string
-	ChunkSize             time.Duration
-	StepSize              time.Duration
-	MaxTimeRanges         int64
-	MaxQueryRangeDuration time.Duration
+	PrometheusQuery           string
+	PrestoTableName           string
+	ChunkSize                 time.Duration
+	StepSize                  time.Duration
+	MaxTimeRanges             int64
+	MaxQueryRangeDuration     time.Duration
+	ImportFromTime            *time.Time
+	MaxBackfillImportDuration time.Duration
 }
 
 func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometheusMetricsRepo PrometheusMetricsRepo, clock clock.Clock, cfg Config, collectors ImporterMetricsCollectors) *PrometheusImporter {
@@ -105,46 +102,55 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 
 	endTime := importer.clock.Now().UTC()
 
-	// if importer.lastTimestamp is null then it's because we errored sometime
+	cfg := importer.cfg
+
+	// if importer.lastTimestamp is null then it's because we haven't run
+	// before, we have been restarted (error, or not) and do not know the
 	// last time we collected and need to re-query Presto to figure out
 	// the last timestamp
 	if importer.lastTimestamp == nil {
 		var err error
-		importer.logger.Debugf("lastTimestamp for table %s: isn't known, querying for timestamp", importer.cfg.PrestoTableName)
-		importer.lastTimestamp, err = importer.prometheusMetricsRepo.GetLastTimestampForTable(importer.cfg.PrestoTableName)
+		importer.logger.Debugf("lastTimestamp for table %s: isn't known, querying for timestamp", cfg.PrestoTableName)
+		importer.lastTimestamp, err = importer.prometheusMetricsRepo.GetLastTimestampForTable(cfg.PrestoTableName)
 		if err != nil {
-			importer.logger.WithError(err).Errorf("unable to get last timestamp for table %s", importer.cfg.PrestoTableName)
+			importer.logger.WithError(err).Errorf("unable to get last timestamp for table %s", cfg.PrestoTableName)
 			return nil, err
 		}
 	}
 
 	var startTime time.Time
+	// if lastTimestamp is still nil, but we didn't error than there is no
+	// last timestamp and this is the first collection, if not then our query
+	// above found a timestamp in the table
 	if importer.lastTimestamp != nil {
-		importer.logger.Debugf("lastTimestamp for table %s: %s", importer.cfg.PrestoTableName, importer.lastTimestamp.String())
-
+		importer.logger.Debugf("lastTimestamp for table %s: %s", cfg.PrestoTableName, importer.lastTimestamp.String())
 		// We don't want to duplicate the importer.lastTimestamp metric so add
 		// the step size so that we start at the next interval no longer in
 		// our range.
-		startTime = importer.lastTimestamp.Add(importer.cfg.StepSize)
+		startTime = importer.lastTimestamp.Add(cfg.StepSize)
 	} else {
-		// Looks like we haven't populated any data in this table yet.
-		// Let's backfill our last 1 chunk.
-		// we multiple by 2 because the most recent chunk will have a
-		// chunkEnd == endTime, so it won't be queried, so this gets the chunk
-		// before the latest
-		startTime = endTime.Add(-2 * importer.cfg.ChunkSize)
-		importer.logger.Debugf("no data in data store %s yet", importer.cfg.PrestoTableName)
+		// check if we're supposed to start from a specific
+		// time, and if not backfill a default amount
+		if cfg.ImportFromTime != nil {
+			importer.logger.Debugf("importFromTimestamp for table %s: %s", cfg.PrestoTableName, cfg.ImportFromTime.String())
+			startTime = *cfg.ImportFromTime
+		} else {
+			importer.logger.Debugf("no lastTimestamp or importFromTime for table %s: backfilling %s", cfg.PrestoTableName, cfg.MaxBackfillImportDuration)
+			startTime = endTime.Add(-cfg.MaxBackfillImportDuration)
+		}
+		importer.logger.Infof("no data in table %s: backfilling from %s until %s", cfg.PrestoTableName, startTime, endTime)
 	}
 
 	// If the startTime is too far back, we should limit this run to
-	// maxChunkDuration so that if we're stopped for an extended amount of time,
-	// this function won't return a slice with too many time ranges.
+	// cfg.MaxQueryRangeDuration so that if we're stopped for an
+	// extended amount of time, this function won't return a slice with too
+	// many time ranges.
 	totalChunkDuration := startTime.Sub(endTime)
-	if totalChunkDuration >= maxChunkDuration {
-		endTime = startTime.Add(maxChunkDuration)
+	if totalChunkDuration >= cfg.MaxQueryRangeDuration {
+		endTime = startTime.Add(cfg.MaxQueryRangeDuration)
 	}
 
-	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, importer.cfg, allowIncompleteChunks)
+	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, cfg, allowIncompleteChunks)
 	if err != nil {
 		importer.logger.WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what

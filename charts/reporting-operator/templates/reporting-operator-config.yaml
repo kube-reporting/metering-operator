@@ -21,3 +21,6 @@ data:
   presto-host: {{ .Values.spec.config.prestoHost | quote }}
   hive-host: {{ .Values.spec.config.hiveHost | quote }}
   presto-max-query-length: {{ .Values.spec.config.prestoMaxQueryLength | quote }}
+  prometheus-datasource-max-query-range-duration: {{ .Values.spec.config.prometheusDatasourceMaxQueryRangeDuration | quote }}
+  prometheus-datasource-max-import-backfill-duration: {{ .Values.spec.config.prometheusDatasourceMaxImportBackfillDuration | quote }}
+  prometheus-datasource-import-from: {{ .Values.spec.config.prometheusDatasourceImportFrom | quote }}

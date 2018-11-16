@@ -191,13 +191,27 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 
 func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 	curReportDataSource := cur.(*cbTypes.ReportDataSource)
+	prevReportDataSource := prev.(*cbTypes.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
 		op.deleteReportDataSource(curReportDataSource)
 		return
 	}
 
 	// we allow periodic resyncs to trigger ReportDataSources even
-	// if they're not changed to ensure failed ones eventually get re-tried
+	// if they're not changed to ensure failed ones eventually get re-tried.
+	// however, if we know that it's a Prometheus ReportDataSource where the
+	// MetricImportStatus is all that changed, we can safely assume that this
+	// update came from the operator updating that field and we can ignore this
+	// update.
+	isProm := curReportDataSource.Spec.Promsum != nil
+	if isProm {
+		sameSpec := reflect.DeepEqual(curReportDataSource.Spec, prevReportDataSource.Spec)
+		importStatusChanged := !reflect.DeepEqual(curReportDataSource.Status.PrometheusMetricImportStatus, prevReportDataSource.Status.PrometheusMetricImportStatus)
+		if sameSpec && importStatusChanged {
+			return
+		}
+	}
+
 	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }

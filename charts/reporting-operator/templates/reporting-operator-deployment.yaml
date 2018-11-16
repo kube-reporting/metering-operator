@@ -120,6 +120,25 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: presto-max-query-length
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_QUERY_RANGE_DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-datasource-max-query-range-duration
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-datasource-max-import-backfill-duration
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_IMPORT_FROM
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-datasource-import-from
+              optional: true
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
             configMapKeyRef:
