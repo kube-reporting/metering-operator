@@ -1,19 +1,6 @@
-## Prometheus URL
+# Common con***REMOVED***guration
 
-By default, the Metering assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090` within the cluster.
-If your not using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.con***REMOVED***g.prometheusURL` con***REMOVED***guration option.
-
-Below is an example of con***REMOVED***guring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
-
-```
-spec:
-  reporting-operator:
-    spec:
-      con***REMOVED***g:
-        prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
-```
-
-> Note: currently we do not support https connections or authentication to Prometheus except for in Openshift, but support for it is being developed.
+This document contains example con***REMOVED***gurations for con***REMOVED***guration that spans one or more components.
 
 ## Resource requests and limits
 
@@ -34,3 +21,10 @@ See [latest-versions.yaml][latest-versions] for an example of setting the reposi
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 [node-selectors-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-node-selectors.yaml
 [resource-limits]: ../manifests/metering-con***REMOVED***g/resource-limits.yaml
+[route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
+[kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
+[load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+[node-port-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+[service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certi***REMOVED***cate-secrets
+[oauth-proxy]: https://github.com/openshift/oauth-proxy
+[expose-route-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/expose-route.yaml
