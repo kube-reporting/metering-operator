@@ -53,9 +53,9 @@ $ cp manifests/metering-con***REMOVED***g/default.yaml metering-custom.yaml
 ```
 
 For developers, the most common change is modifying the image tag, con***REMOVED***g, and resource limits.
-Take a look at `manifests/metering-con***REMOVED***g/custom-values.yaml` to get an
+Take a look at the [common con***REMOVED***guration docs](common-con***REMOVED***guration.md) to get an
 idea of what you can modify that relates to con***REMOVED***guration and resource limits, and
-`manifests/metering-con***REMOVED***g/latest-versions.yaml` to see  how to change the
+`manifests/metering-con***REMOVED***g/latest-versions.yaml` to see how to change the
 image tag of each component.
 
 ```

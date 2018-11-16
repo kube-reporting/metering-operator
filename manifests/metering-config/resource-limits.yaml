@@ -1,0 +1,83 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      resources:
+        requests:
+          memory: "50Mi"
+          cpu: "50m"
+        limits:
+          memory: "150Mi"
+          cpu: "100m"
+  presto:
+    spec:
+      presto:
+        coordinator:
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+        worker:
+          replicas: 0
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+      hive:
+        metastore:
+          resources:
+            requests:
+              memory: "650Mi"
+              cpu: "500m"
+            limits:
+              memory: "650Mi"
+              cpu: "500m"
+          storage:
+            create: true
+            # Default to null, which means using the default storage class
+            class: null
+            size: "5Gi"
+        server:
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "100m"
+            limits:
+              memory: "500Mi"
+              cpu: "100m"
+  hdfs:
+    spec:
+      datanode:
+        replicas: 1
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "250m"
+          limits:
+            memory: "250Mi"
+            cpu: "250m"
+        storage:
+          # Default to null, which means using the default storage class
+          class: null
+          size: "5Gi"
+      namenode:
+        resources:
+          requests:
+            memory: "350Mi"
+            cpu: "250m"
+          limits:
+            memory: "350Mi"
+            cpu: "250m"
+        storage:
+          # Default to null, which means using the default storage class
+          class: null
+          size: "5Gi"
