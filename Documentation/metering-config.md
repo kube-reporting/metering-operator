@@ -8,6 +8,11 @@ For details on different types of configuration read the relevant document:
 
 - [common configuration options](common-configuration.md)
   - [pod resource requests and limits](common-configuration.md#resource-requests-and-limits)
+  - [node selectors](common-configuration.md#node-selectors)
+  - [image repositories and tags](common-configuration.md#image-repositories-and-tags)
+- [configuring reporting-operator](configuring-reporting-operator.md)
+  - [set the Prometheus URL](configuring-reporting-operator.md#prometheus-url)
+  - [exposing the reporting API](configuring-reporting-operator.md#exposing-the-reporting-api)
 - [configuring storage](configuring-storage.md)
   - [storing data in s3](configuring-storage.md#storing-data-in-s3)
 - [configuring the Hive metastore](configuring-hive-metastore.md)
