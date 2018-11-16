@@ -79,4 +79,4 @@ kubectl delete -n $METERING_NAMESPACE clusterserviceversion-v1s -l operator-mete
 [install-olm]: https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#install-the-latest-released-version-of-olm-for-upstream-kubernetes
 [metering-subscription]: ../manifests/deploy/generic/alm/metering.subscription.yaml
 [configuring-metering]: metering-config.md
-[example-config]: ../manifests/metering-config/custom-values.yaml
+[example-config]: ../manifests/metering-config/default.yaml

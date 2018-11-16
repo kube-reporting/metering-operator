@@ -53,9 +53,9 @@ $ cp manifests/metering-config/default.yaml metering-custom.yaml
 ```
 
 For developers, the most common change is modifying the image tag, config, and resource limits.
-Take a look at `manifests/metering-config/custom-values.yaml` to get an
+Take a look at the [common configuration docs](common-configuration.md) to get an
 idea of what you can modify that relates to configuration and resource limits, and
-`manifests/metering-config/latest-versions.yaml` to see  how to change the
+`manifests/metering-config/latest-versions.yaml` to see how to change the
 image tag of each component.
 
 ```
