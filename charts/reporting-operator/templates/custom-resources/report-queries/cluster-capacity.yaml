@@ -13,6 +13,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   - name: cpu_cores
     type: double
   - name: cpu_core_seconds
@@ -22,11 +24,12 @@ spec:
   query: |
     SELECT
       "timestamp",
+      dt,
       sum(node_capacity_cpu_cores) as cpu_cores,
       sum(node_capacity_cpu_core_seconds) as cpu_core_seconds,
       count(*) AS node_count
     FROM {| generationQueryViewName "node-cpu-capacity-raw" |}
-    GROUP BY "timestamp"
+    GROUP BY "timestamp", dt
 
 ---
 
@@ -80,6 +83,8 @@ spec:
       FROM {| generationQueryViewName "cluster-cpu-capacity-raw" |}
       WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+      AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+      AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     {|- end |}
 
 ---
@@ -99,6 +104,8 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: string
   - name: memory_bytes
     type: double
   - name: memory_byte_seconds
@@ -108,11 +115,12 @@ spec:
   query: |
     SELECT
       "timestamp",
+      dt,
       sum(node_capacity_memory_bytes) as memory_bytes,
       sum(node_capacity_memory_byte_seconds) as memory_byte_seconds,
       count(*) AS node_count
     FROM {| generationQueryViewName "node-memory-capacity-raw" |}
-    GROUP BY "timestamp"
+    GROUP BY "timestamp", dt
 
 ---
 
@@ -166,4 +174,6 @@ spec:
       FROM {| generationQueryViewName "cluster-memory-capacity-raw" |}
       WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+      AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+      AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     {|- end |}
