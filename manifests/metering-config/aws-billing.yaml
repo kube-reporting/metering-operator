@@ -1,0 +1,28 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      config:
+        # Replace these with your own AWS credentials
+        awsAccessKeyID: "REPLACEME"
+        awsSecretAccessKey: "REPLACEME"
+
+        defaultReportDataSources:
+          aws-billing:
+            spec:
+              awsBilling:
+                source:
+                  # Replace these with where your AWS billing reports are
+                  # stored in S3.
+                  bucket: "your-aws-cost-report-bucket"
+                  prefix: "path/to/report"
+                  region: "your-buckets-region"
+  presto:
+    spec:
+      config:
+        # Replace these with your own AWS credentials
+        awsAccessKeyID: "REPLACEME"
+        awsSecretAccessKey: "REPLACEME"

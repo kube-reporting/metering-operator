@@ -13,6 +13,7 @@ spec:
          type: "hive"
          hive:
            tableProperties:
+             # do not change this
              location: "/user/hive/warehouse"
 
   presto:
@@ -21,6 +22,7 @@ spec:
         sharedVolume:
           enabled: true
           storage:
+            # change REPLACEME to the name of your PVC
             persistentVolumeClaimStorageClass: REPLACEME
 
   hdfs:
