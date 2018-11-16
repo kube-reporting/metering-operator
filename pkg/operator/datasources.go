@@ -25,6 +25,10 @@ import (
 const (
 	reportDataSourceFinalizer = cbTypes.GroupName + "/reportdatasource"
 	partitionUpdateInterval   = 30 * time.Minute
+	// allowIncompleteChunks must be true generally if we have a large
+	// chunkSize because otherwise we will wait for an entire chunks worth of
+	// data before importing metrics into Presto.
+	allowIncompleteChunks = true
 )
 
 var (
@@ -55,7 +59,7 @@ func init() {
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
 	logger.Infof("ReportDataSource worker started")
-	const maxRequeues = 10
+	const maxRequeues = 20
 	for op.processResource(logger, op.syncReportDataSource, "ReportDataSource", op.reportDataSourceQueue, maxRequeues) {
 	}
 }
@@ -167,6 +171,8 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		"tableName":        tableName,
 	})
 
+	importerCfg := op.newPromImporterCfg(dataSource, reportPromQuery)
+
 	// wrap in a closure to handle lock and unlock of the mutex
 	importer, err := func() (*prestostore.PrometheusImporter, error) {
 		op.importersMu.Lock()
@@ -174,12 +180,11 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		importer, exists := op.importers[dataSourceName]
 		if exists {
 			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating con***REMOVED***guration", dataSourceName)
-			cfg := op.newPromImporterCfg(dataSource, reportPromQuery)
-			importer.UpdateCon***REMOVED***g(cfg)
+			importer.UpdateCon***REMOVED***g(importerCfg)
 			return importer, nil
 		}
 		// don't already have an importer, so create a new one
-		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery)
+		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery, importerCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -190,15 +195,75 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return err
 	}
 
-	_, err = importer.ImportFromLastTimestamp(context.Background(), false)
+	importTime := op.clock.Now().UTC()
+	results, err := importer.ImportFromLastTimestamp(context.Background(), allowIncompleteChunks)
 	if err != nil {
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
+	numResultsImported := len(results.ProcessedTimeRanges)
 
-	importInterval := op.getQueryIntervalForReportDataSource(dataSource)
-	nextImport := op.clock.Now().Add(importInterval).UTC()
-	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSourceName, importInterval, nextImport)
-	op.enqueueReportDataSourceAfter(dataSource, importInterval)
+	// default to importing at the con***REMOVED***gured import interval
+	importDelay := op.getQueryIntervalForReportDataSource(dataSource)
+
+	var earliestImportedMetricTime, newestImportedMetricTime *metav1.Time
+	if dataSource.Status.PrometheusMetricImportStatus != nil {
+		if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime != nil {
+			earliestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime
+		}
+		if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime != nil {
+			newestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime
+		}
+	}
+
+	// determine if we need to adjust our next import and update the status
+	// information if we've imported new metrics.
+	if numResultsImported != 0 {
+		***REMOVED***rstTimeRange := results.ProcessedTimeRanges[0]
+		lastTimeRange := results.ProcessedTimeRanges[len(results.ProcessedTimeRanges)-1]
+		earliestTS := ***REMOVED***rstTimeRange.Start
+
+		// if there is no existing timestamp then this must be the ***REMOVED***rst import
+		// and we should set the earliestImportedMetricTime
+		if earliestImportedMetricTime == nil {
+			earliestImportedMetricTime = &metav1.Time{earliestTS}
+		} ***REMOVED*** if earliestImportedMetricTime.After(earliestTS) {
+			dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
+			// TODO(chance): Look at adding an error to the status.
+			return nil // strop processing this ReportDataSource
+		}
+
+		lastTS := lastTimeRange.End
+		if newestImportedMetricTime == nil || newestImportedMetricTime.Time.Before(lastTS) {
+			newestImportedMetricTime = &metav1.Time{lastTS}
+		}
+		// the data we collected is farther back than 1.5 their chunkSize, so requeue sooner
+		// since we're backlogged. We use 1.5 because being behind 1 full chunk
+		// is typical, but we shouldn't be 2 full chunks after catching up
+		backlogDetectionDuration := time.Duration(1.5*importerCfg.ChunkSize.Seconds()) * time.Second
+		backlogDuration := op.clock.Now().Sub(lastTS)
+		if backlogDuration > backlogDetectionDuration {
+			// import delay has jitter so that processing backlogged
+			// ReportDataSources happens in a more randomized order to allow
+			// all of them to get processed when the queue is blocked.
+			importDelay = wait.Jitter(5*time.Second, 2)
+			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSourceName, lastTS, backlogDuration, importDelay)
+		}
+	}
+
+	// Update the status to indicate where we are in the metric import process
+	dataSource.Status.PrometheusMetricImportStatus = &cbTypes.PrometheusMetricImportStatus{
+		EarliestImportedMetricTime: earliestImportedMetricTime,
+		NewestImportedMetricTime:   newestImportedMetricTime,
+		LastImportTime:             &metav1.Time{importTime},
+	}
+	dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+	if err != nil {
+		return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSourceName, err)
+	}
+
+	nextImport := op.clock.Now().Add(importDelay).UTC()
+	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSourceName, importDelay, nextImport)
+	op.enqueueReportDataSourceAfter(dataSource, importDelay)
 	return nil
 }
 
