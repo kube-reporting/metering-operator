@@ -35,6 +35,9 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     IMAGE_PULL_SECRET_TEXT="imagePullSecrets: [ { name: \"$METERING_PULL_SECRET_NAME\" } ]"
 fi
 
+CUR_DATE="$(date +%s)"
+DATE_ANNOTATION="\"metering.deploy-custom/deploy-time\": \"$CUR_DATE\""
+
 cat <<EOF > "$METERING_CR_FILE"
 apiVersion: metering.openshift.io/v1alpha1
 kind: Metering
@@ -47,6 +50,7 @@ spec:
         tag: ${DEPLOY_TAG}
 
       ${IMAGE_PULL_SECRET_TEXT:-}
+      annotations: { $DATE_ANNOTATION }
       terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 
       config:
@@ -67,18 +71,22 @@ spec:
         awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
         awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
       presto:
+        annotations: { $DATE_ANNOTATION }
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
       hive:
+        annotations: { $DATE_ANNOTATION }
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
 
   hdfs:
     spec:
       ${IMAGE_PULL_SECRET_TEXT:-}
       datanode:
+        annotations: { $DATE_ANNOTATION }
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
         storage:
           size: ${HDFS_DATANODE_STORAGE_SIZE}
       namenode:
+        annotations: { $DATE_ANNOTATION }
         terminationGracePeriodSeconds: ${TERMINATION_GRACE_PERIOD_SECONDS}
         storage:
           size: ${HDFS_NAMENODE_STORAGE_SIZE}
@@ -87,6 +95,7 @@ EOF
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
+annotations: { $DATE_ANNOTATION }
 reconcileIntervalSeconds: 5
 ${IMAGE_PULL_SECRET_TEXT:-}
 EOF
