@@ -5,8 +5,10 @@ Configuring the operator is done primarily within a `Metering` CR's `spec.report
 
 ## Prometheus URL
 
-By default, the Metering assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090` within the cluster.
-If your not using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheusURL` configuration option.
+Depending on how you installed Metering, the default Prometheus URL varies.
+If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
+Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
+If your not Openshift or using [kube-prometheus][kube-prometheus] on non-openshift clusters, then you will need to override the `reporting-operator.config.prometheusURL` configuration option.
 
 Below is an example of configuring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
