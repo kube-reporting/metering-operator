@@ -15,11 +15,8 @@ def call(body) {
     echo "common: ${commonPre***REMOVED***x}"
     echo "branchPre***REMOVED***x: ${branchPre***REMOVED***x}"
 
-    def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
-    if (isPullRequest) {
-        echo 'Setting Github PR status'
-        githubNotify context: prStatusContext, status: 'PENDING', description: "${pipelineParams.testType} tests started"
-    }
+    echo 'Setting Github commit status'
+    githubNotify context: prStatusContext, status: 'PENDING', description: "${pipelineParams.testType} tests started"
 
     // The rest is the re-usable declarative pipeline
     pipeline {
@@ -122,19 +119,17 @@ spec:
                     archiveArtifacts artifacts: "${env.OUTPUT_DIR}/**", onlyIfSuccessful: false, allowEmptyArchive: true
                 }
                 script {
-                    if (isPullRequest) {
-                        echo 'Updating Github PR status'
-                        def status
-                        def description
-                        if (currentBuild.currentResult ==  "SUCCESS") {
-                            status = "SUCCESS"
-                            description = "All stages succeeded"
-                        } ***REMOVED*** {
-                            status = "FAILURE"
-                            description = "Some stages failed"
-                        }
-                        githubNotify context: prStatusContext, status: status, description: description
+                    echo 'Updating Github PR status'
+                    def status
+                    def description
+                    if (currentBuild.currentResult ==  "SUCCESS") {
+                        status = "SUCCESS"
+                        description = "All stages succeeded"
+                    } ***REMOVED*** {
+                        status = "FAILURE"
+                        description = "Some stages failed"
                     }
+                    githubNotify context: prStatusContext, status: status, description: description
                 }
             }
         }
