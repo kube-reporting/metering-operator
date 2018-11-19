@@ -10,6 +10,11 @@ def call(body) {
     def defaultNamespace = "metering-ci2-${branchPre***REMOVED***x}"
     def prStatusContext = "jenkins/${commonPre***REMOVED***x}"
 
+    def alwaysSkipNamespaceCleanup = pipelineParams.alwaysSkipNamespaceCleanup ?: false
+    echo "alwaysSkipNamespaceCleanup: ${alwaysSkipNamespaceCleanup}"
+    echo "common: ${commonPre***REMOVED***x}"
+    echo "branchPre***REMOVED***x: ${branchPre***REMOVED***x}"
+
     def isPullRequest = env.BRANCH_NAME.startsWith("PR-")
     if (isPullRequest) {
         echo 'Setting Github PR status'
@@ -88,6 +93,7 @@ spec:
                     FINAL_POD_LOGS_LOG_FILE_PATH = "${env.TEST_OUTPUT_PATH}/logs/***REMOVED***nal-pod-descriptions-logs.log"
                     DEPLOY_PLATFORM              = "${pipelineParams.deployPlatform}"
                     METERING_HTTPS_API           = "${pipelineParams.meteringHttpsAPI ?: false}"
+                    UNINSTALL_METERING_BEFORE_INSTALL = "${(pipelineParams.uninstallMeteringBeforeInstall != null) ? pipelineParams.uninstallMeteringBeforeInstall : true}"
                 }
                 steps {
                     runScript()
@@ -98,7 +104,14 @@ spec:
                         step([$class: "TapPublisher", testResults: "${TEST_OUTPUT_DIR}/**/*.tap", failIfNoResults: false, planRequired: false])
                     }
                     cleanup {
-                        cleanup()
+                        script {
+                            captureLogs()
+                            if (alwaysSkipNamespaceCleanup || params.SKIP_NS_CLEANUP) {
+                                echo 'Skipping namespace cleanup'
+                            } ***REMOVED*** {
+                                cleanup()
+                            }
+                        }
                     }
                 }
             }
@@ -141,16 +154,17 @@ private def runScript() {
     }
 }
 
-private def cleanup() {
+private def captureLogs() {
     container('metering-test-runner') {
         echo "Capturing pod logs"
-        sh 'set -e; cd $METERING_SRC_DIR && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $FINAL_POD_LOGS_LOG_FILE_PATH'
+        sh 'set -e; cd $METERING_SRC_DIR && mkdir -p $(dirname $FINAL_POD_LOGS_LOG_FILE_PATH) && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $FINAL_POD_LOGS_LOG_FILE_PATH'
+    }
+}
+
+private def cleanup() {
+    container('metering-test-runner') {
         echo "Deleting namespace ${env.METERING_NAMESPACE}"
-        if (!params.SKIP_NS_CLEANUP) {
-            sh 'set -e; cd $METERING_SRC_DIR && ./hack/delete-ns.sh'
-        } ***REMOVED*** {
-            echo 'Skipping namespace cleanup'
-        }
+        sh 'set -e; cd $METERING_SRC_DIR && ./hack/delete-ns.sh'
     }
 }
 

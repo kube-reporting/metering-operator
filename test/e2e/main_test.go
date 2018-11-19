@@ -239,10 +239,8 @@ func TestReportingE2E(t *testing.T) {
 
 		var periodStart, periodEnd time.Time
 		var collectResp operator.CollectPromsumDataResponse
-		t.Run("TestMetricsCollection", func(t *testing.T) {
-			periodStart, periodEnd, collectResp = testFramework.CollectMetricsOnce(t)
-			testFramework.RequireReportDataSourcesForQueryHaveData(t, queries, collectResp)
-		})
+		periodStart, periodEnd, collectResp = testFramework.CollectMetricsOnce(t)
+		testFramework.RequireReportDataSourcesForQueryHaveData(t, queries, collectResp)
 
 		t.Run("TestReportsProduceData", func(t *testing.T) {
 			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
