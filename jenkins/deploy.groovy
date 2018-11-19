@@ -2,7 +2,6 @@ pipeline {
     parameters {
         string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. Includes the integration-tests image which is used as the Jenkins executor. If unset, uses env.BRANCH_NAME')
         string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to')
-        booleanParam(name: 'GENERIC', defaultValue: false, description: '')
         booleanParam(name: 'OPENSHIFT', defaultValue: false, description: '')
     }
     agent {
@@ -59,24 +58,6 @@ spec:
     stages {
         stage('Deploy') {
             parallel {
-                // Generic/GKE
-                stage('generic') {
-                    when {
-                        expression { return params.GENERIC }
-                    }
-                    environment {
-                        KUBECONFIG      = credentials('gke-metering-ci-kubecon***REMOVED***g')
-                        DEPLOY_PLATFORM = "generic"
-                    }
-                    steps {
-                        deploy()
-                    }
-                    post {
-                        always {
-                            captureLogs()
-                        }
-                    }
-                }
                 stage('openshift') {
                     when {
                         expression { return params.OPENSHIFT }

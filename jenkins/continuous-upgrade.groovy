@@ -5,9 +5,7 @@ pipeline {
     parameters {
         string(name: 'DEPLOY_TAG', defaultValue: '', description: 'The image tag for all images deployed to use. If unset, uses env.BRANCH_NAME')
         string(name: 'OVERRIDE_NAMESPACE', defaultValue: '', description: 'If set, sets the namespace to deploy to. If unset, the namespace is metering-ci2-continuous-upgrade-$env.BRANCH_NAME.')
-        booleanParam(name: 'GENERIC', defaultValue: true, description: '')
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: '')
-        booleanParam(name: 'TECTONIC', defaultValue: true, description: '')
     }
     agent any
     triggers {
@@ -40,9 +38,7 @@ pipeline {
                 build job: "metering/operator-metering-deploy/master", parameters: [
                     string(name: 'DEPLOY_TAG', value: env.DEPLOY_TAG),
                     string(name: 'OVERRIDE_NAMESPACE', value: env.METERING_NAMESPACE),
-                    booleanParam(name: 'GENERIC', value: params.GENERIC),
                     booleanParam(name: 'OPENSHIFT', value: params.OPENSHIFT),
-                    booleanParam(name: 'TECTONIC', value: params.TECTONIC),
                 ]
             }
         }
