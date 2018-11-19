@@ -1,0 +1,20 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-cpu-capacity-hourly
+spec:
+  generationQuery: "cluster-cpu-capacity"
+  schedule:
+    period: "hourly"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-memory-capacity-hourly
+spec:
+  generationQuery: "cluster-memory-capacity"
+  schedule:
+    period: "hourly"
+
