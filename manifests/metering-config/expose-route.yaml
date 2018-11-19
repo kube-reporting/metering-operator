@@ -26,10 +26,11 @@ spec:
         # cookieSeed is used to protect the cookie created if accessing the API
         # via your browser.
         #
-        # generate a 32 character random string using `pwgen 32`
-        # cookieSeed: "ieth3poh3zaihoh8aey6ieVuuw5lohyo"
+        # generate a 32 character random string using a command of your choice,
+        # for example: `openssl rand -base64 32 | head -c32; echo`
+        # cookieSeed: "RCFE+QpwGWL2bupP+wv4EIOnYlbaRmto"
         #
-        # change REPLACEME to one of the outputs of your pwgen command
+        # change REPLACEME to the output of your command
         cookieSeed: "REPLACEME"
 
         # enables authenticating using a serviceAccount token
