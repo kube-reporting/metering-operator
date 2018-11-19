@@ -16,7 +16,6 @@ if (skipAll) {
 }
 
 def skipOpenshift = (isPullRequest && pullRequest.labels.contains("skip-openshift"))
-def skipGke = (isPullRequest && pullRequest.labels.contains("skip-gke"))
 
 def prStatusContext = 'jenkins/main'
 
@@ -35,7 +34,6 @@ pipeline {
         booleanParam(name: 'INTEGRATION', defaultValue: true, description: 'If true, then integration tests will run against the results of the build.')
         booleanParam(name: 'E2E', defaultValue: true, description: 'If true, then e2e tests will run against the results of the build.')
 
-        booleanParam(name: 'GENERIC', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a GKE cluster using the generic con***REMOVED***g.')
         booleanParam(name: 'OPENSHIFT', defaultValue: true, description: 'If true, run the con***REMOVED***gured tests against a Openshift cluster using the Openshift con***REMOVED***g.')
         booleanParam(name: 'USE_IMAGEBUILDER', defaultValue: false, description: 'If true, uses github.com/openshift/imagebuilder as the Docker client when building.')
         booleanParam(name: 'SKIP_NS_CLEANUP', defaultValue: false, description: 'If true, skip cleaning up the e2e/integration namespaces after running tests.')
@@ -115,34 +113,6 @@ pipeline {
                     steps {
                         echo "Running metering openshift e2e tests"
                         build job: "metering/operator-metering-openshift-e2e/${env.TARGET_BRANCH}", parameters: [
-                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
-                        ]
-                    }
-                }
-                stage("gke-integration") {
-                    when {
-                        expression {
-                            return params.INTEGRATION && !skipIntegrationLabel && !skipGke
-                        }
-                    }
-                    steps {
-                        echo "Running metering gke integration tests"
-                        build job: "metering/operator-metering-gke-integration/${env.TARGET_BRANCH}", parameters: [
-                            string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
-                            booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
-                        ]
-                    }
-                }
-                stage("gke-e2e") {
-                    when {
-                        expression {
-                            return params.E2E && !skipE2ELabel && !skipGke
-                        }
-                    }
-                    steps {
-                        echo "Running metering gke e2e tests"
-                        build job: "metering/operator-metering-gke-e2e/${env.TARGET_BRANCH}", parameters: [
                             string(name: 'DEPLOY_TAG', value: skipBuildLabel ? "master" : env.TARGET_BRANCH),
                             booleanParam(name: 'SKIP_NS_CLEANUP', value: params.SKIP_NS_CLEANUP || skipNsCleanup),
                         ]
