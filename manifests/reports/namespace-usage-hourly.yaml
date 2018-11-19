@@ -1,0 +1,19 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: namespace-memory-usage-hourly
+spec:
+  generationQuery: "namespace-memory-usage"
+  schedule:
+    period: "hourly"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: namespace-cpu-usage-hourly
+spec:
+  generationQuery: "namespace-cpu-usage"
+  schedule:
+    period: "hourly"

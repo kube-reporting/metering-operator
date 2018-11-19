@@ -1,0 +1,27 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-cpu-utilization-daily
+spec:
+  generationQuery: "cluster-cpu-utilization"
+  inputs:
+  - name: ClusterCpuUtilizationReportName
+    value: cluster-cpu-utilization-hourly
+  schedule:
+    period: "daily"
+  gracePeriod: 2h # delay running 2 hours so that the hourly report has time to run
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-memory-utilization-daily
+spec:
+  generationQuery: "cluster-memory-utilization"
+  inputs:
+  - name: ClusterMemoryUtilizationReportName
+    value: cluster-memory-utilization-hourly
+  schedule:
+    period: "daily"
+  gracePeriod: 2h # delay running 2 hours so that the hourly report has time to run
