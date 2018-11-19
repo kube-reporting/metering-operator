@@ -34,7 +34,6 @@ pipeline {
                 branch 'master'
             }
             steps {
-                echo "Deploying/Upgrading namespace ${METERING_NAMESPACE}"
                 build job: "metering/operator-metering-openshift-continuous-upgrade/${env.BRANCH_NAME}", parameters: [
                     string(name: 'DEPLOY_TAG', value: env.DEPLOY_TAG),
                 ]
