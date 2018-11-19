@@ -1,0 +1,37 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      route:
+        enabled: true
+
+      authProxy:
+        enabled: true
+
+        # htpasswdData can contain htpasswd ***REMOVED***le contents for allowing auth
+        # using a static list of usernames and their password hashes.
+        #
+        # username is 'testuser' password is 'testpassword123'
+        # generated htpasswdData using: `htpasswd -nb -s testuser password123`
+        # htpasswdData: |
+        #   testuser:{SHA}y/2sYAj5yrQIN4TL0YdPdmGNKpc=
+        #
+        # change REPLACEME to the output of your htpasswd command
+        htpasswdData: |
+          REPLACEME
+
+        # cookieSeed is used to protect the cookie created if accessing the API
+        # via your browser.
+        #
+        # generate a 32 character random string using `pwgen 32`
+        # cookieSeed: "ieth3poh3zaihoh8aey6ieVuuw5lohyo"
+        #
+        # change REPLACEME to one of the outputs of your pwgen command
+        cookieSeed: "REPLACEME"
+
+        # enables authenticating using a serviceAccount token
+        subjectAccessReviewEnabled: true
+        delegateURLsEnabled: true

@@ -8,6 +8,11 @@ For details on different types of con***REMOVED***guration read the relevant doc
 
 - [common con***REMOVED***guration options](common-con***REMOVED***guration.md)
   - [pod resource requests and limits](common-con***REMOVED***guration.md#resource-requests-and-limits)
+  - [node selectors](common-con***REMOVED***guration.md#node-selectors)
+  - [image repositories and tags](common-con***REMOVED***guration.md#image-repositories-and-tags)
+- [con***REMOVED***guring reporting-operator](con***REMOVED***guring-reporting-operator.md)
+  - [set the Prometheus URL](con***REMOVED***guring-reporting-operator.md#prometheus-url)
+  - [exposing the reporting API](con***REMOVED***guring-reporting-operator.md#exposing-the-reporting-api)
 - [con***REMOVED***guring storage](con***REMOVED***guring-storage.md)
   - [storing data in s3](con***REMOVED***guring-storage.md#storing-data-in-s3)
 - [con***REMOVED***guring the Hive metastore](con***REMOVED***guring-hive-metastore.md)
