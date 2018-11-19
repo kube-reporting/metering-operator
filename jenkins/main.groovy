@@ -83,7 +83,7 @@ pipeline {
             }
             post {
                 success {
-                    githubNotify context: prStatusContext, status: 'PENDING', description: 'Build stage passed'
+                    githubNotify context: prStatusContext, status: 'SUCCESS', description: 'Build stage passed'
                 }
             }
         }
@@ -121,7 +121,7 @@ pipeline {
             }
             post {
                 success {
-                    githubNotify context: prStatusContext, status: 'PENDING', description: 'e2e/integration tests stage passed'
+                    githubNotify context: prStatusContext, status: 'SUCCESS', description: 'e2e/integration tests stage passed'
                 }
             }
         }
