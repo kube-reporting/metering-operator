@@ -107,3 +107,11 @@ In this example the externalIP of the LoadBalancer is `35.227.172.86` and the po
 ```
 curl "http://35.227.172.86:8080/api/v1/scheduledreports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
+
+[route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
+[kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
+[load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+[node-port-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+[service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certificate-secrets
+[oauth-proxy]: https://github.com/openshift/oauth-proxy
+[expose-route-config]: ../manifests/metering-config/expose-route.yaml

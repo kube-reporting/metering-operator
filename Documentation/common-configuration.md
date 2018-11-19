@@ -21,10 +21,3 @@ See [latest-versions.yaml][latest-versions] for an example of setting the reposi
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 [node-selectors-config]: ../manifests/metering-config/custom-node-selectors.yaml
 [resource-limits]: ../manifests/metering-config/resource-limits.yaml
-[route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
-[kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
-[load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
-[node-port-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
-[service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certificate-secrets
-[oauth-proxy]: https://github.com/openshift/oauth-proxy
-[expose-route-config]: ../manifests/metering-config/expose-route.yaml
