@@ -8,13 +8,20 @@ source "${ROOT_DIR}/hack/common.sh"
 
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
 : "${INSTALL_METERING:=true}"
-: "${INSTALL_METHOD:=direct}"
+: "${INSTALL_METHOD:=${DEPLOY_PLATFORM}-direct}"
 : "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     : "${DOCKER_USERNAME:?}"
     : "${DOCKER_PASSWORD:?}"
+fi
+
+if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
+    echo "Uninstalling metering"
+    kubectl delete ns "$METERING_NAMESPACE" || true
+else
+    echo "Skipping uninstall"
 fi
 
 while true; do
@@ -48,23 +55,6 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
         --docker-username="$DOCKER_USERNAME" \
         --docker-password="$DOCKER_PASSWORD" \
         --docker-email=example@example.com || true
-fi
-
-if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
-    echo "Uninstalling metering"
-    uninstall_metering "${INSTALL_METHOD}" || true
-
-    until [ "$(kubectl -n $METERING_NAMESPACE get deployments -l app=metering-operator -o json | jq '.items | length' -r)" == "0" ]; do
-        echo 'waiting for metering-operator deployment to be deleted'
-        sleep 5
-    done
-
-    until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length' -r)" == "0" ]; do
-        echo 'waiting for metering pods to be deleted'
-        sleep 5
-    done
-else
-    echo "Skipping uninstall"
 fi
 
 if [ "$INSTALL_METERING" == "true" ]; then

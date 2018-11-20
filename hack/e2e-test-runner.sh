@@ -15,8 +15,8 @@ set -e
 : "${DEPLOY_METERING:=true}"
 : "${TEST_METERING:=true}"
 : "${CLEANUP_METERING:=true}"
-: "${INSTALL_METHOD:=direct}"
-: "${DEPLOY_SCRIPT:=deploy.sh}" # can be deploy-ci.sh or deploy-openshift-ci.sh
+# can be deploy.sh, deploy-custom.sh, deploy-e2e.sh, deploy-integration.sh
+: "${DEPLOY_SCRIPT:=deploy.sh}"
 : "${TEST_OUTPUT_PATH:=/out}"
 : "${OUTPUT_TEST_LOG_STDOUT:=false}"
 : "${OUTPUT_DEPLOY_LOG_STDOUT:=false}"
@@ -27,14 +27,14 @@ set -e
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-export INSTALL_METHOD
 export METERING_NAMESPACE
 export KUBECONFIG
 
 # this script is run inside the container
 echo "\$KUBECONFIG=$KUBECONFIG"
 echo "\$METERING_NAMESPACE=$METERING_NAMESPACE"
-echo "\$INSTALL_METHOD=$INSTALL_METHOD"
+echo "\$DEPLOY_SCRIPT=$DEPLOY_SCRIPT"
+echo "\$TEST_OUTPUT_PATH=$TEST_OUTPUT_PATH"
 
 REPORTS_DIR=$TEST_OUTPUT_PATH/reports
 LOG_DIR=$TEST_OUTPUT_PATH/logs
@@ -69,12 +69,8 @@ function cleanup() {
         echo "Finished capturing final pod logs"
     fi
 
-    echo "Running uninstall"
-    if [ "$OUTPUT_DEPLOY_LOG_STDOUT" == "true" ]; then
-        uninstall_metering "$INSTALL_METHOD" | tee -a "$DEPLOY_LOG_FILE_PATH"
-    else
-        uninstall_metering "$INSTALL_METHOD" >> "$DEPLOY_LOG_FILE_PATH"
-    fi
+    echo "Deleting namespace"
+    kubectl delete ns "$METERING_NAMESPACE" || true
 
     # kill any background jobs, such as stern
     jobs -p | xargs kill
