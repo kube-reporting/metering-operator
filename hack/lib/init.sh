@@ -31,8 +31,11 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 
 # These are currently openshift specific config options, controlling if a
 # clusterrole and clusterrolebinding are created granting access to GET
-# namespaces. This is for granting access to querying the Prometheus API.
-: "${METERING_INSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=true}"
-: "${METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE:=true}"
-: "${METERING_NAMESPACE_VIEWER_ROLE_NAME:=${METERING_NAMESPACE}-metering-namespace-viewer}"
-: "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME:=${METERING_NAMESPACE}-metering-namespace-viewer}"
+# namespaces , create subject access reviews and token reviews
+# This is for granting access to querying the Prometheus API and checking users
+# permissions with the auth proxy.
+: "${METERING_REPORTING_OPERATOR_EXTRA_ROLE_NAME:=openshift-reporting-operator-extra}"
+: "${METERING_REPORTING_OPERATOR_EXTRA_ROLEBINDING_NAME:=${METERING_NAMESPACE}-openshift-reporting-operator-extra}"
+: "${METERING_REPORTING_OPERATOR_EXTRA_ROLE_NAME:=openshift-reporting-operator-extra}"
+: "${METERING_UNINSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING:=false}"
+: "${METERING_INSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING:=true}"
