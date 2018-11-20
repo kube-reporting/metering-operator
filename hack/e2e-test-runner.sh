@@ -111,7 +111,7 @@ if [ "$TEST_METERING" == "true" ]; then
     "$TEST_SCRIPT" 2>&1 \
         | tee -a "$TEST_LOG_FILE_PATH" \
         | "$ROOT_DIR/bin/test2json" \
-        | tee -a "${TEST_LOG_FILE}.json_PATH" \
+        | tee -a "${TEST_LOG_FILE_PATH}.json" \
         | jq -r -s -f "$ROOT_DIR/hack/tap-output.jq" \
         | tee -a "$TEST_TAP_FILE_PATH"
 
