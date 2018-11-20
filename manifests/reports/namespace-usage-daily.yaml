@@ -1,0 +1,21 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: namespace-memory-usage-daily
+spec:
+  generationQuery: "namespace-memory-usage"
+  schedule:
+    period: "daily"
+  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: namespace-cpu-usage-daily
+spec:
+  generationQuery: "namespace-cpu-usage"
+  schedule:
+    period: "daily"
+  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run

@@ -84,12 +84,13 @@ spec:
         stages {
             stage('Run Tests') {
                 environment {
-                    KUBECONFIG                   = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
-                    TEST_OUTPUT_DIR              = "${env.OUTPUT_DIR}/${commonPre***REMOVED***x}-tests"
-                    TEST_OUTPUT_PATH             = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                    FINAL_POD_LOGS_LOG_FILE_PATH = "${env.TEST_OUTPUT_PATH}/logs/***REMOVED***nal-pod-descriptions-logs.log"
-                    DEPLOY_PLATFORM              = "${pipelineParams.deployPlatform}"
-                    METERING_HTTPS_API           = "${pipelineParams.meteringHttpsAPI ?: false}"
+                    KUBECONFIG                        = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
+                    TEST_OUTPUT_DIR                   = "${env.OUTPUT_DIR}/${commonPre***REMOVED***x}-tests"
+                    TEST_OUTPUT_PATH                  = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
+                    FINAL_POD_LOGS_LOG_FILE_PATH      = "${env.TEST_OUTPUT_PATH}/logs/***REMOVED***nal-pod-descriptions-logs.log"
+                    DEPLOY_PLATFORM                   = "${pipelineParams.deployPlatform}"
+                    METERING_HTTPS_API                = "${pipelineParams.meteringHttpsAPI ?: false}"
+                    METERING_CREATE_PULL_SECRET       = "true"
                     UNINSTALL_METERING_BEFORE_INSTALL = "${(pipelineParams.uninstallMeteringBeforeInstall != null) ? pipelineParams.uninstallMeteringBeforeInstall : true}"
                 }
                 steps {
