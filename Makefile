@@ -285,6 +285,9 @@ bin/operator-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
 metering-manifests:
 	./hack/create-metering-manifests.sh $(RELEASE_TAG)
 
+bin/test2json: gotools/test2json/main.go
+	go build -o bin/test2json gotools/test2json/main.go
+
 .PHONY: \
 	test vendor fmt regenerate-hive-thrift thrift-gen \
 	update-codegen verify-codegen \
