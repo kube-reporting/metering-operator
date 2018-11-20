@@ -1,6 +1,6 @@
 FROM openshift/origin-release:golang-1.10 as build
 
-RUN INSTALL_PKGS="curl python PyYAML" && \
+RUN INSTALL_PKGS="curl python PyYAML openssl" && \
     yum install -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
