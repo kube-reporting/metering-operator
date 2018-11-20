@@ -64,7 +64,7 @@ if [ "$INSTALL_METERING" == "true" ]; then
     echo
     echo "Waiting for metering-operator pod to start termination"
     # we just check until there's a non-ready container then the loop below this will check for readiness
-    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "false" ]; do
+    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "false" ]; do
         echo 'waiting for metering-operator pods to terminate'
         sleep 5
     done
@@ -73,7 +73,7 @@ else
 fi
 
 echo "Waiting for metering-operator pods to be ready"
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
     echo 'waiting for metering-operator pods to be ready'
     sleep 5
 done
@@ -99,7 +99,7 @@ until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length
 done
 echo "all of the metering pods have been started"
 
-until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
     echo 'waiting for all pods to be ready'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
     sleep 10
