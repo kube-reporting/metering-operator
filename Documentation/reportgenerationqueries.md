@@ -18,6 +18,10 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `dynamicReportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on, that have `view.disabled` set to true, these are queries that depend on the `.Report` variable. Queries in the list can be re-used by injecting them into the current query using the `renderReportGenerationQuery` template function.
 - `view`: This section controls options related to creating a view from the `query` when the `ReportGenerationQuery` resource is created.
     - `view.disabled`: This is false by default, and if set to true, it will prevent the default behavior of creating a database view using the contents of the `query`. This cannot be true if `dynamicReportQueries` is non-empty or if the `query` depends on the `.Report` templating variables.
+- `inputs`: A list of inputs this report query accepts to control it's behavior.
+  - `name`: The name used to refer to the input in the `Report` or `ScheduledReport` `spec.inputs` and within the queries template variables (see below).
+  - `required`: A boolean indicating if this input is required for the query to run. Defaults to false.
+  - `type`: An optional type indicating what data type this input takes. Available options are `string`, `time`, and `int`. If left empty, it defaults to `string`.
 
 ## Templating
 
@@ -31,7 +35,7 @@ Most of these functions are for referring to other resources such as `ReportData
   - `ReportingStart`: A [time.Time][go-time] object that is generally used to filter the results of a `SELECT` query using a `WHERE` clause.
   - `ReportingEnd`: A [time.Time][go-time] object that is generally used to filter the results of a `SELECT` query using a `WHERE` clause. Built-in queries select datapoints matching `ReportingStart <= timestamp > ReportingEnd`.
 - `DynamicDependentQueries`: This is a list of `ReportGenerationQuery` objects that were listed in the `spec.dynamicReportQueries` field. Generally this list isn't directly referenced in query, but is used indirectly with the `renderReportGenerationQuery` [template function](#template-functions).
-- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report's `spec.inputs`. The value currently is always a string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time].
+- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report's `spec.inputs`. The values type is based on the report queries input definition [type](#fields), and defaults to string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time] automatically.
 
 ### Template functions
 

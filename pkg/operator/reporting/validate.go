@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -410,22 +411,20 @@ func GetDependentReports(reportGetter reportGetter, generationQuery *metering.Re
 func ValidateReportGenerationQueryInputs(generationQuery *metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue) (map[string]interface{}, error) {
 	var givenInputs, missingInputs, expectedInputs []string
 	reportQueryInputs := make(map[string]interface{})
-	for _, v := range inputs {
-		// currently inputs can only have string values, but we want to support
-		// other types in the future.
-		// To support overriding the default ReportingStart and ReportingEnd
-		// using inputs, we have to treat them specially and turn them into
-		// time.Time objects before passing to the template context.
-		if v.Name == ReportingStartInputName || v.Name == ReportingEndInputName {
-			tVal, err := time.Parse(time.RFC3339, v.Value)
-			if err != nil {
-				return nil, fmt.Errorf("inputs Name: %s is not a valid timestamp: %s, must be RFC3339 formatted, err: %s", v.Name, v.Value, err)
-			}
-			reportQueryInputs[v.Name] = tVal
-		} else {
-			reportQueryInputs[v.Name] = v.Value
+	inputDefinitions := make(map[string]metering.ReportGenerationQueryInputDefinition)
+
+	for _, inputDef := range generationQuery.Spec.Inputs {
+		inputDefinitions[inputDef.Name] = inputDef
+	}
+
+	for _, inputVal := range inputs {
+		inputDef := inputDefinitions[inputVal.Name]
+		val, err := convertQueryInputValueFromDefinition(inputVal, inputDef)
+		if err != nil {
+			return nil, err
 		}
-		givenInputs = append(givenInputs, v.Name)
+		reportQueryInputs[inputVal.Name] = val
+		givenInputs = append(givenInputs, inputVal.Name)
 	}
 
 	// now validate the inputs match what the query is expecting
@@ -447,4 +446,32 @@ func ValidateReportGenerationQueryInputs(generationQuery *metering.ReportGenerat
 	}
 
 	return reportQueryInputs, nil
+}
+
+func convertQueryInputValueFromDefinition(inputVal metering.ReportGenerationQueryInputValue, inputDef metering.ReportGenerationQueryInputDefinition) (interface{}, error) {
+	if inputVal.Value == nil {
+		return nil, nil
+	}
+
+	inputType := strings.ToLower(inputDef.Type)
+	if inputVal.Name == ReportingStartInputName || inputVal.Name == ReportingEndInputName {
+		inputType = "time"
+	}
+	// unmarshal the data based on the input definition type
+	var dst interface{}
+	switch inputType {
+	case "", "string":
+		dst = new(string)
+	case "time":
+		dst = new(time.Time)
+	case "int", "integer":
+		dst = new(int)
+	default:
+		return nil, fmt.Errorf("unsupported input type %s", inputType)
+	}
+	err := json.Unmarshal(*inputVal.Value, dst)
+	if err != nil {
+		return nil, fmt.Errorf("inputs Name: %s is not valid a %s: value: %s, err: %s", inputVal.Name, inputType, string(*inputVal.Value), err)
+	}
+	return dst, nil
 }
