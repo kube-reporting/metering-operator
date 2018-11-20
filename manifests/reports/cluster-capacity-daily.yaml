@@ -1,0 +1,29 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-cpu-capacity-daily
+spec:
+  generationQuery: "cluster-cpu-capacity"
+  # this configures the this report to aggregate the hourly one
+  inputs:
+  - name: ClusterCpuCapacityReportName
+    value: cluster-cpu-capacity-hourly
+  schedule:
+    period: "daily"
+  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ScheduledReport
+metadata:
+  name: cluster-memory-capacity-daily
+spec:
+  generationQuery: "cluster-memory-capacity"
+  # this configures the this report to aggregate the hourly one
+  inputs:
+  - name: ClusterMemoryCapacityReportName
+    value: cluster-memory-capacity-hourly
+  schedule:
+    period: "daily"
+  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
