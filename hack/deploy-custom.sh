@@ -37,6 +37,7 @@ fi
 
 CUR_DATE="$(date +%s)"
 DATE_ANNOTATION="\"metering.deploy-custom/deploy-time\": \"$CUR_DATE\""
+COOKIE_SEED="$(openssl rand -base64 32 | head -c32)"
 
 cat <<EOF > "$METERING_CR_FILE"
 apiVersion: metering.openshift.io/v1alpha1
@@ -63,6 +64,13 @@ spec:
         awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
         awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
+      route:
+        enabled: true
+
+      authProxy:
+        enabled: true
+        subjectAccessReviewEnabled: true
+        cookieSeed: "${COOKIE_SEED}"
 
   presto:
     spec:
