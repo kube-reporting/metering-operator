@@ -25,4 +25,4 @@ if [ "$METERING_INSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING" == "true" ]
 fi
 
 export DEPLOY_PLATFORM=openshift
-"${ROOT_DIR}/hack/install.sh"
+"${ROOT_DIR}/hack/install.sh" "$@"
