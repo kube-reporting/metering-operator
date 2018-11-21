@@ -72,7 +72,7 @@ capture_pod_logs() {
     NS="$(sanetize_namespace "$1")"
     echo "Capturing logs for $NS"
     # List all logs for all containers in all pods for the namespace which was
-    PODS="$(kubectl get pods --show-all --no-headers --namespace "$NS")"
+    PODS="$(kubectl get pods --no-headers --namespace "$NS")"
     echo '===Pods==='
     echo "$PODS"
     echo "$PODS" | awk '{ print $1 }' | while read -r pod; do
@@ -85,7 +85,7 @@ capture_pod_logs() {
 
             # There can be multiple containers within a pod. We need to iterate
             # over each of those
-            containers=$(kubectl get pods --show-all -o jsonpath="{.spec.containers[*].name}" --namespace "$NS" "$pod")
+            containers=$(kubectl get pods -o jsonpath="{.spec.containers[*].name}" --namespace "$NS" "$pod")
             for container in $containers; do
                 printf -- '---Logs from container %s in pod %s:---\n' "$container" "$pod"
                 kubectl logs --namespace "$METERING_NAMESPACE" -c "$container" "$pod" || true

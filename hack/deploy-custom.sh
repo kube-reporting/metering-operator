@@ -7,7 +7,7 @@ set -e
 TMP_DIR="$(mktemp -d)"
 
 export INSTALL_METHOD="${DEPLOY_PLATFORM}-direct"
-export METERING_CR_FILE=${METERING_CR_FILE:-"$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"}
+export METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
 export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/custom-deploy-manifests-${DEPLOY_TAG}"}
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
@@ -114,6 +114,10 @@ EOF
 echo "Creating metering manifests"
 export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"
+
+cp \
+    "${DEPLOY_MANIFESTS_DIR}/reporting-operator-clusterrole.yaml" \
+    "$CUSTOM_DEPLOY_MANIFESTS_DIR"
 
 echo "Deploying"
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"

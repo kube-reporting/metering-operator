@@ -8,13 +8,20 @@ source "${ROOT_DIR}/hack/common.sh"
 
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
 : "${INSTALL_METERING:=true}"
-: "${INSTALL_METHOD:=direct}"
+: "${INSTALL_METHOD:=${DEPLOY_PLATFORM}-direct}"
 : "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     : "${DOCKER_USERNAME:?}"
     : "${DOCKER_PASSWORD:?}"
+***REMOVED***
+
+if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
+    echo "Uninstalling metering"
+    kubectl delete ns "$METERING_NAMESPACE" || true
+***REMOVED***
+    echo "Skipping uninstall"
 ***REMOVED***
 
 while true; do
@@ -50,23 +57,6 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
         --docker-email=example@example.com || true
 ***REMOVED***
 
-if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
-    echo "Uninstalling metering"
-    uninstall_metering "${INSTALL_METHOD}" || true
-
-    until [ "$(kubectl -n $METERING_NAMESPACE get deployments -l app=metering-operator -o json | jq '.items | length' -r)" == "0" ]; do
-        echo 'waiting for metering-operator deployment to be deleted'
-        sleep 5
-    done
-
-    until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length' -r)" == "0" ]; do
-        echo 'waiting for metering pods to be deleted'
-        sleep 5
-    done
-***REMOVED***
-    echo "Skipping uninstall"
-***REMOVED***
-
 if [ "$INSTALL_METERING" == "true" ]; then
     echo "Installing metering"
     install_metering "${INSTALL_METHOD}"
@@ -74,7 +64,7 @@ if [ "$INSTALL_METERING" == "true" ]; then
     echo
     echo "Waiting for metering-operator pod to start termination"
     # we just check until there's a non-ready container then the loop below this will check for readiness
-    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "false" ]; do
+    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "false" ]; do
         echo 'waiting for metering-operator pods to terminate'
         sleep 5
     done
@@ -83,7 +73,7 @@ if [ "$INSTALL_METERING" == "true" ]; then
 ***REMOVED***
 
 echo "Waiting for metering-operator pods to be ready"
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
     echo 'waiting for metering-operator pods to be ready'
     sleep 5
 done
@@ -109,7 +99,7 @@ until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length
 done
 echo "all of the metering pods have been started"
 
-until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | jq '.items | map(try(.status.containerStatuses[].ready) // false) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
     echo 'waiting for all pods to be ready'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
     sleep 10
