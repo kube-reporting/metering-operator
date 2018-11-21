@@ -10,3 +10,7 @@ dependencies:
   version: 0.1.0
   repository: "***REMOVED***le://../hdfs"
   condition: hdfs.enabled
+- name: superset
+  version: 1.0.0
+  repository: "***REMOVED***le://../superset"
+  condition: superset.enabled
