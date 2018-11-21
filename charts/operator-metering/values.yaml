@@ -21,3 +21,18 @@ hdfs:
       datanodeDataDirPerms: "775"
     securityContext:
       fsGroup: 0
+
+superset:
+  enabled: false
+  datasources:
+  - fileName: "metering-presto.yaml"
+    content: |-
+      databases:
+      - allow_ctas: true
+        database_name: metering-presto
+        expose_in_sqllab: true
+        extra: "{\r\n    \"metadata_params\": {},\r\n    \"engine_params\": {},\r\n    \"\
+          metadata_cache_timeout\": {},\r\n    \"schemas_allowed_for_csv_upload\": []\r\n\
+          }\r\n"
+        sqlalchemy_uri: presto://presto:8080
+        tables: []
