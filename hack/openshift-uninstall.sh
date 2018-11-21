@@ -6,12 +6,8 @@ source "${ROOT_DIR}/hack/common.sh"
 export DEPLOY_PLATFORM=openshift
 "${ROOT_DIR}/hack/uninstall.sh"
 
-if [ "$METERING_UNINSTALL_NAMESPACE_VIEWER_CLUSTERROLE" == "true" ]; then
+if [ "$METERING_UNINSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING" == "true" ]; then
     kubectl -n "${METERING_NAMESPACE}" \
         delete clusterrolebinding \
-        "${METERING_NAMESPACE_VIEWER_ROLEBINDING_NAME}"
-
-    kubectl -n "${METERING_NAMESPACE}" \
-        delete clusterrole \
-        "${METERING_NAMESPACE_VIEWER_ROLE_NAME}"
+        "${METERING_REPORTING_OPERATOR_EXTRA_ROLEBINDING_NAME}"
 fi
