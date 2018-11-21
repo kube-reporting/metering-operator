@@ -2,6 +2,6 @@ name: metering-operator
 
 cr:
   create: true
-  name: "openshift-metering"
+  name: "operator-metering"
 
 chartPath: "/openshift-metering-0.1.0.tgz"
