@@ -15,8 +15,8 @@ presto:
         fsGroup: 0
 
 hdfs:
+  enabled: true
   spec:
-    enabled: true
     config:
       datanodeDataDirPerms: "775"
     securityContext:
