@@ -10,6 +10,7 @@ spec:
     targetPort: http
   tls:
     termination: Reencrypt
+    insecureEdgeTerminationPolicy: Allow
   to:
     kind: Service
     name: reporting-operator
