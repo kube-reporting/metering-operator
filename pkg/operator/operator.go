@@ -417,8 +417,12 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	if err != nil {
 		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
 	}
+	newTableProperties, err := addTableNameToLocation(*tableProperties, "metering_health_check")
+	if err != nil {
+		return err
+	}
 
-	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, *tableProperties)
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, newTableProperties)
 	op.testWriteToPrestoFunc = func() bool {
 		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
 	}
