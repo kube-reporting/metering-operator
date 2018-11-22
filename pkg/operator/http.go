@@ -279,7 +279,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		return
 	}
 
-	writeResultsResponseV1(logger, format, reportQuery.Spec.Columns, results, w, r)
+	writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
 }
 func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the current report to make sure it's in a ***REMOVED***nished state
@@ -364,14 +364,15 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	if useNewFormat {
-		writeResultsResponseV2(logger, full, format, reportQuery.Spec.Columns, results, w, r)
+		writeResultsResponseV2(logger, full, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
 	} ***REMOVED*** {
-		writeResultsResponseV1(logger, format, reportQuery.Spec.Columns, results, w, r)
+		writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
 	}
 }
 
-func writeResultsResponseAsCSV(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.csv", name))
 	err := writeResultsAsCSV(columns, results, w, ',')
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, err.Error())
@@ -433,8 +434,9 @@ func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []pres
 	return csvWriter.Error()
 }
 
-func writeResultsResponseAsTabular(logger log.FieldLogger, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
+func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/tab-separated-values")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.tsv", name))
 	var padding int = 2
 	paddingStr := r.FormValue("padding")
 	if paddingStr != "" {
@@ -459,24 +461,28 @@ func writeResultsResponseAsTabular(logger log.FieldLogger, columns []api.ReportG
 	w.WriteHeader(http.StatusOK)
 }
 
-func writeResultsResponse(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.json", name))
+	newResults := make([]*orderedmap.OrderedMap, len(results))
+	for i, item := range results {
+		var err error
+		newResults[i], err = orderedmap.NewFromMap(item)
+		if err != nil {
+			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting results: %v", err)
+			return
+		}
+	}
+	writeResponseAsJSON(logger, w, http.StatusOK, newResults)
+}
+
+func writeResultsResponse(logger log.FieldLogger, format, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
-		newResults := make([]*orderedmap.OrderedMap, len(results))
-		for i, item := range results {
-			var err error
-			newResults[i], err = orderedmap.NewFromMap(item)
-			if err != nil {
-				writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting results: %v", err)
-				return
-			}
-		}
-		writeResponseAsJSON(logger, w, http.StatusOK, newResults)
-		return
+		writeResultsResponseAsJSON(logger, name, columns, results, w, r)
 	case "csv":
-		writeResultsResponseAsCSV(logger, columns, results, w, r)
+		writeResultsResponseAsCSV(logger, name, columns, results, w, r)
 	case "tab", "tabular":
-		writeResultsResponseAsTabular(logger, columns, results, w, r)
+		writeResultsResponseAsTabular(logger, name, columns, results, w, r)
 	}
 }
 
@@ -518,7 +524,7 @@ func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerati
 	return results
 }
 
-func writeResultsResponseV1(logger log.FieldLogger, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
 	var ***REMOVED***lteredColumns []api.ReportGenerationQueryColumn
 
@@ -542,10 +548,10 @@ func writeResultsResponseV1(logger log.FieldLogger, format string, columns []api
 		}
 	}
 
-	writeResultsResponse(logger, format, ***REMOVED***lteredColumns, results, w, r)
+	writeResultsResponse(logger, format, name, ***REMOVED***lteredColumns, results, w, r)
 }
 
-func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	format = strings.ToLower(format)
 	isTableFormat := format == "csv" || format == "tab" || format == "tabular"
 	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
@@ -578,10 +584,12 @@ func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, co
 	}
 
 	if format == "json" {
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.json", name))
 		writeResponseAsJSON(logger, w, http.StatusOK, convertsToGetReportResults(results, ***REMOVED***lteredColumns))
 		return
 	}
-	writeResultsResponse(logger, format, ***REMOVED***lteredColumns, results, w, r)
+
+	writeResultsResponse(logger, format, name, ***REMOVED***lteredColumns, results, w, r)
 }
 
 func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w http.ResponseWriter) {
