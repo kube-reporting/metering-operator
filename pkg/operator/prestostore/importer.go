@@ -170,12 +170,11 @@ func promMatrixToPrometheusMetrics(timeRange prom.Range, matrix model.Matrix) []
 	var metrics []*PrometheusMetric
 	// iterate over segments of contiguous billing metrics
 	for _, sampleStream := range matrix {
+		labels := make(map[string]string, len(sampleStream.Metric))
+		for k, v := range sampleStream.Metric {
+			labels[string(k)] = string(v)
+		}
 		for _, value := range sampleStream.Values {
-			labels := make(map[string]string, len(sampleStream.Metric))
-			for k, v := range sampleStream.Metric {
-				labels[string(k)] = string(v)
-			}
-
 			metric := &PrometheusMetric{
 				Labels:    labels,
 				Amount:    float64(value.Value),
