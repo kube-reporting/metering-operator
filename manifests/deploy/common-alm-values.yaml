@@ -5,6 +5,7 @@ spec:
   keywords: ['metering', 'metrics', 'reporting', 'coreos']
   version: latest
   maturity: alpha
+  #namespace:
   maintainers:
     - name: CoreOS, Inc
       email: support@coreos.com

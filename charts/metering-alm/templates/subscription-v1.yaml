@@ -1,8 +1,10 @@
 apiVersion: app.coreos.com/v1alpha1
-kind: Subscription-v1
+#kind: Subscription-v1
+kind: Subscription
 metadata:
   name: {{ .Values.name }}
+  #namespace:
 spec:
   channel: {{ .Values.subscriptionChannel }}
   name: {{ .Values.packageName }}
-  source: tectonic-components
+#  source: tectonic-components
