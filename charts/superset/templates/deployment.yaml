@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "superset.fullname" . }}
+  labels:
+    app: {{ template "superset.name" . }}
+    chart: {{ template "superset.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "superset.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "superset.fullname" . }}
+      labels:
+        app: {{ template "superset.name" . }}
+        chart: {{ template "superset.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 8 }}
+{{- end }}
+      annotations:
+        superset-scripts-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
+        superset-env-secret-hash: {{ include (print $.Template.BasePath "/env-secret.yaml") . | sha256sum }}
+        superset-con***REMOVED***g-secret-hash: {{ include (print $.Template.BasePath "/server-con***REMOVED***g-secret.yaml") . | sha256sum }}
+        superset-datasources-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/datasources-con***REMOVED***gmap.yaml") . | sha256sum }}
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
+    spec:
+{{- if .Values.securityContext }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
+{{- end }}
+      volumes:
+        - name: superset-scripts
+          con***REMOVED***gMap:
+            name: {{ template "superset.fullname" . }}-scripts
+            defaultMode: 0774
+        - name: superset-server-con***REMOVED***g
+          secret:
+            secretName: {{ template "superset.fullname" . }}-con***REMOVED***g
+        - name: superset-datasources-con***REMOVED***g
+          con***REMOVED***gMap:
+            name: {{ template "superset.fullname" . }}-datasources
+        - name: storage-volume
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- ***REMOVED*** }}{{ template "superset.fullname" . }}{{- end }}
+        {{- ***REMOVED*** }}
+          emptyDir: {}
+        {{- end }}
+      initContainers:
+        - name: superset-init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/superset-scripts/entrypoint.sh"]
+          args: ["/superset-scripts/init_superset.sh"]
+          volumeMounts:
+            - name: superset-server-con***REMOVED***g
+              mountPath: /etc/superset
+            - name: superset-scripts
+              mountPath: /superset-scripts
+            - name: superset-datasources-con***REMOVED***g
+              mountPath: /superset-datasources
+            - name: storage-volume
+              mountPath: /var/lib/superset
+          ports:
+            - name: http
+              containerPort: 8088
+              protocol: TCP
+          env:
+            - name: "DATASOURCES_DIRECTORY"
+              value: "/superset-datasources"
+          {{- range $key, $value := .Values.extraEnv }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ template "superset.fullname" . }}-env
+        {{- if .Values.extraEnvFromSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvFromSecret }}
+        {{- end }}
+    {{- with .Values.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+    {{- end }}
+      containers:
+        - name: superset
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/superset-scripts/entrypoint.sh"]
+          args: ["gunicorn", "superset:app" ]
+          volumeMounts:
+            - name: superset-server-con***REMOVED***g
+              mountPath: /etc/superset
+            - name: superset-scripts
+              mountPath: /superset-scripts
+            - name: superset-datasources-con***REMOVED***g
+              mountPath: /superset-datasources
+            - name: storage-volume
+              mountPath: /var/lib/superset
+          ports:
+            - name: http
+              containerPort: 8088
+              protocol: TCP
+          env:
+            - name: "DATASOURCES_DIRECTORY"
+              value: "/superset-datasources"
+          {{- range $key, $value := .Values.extraEnv }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ template "superset.fullname" . }}-env
+        {{- if .Values.extraEnvFromSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvFromSecret }}
+        {{- end }}
+    {{- with .Values.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+    {{- end }}
+    {{- with .Values.livenessProbe }}
+          livenessProbe:
+{{ toYaml . | indent 12 }}
+    {{- end }}
+    {{- with .Values.readinessProbe }}
+          readinessProbe:
+{{ toYaml . | indent 12 }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
