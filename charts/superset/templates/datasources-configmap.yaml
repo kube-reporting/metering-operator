@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "superset.fullname" . }}-datasources
+  labels:
+    app: {{ template "superset.name" . }}
+    chart: {{ template "superset.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+{{- range $i, $value := .Values.datasources }}
+  {{ $value.fileName }}: |
+{{ $value.content | indent 4}}
+{{- end }}
