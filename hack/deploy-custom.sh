@@ -115,10 +115,6 @@ echo "Creating metering manifests"
 export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"
 
-cp \
-    "${DEPLOY_MANIFESTS_DIR}/reporting-operator-clusterrole.yaml" \
-    "$CUSTOM_DEPLOY_MANIFESTS_DIR"
-
 echo "Deploying"
 export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "${ROOT_DIR}/hack/deploy.sh"
