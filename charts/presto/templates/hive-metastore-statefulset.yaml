@@ -115,6 +115,8 @@ spec:
         emptyDir: {}
       - name: datanode-empty
         emptyDir: {}
+      - name: hadoop-logs
+        emptyDir: {}
       - name: hive-metastore-db-data
 {{- if .Values.spec.hive.metastore.storage.create }}
         persistentVolumeClaim:

@@ -143,6 +143,8 @@ spec:
         # required for openshift
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
+        - name: hadoop-logs
+          mountPath: /opt/hadoop/logs
         resources:
 {{ toYaml .Values.spec.namenode.resources | indent 10 }}
       serviceAccount: hdfs
@@ -156,6 +158,8 @@ spec:
           name: hdfs-config
           defaultMode: 0555
       - name: datanode-empty
+        emptyDir: {}
+      - name: hadoop-logs
         emptyDir: {}
   volumeClaimTemplates:
   - metadata:

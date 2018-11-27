@@ -92,6 +92,8 @@ spec:
           mountPath: /opt/jmx_exporter/config
         - name: presto-data
           mountPath: /var/presto/data
+        - name: presto-logs
+          mountPath: /var/presto/logs
 {{- if .Values.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.spec.config.sharedVolume.mountPath }}
@@ -115,6 +117,8 @@ spec:
       - name: presto-etc
         emptyDir: {}
       - name: presto-data
+        emptyDir: {}
+      - name: presto-logs
         emptyDir: {}
 {{- if .Values.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data

@@ -71,3 +71,8 @@ data:
     -Dcom.sun.management.jmxremote.port=8081
     -Dcom.sun.management.jmxremote.rmi.port=8081
     -Djava.rmi.server.hostname=127.0.0.1
+    -verbose:gc
+    -XX:+PrintGCDetails
+    -XX:+PrintGCTimeStamps
+    -XX:+PrintGCDateStamps
+    -Xloggc:/var/presto/logs/gc.log
