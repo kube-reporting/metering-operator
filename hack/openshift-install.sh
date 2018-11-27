@@ -11,7 +11,7 @@ if [ "$METERING_INSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING" == "true" ]
     echo "Creating ClusterRole for reporting-operator"
     kubectl \
         apply -f \
-        "${DEPLOY_MANIFESTS_DIR}/reporting-operator-clusterrole.yaml"
+        "${RBAC_MANIFESTS_DIR}/reporting-operator-clusterrole.yaml"
 
     echo "Creating ClusterRoleBinding for reporting-operator"
     kubectl \
