@@ -20,7 +20,7 @@ source "${ROOT_DIR}/hack/lib/version.sh"
 : "${SKIP_METERING_OPERATOR_DEPLOYMENT:=false}"
 : "${DELETE_PVCS:=false}"
 
-: "${DEPLOY_PLATFORM:=generic}"
+: "${DEPLOY_PLATFORM:=openshift}"
 METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 
 : "${DEPLOY_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy}"
