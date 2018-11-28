@@ -7,12 +7,6 @@ hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
 hive.metastore.uri={{ .Values.spec.hive.config.metastoreURIs }}
-{{- if .Values.spec.config.awsAccessKeyID }}
-hive.s3.aws-access-key={{ .Values.spec.config.awsAccessKeyID }}
-{{- end}}
-{{- if .Values.spec.config.awsSecretAccessKey }}
-hive.s3.aws-secret-key={{ .Values.spec.config.awsSecretAccessKey }}
-{{- end}}
 {{ end }}
 
 {{- define "presto-jmx-catalog-properties" -}}
@@ -46,6 +40,18 @@ connector.name=jmx
     resourceFieldRef:
       containerName: presto
       resource: limits.memory
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
+      key: aws-access-key-id
+      optional: true
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
+      key: aws-secret-access-key
+      optional: true
 {{- end }}
 
 {{- define "hive-env" }}
@@ -66,13 +72,13 @@ connector.name=jmx
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: hive-secrets
+      name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
       key: aws-access-key-id
       optional: true
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: hive-secrets
+      name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
       key: aws-secret-access-key
       optional: true
 {{- end }}
