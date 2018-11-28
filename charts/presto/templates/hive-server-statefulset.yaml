@@ -122,6 +122,8 @@ spec:
         emptyDir: {}
       - name: hive-metastore-db-data
         emptyDir: {}
+      - name: hadoop-logs
+        emptyDir: {}
 {{- if .Values.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
