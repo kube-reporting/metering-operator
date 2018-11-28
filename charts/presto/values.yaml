@@ -157,9 +157,10 @@ spec:
     annotations: {}
 
   con***REMOVED***g:
-    awsRegion: ""
     awsAccessKeyID: ""
     awsSecretAccessKey: ""
+    createAwsCredentialsSecret: true
+    awsCredentialsSecretName: presto-aws-credentials
 
     sharedVolume:
       enabled: false
