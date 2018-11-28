@@ -75,7 +75,7 @@ Replace `operator-metering-data` with the name of your bucket.
 Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
 
 Because the deployed HDFS cluster will not be used to store data, it may also be disabled.
-In `s3-storage.yaml`, this has already been done by setting `hdfs.enabled` to `false`.
+In `s3-storage.yaml`, this has already been done by setting `hdfs.enabled` to `false` and setting `presto.spec.hive.config.useHdfsConfigMap` to `false`.
 
 ## Using shared volumes for storage
 
