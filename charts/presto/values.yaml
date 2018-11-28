@@ -157,9 +157,10 @@ spec:
     annotations: {}
 
   config:
-    awsRegion: ""
     awsAccessKeyID: ""
     awsSecretAccessKey: ""
+    createAwsCredentialsSecret: true
+    awsCredentialsSecretName: presto-aws-credentials
 
     sharedVolume:
       enabled: false
