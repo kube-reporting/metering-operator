@@ -30,7 +30,7 @@ spec:
       annotations:
         hive-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/hive-con***REMOVED***gmap.yaml") . | sha256sum }}
         hive-scripts-hash: {{ include (print $.Template.BasePath "/hive-scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
-        hive-secrets-hash: {{ include (print $.Template.BasePath "/hive-secrets.yaml") . | sha256sum }}
+        presto-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- if .Values.spec.hive.annotations }}
 {{ toYaml .Values.spec.hive.annotations | indent 8 }}
 {{- end }}

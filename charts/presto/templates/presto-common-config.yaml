@@ -33,9 +33,9 @@ data:
     # set min to max to avoid pauses caused by heap expansion
     export MIN_HEAPSIZE="$MAX_HEAPSIZE"
 
+    JVM_CONFIG="${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
     if [ -n "$MAX_HEAPSIZE" ]; then
       # add heapsize to jvm con***REMOVED***g if not already
-      JVM_CONFIG="${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
       if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
         FLAG="-Xmx${MAX_HEAPSIZE}M"
         echo "Adding $FLAG to $JVM_CONFIG"
@@ -56,6 +56,14 @@ data:
       NODE_ID="node.id=$MY_NODE_ID"
       echo "Adding $NODE_ID to $NODE_CONFIG"
       echo "$NODE_ID" >> "$NODE_CONFIG"
+    ***REMOVED***
+
+    # add AWS creds to hive catalog properties
+    HIVE_CATALOG_CONFIG="${PRESTO_HOME}/etc/catalog/hive.properties"
+    if ! grep -q -F 'hive.s3.aws-access-key' "$HIVE_CATALOG_CONFIG"; then
+      echo "Adding hive.s3.aws-access-key and hive.s3.aws-secret-key to $HIVE_CATALOG_CONFIG"
+      echo "hive.s3.aws-access-key=$AWS_ACCESS_KEY_ID" >> "$HIVE_CATALOG_CONFIG"
+      echo "hive.s3.aws-secret-key=$AWS_SECRET_ACCESS_KEY" >> "$HIVE_CATALOG_CONFIG"
     ***REMOVED***
 
     # add UID to /etc/passwd if missing

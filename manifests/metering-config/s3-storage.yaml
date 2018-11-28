@@ -30,6 +30,9 @@ spec:
         # Replace these with your own AWS credentials
         awsAccessKeyID: "REPLACEME"
         awsSecretAccessKey: "REPLACEME"
+      hive:
+        con***REMOVED***g:
+          useHdfsCon***REMOVED***gMap: false
 
   hdfs:
     # disable HDFS components when using S3 to avoid wasting resources.
