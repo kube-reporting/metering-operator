@@ -3,19 +3,15 @@ kind: Metering
 metadata:
   name: "operator-metering"
 spec:
-  reporting-operator:
-    spec:
-     con***REMOVED***g:
-       defaultStorage:
-         create: true
-         name: "local-storage"
-         isDefault: true
-         type: "hive"
-         hive:
-           tableProperties:
-             # do not change this
-             location: "/user/hive/warehouse"
-
+  defaultStorage:
+    create: true
+     name: "local-storage"
+     isDefault: true
+     type: "hive"
+     hive:
+       tableProperties:
+         # do not change this
+         location: "/user/hive/warehouse"
   presto:
     spec:
       con***REMOVED***g:

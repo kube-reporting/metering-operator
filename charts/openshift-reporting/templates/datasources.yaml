@@ -1,0 +1,32 @@
+{{- range $name, $body := .Values.spec.defaultReportDataSources }}
+---
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "{{ $name }}"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" $ }}
+{{- end }}
+spec:
+{{ toYaml $body.spec | indent 2 }}
+{{- end }}
+
+---
+
+{{- if .Values.spec.awsBillingReportDataSource.enabled -}}
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "aws-billing"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  awsBilling:
+    source:
+      bucket: "{{ .Values.spec.awsBillingReportDataSource.bucket }}"
+      pre***REMOVED***x: "{{ .Values.spec.awsBillingReportDataSource.pre***REMOVED***x }}"
+      region: "{{ .Values.spec.awsBillingReportDataSource.region }}"
+{{- end }}

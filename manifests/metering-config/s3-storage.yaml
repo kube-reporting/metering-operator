@@ -5,24 +5,24 @@ metadata:
 spec:
   # If you want to use S3 for storage of reports, and collected metrics, edit
   # the defaultStorage section below, and set awsAccessKeyID and
-  # awsSecretAccessKey for presto
+  # awsSecretAccessKey for reporting-operator and presto
+  defaultStorage:
+    create: true
+    name: "s3"
+    isDefault: true
+    type: "hive"
+    hive:
+      tableProperties:
+        # update this with the name of your bucket and the path within
+        # that bucket you wish to use. Do not change the s3a:// protocol.
+        location: "s3a://bucketName/pathInBucket"
+
   reporting-operator:
     spec:
       con***REMOVED***g:
         # Replace these with your own AWS credentials
         awsAccessKeyID: "REPLACEME"
         awsSecretAccessKey: "REPLACEME"
-
-        defaultStorage:
-          create: true
-          name: "s3"
-          isDefault: true
-          type: "hive"
-          hive:
-            tableProperties:
-              # update this with the name of your bucket and the path within
-              # that bucket you wish to use. Do not change the s3a:// protocol.
-              location: "s3a://bucketName/pathInBucket"
 
   presto:
     spec:
