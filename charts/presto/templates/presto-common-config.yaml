@@ -33,9 +33,9 @@ data:
     # set min to max to avoid pauses caused by heap expansion
     export MIN_HEAPSIZE="$MAX_HEAPSIZE"
 
+    JVM_CONFIG="${PRESTO_HOME}/etc/jvm.config"
     if [ -n "$MAX_HEAPSIZE" ]; then
       # add heapsize to jvm config if not already
-      JVM_CONFIG="${PRESTO_HOME}/etc/jvm.config"
       if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
         FLAG="-Xmx${MAX_HEAPSIZE}M"
         echo "Adding $FLAG to $JVM_CONFIG"
