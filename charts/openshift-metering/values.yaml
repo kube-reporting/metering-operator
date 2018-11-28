@@ -1,3 +1,15 @@
+defaultStorage:
+  create: true
+  name: "hive-hdfs"
+  isDefault: true
+  type: "hive"
+  hive:
+    tableProperties:
+      location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
+
+openshift-reporting:
+  enabled: true
+
 reporting-operator:
   spec:
     config:

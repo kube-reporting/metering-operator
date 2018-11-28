@@ -6,9 +6,7 @@ For clusters running in EC2, this can be enabled by modifying the example [aws-b
 To enable AWS billing correlation, first ensure the AWS Cost and Usage Reports are enabled.
 For more information, see [Turning on the AWS Cost and Usage report][enable-aws-billing] in the AWS documentation.
 
-Next, update the `defaultReportDataSources.aws-billing` section in the [aws-billing.yaml][example-config] example configuration manifest.
-
-Uncomment the entire `defaultReportDataSources` block , and update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report.
+Next, update update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report in the `openshift-reporting.spec.awsBillingReportDataSource` in the [aws-billing.yaml][example-config] example configuration manifest.
 
 Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.reporting-operator.spec.config` and `spec.presto.spec.config` sections.
 
