@@ -3,8 +3,8 @@
 # $CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES are unspecified, then this script
 # requires 1 argument, the image tag for the helm-operator pod. Additionally,
 # a second optional argument can be provided to override where the manifests
-# should be output, by default it outputs everything into
-# deploy/manifests/{generic,openshift} directories.
+# should be output, by default it outputs everything into the
+# deploy/manifests/openshift directory.
 #
 # If both of those environment variables are set, then this script takes no
 # arguments and the environment variables will be used as the paths to files
@@ -67,22 +67,4 @@ echo "Creating Openshift ALM manifests"
     "$MANIFEST_OUTPUT_DIR/openshift/alm" \
     "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
     "$DEPLOY_MANIFESTS_DIR/openshift-alm-values.yaml" \
-    "$ALM_OVERRIDE_VALUES_FILE"
-
-# generic
-echo
-echo "Creating Generic deploy manifests"
-"$ROOT_DIR/hack/create-deploy-manifests.sh" \
-    "$MANIFEST_OUTPUT_DIR/generic/helm-operator" \
-    "$DEPLOY_MANIFESTS_DIR/common-helm-operator-values.yaml" \
-    "$DEPLOY_MANIFESTS_DIR/generic-helm-operator-values.yaml" \
-    "$HELM_OPERATOR_OVERRIDE_VALUES_FILE"
-
-echo
-echo "Creating Generic ALM manifests"
-"$ROOT_DIR/hack/create-alm-manifests.sh" \
-    "$MANIFEST_OUTPUT_DIR/generic/helm-operator" \
-    "$MANIFEST_OUTPUT_DIR/generic/alm" \
-    "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
-    "$DEPLOY_MANIFESTS_DIR/generic-alm-values.yaml" \
     "$ALM_OVERRIDE_VALUES_FILE"
