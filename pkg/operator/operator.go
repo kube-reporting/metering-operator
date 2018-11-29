@@ -88,10 +88,11 @@ type Con***REMOVED***g struct {
 	Namespace  string
 	Kubecon***REMOVED***g string
 
-	HiveHost         string
-	PrestoHost       string
-	DisablePromsum   bool
-	EnableFinalizers bool
+	HiveHost                string
+	PrestoHost              string
+	DisablePromsum          bool
+	DisableWriteHealthCheck bool
+	EnableFinalizers        bool
 
 	PrestoMaxQueryLength int
 
@@ -423,8 +424,15 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}
 
 	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, newTableProperties)
-	op.testWriteToPrestoFunc = func() bool {
-		return prestoHealthChecker.TestWriteToPrestoSingleFlight()
+	if op.cfg.DisableWriteHealthCheck {
+		op.testWriteToPrestoFunc = func() bool {
+			op.logger.Debugf("con***REMOVED***gured to skip checking ability to write to presto")
+			return true
+		}
+	} ***REMOVED*** {
+		op.testWriteToPrestoFunc = func() bool {
+			return prestoHealthChecker.TestWriteToPrestoSingleFlight()
+		}
 	}
 	op.testReadFromPrestoFunc = func() bool {
 		return prestoHealthChecker.TestReadFromPrestoSingleFlight()
@@ -459,18 +467,22 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
 	}()
 
-	// Poll until we can write to presto
-	op.logger.Info("testing ability to write to Presto")
-	err = wait.PollUntil(time.Second*5, func() (bool, error) {
-		if op.testWriteToPrestoFunc() {
-			return true, nil
+	if op.cfg.DisableWriteHealthCheck {
+		op.logger.Info("con***REMOVED***gured to skip checking ability to write to presto")
+	} ***REMOVED*** {
+		// Poll until we can write to presto
+		op.logger.Info("testing ability to write to Presto")
+		err = wait.PollUntil(time.Second*5, func() (bool, error) {
+			if op.testWriteToPrestoFunc() {
+				return true, nil
+			}
+			return false, nil
+		}, stopCh)
+		if err != nil {
+			return err
 		}
-		return false, nil
-	}, stopCh)
-	if err != nil {
-		return err
+		op.logger.Info("writes to Presto are succeeding")
 	}
-	op.logger.Info("writes to Presto are succeeding")
 
 	op.logger.Info("basic initialization completed")
 	op.setInitialized()
