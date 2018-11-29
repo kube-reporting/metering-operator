@@ -3,6 +3,7 @@ package presto
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	_ "github.com/prestodb/presto-go-client/presto"
@@ -27,5 +28,13 @@ func NewPrestoConnWithRetry(ctx context.Context, logger log.FieldLogger, connStr
 		}
 		return false, nil
 	}
-	return db, wait.ExponentialBackoff(backoff, cond)
+	err := wait.ExponentialBackoff(backoff, cond)
+	if err != nil {
+		if err == wait.ErrWaitTimeout {
+			return nil, fmt.Errorf("timed out while waiting to connect to presto")
+		}
+		return nil, err
+	}
+
+	return db, nil
 }

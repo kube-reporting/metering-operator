@@ -208,8 +208,15 @@ func (q *reconnectingQueryer) newConnection(ctx context.Context) (*Connection, e
 			return false, nil
 		}
 	}
+	err := wait.ExponentialBackoff(backoff, cond)
+	if err != nil {
+		if err == wait.ErrWaitTimeout {
+			return nil, fmt.Errorf("timed out while waiting to connect to hive")
+		}
+		return nil, err
+	}
 
-	return conn, wait.ExponentialBackoff(backoff, cond)
+	return conn, nil
 }
 
 func isErrBrokenPipe(err error) bool {
