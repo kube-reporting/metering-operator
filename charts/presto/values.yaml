@@ -41,6 +41,7 @@ spec:
           cpu: "2"
 
       nodeSelector: {}
+      tolerations: {}
 
       af***REMOVED***nity:
         podAntiAf***REMOVED***nity:
@@ -79,6 +80,7 @@ spec:
           cpu: "2"
 
       nodeSelector: {}
+      tolerations: {}
 
       af***REMOVED***nity:
         podAntiAf***REMOVED***nity:
@@ -139,6 +141,8 @@ spec:
         size: "5Gi"
 
       nodeSelector: {}
+      tolerations: {}
+      af***REMOVED***nity: {}
 
     server:
       con***REMOVED***g:
@@ -152,6 +156,8 @@ spec:
           cpu: "100m"
 
       nodeSelector: {}
+      tolerations: {}
+      af***REMOVED***nity: {}
 
     labels: {}
     annotations: {}

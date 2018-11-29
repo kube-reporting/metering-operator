@@ -45,6 +45,10 @@ spec:
       nodeSelector:
 {{ toYaml .Values.spec.presto.worker.nodeSelector | indent 8 }}
 {{- end }}
+{{- if .Values.spec.presto.worker.tolerations }}
+      tolerations:
+{{ toYaml .Values.spec.presto.worker.tolerations | indent 8 }}
+{{- end }}
       initContainers:
       - name: copy-presto-con***REMOVED***g
         image: "{{ .Values.spec.presto.image.repository }}:{{ .Values.spec.presto.image.tag }}"

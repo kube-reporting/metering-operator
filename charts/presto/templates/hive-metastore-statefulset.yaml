@@ -41,6 +41,14 @@ spec:
       nodeSelector:
 {{ toYaml .Values.spec.hive.metastore.nodeSelector | indent 8 }}
 {{- end }}
+{{- if .Values.spec.hive.metastore.tolerations }}
+      tolerations:
+{{ toYaml .Values.spec.hive.metastore.tolerations | indent 8 }}
+{{- end }}
+{{- if .Values.spec.hive.metastore.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.spec.hive.metastore.af***REMOVED***nity | indent 8 }}
+{{- end }}
       containers:
       - name: metastore
         command: ["/hive-scripts/entrypoint.sh"]

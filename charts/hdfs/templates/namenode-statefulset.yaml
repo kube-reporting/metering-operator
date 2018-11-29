@@ -89,6 +89,10 @@ spec:
       nodeSelector:
 {{ toYaml .Values.spec.namenode.nodeSelector | indent 8 }}
 {{- end }}
+{{- if .Values.spec.namenode.tolerations }}
+      tolerations:
+{{ toYaml .Values.spec.namenode.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"
