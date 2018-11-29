@@ -10,7 +10,7 @@ metadata:
 spec:
   reportQueries:
   - "pod-cpu-request-raw"
-  - "node-cpu-allocatable"
+  - "node-cpu-allocatable-raw"
   dynamicReportQueries:
   - "aws-ec2-billing-data"
   view:
@@ -53,7 +53,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
-      FROM {| generationQueryViewName "node-cpu-allocatable" |}
+      FROM {| generationQueryViewName "node-cpu-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -100,7 +100,7 @@ metadata:
 spec:
   reportQueries:
   - "pod-cpu-usage-raw"
-  - "node-cpu-allocatable"
+  - "node-cpu-allocatable-raw"
   dynamicReportQueries:
   - "aws-ec2-billing-data"
   view:
@@ -143,7 +143,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
-      FROM {| generationQueryViewName "node-cpu-allocatable" |}
+      FROM {| generationQueryViewName "node-cpu-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
