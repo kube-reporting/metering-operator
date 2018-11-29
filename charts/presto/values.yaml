@@ -142,6 +142,7 @@ spec:
 
       nodeSelector: {}
       tolerations: {}
+      affinity: {}
 
     server:
       config:
@@ -156,6 +157,7 @@ spec:
 
       nodeSelector: {}
       tolerations: {}
+      affinity: {}
 
     labels: {}
     annotations: {}

@@ -45,6 +45,10 @@ spec:
       tolerations:
 {{ toYaml .Values.spec.hive.server.tolerations | indent 8 }}
 {{- end }}
+{{- if .Values.spec.hive.server.affinity }}
+      affinity:
+{{ toYaml .Values.spec.hive.server.affinity | indent 8 }}
+{{- end }}
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
