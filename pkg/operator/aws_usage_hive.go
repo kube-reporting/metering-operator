@@ -51,5 +51,5 @@ func (op *Reporting) createAWSUsageTable(logger logrus.FieldLogger, dataSource *
 		SerdeRowProperties: reportingutil.AWSUsageHiveSerdeProps,
 		External:           true,
 	}
-	return op.createTableWith(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), params, properties)
+	return op.createTableAndCR(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), params, properties)
 }
