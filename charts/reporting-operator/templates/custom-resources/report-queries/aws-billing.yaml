@@ -11,7 +11,7 @@ spec:
   reportDataSources:
   - "aws-billing"
   reportQueries:
-  - "node-memory-allocatable"
+  - "node-memory-allocatable-raw"
   columns:
   - name: resource_id
     type: string
@@ -28,7 +28,7 @@ spec:
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
-      FROM {| generationQueryViewName "node-memory-allocatable" |}
+      FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
       GROUP BY resource_id
     )
     SELECT lineItem_resourceId as resource_id,
