@@ -45,6 +45,10 @@ spec:
       tolerations:
 {{ toYaml .Values.spec.hive.server.tolerations | indent 8 }}
 {{- end }}
+{{- if .Values.spec.hive.server.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.spec.hive.server.af***REMOVED***nity | indent 8 }}
+{{- end }}
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]

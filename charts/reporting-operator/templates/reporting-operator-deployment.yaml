@@ -48,6 +48,10 @@ spec:
       tolerations:
 {{ toYaml .Values.spec.tolerations | indent 8 }}
 {{- end }}
+{{- if .Values.spec.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml .Values.spec.af***REMOVED***nity | indent 8 }}
+{{- end }}
       containers:
       - name: reporting-operator
         image: "{{ .Values.spec.image.repository }}:{{ .Values.spec.image.tag }}"

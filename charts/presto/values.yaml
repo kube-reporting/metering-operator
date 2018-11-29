@@ -142,6 +142,7 @@ spec:
 
       nodeSelector: {}
       tolerations: {}
+      af***REMOVED***nity: {}
 
     server:
       con***REMOVED***g:
@@ -156,6 +157,7 @@ spec:
 
       nodeSelector: {}
       tolerations: {}
+      af***REMOVED***nity: {}
 
     labels: {}
     annotations: {}
