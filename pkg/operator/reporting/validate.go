@@ -40,11 +40,11 @@ func GetAndValidateGenerationQueryDependencies(
 		generationQuery,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get dependencies for ReportGenerationQuery %s: %v", generationQuery.Name, err)
+		return nil, err
 	}
 	err = ValidateGenerationQueryDependencies(deps, handler)
 	if err != nil {
-		return nil, fmt.Errorf("ReportGenerationQuery dependencies validation failed for ReportGenerationQuery %s: %v", generationQuery.Name, err)
+		return nil, err
 	}
 	return deps, nil
 }
@@ -61,60 +61,38 @@ func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies
 	var (
 		uninitializedQueries     []*metering.ReportGenerationQuery
 		uninitializedDataSources []*metering.ReportDataSource
-		uninitializedQueryNames,
-		disabledViewQueryNames,
-		uninitializedDataSourceNames,
-		uninitializedReportNames,
-		uninitializedScheduledReportNames []string
 	)
-
+	validationErr := new(reportGenerationQueryDependenciesValidationError)
 	for _, query := range deps.ReportGenerationQueries {
 		// it's invalid for a ReportGenerationQuery with view.disabled set to
 		// true to be a non-dynamic ReportGenerationQuery dependency
 		if query.Spec.View.Disabled {
-			disabledViewQueryNames = append(disabledViewQueryNames, query.Name)
+			validationErr.disabledViewQueryNames = append(validationErr.disabledViewQueryNames, query.Name)
 			continue
 		}
 		// if a query doesn't disable view creation, than it is
 		// uninitialized if it's view is not created/set yet
 		if !query.Spec.View.Disabled && query.Status.ViewName == "" {
 			uninitializedQueries = append(uninitializedQueries, query)
-			uninitializedQueryNames = append(uninitializedQueryNames, query.Name)
+			validationErr.uninitializedQueryNames = append(validationErr.uninitializedQueryNames, query.Name)
 		}
 	}
 	// anything below missing tableName in it's status is uninitialized
 	for _, ds := range deps.ReportDataSources {
 		if ds.Status.TableName == "" {
 			uninitializedDataSources = append(uninitializedDataSources, ds)
-			uninitializedDataSourceNames = append(uninitializedDataSourceNames, ds.Name)
+			validationErr.uninitializedDataSourceNames = append(validationErr.uninitializedDataSourceNames, ds.Name)
 		}
 	}
 	for _, report := range deps.Reports {
 		if report.Status.TableName == "" {
-			uninitializedReportNames = append(uninitializedReportNames, report.Name)
+			validationErr.uninitializedReportNames = append(validationErr.uninitializedReportNames, report.Name)
 		}
 	}
 	for _, scheduledReport := range deps.ScheduledReports {
 		if scheduledReport.Status.TableName == "" {
-			uninitializedScheduledReportNames = append(uninitializedScheduledReportNames, scheduledReport.Name)
+			validationErr.uninitializedScheduledReportNames = append(validationErr.uninitializedScheduledReportNames, scheduledReport.Name)
 		}
-	}
-
-	var errs []string
-	if len(uninitializedDataSourceNames) != 0 {
-		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ReportDataSource dependencies: %s", strings.Join(uninitializedDataSourceNames, ", ")))
-	}
-	if len(disabledViewQueryNames) != 0 {
-		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has ReportGenerationQuery with disabled views dependencies: %s", strings.Join(disabledViewQueryNames, ", ")))
-	}
-	if len(uninitializedQueryNames) != 0 {
-		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ReportGenerationQuery dependencies: %s", strings.Join(uninitializedQueryNames, ", ")))
-	}
-	if len(uninitializedReportNames) != 0 {
-		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized Report dependencies: %s", strings.Join(uninitializedReportNames, ", ")))
-	}
-	if len(uninitializedScheduledReportNames) != 0 {
-		errs = append(errs, fmt.Sprintf("ReportGenerationQuery has uninitialized ScheduledReport dependencies: %s", strings.Join(uninitializedScheduledReportNames, ", ")))
 	}
 
 	if handler != nil {
@@ -127,10 +105,59 @@ func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies
 		}
 	}
 
-	if len(errs) != 0 {
-		return fmt.Errorf("ReportGenerationQuery dependency validation error: %s", strings.Join(errs, ", "))
+	if len(validationErr.disabledViewQueryNames) != 0 ||
+		len(validationErr.uninitializedQueryNames) != 0 ||
+		len(validationErr.uninitializedDataSourceNames) != 0 ||
+		len(validationErr.uninitializedReportNames) != 0 ||
+		len(validationErr.uninitializedScheduledReportNames) != 0 {
+		return validationErr
 	}
 	return nil
+}
+
+func IsUninitializedDependencyError(err error) bool {
+	validationErr, ok := err.(*reportGenerationQueryDependenciesValidationError)
+	return ok && (len(validationErr.uninitializedQueryNames) != 0 ||
+		len(validationErr.uninitializedDataSourceNames) != 0 ||
+		len(validationErr.uninitializedReportNames) != 0 ||
+		len(validationErr.uninitializedScheduledReportNames) != 0)
+}
+
+func IsInvalidDependencyError(err error) bool {
+	validationErr, ok := err.(*reportGenerationQueryDependenciesValidationError)
+	return ok && len(validationErr.disabledViewQueryNames) != 0
+}
+
+type reportGenerationQueryDependenciesValidationError struct {
+	uninitializedQueryNames,
+	disabledViewQueryNames,
+	uninitializedDataSourceNames,
+	uninitializedReportNames,
+	uninitializedScheduledReportNames []string
+}
+
+func (e *reportGenerationQueryDependenciesValidationError) Error() string {
+	var errs []string
+	if len(e.uninitializedDataSourceNames) != 0 {
+		errs = append(errs, fmt.Sprintf("uninitialized ReportDataSource dependencies: %s", strings.Join(e.uninitializedDataSourceNames, ", ")))
+	}
+	if len(e.disabledViewQueryNames) != 0 {
+		errs = append(errs, fmt.Sprintf("invalid ReportGenerationQuery dependencies (disabled view): %s", strings.Join(e.disabledViewQueryNames, ", ")))
+	}
+	if len(e.uninitializedQueryNames) != 0 {
+		errs = append(errs, fmt.Sprintf("uninitialized ReportGenerationQuery dependencies: %s", strings.Join(e.uninitializedQueryNames, ", ")))
+	}
+	if len(e.uninitializedReportNames) != 0 {
+		errs = append(errs, fmt.Sprintf("uninitialized Report dependencies: %s", strings.Join(e.uninitializedReportNames, ", ")))
+	}
+	if len(e.uninitializedScheduledReportNames) != 0 {
+		errs = append(errs, fmt.Sprintf("uninitialized ScheduledReport dependencies: %s", strings.Join(e.uninitializedScheduledReportNames, ", ")))
+	}
+
+	if len(errs) != 0 {
+		return fmt.Sprintf("ReportGenerationQueryDependencyValidationError: %s", strings.Join(errs, ", "))
+	}
+	panic("zero uninitialized or invalid dependencies")
 }
 
 func GetGenerationQueryDependencies(

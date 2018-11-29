@@ -71,7 +71,26 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		op.uninitialiedDependendenciesHandler(),
 	)
 	if err != nil {
-		return fmt.Errorf("unable to validate ReportGenerationQuery %s, failed to validate dependencies %v", generationQuery.Name, err)
+		if reporting.IsUninitializedDependencyError(err) {
+			logger.Warnf("unable to validate ReportGenerationQuery %s, has uninitialized dependencies: %v", generationQuery.Name, err)
+			// We do not return an error because we do not need to requeue this
+			// query. instead we can wait until this queries uninitialized
+			// dependencies become initialized. After they're initialized they
+			// will queue anything that depends on them, including this query.
+			return nil
+		} ***REMOVED*** if reporting.IsInvalidDependencyError(err) {
+			logger.WithError(err).Errorf("unable to validate ReportGenerationQuery %s, has invalid dependencies, dropping off queue", generationQuery.Name)
+			// Invalid dependency means it will not resolve itself, so do not
+			// return an error since we do not want to be requeued unless the
+			// resource is modi***REMOVED***ed, or it's dependencies are modi***REMOVED***ed.
+			return nil
+		} ***REMOVED*** {
+			// The error occurred when getting the dependencies or for an
+			// unknown reason so we want to retry up to a limit. This most
+			// commonly occurs when fetching a dependency from the API fails,
+			// or if there is a cyclic dependency.
+			return fmt.Errorf("unable to get or validate ReportGenerationQuery dependencies %s: %v", generationQuery.Name, err)
+		}
 	}
 
 	if createView {
