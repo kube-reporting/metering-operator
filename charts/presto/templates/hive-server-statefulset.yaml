@@ -41,6 +41,10 @@ spec:
       nodeSelector:
 {{ toYaml .Values.spec.hive.server.nodeSelector | indent 8 }}
 {{- end }}
+{{- if .Values.spec.hive.server.tolerations }}
+      tolerations:
+{{ toYaml .Values.spec.hive.server.tolerations | indent 8 }}
+{{- end }}
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
