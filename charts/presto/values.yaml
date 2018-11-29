@@ -41,6 +41,7 @@ spec:
           cpu: "2"
 
       nodeSelector: {}
+      tolerations: {}
 
       affinity:
         podAntiAffinity:
@@ -79,6 +80,7 @@ spec:
           cpu: "2"
 
       nodeSelector: {}
+      tolerations: {}
 
       affinity:
         podAntiAffinity:
@@ -139,6 +141,8 @@ spec:
         size: "5Gi"
 
       nodeSelector: {}
+      tolerations: {}
+      affinity: {}
 
     server:
       config:
@@ -152,6 +156,8 @@ spec:
           cpu: "100m"
 
       nodeSelector: {}
+      tolerations: {}
+      affinity: {}
 
     labels: {}
     annotations: {}

@@ -145,6 +145,8 @@ spec:
   labels: {}
   annotations: {}
   nodeSelector: {}
+  tolerations: {}
+  affinity: {}
 
   service:
     annotations: {}
