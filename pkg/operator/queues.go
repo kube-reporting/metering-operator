@@ -50,6 +50,7 @@ func (op *Reporting) updateReport(prev, cur interface{}) {
 	}
 	if reflect.DeepEqual(prevReport.Spec, curReport.Spec) {
 		op.logger.Debugf("Report %s spec is unchanged, skipping update", curReport.Name)
+		return
 	}
 
 	op.logger.Infof("updating Report %s", curReport.Name)
@@ -133,6 +134,7 @@ func (op *Reporting) updateScheduledReport(prev, cur interface{}) {
 
 	if reflect.DeepEqual(prevScheduledReport.Spec, curScheduledReport.Spec) {
 		op.logger.Debugf("ScheduledReport %s spec is unchanged, skipping update", curScheduledReport.Name)
+		return
 	}
 
 	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
