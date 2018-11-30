@@ -210,28 +210,49 @@ type reportPeriod struct {
 // hasn't elapsed, runScheduledReport will requeue the resource for a time when
 // the period has elapsed.
 func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.ScheduledReport) error {
-	now := op.clock.Now().UTC()
-
-	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
-		// already failed, skip processing
-		if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue {
-			return nil
-		}
-
-		err := fmt.Errorf("ScheduledReport spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time)
-
-		failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.InvalidReportingEndReason, err.Error())
-		cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
-		cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
-
-		_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-		if updateErr != nil {
-			logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
-			return updateErr
-		}
+	// validate the scheduledReport before anything ***REMOVED*** to surface issues
+	// before we actually run
+	runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ValidatingScheduledReportReason, "validating report and its dependencies")
+	cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
+	var err error
+	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to update ScheduledReport status")
 		return err
 	}
 
+	if report.Spec.GenerationQueryName == "" {
+		return op.setScheduledReportStatusValidationFailure(report, "must set spec.generationQuery")
+	}
+
+	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
+		return op.setScheduledReportStatusValidationFailure(report, fmt.Sprintf("spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time))
+	}
+
+	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	if err != nil {
+		logger.WithError(err).Errorf("failed to get report generation query")
+		return err
+	}
+
+	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
+		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
+		reporting.NewReportListerGetter(op.reportLister),
+		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
+		genQuery,
+		op.uninitialiedDependendenciesHandler(),
+	)
+	if err != nil {
+		return op.setScheduledReportStatusValidationFailure(report, fmt.Sprintf("failed to validate ReportGenerationQuery dependencies %s: %v", genQuery.Name, err))
+	}
+
+	// if it was previously failed validation, remove the status
+	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
+
+	now := op.clock.Now().UTC()
+
+	// set the lastReportTime if we've never collected before.
 	if report.Status.LastReportTime == nil {
 		if report.Spec.ReportingStart != nil {
 			logger.Infof("no last report time for report, setting lastReportTime to spec.reportingStart %s", report.Spec.ReportingStart.Time)
@@ -242,47 +263,27 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 			nearestMinute := now.Truncate(time.Minute)
 			report.Status.LastReportTime = &metav1.Time{nearestMinute}
 		}
-
-		var err error
-		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-		if err != nil {
-			logger.WithError(err).Errorf("unable to update ScheduledReport status")
-			return err
-		}
 	} ***REMOVED*** {
-		if report.Spec.ReportingEnd != nil && report.Spec.ReportingEnd.Time.Before(report.Status.LastReportTime.Time) {
-			// already failed, skip processing
-			if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue {
-				return nil
-			}
+		logger.Infof("last report time was %s", report.Status.LastReportTime.Time)
+	}
+	lastReportTime := report.Status.LastReportTime.Time
 
-			err := fmt.Errorf("ScheduledReport spec.reportingEnd (%s) is set to a time before status.lastReportTime (%s), cannot process", report.Spec.ReportingEnd.Time, report.Status.LastReportTime.Time)
+	// check if this report was previously ***REMOVED***nished
+	runningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning)
+	previouslyFinished := runningCond != nil && runningCond.Reason == cbutil.ReportPeriodFinishedReason && runningCond.Status == v1.ConditionTrue
 
-			failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.InvalidReportingEndReason, err.Error())
-			cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
-			cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
-
-			_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-			if updateErr != nil {
-				logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
-				return updateErr
-			}
-
-			return err
-		}
-		if isRunningCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportRunning); isRunningCond != nil && isRunningCond.Reason == cbutil.ReportPeriodFinishedReason && isRunningCond.Status == v1.ConditionFalse {
-			// if the report's reportingEnd is unset or after the lastReportTime
-			// then the report was updated since it last ***REMOVED***nished and we should
-			// consider it something to be reprocessed
-			if report.Spec.ReportingEnd == nil {
-				logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd is unset: beginning processing of report")
-			} ***REMOVED*** if report.Spec.ReportingEnd.Time.After(report.Status.LastReportTime.Time) {
-				logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd, report.Status.LastReportTime.Time)
-			} ***REMOVED*** {
-				// return without processing because the report is complete
-				logger.Infof(isRunningCond.Message)
-				return nil
-			}
+	// if the report's reportingEnd is unset or after the lastReportTime
+	// then the report was updated since it last ***REMOVED***nished and we should
+	// consider it something to be reprocessed
+	if previouslyFinished {
+		if report.Spec.ReportingEnd == nil {
+			logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd is unset: beginning processing of report")
+		} ***REMOVED*** if report.Spec.ReportingEnd.Time.After(lastReportTime) {
+			logger.Infof("previously ***REMOVED***nished report's spec.reportingEnd (%s) is now after lastReportTime (%s): beginning processing of report", report.Spec.ReportingEnd, lastReportTime)
+		} ***REMOVED*** {
+			// return without processing because the report is complete
+			logger.Infof("ScheduledReport %s is already ***REMOVED***nished", report.Name, runningCond.Message)
+			return nil
 		}
 	}
 
@@ -291,7 +292,6 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return err
 	}
 
-	lastReportTime := report.Status.LastReportTime.Time
 	reportPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, lastReportTime)
 
 	if report.Spec.ReportingEnd != nil && reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
@@ -307,8 +307,6 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		"period":            report.Spec.Schedule.Period,
 		"overwriteExisting": report.Spec.OverwriteExistingData,
 	})
-
-	logger.Infof("last report time was %s", lastReportTime)
 
 	var gracePeriod time.Duration
 	if report.Spec.GracePeriod != nil {
@@ -331,70 +329,12 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		return nil
 	}
 
-	// validate the scheduledReport before anything ***REMOVED*** to surface issues
-	// before we actually run
-	msg := fmt.Sprintf("Validating generationQuery %s", report.Spec.GenerationQueryName)
-	runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ValidatingScheduledReportReason, msg)
-	cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
-
-	report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-	if err != nil {
-		logger.WithError(err).Errorf("unable to update ScheduledReport status")
-		return err
-	}
-
-	genQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to get report generation query")
-		return err
-	}
-
-	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
-		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
-		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
-		genQuery,
-		op.uninitialiedDependendenciesHandler(),
-	)
-	if err != nil {
-		// wrapped the error with more information
-		err = fmt.Errorf("unable to run ScheduledReport %s, ReportGenerationQuery %s, failed to validate dependencies: %v", report.Name, genQuery.Name, err)
-
-		// avoid continously triggering an update cycle if we're already failed
-		// validation
-		if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue && isFailureCond.Reason == cbutil.FailedValidationReason {
-			logger.Warnf("ScheduledReport %s failed validation last reconcile, skipping updating status", report.Name)
-		} ***REMOVED*** {
-			// update the status to indicate the query failed validation
-			failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.FailedValidationReason, err.Error())
-			cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
-			cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
-
-			// store updateErr so we can log it and return the wrapped error
-			_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
-			if err != nil {
-				logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
-				return err
-			}
-		}
-		return err
-	}
-	// if it was previously failed validation, remove the status
-	if isFailureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure); isFailureCond != nil && isFailureCond.Status == v1.ConditionTrue && isFailureCond.Reason == cbutil.FailedValidationReason {
-		cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
-	}
-
 	if reportGracePeriodUnmet {
 		waitMsg := fmt.Sprintf("next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
 		logger.Infof(waitMsg+". waiting %s", waitTime)
 
-		runningCondition = cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ReportPeriodWaitingReason, waitMsg)
-		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
-
-		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		report, err = op.updateScheduledReportStatusRunning(report, cbutil.ReportPeriodWaitingReason, waitMsg)
 		if err != nil {
-			logger.WithError(err).Errorf("unable to update ScheduledReport status")
 			return err
 		}
 
@@ -406,12 +346,8 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		runningMsg := fmt.Sprintf("reached end of last reporting period [%s to %s]", reportPeriod.periodStart, reportPeriod.periodEnd)
 		logger.Infof(runningMsg + ", running now")
 
-		runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, cbutil.ScheduledReason, runningMsg)
-		cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
-
-		report, err = op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		report, err = op.updateScheduledReportStatusRunning(report, cbutil.ScheduledReason, runningMsg)
 		if err != nil {
-			logger.WithError(err).Errorf("unable to update ScheduledReport status")
 			return err
 		}
 	}
@@ -470,11 +406,7 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 		// update the status to Failed with message containing the
 		// error
 		errMsg := fmt.Sprintf("error occurred while generating report: %s", err)
-		failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, cbutil.GenerateReportErrorReason, errMsg)
-		cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
-		cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
-
-		_, updateErr := op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+		_, updateErr := op.updateScheduledReportStatusFailure(report, cbutil.GenerateReportErrorReason, errMsg)
 		if updateErr != nil {
 			logger.WithError(updateErr).Errorf("unable to update ScheduledReport status")
 			return updateErr
@@ -604,6 +536,41 @@ func (op *Reporting) queueDependentReportGenerationQueriesForScheduledReport(sch
 				break
 			}
 		}
+	}
+	return nil
+}
+
+func (op *Reporting) updateScheduledReportStatusFailure(report *cbTypes.ScheduledReport, reason, message string) (*cbTypes.ScheduledReport, error) {
+	failureCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportFailure, v1.ConditionTrue, reason, message)
+	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
+	cbutil.SetScheduledReportCondition(&report.Status, *failureCondition)
+	return op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+}
+
+func (op *Reporting) updateScheduledReportStatusRunning(report *cbTypes.ScheduledReport, reason, message string) (*cbTypes.ScheduledReport, error) {
+	runningCondition := cbutil.NewScheduledReportCondition(cbTypes.ScheduledReportRunning, v1.ConditionTrue, reason, message)
+	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportFailure)
+	cbutil.SetScheduledReportCondition(&report.Status, *runningCondition)
+	return op.meteringClient.MeteringV1alpha1().ScheduledReports(report.Namespace).Update(report)
+}
+
+func (op *Reporting) setScheduledReportStatusValidationFailure(report *cbTypes.ScheduledReport, msg string) error {
+	logger := op.logger.WithField("ScheduledReport", report.Name)
+	failureCond := cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure)
+	previouslyFailedValidation := failureCond != nil && failureCond.Status == v1.ConditionTrue && failureCond.Reason == cbutil.FailedValidationReason
+
+	if previouslyFailedValidation && failureCond.Message == msg && cbutil.GetScheduledReportCondition(report.Status, cbTypes.ScheduledReportFailure) == nil {
+		// don't update unless the validation error changes
+		logger.Debugf("ScheduledReport %s failed validation last reconcile, skipping updating status", report.Name)
+		return nil
+	}
+
+	cbutil.RemoveScheduledReportCondition(&report.Status, cbTypes.ScheduledReportRunning)
+	logger.Errorf("ScheduledReport %s failed validation: %s", report.Name, msg)
+	report, err := op.updateScheduledReportStatusFailure(report, cbutil.FailedValidationReason, msg)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to update ScheduledReport status")
+		return err
 	}
 	return nil
 }
