@@ -1,0 +1,44 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-capacity-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "persistentvolumeclaim-capacity-bytes"
+  columns:
+  - name: namespace
+    type: string
+  - name: persistentvolumeclaim
+    type: string
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: persistentvolumeclaim_capacity_bytes
+    type: double
+    unit: bytes
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: persistentvolumeclaim_capacity_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: dt
+    type: string
+  query: |
+    SELECT
+        labels['exported_namespace'] as namespace,
+        labels['persistentvolumeclaim'] as persistentvolumeclaim,
+        labels,
+        amount as persistentvolumeclaim_capacity_bytes,
+        timeprecision,
+        amount * timeprecision as persistentvolumeclaim_capacity_byte_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName "persistentvolumeclaim-capacity-bytes" |}

@@ -108,6 +108,14 @@ spec:
         spec:
           promsum:
             query: "node-capacity-cpu-cores"
+      persistentvolumeclaim-capacity-bytes:
+        spec:
+          promsum:
+            query: "persistentvolumeclaim-capacity-bytes"
+      persistentvolumeclaim-usage-bytes:
+        spec:
+          promsum:
+            query: "persistentvolumeclaim-usage-bytes"
 
   resources:
     requests:

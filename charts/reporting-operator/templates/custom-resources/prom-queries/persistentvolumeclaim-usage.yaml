@@ -1,0 +1,11 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: persistentvolumeclaim-usage-bytes
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    kubelet_volume_stats_used_bytes
