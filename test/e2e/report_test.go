@@ -22,7 +22,7 @@ import (
 type reportProducesDataTestCase struct {
 	name          string
 	queryName     string
-	newReportFunc func(name, queryName string, start, end time.Time) *meteringv1alpha1.Report
+	newReportFunc func(name, queryName string, start, end *time.Time) *meteringv1alpha1.Report
 	timeout       time.Duration
 	skip          bool
 }
@@ -50,7 +50,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, pe
 				return
 			}
 
-			report := test.newReportFunc(test.name, test.queryName, periodStart, periodEnd)
+			report := test.newReportFunc(test.name, test.queryName, &periodStart, &periodEnd)
 
 			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			require.Condition(t, func() bool {
