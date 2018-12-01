@@ -22,9 +22,12 @@ import (
 )
 
 type scheduledReportProducesDataTestCase struct {
-	name      string
-	queryName string
-	timeout   time.Duration
+	name          string
+	queryName     string
+	schedule      *meteringv1alpha1.ScheduledReportSchedule
+	newReportFunc func(name, queryName string, schedule *meteringv1alpha1.ScheduledReportSchedule, start, end *time.Time) *meteringv1alpha1.ScheduledReport
+	timeout       time.Duration
+	skip          bool
 }
 
 func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Framework, periodStart, periodEnd time.Time, testCases []scheduledReportProducesDataTestCase) {
@@ -34,9 +37,8 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
-			// all scheduled reports get skipped in short test mode
-			if testing.Short() {
-				t.Skipf("skipping test in short mode")
+			if test.skip {
+				t.Skip("test con***REMOVED***gured to be skipped")
 				return
 			}
 
@@ -52,7 +54,8 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 			}
 
 			t.Logf("scheduledReport reportingStart: %s, reportingEnd: %s", reportStart, reportEnd)
-			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &reportStart, &reportEnd)
+
+			report := test.newReportFunc(test.name, test.queryName, test.schedule, &reportStart, &reportEnd)
 
 			err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {

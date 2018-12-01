@@ -200,7 +200,7 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 
 			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
-			report := testFramework.NewSimpleReport(name, test.queryName, reportStart, reportEnd)
+			report := testFramework.NewSimpleReport(name, test.queryName, &reportStart, &reportEnd)
 
 			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {

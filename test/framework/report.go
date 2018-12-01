@@ -26,22 +26,29 @@ func (f *Framework) GetMeteringScheduledReport(name string) (*meteringv1alpha1.S
 	return f.MeteringClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) NewSimpleReport(name, queryName string, start, end time.Time) *meteringv1alpha1.Report {
+func (f *Framework) NewSimpleReport(name, queryName string, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.Report {
+	var start, end *meta.Time
+	if reportingStart != nil {
+		start = &meta.Time{*reportingStart}
+	}
+	if reportingEnd != nil {
+		end = &meta.Time{*reportingEnd}
+	}
 	return &meteringv1alpha1.Report{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
 			Namespace: f.Namespace,
 		},
 		Spec: meteringv1alpha1.ReportSpec{
-			ReportingStart:      &meta.Time{start},
-			ReportingEnd:        &meta.Time{end},
 			GenerationQueryName: queryName,
 			RunImmediately:      true,
+			ReportingStart:      start,
+			ReportingEnd:        end,
 		},
 	}
 }
 
-func (f *Framework) NewSimpleScheduledReport(name, queryName string, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport {
+func (f *Framework) NewSimpleScheduledReport(name, queryName string, schedule *meteringv1alpha1.ScheduledReportSchedule, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport {
 	var start, end *meta.Time
 	if reportingStart != nil {
 		start = &meta.Time{*reportingStart}
@@ -56,11 +63,9 @@ func (f *Framework) NewSimpleScheduledReport(name, queryName string, reportingSt
 		},
 		Spec: meteringv1alpha1.ScheduledReportSpec{
 			GenerationQueryName: queryName,
-			Schedule: &meteringv1alpha1.ScheduledReportSchedule{
-				Period: meteringv1alpha1.ScheduledReportPeriodHourly,
-			},
-			ReportingStart: start,
-			ReportingEnd:   end,
+			Schedule:            schedule,
+			ReportingStart:      start,
+			ReportingEnd:        end,
 		},
 	}
 }
