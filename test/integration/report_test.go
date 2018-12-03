@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -271,67 +271,16 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 			require.NoError(t, err)
 
 			// turn the expected results into a list of maps
-			var tmpExpectedResults []map[string]interface{}
-			err = json.Unmarshal(expectedReportData, &tmpExpectedResults)
+			var expectedResults []map[string]interface{}
+			err = json.Unmarshal(expectedReportData, &expectedResults)
 			require.NoError(t, err)
 
 			// turn the actual results into a list of maps
-			var tmpResults []map[string]interface{}
-			err = json.Unmarshal(reportData, &tmpResults)
+			var actualResults []map[string]interface{}
+			err = json.Unmarshal(reportData, &actualResults)
 			require.NoError(t, err)
 
-			// turn the list of expected results maps into a list of ordered maps
-			expectedResults := make([]*orderedmap.OrderedMap, len(tmpExpectedResults))
-			for i, item := range tmpExpectedResults {
-				expectedResults[i], err = orderedmap.NewFromMap(item)
-				require.NoError(t, err)
-			}
-
-			// turn the list of actual results maps into a list of ordered maps
-			results := make([]*orderedmap.OrderedMap, len(tmpResults))
-			for i, item := range tmpResults {
-				results[i], err = orderedmap.NewFromMap(item)
-				require.NoError(t, err)
-			}
-
-			require.Len(t, results, len(expectedResults), "new should have same number of rows as existing report")
-
-			// now that we have a slice of ordered maps, we should be able to
-			// iterate over each row, and for each row, iterate over all
-			// columns/keys in the row ensuring they match.
-			// if the column is the comparison  column, then we allow a small
-			// error, due to floating point precision
-			// in summary, this does an deep equal comparison with a few tweaks
-			// to allow for small error in the calculations.
-			for i, row := range results {
-				expectedRow := expectedResults[i]
-				columns := row.Keys()
-				expectedColumns := expectedRow.Keys()
-				assert.Equal(t, columns, expectedColumns, "expecting key iteration between actual and expected to be the same")
-				for _, column := range columns {
-
-					actualValue, actualExists := row.Get(column)
-					if !actualExists {
-						t.Errorf("")
-					}
-					expectedValue, expectedExists := row.Get(column)
-					if !expectedExists {
-						t.Errorf("")
-					}
-					isCompareColumn := false
-					for _, comparisionColumn := range test.comparisonColumnNames {
-						if comparisionColumn == column {
-							isCompareColumn = true
-							break
-						}
-					}
-					if isCompareColumn {
-						assert.InEpsilonf(t, actualValue, expectedValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
-					} else {
-						assert.Equal(t, actualValue, expectedValue, "expected column values between actual and expected rows to be the same")
-					}
-				}
-			}
+			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
 		})
 	}
 }
