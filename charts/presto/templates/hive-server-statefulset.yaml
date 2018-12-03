@@ -62,6 +62,14 @@ spec:
         - name: ui
           containerPort: 10002
           protocol: TCP
+{{- if .Values.spec.hive.server.readinessProbe }}
+        readinessProbe:
+{{ toYaml .Values.spec.hive.server.readinessProbe | indent 10 }}
+{{- end }}
+{{- if .Values.spec.hive.server.livenessProbe }}
+        livenessProbe:
+{{ toYaml .Values.spec.hive.server.livenessProbe | indent 10 }}
+{{- end }}
         terminationMessagePath: /dev/termination-log
         env:
         - name: HIVE_LOGLEVEL
