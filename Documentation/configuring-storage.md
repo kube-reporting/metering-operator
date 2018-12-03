@@ -65,7 +65,7 @@ This can be adjusted in the same section as adjusting the Storage Class as docum
 By default, the data that Metering collects and generates is stored in a single node HDFS cluster which is backed by a Persistent Volume.
 To store the data in a location outside of the cluster, configure Metering to store data in S3.
 
-To use S3 for storage, edit the `defaultStorage:` section in the example [s3-storage.yaml][s3-storage-config] configuration.
+To use S3 for storage, edit the `spec.defaultStorage` section in the example [s3-storage.yaml][s3-storage-config] configuration.
 Set `awsAccessKeyID` and `awsSecretAccessKey` in the `reporting-operator.config` and `presto.config` sections.
 
 To store data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read and write access to the bucket.

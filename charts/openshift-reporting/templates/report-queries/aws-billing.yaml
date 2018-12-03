@@ -1,4 +1,4 @@
-{{- if index .Values.spec.config.defaultReportDataSources "aws-billing" -}}
+{{- if .Values.spec.awsBillingReportDataSource.enabled -}}
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
