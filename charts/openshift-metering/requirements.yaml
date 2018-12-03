@@ -3,6 +3,10 @@ dependencies:
 - name: reporting-operator
   version: 0.1.0
   repository: "***REMOVED***le://../reporting-operator"
+- name: openshift-reporting
+  version: 0.1.0
+  repository: "***REMOVED***le://../openshift-reporting"
+  condition: openshift-reporting.enabled
 - name: presto
   version: 0.1.0
   repository: "***REMOVED***le://../presto"

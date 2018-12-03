@@ -44,6 +44,14 @@ kind: Metering
 metadata:
   name: "${DEPLOY_PLATFORM}-metering"
 spec:
+  openshift-reporting:
+    spec:
+      awsBillingReportDataSource:
+        enabled: ${ENABLE_AWS_BILLING}
+        bucket: "${AWS_BILLING_BUCKET}"
+        pre***REMOVED***x: "${AWS_BILLING_BUCKET_PREFIX}"
+        region: "${AWS_BILLING_BUCKET_REGION}"
+
   reporting-operator:
     spec:
       image:
@@ -55,11 +63,6 @@ spec:
 
       con***REMOVED***g:
         disablePromsum: ${DISABLE_PROMSUM}
-        awsBillingDataSource:
-          enabled: ${ENABLE_AWS_BILLING}
-          bucket: "${AWS_BILLING_BUCKET}"
-          pre***REMOVED***x: "${AWS_BILLING_BUCKET_PREFIX}"
-          region: "${AWS_BILLING_BUCKET_REGION}"
         awsAccessKeyID: "${AWS_ACCESS_KEY_ID}"
         awsSecretAccessKey: "${AWS_SECRET_ACCESS_KEY}"
 
