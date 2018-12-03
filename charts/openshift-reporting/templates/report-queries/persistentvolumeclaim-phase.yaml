@@ -1,0 +1,42 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-phase-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "persistentvolumeclaim-phase"
+  columns:
+  - name: namespace
+    type: string
+  - name: persistentvolumeclaim
+    type: string
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: value
+    type: double
+  - name: phase
+    type: string
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: dt
+    type: string
+  query: |
+    SELECT
+        labels['namespace'] as namespace,
+        labels['persistentvolumeclaim'] as persistentvolumeclaim,
+        labels,
+        amount as value,
+        labels['phase'] as phase,
+        timeprecision,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName "persistentvolumeclaim-phase" |}
