@@ -1,0 +1,11 @@
+apiVersion: metering.openshift.io/v1alpha1                                                                                                  
+kind: ReportPrometheusQuery
+metadata:
+  name: persistentvolumeclaim-phase
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    kube_persistentvolumeclaim_status_phase
