@@ -40,17 +40,17 @@ func testScheduledReportsProduceData(t *testing.T, testFramework *framework.Fram
 				return
 			}
 
-			// reportStart needs to be at least 1 hour and 5 minutes ago
-			// because NewSimpleScheduledReport produces hourly reports, and it
-			// won't run unless we set reportingStart in the past by the period
-			// (1 hour) + the default gracePeriod (5 minutes).
-			// to do this, we set reportStart to 1.5 hours back if it isn't
-			// already
-			reportStart := periodStart
-			reportEnd := periodEnd.Truncate(time.Minute)
-			if reportEnd.Sub(reportStart) < time.Hour {
-				reportStart = reportEnd.Add(-time.Hour)
+			// set reportStart to the nearest hour since the hourly
+			// scheduledReport will align to the hour
+			reportStart := periodStart.Truncate(time.Hour)
+			reportEnd := periodEnd.Truncate(time.Hour)
+
+			// if truncation causes them to be the same, set reportStart to 1
+			// hour before reportEnd
+			if reportEnd.Equal(reportStart) {
+				reportStart.Add(-time.Hour)
 			}
+
 			t.Logf("scheduledReport reportingStart: %s, reportingEnd: %s", reportStart, reportEnd)
 			report := testFramework.NewSimpleScheduledReport(name, test.queryName, &reportStart, &reportEnd)
 
