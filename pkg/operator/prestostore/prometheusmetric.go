@@ -151,18 +151,24 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 		if newBufferSize > queryCap {
 			err := presto.InsertInto(queryer, tableName, queryBuf.String())
 			if err != nil {
-				return fmt.Errorf("failed to store metrics into presto: %v", err)
+				return fmt.Errorf("insert: failed to store metrics into presto: %v", err)
 			}
 			queryBuf.Reset()
 		} else {
-			queryBuf.WriteString(metricValue)
+			n, err := queryBuf.WriteString(metricValue)
+			if err != nil {
+				return fmt.Errorf("error writing metricValue string to buffer: %v", err)
+			}
+			if n != bytesToWrite {
+				return fmt.Errorf("error writing metricValue string to buffer: incorrect number of bytes written: expected %d, got %d", bytesToWrite, n)
+			}
 		}
 	}
 	// if the buffer has unwritten values, perform the final insert
 	if queryBuf.Len() != 0 {
 		err := presto.InsertInto(queryer, tableName, queryBuf.String())
 		if err != nil {
-			return fmt.Errorf("failed to store metrics into presto: %v", err)
+			return fmt.Errorf("final insert: failed to store metrics into presto: %v", err)
 		}
 	}
 	return nil
