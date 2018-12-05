@@ -14,13 +14,9 @@ const (
 	// occurs while generating the report data.
 	GenerateReportErrorReason = "GenerateReportError"
 
-	// InvalidReportingEndReason is added to a ScheduledReport when the
-	// spec.reportingEnd is set to a time before it's lastReportTime or before
-	// spec.reportingStart.
-	InvalidReportingEndReason = "InvalidReportingEnd"
-
-	// FailedValidationReason is added to a ScheduledReport when the it's
-	// ReportGenerationQuery or it's dependencies aren't ready
+	// FailedValidationReason is added to a ScheduledReport when the
+	// ScheduledReport is invalid or it's ReportGenerationQuery is invalid or
+	// not ready
 	FailedValidationReason = "FailedValidation"
 
 	// Running scheduledReport conditions:
@@ -29,7 +25,7 @@ const (
 	// reporting time in it's schedule.
 	ScheduledReason = "Scheduled"
 	// ValidatingScheduledReportReason is added to a ScheduledReport when the
-	// report is having it's ReportGenerationQuery validated
+	// report is being validated
 	ValidatingScheduledReportReason = "ValidatingScheduledReport"
 	// ReportPeriodWaitingReason is added to a ScheduledReport when the report
 	// has to wait until the next scheduled reporting time.
