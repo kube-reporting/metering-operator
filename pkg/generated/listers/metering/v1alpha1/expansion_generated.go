@@ -12,14 +12,6 @@ type PrestoTableListerExpansion interface{}
 // PrestoTableNamespaceLister.
 type PrestoTableNamespaceListerExpansion interface{}
 
-// ReportListerExpansion allows custom methods to be added to
-// ReportLister.
-type ReportListerExpansion interface{}
-
-// ReportNamespaceListerExpansion allows custom methods to be added to
-// ReportNamespaceLister.
-type ReportNamespaceListerExpansion interface{}
-
 // ReportDataSourceListerExpansion allows custom methods to be added to
 // ReportDataSourceLister.
 type ReportDataSourceListerExpansion interface{}

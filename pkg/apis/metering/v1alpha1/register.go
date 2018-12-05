@@ -27,8 +27,8 @@ func init() {
 // Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&Report{},
-		&ReportList{},
+		&ScheduledReport{},
+		&ScheduledReportList{},
 		&ReportDataSource{},
 		&ReportDataSourceList{},
 		&ReportGenerationQuery{},
@@ -39,8 +39,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&StorageLocationList{},
 		&PrestoTable{},
 		&PrestoTableList{},
-		&ScheduledReport{},
-		&ScheduledReportList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

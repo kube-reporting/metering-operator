@@ -36,8 +36,8 @@ var ErrReportIsRunning = errors.New("the report is still running")
 var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
-	APIV1ReportsGetEndpoint = "/api/v1/reports/get"
-	APIV2Reports            = "/api/v2/reports"
+	APIV1ScheduledReportsGetEndpoint    = "/api/v1/scheduledreports/get"
+	APIV2ScheduledReportsEndpointPre***REMOVED***x = "/api/v2/scheduledreports"
 )
 
 type server struct {
@@ -50,7 +50,6 @@ type server struct {
 	reportResultsGetter   prestostore.ReportResultsGetter
 
 	namespace                    string
-	reportLister                 listers.ReportLister
 	scheduledReportLister        listers.ScheduledReportLister
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister
 	prestoTableLister            listers.PrestoTableLister
@@ -71,7 +70,6 @@ func newRouter(
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	namespace string,
-	reportLister listers.ReportLister,
 	scheduledReportLister listers.ScheduledReportLister,
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
 	prestoTableLister listers.PrestoTableLister,
@@ -89,20 +87,18 @@ func newRouter(
 		prometheusMetricsRepo:        prometheusMetricsRepo,
 		reportResultsGetter:          reportResultsGetter,
 		namespace:                    namespace,
-		reportLister:                 reportLister,
 		scheduledReportLister:        scheduledReportLister,
 		reportGenerationQuerieLister: reportGenerationQuerieLister,
 		prestoTableLister:            prestoTableLister,
 	}
 
-	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportHandler)
-	router.HandleFunc("/api/v2/reports/{name}/full", srv.getReportV2FullHandler)
-	router.HandleFunc("/api/v2/reports/{name}/table", srv.getReportV2TableHandler)
+	router.HandleFunc(APIV2ScheduledReportsEndpointPre***REMOVED***x+"/{name}/full", srv.getScheduledReportV2FullHandler)
+	router.HandleFunc(APIV2ScheduledReportsEndpointPre***REMOVED***x+"/{name}/table", srv.getScheduledReportV2TableHandler)
 	// The following two routes handle returning a 400 when the name parameter is missing, rather than having a 404 returned.
-	router.HandleFunc("/api/v2/reports//full", srv.getReportV2NameMissingHandler)
-	router.HandleFunc("/api/v2/reports//table", srv.getReportV2NameMissingHandler)
-	router.HandleFunc("/api/v1/scheduledreports/get", srv.getScheduledReportHandler)
-	router.HandleFunc("/api/v1/reports/run", srv.runReportHandler)
+	router.HandleFunc(APIV2ScheduledReportsEndpointPre***REMOVED***x+"//full", srv.getScheduledReportV2NameMissingHandler)
+	router.HandleFunc(APIV2ScheduledReportsEndpointPre***REMOVED***x+"//table", srv.getScheduledReportV2NameMissingHandler)
+
+	router.HandleFunc(APIV1ScheduledReportsGetEndpoint, srv.getScheduledReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
@@ -134,66 +130,38 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryPar
 	return false
 }
 
-func (srv *server) getReportHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getScheduledReportV1Handler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
+	srv.getScheduledReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
 }
 
-func (srv *server) getReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getScheduledReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, name, r.Form["format"][0], true, true, w, r)
+	srv.getScheduledReport(logger, name, r.Form["format"][0], true, true, w, r)
 }
 
-func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getScheduledReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, name, r.Form["format"][0], true, false, w, r)
+	srv.getScheduledReport(logger, name, r.Form["format"][0], true, false, w, r)
 }
 
-func (srv *server) getReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getScheduledReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
 	writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following ***REMOVED***elds are missing or empty: name")
-}
-
-func (srv *server) getScheduledReportHandler(w http.ResponseWriter, r *http.Request) {
-	logger := newRequestLogger(srv.logger, r, srv.rand)
-	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
-		return
-	}
-	srv.getScheduledReport(logger, r.Form["name"][0], r.Form["format"][0], w, r)
-}
-
-func (srv *server) runReportHandler(w http.ResponseWriter, r *http.Request) {
-	logger := newRequestLogger(srv.logger, r, srv.rand)
-	if r.Method != "GET" {
-		writeErrorResponse(logger, w, r, http.StatusNotFound, "Not found")
-		return
-	}
-	err := r.ParseForm()
-	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusBadRequest, "couldn't parse URL query params: %v", err)
-		return
-	}
-	vals := r.Form
-	err = checkForFields([]string{"query", "start", "end"}, vals)
-	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusBadRequest, "%v", err)
-		return
-	}
-	srv.runReport(logger, vals["query"][0], vals["start"][0], vals["end"][0], w)
 }
 
 func checkForFields(***REMOVED***elds []string, vals url.Values) error {
@@ -209,12 +177,16 @@ func checkForFields(***REMOVED***elds []string, vals url.Values) error {
 	return nil
 }
 
-func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, w http.ResponseWriter, r *http.Request) {
+func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the scheduledReport to make sure it's isn't failed
 	report, err := srv.scheduledReportLister.ScheduledReports(srv.namespace).Get(name)
 	if err != nil {
+		code := http.StatusInternalServerError
+		if k8serrors.IsNotFound(err) {
+			code = http.StatusNotFound
+		}
 		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting scheduledReport: %v", err)
+		writeErrorResponse(logger, w, r, code, "error getting scheduledReport: %v", err)
 		return
 	}
 
@@ -275,90 +247,6 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 
 	if len(results) > 0 && len(prestoTable.Status.Parameters.Columns) != len(results[0]) {
 		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.Status.Parameters.Columns))
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
-		return
-	}
-
-	writeResultsResponseV1(logger, format, reportQuery.Name, reportQuery.Spec.Columns, results, w, r)
-}
-func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
-	// Get the current report to make sure it's in a ***REMOVED***nished state
-	report, err := srv.reportLister.Reports(srv.namespace).Get(name)
-	if err != nil {
-		code := http.StatusInternalServerError
-		if k8serrors.IsNotFound(err) {
-			code = http.StatusNotFound
-		}
-
-		logger.WithError(err).Errorf("error getting report: %v", err)
-		writeErrorResponse(logger, w, r, code, "error getting report: %v", err)
-		return
-	}
-	switch report.Status.Phase {
-	case api.ReportPhaseError:
-		err := fmt.Errorf(report.Status.Output)
-		logger.WithError(err).Errorf("the report encountered an error")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "the report encountered an error: %v", err)
-		return
-	case api.ReportPhaseFinished:
-		// continue with returning the report if the report is ***REMOVED***nished
-	case api.ReportPhaseWaiting, api.ReportPhaseStarted:
-		fallthrough
-	default:
-		logger.Errorf(ErrReportIsRunning.Error())
-		writeErrorResponse(logger, w, r, http.StatusAccepted, ErrReportIsRunning.Error())
-		return
-	}
-
-	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
-	if err != nil {
-		logger.WithError(err).Errorf("error getting report: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
-		return
-	}
-
-	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Name))
-	if err != nil {
-		if k8serrors.IsNotFound(err) {
-			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
-			return
-		}
-		logger.WithError(err).Errorf("error getting presto table: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting presto table: %v", err)
-		return
-	}
-
-	tableColumns := prestoTable.Status.Parameters.Columns
-	queryPrestoColumns, err := reportingutil.GeneratePrestoColumns(reportQuery)
-	if err != nil {
-		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
-		return
-	}
-
-	prestoColumns, err := reportingutil.HiveColumnsToPrestoColumns(tableColumns)
-	if err != nil {
-		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
-		return
-	}
-
-	if !reflect.DeepEqual(queryPrestoColumns, prestoColumns) {
-		logger.Warnf("report columns and table columns don't match, ReportGenerationQuery was likely updated after the report ran")
-		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
-	}
-
-	tableName := reportingutil.ReportTableName(name)
-	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to perform presto query")
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "failed to perform presto query (see operator logs for more details): %v", err)
-		return
-	}
-
-	if len(results) > 0 && len(prestoColumns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoColumns))
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}

@@ -4,8 +4,6 @@ package v1alpha1
 
 type PrestoTableExpansion interface{}
 
-type ReportExpansion interface{}
-
 type ReportDataSourceExpansion interface{}
 
 type ReportGenerationQueryExpansion interface{}

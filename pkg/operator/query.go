@@ -65,7 +65,6 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
 		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
 		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		generationQuery,
 		op.uninitialiedDependendenciesHandler(),
@@ -118,10 +117,6 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	if err := op.queueDependentReportGenerationQueriesForQuery(generationQuery); err != nil {
 		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportGenerationQuery %s", generationQuery.Name)
 	}
-	// enqueue any reports depending on this one
-	if err := op.queueDependentReportsForQuery(generationQuery); err != nil {
-		logger.WithError(err).Errorf("error queuing Report dependents of ReportGenerationQuery %s", generationQuery.Name)
-	}
 	// enqueue any scheduledReports depending on this one
 	if err := op.queueDependentScheduledReportsForQuery(generationQuery); err != nil {
 		logger.WithError(err).Errorf("error queuing ScheduledReport dependents of ReportGenerationQuery %s", generationQuery.Name)
@@ -168,21 +163,6 @@ func (op *Reporting) queueDependentReportGenerationQueriesForQuery(generationQue
 				op.enqueueReportGenerationQuery(query)
 				break
 			}
-		}
-	}
-	return nil
-}
-
-func (op *Reporting) queueDependentReportsForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
-	reportLister := op.meteringClient.MeteringV1alpha1().Reports(generationQuery.Namespace)
-	reports, err := reportLister.List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, report := range reports.Items {
-		if report.Spec.GenerationQueryName == generationQuery.Name {
-			op.enqueueReport(report)
 		}
 	}
 	return nil

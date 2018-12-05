@@ -121,7 +121,6 @@ type Reporting struct {
 	informerFactory factory.SharedInformerFactory
 
 	prestoTableLister           listers.PrestoTableLister
-	reportLister                listers.ReportLister
 	reportDataSourceLister      listers.ReportDataSourceLister
 	reportGenerationQueryLister listers.ReportGenerationQueryLister
 	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
@@ -129,7 +128,6 @@ type Reporting struct {
 	storageLocationLister       listers.StorageLocationLister
 
 	queueList                  []workqueue.RateLimitingInterface
-	reportQueue                workqueue.RateLimitingInterface
 	scheduledReportQueue       workqueue.RateLimitingInterface
 	reportDataSourceQueue      workqueue.RateLimitingInterface
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
@@ -221,21 +219,18 @@ func newReportingOperator(
 	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, cfg.Namespace, nil)
 
 	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
-	reportInformer := informerFactory.Metering().V1alpha1().Reports()
 	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
 	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
 	reportPrometheusQueryInformer := informerFactory.Metering().V1alpha1().ReportPrometheusQueries()
 	scheduledReportInformer := informerFactory.Metering().V1alpha1().ScheduledReports()
 	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
 
-	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
 	scheduledReportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "scheduledreports")
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
 	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
 
 	queueList := []workqueue.RateLimitingInterface{
-		reportQueue,
 		scheduledReportQueue,
 		reportDataSourceQueue,
 		reportGenerationQueryQueue,
@@ -252,7 +247,6 @@ func newReportingOperator(
 		informerFactory: informerFactory,
 
 		prestoTableLister:           prestoTableInformer.Lister(),
-		reportLister:                reportInformer.Lister(),
 		reportDataSourceLister:      reportDataSourceInformer.Lister(),
 		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
 		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
@@ -260,7 +254,6 @@ func newReportingOperator(
 		storageLocationLister:       storageLocationInformer.Lister(),
 
 		queueList:                  queueList,
-		reportQueue:                reportQueue,
 		scheduledReportQueue:       scheduledReportQueue,
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
@@ -270,12 +263,6 @@ func newReportingOperator(
 		clock:     clock,
 		importers: make(map[string]*prestostore.PrometheusImporter),
 	}
-
-	reportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addReport,
-		UpdateFunc: op.updateReport,
-		DeleteFunc: op.deleteReport,
-	})
 
 	scheduledReportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addScheduledReport,
@@ -441,7 +428,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
 		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
-		op.reportLister, op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
+		op.scheduledReportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
 	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
@@ -656,14 +643,6 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			wait.Until(op.runReportGenerationQueryWorker, time.Second, stopCh)
 			wg.Done()
 			op.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
-		}()
-
-		wg.Add(1)
-		go func() {
-			op.logger.Infof("starting Report worker #%d", i)
-			wait.Until(op.runReportWorker, time.Second, stopCh)
-			wg.Done()
-			op.logger.Infof("Report worker #%d stopped", i)
 		}()
 
 		wg.Add(1)
