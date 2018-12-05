@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,15 +25,9 @@ var (
 	reportTestTimeout         = 5 * time.Minute
 	reportTestOutputDirectory string
 
-	testReportsProduceCorrectDataForInputTestCases = map[string]struct {
-		// name is the name of the sub test but also the name of the report.
-		queryName                    string
-		dataSources                  []testDatasource
-		expectedReportOutputFileName string
-		comparisonColumnNames        []string
-		timeout                      time.Duration
-	}{
-		"namespace-cpu-request": {
+	testReportsProduceCorrectDataForInputTestCases = []reportsProduceCorrectDataForInputTestCase{
+		{
+			name:      "namespace-cpu-request",
 			queryName: "namespace-cpu-request",
 			dataSources: []testDatasource{
 				{
@@ -45,7 +39,8 @@ var (
 			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"namespace-cpu-usage": {
+		{
+			name:      "namespace-cpu-usage",
 			queryName: "namespace-cpu-usage",
 			dataSources: []testDatasource{
 				{
@@ -57,7 +52,8 @@ var (
 			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"namespace-memory-request": {
+		{
+			name:      "namespace-memory-request",
 			queryName: "namespace-memory-request",
 			dataSources: []testDatasource{
 				{
@@ -69,7 +65,8 @@ var (
 			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"namespace-memory-usage": {
+		{
+			name:      "namespace-memory-usage",
 			queryName: "namespace-memory-usage",
 			dataSources: []testDatasource{
 				{
@@ -81,7 +78,8 @@ var (
 			comparisonColumnNames:        []string{"pod_usage_memory_core_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"pod-cpu-request": {
+		{
+			name:      "pod-cpu-request",
 			queryName: "pod-cpu-request",
 			dataSources: []testDatasource{
 				{
@@ -93,7 +91,8 @@ var (
 			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"pod-cpu-usage": {
+		{
+			name:      "pod-cpu-usage",
 			queryName: "pod-cpu-usage",
 			dataSources: []testDatasource{
 				{
@@ -105,7 +104,8 @@ var (
 			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"pod-memory-request": {
+		{
+			name:      "pod-memory-request",
 			queryName: "pod-memory-request",
 			dataSources: []testDatasource{
 				{
@@ -117,7 +117,8 @@ var (
 			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"pod-memory-usage": {
+		{
+			name:      "pod-memory-usage",
 			queryName: "pod-memory-usage",
 			dataSources: []testDatasource{
 				{
@@ -129,7 +130,8 @@ var (
 			comparisonColumnNames:        []string{"pod_usage_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
 		},
-		"node-cpu-utilization": {
+		{
+			name:      "node-cpu-utilization",
 			queryName: "node-cpu-utilization",
 			dataSources: []testDatasource{
 				{
@@ -145,7 +147,8 @@ var (
 			comparisonColumnNames:        []string{"node_allocatable_cpu_core_seconds", "pod_request_cpu_core_seconds", "cpu_used_percent", "cpu_unused_percent"},
 			timeout:                      reportTestTimeout,
 		},
-		"node-memory-utilization": {
+		{
+			name:      "node-memory-utilization",
 			queryName: "node-memory-utilization",
 			dataSources: []testDatasource{
 				{
@@ -176,12 +179,21 @@ func init() {
 	}
 }
 
+type reportsProduceCorrectDataForInputTestCase struct {
+	name                         string
+	queryName                    string
+	dataSources                  []testDatasource
+	expectedReportOutputFileName string
+	comparisonColumnNames        []string
+	timeout                      time.Duration
+}
+
 type testDatasource struct {
 	DatasourceName string
 	FileName       string
 }
 
-func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time) {
+func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time, testCases []reportsProduceCorrectDataForInputTestCase) {
 	if reportTestOutputDirectory == "" {
 		t.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
 	}
@@ -189,8 +201,9 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 	require.NotZero(t, reportStart, "reportStart should not be zero")
 	require.NotZero(t, reportEnd, "reportEnd should not be zero")
 
-	for name, test := range testReportsProduceCorrectDataForInputTestCases {
+	for _, test := range testCases {
 		// Fix closure captures
+		name := test.name
 		test := test
 		t.Run(name, func(t *testing.T) {
 			if testing.Short() {
@@ -200,7 +213,7 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 
 			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
-			report := testFramework.NewSimpleReport(name, test.queryName, reportStart, reportEnd)
+			report := testFramework.NewSimpleReport(test.name, test.queryName, &reportStart, &reportEnd)
 
 			err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 			assert.Condition(t, func() bool {
@@ -258,67 +271,16 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 			require.NoError(t, err)
 
 			// turn the expected results into a list of maps
-			var tmpExpectedResults []map[string]interface{}
-			err = json.Unmarshal(expectedReportData, &tmpExpectedResults)
+			var expectedResults []map[string]interface{}
+			err = json.Unmarshal(expectedReportData, &expectedResults)
 			require.NoError(t, err)
 
 			// turn the actual results into a list of maps
-			var tmpResults []map[string]interface{}
-			err = json.Unmarshal(reportData, &tmpResults)
+			var actualResults []map[string]interface{}
+			err = json.Unmarshal(reportData, &actualResults)
 			require.NoError(t, err)
 
-			// turn the list of expected results maps into a list of ordered maps
-			expectedResults := make([]*orderedmap.OrderedMap, len(tmpExpectedResults))
-			for i, item := range tmpExpectedResults {
-				expectedResults[i], err = orderedmap.NewFromMap(item)
-				require.NoError(t, err)
-			}
-
-			// turn the list of actual results maps into a list of ordered maps
-			results := make([]*orderedmap.OrderedMap, len(tmpResults))
-			for i, item := range tmpResults {
-				results[i], err = orderedmap.NewFromMap(item)
-				require.NoError(t, err)
-			}
-
-			require.Len(t, results, len(expectedResults), "new should have same number of rows as existing report")
-
-			// now that we have a slice of ordered maps, we should be able to
-			// iterate over each row, and for each row, iterate over all
-			// columns/keys in the row ensuring they match.
-			// if the column is the comparison  column, then we allow a small
-			// error, due to floating point precision
-			// in summary, this does an deep equal comparison with a few tweaks
-			// to allow for small error in the calculations.
-			for i, row := range results {
-				expectedRow := expectedResults[i]
-				columns := row.Keys()
-				expectedColumns := expectedRow.Keys()
-				assert.Equal(t, columns, expectedColumns, "expecting key iteration between actual and expected to be the same")
-				for _, column := range columns {
-
-					actualValue, actualExists := row.Get(column)
-					if !actualExists {
-						t.Errorf("")
-					}
-					expectedValue, expectedExists := row.Get(column)
-					if !expectedExists {
-						t.Errorf("")
-					}
-					isCompareColumn := false
-					for _, comparisionColumn := range test.comparisonColumnNames {
-						if comparisionColumn == column {
-							isCompareColumn = true
-							break
-						}
-					}
-					if isCompareColumn {
-						assert.InEpsilonf(t, actualValue, expectedValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
-					} else {
-						assert.Equal(t, actualValue, expectedValue, "expected column values between actual and expected rows to be the same")
-					}
-				}
-			}
+			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
 		})
 	}
 }

@@ -30,7 +30,7 @@ type ScheduledReportSpec struct {
 	GenerationQueryName string `json:"generationQuery"`
 
 	// Schedule configures when the report runs.
-	Schedule ScheduledReportSchedule `json:"schedule"`
+	Schedule *ScheduledReportSchedule `json:"schedule,omitempty"`
 
 	// ReportingStart specifies the time this ScheduledReport should start from
 	// instead of the current time.
@@ -52,6 +52,10 @@ type ScheduledReportSpec struct {
 	// having a report that is just a snapshot of the most recent data rather
 	// than a log of all runs before it.
 	OverwriteExistingData bool `json:"overwriteExistingData,omitempty"`
+
+	// RunImmediately will run the report immediately, ignoring ReportingStart,
+	// ReportingEnd and GracePeriod.
+	RunImmediately bool `json:"runImmediately,omitempty"`
 
 	// Inputs are the inputs to the ReportGenerationQuery
 	Inputs ReportGenerationQueryInputValues `json:"inputs,omitempty"`

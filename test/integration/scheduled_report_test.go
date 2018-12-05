@@ -1,0 +1,49 @@
+package integration
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"testing"
+	"time"
+
+	"github.com/operator-framework/operator-metering/test/testhelpers"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func testScheduledReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time, testCases []reportsProduceCorrectDataForInputTestCase) {
+	require.NotZero(t, reportStart, "reportStart should not be zero")
+	require.NotZero(t, reportEnd, "reportEnd should not be zero")
+
+	for _, test := range testCases {
+		// Fix closure captures
+		name := test.name
+		test := test
+		t.Run(name, func(t *testing.T) {
+
+			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
+
+			report := testFramework.NewSimpleScheduledReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
+
+			defer func() {
+				t.Logf("deleting scheduled report %s", report.Name)
+				err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
+				assert.NoError(t, err, "expected delete scheduled report to succeed")
+			}()
+
+			testFramework.RequireScheduledReportSuccessfullyRuns(t, report, time.Minute)
+
+			// read expected results from a file
+			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
+			require.NoError(t, err)
+			// turn the expected results into a list of maps
+			var expectedResults []map[string]interface{}
+			err = json.Unmarshal(expectedReportData, &expectedResults)
+			require.NoError(t, err)
+
+			actualResults := testFramework.GetScheduledReportResults(t, report, time.Minute)
+
+			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
+		})
+	}
+}
