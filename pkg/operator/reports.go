@@ -90,6 +90,17 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 }
 
 func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
+	if report.Spec.GenerationQueryName == "" {
+		err := fmt.Errorf("invalid Report %s: must set spec.generationQuery", report.Name)
+		op.setReportError(logger, report, err, err.Error())
+		return nil
+	}
+	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
+		err := fmt.Errorf("invalid Report %s: spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Name, report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time)
+		op.setReportError(logger, report, err, err.Error())
+		return nil
+	}
+
 	tableName := reportingutil.ReportTableName(report.Name)
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
