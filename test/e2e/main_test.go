@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
+	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator"
 	"github.com/operator-framework/operator-metering/test/framework"
 )
@@ -59,156 +60,71 @@ func TestMain(m *testing.M) {
 }
 
 func TestReportingE2E(t *testing.T) {
-	reportsProduceDataTestCases := []reportProducesDataTestCase{
-		{
-			name:          "namespace-cpu-request",
-			queryName:     "namespace-cpu-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "namespace-cpu-usage",
-			queryName:     "namespace-cpu-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "namespace-memory-request",
-			queryName:     "namespace-memory-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout + time.Minute,
-		},
-		{
-			name:          "namespace-persistentvolumeclaim-request",
-			queryName:     "namespace-persistentvolumeclaim-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout + time.Minute,
-		},
-		{
-			name:          "namespace-memory-usage",
-			queryName:     "namespace-memory-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout + time.Minute,
-		},
-		{
-			name:          "pod-cpu-request",
-			queryName:     "pod-cpu-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "pod-cpu-usage",
-			queryName:     "pod-cpu-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "pod-memory-request",
-			queryName:     "pod-memory-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "pod-memory-usage",
-			queryName:     "pod-memory-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "pod-memory-request-vs-node-memory-allocatable",
-			queryName:     "pod-memory-request-vs-node-memory-allocatable",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout + time.Minute,
-		},
-		{
-			name:          "persistentvolumeclaim-request",
-			queryName:     "persistentvolumeclaim-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout + time.Minute,
-		},
-		{
-			name:          "node-cpu-utilization",
-			queryName:     "node-cpu-utilization",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "node-memory-utilization",
-			queryName:     "node-memory-utilization",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "pod-cpu-request-aws",
-			queryName:     "pod-cpu-request-aws",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-			skip:          !runAWSBillingTests,
-		},
-		{
-			name:          "pod-memory-request-aws",
-			queryName:     "pod-memory-request-aws",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-			skip:          !runAWSBillingTests,
-		},
-		{
-			name:          "cluster-persistentvolumeclaim-request",
-			queryName:     "cluster-persistentvolumeclaim-request",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-cpu-capacity",
-			queryName:     "cluster-cpu-capacity",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-memory-capacity",
-			queryName:     "cluster-memory-capacity",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-cpu-usage",
-			queryName:     "cluster-cpu-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-memory-usage",
-			queryName:     "cluster-memory-usage",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-cpu-utilization",
-			queryName:     "cluster-cpu-utilization",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "cluster-memory-utilization",
-			queryName:     "cluster-memory-utilization",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-		},
-		{
-			name:          "aws-ec2-cluster-cost",
-			queryName:     "aws-ec2-cluster-cost",
-			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
-			skip:          !runAWSBillingTests,
-		},
+	hourlySchedule := &meteringv1alpha1.ScheduledReportSchedule{
+		Period: meteringv1alpha1.ScheduledReportPeriodHourly,
 	}
 
-	scheduledReportsProduceDataTestCases := []scheduledReportProducesDataTestCase{
-		{
-			name:      "namespace-cpu-request-hourly",
-			queryName: "namespace-cpu-request",
-			timeout:   reportTestTimeout,
-		},
+	queries := []struct {
+		queryName string
+		skip      bool
+	}{
+		{queryName: "namespace-cpu-request"},
+		{queryName: "namespace-cpu-usage"},
+		{queryName: "namespace-memory-request"},
+		{queryName: "namespace-persistentvolumeclaim-request"},
+		{queryName: "namespace-memory-usage"},
+		{queryName: "pod-cpu-request"},
+		{queryName: "pod-cpu-usage"},
+		{queryName: "pod-memory-request"},
+		{queryName: "pod-memory-usage"},
+		{queryName: "pod-memory-request-vs-node-memory-allocatable"},
+		{queryName: "persistentvolumeclaim-request"},
+		{queryName: "node-cpu-utilization"},
+		{queryName: "node-memory-utilization"},
+		{queryName: "cluster-persistentvolumeclaim-request"},
+		{queryName: "cluster-cpu-capacity"},
+		{queryName: "cluster-memory-capacity"},
+		{queryName: "cluster-cpu-usage"},
+		{queryName: "cluster-memory-usage"},
+		{queryName: "cluster-cpu-utilization"},
+		{queryName: "cluster-memory-utilization"},
+		{queryName: "pod-cpu-request-aws", skip: !runAWSBillingTests},
+		{queryName: "pod-memory-request-aws", skip: !runAWSBillingTests},
+		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests},
+	}
+
+	var reportsProduceDataTestCases []reportProducesDataTestCase
+	var scheduledReportsProduceDataTestCases []scheduledReportProducesDataTestCase
+
+	for _, query := range queries {
+		reportTestCase := reportProducesDataTestCase{
+			name:          query.queryName,
+			queryName:     query.queryName,
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+			skip:          query.skip,
+		}
+
+		scheduledReportHourlyTestCase := scheduledReportProducesDataTestCase{
+			name:          query.queryName + "-hourly",
+			queryName:     query.queryName,
+			schedule:      hourlySchedule,
+			newReportFunc: testFramework.NewSimpleScheduledReport,
+			timeout:       reportTestTimeout,
+			skip:          query.skip,
+		}
+		scheduledReportRunOnceTestCase := scheduledReportProducesDataTestCase{
+			name:          query.queryName + "-runonce",
+			queryName:     query.queryName,
+			schedule:      nil, // runOnce
+			newReportFunc: testFramework.NewSimpleScheduledReport,
+			timeout:       reportTestTimeout,
+			skip:          query.skip,
+		}
+
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportTestCase)
+		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportHourlyTestCase)
+		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportRunOnceTestCase)
 	}
 
 	t.Run("TestReportingProducesResults", func(t *testing.T) {
@@ -223,13 +139,25 @@ func TestReportingE2E(t *testing.T) {
 		_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
 		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
+		seenQuery := make(map[string]struct{})
 		for _, test := range reportsProduceDataTestCases {
 			if test.skip {
 				continue
 			}
+			if _, ok := seenQuery[test.queryName]; ok {
+				continue
+			}
+			seenQuery[test.queryName] = struct{}{}
 			queries = append(queries, test.queryName)
 		}
 		for _, test := range scheduledReportsProduceDataTestCases {
+			if test.skip {
+				continue
+			}
+			if _, ok := seenQuery[test.queryName]; ok {
+				continue
+			}
+			seenQuery[test.queryName] = struct{}{}
 			queries = append(queries, test.queryName)
 		}
 
