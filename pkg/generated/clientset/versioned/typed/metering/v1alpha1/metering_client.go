@@ -12,7 +12,6 @@ import (
 type MeteringV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	PrestoTablesGetter
-	ReportsGetter
 	ReportDataSourcesGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
@@ -27,10 +26,6 @@ type MeteringV1alpha1Client struct {
 
 func (c *MeteringV1alpha1Client) PrestoTables(namespace string) PrestoTableInterface {
 	return newPrestoTables(c, namespace)
-}
-
-func (c *MeteringV1alpha1Client) Reports(namespace string) ReportInterface {
-	return newReports(c, namespace)
 }
 
 func (c *MeteringV1alpha1Client) ReportDataSources(namespace string) ReportDataSourceInterface {

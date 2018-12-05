@@ -21,44 +21,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (f *Framework) CreateMeteringReport(report *meteringv1alpha1.Report) error {
-	_, err := f.MeteringClient.Reports(f.Namespace).Create(report)
-	return err
-}
-
 func (f *Framework) CreateMeteringScheduledReport(report *meteringv1alpha1.ScheduledReport) error {
 	_, err := f.MeteringClient.ScheduledReports(f.Namespace).Create(report)
 	return err
 }
 
-func (f *Framework) GetMeteringReport(name string) (*meteringv1alpha1.Report, error) {
-	return f.MeteringClient.Reports(f.Namespace).Get(name, meta.GetOptions{})
-}
-
 func (f *Framework) GetMeteringScheduledReport(name string) (*meteringv1alpha1.ScheduledReport, error) {
 	return f.MeteringClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
-}
-
-func (f *Framework) NewSimpleReport(name, queryName string, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.Report {
-	var start, end *meta.Time
-	if reportingStart != nil {
-		start = &meta.Time{*reportingStart}
-	}
-	if reportingEnd != nil {
-		end = &meta.Time{*reportingEnd}
-	}
-	return &meteringv1alpha1.Report{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: f.Namespace,
-		},
-		Spec: meteringv1alpha1.ReportSpec{
-			GenerationQueryName: queryName,
-			RunImmediately:      true,
-			ReportingStart:      start,
-			ReportingEnd:        end,
-		},
-	}
 }
 
 func (f *Framework) NewSimpleScheduledReport(name, queryName string, schedule *meteringv1alpha1.ScheduledReportSchedule, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport {

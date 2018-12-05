@@ -260,7 +260,6 @@ func (op *Reporting) runScheduledReport(logger log.FieldLogger, report *cbTypes.
 	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
 		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
 		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
 		genQuery,
 		op.uninitialiedDependendenciesHandler(),

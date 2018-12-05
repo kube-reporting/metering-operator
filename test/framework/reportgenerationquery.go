@@ -42,7 +42,6 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
-	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
 	scheduledReportGetter := reporting.NewScheduledReportClientGetter(f.MeteringClient)
 	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
@@ -80,13 +79,12 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 		t.Logf("waiting for ReportGenerationQuery %s dependencies to become initialized", queryName)
 		// explicitly ignoring results, since we'll get errors above if any of
 		// the uninitialized dependencies don't become ready in the handler
-		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, scheduledReportGetter, reportGenQuery, depHandler)
+		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, scheduledReportGetter, reportGenQuery, depHandler)
 		readyReportGenQueries[queryName] = struct{}{}
 	}
 }
 
 func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPromsumDataResponse) {
-	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
 	scheduledReportGetter := reporting.NewScheduledReportClientGetter(f.MeteringClient)
 	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
@@ -99,7 +97,7 @@ func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queri
 	for _, queryName := range queries {
 		query, err := f.GetMeteringReportGenerationQuery(queryName)
 		require.NoError(t, err, "ReportGenerationQuery should exist")
-		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, scheduledReportGetter, query)
+		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, scheduledReportGetter, query)
 		require.NoError(t, err, "Getting ReportGenerationQuery dependencies should succeed")
 
 		for _, dataSource := range deps.ReportDataSources {

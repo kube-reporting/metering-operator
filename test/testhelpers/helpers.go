@@ -10,29 +10,6 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
-func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, reportStatus v1alpha1.ReportStatus) *v1alpha1.Report {
-	var start, end *meta.Time
-	if reportStart != nil {
-		start = &meta.Time{*reportStart}
-	}
-	if reportEnd != nil {
-		end = &meta.Time{*reportEnd}
-	}
-	return &v1alpha1.Report{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: v1alpha1.ReportSpec{
-			GenerationQueryName: testQueryName,
-			ReportingStart:      start,
-			ReportingEnd:        end,
-			RunImmediately:      true,
-		},
-		Status: reportStatus,
-	}
-}
-
 func NewScheduledReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status v1alpha1.ScheduledReportStatus) *v1alpha1.ScheduledReport {
 	var start, end *meta.Time
 	if reportStart != nil {
@@ -79,7 +56,7 @@ func NewReportDataSource(name, namespace string) *v1alpha1.ReportDataSource {
 func NewPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1.PrestoTable {
 	return &v1alpha1.PrestoTable{
 		ObjectMeta: meta.ObjectMeta{
-			Name:      reportingutil.PrestoTableResourceNameFromKind("report", name),
+			Name:      reportingutil.PrestoTableResourceNameFromKind("ScheduledReport", name),
 			Namespace: namespace,
 		},
 		Status: v1alpha1.PrestoTableStatus{

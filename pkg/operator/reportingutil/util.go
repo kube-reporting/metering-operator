@@ -16,10 +16,6 @@ func DataSourceTableName(dataSourceName string) string {
 	return fmt.Sprintf("datasource_%s", resourceNameReplacer.Replace(dataSourceName))
 }
 
-func ReportTableName(reportName string) string {
-	return fmt.Sprintf("report_%s", resourceNameReplacer.Replace(reportName))
-}
-
 func ScheduledReportTableName(reportName string) string {
 	return fmt.Sprintf("scheduled_report_%s", resourceNameReplacer.Replace(reportName))
 }

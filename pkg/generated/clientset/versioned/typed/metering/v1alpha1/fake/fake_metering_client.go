@@ -16,10 +16,6 @@ func (c *FakeMeteringV1alpha1) PrestoTables(namespace string) v1alpha1.PrestoTab
 	return &FakePrestoTables{c, namespace}
 }
 
-func (c *FakeMeteringV1alpha1) Reports(namespace string) v1alpha1.ReportInterface {
-	return &FakeReports{c, namespace}
-}
-
 func (c *FakeMeteringV1alpha1) ReportDataSources(namespace string) v1alpha1.ReportDataSourceInterface {
 	return &FakeReportDataSources{c, namespace}
 }

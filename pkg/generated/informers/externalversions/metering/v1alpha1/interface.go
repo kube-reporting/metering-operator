@@ -12,8 +12,6 @@ import (
 type Interface interface {
 	// PrestoTables returns a PrestoTableInformer.
 	PrestoTables() PrestoTableInformer
-	// Reports returns a ReportInformer.
-	Reports() ReportInformer
 	// ReportDataSources returns a ReportDataSourceInformer.
 	ReportDataSources() ReportDataSourceInformer
 	// ReportGenerationQueries returns a ReportGenerationQueryInformer.
@@ -40,11 +38,6 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // PrestoTables returns a PrestoTableInformer.
 func (v *version) PrestoTables() PrestoTableInformer {
 	return &prestoTableInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// Reports returns a ReportInformer.
-func (v *version) Reports() ReportInformer {
-	return &reportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReportDataSources returns a ReportDataSourceInformer.

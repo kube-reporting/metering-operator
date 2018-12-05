@@ -37,6 +37,16 @@ var (
 	testLogger = logrus.New()
 )
 
+//for v2 endpoints full
+func apiScheduledReportV2URLFull(reportName string) string {
+	return path.Join(APIV2ScheduledReportsEndpointPrefix, reportName, "full")
+}
+
+//for v2 endpoints TableHidden
+func apiScheduledReportV2URLTable(reportName string) string {
+	return path.Join(APIV2ScheduledReportsEndpointPrefix, reportName, "table")
+}
+
 type fakePrometheusMetricsRepo struct {
 	metrics map[string][]*prestostore.PrometheusMetric
 	err     error
@@ -81,7 +91,7 @@ func (f *fakeReportResultsGetter) GetReportResults(tableName string, columns []p
 	return f.results, f.err
 }
 
-func TestAPIV1ReportsGet(t *testing.T) {
+func TestAPIV1ScheduledReportsGet(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
@@ -92,7 +102,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	tests := map[string]struct {
 		reportName string
 
-		report      *v1alpha1.Report
+		report      *v1alpha1.ScheduledReport
 		query       *v1alpha1.ReportGenerationQuery
 		prestoTable *v1alpha1.PrestoTable
 
@@ -105,7 +115,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	}{
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -133,7 +143,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -174,7 +184,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -219,7 +229,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -270,19 +280,17 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// needed for meteringListers. Since a cache.Indexer is a
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
-			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			reportLister := listers.NewReportLister(reportIndexer)
 			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
 			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
-				reportIndexer.Add(tt.report)
+				scheduledReportIndexer.Add(tt.report)
 			}
 			// add our test query for the report
 			if tt.query != nil {
@@ -294,7 +302,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
-				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+				scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -307,7 +315,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				"name":   []string{tt.reportName},
 			}
 
-			endpoint := server.URL + APIV1ReportsGetEndpoint
+			endpoint := server.URL + APIV1ScheduledReportsGetEndpoint
 
 			// construct the url object
 			endpointURL, err := url.Parse(endpoint)
@@ -348,12 +356,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	}
 }
 
-//for v2 endpoints full
-func apiReportV2URLFull(reportName string) string {
-	return path.Join(APIV2Reports, reportName, "full")
-}
-
-func TestAPIV2ReportsFull(t *testing.T) {
+func TestAPIV2ScheduledReportsFull(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
@@ -363,12 +366,12 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
-		reportStatus v1alpha1.ReportStatus
+		reportStatus v1alpha1.ScheduledReportStatus
 		reportName   string
 		reportFormat string
 		apiPath      string
 
-		report      *v1alpha1.Report
+		report      *v1alpha1.ScheduledReport
 		query       *v1alpha1.ReportGenerationQuery
 		prestoTable *v1alpha1.PrestoTable
 
@@ -381,8 +384,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLFull(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -431,8 +434,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLFull(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -462,8 +465,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLFull(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -495,7 +498,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:            "doesnt-exist",
-			apiPath:               apiReportV2URLFull("doesnt-exist") + testFormat,
+			apiPath:               apiScheduledReportV2URLFull("doesnt-exist") + testFormat,
 			expectedStatusCode:    http.StatusNotFound,
 			expectedAPIError:      "not found",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -503,7 +506,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-name-not-specified": {
 			reportName:            "",
-			apiPath:               "/api/v2/reports//full" + testFormat,
+			apiPath:               APIV2ScheduledReportsEndpointPrefix + "//full" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -511,8 +514,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-not-specified": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:               apiReportV2URLFull(testReportName),
+			report:                testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:               apiScheduledReportV2URLFull(testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -520,8 +523,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:               apiReportV2URLFull(testReportName) + "?format=doesntexist",
+			report:                testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:               apiScheduledReportV2URLFull(testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -529,8 +532,8 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLFull(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -576,19 +579,17 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			// needed for meteringListers. Since a cache.Indexer is a
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
-			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			reportLister := listers.NewReportLister(reportIndexer)
 			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
 			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
-				reportIndexer.Add(tt.report)
+				scheduledReportIndexer.Add(tt.report)
 			}
 			// add our test query for the report
 			if tt.query != nil {
@@ -600,7 +601,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
-				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+				scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -637,12 +638,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	}
 }
 
-//for v2 endpoints TableHidden
-func apiReportV2URLTable(reportName string) string {
-	return path.Join(APIV2Reports, reportName, "table")
-}
-
-func TestAPIV2ReportsTable(t *testing.T) {
+func TestAPIV2ScheduledReportsTable(t *testing.T) {
 	const namespace = "default"
 	const testReportName = "test-report"
 	const testQueryName = "test-query"
@@ -652,12 +648,12 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	reportEnd := &reportEndTmp
 
 	tests := map[string]struct {
-		reportStatus v1alpha1.ReportStatus
+		reportStatus v1alpha1.ScheduledReportStatus
 		reportName   string
 		reportFormat string
 		apiPath      string
 
-		report      *v1alpha1.Report
+		report      *v1alpha1.ScheduledReport
 		query       *v1alpha1.ReportGenerationQuery
 		prestoTable *v1alpha1.PrestoTable
 
@@ -670,8 +666,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLTable(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -722,8 +718,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLTable(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -753,8 +749,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLTable(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -786,7 +782,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:            "doesnt-exist",
-			apiPath:               apiReportV2URLTable("doesnt-exist") + testFormat,
+			apiPath:               apiScheduledReportV2URLTable("doesnt-exist") + testFormat,
 			expectedStatusCode:    http.StatusNotFound,
 			expectedAPIError:      "not found",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -794,7 +790,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-name-not-specified": {
 			reportName:            "",
-			apiPath:               "/api/v2/reports//table" + testFormat,
+			apiPath:               APIV2ScheduledReportsEndpointPrefix + "//table" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -802,8 +798,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-not-specified": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:               apiReportV2URLTable(testReportName),
+			report:                testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:               apiScheduledReportV2URLTable(testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -811,8 +807,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:               apiReportV2URLTable(testReportName) + "?format=doesntexist",
+			report:                testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:               apiScheduledReportV2URLTable(testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -820,8 +816,8 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{Phase: v1alpha1.ReportPhaseFinished}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			report:     testhelpers.NewScheduledReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ScheduledReportStatus{}),
+			apiPath:    apiScheduledReportV2URLTable(testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -867,19 +863,17 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			// needed for meteringListers. Since a cache.Indexer is a
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
-			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			scheduledReportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
-			reportLister := listers.NewReportLister(reportIndexer)
 			scheduledReportLister := listers.NewScheduledReportLister(scheduledReportIndexer)
 			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
 			if tt.report != nil {
-				reportIndexer.Add(tt.report)
+				scheduledReportIndexer.Add(tt.report)
 			}
 			// add our test query for the report
 			if tt.query != nil {
@@ -891,7 +885,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
-				reportLister, scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
+				scheduledReportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
