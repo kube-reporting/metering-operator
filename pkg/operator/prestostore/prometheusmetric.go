@@ -120,10 +120,14 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 	// calculate the queryCap with the "INSERT INTO $table_name" portion
 	// accounted for
 	queryCap := bufferCapacity - insertStatementLength
+	// account for "," and "VALUES " string length when writing to buffer
+	commaStr := ","
+	valuesStmtStr := "VALUES "
 
-	for _, metric := range metrics {
-		metricValue := generatePrometheusMetricSQLValues(metric)
+	metricsInBuffer := false
+	numMetrics := len(metrics)
 
+	for i, metric := range metrics {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -131,44 +135,60 @@ func StorePrometheusMetricsWithBuffer(queryBuf *bytes.Buffer, ctx context.Contex
 			// continue processing if context isn't cancelled.
 		}
 
-		// If the buffer is empty, we add VALUES to it, and everything the
-		// follows will be a single row to insert
-		if queryBuf.Len() == 0 {
-			queryBuf.WriteString("VALUES ")
-		} ***REMOVED*** {
-			// if the buffer isn't empty, then before we add more rows to the
-			// insert query, add a comma to separate them.
-			queryBuf.WriteString(",")
+		metricSQLStr := generatePrometheusMetricSQLValues(metric)
+
+		// lastMetric means we need to insert after writing the metric to the
+		// buffer
+		lastMetric := i == (numMetrics - 1)
+
+		if metricsInBuffer {
+			// if writing the current metricSQLStr to the buffer would exceed the
+			// bufferCapacity, perform the insert query, and reset the buffer
+			// to flush it
+			bytesToWrite := len(commaStr + metricSQLStr)
+			if (bytesToWrite + queryBuf.Len()) > queryCap {
+				err := presto.InsertInto(queryer, tableName, queryBuf.String())
+				if err != nil {
+					return fmt.Errorf("failed to store metrics into presto: %v", err)
+				}
+				queryBuf.Reset()
+
+				// we just inserted the contents of the buffer, so reset
+				// metricsInBuffer and prepend VALUES
+				metricsInBuffer = false
+			}
 		}
 
-		// There's a character limit of bufferCapacity on insert
-		// queries, so let's chunk them at that limit.
-		bytesToWrite := len(metricValue)
-		newBufferSize := (bytesToWrite + queryBuf.Len())
+		var toWrite string
+		if !metricsInBuffer {
+			// no metrics in buffer means we need to prepend "VALUES " before
+			// we write metricSQL
+			toWrite = valuesStmtStr + metricSQLStr
+		} ***REMOVED*** {
+			// existing metrics in buffer means we need to prepend "," before
+			// we write metricSQL since that separates each record
+			toWrite = commaStr + metricSQLStr
+		}
 
-		// if writing the current metricValue to the buffer would exceed the
-		// bufferCapacity, perform the insert query, and reset the buffer
-		if newBufferSize > queryCap {
+		bytesToWrite := len(toWrite)
+		if (bytesToWrite + queryBuf.Len()) > queryCap {
+			return fmt.Errorf("writing %q would exceed buffer size, please adjust buffer size: bufferCapacityBytes: %d, queryCapacityBytes: %d, currentBufferSize: %d bytesToWrite: %d", toWrite, bufferCapacity, queryCap, queryBuf.Len(), bytesToWrite)
+		}
+
+		_, err := queryBuf.WriteString(toWrite)
+		if err != nil {
+			return fmt.Errorf(`error writing %q string to buffer: %v`, toWrite, err)
+		}
+		metricsInBuffer = true
+
+		// this is the last metric in the loop, insert the contents of the
+		// buffer
+		if lastMetric {
 			err := presto.InsertInto(queryer, tableName, queryBuf.String())
 			if err != nil {
-				return fmt.Errorf("insert: failed to store metrics into presto: %v", err)
+				return fmt.Errorf("failed to store metrics into presto: %v", err)
 			}
 			queryBuf.Reset()
-		} ***REMOVED*** {
-			n, err := queryBuf.WriteString(metricValue)
-			if err != nil {
-				return fmt.Errorf("error writing metricValue string to buffer: %v", err)
-			}
-			if n != bytesToWrite {
-				return fmt.Errorf("error writing metricValue string to buffer: incorrect number of bytes written: expected %d, got %d", bytesToWrite, n)
-			}
-		}
-	}
-	// if the buffer has unwritten values, perform the ***REMOVED***nal insert
-	if queryBuf.Len() != 0 {
-		err := presto.InsertInto(queryer, tableName, queryBuf.String())
-		if err != nil {
-			return fmt.Errorf("***REMOVED***nal insert: failed to store metrics into presto: %v", err)
 		}
 	}
 	return nil
