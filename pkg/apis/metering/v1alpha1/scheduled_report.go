@@ -7,39 +7,39 @@ import (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type ScheduledReportList struct {
+type ReportList struct {
 	meta.TypeMeta `json:",inline"`
 	meta.ListMeta `json:"metadata,omitempty"`
-	Items         []*ScheduledReport `json:"items"`
+	Items         []*Report `json:"items"`
 }
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type ScheduledReport struct {
+type Report struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ScheduledReportSpec   `json:"spec"`
-	Status ScheduledReportStatus `json:"status"`
+	Spec   ReportSpec   `json:"spec"`
+	Status ReportStatus `json:"status"`
 }
 
-type ScheduledReportSpec struct {
+type ReportSpec struct {
 	// GenerationQueryName speci***REMOVED***es the ReportGenerationQuery to execute when
 	// the report runs.
 	GenerationQueryName string `json:"generationQuery"`
 
 	// Schedule con***REMOVED***gures when the report runs.
-	Schedule *ScheduledReportSchedule `json:"schedule,omitempty"`
+	Schedule *ReportSchedule `json:"schedule,omitempty"`
 
-	// ReportingStart speci***REMOVED***es the time this ScheduledReport should start from
+	// ReportingStart speci***REMOVED***es the time this Report should start from
 	// instead of the current time.
-	// This is intended for allowing a ScheduledReport to start from the past
-	// and report on data collected before the ScheduledReport was created.
+	// This is intended for allowing a Report to start from the past
+	// and report on data collected before the Report was created.
 	ReportingStart *meta.Time `json:"reportingStart,omitempty"`
 
-	// ReportingEnd speci***REMOVED***es the time this ScheduledReport should stop
-	// running. Once a ScheduledReport has reached ReportingEnd, no new results
+	// ReportingEnd speci***REMOVED***es the time this Report should stop
+	// running. Once a Report has reached ReportingEnd, no new results
 	// will be generated.
 	ReportingEnd *meta.Time `json:"reportingEnd,omitempty"`
 
@@ -64,64 +64,64 @@ type ScheduledReportSpec struct {
 	Output *StorageLocationRef `json:"output,omitempty"`
 }
 
-type ScheduledReportPeriod string
+type ReportPeriod string
 
 const (
-	ScheduledReportPeriodCron    ScheduledReportPeriod = "cron"
-	ScheduledReportPeriodHourly  ScheduledReportPeriod = "hourly"
-	ScheduledReportPeriodDaily   ScheduledReportPeriod = "daily"
-	ScheduledReportPeriodWeekly  ScheduledReportPeriod = "weekly"
-	ScheduledReportPeriodMonthly ScheduledReportPeriod = "monthly"
+	ReportPeriodCron    ReportPeriod = "cron"
+	ReportPeriodHourly  ReportPeriod = "hourly"
+	ReportPeriodDaily   ReportPeriod = "daily"
+	ReportPeriodWeekly  ReportPeriod = "weekly"
+	ReportPeriodMonthly ReportPeriod = "monthly"
 )
 
-type ScheduledReportSchedule struct {
-	Period ScheduledReportPeriod `json:"period"`
+type ReportSchedule struct {
+	Period ReportPeriod `json:"period"`
 
-	Cron    *ScheduledReportScheduleCron    `json:"cron,omitempty"`
-	Hourly  *ScheduledReportScheduleHourly  `json:"hourly,omitempty"`
-	Daily   *ScheduledReportScheduleDaily   `json:"daily,omitempty"`
-	Weekly  *ScheduledReportScheduleWeekly  `json:"weekly,omitempty"`
-	Monthly *ScheduledReportScheduleMonthly `json:"monthly,omitempty"`
+	Cron    *ReportScheduleCron    `json:"cron,omitempty"`
+	Hourly  *ReportScheduleHourly  `json:"hourly,omitempty"`
+	Daily   *ReportScheduleDaily   `json:"daily,omitempty"`
+	Weekly  *ReportScheduleWeekly  `json:"weekly,omitempty"`
+	Monthly *ReportScheduleMonthly `json:"monthly,omitempty"`
 }
 
-type ScheduledReportScheduleCron struct {
+type ReportScheduleCron struct {
 	Expression string `json:"expression,omitempty"`
 }
 
-type ScheduledReportScheduleHourly struct {
+type ReportScheduleHourly struct {
 	Minute int64 `json:"minute,omitempty"`
 	Second int64 `json:"second,omitempty"`
 }
 
-type ScheduledReportScheduleDaily struct {
+type ReportScheduleDaily struct {
 	Hour   int64 `json:"hour,omitempty"`
 	Minute int64 `json:"minute,omitempty"`
 	Second int64 `json:"second,omitempty"`
 }
 
-type ScheduledReportScheduleWeekly struct {
+type ReportScheduleWeekly struct {
 	DayOfWeek *string `json:"dayOfWeek,omitempty"`
 	Hour      int64   `json:"hour,omitempty"`
 	Minute    int64   `json:"minute,omitempty"`
 	Second    int64   `json:"second,omitempty"`
 }
 
-type ScheduledReportScheduleMonthly struct {
+type ReportScheduleMonthly struct {
 	DayOfMonth *int64 `json:"dayOfMonth,omitempty"`
 	Hour       int64  `json:"hour,omitempty"`
 	Minute     int64  `json:"minute,omitempty"`
 	Second     int64  `json:"second,omitempty"`
 }
 
-type ScheduledReportStatus struct {
-	Conditions     []ScheduledReportCondition `json:"conditions,omitempty"`
+type ReportStatus struct {
+	Conditions     []ReportCondition `json:"conditions,omitempty"`
 	LastReportTime *meta.Time                 `json:"lastReportTime,omitempty"`
 	TableName      string                     `json:"tableName"`
 }
 
-type ScheduledReportCondition struct {
-	// Type of ScheduledReport condition, Waiting, Active or Failed.
-	Type ScheduledReportConditionType `json:"type"`
+type ReportCondition struct {
+	// Type of Report condition, Waiting, Active or Failed.
+	Type ReportConditionType `json:"type"`
 	// Status of the condition, one of True, False, Unknown.
 	Status v1.ConditionStatus `json:"status"`
 	// Last time the condition was checked.
@@ -138,9 +138,9 @@ type ScheduledReportCondition struct {
 	Message string `json:"message,omitempty"`
 }
 
-type ScheduledReportConditionType string
+type ReportConditionType string
 
 const (
-	ScheduledReportRunning ScheduledReportConditionType = "Running"
-	ScheduledReportFailure ScheduledReportConditionType = "Failure"
+	ReportRunning ReportConditionType = "Running"
+	ReportFailure ReportConditionType = "Failure"
 )

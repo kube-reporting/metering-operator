@@ -60,8 +60,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestReportingE2E(t *testing.T) {
-	hourlySchedule := &meteringv1alpha1.ScheduledReportSchedule{
-		Period: meteringv1alpha1.ScheduledReportPeriodHourly,
+	hourlySchedule := &meteringv1alpha1.ReportSchedule{
+		Period: meteringv1alpha1.ReportPeriodHourly,
 	}
 
 	queries := []struct {
@@ -93,28 +93,28 @@ func TestReportingE2E(t *testing.T) {
 		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests},
 	}
 
-	var scheduledReportsProduceDataTestCases []scheduledReportProducesDataTestCase
+	var reportsProduceDataTestCases []reportProducesDataTestCase
 
 	for _, query := range queries {
-		scheduledReportHourlyTestCase := scheduledReportProducesDataTestCase{
+		reportHourlyTestCase := reportProducesDataTestCase{
 			name:          query.queryName + "-hourly",
 			queryName:     query.queryName,
 			schedule:      hourlySchedule,
-			newReportFunc: testFramework.NewSimpleScheduledReport,
+			newReportFunc: testFramework.NewSimpleReport,
 			timeout:       reportTestTimeout,
 			skip:          query.skip,
 		}
-		scheduledReportRunOnceTestCase := scheduledReportProducesDataTestCase{
+		reportRunOnceTestCase := reportProducesDataTestCase{
 			name:          query.queryName + "-runonce",
 			queryName:     query.queryName,
 			schedule:      nil, // runOnce
-			newReportFunc: testFramework.NewSimpleScheduledReport,
+			newReportFunc: testFramework.NewSimpleReport,
 			timeout:       reportTestTimeout,
 			skip:          query.skip,
 		}
 
-		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportHourlyTestCase)
-		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportRunOnceTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportHourlyTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportRunOnceTestCase)
 	}
 
 	t.Run("TestReportingProducesResults", func(t *testing.T) {
@@ -130,7 +130,7 @@ func TestReportingE2E(t *testing.T) {
 		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
 		seenQuery := make(map[string]struct{})
-		for _, test := range scheduledReportsProduceDataTestCases {
+		for _, test := range reportsProduceDataTestCases {
 			if test.skip {
 				continue
 			}
@@ -150,8 +150,8 @@ func TestReportingE2E(t *testing.T) {
 		periodStart, periodEnd, collectResp = testFramework.CollectMetricsOnce(t)
 		testFramework.RequireReportDataSourcesForQueryHaveData(t, queries, collectResp)
 
-		t.Run("TestScheduledReportsProduceData", func(t *testing.T) {
-			testScheduledReportsProduceData(t, testFramework, periodStart, periodEnd, scheduledReportsProduceDataTestCases)
+		t.Run("TestReportsProduceData", func(t *testing.T) {
+			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
 		})
 	})
 }

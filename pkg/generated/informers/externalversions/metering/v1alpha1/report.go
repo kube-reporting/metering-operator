@@ -17,59 +17,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// ScheduledReportInformer provides access to a shared informer and lister for
-// ScheduledReports.
-type ScheduledReportInformer interface {
+// ReportInformer provides access to a shared informer and lister for
+// Reports.
+type ReportInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ScheduledReportLister
+	Lister() v1alpha1.ReportLister
 }
 
-type scheduledReportInformer struct {
+type reportInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewScheduledReportInformer constructs a new informer for ScheduledReport type.
+// NewReportInformer constructs a new informer for Report type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewScheduledReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredScheduledReportInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredScheduledReportInformer constructs a new informer for ScheduledReport type.
+// NewFilteredReportInformer constructs a new informer for Report type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredScheduledReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredReportInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1alpha1().ScheduledReports(namespace).List(options)
+				return client.MeteringV1alpha1().Reports(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.MeteringV1alpha1().ScheduledReports(namespace).Watch(options)
+				return client.MeteringV1alpha1().Reports(namespace).Watch(options)
 			},
 		},
-		&metering_v1alpha1.ScheduledReport{},
+		&metering_v1alpha1.Report{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *scheduledReportInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredScheduledReportInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *reportInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredReportInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *scheduledReportInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&metering_v1alpha1.ScheduledReport{}, f.defaultInformer)
+func (f *reportInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&metering_v1alpha1.Report{}, f.defaultInformer)
 }
 
-func (f *scheduledReportInformer) Lister() v1alpha1.ScheduledReportLister {
-	return v1alpha1.NewScheduledReportLister(f.Informer().GetIndexer())
+func (f *reportInformer) Lister() v1alpha1.ReportLister {
+	return v1alpha1.NewReportLister(f.Informer().GetIndexer())
 }

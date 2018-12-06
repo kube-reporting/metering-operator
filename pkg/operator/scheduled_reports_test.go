@@ -12,12 +12,12 @@ import (
 func TestGetNextReportPeriod(t *testing.T) {
 	baseTime := time.Date(2018, time.July, 1, 0, 0, 0, 0, time.UTC)
 	tests := map[string]struct {
-		period              v1alpha1.ScheduledReportPeriod
+		period              v1alpha1.ReportPeriod
 		expectError         bool
 		expectReportPeriods []reportPeriod
 	}{
 		"hourly": {
-			period: v1alpha1.ScheduledReportPeriodHourly,
+			period: v1alpha1.ReportPeriodHourly,
 			expectReportPeriods: []reportPeriod{
 				{
 					periodStart: baseTime,
@@ -30,7 +30,7 @@ func TestGetNextReportPeriod(t *testing.T) {
 			},
 		},
 		"daily": {
-			period: v1alpha1.ScheduledReportPeriodDaily,
+			period: v1alpha1.ReportPeriodDaily,
 			expectReportPeriods: []reportPeriod{
 				{
 					periodStart: baseTime,
@@ -43,7 +43,7 @@ func TestGetNextReportPeriod(t *testing.T) {
 			},
 		},
 		"weekly": {
-			period: v1alpha1.ScheduledReportPeriodWeekly,
+			period: v1alpha1.ReportPeriodWeekly,
 			expectReportPeriods: []reportPeriod{
 				{
 					periodStart: baseTime,
@@ -56,7 +56,7 @@ func TestGetNextReportPeriod(t *testing.T) {
 			},
 		},
 		"monthly": {
-			period: v1alpha1.ScheduledReportPeriodMonthly,
+			period: v1alpha1.ReportPeriodMonthly,
 			expectReportPeriods: []reportPeriod{
 				{
 					periodStart: baseTime,
@@ -68,14 +68,14 @@ func TestGetNextReportPeriod(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			apiSched := &v1alpha1.ScheduledReportSchedule{
+			apiSched := &v1alpha1.ReportSchedule{
 				Period: test.period,
 				// Normally only one is set, but we simply use a zero value
 				// for each to make it easier in tests.
-				Hourly:  &v1alpha1.ScheduledReportScheduleHourly{},
-				Daily:   &v1alpha1.ScheduledReportScheduleDaily{},
-				Weekly:  &v1alpha1.ScheduledReportScheduleWeekly{},
-				Monthly: &v1alpha1.ScheduledReportScheduleMonthly{},
+				Hourly:  &v1alpha1.ReportScheduleHourly{},
+				Daily:   &v1alpha1.ReportScheduleDaily{},
+				Weekly:  &v1alpha1.ReportScheduleWeekly{},
+				Monthly: &v1alpha1.ReportScheduleMonthly{},
 			}
 
 			schedule, err := getSchedule(apiSched)

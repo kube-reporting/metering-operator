@@ -8,36 +8,36 @@ import (
 )
 
 const (
-	// Failure scheduledReport conditions:
+	// Failure report conditions:
 	//
-	// GenerateReportErrorReason is added to a ScheduledReport when an error
+	// GenerateReportErrorReason is added to a Report when an error
 	// occurs while generating the report data.
 	GenerateReportErrorReason = "GenerateReportError"
 
-	// FailedValidationReason is added to a ScheduledReport when the
-	// ScheduledReport is invalid or it's ReportGenerationQuery is invalid or
+	// FailedValidationReason is added to a Report when the
+	// Report is invalid or it's ReportGenerationQuery is invalid or
 	// not ready
 	FailedValidationReason = "FailedValidation"
 
-	// Running scheduledReport conditions:
+	// Running report conditions:
 
-	// ScheduledReason is added to a ScheduledReport when it's reached the next
+	// ScheduledReason is added to a Report when it's reached the next
 	// reporting time in it's schedule.
 	ScheduledReason = "Scheduled"
-	// ValidatingScheduledReportReason is added to a ScheduledReport when the
+	// ValidatingReportReason is added to a Report when the
 	// report is being validated
-	ValidatingScheduledReportReason = "ValidatingScheduledReport"
-	// ReportPeriodWaitingReason is added to a ScheduledReport when the report
+	ValidatingReportReason = "ValidatingReport"
+	// ReportPeriodWaitingReason is added to a Report when the report
 	// has to wait until the next scheduled reporting time.
 	ReportPeriodWaitingReason = "ReportPeriodNotFinished"
-	// ReportPeriodFinishedReason is added to a ScheduledReport when the report
+	// ReportPeriodFinishedReason is added to a Report when the report
 	// has had it's report processed up until it's reportingEnd.
 	ReportPeriodFinishedReason = "ReportPeriodFinished"
 )
 
-// NewScheduledReportCondition creates a new scheduledReport condition.
-func NewScheduledReportCondition(condType v1alpha1.ScheduledReportConditionType, status v1.ConditionStatus, reason, message string) *v1alpha1.ScheduledReportCondition {
-	return &v1alpha1.ScheduledReportCondition{
+// NewReportCondition creates a new report condition.
+func NewReportCondition(condType v1alpha1.ReportConditionType, status v1.ConditionStatus, reason, message string) *v1alpha1.ReportCondition {
+	return &v1alpha1.ReportCondition{
 		Type:               condType,
 		Status:             status,
 		LastUpdateTime:     metav1.Now(),
@@ -47,8 +47,8 @@ func NewScheduledReportCondition(condType v1alpha1.ScheduledReportConditionType,
 	}
 }
 
-// GetScheduledReportCondition returns the condition with the provided type.
-func GetScheduledReportCondition(status v1alpha1.ScheduledReportStatus, condType v1alpha1.ScheduledReportConditionType) *v1alpha1.ScheduledReportCondition {
+// GetReportCondition returns the condition with the provided type.
+func GetReportCondition(status v1alpha1.ReportStatus, condType v1alpha1.ReportConditionType) *v1alpha1.ReportCondition {
 	for i := range status.Conditions {
 		c := status.Conditions[i]
 		if c.Type == condType {
@@ -58,10 +58,10 @@ func GetScheduledReportCondition(status v1alpha1.ScheduledReportStatus, condType
 	return nil
 }
 
-// SetScheduledReportCondition updates the scheduledReport to include the provided condition. If the condition that
+// SetReportCondition updates the report to include the provided condition. If the condition that
 // we are about to add already exists and has the same status and reason then we are not going to update.
-func SetScheduledReportCondition(status *v1alpha1.ScheduledReportStatus, condition v1alpha1.ScheduledReportCondition) {
-	currentCond := GetScheduledReportCondition(*status, condition.Type)
+func SetReportCondition(status *v1alpha1.ReportStatus, condition v1alpha1.ReportCondition) {
+	currentCond := GetReportCondition(*status, condition.Type)
 	if currentCond != nil && currentCond.Status == condition.Status && currentCond.Reason == condition.Reason {
 		return
 	}
@@ -73,14 +73,14 @@ func SetScheduledReportCondition(status *v1alpha1.ScheduledReportStatus, conditi
 	status.Conditions = append(newConditions, condition)
 }
 
-// RemoveScheduledReportCondition removes the scheduledReport condition with the provided type.
-func RemoveScheduledReportCondition(status *v1alpha1.ScheduledReportStatus, condType v1alpha1.ScheduledReportConditionType) {
+// RemoveReportCondition removes the report condition with the provided type.
+func RemoveReportCondition(status *v1alpha1.ReportStatus, condType v1alpha1.ReportConditionType) {
 	status.Conditions = ***REMOVED***lterOutCondition(status.Conditions, condType)
 }
 
-// ***REMOVED***lterOutCondition returns a new slice of scheduledReport conditions without conditions with the provided type.
-func ***REMOVED***lterOutCondition(conditions []v1alpha1.ScheduledReportCondition, condType v1alpha1.ScheduledReportConditionType) []v1alpha1.ScheduledReportCondition {
-	var newConditions []v1alpha1.ScheduledReportCondition
+// ***REMOVED***lterOutCondition returns a new slice of report conditions without conditions with the provided type.
+func ***REMOVED***lterOutCondition(conditions []v1alpha1.ReportCondition, condType v1alpha1.ReportConditionType) []v1alpha1.ReportCondition {
+	var newConditions []v1alpha1.ReportCondition
 	for _, c := range conditions {
 		if c.Type == condType {
 			continue
