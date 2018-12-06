@@ -21,9 +21,9 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
 	dataSourceTableSet.Status.TableName = reportingutil.DataSourceTableName("initialized-datasource")
 
-	reportTableUnset := testhelpers.NewScheduledReport("uninitialized-report", "default", "some-query", nil, nil, metering.ScheduledReportStatus{})
-	reportTableSet := testhelpers.NewScheduledReport("initialized-report", "default", "some-query", nil, nil, metering.ScheduledReportStatus{
-		TableName: reportingutil.ScheduledReportTableName("initialized-report"),
+	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{})
+	reportTableSet := testhelpers.NewReport("initialized-report", "default", "some-query", nil, nil, metering.ReportStatus{
+		TableName: reportingutil.ReportTableName("initialized-report"),
 	})
 
 	// we keep a set of our test objects here since we re-use them in different
@@ -47,10 +47,10 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 	initializedDataSources := []*metering.ReportDataSource{
 		dataSourceTableSet,
 	}
-	uninitializedScheduledReports := []*metering.ScheduledReport{
+	uninitializedReports := []*metering.Report{
 		reportTableUnset,
 	}
-	initializedScheduledReports := []*metering.ScheduledReport{
+	initializedReports := []*metering.Report{
 		reportTableSet,
 	}
 
@@ -104,18 +104,18 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		},
 		"Report dependencies with status.tableName unset is a validation error": {
 			deps: ReportGenerationQueryDependencies{
-				ScheduledReports: uninitializedScheduledReports,
+				Reports: uninitializedReports,
 			},
 			expectErr: true,
 		},
 		"Report dependencies with status.tableName set is valid": {
 			deps: ReportGenerationQueryDependencies{
-				ScheduledReports: initializedScheduledReports,
+				Reports: initializedReports,
 			},
 		},
 		"mixing valid and invalid dependencies is a validation error": {
 			deps: ReportGenerationQueryDependencies{
-				ScheduledReports:        uninitializedScheduledReports,
+				Reports:        uninitializedReports,
 				ReportGenerationQueries: combinedUninitializedQueries,
 				ReportDataSources:       uninitializedDataSources,
 				// disabledViewQueries is fine for dynamic queries
@@ -125,7 +125,7 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		},
 		"mixing valid dependencies is a valid": {
 			deps: ReportGenerationQueryDependencies{
-				ScheduledReports:               uninitializedScheduledReports,
+				Reports:               uninitializedReports,
 				ReportGenerationQueries:        initializedQueries,
 				ReportDataSources:              initializedDataSources,
 				DynamicReportGenerationQueries: disabledViewQueries,

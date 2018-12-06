@@ -65,7 +65,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
 		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
 		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewScheduledReportListerGetter(op.scheduledReportLister),
+		reporting.NewReportListerGetter(op.reportLister),
 		generationQuery,
 		op.uninitialiedDependendenciesHandler(),
 	)
@@ -117,9 +117,9 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 	if err := op.queueDependentReportGenerationQueriesForQuery(generationQuery); err != nil {
 		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportGenerationQuery %s", generationQuery.Name)
 	}
-	// enqueue any scheduledReports depending on this one
-	if err := op.queueDependentScheduledReportsForQuery(generationQuery); err != nil {
-		logger.WithError(err).Errorf("error queuing ScheduledReport dependents of ReportGenerationQuery %s", generationQuery.Name)
+	// enqueue any reports depending on this one
+	if err := op.queueDependentReportsForQuery(generationQuery); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportGenerationQuery %s", generationQuery.Name)
 	}
 
 	return nil
@@ -168,16 +168,16 @@ func (op *Reporting) queueDependentReportGenerationQueriesForQuery(generationQue
 	return nil
 }
 
-func (op *Reporting) queueDependentScheduledReportsForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
-	scheduledReportLister := op.meteringClient.MeteringV1alpha1().ScheduledReports(generationQuery.Namespace)
-	scheduledReports, err := scheduledReportLister.List(metav1.ListOptions{})
+func (op *Reporting) queueDependentReportsForQuery(generationQuery *cbTypes.ReportGenerationQuery) error {
+	reportLister := op.meteringClient.MeteringV1alpha1().Reports(generationQuery.Namespace)
+	reports, err := reportLister.List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 
-	for _, report := range scheduledReports.Items {
+	for _, report := range reports.Items {
 		if report.Spec.GenerationQueryName == generationQuery.Name {
-			op.enqueueScheduledReport(report)
+			op.enqueueReport(report)
 		}
 	}
 	return nil

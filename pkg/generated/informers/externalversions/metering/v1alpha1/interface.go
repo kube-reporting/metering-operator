@@ -12,14 +12,14 @@ import (
 type Interface interface {
 	// PrestoTables returns a PrestoTableInformer.
 	PrestoTables() PrestoTableInformer
+	// Reports returns a ReportInformer.
+	Reports() ReportInformer
 	// ReportDataSources returns a ReportDataSourceInformer.
 	ReportDataSources() ReportDataSourceInformer
 	// ReportGenerationQueries returns a ReportGenerationQueryInformer.
 	ReportGenerationQueries() ReportGenerationQueryInformer
 	// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 	ReportPrometheusQueries() ReportPrometheusQueryInformer
-	// ScheduledReports returns a ScheduledReportInformer.
-	ScheduledReports() ScheduledReportInformer
 	// StorageLocations returns a StorageLocationInformer.
 	StorageLocations() StorageLocationInformer
 }
@@ -40,6 +40,11 @@ func (v *version) PrestoTables() PrestoTableInformer {
 	return &prestoTableInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
+// Reports returns a ReportInformer.
+func (v *version) Reports() ReportInformer {
+	return &reportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // ReportDataSources returns a ReportDataSourceInformer.
 func (v *version) ReportDataSources() ReportDataSourceInformer {
 	return &reportDataSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -53,11 +58,6 @@ func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
 // ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 func (v *version) ReportPrometheusQueries() ReportPrometheusQueryInformer {
 	return &reportPrometheusQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// ScheduledReports returns a ScheduledReportInformer.
-func (v *version) ScheduledReports() ScheduledReportInformer {
-	return &scheduledReportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // StorageLocations returns a StorageLocationInformer.

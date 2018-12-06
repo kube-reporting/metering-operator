@@ -16,6 +16,10 @@ func (c *FakeMeteringV1alpha1) PrestoTables(namespace string) v1alpha1.PrestoTab
 	return &FakePrestoTables{c, namespace}
 }
 
+func (c *FakeMeteringV1alpha1) Reports(namespace string) v1alpha1.ReportInterface {
+	return &FakeReports{c, namespace}
+}
+
 func (c *FakeMeteringV1alpha1) ReportDataSources(namespace string) v1alpha1.ReportDataSourceInterface {
 	return &FakeReportDataSources{c, namespace}
 }
@@ -26,10 +30,6 @@ func (c *FakeMeteringV1alpha1) ReportGenerationQueries(namespace string) v1alpha
 
 func (c *FakeMeteringV1alpha1) ReportPrometheusQueries(namespace string) v1alpha1.ReportPrometheusQueryInterface {
 	return &FakeReportPrometheusQueries{c, namespace}
-}
-
-func (c *FakeMeteringV1alpha1) ScheduledReports(namespace string) v1alpha1.ScheduledReportInterface {
-	return &FakeScheduledReports{c, namespace}
 }
 
 func (c *FakeMeteringV1alpha1) StorageLocations(namespace string) v1alpha1.StorageLocationInterface {

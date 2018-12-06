@@ -30,7 +30,7 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
 		"prestoTimestamp":                 PrestoTimestamp,
 		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
-		"scheduledReportTableName":        reportingutil.ScheduledReportTableName,
+		"reportTableName":        reportingutil.ReportTableName,
 		"dataSourceTableName":             reportingutil.DataSourceTableName,
 		"generationQueryViewName":         reportingutil.GenerationQueryViewName,
 		"billingPeriodTimestamp":          reportingutil.BillingPeriodTimestamp,

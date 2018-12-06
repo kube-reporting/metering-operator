@@ -12,10 +12,10 @@ import (
 type MeteringV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	PrestoTablesGetter
+	ReportsGetter
 	ReportDataSourcesGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
-	ScheduledReportsGetter
 	StorageLocationsGetter
 }
 
@@ -28,6 +28,10 @@ func (c *MeteringV1alpha1Client) PrestoTables(namespace string) PrestoTableInter
 	return newPrestoTables(c, namespace)
 }
 
+func (c *MeteringV1alpha1Client) Reports(namespace string) ReportInterface {
+	return newReports(c, namespace)
+}
+
 func (c *MeteringV1alpha1Client) ReportDataSources(namespace string) ReportDataSourceInterface {
 	return newReportDataSources(c, namespace)
 }
@@ -38,10 +42,6 @@ func (c *MeteringV1alpha1Client) ReportGenerationQueries(namespace string) Repor
 
 func (c *MeteringV1alpha1Client) ReportPrometheusQueries(namespace string) ReportPrometheusQueryInterface {
 	return newReportPrometheusQueries(c, namespace)
-}
-
-func (c *MeteringV1alpha1Client) ScheduledReports(namespace string) ScheduledReportInterface {
-	return newScheduledReports(c, namespace)
 }
 
 func (c *MeteringV1alpha1Client) StorageLocations(namespace string) StorageLocationInterface {

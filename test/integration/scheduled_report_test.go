@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func testScheduledReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time, testCases []reportsProduceCorrectDataForInputTestCase) {
+func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time, testCases []reportsProduceCorrectDataForInputTestCase) {
 	require.NotZero(t, reportStart, "reportStart should not be zero")
 	require.NotZero(t, reportEnd, "reportEnd should not be zero")
 
@@ -23,15 +23,15 @@ func testScheduledReportsProduceCorrectDataForInput(t *testing.T, reportStart, r
 
 			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
-			report := testFramework.NewSimpleScheduledReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
+			report := testFramework.NewSimpleReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
 
 			defer func() {
 				t.Logf("deleting scheduled report %s", report.Name)
-				err := testFramework.MeteringClient.ScheduledReports(testFramework.Namespace).Delete(report.Name, nil)
+				err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
 				assert.NoError(t, err, "expected delete scheduled report to succeed")
 			}()
 
-			testFramework.RequireScheduledReportSuccessfullyRuns(t, report, time.Minute)
+			testFramework.RequireReportSuccessfullyRuns(t, report, time.Minute)
 
 			// read expected results from a file
 			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
@@ -41,7 +41,7 @@ func testScheduledReportsProduceCorrectDataForInput(t *testing.T, reportStart, r
 			err = json.Unmarshal(expectedReportData, &expectedResults)
 			require.NoError(t, err)
 
-			actualResults := testFramework.GetScheduledReportResults(t, report, time.Minute)
+			actualResults := testFramework.GetReportResults(t, report, time.Minute)
 
 			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
 		})

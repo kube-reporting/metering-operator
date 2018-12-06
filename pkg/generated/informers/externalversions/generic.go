@@ -41,14 +41,14 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=metering.openshift.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("prestotables"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().PrestoTables().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("reports"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().Reports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportdatasources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ReportDataSources().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportgenerationqueries"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ReportGenerationQueries().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reportprometheusqueries"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ReportPrometheusQueries().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("scheduledreports"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ScheduledReports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("storagelocations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().StorageLocations().Informer()}, nil
 

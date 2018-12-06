@@ -36,8 +36,8 @@ var ErrReportIsRunning = errors.New("the report is still running")
 var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
-	APIV1ScheduledReportsGetEndpoint    = "/api/v1/scheduledreports/get"
-	APIV2ScheduledReportsEndpointPrefix = "/api/v2/scheduledreports"
+	APIV1ReportsGetEndpoint    = "/api/v1/reports/get"
+	APIV2ReportsEndpointPrefix = "/api/v2/reports"
 )
 
 type server struct {
@@ -50,7 +50,7 @@ type server struct {
 	reportResultsGetter   prestostore.ReportResultsGetter
 
 	namespace                    string
-	scheduledReportLister        listers.ScheduledReportLister
+	reportLister        listers.ReportLister
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister
 	prestoTableLister            listers.PrestoTableLister
 }
@@ -70,7 +70,7 @@ func newRouter(
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	namespace string,
-	scheduledReportLister listers.ScheduledReportLister,
+	reportLister listers.ReportLister,
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
 	prestoTableLister listers.PrestoTableLister,
 ) chi.Router {
@@ -87,18 +87,18 @@ func newRouter(
 		prometheusMetricsRepo:        prometheusMetricsRepo,
 		reportResultsGetter:          reportResultsGetter,
 		namespace:                    namespace,
-		scheduledReportLister:        scheduledReportLister,
+		reportLister:        reportLister,
 		reportGenerationQuerieLister: reportGenerationQuerieLister,
 		prestoTableLister:            prestoTableLister,
 	}
 
-	router.HandleFunc(APIV2ScheduledReportsEndpointPrefix+"/{name}/full", srv.getScheduledReportV2FullHandler)
-	router.HandleFunc(APIV2ScheduledReportsEndpointPrefix+"/{name}/table", srv.getScheduledReportV2TableHandler)
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{name}/full", srv.getReportV2FullHandler)
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{name}/table", srv.getReportV2TableHandler)
 	// The following two routes handle returning a 400 when the name parameter is missing, rather than having a 404 returned.
-	router.HandleFunc(APIV2ScheduledReportsEndpointPrefix+"//full", srv.getScheduledReportV2NameMissingHandler)
-	router.HandleFunc(APIV2ScheduledReportsEndpointPrefix+"//table", srv.getScheduledReportV2NameMissingHandler)
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"//full", srv.getReportV2NameMissingHandler)
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"//table", srv.getReportV2NameMissingHandler)
 
-	router.HandleFunc(APIV1ScheduledReportsGetEndpoint, srv.getScheduledReportV1Handler)
+	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
@@ -130,33 +130,33 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryPar
 	return false
 }
 
-func (srv *server) getScheduledReportV1Handler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReportV1Handler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
 		return
 	}
-	srv.getScheduledReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
+	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
 }
 
-func (srv *server) getScheduledReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getScheduledReport(logger, name, r.Form["format"][0], true, true, w, r)
+	srv.getReport(logger, name, r.Form["format"][0], true, true, w, r)
 }
 
-func (srv *server) getScheduledReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getScheduledReport(logger, name, r.Form["format"][0], true, false, w, r)
+	srv.getReport(logger, name, r.Form["format"][0], true, false, w, r)
 }
 
-func (srv *server) getScheduledReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
@@ -177,23 +177,23 @@ func checkForFields(fields []string, vals url.Values) error {
 	return nil
 }
 
-func (srv *server) getScheduledReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
-	// Get the scheduledReport to make sure it's isn't failed
-	report, err := srv.scheduledReportLister.ScheduledReports(srv.namespace).Get(name)
+func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
+	// Get the report to make sure it hasn't failed
+	report, err := srv.reportLister.Reports(srv.namespace).Get(name)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if k8serrors.IsNotFound(err) {
 			code = http.StatusNotFound
 		}
-		logger.WithError(err).Errorf("error getting scheduledReport: %v", err)
-		writeErrorResponse(logger, w, r, code, "error getting scheduledReport: %v", err)
+		logger.WithError(err).Errorf("error getting report: %v", err)
+		writeErrorResponse(logger, w, r, code, "error getting report: %v", err)
 		return
 	}
 
 	if r.FormValue("ignore_failed") != "true" {
-		if cond := cbutil.GetScheduledReportCondition(report.Status, api.ScheduledReportFailure); cond != nil && cond.Status == v1.ConditionTrue {
-			logger.Errorf("scheduledReport is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
-			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "scheduledReport is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
+		if cond := cbutil.GetReportCondition(report.Status, api.ReportFailure); cond != nil && cond.Status == v1.ConditionTrue {
+			logger.Errorf("report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
+			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			return
 		}
 	}
@@ -206,10 +206,10 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("scheduledreport", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			writeErrorResponse(logger, w, r, http.StatusAccepted, "ScheduledReport is not processed yet")
+			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
 			return
 		}
 		logger.WithError(err).Errorf("error getting presto table: %v", err)
@@ -237,7 +237,7 @@ func (srv *server) getScheduledReport(logger log.FieldLogger, name, format strin
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := reportingutil.ScheduledReportTableName(name)
+	tableName := reportingutil.ReportTableName(name)
 	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")

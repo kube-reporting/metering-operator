@@ -268,8 +268,8 @@ func TestReportingIntegration(t *testing.T) {
 			}
 		}
 
-		t.Run("TestScheduledReportsProduceCorrectDataForInput", func(t *testing.T) {
-			testScheduledReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
+		t.Run("TestReportsProduceCorrectDataForInput", func(t *testing.T) {
+			testReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
 		})
 	})
 }
