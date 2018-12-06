@@ -52,14 +52,14 @@ spec:
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
       namespace,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
-    FROM {| .Report.Inputs.AggregatedReportName | scheduledReportTableName |}
-    WHERE {| .Report.Inputs.AggregatedReportName | scheduledReportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND {| .Report.Inputs.AggregatedReportName | scheduledReportTableName |}.period_end < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    FROM {| .Report.Inputs.AggregatedReportName | reportTableName |}
+    WHERE {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_end < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
     ORDER BY pod_usage_cpu_core_seconds DESC
 ```
 
-Note the use of the macro `scheduledReportTableName`, which will automatically get the proper table name from the given scheduled report name.
+Note the use of the macro `reportTableName`, which will automatically get the proper table name from the given scheduled report name.
 
 ## 3. Create the aggregator report
 
