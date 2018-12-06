@@ -140,7 +140,7 @@ spec:
 private def runScript() {
     container('metering-test-runner') {
         ansiColor('xterm') {
-            timeout(15) {
+            timeout(20) {
                 sh '''#!/bin/bash -ex
                 cd $METERING_SRC_DIR
                 $SCRIPT
