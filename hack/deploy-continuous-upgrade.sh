@@ -16,7 +16,7 @@ export UNINSTALL_METERING_BEFORE_INSTALL="${UNINSTALL_METERING_BEFORE_INSTALL:-f
 
 "$DIR/deploy-custom.sh"
 
-echo "Deploying default ScheduledReports"
+echo "Deploying default Reports"
 
 HOURLY=( \
     "$MANIFESTS_DIR/reports/cluster-capacity-hourly.yaml" \
