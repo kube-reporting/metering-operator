@@ -304,11 +304,6 @@ spec:
       kind: ReportPrometheusQuery
       name: reportprometheusqueries.metering.openshift.io
       version: v1alpha1
-    - description: A metering report for a speci***REMOVED***c time interval
-      displayName: Metering Report
-      kind: Report
-      name: reports.metering.openshift.io
-      version: v1alpha1
     - description: A metering report that runs on a scheduled interval
       displayName: Metering Scheduled Report
       kind: ScheduledReport
