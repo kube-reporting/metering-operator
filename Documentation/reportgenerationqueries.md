@@ -10,7 +10,7 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `query`: A [SQL SELECT statement][presto-select]. This SQL statement supports [go templates][go-templates] and provides additional custom functions speci***REMOVED***c to Operator Metering (de***REMOVED***ned in the [templating](#templating) section below).
 - `columns`: A list of columns that match the schema of the results of the query. The order of these columns must match the order of the columns returned by the SELECT statement. Columns have 3 ***REMOVED***elds, `name`, `type`, and `unit`. Each ***REMOVED***eld is covered in more detail below.
   - `name`: This is the name of the column returned in the `SELECT` statement.
-  - `type`: This is the [Hive][hive-types] column type. Currently due to implementation details, column types are expressed using hive types. In the future, this will likely be switched to using the Presto native types. This also has an effect that queries with columns containing complex types such as `maps` or `arrays` cannot be used by `Reports` or `ScheduledReports`.
+  - `type`: This is the [Hive][hive-types] column type. Currently due to implementation details, column types are expressed using hive types. In the future, this will likely be switched to using the Presto native types. This also has an effect that queries with columns containing complex types such as `maps` or `arrays` cannot be used by `Reports`.
   - `unit`: Unit refers to the unit of measurement of the column.
   - `tableHidden`: Takes a boolean, when true, hides the column from report results depending on the format and endpoint. See [api docs for details][apiTable].
 - `reportDataSources`: This is a list of `ReportDataSource` resources that this `ReportGenerationQuery` depends on. These data sources can be referenced as database tables in the `query` using the `dataSourceTableName` template function.
@@ -27,11 +27,11 @@ Most of these functions are for referring to other resources such as `ReportData
 
 ### Template variables
 
-- `Report`: This object has two ***REMOVED***elds, `ReportingStart` and `ReportingEnd` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `ScheduledReport` the values map to the speci***REMOVED***c period being collected when the `ScheduledReport` runs.
+- `Report`: This object has two ***REMOVED***elds, `ReportingStart` and `ReportingEnd` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `Report` with a `spec.schedule` set, the values map to the speci***REMOVED***c period being collected when the `Report` runs.
   - `ReportingStart`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
   - `ReportingEnd`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause. Built-in queries select datapoints matching `ReportingStart <= timestamp > ReportingEnd`.
 - `DynamicDependentQueries`: This is a list of `ReportGenerationQuery` objects that were listed in the `spec.dynamicReportQueries` ***REMOVED***eld. Generally this list isn't directly referenced in query, but is used indirectly with the `renderReportGenerationQuery` [template function](#template-functions).
-- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report or ScheduledReport's `spec.inputs`. The value currently is always a string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time].
+- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report's `spec.inputs`. The value currently is always a string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time].
 
 ### Template functions
 
@@ -51,10 +51,10 @@ In addition to the above functions, the reporting-operator includes all of the f
 Before going into examples, there's an important convention that all the built-in `ReportGenerationQueries` follow that is worth calling out, as these examples will demonstrate them heavily.
 
 The convention I am referring to is the fact that there are quite a few ReportGenerationQueries suf***REMOVED***xed with `-raw` in their `metadata.name`.
-These queries are not intended to be used by Reports, or ScheduledReports, but are intended to be purely for re-use.
+These queries are not intended to be used by Reports, but are intended to be purely for re-use.
 Currently, these queries suf***REMOVED***xed with `-raw` in their name are generally only ever used as database views that are referenced in other queries.
 Additionally, due to implementation reasons, the `types` within the `columns` are using [Hive column types][hive-types] instead of the Presto column types.
-This has a negative effect the results in being unable to use `ReportGenerationQueries` containing with complex types (array, maps) with `Reports` and `ScheduledReports`, which is why the `ReportGenerationQueries` that are _not_ suf***REMOVED***xed in `-raw` never expose those types in their output.
+This has a negative effect the results in being unable to use `ReportGenerationQueries` containing with complex types (array, maps) with `Reports`, which is why the `ReportGenerationQueries` that are _not_ suf***REMOVED***xed in `-raw` never expose those types in their output.
 
 
 The example below is a built-in `ReportGenerationQuery` that is installed with Operator Metering by default.
@@ -111,7 +111,7 @@ spec:
 ```
 
 This next example is also one of the built-in `ReportGenerationQueries`.
-This example, unlike the previous is designed to be used with Reports and ScheduledReports.
+This example, unlike the previous is designed to be used with Reports.
 It summarizes the information exposed in the example above by Kubernetes namespace, and reduces the output ***REMOVED***elds down to the ones that matter for this speci***REMOVED***c use-case.
 
 The important things to note with this example is that it's depending on the previous `ReportGenerationQuery` and referencing the database view by using the `generationQueryViewName` template function.

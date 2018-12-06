@@ -8,7 +8,7 @@ Currently, there are no built-in roll-up reports. Therefore, a custom roll-up re
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: namespace-cpu-usage-hourly
 spec:
@@ -59,15 +59,15 @@ spec:
     ORDER BY pod_usage_cpu_core_seconds DESC
 ```
 
-Note the use of the macro `reportTableName`, which will automatically get the proper table name from the given scheduled report name.
+Note the use of the macro `reportTableName`, which will automatically get the proper table name from the given report name.
 
 ## 3. Create the aggregator report
 
-We now have a sub-report and a query that can read data from other reports. We can create a `ScheduledReport` that uses that custom generation query with the sub-report:
+We now have a sub-report and a query that can read data from other reports. We can create a `Report` that uses that custom generation query with the sub-report:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: namespace-cpu-usage-daily-aggregate
 spec:
