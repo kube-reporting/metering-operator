@@ -115,8 +115,8 @@ type ReportScheduleMonthly struct {
 
 type ReportStatus struct {
 	Conditions     []ReportCondition `json:"conditions,omitempty"`
-	LastReportTime *meta.Time                 `json:"lastReportTime,omitempty"`
-	TableName      string                     `json:"tableName"`
+	LastReportTime *meta.Time        `json:"lastReportTime,omitempty"`
+	TableName      string            `json:"tableName"`
 }
 
 type ReportCondition struct {

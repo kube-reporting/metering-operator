@@ -124,11 +124,11 @@ type Reporting struct {
 	reportDataSourceLister      listers.ReportDataSourceLister
 	reportGenerationQueryLister listers.ReportGenerationQueryLister
 	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
-	reportLister       listers.ReportLister
+	reportLister                listers.ReportLister
 	storageLocationLister       listers.StorageLocationLister
 
 	queueList                  []workqueue.RateLimitingInterface
-	reportQueue       workqueue.RateLimitingInterface
+	reportQueue                workqueue.RateLimitingInterface
 	reportDataSourceQueue      workqueue.RateLimitingInterface
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 	prestoTableQueue           workqueue.RateLimitingInterface
@@ -250,11 +250,11 @@ func newReportingOperator(
 		reportDataSourceLister:      reportDataSourceInformer.Lister(),
 		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
 		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
-		reportLister:       reportInformer.Lister(),
+		reportLister:                reportInformer.Lister(),
 		storageLocationLister:       storageLocationInformer.Lister(),
 
 		queueList:                  queueList,
-		reportQueue:       reportQueue,
+		reportQueue:                reportQueue,
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
 		prestoTableQueue:           prestoTableQueue,

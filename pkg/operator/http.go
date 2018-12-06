@@ -50,7 +50,7 @@ type server struct {
 	reportResultsGetter   prestostore.ReportResultsGetter
 
 	namespace                    string
-	reportLister        listers.ReportLister
+	reportLister                 listers.ReportLister
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister
 	prestoTableLister            listers.PrestoTableLister
 }
@@ -87,7 +87,7 @@ func newRouter(
 		prometheusMetricsRepo:        prometheusMetricsRepo,
 		reportResultsGetter:          reportResultsGetter,
 		namespace:                    namespace,
-		reportLister:        reportLister,
+		reportLister:                 reportLister,
 		reportGenerationQuerieLister: reportGenerationQuerieLister,
 		prestoTableLister:            prestoTableLister,
 	}

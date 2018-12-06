@@ -30,7 +30,7 @@ type ReportGenerationQuerySpec struct {
 	ReportQueries        []string                               `json:"reportQueries,omitempty"`
 	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
 	DataSources          []string                               `json:"reportDataSources,omitempty"`
-	Reports     []string                               `json:"reports,omitempty"`
+	Reports              []string                               `json:"reports,omitempty"`
 	Inputs               []ReportGenerationQueryInputDe***REMOVED***nition `json:"inputs,omitempty"`
 }
 

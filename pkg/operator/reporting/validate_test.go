@@ -115,7 +115,7 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		},
 		"mixing valid and invalid dependencies is a validation error": {
 			deps: ReportGenerationQueryDependencies{
-				Reports:        uninitializedReports,
+				Reports:                 uninitializedReports,
 				ReportGenerationQueries: combinedUninitializedQueries,
 				ReportDataSources:       uninitializedDataSources,
 				// disabledViewQueries is ***REMOVED***ne for dynamic queries
@@ -125,7 +125,7 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		},
 		"mixing valid dependencies is a valid": {
 			deps: ReportGenerationQueryDependencies{
-				Reports:               uninitializedReports,
+				Reports:                        uninitializedReports,
 				ReportGenerationQueries:        initializedQueries,
 				ReportDataSources:              initializedDataSources,
 				DynamicReportGenerationQueries: disabledViewQueries,
