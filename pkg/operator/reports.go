@@ -397,7 +397,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	}
 
 	metricLabels := prometheus.Labels{
-		"report":       report.Name,
+		"report":                report.Name,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
 		"table_name":            tableName,
 	}
