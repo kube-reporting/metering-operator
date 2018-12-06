@@ -209,7 +209,7 @@ data:
     hdfs fsck / > /tmp/fsck.log
     # example output:
     # /operator_metering/storage/datasource_node_allocatable_cpu_cores/20181016_210834_02359_srzkh_40207cb6-56fb-4aad-9428-acb203250be8:  Under replicated BP-27232867-172.16.2.102-1539711209651:blk_1073742397_1573. Target Replicas is 3 but found 1 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
-    # /operator_metering/storage/scheduled_report_namespace_cpu_usage_daily/20181111_035359_00063_yihp2_885f5ff5-45dc-4a3e-acb1-0a39f7aff8ab:  Replica placement policy is violated for BP-27232867-172.16.2.102-1539711209651:blk_1073843950_103126. Block should be additionally replicated on 1 more rack(s). Total number of racks in the cluster: 3
+    # /operator_metering/storage/report_namespace_cpu_usage_daily/20181111_035359_00063_yihp2_885f5ff5-45dc-4a3e-acb1-0a39f7aff8ab:  Replica placement policy is violated for BP-27232867-172.16.2.102-1539711209651:blk_1073843950_103126. Block should be additionally replicated on 1 more rack(s). Total number of racks in the cluster: 3
     UNDER_REP_REGEX='^(.*):[[:space:]]+Under replicated.*Target Replicas is ([0-9]+) but found ([0-9]) live.*'
     NEEDS_REP_REGEX='^(.*):[[:space:]]+Replica placement policy is violated.*'
     echo "Checking for files under replicated files. Replication factor: $REPLICATION_FACTOR"
