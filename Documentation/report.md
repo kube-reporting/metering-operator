@@ -262,7 +262,7 @@ inputs:
 - name: AggregatedReportName
   required: true
 ...
- WHERE {| .Report.Inputs.AggregatedReportName | scheduledReportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+ WHERE {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
 ```
 
 ```
