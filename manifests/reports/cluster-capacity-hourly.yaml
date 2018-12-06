@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: cluster-cpu-capacity-hourly
 spec:
@@ -10,7 +10,7 @@ spec:
 ---
 
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: cluster-memory-capacity-hourly
 spec:
