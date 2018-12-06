@@ -1,19 +1,21 @@
-# Scheduled Reports
+# Reports
 
-The `ScheduledReport` custom resource is used to manage the execution and status of reports.
+The `Report` custom resource is used to manage the execution and status of reports.
 Metering produces reports derived from usage data sources which can be used in further analysis and filtering.
 
-## Scheduled Report object
+## Report object
 
-A single `ScheduledReport` resource represents a report which is updated with new information according to a schedule. Scheduled reports are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
+A single `Report` resource represents a report which is updated with new information according to a schedule.
+Reports with a `spec.schedule` field set are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
+If it's unset, then the Report will run once for the time specified by the reportingStart and reportingEnd.
 
-## Example Scheduled Report
+## Example Report with a Schedule
 
-The following example scheduled report will contain information on every Pod's CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
+The following example Report will contain information on every Pod's CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
@@ -26,14 +28,14 @@ spec:
       second: 0
 ```
 
-## Example Run-Once Report
+## Example Report without a Schedule (Run-Once)
 
 The following example report will contain information on every Pod's CPU requests for all of July.
 After completion it does not run again.
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
@@ -175,14 +177,14 @@ For cron periods, normal cron expressions are valid:
 
 ### reportingStart
 
-To support running a ScheduledReport against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the ScheduledReport to run according to it's `schedule` starting from `reportingStart` rather than the current time.
+To support running a Report against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
 One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time. This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
 
-As an example of how to use this field, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your scheduledReport, you could create a report with the following values:
+As an example of how to use this field, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your Report, you could create a report with the following values:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
@@ -196,16 +198,16 @@ spec:
 
 ### reportingEnd
 
-To configure a ScheduledReport to only run until a specified time, you can set the `spec.reportingEnd` field to an RFC3339 timestamp.
-The value of this field will cause the ScheduledReport to stop running on it's schedule after it has finished generating reporting data for the period covered from it's start time until `reportingEnd`.
+To configure a Report to only run until a specified time, you can set the `spec.reportingEnd` field to an RFC3339 timestamp.
+The value of this field will cause the Report to stop running on its schedule after it has finished generating reporting data for the period covered from its start time until `reportingEnd`.
 Because a schedule will most likely not align with reportingEnd, the last period in the schedule will be shortened to end at the specified reportingEnd time.
-If left unset, then the ScheduledReport will run forever, or until a `reportingEnd` is set on the ScheduledReport.
+If left unset, then the Report will run forever, or until a `reportingEnd` is set on the Report.
 
 For example, if you wanted to create a report that runs once a week for the month of July:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
@@ -222,7 +224,7 @@ spec:
 Sets the period of time after `reportingEnd` that the report will be run.
 This value is `5m` by default.
 
-By default, a report waits until it's scheduled period has elapsed or until it's reached the reportingEnd if the schedule isn't set (run-once).
+By default, a report waits until its scheduled period has elapsed or until it has reached the reportingEnd if the schedule isn't set (run-once).
 The gracePeriod is added to the period or reporting end time and that value is used to determine when the report should execute.
 The grace period is not used if `runImmediately` is true.
 
@@ -233,7 +235,7 @@ has ended.
 ### runImmediately
 
 Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
-For reports with a schedule set, it will not wait for each periods reportingEnd to elapse before processing.
+For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing.
 
 ### Inputs
 
@@ -280,9 +282,9 @@ For more information on setting up a roll-up report, see the [roll-up report gui
 
 The execution of a scheduled report can be tracked using its status field. Any errors occurring during the preparation of a report will be recorded here.
 
-The `status` field of a `ScheduledReport` currently has two fields:
+The `status` field of a `Report` currently has two fields:
 
-- `conditions`: Conditions is an list of conditions, each have a `Type`, `Reason`, and `Message` field. Possible values of a condition's `Type` field are `Running` and `Failure`, indicating the current state of the scheduled report. The `Reason` indicates why it's the `Condition` is in it's current state, with and the `Message` provides a detailed information on the `Reason`.
+- `conditions`: Conditions is an list of conditions, each have a `Type`, `Reason`, and `Message` field. Possible values of a condition's `Type` field are `Running` and `Failure`, indicating the current state of the scheduled report. The `Reason` indicates why its `Condition` is in its current state, with and the `Message` provides a detailed information on the `Reason`.
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
