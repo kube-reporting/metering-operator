@@ -233,7 +233,7 @@ spec:
 ```
 
 However, the above example is missing one crucial bit, and that's the ability to constrain the period of time that this query is reporting over.
-To handle this, the `.Report` variable is accessible within templates and contains a `.Report.StartPeriod` and `.Report.EndPeriod` ***REMOVED***eld which will be ***REMOVED***lled in with values corresponding to the Report or ScheduledReport's reporting period.
+To handle this, the `.Report` variable is accessible within templates and contains a `.Report.StartPeriod` and `.Report.EndPeriod` ***REMOVED***eld which will be ***REMOVED***lled in with values corresponding to the Report's reporting period.
 We can use these variables in a `WHERE` clause within our query to ***REMOVED***lter the results to those time ranges.
 
 The `WHERE` clause generally for this generally looks the same for all `ReportGenerationQueries` that expect to be used by a Report:

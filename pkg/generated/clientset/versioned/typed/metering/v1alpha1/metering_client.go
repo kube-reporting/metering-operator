@@ -16,7 +16,6 @@ type MeteringV1alpha1Interface interface {
 	ReportDataSourcesGetter
 	ReportGenerationQueriesGetter
 	ReportPrometheusQueriesGetter
-	ScheduledReportsGetter
 	StorageLocationsGetter
 }
 
@@ -43,10 +42,6 @@ func (c *MeteringV1alpha1Client) ReportGenerationQueries(namespace string) Repor
 
 func (c *MeteringV1alpha1Client) ReportPrometheusQueries(namespace string) ReportPrometheusQueryInterface {
 	return newReportPrometheusQueries(c, namespace)
-}
-
-func (c *MeteringV1alpha1Client) ScheduledReports(namespace string) ScheduledReportInterface {
-	return newScheduledReports(c, namespace)
 }
 
 func (c *MeteringV1alpha1Client) StorageLocations(namespace string) StorageLocationInterface {

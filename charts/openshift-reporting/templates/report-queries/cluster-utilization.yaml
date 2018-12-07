@@ -59,7 +59,7 @@ spec:
       avg(avg_node_count) AS avg_node_count,
       avg(avg_pod_count) AS avg_pod_count,
       avg(avg_pod_per_node_count) AS avg_pod_per_node_count
-    FROM {| .Report.Inputs.ClusterCpuUtilizationReportName | scheduledReportTableName |}
+    FROM {| .Report.Inputs.ClusterCpuUtilizationReportName | reportTableName |}
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- ***REMOVED*** -|}
@@ -151,7 +151,7 @@ spec:
       avg(avg_node_count) AS avg_node_count,
       avg(avg_pod_count) AS avg_pod_count,
       avg(avg_pod_per_node_count) AS avg_pod_per_node_count
-    FROM {| .Report.Inputs.ClusterMemoryUtilizationReportName | scheduledReportTableName |}
+    FROM {| .Report.Inputs.ClusterMemoryUtilizationReportName | reportTableName |}
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     {|- ***REMOVED*** -|}

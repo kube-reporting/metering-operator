@@ -31,7 +31,6 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 		"prestoTimestamp":                 PrestoTimestamp,
 		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
 		"reportTableName":                 reportingutil.ReportTableName,
-		"scheduledReportTableName":        reportingutil.ScheduledReportTableName,
 		"dataSourceTableName":             reportingutil.DataSourceTableName,
 		"generationQueryViewName":         reportingutil.GenerationQueryViewName,
 		"billingPeriodTimestamp":          reportingutil.BillingPeriodTimestamp,

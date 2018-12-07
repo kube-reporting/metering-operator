@@ -4,7 +4,7 @@ metadata:
   name: reports.metering.openshift.io
   annotations:
     catalog.app.coreos.com/displayName: "Metering Report"
-    catalog.app.coreos.com/description: "A metering report for a speci***REMOVED***c time interval"
+    catalog.app.coreos.com/description: "A metering report summarizes metrics based on the query speci***REMOVED***ed"
 spec:
   group: metering.openshift.io
   version: v1alpha1
@@ -16,12 +16,21 @@ spec:
   - name: Query
     type: string
     JSONPath: .spec.generationQuery
+  - name: Schedule
+    type: string
+    JSONPath: .spec.schedule.period
+  - name: Running
+    type: string
+    JSONPath: .status.conditions[?(@.type=="Running")].reason
+  - name: Failed
+    type: string
+    JSONPath: .status.conditions[?(@.type=="Failure")].reason
   - name: Table Name
     type: string
     JSONPath: .status.tableName
-  - name: Phase
+  - name: Last Report Time
     type: string
-    JSONPath: .status.phase
+    JSONPath: .status.lastReportTime
   - name: Age
     type: date
     JSONPath: .metadata.creationTimestamp

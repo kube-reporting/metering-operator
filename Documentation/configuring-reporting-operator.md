@@ -61,13 +61,13 @@ To authenticate with a service account, pass it using the Authorization header a
 
 ```
 TOKEN=$(oc -n openshift-metering serviceaccounts get-token reporting-operator)
-curl -H "Authorization: Bearer $TOKEN" -k "https://metering-openshift-metering.apps.example.com/api/v1/scheduledreports/get?name=cluster-memory-capacity-hourly&format=tab"
+curl -H "Authorization: Bearer $TOKEN" -k "https://metering-openshift-metering.apps.example.com/api/v1/reports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
 
 And to authenticate using a username and password, use basic authentication:
 
 ```
-curl -u testuser:password123 -k "https://metering-openshift-metering.apps.example.com/api/v1/scheduledreports/get?name=cluster-memory-capacity-hourly&format=tab"
+curl -u testuser:password123 -k "https://metering-openshift-metering.apps.example.com/api/v1/reports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
 
 ### Load Balancer/Node Port services
@@ -105,7 +105,7 @@ reporting-operator   LoadBalancer   172.30.21.195   35.227.172.86   8080:32313/T
 In this example the externalIP of the LoadBalancer is `35.227.172.86` and the port is 8080:
 
 ```
-curl "http://35.227.172.86:8080/api/v1/scheduledreports/get?name=cluster-memory-capacity-hourly&format=tab"
+curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html

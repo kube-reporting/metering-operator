@@ -20,10 +20,6 @@ func ReportTableName(reportName string) string {
 	return fmt.Sprintf("report_%s", resourceNameReplacer.Replace(reportName))
 }
 
-func ScheduledReportTableName(reportName string) string {
-	return fmt.Sprintf("scheduled_report_%s", resourceNameReplacer.Replace(reportName))
-}
-
 func GenerationQueryViewName(queryName string) string {
 	return fmt.Sprintf("view_%s", resourceNameReplacer.Replace(queryName))
 }

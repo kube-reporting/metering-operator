@@ -39,8 +39,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&StorageLocationList{},
 		&PrestoTable{},
 		&PrestoTableList{},
-		&ScheduledReport{},
-		&ScheduledReportList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
