@@ -27,7 +27,6 @@ func (op *Reporting) addReport(obj interface{}) {
 		op.deleteReport(report)
 		return
 	}
-
 	op.logger.Infof("adding Report %s", report.Name)
 	op.enqueueReport(report)
 }
@@ -42,12 +41,12 @@ func (op *Reporting) updateReport(prev, cur interface{}) {
 
 	if curReport.ResourceVersion == prevReport.ResourceVersion {
 		// Periodic resyncs will send update events for all known Reports.
-		// Two different versions of the same scheduledReport will always have
+		// Two different versions of the same report will always have
 		// different ResourceVersions.
-
 		op.logger.Debugf("Report %s resourceVersion is unchanged, skipping update", curReport.Name)
 		return
 	}
+
 	if reflect.DeepEqual(prevReport.Spec, curReport.Spec) {
 		op.logger.Debugf("Report %s spec is unchanged, skipping update", curReport.Name)
 		return
@@ -82,103 +81,19 @@ func (op *Reporting) deleteReport(obj interface{}) {
 func (op *Reporting) enqueueReport(report *cbTypes.Report) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
-		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
 		return
 	}
 	op.reportQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportRateLimited(report *cbTypes.Report) {
-	key, err := cache.MetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
-		return
-	}
-	op.reportQueue.AddRateLimited(key)
-}
-
 func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
-		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
 		return
 	}
 	op.reportQueue.AddAfter(key, duration)
-}
-
-func (op *Reporting) addScheduledReport(obj interface{}) {
-	report := obj.(*cbTypes.ScheduledReport)
-	if report.DeletionTimestamp != nil {
-		op.deleteScheduledReport(report)
-		return
-	}
-	op.logger.Infof("adding ScheduledReport %s", report.Name)
-	op.enqueueScheduledReport(report)
-}
-
-func (op *Reporting) updateScheduledReport(prev, cur interface{}) {
-	prevScheduledReport := prev.(*cbTypes.ScheduledReport)
-	curScheduledReport := cur.(*cbTypes.ScheduledReport)
-	if curScheduledReport.DeletionTimestamp != nil {
-		op.deleteScheduledReport(curScheduledReport)
-		return
-	}
-
-	if curScheduledReport.ResourceVersion == prevScheduledReport.ResourceVersion {
-		// Periodic resyncs will send update events for all known ScheduledReports.
-		// Two different versions of the same scheduledReport will always have
-		// different ResourceVersions.
-		op.logger.Debugf("ScheduledReport %s resourceVersion is unchanged, skipping update", curScheduledReport.Name)
-		return
-	}
-
-	if reflect.DeepEqual(prevScheduledReport.Spec, curScheduledReport.Spec) {
-		op.logger.Debugf("ScheduledReport %s spec is unchanged, skipping update", curScheduledReport.Name)
-		return
-	}
-
-	op.logger.Infof("updating ScheduledReport %s", curScheduledReport.Name)
-	op.enqueueScheduledReport(curScheduledReport)
-}
-
-func (op *Reporting) deleteScheduledReport(obj interface{}) {
-	report, ok := obj.(*cbTypes.ScheduledReport)
-	if !ok {
-		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			op.logger.WithField("scheduledReport", report.Name).Errorf("Couldn't get object from tombstone %#v", obj)
-			return
-		}
-		report, ok = tombstone.Obj.(*cbTypes.ScheduledReport)
-		if !ok {
-			op.logger.WithField("scheduledReport", report.Name).Errorf("Tombstone contained object that is not a ScheduledReport %#v", obj)
-			return
-		}
-	}
-	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithField("scheduledReport", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
-		return
-	}
-	op.scheduledReportQueue.Add(key)
-}
-
-func (op *Reporting) enqueueScheduledReport(report *cbTypes.ScheduledReport) {
-	key, err := cache.MetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
-		return
-	}
-	op.scheduledReportQueue.Add(key)
-}
-
-func (op *Reporting) enqueueScheduledReportAfter(report *cbTypes.ScheduledReport, duration time.Duration) {
-	key, err := cache.MetaNamespaceKeyFunc(report)
-	if err != nil {
-		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
-		return
-	}
-	op.scheduledReportQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {

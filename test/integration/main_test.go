@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"flag"
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -15,7 +16,179 @@ import (
 	"github.com/operator-framework/operator-metering/test/framework"
 )
 
-var testFramework *framework.Framework
+var (
+	testFramework *framework.Framework
+
+	reportTestTimeout         = 5 * time.Minute
+	reportTestOutputDirectory string
+
+	testReportsProduceCorrectDataForInputTestCases = []reportsProduceCorrectDataForInputTestCase{
+		{
+			name:      "namespace-cpu-request",
+			queryName: "namespace-cpu-request",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-request-cpu-cores",
+					FileName:       "testdata/datasources/pod-request-cpu-cores.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/namespace-cpu-request.json",
+			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "namespace-cpu-usage",
+			queryName: "namespace-cpu-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-usage-cpu-cores",
+					FileName:       "testdata/datasources/pod-usage-cpu-cores.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/namespace-cpu-usage.json",
+			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "namespace-memory-request",
+			queryName: "namespace-memory-request",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-request-memory-bytes",
+					FileName:       "testdata/datasources/pod-request-memory-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/namespace-memory-request.json",
+			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "namespace-memory-usage",
+			queryName: "namespace-memory-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-usage-memory-bytes",
+					FileName:       "testdata/datasources/pod-usage-memory-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/namespace-memory-usage.json",
+			comparisonColumnNames:        []string{"pod_usage_memory_core_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "pod-cpu-request",
+			queryName: "pod-cpu-request",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-request-cpu-cores",
+					FileName:       "testdata/datasources/pod-request-cpu-cores.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/pod-cpu-request.json",
+			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "pod-cpu-usage",
+			queryName: "pod-cpu-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-usage-cpu-cores",
+					FileName:       "testdata/datasources/pod-usage-cpu-cores.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/pod-cpu-usage.json",
+			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "pod-memory-request",
+			queryName: "pod-memory-request",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-request-memory-bytes",
+					FileName:       "testdata/datasources/pod-request-memory-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/pod-memory-request.json",
+			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "pod-memory-usage",
+			queryName: "pod-memory-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "pod-usage-memory-bytes",
+					FileName:       "testdata/datasources/pod-usage-memory-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/pod-memory-usage.json",
+			comparisonColumnNames:        []string{"pod_usage_memory_byte_seconds"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "node-cpu-utilization",
+			queryName: "node-cpu-utilization",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "node-allocatable-cpu-cores",
+					FileName:       "testdata/datasources/node-allocatable-cpu-cores.json",
+				},
+				{
+					DatasourceName: "pod-request-cpu-cores",
+					FileName:       "testdata/datasources/pod-request-cpu-cores.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/node-cpu-utilization.json",
+			comparisonColumnNames:        []string{"node_allocatable_cpu_core_seconds", "pod_request_cpu_core_seconds", "cpu_used_percent", "cpu_unused_percent"},
+			timeout:                      reportTestTimeout,
+		},
+		{
+			name:      "node-memory-utilization",
+			queryName: "node-memory-utilization",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "node-allocatable-memory-bytes",
+					FileName:       "testdata/datasources/node-allocatable-memory-bytes.json",
+				},
+				{
+					DatasourceName: "pod-request-memory-bytes",
+					FileName:       "testdata/datasources/pod-request-memory-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/node-memory-utilization.json",
+			comparisonColumnNames:        []string{"node_allocatable_memory_byte_seconds", "pod_request_memory_byte_seconds", "memory_used_percent", "memory_unused_percent"},
+			timeout:                      reportTestTimeout,
+		},
+	}
+)
+
+type reportsProduceCorrectDataForInputTestCase struct {
+	name                         string
+	queryName                    string
+	dataSources                  []testDatasource
+	expectedReportOutputFileName string
+	comparisonColumnNames        []string
+	timeout                      time.Duration
+}
+
+type testDatasource struct {
+	DatasourceName string
+	FileName       string
+}
+
+func init() {
+	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
+	if reportTestOutputDirectory == "" {
+		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
+	}
+
+	err := os.MkdirAll(reportTestOutputDirectory, 0777)
+	if err != nil {
+		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
+	}
+}
 
 func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
@@ -97,9 +270,6 @@ func TestReportingIntegration(t *testing.T) {
 
 		t.Run("TestReportsProduceCorrectDataForInput", func(t *testing.T) {
 			testReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
-		})
-		t.Run("TestScheduledReportsProduceCorrectDataForInput", func(t *testing.T) {
-			testScheduledReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
 		})
 	})
 }

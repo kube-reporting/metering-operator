@@ -26,20 +26,11 @@ func (f *Framework) CreateMeteringReport(report *meteringv1alpha1.Report) error 
 	return err
 }
 
-func (f *Framework) CreateMeteringScheduledReport(report *meteringv1alpha1.ScheduledReport) error {
-	_, err := f.MeteringClient.ScheduledReports(f.Namespace).Create(report)
-	return err
-}
-
 func (f *Framework) GetMeteringReport(name string) (*meteringv1alpha1.Report, error) {
 	return f.MeteringClient.Reports(f.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) GetMeteringScheduledReport(name string) (*meteringv1alpha1.ScheduledReport, error) {
-	return f.MeteringClient.ScheduledReports(f.Namespace).Get(name, meta.GetOptions{})
-}
-
-func (f *Framework) NewSimpleReport(name, queryName string, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.Report {
+func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1alpha1.ReportSchedule, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.Report {
 	var start, end *meta.Time
 	if reportingStart != nil {
 		start = &meta.Time{*reportingStart}
@@ -54,28 +45,6 @@ func (f *Framework) NewSimpleReport(name, queryName string, reportingStart, repo
 		},
 		Spec: meteringv1alpha1.ReportSpec{
 			GenerationQueryName: queryName,
-			RunImmediately:      true,
-			ReportingStart:      start,
-			ReportingEnd:        end,
-		},
-	}
-}
-
-func (f *Framework) NewSimpleScheduledReport(name, queryName string, schedule *meteringv1alpha1.ScheduledReportSchedule, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.ScheduledReport {
-	var start, end *meta.Time
-	if reportingStart != nil {
-		start = &meta.Time{*reportingStart}
-	}
-	if reportingEnd != nil {
-		end = &meta.Time{*reportingEnd}
-	}
-	return &meteringv1alpha1.ScheduledReport{
-		ObjectMeta: meta.ObjectMeta{
-			Name:      name,
-			Namespace: f.Namespace,
-		},
-		Spec: meteringv1alpha1.ScheduledReportSpec{
-			GenerationQueryName: queryName,
 			Schedule:            schedule,
 			ReportingStart:      start,
 			ReportingEnd:        end,
@@ -83,31 +52,31 @@ func (f *Framework) NewSimpleScheduledReport(name, queryName string, schedule *m
 	}
 }
 
-func (f *Framework) RequireScheduledReportSuccessfullyRuns(t *testing.T, report *meteringv1alpha1.ScheduledReport, waitTimeout time.Duration) {
-	err := f.MeteringClient.ScheduledReports(f.Namespace).Delete(report.Name, nil)
+func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) {
+	err := f.MeteringClient.Reports(f.Namespace).Delete(report.Name, nil)
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
 	}, "failed to ensure scheduled report doesn't exist before creating scheduled report")
 
 	t.Logf("creating scheduled report %s", report.Name)
-	err = f.CreateMeteringScheduledReport(report)
+	err = f.CreateMeteringReport(report)
 	require.NoError(t, err, "creating scheduled report should succeed")
 
 	reportEnd := report.Spec.ReportingEnd.Time
 
 	err = wait.PollImmediate(time.Second*5, waitTimeout, func() (bool, error) {
 		// poll the status
-		newReport, err := f.GetMeteringScheduledReport(report.Name)
+		newReport, err := f.GetMeteringReport(report.Name)
 		if err != nil {
 			return false, err
 		}
-		cond := meteringutil.GetScheduledReportCondition(newReport.Status, meteringv1alpha1.ScheduledReportFailure)
+		cond := meteringutil.GetReportCondition(newReport.Status, meteringv1alpha1.ReportFailure)
 		if cond != nil && cond.Status == v1.ConditionTrue {
 			return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
 		}
 
 		if newReport.Status.TableName == "" {
-			t.Logf("ScheduledReport %s table isn't created yet, status: %+v", report.Name, newReport.Status)
+			t.Logf("Report %s table isn't created yet, status: %+v", report.Name, newReport.Status)
 			return false, nil
 		}
 
@@ -124,11 +93,11 @@ func (f *Framework) RequireScheduledReportSuccessfullyRuns(t *testing.T, report 
 		}
 		return true, nil
 	})
-	require.NoError(t, err, "expected getting ScheduledReport to not timeout")
+	require.NoError(t, err, "expected getting Report to not timeout")
 
 }
 
-func (f *Framework) GetScheduledReportResults(t *testing.T, report *meteringv1alpha1.ScheduledReport, waitTimeout time.Duration) []map[string]interface{} {
+func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) []map[string]interface{} {
 	var reportResults []map[string]interface{}
 	var reportData []byte
 
@@ -137,10 +106,10 @@ func (f *Framework) GetScheduledReportResults(t *testing.T, report *meteringv1al
 		"format": "json",
 	}
 	err := wait.PollImmediate(time.Second*5, waitTimeout, func() (bool, error) {
-		req := f.NewReportingOperatorSVCRequest("/api/v1/scheduledreports/get", queryParams)
+		req := f.NewReportingOperatorSVCRequest("/api/v1/reports/get", queryParams)
 		result := req.Do()
 		resp, err := result.Raw()
-		require.NoError(t, err, "fetching ScheduledReport results should be successful")
+		require.NoError(t, err, "fetching Report results should be successful")
 
 		var statusCode int
 		result.StatusCode(&statusCode)
@@ -154,12 +123,12 @@ func (f *Framework) GetScheduledReportResults(t *testing.T, report *meteringv1al
 		require.NoError(t, err, "expected to unmarshal response")
 		reportData = resp
 		if len(reportResults) == 0 {
-			t.Logf("ScheduledReport %s has 0 results", report.Name)
+			t.Logf("Report %s has 0 results", report.Name)
 			return false, nil
 		}
 		return true, nil
 	})
-	require.NoError(t, err, "expected ScheduledReport to have 1 row of results before timing out")
+	require.NoError(t, err, "expected Report to have 1 row of results before timing out")
 	assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
 	fileName := path.Join(f.ReportOutputDirectory, fmt.Sprintf("%s-scheduled-report.json", report.Name))

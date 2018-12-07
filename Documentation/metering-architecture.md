@@ -27,11 +27,11 @@ The rest of this document covers how each custom resource that metering consumes
 
 There are 6 custom resources that Operator Metering defines that you need to be aware of:
 
-- `StorageLocations`: Provides a place to store data. Is used by `ReportDataSources`, `Reports`, and `ScheduledReports`.
+- `StorageLocations`: Provides a place to store data. Is used by `ReportDataSources`, `Reports`.
 - `ReportDataSources`: Controls what data is collected (Prometheus data, AWS billing data), and where it's stored
 - `ReportPrometheusQueries`: Controls how Prometheus data is collected
-- `ReportGenerationQueries`: Controls how we query the data we've collected and is what a `Report` or `ScheduledReport` references to control what it's reporting on.
-- `Reports` and `ScheduledReports`: Causes reports to be generated using the `ReportGenerationQuery` configured. This is the primary resource an end-user of Operator Metering would interact with.
+- `ReportGenerationQueries`: Controls how we query the data we've collected and is what a `Report` references to control what it's reporting on.
+- `Reports`: Causes reports to be generated using the `ReportGenerationQuery` configured. This is the primary resource an end-user of Operator Metering would interact with.
 
 In the sections below, we will cover these resources in more detail.
 
@@ -103,20 +103,20 @@ For user-docs containing a description of the fields, and examples, see [ReportG
 When the metering operator sees a new `ReportGenerationQuery` in it's namespace, it will check if the `spec.view.disabled` field is true, if it is, it doesn't do anything with these queries on creation.
 If it's false, then it will create a database view.
 
-### Report and ScheduledReport
+### Report
 
-For user-docs containing a description of the fields, and examples, see [Reports and ScheduledReports][reports].
+For user-docs containing a description of the fields, and examples, see [Reports][reports].
 
-When a `Report` or `ScheduledReport` is created, and it sees the creation event, it does the following to generate the results:
+When a `Report` is created, and it sees the creation event, it does the following to generate the results:
 
-- Retrieve the `ReportGenerationQuery` for the Report/ScheduledReport.
+- Retrieve the `ReportGenerationQuery` for the Report.
 - For each `ReportGenerationQuery` from the `spec.reportQueries` and `spec.dynamicReportQueries` fields, retrieve them, and then do the same for each of those queries until we have all the required `ReportGenerationQueries`
 - Validate the `ReportDataSources` that each query depends on has it's table created.
-- Update the Report/ScheduledReport status to indicate we're beginning to generate the report.
+- Update the Report status to indicate we're beginning to generate the report.
 - Evaluate the `ReportGenerationQuery` template, passing the StartPeriod & EndPeriod into the template context.
-- Create a database table using Hive named after the Report/ScheduledReport. This table is either configured to use HDFS or S3 based on the Report/ScheduledReport's StorageLocation.
+- Create a database table using Hive named after the Report This table is either configured to use HDFS or S3 based on the Report's StorageLocation.
 - Execute the query using Presto.
-- Update the Report/ScheduledReports status that everything succeeded.
+- Update the Report status that everything succeeded.
 
 [presto-overview]: https://prestodb.io/docs/current/overview/use-cases.html
 [hive-overview]: https://cwiki.apache.org/confluence/display/Hive/Home#Home-ApacheHive

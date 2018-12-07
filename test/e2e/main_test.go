@@ -60,8 +60,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestReportingE2E(t *testing.T) {
-	hourlySchedule := &meteringv1alpha1.ScheduledReportSchedule{
-		Period: meteringv1alpha1.ScheduledReportPeriodHourly,
+	hourlySchedule := &meteringv1alpha1.ReportSchedule{
+		Period: meteringv1alpha1.ReportPeriodHourly,
 	}
 
 	queries := []struct {
@@ -94,37 +94,27 @@ func TestReportingE2E(t *testing.T) {
 	}
 
 	var reportsProduceDataTestCases []reportProducesDataTestCase
-	var scheduledReportsProduceDataTestCases []scheduledReportProducesDataTestCase
 
 	for _, query := range queries {
-		reportTestCase := reportProducesDataTestCase{
-			name:          query.queryName,
+		reportHourlyTestCase := reportProducesDataTestCase{
+			name:          query.queryName + "-hourly",
 			queryName:     query.queryName,
+			schedule:      hourlySchedule,
+			newReportFunc: testFramework.NewSimpleReport,
+			timeout:       reportTestTimeout,
+			skip:          query.skip,
+		}
+		reportRunOnceTestCase := reportProducesDataTestCase{
+			name:          query.queryName + "-runonce",
+			queryName:     query.queryName,
+			schedule:      nil, // runOnce
 			newReportFunc: testFramework.NewSimpleReport,
 			timeout:       reportTestTimeout,
 			skip:          query.skip,
 		}
 
-		scheduledReportHourlyTestCase := scheduledReportProducesDataTestCase{
-			name:          query.queryName + "-hourly",
-			queryName:     query.queryName,
-			schedule:      hourlySchedule,
-			newReportFunc: testFramework.NewSimpleScheduledReport,
-			timeout:       reportTestTimeout,
-			skip:          query.skip,
-		}
-		scheduledReportRunOnceTestCase := scheduledReportProducesDataTestCase{
-			name:          query.queryName + "-runonce",
-			queryName:     query.queryName,
-			schedule:      nil, // runOnce
-			newReportFunc: testFramework.NewSimpleScheduledReport,
-			timeout:       reportTestTimeout,
-			skip:          query.skip,
-		}
-
-		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportTestCase)
-		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportHourlyTestCase)
-		scheduledReportsProduceDataTestCases = append(scheduledReportsProduceDataTestCases, scheduledReportRunOnceTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportHourlyTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportRunOnceTestCase)
 	}
 
 	t.Run("TestReportingProducesResults", func(t *testing.T) {
@@ -150,16 +140,6 @@ func TestReportingE2E(t *testing.T) {
 			seenQuery[test.queryName] = struct{}{}
 			queries = append(queries, test.queryName)
 		}
-		for _, test := range scheduledReportsProduceDataTestCases {
-			if test.skip {
-				continue
-			}
-			if _, ok := seenQuery[test.queryName]; ok {
-				continue
-			}
-			seenQuery[test.queryName] = struct{}{}
-			queries = append(queries, test.queryName)
-		}
 
 		// validate all ReportGenerationQueries and ReportDataSources that are
 		// used by our test cases are initialized
@@ -172,9 +152,6 @@ func TestReportingE2E(t *testing.T) {
 
 		t.Run("TestReportsProduceData", func(t *testing.T) {
 			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
-		})
-		t.Run("TestScheduledReportsProduceData", func(t *testing.T) {
-			testScheduledReportsProduceData(t, testFramework, periodStart, periodEnd, scheduledReportsProduceDataTestCases)
 		})
 	})
 }

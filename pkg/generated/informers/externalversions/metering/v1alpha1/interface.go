@@ -20,8 +20,6 @@ type Interface interface {
 	ReportGenerationQueries() ReportGenerationQueryInformer
 	// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 	ReportPrometheusQueries() ReportPrometheusQueryInformer
-	// ScheduledReports returns a ScheduledReportInformer.
-	ScheduledReports() ScheduledReportInformer
 	// StorageLocations returns a StorageLocationInformer.
 	StorageLocations() StorageLocationInformer
 }
@@ -60,11 +58,6 @@ func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
 // ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
 func (v *version) ReportPrometheusQueries() ReportPrometheusQueryInformer {
 	return &reportPrometheusQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// ScheduledReports returns a ScheduledReportInformer.
-func (v *version) ScheduledReports() ScheduledReportInformer {
-	return &scheduledReportInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // StorageLocations returns a StorageLocationInformer.

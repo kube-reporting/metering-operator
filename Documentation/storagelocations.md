@@ -1,7 +1,7 @@
 # Storage Locations
 
 A `StorageLocation` is a custom resource that configures where data will be stored.
-This includes the data collected from Prometheus, and the results produced by generating a `Report` or `ScheduledReport`.
+This includes the data collected from Prometheus, and the results produced by generating a `Report`.
 
 The Operator Metering default installation provides a few ways of configuring the [Default StorageLocation](#default-storagelocation), and normally it shouldn't be necessary to create these directly.
 Refer to the [Metering Configuration doc](metering-config.md#storing-data-in-s3) for details on using the `Metering` resource to set your default StorageLocation.

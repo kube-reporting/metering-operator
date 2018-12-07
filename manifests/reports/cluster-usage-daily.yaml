@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: cluster-cpu-usage-daily
 spec:
@@ -15,7 +15,7 @@ spec:
 ---
 
 apiVersion: metering.openshift.io/v1alpha1
-kind: ScheduledReport
+kind: Report
 metadata:
   name: cluster-memory-usage-daily
 spec:

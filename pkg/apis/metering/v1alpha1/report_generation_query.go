@@ -31,7 +31,6 @@ type ReportGenerationQuerySpec struct {
 	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
 	DataSources          []string                               `json:"reportDataSources,omitempty"`
 	Reports              []string                               `json:"reports,omitempty"`
-	ScheduledReports     []string                               `json:"scheduledReports,omitempty"`
 	Inputs               []ReportGenerationQueryInputDefinition `json:"inputs,omitempty"`
 }
 
