@@ -28,7 +28,7 @@ spec:
 
 
     nodeSelector: {}
-    tolerations: {}
+    tolerations: []
 
     affinity:
       podAntiAffinity:
@@ -62,7 +62,7 @@ spec:
         cpu: "250m"
 
     nodeSelector: {}
-    tolerations: {}
+    tolerations: []
 
     affinity:
       podAntiAffinity:

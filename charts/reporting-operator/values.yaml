@@ -83,7 +83,7 @@ spec:
   labels: {}
   annotations: {}
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
   service:
