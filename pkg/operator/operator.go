@@ -615,8 +615,6 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 		op.logger.Infof("PrestoTable worker stopped")
 	}()
 
-	// We have a lot of ReportDataSources and we need to run more workers to
-	// make sure we collect data quickly
 	threadiness := 4
 	for i := 0; i < threadiness; i++ {
 		i := i
@@ -628,14 +626,6 @@ func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
 			wg.Done()
 			op.logger.Infof("ReportDataSource worker #%d stopped", i)
 		}()
-	}
-
-	// Reports and Reports we want to limit the number running
-	// concurrently, and ReportGenerationQueries don't need many workers, so
-	// these resources get less workers.
-	threadiness = 2
-	for i := 0; i < threadiness; i++ {
-		i := i
 
 		wg.Add(1)
 		go func() {
