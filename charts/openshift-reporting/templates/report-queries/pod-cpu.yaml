@@ -422,3 +422,5 @@ spec:
     JOIN cluster_cpu_capacity as capacity
       ON capacity.period_start = request.period_start
       AND capacity.period_end = request.period_end
+      AND capacity.period_start = usage.period_start
+      AND capacity.period_end = usage.period_end
