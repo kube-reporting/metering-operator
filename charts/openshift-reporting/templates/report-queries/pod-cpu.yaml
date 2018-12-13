@@ -257,14 +257,25 @@ spec:
     unit: date
   - name: pod_request_cpu_core_seconds
     type: double
-    unit: cpu_core_seconds
+    unit: core_seconds
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
+  - name: NamespaceCPURequestReportName
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    {|- if .Report.Inputs.NamespaceCPURequestReportName |}
+      namespace,
+      min("period_start") as data_start,
+      max("period_end") as data_end,
+      sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
+    FROM {| .Report.Inputs.NamespaceCPURequestReportName | reportTableName |}
+    WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    GROUP BY namespace
+    {|- else |}
       namespace,
       min("timestamp") as data_start,
       max("timestamp") as data_end,
@@ -275,7 +286,7 @@ spec:
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
-    ORDER BY pod_request_cpu_core_seconds DESC
+    {|- end |}
 
 ---
 
@@ -310,14 +321,25 @@ spec:
     unit: date
   - name: pod_usage_cpu_core_seconds
     type: double
-    unit: cpu_core_seconds
+    unit: core_seconds
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
+  - name: NamespaceCPUUsageReportName
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    {|- if .Report.Inputs.NamespaceCPUUsageReportName |}
+      namespace,
+      min("period_start") as data_start,
+      max("period_end") as data_end,
+      sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
+    FROM {| .Report.Inputs.NamespaceCPUUsageReportName | reportTableName |}
+    WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    GROUP BY namespace
+    {|- else |}
       namespace,
       min("timestamp") as data_start,
       max("timestamp") as data_end,
@@ -328,22 +350,23 @@ spec:
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
-    ORDER BY pod_usage_cpu_core_seconds DESC
+    {|- end |}
 
 ---
 
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-request-vs-node-cpu-allocatable"
+  name: "namespace-cpu-utilization"
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "pod-cpu-request-raw"
-  - "node-cpu-allocatable-raw"
+  dynamicReportQueries:
+  - "namespace-cpu-request"
+  - "namespace-cpu-usage"
+  - "cluster-cpu-capacity"
   view:
     disabled: true
   columns:
@@ -353,55 +376,49 @@ spec:
   - name: period_end
     type: timestamp
     unit: date
-  - name: pod
-    type: string
-    unit: kubernetes_pod
   - name: namespace
     type: string
     unit: kubernetes_namespace
-  - name: node
-    type: string
-    unit: kubernetes_node
-  - name: data_start
-    type: timestamp
-    unit: date
-  - name: data_end
-    type: timestamp
-    unit: date
+  - name: pod_usage_cpu_core_seconds
+    type: double
+    unit: core_seconds
   - name: pod_request_cpu_core_seconds
     type: double
-    unit: cpu_core_seconds
+    unit: core_seconds
   - name: pod_cpu_usage_percent
     type: double
+  - name: pod_cpu_request_percent
+    type: double
+  - name: total_cluster_capacity_cpu_core_seconds
+    type: double
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  - name: NamespaceCPURequestReportName
+  - name: NamespaceCPUUsageReportName
+  - name: ClusterCpuCapacityReportName
   query: |
-    WITH node_cpu_allocatable AS (
-      SELECT min("timestamp") as node_allocatable_data_start,
-        max("timestamp") as node_allocatable_data_end,
-        sum(node_allocatable_cpu_core_seconds) as node_allocatable_cpu_core_seconds
-      FROM {| generationQueryViewName "node-cpu-allocatable-raw" |}
-        WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-        AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-        AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
-        AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
-    ), pod_cpu_consumption AS (
-      SELECT pod,
-              namespace,
-              node,
-              min("timestamp") as data_start,
-              max("timestamp") as data_end,
-              sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
-      FROM {| generationQueryViewName "pod-cpu-request-raw" |}
-      WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-      AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-      AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
-      AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
-      GROUP BY pod, namespace, node
+    WITH cluster_cpu_capacity AS (
+      {| renderReportGenerationQuery "cluster-cpu-capacity" . |}
+    ), namespace_cpu_usage AS (
+      {| renderReportGenerationQuery "namespace-cpu-usage" . |}
+    ), namespace_cpu_request AS (
+      {| renderReportGenerationQuery "namespace-cpu-request" . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      pod_cpu_consumption.*,
-      pod_cpu_consumption.pod_request_cpu_core_seconds / node_cpu_allocatable.node_allocatable_cpu_core_seconds as pod_cpu_usage_percent
-    FROM pod_cpu_consumption
-    CROSS JOIN node_cpu_allocatable
-    ORDER BY pod_cpu_consumption.pod_request_cpu_core_seconds DESC
+      usage.namespace,
+      usage.pod_usage_cpu_core_seconds,
+      request.pod_request_cpu_core_seconds,
+      usage.pod_usage_cpu_core_seconds / capacity.total_cluster_capacity_cpu_core_seconds AS pod_cpu_usage_percent,
+      request.pod_request_cpu_core_seconds / capacity.total_cluster_capacity_cpu_core_seconds AS pod_cpu_request_percent,
+      capacity.total_cluster_capacity_cpu_core_seconds
+    FROM namespace_cpu_request as request
+    JOIN namespace_cpu_usage as usage
+      ON request.period_start = usage.period_start
+      AND request.period_end = usage.period_end
+      AND request.namespace = usage.namespace
+    JOIN cluster_cpu_capacity as capacity
+      ON capacity.period_start = request.period_start
+      AND capacity.period_end = request.period_end
