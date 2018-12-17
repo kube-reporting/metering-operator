@@ -75,7 +75,7 @@ Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
  pod-memory-request-vs-node-memory-allocatable   11m
 ```
 
-ReportGenerationQueries with the `-raw` suffix are used by other ReportGenerationQueries to build more complex queries, and should not be should not be used directly for reports.
+ReportGenerationQueries with the `-raw` suffix are used by other ReportGenerationQueries to build more complex queries, and should not be used directly for reports.
 
 `namespace-` prefixed queries aggregate Pod CPU/memory requests by namespace, providing a list of namespaces and their overall usage based on resource requests.
 
