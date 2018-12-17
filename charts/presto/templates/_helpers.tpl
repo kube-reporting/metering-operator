@@ -7,6 +7,9 @@ hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
 hive.metastore.uri={{ .Values.spec.hive.con***REMOVED***g.metastoreURIs }}
+{{- if .Values.spec.hive.con***REMOVED***g.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.spec.hive.con***REMOVED***g.metastoreTimeout }}
+{{- end }}
 {{ end }}
 
 {{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}
