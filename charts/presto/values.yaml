@@ -115,6 +115,8 @@ spec:
       metastoreURIs: "thrift://hive-metastore:9083"
       useHdfsConfigMap: true
       hdfsConfigMapName: hdfs-config
+      # Uncomment to set a custom timeout for the metastore:
+      # metastoreTimeout: "20s"
 
     securityContext:
       runAsNonRoot: true
