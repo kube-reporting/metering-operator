@@ -7,7 +7,8 @@ RUN make reporting-operator-bin RUN_UPDATE_CODEGEN=false CHECK_GO_FILES=false
 
 FROM openshift/origin-base
 
-RUN yum install -y ca-certi***REMOVED***cates bash
+RUN yum install --setopt=skip_missing_names_on_install=False -y \
+        ca-certi***REMOVED***cates bash
 
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/reporting-operator /usr/local/bin/reporting-operator
 

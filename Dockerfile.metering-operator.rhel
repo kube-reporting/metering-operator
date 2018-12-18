@@ -5,7 +5,8 @@ FROM openshift/ose-metering-helm:v4.0 as helm
 FROM openshift/golang-builder:1.10 AS build
 
 RUN INSTALL_PKGS="python PyYAML jq" \
-    && yum install -y $INSTALL_PKGS \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        $INSTALL_PKGS \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -27,7 +28,8 @@ FROM openshift/ose-metering-helm:v4.0
 
 USER root
 RUN INSTALL_PKGS="curl bash jq ca-certi***REMOVED***cates socat kubernetes-client" \
-    && yum install -y $INSTALL_PKGS  \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        $INSTALL_PKGS  \
     && yum clean all \
     && rm -rf /var/cache/yum
 
