@@ -1,7 +1,7 @@
 FROM openshift/origin-release:golang-1.10 as build
 
 RUN INSTALL_PKGS="curl python PyYAML" && \
-    yum install -y $INSTALL_PKGS && \
+    yum install --setopt=skip_missing_names_on_install=False -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
 
