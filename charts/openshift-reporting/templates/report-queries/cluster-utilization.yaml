@@ -19,12 +19,12 @@ spec:
   - name: period_end
     type: timestamp
     unit: date
-  - name: total_cluster_capacity_cpu_core_hours
+  - name: total_cluster_capacity_cpu_core_seconds
     type: double
-    unit: cpu_core_hours
-  - name: total_cluster_usage_cpu_core_hours
+    unit: cpu_core_seconds
+  - name: total_cluster_usage_cpu_core_seconds
     type: double
-    unit: cpu_core_hours
+    unit: cpu_core_seconds
   - name: cluster_cpu_utilization_percent
     type: double
   - name: avg_cluster_capacity_cpu_cores
@@ -51,8 +51,8 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      sum(total_cluster_capacity_cpu_core_hours) AS total_cluster_capacity_cpu_core_hours,
-      sum(total_cluster_usage_cpu_core_hours) AS total_cluster_usage_cpu_core_hours,
+      sum(total_cluster_capacity_cpu_core_seconds) AS total_cluster_capacity_cpu_core_seconds,
+      sum(total_cluster_usage_cpu_core_seconds) AS total_cluster_usage_cpu_core_seconds,
       avg(cluster_cpu_utilization_percent) AS cluster_cpu_utilization_percent,
       avg(avg_cluster_capacity_cpu_cores) AS avg_cluster_capacity_cpu_cores,
       avg(avg_cluster_usage_cpu_cores) AS avg_cluster_usage_cpu_cores,
@@ -74,9 +74,9 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      capacity.total_cluster_capacity_cpu_core_hours,
-      usage.total_cluster_usage_cpu_core_hours,
-      usage.total_cluster_usage_cpu_core_hours / capacity.total_cluster_capacity_cpu_core_hours AS cluster_cpu_utilization_percent,
+      capacity.total_cluster_capacity_cpu_core_seconds,
+      usage.total_cluster_usage_cpu_core_seconds,
+      usage.total_cluster_usage_cpu_core_seconds / capacity.total_cluster_capacity_cpu_core_seconds AS cluster_cpu_utilization_percent,
       capacity.avg_cluster_capacity_cpu_cores,
       usage.avg_cluster_usage_cpu_cores,
       capacity.avg_node_count,
@@ -111,12 +111,12 @@ spec:
   - name: period_end
     type: timestamp
     unit: date
-  - name: total_cluster_capacity_memory_byte_hours
+  - name: total_cluster_capacity_memory_byte_seconds
     type: double
-    unit: memory_byte_hours
-  - name: total_cluster_usage_memory_byte_hours
+    unit: memory_byte_seconds
+  - name: total_cluster_usage_memory_byte_seconds
     type: double
-    unit: memory_byte_hours
+    unit: memory_byte_seconds
   - name: cluster_memory_utilization_percent
     type: double
   - name: avg_cluster_capacity_memory_bytes
@@ -143,8 +143,8 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      sum(total_cluster_capacity_memory_byte_hours) AS total_cluster_capacity_memory_byte_hours,
-      sum(total_cluster_usage_memory_byte_hours) AS total_cluster_usage_memory_byte_hours,
+      sum(total_cluster_capacity_memory_byte_seconds) AS total_cluster_capacity_memory_byte_seconds,
+      sum(total_cluster_usage_memory_byte_seconds) AS total_cluster_usage_memory_byte_seconds,
       avg(cluster_memory_utilization_percent) AS cluster_memory_utilization_percent,
       avg(avg_cluster_capacity_memory_bytes) AS avg_cluster_capacity_memory_bytes,
       avg(avg_cluster_usage_memory_bytes) AS avg_cluster_usage_memory_bytes,
@@ -167,9 +167,9 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      capacity.total_cluster_capacity_memory_byte_hours,
-      usage.total_cluster_usage_memory_byte_hours,
-      usage.total_cluster_usage_memory_byte_hours / capacity.total_cluster_capacity_memory_byte_hours AS cluster_memory_utilization_percent,
+      capacity.total_cluster_capacity_memory_byte_seconds,
+      usage.total_cluster_usage_memory_byte_seconds,
+      usage.total_cluster_usage_memory_byte_seconds / capacity.total_cluster_capacity_memory_byte_seconds AS cluster_memory_utilization_percent,
       capacity.avg_cluster_capacity_memory_bytes,
       usage.avg_cluster_usage_memory_bytes,
       capacity.avg_node_count,
