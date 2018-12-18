@@ -6,8 +6,10 @@ FROM openshift/origin-release:golang-1.10 as build
 
 # epel-release is for `jq`
 RUN INSTALL_PKGS="python PyYAML jq" \
-    && yum install -y epel-release \
-    && yum install -y $INSTALL_PKGS \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        epel-release \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        $INSTALL_PKGS \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -29,8 +31,10 @@ FROM quay.io/coreos/helm:metering-v2.8.2
 USER root
 # epel-release is for `jq`
 RUN INSTALL_PKGS="curl bash jq ca-certificates socat kubernetes-client" \
-    && yum install -y epel-release \
-    && yum install -y $INSTALL_PKGS  \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        epel-release \
+    && yum install --setopt=skip_missing_names_on_install=False -y \
+        $INSTALL_PKGS  \
     && yum clean all \
     && rm -rf /var/cache/yum
 
