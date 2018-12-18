@@ -219,6 +219,8 @@ vendor: Gopkg.toml
 
 test:
 	go test -coverpro***REMOVED***le=$(COVERAGE_OUTFILE) ./pkg/...
+	go test -c -o bin/e2e-tests ./test/e2e
+	go test -c -o bin/integration-tests ./test/integration
 
 test-docker:
 	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make test'
