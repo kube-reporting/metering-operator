@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"encoding/json"
+
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -50,11 +52,12 @@ type GenQueryView struct {
 type ReportGenerationQueryInputDefinition struct {
 	Name     string `json:"name"`
 	Required bool   `json:"required"`
+	Type     string `json:"type,omitempty"`
 }
 
 type ReportGenerationQueryInputValue struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	Name  string           `json:"name"`
+	Value *json.RawMessage `json:"value,omitempty"`
 }
 
 type ReportGenerationQueryInputValues []ReportGenerationQueryInputValue
