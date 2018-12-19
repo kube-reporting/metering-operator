@@ -6,7 +6,8 @@ metadata:
 {{- end }}
 data:
   entrypoint.sh: |
-    #!/bin/bash -e
+    #!/bin/bash
+    set -e
 
     max_memory() {
         local memory_limit=$1
@@ -30,9 +31,19 @@ data:
 
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then
-      if [ -w /etc/passwd ]; then
-        echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /etc/passwd
-      fi
+        if [ -w /etc/passwd ]; then
+            echo "Adding user ${USER_NAME:-hadoop} with current UID $(id -u) to /etc/passwd"
+            # Remove existing entry with user first.
+            # cannot use sed -i because we do not have permission to write new
+            # files into /etc
+            sed  "/${USER_NAME:-hadoop}:x/d" /etc/passwd > /tmp/passwd
+            # add our user with our current user ID into passwd
+            echo "${USER_NAME:-hadoop}:x:$(id -u):0:${USER_NAME:-hadoop} user:${HOME}:/sbin/nologin" >> /tmp/passwd
+            # overwrite existing contents with new contents (cannot replace the
+            # file due to permissions)
+            cat /tmp/passwd > /etc/passwd
+            rm /tmp/passwd
+        fi
     fi
 
     # symlink our configuration files to the correct location
