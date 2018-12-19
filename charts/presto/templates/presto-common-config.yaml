@@ -7,6 +7,7 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/bash
+    set -e
 
     max_memory() {
         local memory_limit=$1
@@ -70,10 +71,16 @@ data:
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "Adding user ${USER_NAME:-presto} with current UID $(id -u) to /etc/passwd"
-            # Remove existing entry with user first
-            sed -i "/${USER_NAME:-presto}:x/d" /etc/passwd
+            # Remove existing entry with user first.
+            # cannot use sed -i because we do not have permission to write new
+            # files into /etc
+            sed  "/${USER_NAME:-presto}:x/d" /etc/passwd > /tmp/passwd
             # add our user with our current user ID into passwd
-            echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /etc/passwd
+            echo "${USER_NAME:-presto}:x:$(id -u):0:${USER_NAME:-presto} user:${HOME}:/sbin/nologin" >> /tmp/passwd
+            # overwrite existing contents with new contents (cannot replace the
+            # file due to permissions)
+            cat /tmp/passwd > /etc/passwd
+            rm /tmp/passwd
         fi
     fi
 

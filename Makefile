@@ -73,8 +73,7 @@ REPORTING_OPERATOR_GO_FILES =
 
 # Adds all the Go files in the repo as a dependency to the build-reporting-operator target
 ifeq ($(CHECK_GO_FILES), true)
-	JQ_DEP_SCRIPT = '.Deps[] | select(. | contains("$(GO_PKG)"))'
-	REPORTING_OPERATOR_GO_FILES := $(shell go list -json $(REPORTING_OPERATOR_PKG) | jq $(JQ_DEP_SCRIPT) -r | xargs -I{} find $(GOPATH)/src/$(REPORTING_OPERATOR_PKG) $(GOPATH)/src/{} -type f -name '*.go' | sort | uniq)
+	REPORTING_OPERATOR_GO_FILES := $(shell find $(ROOT_DIR) -name '*.go')
 endif
 
 # Adds the update-codegen dependency to the build-reporting-operator target
