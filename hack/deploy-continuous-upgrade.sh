@@ -14,7 +14,7 @@ export HDFS_DATANODE_STORAGE_SIZE="30Gi"
 
 export UNINSTALL_METERING_BEFORE_INSTALL="${UNINSTALL_METERING_BEFORE_INSTALL:-false}"
 
-"$DIR/deploy-custom.sh"
+"$DIR/deploy-e2e.sh"
 
 echo "Deploying default Reports"
 
