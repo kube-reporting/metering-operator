@@ -1,0 +1,11 @@
+deployPlatform: openshift
+deployTag: master
+disablePromsum: false
+awsAccessKeyID: ""
+awsSecretAccessKey: ""
+enableAwsBilling: false
+imagePullSecretName: ""
+dateAnnotationValue: ""
+terminationGracePeriodSeconds: null
+hdfsDatanodeStorageSize: null
+hdfsNamenodeStorageSize: null
