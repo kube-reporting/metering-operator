@@ -9,3 +9,5 @@ dateAnnotationValue: ""
 terminationGracePeriodSeconds: null
 hdfsDatanodeStorageSize: null
 hdfsNamenodeStorageSize: null
+hiveMetastoreStorageSize: null
+hiveMetastoreMemory: null
