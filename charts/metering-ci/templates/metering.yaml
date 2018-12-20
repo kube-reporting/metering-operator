@@ -1,0 +1,97 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "{{ .Values.deployPlatform }}-metering"
+spec:
+  openshift-reporting:
+    spec:
+      awsBillingReportDataSource:
+        enabled: {{ .Values.enableAwsBilling }}
+        bucket: "{{ .Values.awsBillingBucket }}"
+        pre***REMOVED***x: "{{ .Values.awsBillingBucketPre***REMOVED***x }}"
+        region: "{{ .Values.awsBillingBucketRegion }}"
+
+  reporting-operator:
+    spec:
+      image:
+        tag: "{{ .Values.deployTag }}"
+
+{{- if .Values.imagePullSecretName }}
+      imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
+{{- end }}
+{{- if .Values.dateAnnotationValue }}
+      annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+{{- end }}
+{{- if .Values.terminationGracePeriodSeconds  }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- end }}
+
+      con***REMOVED***g:
+        disablePromsum: {{ .Values.disablePromsum }}
+        awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
+        awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
+
+  presto:
+    spec:
+{{- if .Values.imagePullSecretName }}
+      imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
+{{- end }}
+      con***REMOVED***g:
+        awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
+        awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
+      presto:
+  {{- if .Values.dateAnnotationValue }}
+        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+  {{- end }}
+  {{- if .Values.terminationGracePeriodSeconds  }}
+        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+  {{- end }}
+      hive:
+  {{- if .Values.dateAnnotationValue }}
+        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+  {{- end }}
+  {{- if .Values.terminationGracePeriodSeconds  }}
+        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+  {{- end }}
+{{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreStorageSize }}
+        metastore:
+          {{- if .Values.hiveMetastoreMemory  }}
+          resources:
+            requests:
+              memory: "{{ .Values.hiveMetastoreMemory }}"
+            limits:
+              memory: "{{ .Values.hiveMetastoreMemory }}"
+          {{- end }}
+          {{- if .Values.hiveMetastoreStorageSize }}
+          storage:
+            size: "{{ .Values.hiveMetastoreStorageSize }}"
+          {{- end }}
+{{- end }}
+
+  hdfs:
+    spec:
+{{- if .Values.imagePullSecretName }}
+      imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
+{{- end }}
+      datanode:
+  {{- if .Values.dateAnnotationValue }}
+        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+  {{- end }}
+  {{- if .Values.terminationGracePeriodSeconds  }}
+        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+  {{- end }}
+  {{- if .Values.hdfsDatanodeStorageSize   }}
+        storage:
+          size: {{ .Values.hdfsDatanodeStorageSize }}
+  {{- end }}
+      namenode:
+  {{- if .Values.dateAnnotationValue }}
+        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+  {{- end }}
+  {{- if .Values.terminationGracePeriodSeconds  }}
+        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+  {{- end }}
+  {{- if .Values.hdfsNamenodeStorageSize   }}
+        storage:
+          size: {{ .Values.hdfsNamenodeStorageSize }}
+  {{- end }}
