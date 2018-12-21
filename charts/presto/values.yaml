@@ -142,6 +142,25 @@ spec:
         class: null
         size: "5Gi"
 
+      readinessProbe:
+       initialDelaySeconds: 60
+       timeoutSeconds: 15
+       periodSeconds: 20
+       successThreshold: 1
+       failureThreshold: 3
+       tcpSocket:
+         port: 9083
+      livenessProbe:
+       initialDelaySeconds: 90
+       timeoutSeconds: 15
+       periodSeconds: 30
+       successThreshold: 1
+       failureThreshold: 3
+       tcpSocket:
+         port: 9083
+
+      livenessProbe: {}
+
       nodeSelector: {}
       tolerations: []
       af***REMOVED***nity: {}
@@ -156,6 +175,23 @@ spec:
         limits:
           memory: "500Mi"
           cpu: "100m"
+
+      readinessProbe:
+       initialDelaySeconds: 60
+       timeoutSeconds: 15
+       periodSeconds: 20
+       successThreshold: 1
+       failureThreshold: 3
+       tcpSocket:
+         port: 10000
+      livenessProbe:
+       initialDelaySeconds: 90
+       timeoutSeconds: 15
+       periodSeconds: 30
+       successThreshold: 1
+       failureThreshold: 3
+       tcpSocket:
+         port: 10000
 
       nodeSelector: {}
       tolerations: []
