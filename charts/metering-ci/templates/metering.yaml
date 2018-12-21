@@ -53,14 +53,16 @@ spec:
   {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
   {{- end }}
-{{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreStorageSize }}
+{{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreCpu .Values.hiveMetastoreStorageSize }}
         metastore:
-          {{- if .Values.hiveMetastoreMemory  }}
+          {{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreCpu }}
           resources:
             requests:
               memory: "{{ .Values.hiveMetastoreMemory }}"
+              cpu: "{{ .Values.hiveMetastoreCpu }}"
             limits:
               memory: "{{ .Values.hiveMetastoreMemory }}"
+              cpu: "{{ .Values.hiveMetastoreCpu }}"
           {{- end }}
           {{- if .Values.hiveMetastoreStorageSize }}
           storage:
