@@ -11,3 +11,4 @@ hdfsDatanodeStorageSize: null
 hdfsNamenodeStorageSize: null
 hiveMetastoreStorageSize: null
 hiveMetastoreMemory: null
+hiveMetastorCpu: null
