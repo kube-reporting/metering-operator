@@ -33,6 +33,7 @@ export METERING_CREATE_PULL_SECRET
 : "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
 : "${HIVE_METASTORE_STORAGE_SIZE:=}"
 : "${HIVE_METASTORE_MEMORY:=}"
+: "${HIVE_METASTORE_CPU:=}"
 : "${CUR_DATE:=$(date +%s)}"
 
 HELM_ARGS=(\
@@ -49,6 +50,7 @@ HELM_ARGS=(\
     --set "hdfsDatanodeStorageSize=${HDFS_DATANODE_STORAGE_SIZE}" \
     --set "hiveMetastoreStorageSize=${HIVE_METASTORE_STORAGE_SIZE}" \
     --set "hiveMetastoreMemory=${HIVE_METASTORE_MEMORY}" \
+    --set "hiveMetastoreCpu=${HIVE_METASTORE_CPU}" \
     --set "dateAnnotationValue=currdate-$CUR_DATE" \
 )
 
