@@ -34,6 +34,7 @@ rules:
 - apiGroups: ["metering.openshift.io"]
   resources:
   - reports
+  - reports/export
   - reportgenerationqueries
   - reportdatasources
   - reportprometheusqueries
@@ -53,6 +54,7 @@ rules:
 - apiGroups: ["metering.openshift.io"]
   resources:
   - reports
+  - reports/export
   - reportgenerationqueries
   - reportdatasources
   - reportprometheusqueries
@@ -60,3 +62,16 @@ rules:
   - storagelocations
   verbs: ["get", "list", "watch"]
 
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: report-exporter
+{{- block "extraMetadata" . }}
+{{- end }}
+rules:
+- apiGroups: ["metering.openshift.io"]
+  resources:
+  - reports/export
+  verbs: ["get"]

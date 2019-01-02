@@ -15,6 +15,7 @@ permissions:
   meteringAdmins: []
   reportingAdmins: []
   reportingViewers: []
+  reportExporters: []
 
 openshift-reporting:
   enabled: true
