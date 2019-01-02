@@ -136,7 +136,6 @@ helmUpgrade() {
     CHART_LOCATION=$2
     helm upgrade \
         --install \
-        --force \
         --namespace "$MY_POD_NAMESPACE" \
         --wait="$HELM_WAIT" \
         --timeout="$HELM_WAIT_TIMEOUT" \
