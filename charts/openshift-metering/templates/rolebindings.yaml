@@ -1,0 +1,93 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metering-admins
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: metering-admin
+subjects:
+{{- range .Values.permissions.meteringAdmins }}
+- kind: "{{ .kind }}"
+  name: "{{ .name }}"
+{{- if .namespace }}
+  namespace: "{{ .namespace }}"
+{{- end }}
+{{- if .apiGroup }}
+  apiGroup: "{{ .apiGroup }}"
+{{- end }}
+{{- end }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metering-viewers
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: metering-viewer
+subjects:
+{{- range .Values.permissions.meteringViewers }}
+- kind: "{{ .kind }}"
+  name: "{{ .name }}"
+{{- if .namespace }}
+  namespace: "{{ .namespace }}"
+{{- end }}
+{{- if .apiGroup }}
+  apiGroup: "{{ .apiGroup }}"
+{{- end }}
+{{- end }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: reporting-admins
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reporting-admin
+subjects:
+{{- range .Values.permissions.reportingAdmins }}
+- kind: "{{ .kind }}"
+  name: "{{ .name }}"
+{{- if .namespace }}
+  namespace: "{{ .namespace }}"
+{{- end }}
+{{- if .apiGroup }}
+  apiGroup: "{{ .apiGroup }}"
+{{- end }}
+{{- end }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: reporting-viewers
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reporting-viewer
+subjects:
+{{- range .Values.permissions.reportingViewers }}
+- kind: "{{ .kind }}"
+  name: "{{ .name }}"
+{{- if .namespace }}
+  namespace: "{{ .namespace }}"
+{{- end }}
+{{- if .apiGroup }}
+  apiGroup: "{{ .apiGroup }}"
+{{- end }}
+{{- end }}

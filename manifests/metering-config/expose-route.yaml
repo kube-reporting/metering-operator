@@ -14,7 +14,7 @@ spec:
         # htpasswdData can contain htpasswd file contents for allowing auth
         # using a static list of usernames and their password hashes.
         #
-        # username is 'testuser' password is 'testpassword123'
+        # username is 'testuser' password is 'password123'
         # generated htpasswdData using: `htpasswd -nb -s testuser password123`
         # htpasswdData: |
         #   testuser:{SHA}y/2sYAj5yrQIN4TL0YdPdmGNKpc=
@@ -33,6 +33,10 @@ spec:
         # change REPLACEME to the output of your command
         cookieSeed: "REPLACEME"
 
-        # enables authenticating using a serviceAccount token
+        # Enables authenticating using a bearer token from a serviceAccount or user.
+        # It must have have one of the following roles:
+        # "report-exporter", "reporting-admin" or "reporting-viewer"
+        # or it must have permissions granting "GET reports/export":
+        # the export subresource of "reports".
         subjectAccessReviewEnabled: true
         delegateURLsEnabled: true
