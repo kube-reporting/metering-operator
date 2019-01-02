@@ -12,6 +12,7 @@ TMP_DIR="$(mktemp -d)"
 export DOCKER_USERNAME="$DOCKER_CREDS_USR"
 export DOCKER_PASSWORD="$DOCKER_CREDS_PSW"
 
+unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
 export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
@@ -30,7 +31,9 @@ export METERING_CREATE_PULL_SECRET
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${TERMINATION_GRACE_PERIOD_SECONDS:=0}"
 : "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
+: "${HDFS_NAMENODE_MEMORY:=}"
 : "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
+: "${HDFS_DATANODE_MEMORY:=}"
 : "${HIVE_METASTORE_STORAGE_SIZE:=}"
 : "${HIVE_METASTORE_MEMORY:=}"
 : "${HIVE_METASTORE_CPU:=}"
@@ -47,11 +50,13 @@ HELM_ARGS=(\
     --set "meteringPullSecretName=${METERING_PULL_SECRET_NAME}" \
     --set "terminationGracePeriodSeconds=${TERMINATION_GRACE_PERIOD_SECONDS}" \
     --set "hdfsNamenodeStorageSize=${HDFS_NAMENODE_STORAGE_SIZE}" \
+    --set "hdfsNamenodeMemory=${HDFS_NAMENODE_MEMORY}" \
     --set "hdfsDatanodeStorageSize=${HDFS_DATANODE_STORAGE_SIZE}" \
+    --set "hdfsDatanodeMemory=${HDFS_DATANODE_MEMORY}" \
     --set "hiveMetastoreStorageSize=${HIVE_METASTORE_STORAGE_SIZE}" \
     --set "hiveMetastoreMemory=${HIVE_METASTORE_MEMORY}" \
     --set "hiveMetastoreCpu=${HIVE_METASTORE_CPU}" \
-    --set "dateAnnotationValue=currdate-$CUR_DATE" \
+    --set "dateAnnotationValue=currdate-${CUR_DATE}" \
 )
 
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then

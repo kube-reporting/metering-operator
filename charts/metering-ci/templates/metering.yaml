@@ -82,7 +82,14 @@ spec:
   {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
   {{- end }}
-  {{- if .Values.hdfsDatanodeStorageSize   }}
+  {{- if .Values.hdfsDatanodeMemory }}
+        resources:
+          requests:
+            memory: "{{ .Values.hdfsDatanodeMemory }}"
+          limits:
+            memory: "{{ .Values.hdfsDatanodeMemory }}"
+  {{- end }}
+  {{- if .Values.hdfsDatanodeStorageSize }}
         storage:
           size: {{ .Values.hdfsDatanodeStorageSize }}
   {{- end }}
@@ -92,6 +99,13 @@ spec:
   {{- end }}
   {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+  {{- end }}
+  {{- if .Values.hdfsNamenodeMemory }}
+        resources:
+          requests:
+            memory: "{{ .Values.hdfsNamenodeMemory }}"
+          limits:
+            memory: "{{ .Values.hdfsNamenodeMemory }}"
   {{- end }}
   {{- if .Values.hdfsNamenodeStorageSize   }}
         storage:
