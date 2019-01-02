@@ -76,7 +76,7 @@ CR_SPEC=$("$ROOT_DIR/hack/yamltojson" < "$CUSTOM_METERING_CR_FILE" | jq -r '{ cr
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
   tag: ${DEPLOY_TAG}
-annotations: { $DATE_ANNOTATION }
+annotations: { "metering.deploy-custom/deploy-time": "${CUR_DATE}" }
 reconcileIntervalSeconds: 5
 ${CR_SPEC}
 EOF
