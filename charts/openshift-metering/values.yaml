@@ -10,6 +10,12 @@ defaultStorage:
     tableProperties:
       location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
 
+permissions:
+  meteringViewers: []
+  meteringAdmins: []
+  reportingAdmins: []
+  reportingViewers: []
+
 openshift-reporting:
   enabled: true
 

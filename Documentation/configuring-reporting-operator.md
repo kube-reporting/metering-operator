@@ -43,6 +43,7 @@ Additionally, on Openshift:
 There are a few ways to do authentication, you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd ***REMOVED***le.
 
 See the [expose-route.yaml][expose-route-con***REMOVED***g] con***REMOVED***guration for an example of setting enabling an Openshift route and con***REMOVED***guring authentication with both options enabled.
+See the [openshift authentication][#openshift-authentication] section below for details on how authentication is done.
 Make sure you modify the `reporting-operator.spec.authProxy.httpasswdData` and `reporting-operator.spec.authProxy.cookieSeed` values.
 
 Once installed with the customized con***REMOVED***guration to enable the route, you should query in your namespace to check for the route:
@@ -69,6 +70,26 @@ And to authenticate using a username and password, use basic authentication:
 ```
 curl -u testuser:password123 -k "https://metering-openshift-metering.apps.example.com/api/v1/reports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
+
+#### Openshift Authentication
+
+When the following options are set to true, it enables authenticating using a bearer token from a serviceAccount or for your user when querying the reporting rest API:
+
+- `reporting-operator.spec.authProxy.subjectAccessReviewEnabled`
+- `reporting-operator.spec.authProxy.delegateURLsEnabled`
+
+When authentication is enabled, the Bearer token used to query the reporting API of the user or serviceAccount must be granted access using one of the following roles:
+
+- `report-exporter`
+- `reporting-admin`
+- `reporting-viewer`
+- `metering-admin`
+- `metering-viewer`
+
+Alternatively, you may use any role which has rules granting `get` permissions to `reports/export`, meaning, `get` access to the `export` _sub-resource_ of the `Report` resources in the namespace of the `reporting-operator`, eg: `admin` and `cluster-admin`.
+
+By default, the `reporting-operator` and `metering-operator` serviceAccounts both have these permissions, and their tokens may be used for authentication.
+In this document, most examples will prefer this method.
 
 ### Load Balancer/Node Port services
 
