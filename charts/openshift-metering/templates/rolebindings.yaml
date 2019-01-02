@@ -91,3 +91,27 @@ subjects:
   apiGroup: "{{ .apiGroup }}"
 {{- end }}
 {{- end }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: report-exporters
+{{- block "extraMetadata" . }}
+{{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: report-exporter
+subjects:
+{{- range .Values.permissions.reportExporters }}
+- kind: "{{ .kind }}"
+  name: "{{ .name }}"
+{{- if .namespace }}
+  namespace: "{{ .namespace }}"
+{{- end }}
+{{- if .apiGroup }}
+  apiGroup: "{{ .apiGroup }}"
+{{- end }}
+{{- end }}
