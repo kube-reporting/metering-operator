@@ -8,7 +8,9 @@ imagePullSecretName: ""
 dateAnnotationValue: ""
 terminationGracePeriodSeconds: null
 hdfsDatanodeStorageSize: null
+hdfsDatanodeMemory: null
 hdfsNamenodeStorageSize: null
+hdfsNamenodeMemory: null
 hiveMetastoreStorageSize: null
 hiveMetastoreMemory: null
 hiveMetastorCpu: null
