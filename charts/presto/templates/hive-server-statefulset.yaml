@@ -115,6 +115,10 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.spec.hive.terminationGracePeriodSeconds }}
       serviceAccount: hive
+{{- if .Values.spec.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.spec.imagePullSecrets | indent 8 }}
+{{- end }}
       volumes:
       - name: hive-config
         configMap:
