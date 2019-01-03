@@ -138,6 +138,7 @@ helmUpgrade() {
         --install \
         --namespace "$MY_POD_NAMESPACE" \
         --wait="$HELM_WAIT" \
+        --force \
         --timeout="$HELM_WAIT_TIMEOUT" \
         "$RELEASE_NAME"\
         "$CHART_LOCATION" \
