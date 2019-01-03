@@ -120,7 +120,7 @@ This adjusts the ports so that the reporting-operator API isn't exposed directly
 
 #### Token Authentication
 
-When the following options are set to true, authentication using a bearer token is enabled for the reporting rest API.
+When the following options are set to true, authentication using a bearer token is enabled for the reporting REST API.
 Bearer tokens may come from serviceAccounts or users.
 
 - `reporting-operator.spec.authProxy.subjectAccessReviewEnabled`
@@ -134,6 +134,9 @@ When authentication is enabled, the Bearer token used to query the reporting API
 - `metering-admin`
 - `metering-viewer`
 
+The metering-operator is capable of creating RoleBindings for you, granting these permissions by specifying a list of subjects in the Metering `spec.permissions` section.
+For an example see the [advanced-auth.yaml][advanced-auth-config] example configuration.
+
 Alternatively, you may use any role which has rules granting `get` permissions to `reports/export`.
 Meaning: `get` access to the `export` _sub-resource_ of the `Report` resources in the namespace of the `reporting-operator`.
 For example: `admin` and `cluster-admin`.
@@ -146,7 +149,6 @@ In this document, most examples will prefer this method.
 If `reporting-operator.spec.authProxy.htpasswdData` is non-empty, it's contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
 When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
 
-
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
 [kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
 [load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
@@ -155,3 +157,4 @@ When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide you
 [oauth-proxy]: https://github.com/openshift/oauth-proxy
 [expose-route-config]: ../manifests/metering-config/expose-route.yaml
 [basic-auth-rfc]: https://tools.ietf.org/html/rfc7617
+[advanced-auth-config]: ../manifests/metering-config/advanced-auth.yaml
