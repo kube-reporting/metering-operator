@@ -41,8 +41,9 @@ Additionally, on Openshift:
 - We deploy the [Openshift OAuth proxy][oauth-proxy] as a side-car container for reporting-operator, which protects the reporting API with authentication
 
 There are a few ways to do authentication, you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd file.
-
+See the [openshift authentication](#openshift-authentication) section below for details on how authentication and authorization works.
 See the [expose-route.yaml][expose-route-config] configuration for an example of setting enabling an Openshift route and configuring authentication with both options enabled.
+
 Make sure you modify the `reporting-operator.spec.authProxy.httpasswdData` and `reporting-operator.spec.authProxy.cookieSeed` values.
 
 Once installed with the customized configuration to enable the route, you should query in your namespace to check for the route:
@@ -108,6 +109,46 @@ In this example the externalIP of the LoadBalancer is `35.227.172.86` and the po
 curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-hourly&format=tab"
 ```
 
+### Openshift Authentication
+
+Authentication can be enabled by setting the options below to true.
+Enabling authentication configures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.
+This adjusts the ports so that the reporting-operator API isn't exposed directly, but instead is proxied to via the auth-proxy sidecar container.
+
+- `reporting-operator.spec.authProxy.enabled`
+- `reporting-operator.spec.authProxy.cookieSeed`
+
+#### Token Authentication
+
+When the following options are set to true, authentication using a bearer token is enabled for the reporting REST API.
+Bearer tokens may come from serviceAccounts or users.
+
+- `reporting-operator.spec.authProxy.subjectAccessReviewEnabled`
+- `reporting-operator.spec.authProxy.delegateURLsEnabled`
+
+When authentication is enabled, the Bearer token used to query the reporting API of the user or serviceAccount must be granted access using one of the following roles:
+
+- `report-exporter`
+- `reporting-admin`
+- `reporting-viewer`
+- `metering-admin`
+- `metering-viewer`
+
+The metering-operator is capable of creating RoleBindings for you, granting these permissions by specifying a list of subjects in the Metering `spec.permissions` section.
+For an example see the [advanced-auth.yaml][advanced-auth-config] example configuration.
+
+Alternatively, you may use any role which has rules granting `get` permissions to `reports/export`.
+Meaning: `get` access to the `export` _sub-resource_ of the `Report` resources in the namespace of the `reporting-operator`.
+For example: `admin` and `cluster-admin`.
+
+By default, the `reporting-operator` and `metering-operator` serviceAccounts both have these permissions, and their tokens may be used for authentication.
+In this document, most examples will prefer this method.
+
+#### Basic Authentication (username/password)
+
+If `reporting-operator.spec.authProxy.htpasswdData` is non-empty, it's contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
+When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
+
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
 [kube-svc]: https://kubernetes.io/docs/concepts/services-networking/service/
 [load-balancer-svc]: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
@@ -115,3 +156,5 @@ curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-
 [service-certs]: https://docs.openshift.com/container-platform/3.11/dev_guide/secrets.html#service-serving-certificate-secrets
 [oauth-proxy]: https://github.com/openshift/oauth-proxy
 [expose-route-config]: ../manifests/metering-config/expose-route.yaml
+[basic-auth-rfc]: https://tools.ietf.org/html/rfc7617
+[advanced-auth-config]: ../manifests/metering-config/advanced-auth.yaml

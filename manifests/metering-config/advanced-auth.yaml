@@ -1,0 +1,57 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  permissions:
+    # anyone in the "metering-admins" group can create, update, delete, etc any
+    # metering.openshift.io resources in the namespace.
+    # This also grants permissions to get query report results from the reporting REST API.
+    meteringAdmins:
+    - kind: Group
+      name: metering-admins
+    # Same as above except read only access and for the metering-viewers group.
+    meteringViewers:
+    - kind: Group
+      name: metering-viewers
+    # the default serviceaccount in the namespace "my-custom-ns" can:
+    # create, update, delete, etc reports.
+    # This also gives permissions query the results from the reporting REST API.
+    reportingAdmins:
+    - kind: ServiceAccount
+      name: default
+      namespace: my-custom-ns
+    # anyone in the group reporting-readers can get, list, watch reports, and
+    # query report results from the reporting REST API.
+    reportingViewers:
+    - kind: Group
+      name: reporting-readers
+    # anyone in the group cluster-admins can query report results
+    # from the reporting REST API. So can the user bob-from-accounting.
+    reportExporters:
+    - kind: Group
+      name: cluster-admins
+    - kind: User
+      name: bob-from-accounting
+
+  reporting-operator:
+    spec:
+      route:
+        enabled: true
+
+      authProxy:
+        enabled: true
+        # cookieSeed is used to protect the cookie created if accessing the API
+        # via your browser.
+        #
+        # generate a 32 character random string using a command of your choice,
+        # for example: `openssl rand -base64 32 | head -c32; echo`
+        # cookieSeed: "RCFE+QpwGWL2bupP+wv4EIOnYlbaRmto"
+        #
+        # change REPLACEME to the output of your command
+        cookieSeed: "REPLACEME"
+
+        # Enables authenticating using a bearer token from a serviceAccount or
+        # for your user.
+        subjectAccessReviewEnabled: true
+        delegateURLsEnabled: true

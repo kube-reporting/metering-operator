@@ -212,6 +212,11 @@ spec:
       - name: reporting-operator-auth-proxy
         image: "{{ .Values.spec.authProxy.image.repository }}:{{ .Values.spec.authProxy.image.tag }}"
         imagePullPolicy: {{ .Values.spec.authProxy.image.pullPolicy }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         args:
         - -provider=openshift
         - -https-address=:8081
@@ -232,10 +237,10 @@ spec:
         - -email-domain=*
 {{- end }}
 {{- if .Values.spec.authProxy.subjectAccessReviewEnabled }}
-        - '-openshift-sar={"resource": "namespaces", "verb": "get"}'
+        - '-openshift-sar={{- .Values.spec.authProxy.subjectAccessReviewPolicy | trim -}}'
 {{- end }}
 {{- if .Values.spec.authProxy.delegateURLsEnabled }}
-        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get"}}'
+        - '-openshift-delegate-urls={{- .Values.spec.authProxy.delegateURLsPolicy | trim -}}'
 {{- end }}
         ports:
         - name: auth-proxy
