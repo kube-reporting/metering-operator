@@ -179,7 +179,8 @@ data:
 
     set -ex
 
-    if [ "$(curl "$DATANODE_ADDRESS/jmx?qry=Hadoop:service=DataNode,name=DataNodeInfo" | jq '.beans[0].NamenodeAddresses' -r | jq 'to_entries | map(.value) | all')" == "true" ]; then
+    # we use reduce instead of all because jq 1.3 doesn't have the "all" function
+    if [ "$(curl "$DATANODE_ADDRESS/jmx?qry=Hadoop:service=DataNode,name=DataNodeInfo" | jq -r '.beans[0].NamenodeAddresses' | jq -r 'to_entries | reduce .[] as $item (true; . and ($item.value != null))')" == "true" ]; then
         echo "Name node addresses all have addresses, healthy"
         exit 0
     else
