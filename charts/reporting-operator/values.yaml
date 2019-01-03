@@ -114,9 +114,14 @@ spec:
     cookieSeed: ""
 
     createAuthProxyClusterRole: false
+
+    subjectAccessReviewPolicy: |-
+      {"group": "metering.openshift.io", "resource": "reports", "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}
+    delegateURLsPolicy: |-
+      {"/": {"group": "metering.openshift.io", "resource": "reports", "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}}
+
     subjectAccessReviewEnabled: false
     delegateURLsEnabled: false
-
     authenticatedEmailsSecretName: reporting-operator-auth-proxy-authenticated-emails
     authenticatedEmailsEnabled: false
     createAuthenticatedEmailsSecret: true
