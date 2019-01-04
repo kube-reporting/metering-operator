@@ -78,7 +78,7 @@ setOwnerOnReleaseConfigmaps(){
 cleanupOldReleaseConfigmaps() {
     if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
         echo "Getting list of helm release configmaps to delete"
-        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$RELEASE_CONFIGMAPS_FILE")"
+        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -r -c "$RELEASE_CONFIGMAPS_FILE")"
         if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
             echo "No release configmaps to delete yet"
         else
@@ -168,12 +168,12 @@ while true; do
     if [ -s "$HELM_RELEASES_FILE" ]; then
         while read -r release; do
             echo -E "$release" > "$CURRENT_RELEASE_FILE"
-            RELEASE_NAME="$(jq -Mcr '.metadata.name' "$CURRENT_RELEASE_FILE")"
-            RELEASE_UID="$(jq -Mcr '.metadata.uid' "$CURRENT_RELEASE_FILE")"
-            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
-            CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
+            RELEASE_NAME="$(jq -M -c -r '.metadata.name' "$CURRENT_RELEASE_FILE")"
+            RELEASE_UID="$(jq -M -c -r '.metadata.uid' "$CURRENT_RELEASE_FILE")"
+            RELEASE_API_VERSION="$(jq -M -c -r '.apiVersion' "$CURRENT_RELEASE_FILE")"
+            RELEASE_RESOURCE_VERSION="$(jq -M -c -r '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
+            RELEASE_VALUES="$(jq -M -c -r '.spec // empty' "$CURRENT_RELEASE_FILE")"
+            CHART_LOCATION="$(jq -M -c -r '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
 
             HELM_ARGS=()
             if [ -s "$EXTRA_VALUES_FILE" ]; then
@@ -211,7 +211,7 @@ while true; do
             fi
 
             checkExit
-        done < <(jq '.items[]' -Mcr "$HELM_RELEASES_FILE")
+        done < <(jq '.items[]' -M -c -r "$HELM_RELEASES_FILE")
 
         echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
         for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
