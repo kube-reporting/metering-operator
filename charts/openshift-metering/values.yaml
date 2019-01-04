@@ -17,6 +17,10 @@ permissions:
   reportingViewers: []
   reportExporters: []
 
+monitoring:
+  enabled: true
+  namespace: openshift-monitoring
+
 openshift-reporting:
   enabled: true
 

@@ -1,12 +1,12 @@
+{{- if .Values.monitoring.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: metering-presto
-  namespace: openshift-monitoring
-  labels:
-    k8s-app: metering-presto
+{{- block "extraMetadata" . }}
+{{- end }}
 spec:
-  jobLabel: k8s-app
+  jobLabel: app
   endpoints:
   - port: metrics
     interval: 30s
@@ -17,4 +17,5 @@ spec:
       metrics: "true"
   namespaceSelector:
     matchNames:
-    - openshift-metering
+    - {{ .Release.Namespace }}
+{{- end }}

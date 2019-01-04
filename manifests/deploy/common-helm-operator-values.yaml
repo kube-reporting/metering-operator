@@ -28,9 +28,15 @@ serviceAccountName: metering-operator
 rbac:
   roleName: metering-operator
   rules:
+  # grant access to metering resources
   - apiGroups: ["metering.openshift.io"]
     resources: ["*"]
     verbs: ["*"]
+  # grant access to monitoring resources for optional monitoring integration
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["*"]
+    verbs: ["*"]
+  # access to most core resources that can be created by metering
   - apiGroups:
     - ""
     resources:
