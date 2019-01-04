@@ -24,5 +24,11 @@ if [ "$METERING_INSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING" == "true" ]
         --dry-run -o json | kubectl replace -f -
 ***REMOVED***
 
+echo "Labeling namespace ${METERING_NAMESPACE} with 'openshift.io/cluster-monitoring=true'"
+kubectl label \
+    --overwrite \
+    namespace "${METERING_NAMESPACE}" \
+    "openshift.io/cluster-monitoring=true"
+
 export DEPLOY_PLATFORM=openshift
 "${ROOT_DIR}/hack/install.sh" "$@"

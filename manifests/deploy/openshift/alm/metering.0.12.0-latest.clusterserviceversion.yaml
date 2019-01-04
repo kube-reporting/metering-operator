@@ -38,6 +38,12 @@ spec:
             verbs:
             - '*'
           - apiGroups:
+            - monitoring.coreos.com
+            resources:
+            - '*'
+            verbs:
+            - '*'
+          - apiGroups:
             - ""
             resources:
             - pods
