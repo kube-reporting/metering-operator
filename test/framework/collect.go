@@ -2,6 +2,7 @@ package framework
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -37,7 +38,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, oper
 		}
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
-		collectEndpoint := "/api/v1/datasources/prometheus/collect"
+		collectEndpoint := fmt.Sprintf("/api/v1/datasources/prometheus/collect/%s", f.Namespace)
 		t.Logf("currentTime: %s", now)
 		t.Logf("querying %s, with startTime: %s endTime: %s", collectEndpoint, f.reportStart, f.reportEnd)
 		req := f.NewReportingOperatorSVCPOSTRequest(collectEndpoint, body)

@@ -19,7 +19,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	api "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -49,7 +49,6 @@ type server struct {
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportResultsGetter   prestostore.ReportResultsGetter
 
-	namespace                    string
 	reportLister                 listers.ReportLister
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister
 	prestoTableLister            listers.PrestoTableLister
@@ -69,7 +68,6 @@ func newRouter(
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo,
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
-	namespace string,
 	reportLister listers.ReportLister,
 	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
 	prestoTableLister listers.PrestoTableLister,
@@ -86,22 +84,17 @@ func newRouter(
 		collectorFunc:                collectorFunc,
 		prometheusMetricsRepo:        prometheusMetricsRepo,
 		reportResultsGetter:          reportResultsGetter,
-		namespace:                    namespace,
 		reportLister:                 reportLister,
 		reportGenerationQuerieLister: reportGenerationQuerieLister,
 		prestoTableLister:            prestoTableLister,
 	}
 
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{name}/full", srv.getReportV2FullHandler)
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{name}/table", srv.getReportV2TableHandler)
-	// The following two routes handle returning a 400 when the name parameter is missing, rather than having a 404 returned.
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"//full", srv.getReportV2NameMissingHandler)
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"//table", srv.getReportV2NameMissingHandler)
-
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
+	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
-	router.HandleFunc("/api/v1/datasources/prometheus/collect", srv.collectPromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/store/{datasourceName}", srv.storePromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{datasourceName}", srv.fetchPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/store/{namespace}/{datasourceName}", srv.storePromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{namespace}/{datasourceName}", srv.fetchPromsumDataHandler)
 
 	return router
 }
@@ -132,36 +125,38 @@ func (srv *server) validateGetReportReq(logger log.FieldLogger, requiredQueryPar
 
 func (srv *server) getReportV1Handler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
-	if !srv.validateGetReportReq(logger, []string{"name", "format"}, w, r) {
+	if !srv.validateGetReportReq(logger, []string{"name", "namespace", "format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, r.Form["name"][0], r.Form["format"][0], false, true, w, r)
+	srv.getReport(logger, r.Form["name"][0], r.Form["namespace"][0], r.Form["format"][0], false, true, w, r)
 }
 
 func (srv *server) getReportV2FullHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
+	namespace := chi.URLParam(r, "namespace")
+	if name == "" {
+		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
+		return
+	}
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, name, r.Form["format"][0], true, true, w, r)
+	srv.getReport(logger, name, namespace, r.Form["format"][0], true, true, w, r)
 }
 
 func (srv *server) getReportV2TableHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 	name := chi.URLParam(r, "name")
+	namespace := chi.URLParam(r, "namespace")
+	if name == "" {
+		writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
+		return
+	}
 	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
 		return
 	}
-	srv.getReport(logger, name, r.Form["format"][0], true, false, w, r)
-}
-
-func (srv *server) getReportV2NameMissingHandler(w http.ResponseWriter, r *http.Request) {
-	logger := newRequestLogger(srv.logger, r, srv.rand)
-	if !srv.validateGetReportReq(logger, []string{"format"}, w, r) {
-		return
-	}
-	writeErrorResponse(logger, w, r, http.StatusBadRequest, "the following fields are missing or empty: name")
+	srv.getReport(logger, name, namespace, r.Form["format"][0], true, false, w, r)
 }
 
 func checkForFields(fields []string, vals url.Values) error {
@@ -177,9 +172,9 @@ func checkForFields(fields []string, vals url.Values) error {
 	return nil
 }
 
-func (srv *server) getReport(logger log.FieldLogger, name, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
+func (srv *server) getReport(logger log.FieldLogger, name, namespace, format string, useNewFormat bool, full bool, w http.ResponseWriter, r *http.Request) {
 	// Get the report to make sure it hasn't failed
-	report, err := srv.reportLister.Reports(srv.namespace).Get(name)
+	report, err := srv.reportLister.Reports(namespace).Get(name)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if k8serrors.IsNotFound(err) {
@@ -206,7 +201,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Namespace, report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
@@ -237,7 +232,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, format string, useNew
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := reportingutil.ReportTableName(name)
+	tableName := reportingutil.ReportTableName(namespace, name)
 	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
@@ -497,6 +492,8 @@ type CollectPromsumDataResponse struct {
 func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
+	namespace := chi.URLParam(r, "namespace")
+
 	decoder := json.NewDecoder(r.Body)
 	var req CollectPromsumDataRequest
 	err := decoder.Decode(&req)
@@ -508,9 +505,9 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	start := req.StartTime.UTC()
 	end := req.EndTime.UTC()
 
-	logger.Debugf("collecting promsum data between %s and %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
+	logger.Debugf("collecting promsum data for ReportDataSources in namespace %s between %s and %s", namespace, start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	results, err := srv.collectorFunc(context.Background(), start, end)
+	results, err := srv.collectorFunc(context.Background(), namespace, start, end)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
 		return
@@ -527,6 +524,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	name := chi.URLParam(r, "datasourceName")
+	namespace := chi.URLParam(r, "namespace")
 
 	decoder := json.NewDecoder(r.Body)
 	var req StorePromsumDataRequest
@@ -536,7 +534,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(name), []*prestostore.PrometheusMetric(req))
+	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), []*prestostore.PrometheusMetric(req))
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
@@ -549,13 +547,14 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	name := chi.URLParam(r, "datasourceName")
+	namespace := chi.URLParam(r, "namespace")
 	err := r.ParseForm()
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode body: %v", err)
 		return
 	}
 
-	datasourceTable := reportingutil.DataSourceTableName(name)
+	datasourceTable := reportingutil.DataSourceTableName(namespace, name)
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 	var startTime, endTime time.Time

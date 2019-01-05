@@ -10,8 +10,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationLister) (*cbTypes.StorageLocation, error) {
-	storageLocations, err := lister.StorageLocations(op.cfg.Namespace).List(labels.Everything())
+func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*cbTypes.StorageLocation, error) {
+	storageLocations, err := lister.StorageLocations(namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
@@ -37,24 +37,24 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 
 }
 
-func (op *Reporting) getStorageSpec(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (cbTypes.StorageLocationSpec, error) {
+func (op *Reporting) getStorageSpec(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind, namespace string) (cbTypes.StorageLocationSpec, error) {
 	storageLister := op.storageLocationLister
 	var storageSpec cbTypes.StorageLocationSpec
 	// Nothing specified, try to use default storage location
 	if storage == nil || (storage.StorageSpec == nil && storage.StorageLocationName == "") {
-		logger.Debugf("%s storage does not have a spec or storageLocationName set, getting default storage location", kind)
-		storageLocation, err := op.getDefaultStorageLocation(storageLister)
+		logger.Debugf("%s storage does not have a spec or storageLocationName set, getting default storage location in namespace %s", kind, namespace)
+		storageLocation, err := op.getDefaultStorageLocation(storageLister, namespace)
 		if err != nil {
 			return storageSpec, err
 		}
 		if storageLocation == nil {
-			return storageSpec, fmt.Errorf("invalid %s, storage spec or storageLocationName not set and cluster has no default StorageLocation", kind)
+			return storageSpec, fmt.Errorf("invalid %s, storage spec or storageLocationName not set and namespace %s has no default StorageLocation", kind, namespace)
 		}
 
 		storageSpec = storageLocation.Spec
 	} else if storage.StorageLocationName != "" { // Specific storage location specified
 		logger.Debugf("%s configured to use StorageLocation %s", kind, storage.StorageLocationName)
-		storageLocation, err := storageLister.StorageLocations(op.cfg.Namespace).Get(storage.StorageLocationName)
+		storageLocation, err := storageLister.StorageLocations(namespace).Get(storage.StorageLocationName)
 		if err != nil {
 			return storageSpec, err
 		}
@@ -65,8 +65,8 @@ func (op *Reporting) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 	return storageSpec, nil
 }
 
-func (op *Reporting) getHiveTableProperties(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind string) (*hive.TableProperties, error) {
-	storageSpec, err := op.getStorageSpec(logger, storage, kind)
+func (op *Reporting) getHiveTableProperties(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, kind, namespace string) (*hive.TableProperties, error) {
+	storageSpec, err := op.getStorageSpec(logger, storage, kind, namespace)
 	if err != nil {
 		return nil, err
 	}

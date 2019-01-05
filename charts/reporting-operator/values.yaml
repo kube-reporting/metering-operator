@@ -29,9 +29,11 @@ spec:
     logDDLQueries: "false"
     logDMLQueries: "false"
     disablePromsum: "false"
-    enableFinalizers: "false"
 
+    enableFinalizers: "false"
     leaderLeaseDuration: "60s"
+    allNamespaces: false
+    targetNamespaces: []
 
     tls:
       enabled: false

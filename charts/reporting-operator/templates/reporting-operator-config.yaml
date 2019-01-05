@@ -11,16 +11,38 @@ data:
   log-reports: {{ .Values.spec.config.logReports | quote}}
   log-ddl-queries: {{ .Values.spec.config.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.spec.config.logDMLQueries | quote}}
-  disable-promsum: {{ .Values.spec.config.disablePromsum | quote}}
-  enable-finalizers: {{ .Values.spec.config.enableFinalizers | quote}}
-  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" .Values.spec.config.prometheusURL | quote}}
-  promsum-poll-interval: {{ .Values.spec.config.promsumPollInterval | quote}}
-  promsum-chunk-size: {{ .Values.spec.config.promsumChunkSize | quote}}
-  promsum-step-size: {{ .Values.spec.config.promsumStepSize | quote}}
-  leader-lease-duration: {{ .Values.spec.config.leaderLeaseDuration | quote }}
   presto-host: {{ .Values.spec.config.prestoHost | quote }}
   hive-host: {{ .Values.spec.config.hiveHost | quote }}
+  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" .Values.spec.config.prometheusURL | quote}}
+  disable-promsum: {{ .Values.spec.config.disablePromsum | quote}}
+  enable-finalizers: {{ .Values.spec.config.enableFinalizers | quote}}
+{{- if .Values.spec.config.promsumPollInterval }}
+  promsum-poll-interval: {{ .Values.spec.config.promsumPollInterval | quote}}
+{{- end }}
+{{- if .Values.spec.config.promsumChunkSize }}
+  promsum-chunk-size: {{ .Values.spec.config.promsumChunkSize | quote}}
+{{- end }}
+{{- if .Values.spec.config.promsumStepSize }}
+  promsum-step-size: {{ .Values.spec.config.promsumStepSize | quote}}
+{{- end }}
+{{- if .Values.spec.config.leaderLeaseDuration }}
+  leader-lease-duration: {{ .Values.spec.config.leaderLeaseDuration | quote }}
+{{- end }}
+{{- if .Values.spec.config.prestoMaxQueryLength }}
   presto-max-query-length: {{ .Values.spec.config.prestoMaxQueryLength | quote }}
+{{- end }}
+{{- if .Values.spec.config.prometheusDatasourceMaxQueryRangeDuration }}
   prometheus-datasource-max-query-range-duration: {{ .Values.spec.config.prometheusDatasourceMaxQueryRangeDuration | quote }}
+{{- end }}
+{{- if .Values.spec.config.prometheusDatasourceMaxImportBackfillDuration }}
   prometheus-datasource-max-import-backfill-duration: {{ .Values.spec.config.prometheusDatasourceMaxImportBackfillDuration | quote }}
+{{- end }}
+{{- if .Values.spec.config.prometheusDatasourceImportFrom }}
   prometheus-datasource-import-from: {{ .Values.spec.config.prometheusDatasourceImportFrom | quote }}
+{{- end }}
+{{- if .Values.spec.config.allNamespaces }}
+  all-namespaces: {{ .Values.spec.config.allNamespaces | quote }}
+{{- end }}
+{{- if .Values.spec.config.targetNamespaces }}
+  target-namespaces: {{ .Values.spec.config.targetNamespaces | join "," | quote }}
+{{- end }}
