@@ -1,11 +1,12 @@
-#! validate-crd: ../../deploy/chart/templates/03-clusterserviceversion.crd.yaml
+#! validate-crd: deploy/chart/templates/0000_30_02-clusterserviceversion.crd.yaml
 #! parse-kind: ClusterServiceVersion
 apiVersion: app.coreos.com/v1alpha1
-kind: ClusterServiceVersion-v1
+kind: ClusterServiceVersion
 metadata:
   name: {{ .Values.name }}
   annotations:
 {{ toYaml .Values.annotations | indent 4 }}
+  namespace: placeholder
   labels:
 {{ toYaml .Values.labels | indent 4 }}
 spec:
@@ -23,6 +24,8 @@ spec:
   selector:
     matchLabels:
 {{ toYaml .Values.spec.matchLabels | indent 6 }}
+  installModes:
+{{ toYaml  .Values.spec.installModes | indent 2 }}
   install:
     strategy: deployment
     spec:

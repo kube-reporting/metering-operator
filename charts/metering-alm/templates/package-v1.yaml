@@ -1,4 +1,0 @@
-#! package-manifest: ../../catalog_resources/components/{{ .Values.packageName }}.{{ .Values.spec.version }}.clusterserviceversion.yaml
-packageName: {{ .Values.packageName }}
-channels:
-{{ toYaml .Values.channels }}

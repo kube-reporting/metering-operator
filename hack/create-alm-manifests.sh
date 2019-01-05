@@ -136,7 +136,7 @@ TMP_CSV="$TMPDIR/metering.clusterserviceversion.yaml"
 helm template "$CHART" \
     -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
-    -x "templates/clusterserviceversion-v1.yaml" \
+    -x "templates/clusterserviceversion.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$TMP_CSV"
 
@@ -149,7 +149,7 @@ PACKAGE_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.package.yaml"
 helm template "$CHART" \
     -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
-    -x "templates/package-v1.yaml" \
+    -x "templates/package.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
@@ -157,6 +157,6 @@ SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
 helm template "$CHART" \
     -f "$TMPDIR/alm-values.yaml" \
     "${VALUES_ARGS[@]}" \
-    -x "templates/subscription-v1.yaml" \
+    -x "templates/subscription.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$SUBSCRIPTION_MANIFEST_DESTINATION"
