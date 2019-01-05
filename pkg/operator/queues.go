@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/prestodb/presto-go-client/presto"
 	log "github.com/sirupsen/logrus"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -27,7 +28,7 @@ func (op *Reporting) addReport(obj interface{}) {
 		op.deleteReport(report)
 		return
 	}
-	op.logger.Infof("adding Report %s", report.Name)
+	op.logger.Infof("adding Report %s/%s", report.Namespace, report.Name)
 	op.enqueueReport(report)
 }
 
@@ -43,16 +44,16 @@ func (op *Reporting) updateReport(prev, cur interface{}) {
 		// Periodic resyncs will send update events for all known Reports.
 		// Two different versions of the same report will always have
 		// different ResourceVersions.
-		op.logger.Debugf("Report %s resourceVersion is unchanged, skipping update", curReport.Name)
+		op.logger.Debugf("Report %s/%s resourceVersion is unchanged, skipping update", curReport.Namespace, curReport.Name)
 		return
 	}
 
 	if reflect.DeepEqual(prevReport.Spec, curReport.Spec) {
-		op.logger.Debugf("Report %s spec is unchanged, skipping update", curReport.Name)
+		op.logger.Debugf("Report %s/%s spec is unchanged, skipping update", curReport.Namespace, curReport.Name)
 		return
 	}
 
-	op.logger.Infof("updating Report %s", curReport.Name)
+	op.logger.Infof("updating Report %s/%s", curReport.Namespace, curReport.Name)
 	op.enqueueReport(curReport)
 }
 
@@ -61,18 +62,18 @@ func (op *Reporting) deleteReport(obj interface{}) {
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
-			op.logger.WithField("report", report.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
 		report, ok = tombstone.Obj.(*cbTypes.Report)
 		if !ok {
-			op.logger.WithField("report", report.Name).Errorf("Tombstone contained object that is not a Report %#v", obj)
+			op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace}).Errorf("Tombstone contained object that is not a Report %#v", obj)
 			return
 		}
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(report)
 	if err != nil {
-		op.logger.WithField("report", report.Name).WithError(err).Errorf("couldn't get key for object: %#v", report)
+		op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", report)
 		return
 	}
 	op.reportQueue.Add(key)
@@ -102,7 +103,7 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 		op.deleteReportDataSource(ds)
 		return
 	}
-	op.logger.Infof("adding ReportDataSource %s", ds.Name)
+	op.logger.Infof("adding ReportDataSource %s/%s", ds.Namespace, ds.Name)
 	op.enqueueReportDataSource(ds)
 }
 
@@ -129,7 +130,7 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 		}
 	}
 
-	op.logger.Infof("updating ReportDataSource %s", curReportDataSource.Name)
+	op.logger.Infof("updating ReportDataSource %s/%s", curReportDataSource.Namespace, curReportDataSource.Name)
 	op.enqueueReportDataSource(curReportDataSource)
 }
 
@@ -138,18 +139,18 @@ func (op *Reporting) deleteReportDataSource(obj interface{}) {
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
-			op.logger.WithField("reportDataSource", dataSource.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			op.logger.WithFields(log.Fields{"reportDataSsource": dataSource.Name, "namespace": dataSource.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
 		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
 		if !ok {
-			op.logger.WithField("reportDataSource", dataSource.Name).Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
+			op.logger.WithFields(log.Fields{"reportDataSsource": dataSource.Name, "namespace": dataSource.Namespace}).Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
 			return
 		}
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(dataSource)
 	if err != nil {
-		op.logger.WithField("reportDataSource", dataSource.Name).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
+		op.logger.WithFields(log.Fields{"reportDataSsource": dataSource.Name, "namespace": dataSource.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", dataSource)
 		return
 	}
 	op.reportDataSourceQueue.Add(key)
@@ -158,7 +159,7 @@ func (op *Reporting) deleteReportDataSource(obj interface{}) {
 func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
-		op.logger.WithField("reportDataSource", ds.Name).WithError(err).Errorf("couldn't get key for object: %#v", ds)
+		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
 		return
 	}
 	op.reportDataSourceQueue.Add(key)
@@ -167,41 +168,42 @@ func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
 func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
-		op.logger.WithField("reportDataSource", ds.Name).WithError(err).Errorf("couldn't get key for object: %#v", ds)
+		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
 		return
 	}
 	op.reportDataSourceQueue.AddAfter(key, duration)
 }
 
 func (op *Reporting) addReportGenerationQuery(obj interface{}) {
-	report := obj.(*cbTypes.ReportGenerationQuery)
-	op.logger.Infof("adding ReportGenerationQuery %s", report.Name)
-	op.enqueueReportGenerationQuery(report)
+	query := obj.(*cbTypes.ReportGenerationQuery)
+	op.logger.Infof("adding ReportGenerationQuery %s/%s", query.Namespace, query.Name)
+	op.enqueueReportGenerationQuery(query)
 }
 
 func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 	curReportGenerationQuery := cur.(*cbTypes.ReportGenerationQuery)
 	prevReportGenerationQuery := prev.(*cbTypes.ReportGenerationQuery)
+	logger := op.logger.WithFields(log.Fields{"reportGenerationQuery": curReportGenerationQuery.Name, "namespace": curReportGenerationQuery.Namespace})
 
 	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
 		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
 		// Two different versions of the same reportGenerationQuery will always have
 		// different ResourceVersions.
-		op.logger.Debugf("ReportGenerationQuery resourceVersion %s is unchanged, skipping update", curReportGenerationQuery.Name)
+		logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
 		return
 	}
 	if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
-		op.logger.Debugf("ReportGenerationQuery %s spec is unchanged, skipping update", curReportGenerationQuery.Name)
+		logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
 	}
 
-	op.logger.Infof("updating ReportGenerationQuery %s", curReportGenerationQuery.Name)
+	logger.Infof("updating ReportGenerationQuery %s/%s", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
 	op.enqueueReportGenerationQuery(curReportGenerationQuery)
 }
 
 func (op *Reporting) enqueueReportGenerationQuery(query *cbTypes.ReportGenerationQuery) {
 	key, err := cache.MetaNamespaceKeyFunc(query)
 	if err != nil {
-		op.logger.WithField("reportGenerationQuery", query.Name).WithError(err).Errorf("couldn't get key for object: %#v", query)
+		op.logger.WithFields(log.Fields{"reportGenerationQuery": query.Name, "namespace": query.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", query)
 		return
 	}
 	op.reportGenerationQueryQueue.Add(key)
@@ -213,7 +215,8 @@ func (op *Reporting) addPrestoTable(obj interface{}) {
 		op.deletePrestoTable(table)
 		return
 	}
-	op.logger.Infof("adding PrestoTable %s", table.Name)
+	logger := op.logger.WithFields(log.Fields{"prestoTable": table.Name, "namespace": table.Namespace})
+	logger.Infof("adding PrestoTable %s/%s", table.Namespace, table.Name)
 	op.enqueuePrestoTable(table)
 }
 
@@ -223,7 +226,8 @@ func (op *Reporting) updatePrestoTable(_, cur interface{}) {
 		op.deletePrestoTable(curPrestoTable)
 		return
 	}
-	op.logger.Infof("updating PrestoTable %s", curPrestoTable.Name)
+	logger := op.logger.WithFields(log.Fields{"prestoTable": curPrestoTable.Name, "namespace": curPrestoTable.Namespace})
+	logger.Infof("updating PrestoTable %s/%s", curPrestoTable.Namespace, curPrestoTable.Name)
 	op.enqueuePrestoTable(curPrestoTable)
 }
 
@@ -232,12 +236,12 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
-			op.logger.WithField("prestoTable", prestoTable.Name).Errorf("Couldn't get object from tombstone %#v", obj)
+			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
 		prestoTable, ok = tombstone.Obj.(*cbTypes.PrestoTable)
 		if !ok {
-			op.logger.WithField("prestoTable", prestoTable.Name).Errorf("Tombstone contained object that is not a PrestoTable %#v", obj)
+			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).Errorf("Tombstone contained object that is not a PrestoTable %#v", obj)
 			return
 		}
 	}
@@ -250,7 +254,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(prestoTable)
 	if err != nil {
-		op.logger.WithField("prestoTable", prestoTable.Name).WithError(err).Errorf("couldn't get key for object: %#v", prestoTable)
+		op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", prestoTable)
 		return
 	}
 	op.prestoTableQueue.Add(key)
@@ -259,7 +263,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 	key, err := cache.MetaNamespaceKeyFunc(table)
 	if err != nil {
-		op.logger.WithField("prestoTable", table.Name).WithError(err).Errorf("couldn't get key for object: %#v", table)
+		op.logger.WithFields(log.Fields{"prestoTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
 		return
 	}
 	op.prestoTableQueue.Add(key)
@@ -327,4 +331,54 @@ func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string
 
 	queue.Forget(obj)
 	logger.WithError(err).Infof("error syncing %s %q, dropping out of the queue", objType, obj)
+}
+
+// inTargetNamespaceEventHandlerFunc wraps a cache.ResourceEventHandler and
+// only runs the wrapped handler if the resource is listed in targetNamespaces.
+type inTargetNamespaceResourceEventHandler struct {
+	handler          cache.ResourceEventHandler
+	targetNamespaces []string
+}
+
+func (handler *inTargetNamespaceResourceEventHandler) inTargetNamespace(obj interface{}) bool {
+	metav1Obj, ok := obj.(metav1.Object)
+	if !ok {
+		return false
+	}
+
+	for _, targetNS := range handler.targetNamespaces {
+		if metav1Obj.GetNamespace() == targetNS {
+			return true
+		}
+	}
+	return false
+}
+
+func (handler *inTargetNamespaceResourceEventHandler) OnAdd(obj interface{}) {
+	if handler.inTargetNamespace(obj) {
+		handler.handler.OnAdd(obj)
+	}
+}
+
+func (handler *inTargetNamespaceResourceEventHandler) OnUpdate(oldObj, newObj interface{}) {
+	if handler.inTargetNamespace(oldObj) && handler.inTargetNamespace(newObj) {
+		handler.handler.OnUpdate(oldObj, newObj)
+	}
+}
+
+func (handler *inTargetNamespaceResourceEventHandler) OnDelete(obj interface{}) {
+	if handler.inTargetNamespace(obj) {
+		handler.handler.OnDelete(obj)
+	}
+}
+
+// newInTargetNamespaceEventHandler returns an
+// inTargetNamespaceResourceEventHandler to wrap the given handler. If
+// targetNamespaces is empty, then it returns the original eventHandler
+// unmodi***REMOVED***ed.
+func newInTargetNamespaceEventHandler(handler cache.ResourceEventHandler, targetNamespaces []string) cache.ResourceEventHandler {
+	if len(targetNamespaces) == 0 {
+		return handler
+	}
+	return &inTargetNamespaceResourceEventHandler{handler: handler, targetNamespaces: targetNamespaces}
 }

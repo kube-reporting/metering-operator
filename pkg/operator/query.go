@@ -33,7 +33,7 @@ func (op *Reporting) syncReportGenerationQuery(logger log.FieldLogger, key strin
 		return nil
 	}
 
-	logger = logger.WithField("ReportGenerationQuery", name)
+	logger = logger.WithFields(log.Fields{"reportGenerationQuery": name, "namespace": namespace})
 
 	reportGenerationQueryLister := op.reportGenerationQueryLister
 	reportGenerationQuery, err := reportGenerationQueryLister.ReportGenerationQueries(namespace).Get(name)
@@ -55,7 +55,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		logger.Infof("ReportGenerationQuery has spec.view.disabled=true, skipping view creation")
 	} ***REMOVED*** if generationQuery.Status.ViewName == "" {
 		logger.Infof("new ReportGenerationQuery discovered")
-		viewName = reportingutil.GenerationQueryViewName(generationQuery.Name)
+		viewName = reportingutil.GenerationQueryViewName(generationQuery.Namespace, generationQuery.Name)
 		createView = true
 	} ***REMOVED*** {
 		logger.Infof("existing ReportGenerationQuery discovered, viewName: %s", generationQuery.Status.ViewName)
@@ -97,7 +97,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 			DynamicDependentQueries: queryDependencies.DynamicReportGenerationQueries,
 			Report:                  nil,
 		}
-		renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, tmplCtx)
+		renderedQuery, err := reporting.RenderQuery(generationQuery.Spec.Query, generationQuery.Namespace, tmplCtx)
 		if err != nil {
 			return err
 		}

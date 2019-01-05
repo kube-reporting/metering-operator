@@ -12,20 +12,20 @@ import (
 
 var resourceNameReplacer = strings.NewReplacer("-", "_", ".", "_")
 
-func DataSourceTableName(dataSourceName string) string {
-	return fmt.Sprintf("datasource_%s", resourceNameReplacer.Replace(dataSourceName))
+func DataSourceTableName(namespace, dataSourceName string) string {
+	return fmt.Sprintf("datasource_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(dataSourceName))
 }
 
-func ReportTableName(reportName string) string {
-	return fmt.Sprintf("report_%s", resourceNameReplacer.Replace(reportName))
+func ReportTableName(namespace, reportName string) string {
+	return fmt.Sprintf("report_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(reportName))
 }
 
-func GenerationQueryViewName(queryName string) string {
-	return fmt.Sprintf("view_%s", resourceNameReplacer.Replace(queryName))
+func GenerationQueryViewName(namespace, queryName string) string {
+	return fmt.Sprintf("view_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(queryName))
 }
 
-func PrestoTableResourceNameFromKind(kind, name string) string {
-	return strings.ToLower(fmt.Sprintf("%s-%s", kind, name))
+func PrestoTableResourceNameFromKind(kind, namespace, name string) string {
+	return strings.ToLower(fmt.Sprintf("%s-%s-%s", kind, namespace, name))
 }
 
 func BillingPeriodTimestamp(date time.Time) string {

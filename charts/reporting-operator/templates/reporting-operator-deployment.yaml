@@ -103,16 +103,19 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: promsum-poll-interval
+              optional: true
         - name: REPORTING_OPERATOR_PROMSUM_CHUNK_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: promsum-chunk-size
+              optional: true
         - name: REPORTING_OPERATOR_PROMSUM_STEP_SIZE
           valueFrom:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: promsum-step-size
+              optional: true
         - name: REPORTING_OPERATOR_DISABLE_PROMSUM
           valueFrom:
             con***REMOVED***gMapKeyRef:
@@ -184,6 +187,18 @@ spec:
         - name: REPORTING_OPERATOR_METRICS_USE_TLS
           value: "true"
 {{- end }}
+        - name: REPORTING_OPERATOR_ALL_NAMESPACES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: all-namespaces
+              optional: true
+        - name: REPORTING_OPERATOR_TARGET_NAMESPACES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: target-namespaces
+              optional: true
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
         ports:

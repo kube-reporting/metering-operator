@@ -15,7 +15,7 @@ import (
 )
 
 func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Object, gvk schema.GroupVersionKind, storage *cbTypes.StorageLocationRef, tableName string, columns, partitions []hive.Column) error {
-	tableProperties, err := op.getHiveTableProperties(logger, storage, gvk.Kind)
+	tableProperties, err := op.getHiveTableProperties(logger, storage, gvk.Kind, obj.GetNamespace())
 	if err != nil {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s %s, err: %v", gvk, obj.GetName(), err)
 	}
@@ -28,8 +28,8 @@ func (op *Reporting) createTableForStorage(logger log.FieldLogger, obj metav1.Ob
 	return op.createTableWith(logger, obj, gvk, tableParams, *tableProperties)
 }
 
-func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName string, columns []hive.Column) error {
-	tableProperties, err := op.getHiveTableProperties(logger, storage, tableName)
+func (op *Reporting) createTableForStorageNoCR(logger log.FieldLogger, storage *cbTypes.StorageLocationRef, tableName, namespace string, columns []hive.Column) error {
+	tableProperties, err := op.getHiveTableProperties(logger, storage, tableName, namespace)
 	if err != nil {
 		return fmt.Errorf("storage incorrectly con***REMOVED***gured for %s, err: %v", tableName, err)
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rob***REMOVED***g/cron"
 	log "github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
@@ -25,7 +25,7 @@ const (
 )
 
 var (
-	reportPrometheusMetricLabels = []string{"report", "reportgenerationquery", "table_name"}
+	reportPrometheusMetricLabels = []string{"report", "namespace", "reportgenerationquery", "table_name"}
 
 	generateReportTotalCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -77,11 +77,11 @@ func (op *Reporting) syncReport(logger log.FieldLogger, key string) error {
 		return nil
 	}
 
-	logger = logger.WithField("Report", name)
+	logger = logger.WithFields(log.Fields{"report": name, "namespace": namespace})
 	report, err := op.reportLister.Reports(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			logger.Infof("Report %s does not exist anymore, stopping and removing any running jobs for Report", name)
+			logger.Infof("report %s/%s does not exist anymore, stopping and removing any running jobs for Report", namespace, name)
 			return nil
 		}
 		return err
@@ -371,7 +371,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return err
 	}
 
-	tableName := reportingutil.ReportTableName(report.Name)
+	tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
 	// if tableName isn't set, this report is still new and we should make sure
 	// no tables exist already in case of a previously failed cleanup.
 	if report.Status.TableName == "" {
@@ -398,6 +398,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
+		"namespace":             report.Namespace,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
 		"table_name":            tableName,
 	}
@@ -410,6 +411,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	generateReportStart := op.clock.Now()
 	err = op.reportGenerator.GenerateReport(
 		tableName,
+		report.Namespace,
 		&reportPeriod.periodStart,
 		&reportPeriod.periodEnd,
 		genQuery,
@@ -533,7 +535,7 @@ func convertDayOfWeek(dow string) (int, error) {
 func (op *Reporting) addReportFinalizer(report *cbTypes.Report) (*cbTypes.Report, error) {
 	report.Finalizers = append(report.Finalizers, reportFinalizer)
 	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
-	logger := op.logger.WithField("Report", report.Name)
+	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 		return nil, err
@@ -548,7 +550,7 @@ func (op *Reporting) removeReportFinalizer(report *cbTypes.Report) (*cbTypes.Rep
 	}
 	report.Finalizers = slice.RemoveString(report.Finalizers, reportFinalizer, nil)
 	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
-	logger := op.logger.WithField("Report", report.Name)
+	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
 		return nil, err
@@ -599,7 +601,7 @@ func (op *Reporting) updateReportStatusRunning(report *cbTypes.Report, reason, m
 }
 
 func (op *Reporting) setReportStatusValidationFailure(report *cbTypes.Report, msg string) error {
-	logger := op.logger.WithField("Report", report.Name)
+	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	failureCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportFailure)
 	previouslyFailedValidation := failureCond != nil && failureCond.Status == v1.ConditionTrue && failureCond.Reason == cbutil.FailedValidationReason
 

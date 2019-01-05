@@ -11,16 +11,38 @@ data:
   log-reports: {{ .Values.spec.con***REMOVED***g.logReports | quote}}
   log-ddl-queries: {{ .Values.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ .Values.spec.con***REMOVED***g.logDMLQueries | quote}}
-  disable-promsum: {{ .Values.spec.con***REMOVED***g.disablePromsum | quote}}
-  enable-***REMOVED***nalizers: {{ .Values.spec.con***REMOVED***g.enableFinalizers | quote}}
-  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
-  promsum-poll-interval: {{ .Values.spec.con***REMOVED***g.promsumPollInterval | quote}}
-  promsum-chunk-size: {{ .Values.spec.con***REMOVED***g.promsumChunkSize | quote}}
-  promsum-step-size: {{ .Values.spec.con***REMOVED***g.promsumStepSize | quote}}
-  leader-lease-duration: {{ .Values.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
   presto-host: {{ .Values.spec.con***REMOVED***g.prestoHost | quote }}
   hive-host: {{ .Values.spec.con***REMOVED***g.hiveHost | quote }}
+  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
+  disable-promsum: {{ .Values.spec.con***REMOVED***g.disablePromsum | quote}}
+  enable-***REMOVED***nalizers: {{ .Values.spec.con***REMOVED***g.enableFinalizers | quote}}
+{{- if .Values.spec.con***REMOVED***g.promsumPollInterval }}
+  promsum-poll-interval: {{ .Values.spec.con***REMOVED***g.promsumPollInterval | quote}}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.promsumChunkSize }}
+  promsum-chunk-size: {{ .Values.spec.con***REMOVED***g.promsumChunkSize | quote}}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.promsumStepSize }}
+  promsum-step-size: {{ .Values.spec.con***REMOVED***g.promsumStepSize | quote}}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.leaderLeaseDuration }}
+  leader-lease-duration: {{ .Values.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prestoMaxQueryLength }}
   presto-max-query-length: {{ .Values.spec.con***REMOVED***g.prestoMaxQueryLength | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusDatasourceMaxQueryRangeDuration }}
   prometheus-datasource-max-query-range-duration: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceMaxQueryRangeDuration | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusDatasourceMaxImportBack***REMOVED***llDuration }}
   prometheus-datasource-max-import-back***REMOVED***ll-duration: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceMaxImportBack***REMOVED***llDuration | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusDatasourceImportFrom }}
   prometheus-datasource-import-from: {{ .Values.spec.con***REMOVED***g.prometheusDatasourceImportFrom | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.allNamespaces }}
+  all-namespaces: {{ .Values.spec.con***REMOVED***g.allNamespaces | quote }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.targetNamespaces }}
+  target-namespaces: {{ .Values.spec.con***REMOVED***g.targetNamespaces | join "," | quote }}
+{{- end }}

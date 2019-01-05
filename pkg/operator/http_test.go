@@ -31,20 +31,20 @@ import (
 var (
 	testRandSeed               = rand.NewSource(0)
 	testRand                   = rand.New(testRandSeed)
-	noopPrometheusImporterFunc = func(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error) {
+	noopPrometheusImporterFunc = func(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error) {
 		return nil, nil
 	}
 	testLogger = logrus.New()
 )
 
 //for v2 endpoints full
-func apiReportV2URLFull(reportName string) string {
-	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, reportName, "full")
+func apiReportV2URLFull(namespace, reportName string) string {
+	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, namespace, reportName, "full")
 }
 
 //for v2 endpoints TableHidden
-func apiReportV2URLTable(reportName string) string {
-	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, reportName, "table")
+func apiReportV2URLTable(namespace, reportName string) string {
+	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, namespace, reportName, "table")
 }
 
 type fakePrometheusMetricsRepo struct {
@@ -301,7 +301,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
 				reportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
@@ -311,8 +311,9 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// we hardcode format to JSON because validating CSV output is a
 			// bit trickier than JSON
 			params := url.Values{
-				"format": []string{"json"},
-				"name":   []string{tt.reportName},
+				"format":    []string{"json"},
+				"name":      []string{tt.reportName},
+				"namespace": []string{namespace},
 			}
 
 			endpoint := server.URL + APIV1ReportsGetEndpoint
@@ -385,7 +386,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -435,7 +436,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -466,7 +467,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -498,7 +499,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:            "doesnt-exist",
-			apiPath:               apiReportV2URLFull("doesnt-exist") + testFormat,
+			apiPath:               apiReportV2URLFull(namespace, "doesnt-exist") + testFormat,
 			expectedStatusCode:    http.StatusNotFound,
 			expectedAPIError:      "not found",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -506,7 +507,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-name-not-speci***REMOVED***ed": {
 			reportName:            "",
-			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "//full" + testFormat,
+			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "/ " + namespace + "//full" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -515,7 +516,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"report-format-not-speci***REMOVED***ed": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:               apiReportV2URLFull(testReportName),
+			apiPath:               apiReportV2URLFull(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -524,7 +525,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"report-format-non-existent": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:               apiReportV2URLFull(testReportName) + "?format=doesntexist",
+			apiPath:               apiReportV2URLFull(namespace, testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -533,7 +534,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLFull(testReportName) + testFormat,
+			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -600,7 +601,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
 				reportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
@@ -667,7 +668,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -719,7 +720,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -750,7 +751,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-***REMOVED***nished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -782,7 +783,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"non-existent-report": {
 			reportName:            "doesnt-exist",
-			apiPath:               apiReportV2URLTable("doesnt-exist") + testFormat,
+			apiPath:               apiReportV2URLTable(namespace, "doesnt-exist") + testFormat,
 			expectedStatusCode:    http.StatusNotFound,
 			expectedAPIError:      "not found",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -790,7 +791,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-name-not-speci***REMOVED***ed": {
 			reportName:            "",
-			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "//table" + testFormat,
+			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "/ " + namespace + "//table" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -799,7 +800,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-format-not-speci***REMOVED***ed": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:               apiReportV2URLTable(testReportName),
+			apiPath:               apiReportV2URLTable(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: format",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -808,7 +809,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"report-format-non-existent": {
 			reportName:            testReportName,
 			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:               apiReportV2URLTable(testReportName) + "?format=doesntexist",
+			apiPath:               apiReportV2URLTable(namespace, testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -817,7 +818,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
-			apiPath:    apiReportV2URLTable(testReportName) + testFormat,
+			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name:        "timestamp",
@@ -884,7 +885,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc, namespace,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
 				reportLister, reportGenerationQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
