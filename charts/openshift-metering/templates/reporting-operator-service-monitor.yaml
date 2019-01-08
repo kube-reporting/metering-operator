@@ -1,19 +1,19 @@
+{{- if .Values.monitoring.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: metering-reporting-operator
-  namespace: openshift-monitoring
-  labels:
-    k8s-app: metering-reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
 spec:
-  jobLabel: k8s-app
+  jobLabel: app
   endpoints:
   - port: metrics
     scheme: "https"
     interval: 30s
     tlsConfig:
-      caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-      serverName: reporting-operator-metrics.openshift-metering.svc
+      caFile: /etc/prometheus/configmaps/serving-certs-ca-bundle/service-ca.crt
+      serverName: reporting-operator-metrics.{{ .Release.Namespace }}.svc
     bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
   selector:
     matchLabels:
@@ -21,4 +21,5 @@ spec:
       metrics: "true"
   namespaceSelector:
     matchNames:
-    - openshift-metering
+    - {{ .Release.Namespace }}
+{{- end }}
