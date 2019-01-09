@@ -40,7 +40,8 @@ export METERING_CREATE_PULL_SECRET
 : "${CUR_DATE:=$(date +%s)}"
 
 HELM_ARGS=(\
-    --set "enableAwsBilling=$ENABLE_AWS_BILLING" \
+    --set "deployTag=${DEPLOY_TAG}" \
+    --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
     --set "disablePromsum=${DISABLE_PROMSUM}" \
     --set "awsAccessKeyId=${AWS_ACCESS_KEY_ID}" \
     --set "awsSecretAccessKey=${AWS_SECRET_ACCESS_KEY}" \
