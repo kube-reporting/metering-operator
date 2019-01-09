@@ -5,23 +5,32 @@ set -o pipefail
 
 ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
 
-TMP="$(mktemp -d)"
-trap "rm -rf $TMP" EXIT SIGINT
-
-export MANIFEST_OUTPUT_DIR="$TMP"
-if [[ -n "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES-}" && -n "${CUSTOM_ALM_OVERRIDE_VALUES-}" ]]; then
-    "$ROOT_DIR/hack/create-metering-manifests.sh"
-else
-    if [ $# -lt 2 ]; then
-        echo "Usage: $0 [metering-operator-image-tag] [install-script] [args]"
-        echo "Must specify at least two args, metering-operator image tag, and the install script to run"
-        exit 1
-    fi
-
-    HELM_OPERATOR_IMAGE_TAG="$1"
+IMAGE_TAG=""
+if [ -n "$1" ]; then
+    IMAGE_TAG="$1"
+    echo "using $1 as metering-helm-operator image tag"
     shift
-    "$ROOT_DIR/hack/create-metering-manifests.sh" "$HELM_OPERATOR_IMAGE_TAG"
 fi
 
-export DEPLOY_MANIFESTS_DIR="$TMP"
+export METERING_OPERATOR_IMAGE="${METERING_OPERATOR_IMAGE:-"quay.io/coreos/metering-helm-operator"}"
+export METERING_OPERATOR_IMAGE_TAG="${METERING_OPERATOR_IMAGE_TAG:-$IMAGE_TAG}"
+
+if [ -z "$METERING_OPERATOR_IMAGE_TAG" ]; then
+    echo "Must pass IMAGE_TAG as first argument, or set \$METERING_OPERATOR_IMAGE_TAG"
+    exit 1
+fi
+
+TMPDIR="$(mktemp -d)"
+trap "rm -rf $TMPDIR" EXIT SIGINT
+
+export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-values.yaml"
+"$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
+
+export CUSTOM_ALM_OVERRIDE_VALUES="$TMPDIR/override-alm-values.yaml"
+"$ROOT_DIR/hack/render-alm-override-values.sh" > "$CUSTOM_ALM_OVERRIDE_VALUES"
+
+export MANIFEST_OUTPUT_DIR="$TMPDIR"
+"$ROOT_DIR/hack/create-metering-manifests.sh"
+
+export DEPLOY_MANIFESTS_DIR="$TMPDIR"
 "$@"
