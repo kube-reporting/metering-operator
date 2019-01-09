@@ -1,12 +1,27 @@
 #!/bin/bash
 
 set -e
-
-: "${1?"Usage: $0 IMAGE_TAG"}"
+set -u
 
 cat <<EOF
 reporting-operator:
   spec:
     image:
-      tag: $1
+      repository: ${REPORTING_OPERATOR_IMAGE}
+      tag: ${REPORTING_OPERATOR_IMAGE_TAG}
+presto:
+  spec:
+    presto:
+      image:
+        repository: ${PRESTO_IMAGE}
+        tag: ${PRESTO_IMAGE_TAG}
+    hive:
+      image:
+        repository: ${HIVE_IMAGE}
+        tag: ${HIVE_IMAGE_TAG}
+hdfs:
+  spec:
+    image:
+      repository: ${HDFS_IMAGE}
+      tag: ${HDFS_IMAGE_TAG}
 EOF
