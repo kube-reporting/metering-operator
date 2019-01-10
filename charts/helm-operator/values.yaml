@@ -25,6 +25,9 @@ rbac:
   roleName: helm-operator
   rules: []
 
+  clusterRoleName: helm-operator
+  clusterRoleRules: []
+
 reconcileIntervalSeconds: 30
 
 chartPath: ""

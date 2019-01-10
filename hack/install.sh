@@ -27,6 +27,31 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
         "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
         "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
 
+    if [ "${METERING_INSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING}" == "true" ]; then
+        msg "Installing metering-operator Cluster level RBAC resources"
+
+        TMPDIR="$(mktemp -d)"
+        trap "rm -rf $TMPDIR" EXIT
+
+        # to set the ServiceAccount subject namespace, since it's cluster
+        # scoped.  updating the name is to avoid conflicting with others also
+        # using this script to install.
+
+        "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrolebinding.yaml" \
+            | jq -r '.metadata.name=$namespace + "-" + .metadata.name | .subjects[0].namespace=$namespace | .roleRef.name=.metadata.name' \
+            --arg namespace "$METERING_NAMESPACE" \
+            > "$TMPDIR/metering-operator-clusterrolebinding.yaml"
+
+        "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrole.yaml" \
+            | jq -r '.metadata.name=$namespace + "-" + .metadata.name' \
+            --arg namespace "$METERING_NAMESPACE" \
+            > "$TMPDIR/metering-operator-clusterrole.yaml"
+
+        kube-install \
+            "$TMPDIR/metering-operator-clusterrole.yaml" \
+            "$TMPDIR/metering-operator-clusterrolebinding.yaml"
+    ***REMOVED***
+
     msg "Installing metering-operator"
     kube-install \
         "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"

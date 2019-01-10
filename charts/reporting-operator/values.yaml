@@ -32,8 +32,12 @@ spec:
 
     enableFinalizers: "false"
     leaderLeaseDuration: "60s"
+
     allNamespaces: false
     targetNamespaces: []
+
+    createClusterMonitoringViewClusterRoleBinding: true
+    createClusterMonitoringViewClusterRole: true
 
     tls:
       enabled: false
@@ -115,7 +119,7 @@ spec:
     createCookieSecret: true
     cookieSeed: ""
 
-    createAuthProxyClusterRole: false
+    createAuthProxyClusterRole: true
 
     subjectAccessReviewPolicy: |-
       {"group": "metering.openshift.io", "resource": "reports", "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}
