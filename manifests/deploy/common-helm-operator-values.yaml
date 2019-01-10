@@ -26,6 +26,46 @@ image:
 serviceAccountName: metering-operator
 
 rbac:
+  clusterRoleName: metering-operator
+  clusterRoleRules:
+  # grants access to metrics data
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - get
+  # used by openshift auth-proxy
+  - apiGroups:
+    - authorization.k8s.io
+    resources:
+    - subjectaccessreviews
+    verbs:
+    - create
+  # used by openshift auth-proxy
+  - apiGroups:
+    - authentication.k8s.io
+    resources:
+    - tokenreviews
+    verbs:
+    - create
+  # grants access to creating clusterroles and clusterrolebindings for
+  # reporting-operator
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - clusterrolebindings
+    - clusterroles
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+
   roleName: metering-operator
   rules:
   # grant access to metering resources
