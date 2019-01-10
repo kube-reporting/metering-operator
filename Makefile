@@ -3,19 +3,41 @@ SHELL := /bin/bash
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include build/check_defined.mk
 
+GIT_SHA    := $(shell git rev-parse HEAD)
+GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+RELEASE_TAG := $(shell hack/print-version.sh)
+IMAGE_TAG = $(GIT_SHA)
+OCP_RELEASE_TAG = v4.0
+
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 
-DOCKER_BASE_URL := quay.io/coreos
+IMAGE_REPOSITORY = quay.io
+IMAGE_ORG = coreos
+DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
-METERING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-helm-operator
-REPORTING_OPERATOR_IMAGE := $(DOCKER_BASE_URL)/metering-reporting-operator
-METERING_E2E_IMAGE := $(DOCKER_BASE_URL)/metering-e2e
+METERING_OPERATOR_IMAGE_NAME = metering-helm-operator
+REPORTING_OPERATOR_IMAGE_NAME = metering-reporting-operator
+METERING_E2E_IMAGE_NAME = metering-e2e
+PRESTO_IMAGE_NAME = presto
+HIVE_IMAGE_NAME = hive
+HDFS_IMAGE_NAME = hadoop
 
-GIT_SHA    := $(shell git rev-parse HEAD)
-GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG := $(shell hack/print-version.sh)
+# these image tags are used in the rendering over the metering chart override
+# values
+METERING_OPERATOR_IMAGE_TAG = $(RELEASE_TAG)
+REPORTING_OPERATOR_IMAGE_TAG = $(RELEASE_TAG)
+PRESTO_IMAGE_TAG = metering-0.212
+HIVE_IMAGE_TAG = metering-2.3.3
+HDFS_IMAGE_TAG = metering-3.1.1
+
+METERING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(METERING_OPERATOR_IMAGE_NAME)
+REPORTING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(REPORTING_OPERATOR_IMAGE_NAME)
+METERING_E2E_IMAGE = $(DOCKER_BASE_URL)/$(METERING_E2E_IMAGE_NAME)
+PRESTO_IMAGE = $(DOCKER_BASE_URL)/$(PRESTO_IMAGE_NAME)
+HIVE_IMAGE = $(DOCKER_BASE_URL)/$(HIVE_IMAGE_NAME)
+HDFS_IMAGE = $(DOCKER_BASE_URL)/$(HDFS_IMAGE_NAME)
 
 # by default we build using docker, and assume building an image uses typical
 # docker args and flags (-t, -f, and the build context positional arg.)
@@ -41,19 +63,28 @@ endif
 endif
 
 # default Dockerfiles
-METERING_OPERATOR_DOCKERFILE := Dockerfile.metering-operator
-REPORTING_OPERATOR_DOCKERFILE := Dockerfile.reporting-operator
+METERING_OPERATOR_DOCKERFILE = Dockerfile.metering-operator
+REPORTING_OPERATOR_DOCKERFILE = Dockerfile.reporting-operator
 
 # override our Dockerfiles to rhel dockerfiles
+# and update the image names in the chart override values
 ifeq ($(OCP_BUILD), true)
-	METERING_OPERATOR_IMAGE := registry.access.redhat.com/ose-metering-helm-operator
-	REPORTING_OPERATOR_IMAGE := registry.access.redhat.com/ose-metering-reporting-operator
+	IMAGE_REPOSITORY = registry.access.redhat.com
+	IMAGE_ORG = openshift4
+	METERING_OPERATOR_IMAGE_NAME = ose-metering-helm-operator
+	REPORTING_OPERATOR_IMAGE_NAME = ose-metering-reporting-operator
+	PRESTO_IMAGE_NAME = ose-presto
+	HIVE_IMAGE_NAME = ose-hive
+	HDFS_IMAGE_NAME = ose-hadoop
+
+	METERING_OPERATOR_IMAGE_TAG = $(OCP_RELEASE_TAG)
+	REPORTING_OPERATOR_IMAGE_TAG = $(OCP_RELEASE_TAG)
+	PRESTO_IMAGE_TAG = $(OCP_RELEASE_TAG)
+	HIVE_IMAGE_TAG = $(OCP_RELEASE_TAG)
+	HDFS_IMAGE_TAG = $(OCP_RELEASE_TAG)
 
 	METERING_OPERATOR_DOCKERFILE = Dockerfile.metering-operator.rhel
 	REPORTING_OPERATOR_DOCKERFILE = Dockerfile.reporting-operator.rhel
-	RENDER_METERING_CHART_VALUES_CMD=cat ./hack/ocp-util/ocp-metering-chart-values.yaml
-else
-	RENDER_METERING_CHART_VALUES_CMD=./hack/render-metering-chart-override-values.sh $(RELEASE_TAG)
 endif
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
@@ -98,7 +129,6 @@ USE_RELEASE_TAG = true
 PUSH_RELEASE_TAG = false
 
 DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
-IMAGE_TAG = $(GIT_SHA)
 TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 
 # Hive Git repository for Thrift definitions
@@ -259,9 +289,19 @@ build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPE
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
 
-bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh ./hack/ocp-util/ocp-metering-chart-values.yaml
+bin/metering-override-values.yaml:
+bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	@mkdir -p bin
-	$(RENDER_METERING_CHART_VALUES_CMD) > bin/metering-override-values.yaml
+	export \
+		REPORTING_OPERATOR_IMAGE=$(REPORTING_OPERATOR_IMAGE) \
+		PRESTO_IMAGE=$(PRESTO_IMAGE) \
+		HIVE_IMAGE=$(HIVE_IMAGE) \
+		HDFS_IMAGE=$(HDFS_IMAGE) \
+		REPORTING_OPERATOR_IMAGE_TAG=$(REPORTING_OPERATOR_IMAGE_TAG) \
+		PRESTO_IMAGE_TAG=$(PRESTO_IMAGE_TAG) \
+		HIVE_IMAGE_TAG=$(HIVE_IMAGE_TAG) \
+		HDFS_IMAGE_TAG=$(HDFS_IMAGE_TAG); \
+	./hack/render-metering-chart-override-values.sh > bin/metering-override-values.yaml
 
 CHART_DEPS := bin/openshift-metering-0.1.0.tgz
 
@@ -275,7 +315,10 @@ bin/openshift-metering-0.1.0.tgz: $(shell find charts -type f)
 	helm package --save=false -d bin charts/openshift-metering
 
 metering-manifests:
-	./hack/create-metering-manifests.sh $(RELEASE_TAG)
+	export \
+		METERING_OPERATOR_IMAGE=$(METERING_OPERATOR_IMAGE) \
+		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
+	./hack/generate-metering-manifests.sh
 
 bin/test2json: gotools/test2json/main.go
 	go build -o bin/test2json gotools/test2json/main.go

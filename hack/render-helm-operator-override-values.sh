@@ -1,10 +1,10 @@
 #!/bin/bash
 
 set -e
-
-: "${1?"Usage: $0 IMAGE_TAG"}"
+set -u
 
 cat <<EOF
 image:
-  tag: $1
+  repository: ${METERING_OPERATOR_IMAGE}
+  tag: ${METERING_OPERATOR_IMAGE_TAG}
 EOF

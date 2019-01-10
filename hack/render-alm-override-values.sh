@@ -1,19 +1,18 @@
 #!/bin/bash
 
 set -e
-
-: "${1?"Usage: $0 IMAGE_TAG"}"
+set -u
 
 cat <<EOF
-name: metering-operator.v$1
+name: metering-operator.v${METERING_OPERATOR_IMAGE_TAG}
 spec:
-  version: $1
+  version: ${METERING_OPERATOR_IMAGE_TAG}
   labels:
-    alm-status-descriptors: metering-operator.v$1
+    alm-status-descriptors: metering-operator.v${METERING_OPERATOR_IMAGE_TAG}
     alm-owner-metering: metering-operator
   matchLabels:
     alm-owner-metering: metering-operator
 channels:
 - name: alpha
-  currentCSV: metering-operator.v$1
+  currentCSV: metering-operator.v${METERING_OPERATOR_IMAGE_TAG}
 EOF
