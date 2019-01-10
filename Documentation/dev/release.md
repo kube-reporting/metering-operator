@@ -45,7 +45,7 @@ For example:
 
 ```
 unset METERING_CR_FILE
-./hack/dev-install-wrapper.sh release-0.8 ./hack/openshift-install.sh
+./hack/custom-metering-operator-install-wrapper.sh release-0.8 ./hack/openshift-install.sh
 ```
 
 ### Pulling in changes into a release branch
