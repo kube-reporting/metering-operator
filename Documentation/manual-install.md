@@ -70,6 +70,14 @@ Then run the installation script for your platform:
 
 For more details on con***REMOVED***guration options, most are documented in the [con***REMOVED***guring metering document][con***REMOVED***guring-metering].
 
+## Install with a custom metering operator image
+
+Use `./hack/custom-metering-operator-install-wrapper.sh` where the ***REMOVED***rst argument is the custom metering operator image tag value, and the second argument is the install script you would normally use:
+
+```
+./hack/custom-metering-operator-install-wrapper.sh pr-1234 ./hack/openshift-install.sh
+```
+
 ## Run reporting operator locally
 
 It's also possible to run the operator locally.
