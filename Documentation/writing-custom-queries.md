@@ -320,11 +320,11 @@ Once the Report's status has changed to `Finished` (this can take a few minutes 
 ```
 kubectl proxy &
 sleep 2
-curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&format=csv"
+curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
 ```
 If your using Openshift, you'll need to change the url to the following:
 ```
-http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&format=csv
+http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv
 ```
 
 This should output a CSV report that looks similar to this:
