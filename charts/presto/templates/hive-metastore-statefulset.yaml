@@ -70,6 +70,9 @@ spec:
         env:
         - name: HIVE_LOGLEVEL
           value: {{ upper .Values.spec.hive.metastore.con***REMOVED***g.logLevel | quote}}
+        - name: JAVA_MAX_MEM_RATIO
+          value: "{{ .Values.spec.hive.metastore.con***REMOVED***g.jvm.percentMemoryLimitAsHeap }}"
+          optional: true
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
