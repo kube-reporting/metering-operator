@@ -70,6 +70,14 @@ Then run the installation script for your platform:
 
 For more details on configuration options, most are documented in the [configuring metering document][configuring-metering].
 
+## Install with a custom metering operator image
+
+Use `./hack/custom-metering-operator-install-wrapper.sh` where the first argument is the custom metering operator image tag value, and the second argument is the install script you would normally use:
+
+```
+./hack/custom-metering-operator-install-wrapper.sh pr-1234 ./hack/openshift-install.sh
+```
+
 ## Run reporting operator locally
 
 It's also possible to run the operator locally.
