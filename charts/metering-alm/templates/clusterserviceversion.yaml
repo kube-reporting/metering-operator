@@ -29,6 +29,10 @@ spec:
   install:
     strategy: deployment
     spec:
+{{- if .Values.spec.clusterPermissions }}
+      clusterPermissions:
+{{ toYaml .Values.spec.clusterPermissions | indent 8 }}
+{{- end }}
       permissions:
 {{ toYaml .Values.spec.permissions | indent 8 }}
       deployments:

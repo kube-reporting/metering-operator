@@ -89,7 +89,7 @@ func TestGenerateReport(t *testing.T) {
 			}
 
 			reportGenerator := NewReportGenerator(logger, reportResultsRepo)
-			err := reportGenerator.GenerateReport(tt.tableName, tt.reportStart, tt.reportEnd, tt.reportGenerationQuery, tt.dynamicReportGenerationQueries, tt.inputs, tt.deleteExistingData)
+			err := reportGenerator.GenerateReport(tt.tableName, "test-ns", tt.reportStart, tt.reportEnd, tt.reportGenerationQuery, tt.dynamicReportGenerationQueries, tt.inputs, tt.deleteExistingData)
 			if tt.expectedErr == "" {
 				assert.NoError(t, err, "expected GenerateReport to not error")
 			} ***REMOVED*** {

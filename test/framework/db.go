@@ -15,7 +15,7 @@ func (f *Framework) StoreDataSourceData(dataSourceName string, metrics []*presto
 		return err
 	}
 
-	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s", dataSourceName)
+	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s/%s", f.Namespace, dataSourceName)
 	req := f.NewReportingOperatorSVCPOSTRequest(url, body)
 
 	resp, err := req.Do().Raw()

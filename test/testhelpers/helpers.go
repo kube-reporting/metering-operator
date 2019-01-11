@@ -56,7 +56,7 @@ func NewReportDataSource(name, namespace string) *v1alpha1.ReportDataSource {
 func NewPrestoTable(name, namespace string, columns []hive.Column) *v1alpha1.PrestoTable {
 	return &v1alpha1.PrestoTable{
 		ObjectMeta: meta.ObjectMeta{
-			Name:      reportingutil.PrestoTableResourceNameFromKind("Report", name),
+			Name:      reportingutil.PrestoTableResourceNameFromKind("Report", namespace, name),
 			Namespace: namespace,
 		},
 		Status: v1alpha1.PrestoTableStatus{

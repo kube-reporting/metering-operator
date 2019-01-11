@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -102,8 +102,9 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 	var reportData []byte
 
 	queryParams := map[string]string{
-		"name":   report.Name,
-		"format": "json",
+		"name":      report.Name,
+		"namespace": report.Namespace,
+		"format":    "json",
 	}
 	err := wait.PollImmediate(time.Second*5, waitTimeout, func() (bool, error) {
 		req := f.NewReportingOperatorSVCRequest("/api/v1/reports/get", queryParams)

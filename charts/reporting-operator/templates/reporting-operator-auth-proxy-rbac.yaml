@@ -1,8 +1,8 @@
-{{- if and (or .Values.spec.authProxy.subjectAccessReviewEnabled .Values.spec.authProxy.delegateURLsEnabled) .Values.spec.authProxy.createAuthProxyClusterRole }}
+{{- if and .Values.spec.authProxy.enabled (or .Values.spec.authProxy.subjectAccessReviewEnabled .Values.spec.authProxy.delegateURLsEnabled) .Values.spec.authProxy.createAuthProxyClusterRole }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: reporting-operator-auth-proxy
+  name: {{ .Release.Namespace }}-reporting-operator-auth-proxy
   labels:
     app: reporting-operator
 {{- block "extraMetadata" . }}
@@ -28,7 +28,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: reporting-operator-auth-proxy
+  name: {{ .Release.Namespace }}-reporting-operator-auth-proxy
   labels:
     app: reporting-operator
 {{- block "extraMetadata" . }}
@@ -36,8 +36,9 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: reporting-operator-auth-proxy
+  name: {{ .Release.Namespace }}-reporting-operator-auth-proxy
 subjects:
 - kind: ServiceAccount
   name: reporting-operator
+  namespace: {{ .Release.Namespace }}
 {{- end }}

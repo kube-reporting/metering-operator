@@ -1,8 +1,6 @@
 package operator
 
 import (
-	"strings"
-
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,10 +17,6 @@ import (
 const (
 	prestoTableFinalizer = cbTypes.GroupName + "/prestotable"
 )
-
-func dataSourceNameToPrestoTableName(name string) string {
-	return strings.Replace(reportingutil.DataSourceTableName(name), "_", "-", -1)
-}
 
 func (op *Reporting) runPrestoTableWorker(stopCh <-chan struct{}) {
 	logger := op.logger.WithField("component", "prestoTableWorker")
@@ -57,7 +51,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 		return nil
 	}
 
-	logger = logger.WithField("PrestoTable", name)
+	logger = logger.WithFields(log.Fields{"prestoTable": name, "namespace": namespace})
 
 	prestoTableLister := op.prestoTableLister
 	prestoTable, err := prestoTableLister.PrestoTables(namespace).Get(name)
@@ -115,7 +109,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 		***REMOVED***nalizers = []string{prestoTableFinalizer}
 	}
 
-	resourceName := reportingutil.PrestoTableResourceNameFromKind(kind, name)
+	resourceName := reportingutil.PrestoTableResourceNameFromKind(kind, namespace, name)
 	prestoTableCR := cbTypes.PrestoTable{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PrestoTable",
@@ -157,7 +151,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
 	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
 	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
-	logger := op.logger.WithField("PrestoTable", prestoTable.Name)
+	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 		return nil, err
@@ -172,7 +166,7 @@ func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable
 	}
 	prestoTable.Finalizers = slice.RemoveString(prestoTable.Finalizers, prestoTableFinalizer, nil)
 	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
-	logger := op.logger.WithField("prestoTable", prestoTable.Name)
+	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
 		return nil, err
@@ -187,7 +181,7 @@ func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
 
 func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
 	tableName := prestoTable.Status.Parameters.Name
-	logger := op.logger.WithFields(log.Fields{"PrestoTable": prestoTable.Name, "tableName": tableName})
+	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace, "tableName": tableName})
 	logger.Infof("dropping presto table %s", tableName)
 	err := op.tableManager.DropTable(tableName, true)
 	if err != nil {

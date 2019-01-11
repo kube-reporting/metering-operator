@@ -20,6 +20,32 @@ kube-remove \
     "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
 
+if [ "${METERING_UNINSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING}" == "true" ]; then
+    msg "Removing metering-operator Cluster level RBAC resources"
+
+    TMPDIR="$(mktemp -d)"
+    trap "rm -rf $TMPDIR" EXIT
+
+    # we modify the name of these resources to be unique by namespace, and
+    # to set the ServiceAccount subject namespace, since it's cluster
+    # scoped.  updating the name is to avoid conflicting with others also
+    # using this script to install.
+    "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrolebinding.yaml" \
+        | jq -r '.metadata.name=$namespace + "-" + .metadata.name | .subjects[0].namespace=$namespace | .roleRef.name=.metadata.name' \
+        --arg namespace "$METERING_NAMESPACE" \
+        > "$TMPDIR/metering-operator-clusterrolebinding.yaml"
+
+    "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrole.yaml" \
+        | jq -r '.metadata.name=$namespace + "-" + .metadata.name' \
+        --arg namespace "$METERING_NAMESPACE" \
+        > "$TMPDIR/metering-operator-clusterrole.yaml"
+
+    kube-remove \
+        "$TMPDIR/metering-operator-clusterrole.yaml" \
+        "$TMPDIR/metering-operator-clusterrolebinding.yaml"
+***REMOVED***
+
+
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
 ***REMOVED***

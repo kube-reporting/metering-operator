@@ -29,14 +29,5 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${ALM_MANIFESTS_DIR:=$MANIFESTS_DIR/deploy/$DEPLOY_PLATFORM/alm}"
 : "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/metering.yaml}"
 : "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions}"
-
-# These are currently openshift speci***REMOVED***c con***REMOVED***g options, controlling if a
-# clusterrole and clusterrolebinding are created granting access to GET
-# namespaces , create subject access reviews and token reviews
-# This is for granting access to querying the Prometheus API and checking users
-# permissions with the auth proxy.
-: "${METERING_REPORTING_OPERATOR_EXTRA_ROLE_NAME:=openshift-reporting-operator-extra}"
-: "${METERING_REPORTING_OPERATOR_EXTRA_ROLEBINDING_NAME:=${METERING_NAMESPACE}-openshift-reporting-operator-extra}"
-: "${METERING_REPORTING_OPERATOR_EXTRA_ROLE_NAME:=openshift-reporting-operator-extra}"
-: "${METERING_UNINSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING:=false}"
-: "${METERING_INSTALL_REPORTING_OPERATOR_EXTRA_CLUSTERROLEBINDING:=true}"
+: "${METERING_UNINSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING:=false}"
+: "${METERING_INSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING:=true}"
