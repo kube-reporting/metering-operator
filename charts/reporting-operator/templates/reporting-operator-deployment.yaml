@@ -103,16 +103,19 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: promsum-poll-interval
+              optional: true
         - name: REPORTING_OPERATOR_PROMSUM_CHUNK_SIZE
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
               key: promsum-chunk-size
+              optional: true
         - name: REPORTING_OPERATOR_PROMSUM_STEP_SIZE
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
               key: promsum-step-size
+              optional: true
         - name: REPORTING_OPERATOR_DISABLE_PROMSUM
           valueFrom:
             configMapKeyRef:
@@ -184,6 +187,18 @@ spec:
         - name: REPORTING_OPERATOR_METRICS_USE_TLS
           value: "true"
 {{- end }}
+        - name: REPORTING_OPERATOR_ALL_NAMESPACES
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: all-namespaces
+              optional: true
+        - name: REPORTING_OPERATOR_TARGET_NAMESPACES
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: target-namespaces
+              optional: true
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
         ports:

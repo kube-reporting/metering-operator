@@ -15,6 +15,7 @@ if [[ $# -ge 3 ]] ; then
 
     DEPLOYMENT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-deployment.yaml"
     RBAC_ROLE_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-role.yaml"
+    RBAC_CLUSTERROLE_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-clusterrole.yaml"
     RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST="$DEPLOYER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
     for f in "$DEPLOYMENT_MANIFEST" "$RBAC_ROLE_MANIFEST" "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST"; do
@@ -82,6 +83,12 @@ EOF
 JQ_RBAC_SCRIPT=$(cat <<EOF
 {
     spec: {
+        clusterPermissions: [
+            {
+                serviceAccountName: .[0].metadata.name,
+                rules: .[2].rules
+            }
+        ],
         permissions: [
             {
                 serviceAccountName: .[0].metadata.name,
@@ -107,13 +114,19 @@ find "$CRD_DIR" \
     | jq -r "$JQ_DEPLOYMENT_SCRIPT" > "$TMPDIR/alm-deployment.json"
 
 
-# Slurp both files, .[0] is the service account, .[1] is the role, based on the
-# arguments ordering. Extracts the rules section of a role, and takes the serviceAccountName
+# Slurp files, which ones are which is based on argument ordering
+# .[0] is the ServiceAccount
+# .[1] is the Role
+# .[2] is the clusterRole
+#  Extracts the rules section of a role, and clusterRole, and takes the
+#  serviceAccountName
 jq \
     -s \
     -r "$JQ_RBAC_SCRIPT" \
     <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
-    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_MANIFEST") > "$TMPDIR/alm-permissions.json"
+    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_MANIFEST") \
+    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_CLUSTERROLE_MANIFEST") \
+    > "$TMPDIR/alm-permissions.json"
 
 # Merge the 3 JSON objects created above
 jq -s '.[0] * .[1] * .[2]' \

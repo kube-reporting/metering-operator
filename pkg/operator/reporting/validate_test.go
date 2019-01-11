@@ -15,15 +15,15 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 	reportQueryViewDisabled := testhelpers.NewReportGenerationQuery("query-view-disabled", "default", nil)
 	reportQueryViewDisabled.Spec.View.Disabled = true
 	reportQueryViewSet := testhelpers.NewReportGenerationQuery("initialized-query", "default", nil)
-	reportQueryViewSet.Status.ViewName = reportingutil.GenerationQueryViewName("initialized-query")
+	reportQueryViewSet.Status.ViewName = reportingutil.GenerationQueryViewName("test-ns", "initialized-query")
 
 	dataSourceTableUnset := testhelpers.NewReportDataSource("uninitialized-datasource", "default")
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
-	dataSourceTableSet.Status.TableName = reportingutil.DataSourceTableName("initialized-datasource")
+	dataSourceTableSet.Status.TableName = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
 
 	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{})
 	reportTableSet := testhelpers.NewReport("initialized-report", "default", "some-query", nil, nil, metering.ReportStatus{
-		TableName: reportingutil.ReportTableName("initialized-report"),
+		TableName: reportingutil.ReportTableName("test-ns", "initialized-report"),
 	})
 
 	// we keep a set of our test objects here since we re-use them in different

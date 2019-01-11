@@ -26,15 +26,15 @@ type ReportTemplateInfo struct {
 	Inputs         map[string]interface{}
 }
 
-func newQueryTemplate(queryTemplate string) (*template.Template, error) {
+func newQueryTemplate(queryTemplate, namespace string) (*template.Template, error) {
 	var templateFuncMap = template.FuncMap{
 		"prestoTimestamp":                 PrestoTimestamp,
-		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
-		"reportTableName":                 reportingutil.ReportTableName,
-		"dataSourceTableName":             reportingutil.DataSourceTableName,
-		"generationQueryViewName":         reportingutil.GenerationQueryViewName,
 		"billingPeriodTimestamp":          reportingutil.BillingPeriodTimestamp,
-		"renderReportGenerationQuery":     renderReportGenerationQuery,
+		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
+		"reportTableName":                 reportTableNameWithNamespaceFunc(namespace),
+		"dataSourceTableName":             dataSourceTableNameWithNamespaceFunc(namespace),
+		"generationQueryViewName":         generationQueryViewNameWithNamespaceFunc(namespace),
+		"renderReportGenerationQuery":     renderReportGenerationQueryFunc(namespace),
 	}
 
 	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(queryTemplate)
@@ -44,8 +44,8 @@ func newQueryTemplate(queryTemplate string) (*template.Template, error) {
 	return tmpl, nil
 }
 
-func RenderQuery(query string, tmplCtx *ReportQueryTemplateContext) (string, error) {
-	tmpl, err := newQueryTemplate(query)
+func RenderQuery(query, namespace string, tmplCtx *ReportQueryTemplateContext) (string, error) {
+	tmpl, err := newQueryTemplate(query, namespace)
 	if err != nil {
 		return "", err
 	}
@@ -61,7 +61,13 @@ func renderTemplate(tmpl *template.Template, tmplCtx *ReportQueryTemplateContext
 	return buf.String(), nil
 }
 
-func renderReportGenerationQuery(queryName string, tmplCtx *ReportQueryTemplateContext) (string, error) {
+func renderReportGenerationQueryFunc(namespace string) func(string, *ReportQueryTemplateContext) (string, error) {
+	return func(queryName string, tmplCtx *ReportQueryTemplateContext) (string, error) {
+		return renderReportGenerationQuery(queryName, namespace, tmplCtx)
+	}
+}
+
+func renderReportGenerationQuery(queryName, namespace string, tmplCtx *ReportQueryTemplateContext) (string, error) {
 	var query string
 	for _, q := range tmplCtx.DynamicDependentQueries {
 		if q.Name == queryName {
@@ -73,7 +79,7 @@ func renderReportGenerationQuery(queryName string, tmplCtx *ReportQueryTemplateC
 		return "", fmt.Errorf("unknown ReportGenerationQuery %s", queryName)
 	}
 
-	renderedQuery, err := RenderQuery(query, tmplCtx)
+	renderedQuery, err := RenderQuery(query, namespace, tmplCtx)
 	if err != nil {
 		return "", fmt.Errorf("unable to render query %s, err: %v", queryName, err)
 	}
@@ -105,4 +111,22 @@ func PrometheusMetricPartitionFormat(input interface{}) (string, error) {
 
 func PrestoTimestamp(input interface{}) (string, error) {
 	return TimestampFormat(input, presto.TimestampFormat)
+}
+
+func dataSourceTableNameWithNamespaceFunc(namespace string) func(string) string {
+	return func(name string) string {
+		return reportingutil.DataSourceTableName(namespace, name)
+	}
+}
+
+func reportTableNameWithNamespaceFunc(namespace string) func(string) string {
+	return func(name string) string {
+		return reportingutil.ReportTableName(namespace, name)
+	}
+}
+
+func generationQueryViewNameWithNamespaceFunc(namespace string) func(string) string {
+	return func(name string) string {
+		return reportingutil.GenerationQueryViewName(namespace, name)
+	}
 }

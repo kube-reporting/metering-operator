@@ -13,7 +13,6 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
-	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
 const (
@@ -23,6 +22,7 @@ const (
 var (
 	prometheusReportDatasourceLabels = []string{
 		"reportdatasource",
+		"namespace",
 		"reportprometheusquery",
 		"table_name",
 	}
@@ -153,15 +153,16 @@ func init() {
 	prometheus.MustRegister(prometheusReportDatasourceRunningImportsGauge)
 }
 
-type prometheusImporterFunc func(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error)
+type prometheusImporterFunc func(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error)
 
 type prometheusImportResults struct {
 	ReportDataSource     string `json:"reportDataSource"`
+	Namespace            string `json:"namespace"`
 	MetricsImportedCount int    `json:"metricsImportedCount"`
 }
 
-func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, end time.Time) ([]*prometheusImportResults, error) {
-	reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(op.cfg.Namespace).List(metav1.ListOptions{})
+func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error) {
+	reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +192,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 			dataSourceLogger := logger.WithFields(logrus.Fields{
 				"queryName":        reportDataSource.Spec.Promsum.Query,
 				"reportDataSource": reportDataSource.Name,
-				"tableName":        reportingutil.DataSourceTableName(reportDataSource.Name),
+				"tableName":        reportDataSource.Status.TableName,
 			})
 			importCfg := op.newPromImporterCfg(reportDataSource, reportPromQuery)
 			// ignore any global ImportFrom configuration since this is an
@@ -225,6 +226,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, start, en
 			}
 			resultsCh <- &prometheusImportResults{
 				ReportDataSource:     reportDataSource.Name,
+				Namespace:            reportDataSource.Namespace,
 				MetricsImportedCount: len(importResults.Metrics),
 			}
 			return nil
@@ -256,9 +258,6 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTyp
 }
 
 func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.Config {
-	dataSourceName := reportDataSource.Name
-	tableName := reportingutil.DataSourceTableName(dataSourceName)
-
 	chunkSize := op.cfg.PrometheusQueryConfig.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryConfig.StepSize.Duration
 
@@ -291,7 +290,7 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 
 	return prestostore.Config{
 		PrometheusQuery:           reportPromQuery.Spec.Query,
-		PrestoTableName:           tableName,
+		PrestoTableName:           reportDataSource.Status.TableName,
 		ChunkSize:                 chunkSize,
 		StepSize:                  stepSize,
 		MaxTimeRanges:             defaultMaxPromTimeRanges,
@@ -320,8 +319,9 @@ func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource
 func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery) prestostore.ImporterMetricsCollectors {
 	promLabels := prometheus.Labels{
 		"reportdatasource":      reportDataSource.Name,
+		"namespace":             reportDataSource.Namespace,
 		"reportprometheusquery": reportPromQuery.Name,
-		"table_name":            reportingutil.DataSourceTableName(reportDataSource.Name),
+		"table_name":            reportDataSource.Status.TableName,
 	}
 
 	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)

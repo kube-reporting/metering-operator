@@ -41,6 +41,18 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
+    -x "templates/clusterrole.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$OUTPUT_DIR/metering-operator-clusterrole.yaml"
+
+helm template "$CHART" \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/clusterrolebinding.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$OUTPUT_DIR/metering-operator-clusterrolebinding.yaml"
+
+helm template "$CHART" \
+    "${VALUES_ARGS[@]}" \
     -x "templates/deployment.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$OUTPUT_DIR/metering-operator-deployment.yaml"

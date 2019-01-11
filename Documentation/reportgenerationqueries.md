@@ -173,14 +173,14 @@ spec:
 
 You can modify the ReportGenerationQuery to display all columns or to hide or show columns as needed. The full endpoint displays all columns.
 To query report results using the reporting-operator API for full endpoint the api call is:
-`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/full?format=json`
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/metering/namespace-cpu-request/full?format=json`
 This example is showing the `namespace-cpu-request` query in JSON format.
 
 To use the TableHidden display feature:
 - enter `TableHidden` field in query as true or false. In `node-cpu-capacity` the `labels` tableHidden value is set to `true`.
 - Next run a report.
 To query report results using the reporting-operator API for tableHidden endpoint the api call is:
-`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/namespace-cpu-request/table?format=json`
+`http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v2/reports/metering/namespace-cpu-request/table?format=json`
 
 [apiTable]: api.md#v2-reports-table
 [presto-select]: https://prestodb.io/docs/current/sql/select.html

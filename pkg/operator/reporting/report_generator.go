@@ -23,7 +23,7 @@ var (
 )
 
 type ReportGenerator interface {
-	GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error
+	GenerateReport(tableName, namespace string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error
 }
 
 type reportGenerator struct {
@@ -38,7 +38,7 @@ func NewReportGenerator(logger log.FieldLogger, reportResultsRepo prestostore.Re
 	}
 }
 
-func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error {
+func (g *reportGenerator) GenerateReport(tableName, namespace string, reportStart, reportEnd *time.Time, generationQuery *metering.ReportGenerationQuery, dynamicReportGenerationQueries []*metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue, deleteExistingData bool) error {
 	if generationQuery == nil {
 		panic("GenerateReport: must specify generationQuery")
 	}
@@ -71,7 +71,7 @@ func (g *reportGenerator) GenerateReport(tableName string, reportStart, reportEn
 			Inputs:         reportQueryInputs,
 		},
 	}
-	query, err := RenderQuery(generationQuery.Spec.Query, tmplCtx)
+	query, err := RenderQuery(generationQuery.Spec.Query, namespace, tmplCtx)
 	if err != nil {
 		return err
 	}

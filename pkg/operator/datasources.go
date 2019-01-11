@@ -71,7 +71,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 		return nil
 	}
 
-	logger = logger.WithField("ReportDataSource", name)
+	logger = logger.WithFields(log.Fields{"reportDataSource": name, "namespace": namespace})
 	reportDataSource, err := op.reportDataSourceLister.ReportDataSources(namespace).Get(name)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -131,7 +131,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	} else {
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
-		tableName := reportingutil.DataSourceTableName(dataSource.Name)
+		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
 		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, promsumHiveColumns, promsumHivePartitions)
 		if err != nil {
 			return err
@@ -156,19 +156,17 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return nil
 	}
 
-	dataSourceName := dataSource.Name
 	queryName := dataSource.Spec.Promsum.Query
-	tableName := reportingutil.DataSourceTableName(dataSourceName)
 
 	reportPromQuery, err := op.reportPrometheusQueryLister.ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
 	if err != nil {
-		return fmt.Errorf("unable to get ReportPrometheusQuery %s for ReportDataSource %s, %s", queryName, dataSourceName, err)
+		return fmt.Errorf("unable to get ReportPrometheusQuery %s for ReportDataSource %s, %s", queryName, dataSource.Name, err)
 	}
 
 	dataSourceLogger := logger.WithFields(log.Fields{
 		"queryName":        queryName,
-		"reportDataSource": dataSourceName,
-		"tableName":        tableName,
+		"reportDataSource": dataSource.Name,
+		"tableName":        dataSource.Status.TableName,
 	})
 
 	importerCfg := op.newPromImporterCfg(dataSource, reportPromQuery)
@@ -177,9 +175,9 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	importer, err := func() (*prestostore.PrometheusImporter, error) {
 		op.importersMu.Lock()
 		defer op.importersMu.Unlock()
-		importer, exists := op.importers[dataSourceName]
+		importer, exists := op.importers[dataSource.Name]
 		if exists {
-			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSourceName)
+			dataSourceLogger.Debugf("ReportDataSource %s already has an importer, updating configuration", dataSource.Name)
 			importer.UpdateConfig(importerCfg)
 			return importer, nil
 		}
@@ -188,7 +186,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if err != nil {
 			return nil, err
 		}
-		op.importers[dataSourceName] = importer
+		op.importers[dataSource.Name] = importer
 		return importer, nil
 	}()
 	if err != nil {
@@ -246,7 +244,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			// ReportDataSources happens in a more randomized order to allow
 			// all of them to get processed when the queue is blocked.
 			importDelay = wait.Jitter(5*time.Second, 2)
-			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSourceName, lastTS, backlogDuration, importDelay)
+			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, lastTS, backlogDuration, importDelay)
 		}
 	}
 
@@ -258,11 +256,11 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 	dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
 	if err != nil {
-		return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSourceName, err)
+		return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSource.Name, err)
 	}
 
 	nextImport := op.clock.Now().Add(importDelay).UTC()
-	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSourceName, importDelay, nextImport)
+	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSource.Name, importDelay, nextImport)
 	op.enqueueReportDataSourceAfter(dataSource, importDelay)
 	return nil
 }
@@ -292,7 +290,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	if dataSource.Status.TableName == "" {
-		tableName := reportingutil.DataSourceTableName(dataSource.Name)
+		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
 		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 		err = op.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Prefix, manifests)
 		if err != nil {
@@ -307,7 +305,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	}
 
 	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.Status.TableName)
-	prestoTableResourceName := reportingutil.PrestoTableResourceNameFromKind("ReportDataSource", dataSource.Name)
+	prestoTableResourceName := reportingutil.PrestoTableResourceNameFromKind("ReportDataSource", dataSource.Namespace, dataSource.Name)
 	prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
 	if err != nil {
 		// if not found, try for the uncached copy
@@ -505,7 +503,7 @@ func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSourc
 func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
-	logger := op.logger.WithField("ReportDataSource", ds.Name)
+	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err
@@ -520,7 +518,7 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSourc
 	}
 	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
-	logger := op.logger.WithField("ReportDataSource", ds.Name)
+	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
 		return nil, err

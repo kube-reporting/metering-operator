@@ -64,7 +64,9 @@ func init() {
 	startCmd.Flags().BoolVar(&logDisableTimestamp, "disable-timestamp", false, "disable timestamp logging")
 
 	startCmd.Flags().StringVar(&cfg.Kubeconfig, "kubeconfig", "", "use kubeconfig provided instead of detecting defaults")
-	startCmd.Flags().StringVar(&cfg.Namespace, "namespace", "", "namespace the operator is running in")
+	startCmd.Flags().StringVar(&cfg.OwnNamespace, "namespace", "", "namespace the operator is running in, if empty, will attempt to detect namespace if running in a pod.")
+	startCmd.Flags().BoolVar(&cfg.AllNamespaces, "all-namespaces", false, "if true, reporting-operator monitors all namespaces.")
+	startCmd.Flags().StringSliceVar(&cfg.TargetNamespaces, "target-namespaces", nil, "the namespaces for reporting-operator to watch for resources, if empty defaults to the value of --namespace, or all namespaces if --all-namespaces is specified.")
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
@@ -121,12 +123,12 @@ func main() {
 
 func startReporting(cmd *cobra.Command, args []string) {
 	logger := newLogger()
-	if cfg.Namespace == "" {
+	if cfg.OwnNamespace == "" {
 		namespace, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 		if err != nil {
 			logger.WithError(err).Fatal("could not determine namespace")
 		}
-		cfg.Namespace = string(namespace)
+		cfg.OwnNamespace = string(namespace)
 	}
 
 	var err error

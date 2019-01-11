@@ -16,7 +16,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -84,8 +85,12 @@ type PrometheusConfig struct {
 }
 
 type Config struct {
-	Hostname   string
-	Namespace  string
+	Hostname     string
+	OwnNamespace string
+
+	AllNamespaces    bool
+	TargetNamespaces []string
+
 	Kubeconfig string
 
 	HiveHost                string
@@ -168,6 +173,12 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 
 	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
 
+	if cfg.AllNamespaces {
+		logger.Infof("watching all namespaces for metering.openshift.io resourcse")
+	} else {
+		logger.Infof("watching namespaces %q for metering.openshift.io resources", cfg.TargetNamespaces)
+	}
+
 	configOverrides := &clientcmd.ConfigOverrides{}
 	var clientConfig clientcmd.ClientConfig
 	if cfg.Kubeconfig == "" {
@@ -199,9 +210,21 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 		return nil, fmt.Errorf("Unable to create Metering client: %v", err)
 	}
 
+	var informerNamespace string
+	if cfg.AllNamespaces {
+		informerNamespace = metav1.NamespaceAll
+	} else if len(cfg.TargetNamespaces) == 1 {
+		informerNamespace = cfg.TargetNamespaces[0]
+	} else if len(cfg.TargetNamespaces) > 1 && !cfg.AllNamespaces {
+		return nil, fmt.Errorf("must set --all-namespaces if more than one namespace is passed to --target-namespaces")
+	} else {
+		informerNamespace = cfg.OwnNamespace
+	}
+
 	clock := clock.RealClock{}
 	rand := rand.New(rand.NewSource(clock.Now().Unix()))
-	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, meteringClient)
+
+	op := newReportingOperator(logger, clock, rand, cfg, kubeConfig, kubeClient, meteringClient, informerNamespace)
 
 	return op, nil
 }
@@ -214,9 +237,10 @@ func newReportingOperator(
 	kubeConfig *rest.Config,
 	kubeClient corev1.CoreV1Interface,
 	meteringClient cbClientset.Interface,
+	informerNamespace string,
 ) *Reporting {
 
-	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, cfg.Namespace, nil)
+	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
 
 	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
 	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
@@ -264,28 +288,34 @@ func newReportingOperator(
 		importers: make(map[string]*prestostore.PrometheusImporter),
 	}
 
-	reportInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	// all eventHandlers are wrapped in an
+	// inTargetNamespaceResourceEventHandler which verifies the resources
+	// passed to the eventHandler functions have a metadata.namespace contained
+	// in the list of TargetNamespaces, and if so, runs the eventHandler func.
+	// If TargetNamespaces is empty, it will no-op and return the original
+	// eventHandler.
+	reportInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addReport,
 		UpdateFunc: op.updateReport,
 		DeleteFunc: op.deleteReport,
-	})
+	}, op.cfg.TargetNamespaces))
 
-	reportDataSourceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	reportDataSourceInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addReportDataSource,
 		UpdateFunc: op.updateReportDataSource,
 		DeleteFunc: op.deleteReportDataSource,
-	})
+	}, op.cfg.TargetNamespaces))
 
-	reportGenerationQueryInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	reportGenerationQueryInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addReportGenerationQuery,
 		UpdateFunc: op.updateReportGenerationQuery,
-	})
+	}, op.cfg.TargetNamespaces))
 
-	prestoTableInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	prestoTableInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    op.addPrestoTable,
 		UpdateFunc: op.updatePrestoTable,
 		DeleteFunc: op.deletePrestoTable,
-	})
+	}, op.cfg.TargetNamespaces))
 
 	return op
 }
@@ -401,7 +431,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	op.tableManager = hiveTableManager
 	op.awsTablePartitionManager = hiveTableManager
 
-	tableProperties, err := op.getHiveTableProperties(op.logger, nil, "health_check")
+	tableProperties, err := op.getHiveTableProperties(op.logger, nil, "health_check", op.cfg.OwnNamespace)
 	if err != nil {
 		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
 	}
@@ -427,7 +457,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
-		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange, op.cfg.Namespace,
+		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange,
 		op.reportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
@@ -476,11 +506,11 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(op.logger.Infof)
-	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.Namespace)})
+	eventBroadcaster.StartRecordingToSink(&corev1.EventSinkImpl{Interface: op.kubeClient.Events(op.cfg.OwnNamespace)})
 	eventRecorder := eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: op.cfg.Hostname})
 
 	rl, err := resourcelock.New(resourcelock.ConfigMapsResourceLock,
-		op.cfg.Namespace, "reporting-operator-leader-lease", op.kubeClient,
+		op.cfg.OwnNamespace, "reporting-operator-leader-lease", op.kubeClient,
 		resourcelock.ResourceLockConfig{
 			Identity:      op.cfg.Hostname,
 			EventRecorder: eventRecorder,
