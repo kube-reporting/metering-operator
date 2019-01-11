@@ -74,6 +74,9 @@ spec:
         env:
         - name: HIVE_LOGLEVEL
           value: {{ upper .Values.spec.hive.server.config.logLevel | quote}}
+        - name: JAVA_MAX_MEM_RATIO
+          value: "{{ .Values.spec.hive.server.config.percentMemoryLimitAsHeap }}"
+          optional: true
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
