@@ -70,8 +70,6 @@ connector.name=jmx
   valueFrom:
     fieldRef:
       fieldPath: metadata.namespace
-- name: JAVA_MAX_MEM_RATIO
-  value: "50"
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
