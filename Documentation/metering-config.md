@@ -13,6 +13,7 @@ For details on different types of configuration read the relevant document:
 - [configuring reporting-operator](configuring-reporting-operator.md)
   - [set the Prometheus URL](configuring-reporting-operator.md#prometheus-url)
   - [exposing the reporting API](configuring-reporting-operator.md#exposing-the-reporting-api)
+  - [configuring Authentication on Openshift](configuring-reporting-operator.md#openshift-authentication)
 - [configuring storage](configuring-storage.md)
   - [storing data in s3](configuring-storage.md#storing-data-in-s3)
 - [configuring the Hive metastore](configuring-hive-metastore.md)
