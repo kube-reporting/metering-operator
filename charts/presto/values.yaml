@@ -126,6 +126,8 @@ spec:
     metastore:
       con***REMOVED***g:
         logLevel: info
+        jvm:
+          percentMemoryLimitAsHeap: "50"
 
       resources:
         requests:
@@ -168,6 +170,9 @@ spec:
     server:
       con***REMOVED***g:
         logLevel: info
+        jvm:
+          percentMemoryLimitAsHeap: "50"
+
       resources:
         requests:
           memory: "500Mi"
