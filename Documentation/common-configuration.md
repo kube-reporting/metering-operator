@@ -5,7 +5,9 @@ This document contains example con***REMOVED***gurations for con***REMOVED***gur
 ## Resource requests and limits
 
 You can adjust the cpu, memory, or storage resource requests and/or limits for pods and volumes.
-See [resource-limits.yaml][resource-limits] for an example of setting resource request and limits for each component.
+See [default-resource-limits.yaml][default-resource-limits] for an example of setting resource request and limits for each component.
+
+For more reading on tuning metering, use the [Resource Tuning documentation][tuning].
 
 ## Node Selectors
 
@@ -20,4 +22,5 @@ See [latest-versions.yaml][latest-versions] for an example of setting the reposi
 [latest-versions]: ../manifests/metering-con***REMOVED***g/latest-versions.yaml
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 [node-selectors-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-node-selectors.yaml
-[resource-limits]: ../manifests/metering-con***REMOVED***g/resource-limits.yaml
+[default-resource-limits]: ../manifests/metering-con***REMOVED***g/default-resource-limits.yaml
+[tuning]: tuning.md
