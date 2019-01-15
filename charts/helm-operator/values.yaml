@@ -31,3 +31,5 @@ rbac:
 reconcileIntervalSeconds: 30
 
 chartPath: ""
+allNamespaces: false
+targetNamespaces: []

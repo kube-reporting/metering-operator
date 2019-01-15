@@ -23,11 +23,15 @@ if [ -z "$METERING_OPERATOR_IMAGE_TAG" ]; then
 TMPDIR="$(mktemp -d)"
 trap "rm -rf $TMPDIR" EXIT SIGINT
 
-export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-values.yaml"
-"$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
+if [ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-}" ]; then
+    export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-values.yaml"
+    "$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
+***REMOVED***
 
-export CUSTOM_ALM_OVERRIDE_VALUES="$TMPDIR/override-alm-values.yaml"
-"$ROOT_DIR/hack/render-alm-override-values.sh" > "$CUSTOM_ALM_OVERRIDE_VALUES"
+if [ -z "${CUSTOM_ALM_OVERRIDE_VALUES:-}" ]; then
+    export CUSTOM_ALM_OVERRIDE_VALUES="$TMPDIR/override-alm-values.yaml"
+    "$ROOT_DIR/hack/render-alm-override-values.sh" > "$CUSTOM_ALM_OVERRIDE_VALUES"
+***REMOVED***
 
 export MANIFEST_OUTPUT_DIR="$TMPDIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"
