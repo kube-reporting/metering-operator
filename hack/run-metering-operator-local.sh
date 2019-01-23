@@ -21,6 +21,7 @@ fi
 
 docker run \
     -it \
+    --name metering-operator \
     --rm \
     -u 0:0 \
     -v "$KUBECONFIG:/kubeconfig" \

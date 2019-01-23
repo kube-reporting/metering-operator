@@ -18,6 +18,10 @@ crd:
     catalog.app.coreos.com/displayName: "Metering"
     catalog.app.coreos.com/description: "An instance of Metering"
 
+targetNamespacesDownwardAPIValueFrom:
+  fieldRef:
+    fieldPath: "metadata.annotations['olm.targetNamespaces']"
+
 image:
   repository: quay.io/coreos/metering-helm-operator
   tag: latest

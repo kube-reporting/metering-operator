@@ -1,25 +1,26 @@
 #!/bin/bash
 
-set -e
-
 if [ "$ENABLE_DEBUG" == "true" ]; then
     set -x
 fi
 
-: ${HELM_CHART_PATH:?}
-: ${HELM_RELEASE_CRD_NAME:?}
-: ${HELM_RELEASE_CRD_API_GROUP:?}
+: "${HELM_CHART_PATH:?}"
+: "${HELM_RELEASE_CRD_NAME:?}"
+: "${HELM_RELEASE_CRD_API_GROUP:?}"
 
-: ${HELM_WAIT:=false}
-: ${HELM_WAIT_TIMEOUT:=120}
-: ${EXTRA_VALUES_FILE:=}
+: "${HELM_WAIT:=false}"
+: "${HELM_WAIT_TIMEOUT:=120}"
+: "${EXTRA_VALUES_FILE:=}"
 
-: ${MY_POD_NAMESPACE:?}
+: "${MY_POD_NAMESPACE:?}"
 
-: ${HELM_RECONCILE_INTERVAL_SECONDS:=120}
-: ${HELM_HOST:="127.0.0.1:44134"}
+: "${HELM_RECONCILE_INTERVAL_SECONDS:=120}"
+: "${HELM_HOST:="127.0.0.1:44134"}"
+: "${TILLER_READY_ENDPOINT:="127.0.0.1:44135/readiness"}"
 
-: ${TILLER_READY_ENDPOINT:="127.0.0.1:44135/readiness"}
+: "${ALL_NAMESPACES:=false}"
+: "${TARGET_NAMESPACES:=$MY_POD_NAMESPACE}"
+
 
 export HELM_HOST
 export RELEASE_HISTORY_LIMIT
@@ -28,11 +29,12 @@ NEEDS_EXIT=false
 
 trap setNeedsExit SIGINT SIGTERM
 
-
+CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
+CR_DIRECTORY=/tmp/custom-resources
+UPGRADE_RESULT_DIRECTORY=/tmp/helm-upgrade-result
+RESOURCE_VERSIONS_DIRECTORY=/tmp/resource-versions
 OWNER_PATCH_FILE=/tmp/owner-patch.json
 OWNER_VALUES_FILE=/tmp/owner-values.yaml
-HELM_RELEASES_FILE=/tmp/helm-release.json
-CURRENT_RELEASE_FILE=/tmp/current-release.json
 RELEASE_CONFIGMAPS_FILE=/tmp/release-configmaps.json
 
 setNeedsExit() {
@@ -134,15 +136,16 @@ EOF
 helmUpgrade() {
     RELEASE_NAME=$1
     CHART_LOCATION=$2
+    NAMESPACE=$3
     helm upgrade \
         --install \
-        --namespace "$MY_POD_NAMESPACE" \
+        --namespace "$NAMESPACE" \
         --wait="$HELM_WAIT" \
         --force \
         --timeout="$HELM_WAIT_TIMEOUT" \
         "$RELEASE_NAME"\
         "$CHART_LOCATION" \
-        "${@:3}"
+        "${@:4}"
     HELM_EXIT_CODE=$?
     if [ $HELM_EXIT_CODE != 0 ]; then
         echo "helm upgrade failed, exit code: $HELM_EXIT_CODE"
@@ -156,69 +159,146 @@ done
 
 checkExit
 
+echo "Target namespaces: $TARGET_NAMESPACES"
+
+TARGET_NAMESPACES_LIST=()
+while read -rd, ns; do
+    TARGET_NAMESPACES_LIST+=("$ns")
+done <<<"$TARGET_NAMESPACES,"
+
 while true; do
     checkExit
 
-    CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
-    kubectl \
-        --namespace "$MY_POD_NAMESPACE" \
-        get "$CRD" \
-        -o json > "$HELM_RELEASES_FILE"
+    rm -rf "$CR_DIRECTORY"
+    mkdir -p "$CR_DIRECTORY"
 
-    if [ -s "$HELM_RELEASES_FILE" ]; then
-        while read -r release; do
-            echo -E "$release" > "$CURRENT_RELEASE_FILE"
-            RELEASE_NAME="$(jq -Mcr '.metadata.name' "$CURRENT_RELEASE_FILE")"
-            RELEASE_UID="$(jq -Mcr '.metadata.uid' "$CURRENT_RELEASE_FILE")"
-            RELEASE_API_VERSION="$(jq -Mcr '.apiVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CURRENT_RELEASE_FILE")"
-            RELEASE_VALUES="$(jq -Mcr '.spec // empty' "$CURRENT_RELEASE_FILE")"
-            CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CURRENT_RELEASE_FILE")"
+    CR_NAMES_LIST=()
 
-            HELM_ARGS=()
-            if [ -s "$EXTRA_VALUES_FILE" ]; then
-                HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+    # Gather all the CR instances for the CRD we're watching
+    if [ "$ALL_NAMESPACES" == "true" ]; then
+        echo "Querying all namespaces for $CRD resources"
+        CURRENT_CR_LIST="/tmp/cr-list.json"
+        rm -f "$CURRENT_CR_LIST"
+        kubectl --all-namespaces get "$CRD" -o json > "$CURRENT_CR_LIST"
+        echo "Got $(jq -Mcr '.items | length' "$CURRENT_CR_LIST") instances of $CRD from all namespaces"
+        while read -r cr_content; do
+            NAME="$(echo "$cr_content" | jq -Mcr '.metadata.name')"
+            NAMESPACE="$(echo "$cr_content" | jq -Mcr '.metadata.namespace')"
+            PROCESS_CR=false
+
+            if [ ${#TARGET_NAMESPACES_LIST[@]} -eq 0 ]; then
+                PROCESS_CR=true
             fi
 
-            if [ -z "$RELEASE_VALUES" ]; then
-                echo "No values, using default values"
-            else
-                VALUES_FILE="/tmp/${RELEASE_NAME}-values.yaml"
-                echo -E "$RELEASE_VALUES" > "$VALUES_FILE"
+            for TARGET_NAMESPACE in "${TARGET_NAMESPACES_LIST[@]}"; do
+                if [ "$NAMESPACE" == "$TARGET_NAMESPACE" ]; then
+                    PROCESS_CR=true
+                    break
+                fi
+            done
 
-                HELM_ARGS+=("-f" "$VALUES_FILE")
+            if [ "$PROCESS_CR" == "true" ]; then
+                CR_NAMES_LIST+=("$NAMESPACE/$NAME")
+                CR_FILE="${CR_DIRECTORY}/${NAMESPACE}-${NAME}-cr.json"
+                echo "$cr_content" > "${CR_FILE}"
             fi
 
-            # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
-            if [[ -s "/tmp/${RELEASE_NAME}.resourceVersion" && "$(cat "/tmp/${RELEASE_NAME}.resourceVersion")" == "$RELEASE_RESOURCE_VERSION" ]]; then
-                echo "Nothing has changed for release $RELEASE_NAME"
-            else
-                echo "$RELEASE_RESOURCE_VERSION" > "/tmp/$RELEASE_NAME.resourceVersion"
-
-                writeReleaseOwnerValuesFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                writeReleaseConfigMapOwnerPatchFile "$RELEASE_API_VERSION" "$HELM_RELEASE_CRD_NAME" "$RELEASE_NAME" "$RELEASE_UID"
-                HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
-
-                echo "Running helm upgrade for release $RELEASE_NAME"
-                # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
-                CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
-                echo "Using $CHART as chart"
-                helmUpgrade "$RELEASE_NAME" "$CHART" "${HELM_ARGS[@]}"
-
-                writeReleaseConfigmapsFile "$RELEASE_NAME"
-                setOwnerOnReleaseConfigmaps
-                cleanupOldReleaseConfigmaps
-            fi
-
-            checkExit
-        done < <(jq '.items[]' -Mcr "$HELM_RELEASES_FILE")
-
-        echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
-        for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
-            sleep 1
-            checkExit
-        done
+        done < <(jq -Mcr '.items[]' "$CURRENT_CR_LIST")
     else
-        echo "No resources with kind $HELM_RELEASE_CRD_NAME and group $HELM_RELEASE_CRD_API_GROUP"
+        for TARGET_NAMESPACE in "${TARGET_NAMESPACES_LIST[@]}"; do
+            echo "Querying $TARGET_NAMESPACE for $CRD resources"
+            CURRENT_CR_LIST="/tmp/cr-list.json"
+            rm -f "$CURRENT_CR_LIST"
+            kubectl --namespace "$TARGET_NAMESPACE" get "$CRD" -o json > "$CURRENT_CR_LIST"
+            echo "Got $(jq -r '.items | length' "$CURRENT_CR_LIST") instances of $CRD from $TARGET_NAMESPACE"
+            while read -r cr_content; do
+                NAME="$(echo "$cr_content" | jq -Mcr '.metadata.name')"
+                NAMESPACE="$(echo "$cr_content" | jq -Mcr '.metadata.namespace')"
+                CR_NAMES_LIST+=("$NAMESPACE/$NAME")
+                CR_FILE="${CR_DIRECTORY}/${NAMESPACE}-${NAME}-cr.json"
+                echo "$cr_content" > "${CR_FILE}"
+            done < <(jq -Mcr '.items[]' "$CURRENT_CR_LIST")
+        done
     fi
+
+    checkExit
+
+    echo "Got ${#CR_NAMES_LIST[@]} total instances of ${CRD}: ${CR_NAMES_LIST[*]}"
+
+    find "$CR_DIRECTORY" -type f -name '*.json' | while read -r CR_FILE; do
+        RESOURCE_KIND="$HELM_RELEASE_CRD_NAME"
+        RESOURCE_NAME="$(jq -Mcr '.metadata.name' "$CR_FILE")"
+        RESOURCE_NAMESPACE="$(jq -Mcr '.metadata.namespace' "$CR_FILE")"
+        FULL_RESOURCE_NAME="$RESOURCE_NAMESPACE/$RESOURCE_NAME"
+        RESOURCE_UID="$(jq -Mcr '.metadata.uid' "$CR_FILE")"
+        RESOURCE_API_VERSION="$(jq -Mcr '.apiVersion' "$CR_FILE")"
+        RESOURCE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CR_FILE")"
+        RESOURCE_VALUES="$(jq -Mcr '.spec // empty' "$CR_FILE")"
+        CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CR_FILE")"
+        # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
+        CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
+
+        RELEASE_NAME=""
+        # If running against all namespaces, we have to prefix the namespace to
+        # the release name because helm doesn't namespace releases by
+        # namespace.
+        if [ "$ALL_NAMESPACES" == "true" ]; then
+            RELEASE_NAME="$RESOURCE_NAMESPACE-$RESOURCE_NAME"
+        else
+            RELEASE_NAME="$RESOURCE_NAME"
+        fi
+
+        if [ ${#RELEASE_NAME} -gt 52 ]; then
+            echo "$CRD generated release name cannot be more than than 52 characters, got ${#RELEASE_NAME} for $RELEASE_NAME"
+            continue
+        fi
+        echo "Processing $CRD $FULL_RESOURCE_NAME at resourceVersion: $RESOURCE_RESOURCE_VERSION using $CHART as chart and $RELEASE_NAME as release name"
+
+        HELM_ARGS=()
+        if [ -s "$EXTRA_VALUES_FILE" ]; then
+            HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+        fi
+
+        if [ -z "$RESOURCE_VALUES" ]; then
+            echo "No values for $FULL_RESOURCE_NAME, using default values"
+        else
+            VALUES_FILE="/tmp/$RESOURCE_NAMESPACE-$RESOURCE_NAME-values.yaml"
+            echo -E "$RESOURCE_VALUES" > "$VALUES_FILE"
+
+            HELM_ARGS+=("-f" "$VALUES_FILE")
+        fi
+
+        mkdir -p "$RESOURCE_VERSIONS_DIRECTORY"
+        RESOURCE_VERSION_FILE="$RESOURCE_VERSIONS_DIRECTORY/$RESOURCE_NAMESPACE-$RESOURCE_NAME.resourceVersion"
+        # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
+        if [[ -s "$RESOURCE_VERSION_FILE" && "$(cat "$RESOURCE_VERSION_FILE")" == "$RESOURCE_RESOURCE_VERSION" ]]; then
+            echo "Nothing has changed for $FULL_RESOURCE_NAME"
+        else
+            echo "$CRD $FULL_RESOURCE_NAME has been modified"
+            echo "$RESOURCE_RESOURCE_VERSION" > "$RESOURCE_VERSION_FILE"
+
+            writeReleaseOwnerValuesFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
+            writeReleaseConfigMapOwnerPatchFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
+            HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
+
+            mkdir -p "$UPGRADE_RESULT_DIRECTORY"
+            echo "Running helm upgrade for release $RELEASE_NAME"
+            if helmUpgrade "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" "${HELM_ARGS[@]}" | tee "$UPGRADE_RESULT_DIRECTORY/$RELEASE_NAME.txt"; then
+                echo "Error occurred when processing $FULL_RESOURCE_NAME"
+            fi
+
+            writeReleaseConfigmapsFile "$RESOURCE_NAME"
+            setOwnerOnReleaseConfigmaps
+            cleanupOldReleaseConfigmaps
+        fi
+        checkExit
+    done
+
+    checkExit
+
+    echo "Sleeping $HELM_RECONCILE_INTERVAL_SECONDS seconds"
+    for ((i=0; i < $HELM_RECONCILE_INTERVAL_SECONDS; i++)); do
+        sleep 1
+        checkExit
+    done
 done
