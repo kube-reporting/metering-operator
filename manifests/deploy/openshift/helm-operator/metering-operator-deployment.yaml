@@ -25,11 +25,17 @@ spec:
         imagePullPolicy: Always
         env:
         - name: HELM_RELEASE_CRD_NAME
-          value: Metering
+          value: "Metering"
         - name: HELM_RELEASE_CRD_API_GROUP
-          value: metering.openshift.io
+          value: "metering.openshift.io"
         - name: HELM_CHART_PATH
-          value: /openshift-metering-0.1.0.tgz
+          value: "/openshift-metering-0.1.0.tgz"
+        - name: ALL_NAMESPACES
+          value: "false"
+        - name: TARGET_NAMESPACES
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
         - name: MY_POD_NAME
           valueFrom:
             ***REMOVED***eldRef:

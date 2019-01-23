@@ -23,15 +23,34 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
 ***REMOVED***
     msg "Installing metering-operator service account and RBAC resources"
     kube-install \
-        "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml" \
-        "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
-        "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
+        "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
+
+    TMPDIR="$(mktemp -d)"
+    trap "rm -rf $TMPDIR" EXIT
+
+    # if $METERING_OPERATOR_TARGET_NAMESPACES is set, then install the
+    # metering-operator role and rolebinding in each namespace con***REMOVED***gured to
+    # grant the metering-operator serviceAccount permissions
+    if [ -z "${METERING_OPERATOR_TARGET_NAMESPACES:-}" ]; then
+        kube-install \
+            "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
+            "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
+    ***REMOVED***
+        while read -rd, TARGET_NS; do
+            "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml" \
+                | jq -r '.subjects[0].namespace=$namespace' \
+                --arg namespace "$METERING_NAMESPACE" \
+                > "$TMPDIR/metering-operator-rolebinding.yaml"
+
+            # the role is unmodi***REMOVED***ed
+            kubectl apply -n "$TARGET_NS" -f "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml"
+            kubectl apply -n "$TARGET_NS" -f "$TMPDIR/metering-operator-rolebinding.yaml"
+
+        done <<<"$METERING_OPERATOR_TARGET_NAMESPACES,"
+    ***REMOVED***
 
     if [ "${METERING_INSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING}" == "true" ]; then
         msg "Installing metering-operator Cluster level RBAC resources"
-
-        TMPDIR="$(mktemp -d)"
-        trap "rm -rf $TMPDIR" EXIT
 
         # to set the ServiceAccount subject namespace, since it's cluster
         # scoped.  updating the name is to avoid conflicting with others also

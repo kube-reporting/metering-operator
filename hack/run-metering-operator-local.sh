@@ -21,6 +21,7 @@ if [ "$LOCAL_METERING_OPERATOR_RUN_INSTALL" == "true" ]; then
 
 docker run \
     -it \
+    --name metering-operator \
     --rm \
     -u 0:0 \
     -v "$KUBECONFIG:/kubecon***REMOVED***g" \

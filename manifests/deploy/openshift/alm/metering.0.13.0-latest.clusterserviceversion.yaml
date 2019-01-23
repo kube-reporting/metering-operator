@@ -257,6 +257,12 @@ spec:
                     value: metering.openshift.io
                   - name: HELM_CHART_PATH
                     value: /openshift-metering-0.1.0.tgz
+                  - name: ALL_NAMESPACES
+                    value: "false"
+                  - name: TARGET_NAMESPACES
+                    valueFrom:
+                      ***REMOVED***eldRef:
+                        ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
                   - name: MY_POD_NAME
                     valueFrom:
                       ***REMOVED***eldRef:

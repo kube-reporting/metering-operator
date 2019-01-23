@@ -35,11 +35,21 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: HELM_RELEASE_CRD_NAME
-          value: {{ .Values.crd.kind }}
+          value: "{{ .Values.crd.kind }}"
         - name: HELM_RELEASE_CRD_API_GROUP
-          value: {{ .Values.crd.apiGroup }}
+          value: "{{ .Values.crd.apiGroup }}"
         - name: HELM_CHART_PATH
-          value: {{ required "chartPath is required" .Values.chartPath }}
+          value: "{{ required "chartPath is required" .Values.chartPath }}"
+        - name: ALL_NAMESPACES
+          value: "{{ .Values.allNamespaces }}"
+{{- if .Values.targetNamespaces }}
+        - name: TARGET_NAMESPACES
+          value: "{{ .Values.targetNamespaces | join "," }}"
+{{- ***REMOVED*** if .Values.targetNamespacesDownwardAPIValueFrom }}
+        - name: TARGET_NAMESPACES
+          valueFrom:
+{{ toYaml .Values.targetNamespacesDownwardAPIValueFrom | indent 12 }}
+{{- end }}
         - name: MY_POD_NAME
           valueFrom:
             ***REMOVED***eldRef:
