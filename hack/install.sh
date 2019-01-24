@@ -21,6 +21,35 @@ kube-install \
 if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
     echo "\$SKIP_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
 else
+    TMPDIR="$(mktemp -d)"
+    trap "rm -rf $TMPDIR" EXIT SIGINT
+
+    if [ "$USE_CUSTOM_METERING_OPERATOR_IMAGE" == "true" ]; then
+        echo "\$USE_CUSTOM_METERING_OPERATOR_IMAGE=true, using \$CUSTOM_METERING_OPERATOR_IMAGE and \$CUSTOM_METERING_OPERATOR_IMAGE_TAG to override metering-operator image"
+        export METERING_OPERATOR_IMAGE="${CUSTOM_METERING_OPERATOR_IMAGE:?}"
+        export METERING_OPERATOR_IMAGE_TAG="${CUSTOM_METERING_OPERATOR_IMAGE_TAG:?}"
+
+        # render out custom helm operator override values if CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES isn't set
+        if [ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-}" ]; then
+            export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-values.yaml"
+            "$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
+        fi
+
+        # render out custom alm override values if CUSTOM_ALM_OVERRIDE_VALUES isn't set
+        if [ -z "${CUSTOM_ALM_OVERRIDE_VALUES:-}" ]; then
+            export CUSTOM_ALM_OVERRIDE_VALUES="$TMPDIR/override-alm-values.yaml"
+            "$ROOT_DIR/hack/render-alm-override-values.sh" > "$CUSTOM_ALM_OVERRIDE_VALUES"
+        fi
+
+        export MANIFEST_OUTPUT_DIR="$TMPDIR"
+        "$ROOT_DIR/hack/create-metering-manifests.sh"
+
+        # override DEPLOY_MANIFESTS_DIR since we've modified the files
+        export DEPLOY_MANIFESTS_DIR="$TMPDIR"
+        # update INSTALLER_MANIFESTS_DIR used below to use new DEPLOY_MANIFESTS_DIR
+        export INSTALLER_MANIFESTS_DIR="$DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/helm-operator"
+    fi
+
     msg "Installing metering-operator service account and RBAC resources"
     kube-install \
         "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
