@@ -1,0 +1,149 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: Metering
+metadata:
+  name: "operator-metering"
+spec:
+  reporting-operator:
+    spec:
+      config:
+        # reporting-operator does the work of importing Metrics in chunks of 5
+        # minutes (by default), every 5 minutes.
+        # This only needs to be adjusted if your cluster is really large, and 5
+        # minutes of data is more than a few hundred metrics per time series.
+        # This comes up when you have hundreds of namespaces and pods.
+        promsumChunkSize: "5m"
+        promsumPollInterval: "5m"
+        # This is the resolution of the metrics. Setting this higher reduces
+        # granularity of the data we import, but also reduces the number of
+        # metrics returned per query.
+        promsumStepSize: "60s"
+
+      # Increasing memory to 500Mi allows reporting-operator to keep more
+      # metrics in memory at once and helps when the reporting-operator is
+      # backlogged.
+      # More CPU is for ensuring it never get's throttled during metrics
+      # importing when backlogged.
+      resources:
+        requests:
+          memory: "500Mi"
+          cpu: "250m"
+        limits:
+          memory: "500Mi"
+          cpu: "250m"
+
+  presto:
+    spec:
+      presto:
+        # for Presto, more memory and more CPUs is better and can speed things
+        # up, and becomes necessary when dealing with larger amounts of
+        # metrics.
+        coordinator:
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "4"
+            limits:
+              memory: "4Gi"
+              cpu: "4"
+        worker:
+          # Change this from 0 to increase parallelism when generating larger
+          # reports.
+          # Adjusting replicas doesn't improve ReportDataSource import
+          # performance which must go through the coordinator.
+          replicas: 0
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "4"
+            limits:
+              memory: "4Gi"
+              cpu: "4"
+      hive:
+        metastore:
+          # Hive Metastore often requires more memory, and is heavily utilized
+          # by Presto.
+          # It tracks a lot of things like table statistics, and is
+          # communicated with by both presto, and hive-server.
+          #
+          # Increasing CPU improves GC performance, as less than a core of CPU
+          # is generally not enough for most Java applications.
+          resources:
+            requests:
+              memory: "1.5Gi"
+              cpu: "1"
+            limits:
+              memory: "1.5Gi"
+              cpu: "1"
+          storage:
+            # class defaults to null, which means using the default storage
+            # class.
+            # If you have a storageClass which provides SSDs, uncomment and
+            # specify it here:
+            # class: "fast-ssd"
+            class: null
+            # Generally the default metastore size of 5Gi is sufficient, but
+            # with a large amount of ReportDataSources, you may wish to
+            # increase it.
+            size: "10Gi"
+        server:
+          # Hive server is generally mostly idle and currently doesn't require
+          # many resources.
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "250m"
+  hdfs:
+    spec:
+      datanode:
+        # 3 replicas is recommended to ensure data is replicated.
+        replicas: 3
+        # Since HDFS stores all of the data, and its frequently being accessed,
+        # it requires an increased amount of memory as metrics grow or when
+        # there's a large cluster.
+        resources:
+          requests:
+            memory: "750Mi"
+            cpu: "250m"
+          limits:
+            memory: "750Mi"
+            cpu: "250m"
+        storage:
+          # class defaults to null, which means using the default storage
+          # class.
+          # If you have a storageClass which provides SSDs, uncomment and
+          # specify it here:
+          # class: "fast-ssd"
+          class: null
+          # The default size of 5Gi is fairly small. With 1000 namespaces and
+          # at least 5 pods per namespace you could expect a few hundred Mb of
+          # storage per week.
+          # With multiple replicas, storage capacity is also increased.
+          # Additionally, on many clouds, IOPS are provisioned based on disk
+          # size, meaning a larger PVC can be faster.
+          size: "20Gi"
+      namenode:
+        # The HDFS Namenode stores metadata, and requires more resources as the
+        # amount of storage increases.
+        resources:
+          requests:
+            memory: "750Mi"
+            cpu: "250m"
+          limits:
+            memory: "750Mi"
+            cpu: "250m"
+        storage:
+          # class defaults to null, which means using the default storage
+          # class.
+          # If you have a storageClass which provides SSDs, uncomment and
+          # specify it here:
+          # class: "fast-ssd"
+          class: null
+          # Namenodes mostly need larger disks because they consume more
+          # inodes, and the amount of storage needed grows over time as more
+          # blocks are created on HDFS datanodes.
+          # Additionally, on many clouds, IOPS are provisioned based on disk
+          # size, meaning a larger PVC can be faster.
+          size: "20Gi"
