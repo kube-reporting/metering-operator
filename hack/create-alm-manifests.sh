@@ -100,18 +100,20 @@ JQ_RBAC_SCRIPT=$(cat <<EOF
 EOF
 )
 
-# find gets all the CRD files, and execs yamltojson on them, outputting a stream
-# of JSON objects separated by newlines.
-# this stream of JSON objects is used with jq -s to slurp them into an array,
-# which we map over in our $JQ_CRD_SCRIPT.
+# find gets all the CRD files, and execs faq with -s (slurp) to put them all in
+# array to be processed by the $JQ_CRD_SCRIPT
 find "$CRD_DIR" \
     -type f \
-    -exec sh -c "$ROOT_DIR/hack/yamltojson < \$0" {} \; \
-    | jq -rcs "$JQ_CRD_SCRIPT" > "$TMPDIR/alm-crd.json"
+    -exec "$FAQ_BIN" -f yaml -o yaml -M -c -r -s \
+        "$JQ_CRD_SCRIPT" \
+        {} \+ \
+    > "$TMPDIR/alm-crd.yaml"
 
 # Extract the spec of the deployment, and it's name
-"$ROOT_DIR/hack/yamltojson" < "$DEPLOYMENT_MANIFEST" \
-    | jq -r "$JQ_DEPLOYMENT_SCRIPT" > "$TMPDIR/alm-deployment.json"
+"$FAQ_BIN" -f yaml -o yaml -M -c -r -r \
+    "$JQ_DEPLOYMENT_SCRIPT" \
+    "$DEPLOYMENT_MANIFEST" \
+    > "$TMPDIR/alm-deployment.yaml"
 
 
 # Slurp files, which ones are which is based on argument ordering
@@ -120,20 +122,22 @@ find "$CRD_DIR" \
 # .[2] is the clusterRole
 #  Extracts the rules section of a role, and clusterRole, and takes the
 #  serviceAccountName
-jq \
-    -s \
-    -r "$JQ_RBAC_SCRIPT" \
-    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST") \
-    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_ROLE_MANIFEST") \
-    <("$ROOT_DIR/hack/yamltojson" < "$RBAC_CLUSTERROLE_MANIFEST") \
-    > "$TMPDIR/alm-permissions.json"
+"$FAQ_BIN" \
+    -f yaml -o yaml -r -M -c -r -s \
+    "$JQ_RBAC_SCRIPT" \
+    "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST" \
+    "$RBAC_ROLE_MANIFEST" \
+    "$RBAC_CLUSTERROLE_MANIFEST" \
+    > "$TMPDIR/alm-permissions.yaml"
 
 # Merge the 3 JSON objects created above
-jq -s '.[0] * .[1] * .[2]' \
-    "$TMPDIR/alm-crd.json" \
-    "$TMPDIR/alm-deployment.json" \
-    "$TMPDIR/alm-permissions.json" \
-    | "$ROOT_DIR/hack/jsontoyaml" > "$TMPDIR/alm-values.yaml"
+"$FAQ_BIN" \
+    -f yaml -o yaml -r -M -c -r -s \
+    '.[0] * .[1] * .[2]' \
+    "$TMPDIR/alm-crd.yaml" \
+    "$TMPDIR/alm-deployment.yaml" \
+    "$TMPDIR/alm-permissions.yaml" \
+    > "$TMPDIR/alm-values.yaml"
 
 # use helm template to create the csv and package using our metering-alm chart.
 # the metering-alm-values is the set of values which are entirely ALM
@@ -154,7 +158,7 @@ helm template "$CHART" \
     > "$TMP_CSV"
 
 # Rename the file with it's version in it, and move it to the final destination
-CSV_VERSION="$("$ROOT_DIR/hack/yamltojson" < "$TMP_CSV" | jq -r '.spec.version' )"
+CSV_VERSION="$("$FAQ_BIN" -M -c -r -o json '.spec.version' "$TMP_CSV" )"
 CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.${CSV_VERSION}.clusterserviceversion.yaml"
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 

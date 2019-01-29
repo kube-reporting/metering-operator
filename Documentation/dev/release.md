@@ -45,7 +45,7 @@ For example:
 
 ```
 unset METERING_CR_FILE
-export USE_CUSTOM_METERING_OPERATOR_IMAGE=true
+export USE_CUSTOM_METERING_OPERATOR=true
 export CUSTOM_METERING_OPERATOR_IMAGE_TAG=release-0.8
 ./hack/openshift-install.sh
 ```

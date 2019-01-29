@@ -31,7 +31,7 @@ while true; do
         echo "Namespace ${METERING_NAMESPACE} does not exist"
         break
     fi
-    PHASE="$(echo "$NS" | jq -r '.status.phase')"
+    PHASE="$(echo "$NS" | "$FAQ_BIN" -f json -o json -M -c -r '.status.phase')"
     if [ "$PHASE" == "Active" ]; then
         echo "Namespace is active"
         break
@@ -64,7 +64,7 @@ if [ "$INSTALL_METERING" == "true" ]; then
     echo
     echo "Waiting for metering-operator pod to start termination"
     # we just check until there's a non-ready container then the loop below this will check for readiness
-    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "false" ]; do
+    until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | "$FAQ_BIN" -f json -o json -M -c -r '.items | map(.status.containerStatuses[].ready) | all')" == "false" ]; do
         echo 'waiting for metering-operator pods to terminate'
         sleep 5
     done
@@ -73,7 +73,7 @@ else
 fi
 
 echo "Waiting for metering-operator pods to be ready"
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o json | "$FAQ_BIN" -f json -o json -M -c -r '.items | map(.status.containerStatuses[].ready) | all')" == "true" ]; do
     echo 'waiting for metering-operator pods to be ready'
     sleep 5
 done
@@ -84,7 +84,7 @@ echo "Waiting a for pods to be recreated"
 
 EXPECTED_POD_COUNT=7
 # wait for the count to not equal the expected count so we know pods are restarting
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length' -r)" != "$EXPECTED_POD_COUNT" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | "$FAQ_BIN" -f json -o json -M -c -r '.items | length')" != "$EXPECTED_POD_COUNT" ]; do
     echo 'waiting for metering pods to be recreated'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
     sleep 10
@@ -92,14 +92,14 @@ done
 
 # now wait for the pods to reach our expected count
 echo "checking for pod statuses"
-until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | jq '.items | length' -r)" == "$EXPECTED_POD_COUNT" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods -o json | "$FAQ_BIN" -f json -o json -M -c -r '.items | length')" == "$EXPECTED_POD_COUNT" ]; do
     echo 'waiting for metering pods to be created'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
     sleep 10
 done
 echo "all of the metering pods have been started"
 
-until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | jq '.items | map(.status.containerStatuses[].ready) | all' -r)" == "true" ]; do
+until [ "$(kubectl -n $METERING_NAMESPACE get pods  -o json | "$FAQ_BIN" -f json -o json -M -c -r '.items | map(.status.containerStatuses[].ready) | all')" == "true" ]; do
     echo 'waiting for all pods to be ready'
     kubectl -n $METERING_NAMESPACE get pods --no-headers -o wide
     sleep 10
