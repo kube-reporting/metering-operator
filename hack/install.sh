@@ -22,12 +22,15 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
     echo "\$SKIP_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
 ***REMOVED***
     TMPDIR="$(mktemp -d)"
+    # shellcheck disable=SC2064
     trap "rm -rf $TMPDIR" EXIT SIGINT
 
-    if [ "$USE_CUSTOM_METERING_OPERATOR_IMAGE" == "true" ]; then
-        echo "\$USE_CUSTOM_METERING_OPERATOR_IMAGE=true, using \$CUSTOM_METERING_OPERATOR_IMAGE and \$CUSTOM_METERING_OPERATOR_IMAGE_TAG to override metering-operator image"
+    if [ "$USE_CUSTOM_METERING_OPERATOR" == "true" ]; then
+        echo "\$USE_CUSTOM_METERING_OPERATOR=true, using custom metering-operator con***REMOVED***guration"
+
         export METERING_OPERATOR_IMAGE="${CUSTOM_METERING_OPERATOR_IMAGE:?}"
         export METERING_OPERATOR_IMAGE_TAG="${CUSTOM_METERING_OPERATOR_IMAGE_TAG:?}"
+        echo "using \$CUSTOM_METERING_OPERATOR_IMAGE=$CUSTOM_METERING_OPERATOR_IMAGE and \$CUSTOM_METERING_OPERATOR_IMAGE_TAG=$CUSTOM_METERING_OPERATOR_IMAGE_TAG to override metering-operator image"
 
         # render out custom helm operator override values if CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES isn't set
         if [ -z "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-}" ]; then
@@ -54,9 +57,6 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
     kube-install \
         "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
-    TMPDIR="$(mktemp -d)"
-    trap "rm -rf $TMPDIR" EXIT
-
     # if $METERING_OPERATOR_TARGET_NAMESPACES is set, then install the
     # metering-operator role and rolebinding in each namespace con***REMOVED***gured to
     # grant the metering-operator serviceAccount permissions
@@ -66,9 +66,11 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
             "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml"
     ***REMOVED***
         while read -rd, TARGET_NS; do
-            "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml" \
-                | jq -r '.subjects[0].namespace=$namespace' \
-                --arg namespace "$METERING_NAMESPACE" \
+            # shellcheck disable=SC2016
+            "$FAQ_BIN" -f yaml -o yaml -M -c -r \
+                --kwargs "namespace=$METERING_NAMESPACE" \
+                '.subjects[0].namespace=$namespace' \
+                "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml" \
                 > "$TMPDIR/metering-operator-rolebinding.yaml"
 
             # the role is unmodi***REMOVED***ed
@@ -85,14 +87,18 @@ if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
         # scoped.  updating the name is to avoid conflicting with others also
         # using this script to install.
 
-        "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrolebinding.yaml" \
-            | jq -r '.metadata.name=$namespace + "-" + .metadata.name | .subjects[0].namespace=$namespace | .roleRef.name=.metadata.name' \
-            --arg namespace "$METERING_NAMESPACE" \
+        # shellcheck disable=SC2016
+        "$FAQ_BIN" -f yaml -o yaml -M -c -r \
+            --kwargs "namespace=$METERING_NAMESPACE" \
+            '.metadata.name=$namespace + "-" + .metadata.name | .subjects[0].namespace=$namespace | .roleRef.name=.metadata.name' \
+            "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrolebinding.yaml" \
             > "$TMPDIR/metering-operator-clusterrolebinding.yaml"
 
-        "$ROOT_DIR/hack/yamltojson" < "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrole.yaml" \
-            | jq -r '.metadata.name=$namespace + "-" + .metadata.name' \
-            --arg namespace "$METERING_NAMESPACE" \
+        # shellcheck disable=SC2016
+        "$FAQ_BIN" -f yaml -o yaml -M -c -r \
+            --kwargs "namespace=$METERING_NAMESPACE" \
+            '.metadata.name=$namespace + "-" + .metadata.name' \
+            "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrole.yaml" \
             > "$TMPDIR/metering-operator-clusterrole.yaml"
 
         kube-install \

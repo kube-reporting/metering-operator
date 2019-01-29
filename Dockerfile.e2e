@@ -1,6 +1,10 @@
-FROM openshift/origin-release:golang-1.10 as build
+FROM openshift/origin-release:golang-1.10
 
-RUN INSTALL_PKGS="curl python PyYAML" && \
+# our copy of faq and jq
+COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
+
+RUN INSTALL_PKGS="curl jq-1.6-2.el7 faq" && \
+    yum -y remove jq && \
     yum install --setopt=skip_missing_names_on_install=False -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
