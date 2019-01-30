@@ -44,7 +44,7 @@ spec:
       labels['persistentvolumeclaim'] as persistentvolumeclaim,
       element_at(labels, 'volumename') as persistentvolume,
           labels['namespace'] as namespace,
-          labels['storageclass'] as storageclass,
+          element_at(labels, 'storageclass') as storageclass,
           amount as volume_request_storage_bytes,
           timeprecision,
           amount * timeprecision as volume_request_storage_byte_seconds,
