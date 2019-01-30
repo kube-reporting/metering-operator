@@ -20,14 +20,21 @@ spec:
 
 ## 2. Create the aggregation query
 
-To aggregate the reports together, we need a query that will retrieve the data from the report we wish to aggregate. This report is essentially a duplicate of the original `namespace-cpu-usage` query with the `data_end` and `data_start` timestamps stripped out, and a custom input `AggregatedReportName` that we use to pass the name of our sub-report in:
+To aggregate the reports together, we need a query that will retrieve the data from the report we wish to aggregate. This report is essentially a duplicate of the original `namespace-cpu-usage` query. 
+It contains a few a custom inputs: `NamespaceCPUUsageReportName` that we use to pass the name of our sub-report in:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: namespace-cpu-usage-aggregated
+  name: "namespace-cpu-usage"
+  labels:
+    operator-metering: "true"
 spec:
+  reportQueries:
+  - "pod-cpu-usage-raw"
+  view:
+    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -38,25 +45,44 @@ spec:
   - name: namespace
     type: string
     unit: kubernetes_namespace
+  - name: data_start
+    type: timestamp
+    unit: date
+  - name: data_end
+    type: timestamp
+    unit: date
   - name: pod_usage_cpu_core_seconds
     type: double
-    unit: cpu_core_seconds
+    unit: core_seconds
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
-  - name: AggregatedReportName
-    required: true
+  - name: NamespaceCPUUsageReportName
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    {|- if .Report.Inputs.NamespaceCPUUsageReportName |}
       namespace,
+      min("period_start") as data_start,
+      max("period_end") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
-    FROM {| .Report.Inputs.AggregatedReportName | reportTableName |}
-    WHERE {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_end < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    FROM {| .Report.Inputs.NamespaceCPUUsageReportName | reportTableName |}
+    WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND period_end <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY namespace
-    ORDER BY pod_usage_cpu_core_seconds DESC
+    {|- else |}
+      namespace,
+      min("timestamp") as data_start,
+      max("timestamp") as data_end,
+      sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
+    FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
+    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+    GROUP BY namespace
+    {|- end |}
 ```
 
 Note the use of the macro `reportTableName`, which will automatically get the proper table name from the given report name.
@@ -73,7 +99,7 @@ metadata:
 spec:
   generationQuery: "namespace-cpu-usage-aggregated"
   inputs:
-  - name: "AggregatedReportName"
+  - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
   reportingStart: '2018-10-09T00:00:00Z'
   gracePeriod: "10m" # wait for sub-query to finish
