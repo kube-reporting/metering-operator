@@ -7,8 +7,8 @@ hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
 hive.metastore.uri={{ .Values.spec.hive.config.metastoreURIs }}
-{{- if .Values.spec.hive.config.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.spec.hive.config.metastoreTimeout }}
+{{- if .Values.spec.presto.config.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.spec.presto.config.metastoreTimeout }}
 {{- end }}
 {{ end }}
 
