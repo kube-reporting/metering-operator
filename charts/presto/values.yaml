@@ -14,6 +14,7 @@ spec:
       # maxQueryLength: 1000000
       hiveMetastoreURI: thrift://hive-metastore:9083
       nodeSchedulerIncludeCoordinator: true
+      metastoreTimeout: null
 
     coordinator:
       terminationGracePeriodSeconds: 30
@@ -115,8 +116,6 @@ spec:
       metastoreURIs: "thrift://hive-metastore:9083"
       useHdfsCon***REMOVED***gMap: true
       hdfsCon***REMOVED***gMapName: hdfs-con***REMOVED***g
-      # Uncomment to set a custom timeout for the metastore:
-      # metastoreTimeout: "20s"
 
     securityContext:
       runAsNonRoot: true
