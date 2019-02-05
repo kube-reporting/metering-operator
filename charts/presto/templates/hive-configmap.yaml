@@ -51,6 +51,12 @@ data:
         <name>hive.default.***REMOVED***leformat</name>
         <value>{{ .Values.spec.hive.con***REMOVED***g.defaultFileFormat }}</value>
       </property>
+{{- if .Values.spec.hive.con***REMOVED***g.metastoreClientSocketTimeout }}
+      <property>
+        <name>hive.metastore.client.socket.timeout</name>
+        <value>{{ .Values.spec.hive.con***REMOVED***g.metastoreClientSocketTimeout }}</value>
+      </property>
+{{- end }}
     </con***REMOVED***guration>
 
 
