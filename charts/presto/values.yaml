@@ -116,6 +116,7 @@ spec:
       metastoreURIs: "thrift://hive-metastore:9083"
       useHdfsConfigMap: true
       hdfsConfigMapName: hdfs-config
+      metastoreClientSocketTimeout: null
 
     securityContext:
       runAsNonRoot: true
