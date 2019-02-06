@@ -42,3 +42,20 @@ spec:
         "timestamp",
         dt
     FROM {| dataSourceTableName "persistentvolumeclaim-usage-bytes" |}
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-usage"
+  labels:
+    operator-metering: "true"
+{{ -block "extraMetadata" . }}
+{{ -end }}
+spec:
+  reportQueries:
+  - "persistentvolumeclaim-usage"
+  view:
+    disabled: true
+  columns:
