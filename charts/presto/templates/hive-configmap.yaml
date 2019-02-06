@@ -51,6 +51,12 @@ data:
         <name>hive.default.fileformat</name>
         <value>{{ .Values.spec.hive.config.defaultFileFormat }}</value>
       </property>
+{{- if .Values.spec.hive.config.metastoreClientSocketTimeout }}
+      <property>
+        <name>hive.metastore.client.socket.timeout</name>
+        <value>{{ .Values.spec.hive.config.metastoreClientSocketTimeout }}</value>
+      </property>
+{{- end }}
     </configuration>
 
 
