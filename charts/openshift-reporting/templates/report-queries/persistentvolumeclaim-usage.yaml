@@ -59,3 +59,26 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: persistentvolumeclaim
+    type: string
+    unit: kubernetes_persistentvolumeclaim
+  - name: persistentvolumeclaim_usage_bytes
+    type: double
+    unit: bytes
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: persistentvolumeclaim_usage_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: timestamp
+    type: timestamp
