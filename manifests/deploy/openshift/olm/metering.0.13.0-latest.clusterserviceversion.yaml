@@ -1,5 +1,3 @@
-#! validate-crd: deploy/chart/templates/0000_30_02-clusterserviceversion.crd.yaml
-#! parse-kind: ClusterServiceVersion
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -8,7 +6,7 @@ metadata:
     tectonic-visibility: openshift-feature
   namespace: placeholder
   labels:
-    alm-catalog: openshift-feature
+    olm-catalog: openshift-feature
     operator-metering: "true"
 spec:
   displayName: Metering
@@ -22,11 +20,11 @@ spec:
   provider:
     name: Red Hat
   labels:
-    alm-owner-metering: metering-operator
-    alm-status-descriptors: metering-operator.v0.13.0-latest
+    olm-owner-metering: metering-operator
+    olm-status-descriptors: metering-operator.v0.13.0-latest
   selector:
     matchLabels:
-      alm-owner-metering: metering-operator
+      olm-owner-metering: metering-operator
   installModes:
   - supported: true
     type: OwnNamespace

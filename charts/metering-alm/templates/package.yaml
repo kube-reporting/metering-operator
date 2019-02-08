@@ -1,4 +1,0 @@
-#! package-manifest: deploy/chart/catalog_resources/rh-operators/{{ .Values.packageName }}.{{ .Values.spec.version }}.clusterserviceversion.yaml
-packageName: {{ .Values.packageName }}
-channels:
-{{ toYaml .Values.channels }}

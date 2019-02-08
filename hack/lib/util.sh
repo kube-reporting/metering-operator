@@ -44,8 +44,8 @@ function install_metering() {
         "$ROOT_DIR/hack/install.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
         "$ROOT_DIR/hack/openshift-install.sh"
-    elif [ "$INSTALL_METHOD" == "alm" ]; then
-        "$ROOT_DIR/hack/alm-install.sh"
+    elif [ "$INSTALL_METHOD" == "olm" ]; then
+        "$ROOT_DIR/hack/olm-install.sh"
     ***REMOVED***
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1
@@ -59,8 +59,8 @@ function uninstall_metering() {
         "$ROOT_DIR/hack/uninstall.sh"
     elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
         "$ROOT_DIR/hack/openshift-uninstall.sh"
-    elif [ "$INSTALL_METHOD" == "alm" ]; then
-        "$ROOT_DIR/hack/alm-uninstall.sh"
+    elif [ "$INSTALL_METHOD" == "olm" ]; then
+        "$ROOT_DIR/hack/olm-uninstall.sh"
     ***REMOVED***
         echo "Invalid \$INSTALL_METHOD: $INSTALL_METHOD"
         exit 1
