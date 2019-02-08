@@ -1,20 +1,18 @@
-#! validate-crd: deploy/chart/templates/0000_30_02-clusterserviceversion.crd.yaml
-#! parse-kind: ClusterServiceVersion
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: metering-operator.v0.12.0-latest
+  name: metering-operator.v0.13.0-latest
   annotations:
     tectonic-visibility: openshift-feature
   namespace: placeholder
   labels:
-    alm-catalog: openshift-feature
+    olm-catalog: openshift-feature
     operator-metering: "true"
 spec:
   displayName: Metering
   description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
   keywords: [metering metrics reporting]
-  version: 0.12.0-latest
+  version: 0.13.0-latest
   maturity: alpha
   maintainers:
     - email: sd-operator-metering@redhat.com
@@ -22,11 +20,11 @@ spec:
   provider:
     name: Red Hat
   labels:
-    alm-owner-metering: metering-operator
-    alm-status-descriptors: metering-operator.v0.12.0-latest
+    olm-owner-metering: metering-operator
+    olm-status-descriptors: metering-operator.v0.13.0-latest
   selector:
     matchLabels:
-      alm-owner-metering: metering-operator
+      olm-owner-metering: metering-operator
   installModes:
   - supported: true
     type: OwnNamespace
@@ -257,6 +255,12 @@ spec:
                     value: metering.openshift.io
                   - name: HELM_CHART_PATH
                     value: /openshift-metering-0.1.0.tgz
+                  - name: ALL_NAMESPACES
+                    value: "false"
+                  - name: TARGET_NAMESPACES
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.annotations['olm.targetNamespaces']
                   - name: MY_POD_NAME
                     valueFrom:
                       fieldRef:
@@ -273,7 +277,7 @@ spec:
                     value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/coreos/metering-helm-operator:0.12.0-latest
+                  image: quay.io/coreos/metering-helm-operator:0.13.0-latest
                   imagePullPolicy: Always
                   name: metering-operator
                   resources:
@@ -292,7 +296,7 @@ spec:
                         fieldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: quay.io/coreos/metering-helm-operator:0.12.0-latest
+                  image: quay.io/coreos/metering-helm-operator:0.13.0-latest
                   imagePullPolicy: Always
                   livenessProbe:
                     failureThreshold: 3

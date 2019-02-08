@@ -16,7 +16,7 @@ export DOCKER_PASSWORD="$DOCKER_CREDS_PSW"
 unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
 export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
-export CUSTOM_ALM_OVERRIDE_VALUES=${CUSTOM_ALM_OVERRIDE_VALUES:-"$TMP_DIR/custom-alm-values-${DEPLOY_TAG}.yaml"}
+export CUSTOM_OLM_OVERRIDE_VALUES=${CUSTOM_OLM_OVERRIDE_VALUES:-"$TMP_DIR/custom-olm-values-${DEPLOY_TAG}.yaml"}
 
 export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
@@ -83,15 +83,15 @@ reconcileIntervalSeconds: 5
 ${CR_SPEC}
 EOF
 
-cat <<EOF > "$CUSTOM_ALM_OVERRIDE_VALUES"
+cat <<EOF > "$CUSTOM_OLM_OVERRIDE_VALUES"
 name: metering-operator.v${DEPLOY_TAG}
 spec:
   version: ${DEPLOY_TAG}
   labels:
-    alm-status-descriptors: metering-operator.v${DEPLOY_TAG}
-    alm-owner-metering: metering-operator
+    olm-status-descriptors: metering-operator.v${DEPLOY_TAG}
+    olm-owner-metering: metering-operator
   matchLabels:
-    alm-owner-metering: metering-operator
+    olm-owner-metering: metering-operator
 EOF
 
 "$DIR/deploy-custom.sh"

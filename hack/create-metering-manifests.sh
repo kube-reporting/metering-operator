@@ -11,7 +11,7 @@ source "${ROOT_DIR}/hack/common.sh"
 # By default, we output into the deploy directory, but this can be overridden
 : "${MANIFEST_OUTPUT_DIR:=$DEPLOY_MANIFESTS_DIR}"
 : "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:?}"
-: "${CUSTOM_ALM_OVERRIDE_VALUES:?}"
+: "${CUSTOM_OLM_OVERRIDE_VALUES:?}"
 
 echo "Using $MANIFEST_OUTPUT_DIR as output directory"
 echo
@@ -26,10 +26,10 @@ echo "Creating Openshift deploy manifests"
     "${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES}"
 
 echo
-echo "Creating Openshift ALM manifests"
-"$ROOT_DIR/hack/create-alm-manifests.sh" \
+echo "Creating Openshift OLM manifests"
+"$ROOT_DIR/hack/create-olm-manifests.sh" \
     "$MANIFEST_OUTPUT_DIR/openshift/helm-operator" \
-    "$MANIFEST_OUTPUT_DIR/openshift/alm" \
-    "$DEPLOY_MANIFESTS_DIR/common-alm-values.yaml" \
-    "$DEPLOY_MANIFESTS_DIR/openshift-alm-values.yaml" \
-    "${CUSTOM_ALM_OVERRIDE_VALUES}"
+    "$MANIFEST_OUTPUT_DIR/openshift/olm" \
+    "$DEPLOY_MANIFESTS_DIR/common-olm-values.yaml" \
+    "$DEPLOY_MANIFESTS_DIR/openshift-olm-values.yaml" \
+    "${CUSTOM_OLM_OVERRIDE_VALUES}"

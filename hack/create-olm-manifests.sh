@@ -7,7 +7,7 @@ source "${ROOT_DIR}/hack/common.sh"
 
 TMPDIR="$(mktemp -d)"
 
-CHART="$ROOT_DIR/charts/metering-alm"
+CHART="$ROOT_DIR/charts/metering-olm"
 
 if [[ $# -ge 3 ]] ; then
     DEPLOYER_MANIFESTS_DIR=$1
@@ -32,7 +32,7 @@ if [[ $# -ge 3 ]] ; then
     mkdir -p "${OUTPUT_DIR}"
     shift
 
-    echo "ALM values files: $*"
+    echo "OLM values files: $*"
     # prepends -f to each argument passed in, and stores the list of arguments
     # (-f $arg1 -f $arg2) in VALUES_ARGS
     while (($# > 0)); do
@@ -49,7 +49,7 @@ mkdir -p "$OUTPUT_DIR"
 JQ_CRD_SCRIPT=$(cat <<EOF
 sort_by(.metadata.name) |
 {
-    spec: {
+    csv: {
         customresourcedefinitions: {
             owned: map(
                 {
@@ -68,7 +68,7 @@ EOF
 
 JQ_DEPLOYMENT_SCRIPT=$(cat <<EOF
 {
-    spec: {
+    csv: {
         deployments: [
             {
                 name: .metadata.name,
@@ -82,7 +82,7 @@ EOF
 
 JQ_RBAC_SCRIPT=$(cat <<EOF
 {
-    spec: {
+    csv: {
         clusterPermissions: [
             {
                 serviceAccountName: .[0].metadata.name,
@@ -107,13 +107,13 @@ find "$CRD_DIR" \
     -exec "$FAQ_BIN" -f yaml -o yaml -M -c -r -s \
         "$JQ_CRD_SCRIPT" \
         {} \+ \
-    > "$TMPDIR/alm-crd.yaml"
+    > "$TMPDIR/olm-crd.yaml"
 
 # Extract the spec of the deployment, and it's name
 "$FAQ_BIN" -f yaml -o yaml -M -c -r -r \
     "$JQ_DEPLOYMENT_SCRIPT" \
     "$DEPLOYMENT_MANIFEST" \
-    > "$TMPDIR/alm-deployment.yaml"
+    > "$TMPDIR/olm-deployment.yaml"
 
 
 # Slurp files, which ones are which is based on argument ordering
@@ -128,19 +128,19 @@ find "$CRD_DIR" \
     "$RBAC_ROLE_SERVICE_ACCOUNT_MANIFEST" \
     "$RBAC_ROLE_MANIFEST" \
     "$RBAC_CLUSTERROLE_MANIFEST" \
-    > "$TMPDIR/alm-permissions.yaml"
+    > "$TMPDIR/olm-permissions.yaml"
 
 # Merge the 3 JSON objects created above
 "$FAQ_BIN" \
     -f yaml -o yaml -r -M -c -r -s \
     '.[0] * .[1] * .[2]' \
-    "$TMPDIR/alm-crd.yaml" \
-    "$TMPDIR/alm-deployment.yaml" \
-    "$TMPDIR/alm-permissions.yaml" \
-    > "$TMPDIR/alm-values.yaml"
+    "$TMPDIR/olm-crd.yaml" \
+    "$TMPDIR/olm-deployment.yaml" \
+    "$TMPDIR/olm-permissions.yaml" \
+    > "$TMPDIR/olm-values.yaml"
 
-# use helm template to create the csv and package using our metering-alm chart.
-# the metering-alm-values is the set of values which are entirely ALM
+# use helm template to create the csv and package using our metering-olm chart.
+# the metering-olm-values is the set of values which are entirely OLM
 # specific, and the rest are things we can create from our installer manifests
 # and CRD manifests.
 #
@@ -151,7 +151,7 @@ find "$CRD_DIR" \
 # filename after it's been rendered
 TMP_CSV="$TMPDIR/metering.clusterserviceversion.yaml"
 helm template "$CHART" \
-    -f "$TMPDIR/alm-values.yaml" \
+    -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/clusterserviceversion.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
@@ -164,7 +164,7 @@ mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 
 PACKAGE_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.package.yaml"
 helm template "$CHART" \
-    -f "$TMPDIR/alm-values.yaml" \
+    -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/package.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
@@ -172,8 +172,24 @@ helm template "$CHART" \
 
 SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
 helm template "$CHART" \
-    -f "$TMPDIR/alm-values.yaml" \
+    -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
     -x "templates/subscription.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$SUBSCRIPTION_MANIFEST_DESTINATION"
+
+CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.catalogsourceconfig.yaml"
+helm template "$CHART" \
+    -f "$TMPDIR/olm-values.yaml" \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/catalogsourceconfig.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$CATALOGSOURCECONFIG_MANIFEST_DESTINATION"
+
+OPERATORGROUP_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.operatorgroup.yaml"
+helm template "$CHART" \
+    -f "$TMPDIR/olm-values.yaml" \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/operatorgroup.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$OPERATORGROUP_MANIFEST_DESTINATION"

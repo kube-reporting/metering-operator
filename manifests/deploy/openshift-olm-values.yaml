@@ -1,5 +1,5 @@
 annotations:
   tectonic-visibility: openshift-feature
 labels:
-  alm-catalog: openshift-feature
+  olm-catalog: openshift-feature
   operator-metering: "true"

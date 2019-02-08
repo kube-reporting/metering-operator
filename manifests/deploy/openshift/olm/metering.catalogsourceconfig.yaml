@@ -1,0 +1,8 @@
+apiVersion: marketplace.redhat.com/v1alpha1
+kind: CatalogSourceConfig
+metadata:
+ name: metering-operators
+ namespace: openshift-marketplace
+spec:
+  targetNamespace: openshift-metering
+  packages: metering
