@@ -3,6 +3,7 @@ set -e
 
 DIR=$(dirname "${BASH_SOURCE}")
 ROOT_DIR="$DIR/.."
+source "${ROOT_DIR}/hack/common.sh"
 
 : "${DEPLOY_TAG:?}"
 
@@ -72,7 +73,7 @@ helm template \
     > "$CUSTOM_METERING_CR_FILE"
 
 # use the CUSTOM_METERING_CR_FILE as the CR values for the helm-operator chart values below
-CR_SPEC=$("$ROOT_DIR/hack/yamltojson" < "$CUSTOM_METERING_CR_FILE" | jq -r '{ cr: {spec: .spec} }' | "$ROOT_DIR/hack/jsontoyaml")
+CR_SPEC=$("$FAQ_BIN" -f yaml -o yaml -M -c -r '{ cr: {spec: .spec} }' "$CUSTOM_METERING_CR_FILE" )
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:

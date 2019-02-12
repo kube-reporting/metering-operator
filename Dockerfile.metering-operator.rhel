@@ -4,7 +4,8 @@ FROM openshift/ose-metering-helm:v4.0 as helm
 # build image builds our charts
 FROM openshift/golang-builder:1.10 AS build
 
-RUN INSTALL_PKGS="python PyYAML jq" \
+RUN INSTALL_PKGS="faq jq-1.6-2.el7" \
+    && yum -y remove jq \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS \
     && yum clean all \
@@ -27,7 +28,7 @@ RUN make \
 FROM openshift/ose-metering-helm:v4.0
 
 USER root
-RUN INSTALL_PKGS="curl bash jq ca-certi***REMOVED***cates socat kubernetes-client" \
+RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates socat kubernetes-client" \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
     && yum clean all \
