@@ -4,6 +4,17 @@ If you want to install metering without OLM, using what's currently in master, f
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
 
+## Requirements
+
+Our installation scripts are written in bash, and utilize a few non-standard tools to interact with yaml and json files.
+Please ensure you have the following tools installed before running the install scripts:
+
+- bash
+- [faq](https://github.com/jzelinskie/faq) 0.0.5 or newer
+  - For Fedora 29, Rawhide, and CentOS 7 you can use the following copr repo: https://copr.fedorainfracloud.org/coprs/ecnahc515/faq/
+  - For mac: `brew tap jzelinskie/faq && brew install faq`
+  - Or you can download the release binaries directly from Github: https://github.com/jzelinskie/faq/releases
+
 ## Install
 
 Depending on your Kubernetes platform (regular Kubernetes, or Openshift)
@@ -72,10 +83,18 @@ For more details on configuration options, most are documented in the [configuri
 
 ## Install with a custom metering operator image
 
-Use `./hack/custom-metering-operator-install-wrapper.sh` where the first argument is the custom metering operator image tag value, and the second argument is the install script you would normally use:
+You can override the metering-operator image using a combination of 3 environment variables:
+
+Set `USE_CUSTOM_METERING_OPERATOR=true` to enable the custom behavior and then set `CUSTOM_METERING_OPERATOR_IMAGE` to the image repository you wish to use, and set `CUSTOM_METERING_OPERATOR_IMAGE_TAG` to the image tag you want.
+If you only want to change the image tag, then leave `CUSTOM_METERING_OPERATOR_IMAGE` unset.
+
+For example:
 
 ```
-./hack/custom-metering-operator-install-wrapper.sh pr-1234 ./hack/openshift-install.sh
+export USE_CUSTOM_METERING_OPERATOR=true
+export CUSTOM_METERING_OPERATOR_IMAGE=internal-registry.example.org:6443/someorg/metering-helm-operator
+export CUSTOM_METERING_OPERATOR_IMAGE_TAG=0.13.0
+./hack/openshift-install.sh
 ```
 
 ## Run reporting operator locally

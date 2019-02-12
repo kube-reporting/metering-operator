@@ -112,7 +112,7 @@ if [ "$TEST_METERING" == "true" ]; then
         | tee -a "$TEST_LOG_FILE_PATH" \
         | "$ROOT_DIR/bin/test2json" \
         | tee -a "${TEST_LOG_FILE_PATH}.json" \
-        | jq -r -s -f "$ROOT_DIR/hack/tap-output.jq" \
+        | "$FAQ_BIN" -f json -o json -M -c -r -s -F "$ROOT_DIR/hack/tap-output.jq" \
         | tee -a "$TEST_TAP_FILE_PATH"
 
     if grep -q '^not' < "$TEST_LOG_FILE_PATH"; then

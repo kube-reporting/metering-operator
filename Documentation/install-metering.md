@@ -40,27 +40,14 @@ In this case if you are not using a [kube-prometheus][kube-prometheus] installat
 
 There are multiple installation methods depending on your Kubernetes platform and the version of Operator Metering you want.
 
-### Ansible via openshift-ansible
-
-Using Ansible is the currently recommended approach for installing onto Openshift.
-The [openshift-metering playbook][metering-playbook] is included in the [openshift-ansible repository][openshift-ansible] and can be used to install and configure operator metering on top of Openshift.
-It properly handles installing the Metering with the correct configuration for communicating to Openshift Cluster Monitoring, as well as enables other options for better integration with Openshift.
-
-Read the [Ansible installation guide][ansible-install] for full details on how to use the playbook and what the available parameters are.
-
-### Operator Lifecycle Manager (OLM)
-
-Using OLM for installation is the recommended approach for installing the most recent packaged release for Kubernetes.
-In the future, using OLM on Openshift will be a supported option.
-
-For instructions on installing using OLM follow the [OLM installation guide][olm-install].
-
 ### Manual install scripts
 
-Manual installation is generally not recommended as it is always changing and relies on a local checkout of the operator-metering git repository.
-The primary use for manual installation is for doing development work or installing an unreleased versions of components.
-
+Manual installation is generally the recommended install method until OLM can be used.
 For instructions on installing using our manual install scripts follow the [manual installation guide][manual-install].
+
+### Operator Lifecycle Manager
+
+In a future release, OLM will be a supported installation method that will be the primary method of installation on Openshift 4.
 
 ## Verifying operation
 

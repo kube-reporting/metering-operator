@@ -313,7 +313,7 @@ openshift-metering-chart: bin/openshift-metering-0.1.0.tgz
 
 bin/openshift-metering-0.1.0.tgz: $(shell find charts -type f)
 	@echo "Packaging openshift-metering chart dependencies"
-	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/extract_helm_dep_repos.py charts/openshift-metering/requirements.yaml | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
+	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/extract_helm_dep_repos.sh charts/openshift-metering/requirements.yaml | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
 	helm package --save=false -d bin charts/openshift-metering
 
 metering-manifests:
