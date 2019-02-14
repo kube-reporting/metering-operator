@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: reporting-operator
@@ -10,6 +10,12 @@ spec:
   replicas: {{ .Values.spec.replicas }}
   strategy:
 {{ toYaml .Values.spec.updateStrategy | indent 4 }}
+  selector:
+    matchLabels:
+      app: reporting-operator
+{{- if .Values.spec.labels }}
+{{ toYaml .Values.spec.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:

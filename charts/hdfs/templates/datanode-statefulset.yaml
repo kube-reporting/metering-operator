@@ -32,7 +32,7 @@ spec:
     app: hdfs-datanode
 ---
 
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: hdfs-datanode
@@ -45,6 +45,12 @@ spec:
   replicas: {{ .Values.spec.datanode.replicas }}
   updateStrategy:
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hdfs-datanode
+{{- if .Values.spec.datanode.labels }}
+{{ toYaml .Values.spec.datanode.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:
