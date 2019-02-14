@@ -46,7 +46,7 @@ func (c *FakeReportPrometheusQueries) List(opts v1.ListOptions) (result *v1alpha
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.ReportPrometheusQueryList{}
+	list := &v1alpha1.ReportPrometheusQueryList{ListMeta: obj.(*v1alpha1.ReportPrometheusQueryList).ListMeta}
 	for _, item := range obj.(*v1alpha1.ReportPrometheusQueryList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
@@ -103,7 +103,7 @@ func (c *FakeReportPrometheusQueries) DeleteCollection(options *v1.DeleteOptions
 // Patch applies the patch and returns the patched reportPrometheusQuery.
 func (c *FakeReportPrometheusQueries) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ReportPrometheusQuery, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(reportprometheusqueriesResource, c.ns, name, data, subresources...), &v1alpha1.ReportPrometheusQuery{})
+		Invokes(testing.NewPatchSubresourceAction(reportprometheusqueriesResource, c.ns, name, pt, data, subresources...), &v1alpha1.ReportPrometheusQuery{})
 
 	if obj == nil {
 		return nil, err
