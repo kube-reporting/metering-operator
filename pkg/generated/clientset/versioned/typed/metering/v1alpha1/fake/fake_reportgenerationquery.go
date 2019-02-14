@@ -46,7 +46,7 @@ func (c *FakeReportGenerationQueries) List(opts v1.ListOptions) (result *v1alpha
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.ReportGenerationQueryList{}
+	list := &v1alpha1.ReportGenerationQueryList{ListMeta: obj.(*v1alpha1.ReportGenerationQueryList).ListMeta}
 	for _, item := range obj.(*v1alpha1.ReportGenerationQueryList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
@@ -115,7 +115,7 @@ func (c *FakeReportGenerationQueries) DeleteCollection(options *v1.DeleteOptions
 // Patch applies the patch and returns the patched reportGenerationQuery.
 func (c *FakeReportGenerationQueries) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.ReportGenerationQuery, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(reportgenerationqueriesResource, c.ns, name, data, subresources...), &v1alpha1.ReportGenerationQuery{})
+		Invokes(testing.NewPatchSubresourceAction(reportgenerationqueriesResource, c.ns, name, pt, data, subresources...), &v1alpha1.ReportGenerationQuery{})
 
 	if obj == nil {
 		return nil, err
