@@ -132,7 +132,14 @@ spec:
   - name: ReportingStart
   - name: ReportingEnd
   query: |
-    SELECT view_metering_emoss_persistentvolumeclaim_phase_raw.namespace,view_metering_emoss_persistentvolumeclaim_phase_raw.persistentvolumeclaim, view_metering_emoss_persistentvolumeclaim_usage_raw.timestamp as usage_timestamp, view_metering_emoss_persistentvolumeclaim_phase_raw.timestamp as phase_timestamp, view_metering_emoss_persistentvolumeclaim_usage_raw.persistentvolumeclaim_usage_bytes FROM view_metering_emoss_persistentvolumeclaim_phase_raw left join view_metering_emoss_persistentvolumeclaim_usage_raw on view_metering_emoss_persistentvolumeclaim_phase_raw.namespace = view_metering_emoss_persistentvolumeclaim_usage_raw.namespace
+        SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
+        FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
+        FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
+        ON phase.namespace=usage.namespace
+        AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
+        AND phase.timestamp=usage.timestamp
+        ORDER BY timestamp
+        LIMIT 25;
 
 # /*
 #           timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
