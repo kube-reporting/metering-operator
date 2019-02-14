@@ -320,7 +320,7 @@ func newReportingOperator(
 	return op
 }
 
-func (op *Reporting) Run(stopCh <-chan struct{}) error {
+func (op *Reporting) Run(ctx context.Context) error {
 	var wg sync.WaitGroup
 	// buffered big enough to hold the errs of each server we start.
 	srvErrChan := make(chan error, 3)
@@ -358,14 +358,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
-	go op.informerFactory.Start(stopCh)
-
-	shutdownCtx, cancel := context.WithCancel(context.Background())
-	// wait for stopChn to be closed, then cancel our context
-	go func() {
-		<-stopCh
-		cancel()
-	}()
+	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Infof("setting up DB connections")
 
@@ -381,7 +374,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	g.Go(func() error {
 		var err error
 		connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
-		prestoConn, err := presto.NewPrestoConnWithRetry(shutdownCtx, op.logger, connStr, connBackoff, maxConnRetries)
+		prestoConn, err := presto.NewPrestoConnWithRetry(ctx, op.logger, connStr, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
 		}
@@ -390,7 +383,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	})
 	g.Go(func() error {
 		var err error
-		reconnectingHiveQueryer := hive.NewReconnectingQueryer(shutdownCtx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+		reconnectingHiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
 		if err != nil {
 			return err
 		}
@@ -411,7 +404,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}
 
 	op.logger.Info("waiting for caches to sync")
-	for t, synced := range op.informerFactory.WaitForCacheSync(stopCh) {
+	for t, synced := range op.informerFactory.WaitForCacheSync(ctx.Done()) {
 		if !synced {
 			return fmt.Errorf("cache for %s not synced in time", t)
 		}
@@ -494,7 +487,7 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 				return true, nil
 			}
 			return false, nil
-		}, stopCh)
+		}, ctx.Done())
 		if err != nil {
 			return err
 		}
@@ -519,8 +512,11 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		return fmt.Errorf("error creating lock %v", err)
 	}
 
-	stopWorkersCh := make(chan struct{})
-	lostLeaderCh := make(chan struct{})
+	// We use a new context instead of the parent because we want shutdown to
+	// be different than leader election loss and do not want shutdown to
+	// trigger the leader election lost case.
+	lostLeaderCtx, leaderCancel := context.WithCancel(context.Background())
+	defer leaderCancel()
 
 	leader, err := leaderelection.NewLeaderElector(leaderelection.LeaderElectionConfig{
 		Lock:          rl,
@@ -528,15 +524,15 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 		RenewDeadline: op.cfg.LeaderLeaseDuration / 2,
 		RetryPeriod:   2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
-			OnStartedLeading: func(leaderStopCh <-chan struct{}) {
+			OnStartedLeading: func(ctx context.Context) {
 				op.logger.Infof("became leader")
 				op.logger.Info("starting Metering workers")
-				op.startWorkers(wg, stopWorkersCh)
+				op.startWorkers(wg, ctx)
 				op.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
 				op.logger.Warn("leader election lost")
-				close(lostLeaderCh)
+				leaderCancel()
 			},
 		},
 	})
@@ -545,15 +541,15 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 	}
 
 	op.logger.Infof("starting leader election")
-	go leader.Run()
+	go leader.Run(ctx)
 
 	// wait for an shutdown signal to begin shutdown.
 	// if we lose leadership or an error occurs from one of our server
 	// processes exit immediately.
 	select {
-	case <-stopCh:
+	case <-ctx.Done():
 		op.logger.Info("got stop signal, shutting down Metering operator")
-	case <-lostLeaderCh:
+	case <-lostLeaderCtx.Done():
 		op.logger.Warnf("lost leadership election, forcing shut down of Metering operator")
 		return fmt.Errorf("lost leadership election")
 	case err := <-srvErrChan:
@@ -563,7 +559,6 @@ func (op *Reporting) Run(stopCh <-chan struct{}) error {
 
 	// if we stop being leader or get a shutdown signal, stop the workers
 	op.logger.Infof("stopping workers and collectors")
-	close(stopWorkersCh)
 
 	// stop our running http servers
 	wg.Add(3)
@@ -636,7 +631,9 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	})
 }
 
-func (op *Reporting) startWorkers(wg sync.WaitGroup, stopCh <-chan struct{}) {
+func (op *Reporting) startWorkers(wg sync.WaitGroup, ctx context.Context) {
+	stopCh := ctx.Done()
+
 	wg.Add(1)
 	go func() {
 		op.logger.Infof("starting PrestoTable worker")
