@@ -23,6 +23,7 @@ func (cfg *frozenCon***REMOVED***g) BorrowStream(writer io.Writer) *Stream {
 }
 
 func (cfg *frozenCon***REMOVED***g) ReturnStream(stream *Stream) {
+	stream.out = nil
 	stream.Error = nil
 	stream.Attachment = nil
 	cfg.streamPool.Put(stream)

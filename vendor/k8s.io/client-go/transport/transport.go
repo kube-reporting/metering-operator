@@ -28,7 +28,7 @@ import (
 // or transport level security de***REMOVED***ned by the provided Con***REMOVED***g.
 func New(con***REMOVED***g *Con***REMOVED***g) (http.RoundTripper, error) {
 	// Set transport level security
-	if con***REMOVED***g.Transport != nil && (con***REMOVED***g.HasCA() || con***REMOVED***g.HasCertAuth() || con***REMOVED***g.TLS.Insecure) {
+	if con***REMOVED***g.Transport != nil && (con***REMOVED***g.HasCA() || con***REMOVED***g.HasCertAuth() || con***REMOVED***g.HasCertCallback() || con***REMOVED***g.TLS.Insecure) {
 		return nil, fmt.Errorf("using a custom transport with TLS certi***REMOVED***cate options or the insecure flag is not allowed")
 	}
 
@@ -52,7 +52,7 @@ func New(con***REMOVED***g *Con***REMOVED***g) (http.RoundTripper, error) {
 // TLSCon***REMOVED***gFor returns a tls.Con***REMOVED***g that will provide the transport level security de***REMOVED***ned
 // by the provided Con***REMOVED***g. Will return nil if no transport level security is requested.
 func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, error) {
-	if !(c.HasCA() || c.HasCertAuth() || c.TLS.Insecure) {
+	if !(c.HasCA() || c.HasCertAuth() || c.HasCertCallback() || c.TLS.Insecure || len(c.TLS.ServerName) > 0) {
 		return nil, nil
 	}
 	if c.HasCA() && c.TLS.Insecure {
@@ -75,12 +75,40 @@ func TLSCon***REMOVED***gFor(c *Con***REMOVED***g) (*tls.Con***REMOVED***g, erro
 		tlsCon***REMOVED***g.RootCAs = rootCertPool(c.TLS.CAData)
 	}
 
+	var staticCert *tls.Certi***REMOVED***cate
 	if c.HasCertAuth() {
+		// If key/cert were provided, verify them before setting up
+		// tlsCon***REMOVED***g.GetClientCerti***REMOVED***cate.
 		cert, err := tls.X509KeyPair(c.TLS.CertData, c.TLS.KeyData)
 		if err != nil {
 			return nil, err
 		}
-		tlsCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{cert}
+		staticCert = &cert
+	}
+
+	if c.HasCertAuth() || c.HasCertCallback() {
+		tlsCon***REMOVED***g.GetClientCerti***REMOVED***cate = func(*tls.Certi***REMOVED***cateRequestInfo) (*tls.Certi***REMOVED***cate, error) {
+			// Note: static key/cert data always take precedence over cert
+			// callback.
+			if staticCert != nil {
+				return staticCert, nil
+			}
+			if c.HasCertCallback() {
+				cert, err := c.TLS.GetCert()
+				if err != nil {
+					return nil, err
+				}
+				// GetCert may return empty value, meaning no cert.
+				if cert != nil {
+					return cert, nil
+				}
+			}
+
+			// Both c.TLS.CertData/KeyData were unset and GetCert didn't return
+			// anything. Return an empty tls.Certi***REMOVED***cate, no client cert will
+			// be sent to the server.
+			return &tls.Certi***REMOVED***cate{}, nil
+		}
 	}
 
 	return tlsCon***REMOVED***g, nil

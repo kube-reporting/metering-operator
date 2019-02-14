@@ -114,6 +114,18 @@ type JobSpec struct {
 	// Describes the pod that will be created when executing a job.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 	Template v1.PodTemplateSpec `json:"template" protobuf:"bytes,6,opt,name=template"`
+
+	// ttlSecondsAfterFinished limits the lifetime of a Job that has ***REMOVED***nished
+	// execution (either Complete or Failed). If this ***REMOVED***eld is set,
+	// ttlSecondsAfterFinished after the Job ***REMOVED***nishes, it is eligible to be
+	// automatically deleted. When the Job is being deleted, its lifecycle
+	// guarantees (e.g. ***REMOVED***nalizers) will be honored. If this ***REMOVED***eld is unset,
+	// the Job won't be automatically deleted. If this ***REMOVED***eld is set to zero,
+	// the Job becomes eligible to be deleted immediately after it ***REMOVED***nishes.
+	// This ***REMOVED***eld is alpha-level and is only honored by servers that enable the
+	// TTLAfterFinished feature.
+	// +optional
+	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty" protobuf:"varint,8,opt,name=ttlSecondsAfterFinished"`
 }
 
 // JobStatus represents the current state of a Job.

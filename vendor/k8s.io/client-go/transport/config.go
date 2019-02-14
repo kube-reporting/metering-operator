@@ -17,6 +17,8 @@ limitations under the License.
 package transport
 
 import (
+	"context"
+	"crypto/tls"
 	"net"
 	"net/http"
 )
@@ -37,9 +39,10 @@ type Con***REMOVED***g struct {
 	// Bearer token for authentication
 	BearerToken string
 
-	// CacheDir is the directory where we'll store HTTP cached responses.
-	// If set to empty string, no caching mechanism will be used.
-	CacheDir string
+	// Path to a ***REMOVED***le containing a BearerToken.
+	// If set, the contents are periodically read.
+	// The last successfully read value takes precedence over BearerToken.
+	BearerTokenFile string
 
 	// Impersonate is the con***REMOVED***g that this Con***REMOVED***g will impersonate using
 	Impersonate ImpersonationCon***REMOVED***g
@@ -57,7 +60,7 @@ type Con***REMOVED***g struct {
 	WrapTransport func(rt http.RoundTripper) http.RoundTripper
 
 	// Dial speci***REMOVED***es the dial function for creating unencrypted TCP connections.
-	Dial func(network, addr string) (net.Conn, error)
+	Dial func(ctx context.Context, network, address string) (net.Conn, error)
 }
 
 // ImpersonationCon***REMOVED***g has all the available impersonation options
@@ -82,12 +85,17 @@ func (c *Con***REMOVED***g) HasBasicAuth() bool {
 
 // HasTokenAuth returns whether the con***REMOVED***guration has token authentication or not.
 func (c *Con***REMOVED***g) HasTokenAuth() bool {
-	return len(c.BearerToken) != 0
+	return len(c.BearerToken) != 0 || len(c.BearerTokenFile) != 0
 }
 
 // HasCertAuth returns whether the con***REMOVED***guration has certi***REMOVED***cate authentication or not.
 func (c *Con***REMOVED***g) HasCertAuth() bool {
-	return len(c.TLS.CertData) != 0 || len(c.TLS.CertFile) != 0
+	return (len(c.TLS.CertData) != 0 || len(c.TLS.CertFile) != 0) && (len(c.TLS.KeyData) != 0 || len(c.TLS.KeyFile) != 0)
+}
+
+// HasCertCallbacks returns whether the con***REMOVED***guration has certi***REMOVED***cate callback or not.
+func (c *Con***REMOVED***g) HasCertCallback() bool {
+	return c.TLS.GetCert != nil
 }
 
 // TLSCon***REMOVED***g holds the information needed to set up a TLS transport.
@@ -102,4 +110,6 @@ type TLSCon***REMOVED***g struct {
 	CAData   []byte // Bytes of the PEM-encoded server trusted root certi***REMOVED***cates. Supercedes CAFile.
 	CertData []byte // Bytes of the PEM-encoded client certi***REMOVED***cate. Supercedes CertFile.
 	KeyData  []byte // Bytes of the PEM-encoded client key. Supercedes KeyFile.
+
+	GetCert func() (*tls.Certi***REMOVED***cate, error) // Callback that returns a TLS client certi***REMOVED***cate. CertData, CertFile, KeyData and KeyFile supercede this ***REMOVED***eld.
 }

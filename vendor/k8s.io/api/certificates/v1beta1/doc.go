@@ -18,4 +18,5 @@ limitations under the License.
 // +k8s:openapi-gen=true
 
 // +groupName=certi***REMOVED***cates.k8s.io
+
 package v1beta1 // import "k8s.io/api/certi***REMOVED***cates/v1beta1"

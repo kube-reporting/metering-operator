@@ -32,15 +32,15 @@ import (
 // data we will likely move to deprecate the Endpoints lock.
 
 type Con***REMOVED***gMapLock struct {
-	// Con***REMOVED***gMapMeta should contain a Name and a Namespace of an
-	// Con***REMOVED***gMapMeta object that the Leadercmlector will attempt to lead.
+	// Con***REMOVED***gMapMeta should contain a Name and a Namespace of a
+	// Con***REMOVED***gMapMeta object that the LeaderElector will attempt to lead.
 	Con***REMOVED***gMapMeta metav1.ObjectMeta
 	Client        corev1client.Con***REMOVED***gMapsGetter
 	LockCon***REMOVED***g    ResourceLockCon***REMOVED***g
 	cm            *v1.Con***REMOVED***gMap
 }
 
-// Get returns the cmlection record from a Con***REMOVED***gMap Annotation
+// Get returns the election record from a Con***REMOVED***gMap Annotation
 func (cml *Con***REMOVED***gMapLock) Get() (*LeaderElectionRecord, error) {
 	var record LeaderElectionRecord
 	var err error
@@ -59,7 +59,7 @@ func (cml *Con***REMOVED***gMapLock) Get() (*LeaderElectionRecord, error) {
 	return &record, nil
 }
 
-// Create attempts to create a LeadercmlectionRecord annotation
+// Create attempts to create a LeaderElectionRecord annotation
 func (cml *Con***REMOVED***gMapLock) Create(ler LeaderElectionRecord) error {
 	recordBytes, err := json.Marshal(ler)
 	if err != nil {
@@ -77,10 +77,10 @@ func (cml *Con***REMOVED***gMapLock) Create(ler LeaderElectionRecord) error {
 	return err
 }
 
-// Update will update and existing annotation on a given resource.
+// Update will update an existing annotation on a given resource.
 func (cml *Con***REMOVED***gMapLock) Update(ler LeaderElectionRecord) error {
 	if cml.cm == nil {
-		return errors.New("endpoint not initialized, call get or create ***REMOVED***rst")
+		return errors.New("con***REMOVED***gmap not initialized, call get or create ***REMOVED***rst")
 	}
 	recordBytes, err := json.Marshal(ler)
 	if err != nil {
@@ -91,7 +91,7 @@ func (cml *Con***REMOVED***gMapLock) Update(ler LeaderElectionRecord) error {
 	return err
 }
 
-// RecordEvent in leader cmlection while adding meta-data
+// RecordEvent in leader election while adding meta-data
 func (cml *Con***REMOVED***gMapLock) RecordEvent(s string) {
 	events := fmt.Sprintf("%v %v", cml.LockCon***REMOVED***g.Identity, s)
 	cml.LockCon***REMOVED***g.EventRecorder.Eventf(&v1.Con***REMOVED***gMap{ObjectMeta: cml.cm.ObjectMeta}, v1.EventTypeNormal, "LeaderElection", events)

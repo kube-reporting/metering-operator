@@ -2,12 +2,13 @@ package jsoniter
 
 import (
 	"encoding/json"
-	"github.com/modern-go/concurrent"
-	"github.com/modern-go/reflect2"
 	"io"
 	"reflect"
 	"sync"
 	"unsafe"
+
+	"github.com/modern-go/concurrent"
+	"github.com/modern-go/reflect2"
 )
 
 // Con***REMOVED***g customize how the API should behave.
@@ -23,6 +24,7 @@ type Con***REMOVED***g struct {
 	OnlyTaggedField               bool
 	ValidateJsonRawMessage        bool
 	ObjectFieldMustBeSimpleString bool
+	CaseSensitive                 bool
 }
 
 // API the public interface of this package.
@@ -72,9 +74,12 @@ type frozenCon***REMOVED***g struct {
 	disallowUnknownFields         bool
 	decoderCache                  *concurrent.Map
 	encoderCache                  *concurrent.Map
-	extensions                    []Extension
+	encoderExtension              Extension
+	decoderExtension              Extension
+	extraExtensions               []Extension
 	streamPool                    *sync.Pool
 	iteratorPool                  *sync.Pool
+	caseSensitive                 bool
 }
 
 func (cfg *frozenCon***REMOVED***g) initCache() {
@@ -128,6 +133,7 @@ func (cfg Con***REMOVED***g) Froze() API {
 		objectFieldMustBeSimpleString: cfg.ObjectFieldMustBeSimpleString,
 		onlyTaggedField:               cfg.OnlyTaggedField,
 		disallowUnknownFields:         cfg.DisallowUnknownFields,
+		caseSensitive:                 cfg.CaseSensitive,
 	}
 	api.streamPool = &sync.Pool{
 		New: func() interface{} {
@@ -154,22 +160,21 @@ func (cfg Con***REMOVED***g) Froze() API {
 	if cfg.ValidateJsonRawMessage {
 		api.validateJsonRawMessage(encoderExtension)
 	}
-	if len(encoderExtension) > 0 {
-		api.extensions = append(api.extensions, encoderExtension)
-	}
-	if len(decoderExtension) > 0 {
-		api.extensions = append(api.extensions, decoderExtension)
-	}
+	api.encoderExtension = encoderExtension
+	api.decoderExtension = decoderExtension
 	api.con***REMOVED***gBeforeFrozen = cfg
 	return api
 }
 
-func (cfg Con***REMOVED***g) frozeWithCacheReuse() *frozenCon***REMOVED***g {
+func (cfg Con***REMOVED***g) frozeWithCacheReuse(extraExtensions []Extension) *frozenCon***REMOVED***g {
 	api := getFrozenCon***REMOVED***gFromCache(cfg)
 	if api != nil {
 		return api
 	}
 	api = cfg.Froze().(*frozenCon***REMOVED***g)
+	for _, extension := range extraExtensions {
+		api.RegisterExtension(extension)
+	}
 	addFrozenCon***REMOVED***gToCache(cfg, api)
 	return api
 }
@@ -186,7 +191,7 @@ func (cfg *frozenCon***REMOVED***g) validateJsonRawMessage(extension EncoderExte
 			stream.WriteRaw(string(rawMessage))
 		}
 	}, func(ptr unsafe.Pointer) bool {
-		return false
+		return len(*((*json.RawMessage)(ptr))) == 0
 	}}
 	extension[reflect2.TypeOfPtr((*json.RawMessage)(nil)).Elem()] = encoder
 	extension[reflect2.TypeOfPtr((*RawMessage)(nil)).Elem()] = encoder
@@ -215,7 +220,9 @@ func (cfg *frozenCon***REMOVED***g) getTagKey() string {
 }
 
 func (cfg *frozenCon***REMOVED***g) RegisterExtension(extension Extension) {
-	cfg.extensions = append(cfg.extensions, extension)
+	cfg.extraExtensions = append(cfg.extraExtensions, extension)
+	copied := cfg.con***REMOVED***gBeforeFrozen
+	cfg.con***REMOVED***gBeforeFrozen = copied
 }
 
 type lossyFloat32Encoder struct {
@@ -310,7 +317,7 @@ func (cfg *frozenCon***REMOVED***g) MarshalIndent(v interface{}, pre***REMOVED**
 	}
 	newCfg := cfg.con***REMOVED***gBeforeFrozen
 	newCfg.IndentionStep = len(indent)
-	return newCfg.frozeWithCacheReuse().Marshal(v)
+	return newCfg.frozeWithCacheReuse(cfg.extraExtensions).Marshal(v)
 }
 
 func (cfg *frozenCon***REMOVED***g) UnmarshalFromString(str string, v interface{}) error {

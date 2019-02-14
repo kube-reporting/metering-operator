@@ -17,6 +17,8 @@ limitations under the License.
 package rest
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -27,9 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/glog"
-
-	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -37,12 +36,15 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/flowcontrol"
+	"k8s.io/klog"
 )
 
 const (
 	DefaultQPS   float32 = 5.0
 	DefaultBurst int     = 10
 )
+
+var ErrNotInCluster = errors.New("unable to load in-cluster con***REMOVED***guration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be de***REMOVED***ned")
 
 // Con***REMOVED***g holds the common attributes that can be passed to a Kubernetes client on
 // initialization.
@@ -54,9 +56,6 @@ type Con***REMOVED***g struct {
 	Host string
 	// APIPath is a sub-path that points to an API root.
 	APIPath string
-	// Pre***REMOVED***x is the sub path of the server. If not speci***REMOVED***ed, the client will set
-	// a default value.  Use "/" to indicate the server root should be used
-	Pre***REMOVED***x string
 
 	// ContentCon***REMOVED***g contains settings that affect how objects are transformed when
 	// sent to the server.
@@ -71,9 +70,10 @@ type Con***REMOVED***g struct {
 	// TODO: demonstrate an OAuth2 compatible client.
 	BearerToken string
 
-	// CacheDir is the directory where we'll store HTTP cached responses.
-	// If set to empty string, no caching mechanism will be used.
-	CacheDir string
+	// Path to a ***REMOVED***le containing a BearerToken.
+	// If set, the contents are periodically read.
+	// The last successfully read value takes precedence over BearerToken.
+	BearerTokenFile string
 
 	// Impersonate is the con***REMOVED***guration that RESTClient will use for impersonation.
 	Impersonate ImpersonationCon***REMOVED***g
@@ -83,6 +83,9 @@ type Con***REMOVED***g struct {
 
 	// Callback to persist con***REMOVED***g for AuthProvider.
 	AuthCon***REMOVED***gPersister AuthProviderCon***REMOVED***gPersister
+
+	// Exec-based authentication provider.
+	ExecProvider *clientcmdapi.ExecCon***REMOVED***g
 
 	// TLSClientCon***REMOVED***g contains settings to enable transport layer security
 	TLSClientCon***REMOVED***g
@@ -115,7 +118,7 @@ type Con***REMOVED***g struct {
 	Timeout time.Duration
 
 	// Dial speci***REMOVED***es the dial function for creating unencrypted TCP connections.
-	Dial func(network, addr string) (net.Conn, error)
+	Dial func(ctx context.Context, network, address string) (net.Conn, error)
 
 	// Version forces a speci***REMOVED***c version to be used (if registered)
 	// Do we need this?
@@ -224,7 +227,7 @@ func RESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient, error) {
 // the con***REMOVED***g.Version to be empty.
 func UnversionedRESTClientFor(con***REMOVED***g *Con***REMOVED***g) (*RESTClient, error) {
 	if con***REMOVED***g.NegotiatedSerializer == nil {
-		return nil, fmt.Errorf("NeogitatedSerializer is required when initializing a RESTClient")
+		return nil, fmt.Errorf("NegotiatedSerializer is required when initializing a RESTClient")
 	}
 
 	baseURL, versionedAPIPath, err := defaultServerUrlFor(con***REMOVED***g)
@@ -312,22 +315,27 @@ func DefaultKubernetesUserAgent() string {
 
 // InClusterCon***REMOVED***g returns a con***REMOVED***g object which uses the service account
 // kubernetes gives to pods. It's intended for clients that expect to be
-// running inside a pod running on kubernetes. It will return an error if
-// called from a process not running in a kubernetes environment.
+// running inside a pod running on kubernetes. It will return ErrNotInCluster
+// if called from a process not running in a kubernetes environment.
 func InClusterCon***REMOVED***g() (*Con***REMOVED***g, error) {
+	const (
+		tokenFile  = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+		rootCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+	)
 	host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
 	if len(host) == 0 || len(port) == 0 {
-		return nil, fmt.Errorf("unable to load in-cluster con***REMOVED***guration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be de***REMOVED***ned")
+		return nil, ErrNotInCluster
 	}
 
-	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/" + v1.ServiceAccountTokenKey)
+	token, err := ioutil.ReadFile(tokenFile)
 	if err != nil {
 		return nil, err
 	}
+
 	tlsClientCon***REMOVED***g := TLSClientCon***REMOVED***g{}
-	rootCAFile := "/var/run/secrets/kubernetes.io/serviceaccount/" + v1.ServiceAccountRootCAKey
+
 	if _, err := certutil.NewPool(rootCAFile); err != nil {
-		glog.Errorf("Expected to load root CA con***REMOVED***g from %s, but got err: %v", rootCAFile, err)
+		klog.Errorf("Expected to load root CA con***REMOVED***g from %s, but got err: %v", rootCAFile, err)
 	} ***REMOVED*** {
 		tlsClientCon***REMOVED***g.CAFile = rootCAFile
 	}
@@ -335,8 +343,9 @@ func InClusterCon***REMOVED***g() (*Con***REMOVED***g, error) {
 	return &Con***REMOVED***g{
 		// TODO: switch to using cluster DNS.
 		Host:            "https://" + net.JoinHostPort(host, port),
-		BearerToken:     string(token),
 		TLSClientCon***REMOVED***g: tlsClientCon***REMOVED***g,
+		BearerToken:     string(token),
+		BearerTokenFile: tokenFile,
 	}, nil
 }
 
@@ -405,7 +414,6 @@ func AnonymousClientCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con
 	return &Con***REMOVED***g{
 		Host:          con***REMOVED***g.Host,
 		APIPath:       con***REMOVED***g.APIPath,
-		Pre***REMOVED***x:        con***REMOVED***g.Pre***REMOVED***x,
 		ContentCon***REMOVED***g: con***REMOVED***g.ContentCon***REMOVED***g,
 		TLSClientCon***REMOVED***g: TLSClientCon***REMOVED***g{
 			Insecure:   con***REMOVED***g.Insecure,
@@ -427,14 +435,13 @@ func AnonymousClientCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con
 // CopyCon***REMOVED***g returns a copy of the given con***REMOVED***g
 func CopyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con***REMOVED***g {
 	return &Con***REMOVED***g{
-		Host:          con***REMOVED***g.Host,
-		APIPath:       con***REMOVED***g.APIPath,
-		Pre***REMOVED***x:        con***REMOVED***g.Pre***REMOVED***x,
-		ContentCon***REMOVED***g: con***REMOVED***g.ContentCon***REMOVED***g,
-		Username:      con***REMOVED***g.Username,
-		Password:      con***REMOVED***g.Password,
-		BearerToken:   con***REMOVED***g.BearerToken,
-		CacheDir:      con***REMOVED***g.CacheDir,
+		Host:            con***REMOVED***g.Host,
+		APIPath:         con***REMOVED***g.APIPath,
+		ContentCon***REMOVED***g:   con***REMOVED***g.ContentCon***REMOVED***g,
+		Username:        con***REMOVED***g.Username,
+		Password:        con***REMOVED***g.Password,
+		BearerToken:     con***REMOVED***g.BearerToken,
+		BearerTokenFile: con***REMOVED***g.BearerTokenFile,
 		Impersonate: ImpersonationCon***REMOVED***g{
 			Groups:   con***REMOVED***g.Impersonate.Groups,
 			Extra:    con***REMOVED***g.Impersonate.Extra,
@@ -442,6 +449,7 @@ func CopyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) *Con***REMOVED*
 		},
 		AuthProvider:        con***REMOVED***g.AuthProvider,
 		AuthCon***REMOVED***gPersister: con***REMOVED***g.AuthCon***REMOVED***gPersister,
+		ExecProvider:        con***REMOVED***g.ExecProvider,
 		TLSClientCon***REMOVED***g: TLSClientCon***REMOVED***g{
 			Insecure:   con***REMOVED***g.TLSClientCon***REMOVED***g.Insecure,
 			ServerName: con***REMOVED***g.TLSClientCon***REMOVED***g.ServerName,

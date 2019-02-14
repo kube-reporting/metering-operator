@@ -72,13 +72,10 @@ func (g *genGroup) GenerateType(c *generator.Context, t *types.Type, w io.Writer
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 
 	apiPath := func(group string) string {
-		if len(g.apiPath) > 0 {
-			return `"` + g.apiPath + `"`
-		}
 		if group == "core" {
 			return `"/api"`
 		}
-		return `"/apis"`
+		return `"` + g.apiPath + `"`
 	}
 
 	groupName := g.group
@@ -213,17 +210,12 @@ func New(c $.restRESTClientInterface|raw$) *$.GroupGoName$$.Version$Client {
 
 var setInternalVersionClientDefaultsTemplate = `
 func setCon***REMOVED***gDefaults(con***REMOVED***g *$.restCon***REMOVED***g|raw$) error {
-	g, err := scheme.Registry.Group("$.groupName$")
-	if err != nil {
-		return err
-	}
-
 	con***REMOVED***g.APIPath = $.apiPath$
 	if con***REMOVED***g.UserAgent == "" {
 		con***REMOVED***g.UserAgent = $.restDefaultKubernetesUserAgent|raw$()
 	}
-	if con***REMOVED***g.GroupVersion == nil || con***REMOVED***g.GroupVersion.Group != g.GroupVersion.Group {
-		gv := g.GroupVersion
+	if con***REMOVED***g.GroupVersion == nil || con***REMOVED***g.GroupVersion.Group != scheme.Scheme.PrioritizedVersionsForGroup("$.groupName$")[0].Group {
+		gv := scheme.Scheme.PrioritizedVersionsForGroup("$.groupName$")[0]
 		con***REMOVED***g.GroupVersion = &gv
 	}
 	con***REMOVED***g.NegotiatedSerializer = scheme.Codecs

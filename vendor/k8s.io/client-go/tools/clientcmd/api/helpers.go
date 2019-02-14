@@ -29,6 +29,8 @@ import (
 func init() {
 	sDec, _ := base64.StdEncoding.DecodeString("REDACTED+")
 	redactedBytes = []byte(string(sDec))
+	sDec, _ = base64.StdEncoding.DecodeString("DATA+OMITTED")
+	dataOmittedBytes = []byte(string(sDec))
 }
 
 // IsCon***REMOVED***gEmpty returns true if the con***REMOVED***g is empty.
@@ -79,7 +81,10 @@ func MinifyCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) error {
 	return nil
 }
 
-var redactedBytes []byte
+var (
+	redactedBytes    []byte
+	dataOmittedBytes []byte
+)
 
 // Flatten redacts raw data entries from the con***REMOVED***g object for a human-readable view.
 func ShortenCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) {
@@ -97,7 +102,7 @@ func ShortenCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g) {
 	}
 	for key, cluster := range con***REMOVED***g.Clusters {
 		if len(cluster.Certi***REMOVED***cateAuthorityData) > 0 {
-			cluster.Certi***REMOVED***cateAuthorityData = redactedBytes
+			cluster.Certi***REMOVED***cateAuthorityData = dataOmittedBytes
 		}
 		con***REMOVED***g.Clusters[key] = cluster
 	}

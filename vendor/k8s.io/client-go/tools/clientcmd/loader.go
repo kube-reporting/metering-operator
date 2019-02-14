@@ -27,8 +27,8 @@ import (
 	goruntime "runtime"
 	"strings"
 
-	"github.com/golang/glog"
 	"github.com/imdario/mergo"
+	"k8s.io/klog"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -111,7 +111,7 @@ func (g *ClientCon***REMOVED***gGetter) IsDefaultCon***REMOVED***g(con***REMOVED
 // ClientCon***REMOVED***gLoadingRules is an ExplicitPath and string slice of speci***REMOVED***c locations that are used for merging together a Con***REMOVED***g
 // Callers can put the chain together however they want, but we'd recommend:
 // EnvVarPathFiles if set (a list of ***REMOVED***les if set) OR the HomeDirectoryPath
-// ExplicitPath is special, because if a user speci***REMOVED***cally requests a certain ***REMOVED***le be used and error is reported if thie ***REMOVED***le is not present
+// ExplicitPath is special, because if a user speci***REMOVED***cally requests a certain ***REMOVED***le be used and error is reported if this ***REMOVED***le is not present
 type ClientCon***REMOVED***gLoadingRules struct {
 	ExplicitPath string
 	Precedence   []string
@@ -139,7 +139,9 @@ func NewDefaultClientCon***REMOVED***gLoadingRules() *ClientCon***REMOVED***gLoa
 
 	envVarFiles := os.Getenv(RecommendedCon***REMOVED***gPathEnvVar)
 	if len(envVarFiles) != 0 {
-		chain = append(chain, ***REMOVED***lepath.SplitList(envVarFiles)...)
+		***REMOVED***leList := ***REMOVED***lepath.SplitList(envVarFiles)
+		// prevent the same path load multiple times
+		chain = append(chain, deduplicate(***REMOVED***leList)...)
 
 	} ***REMOVED*** {
 		chain = append(chain, RecommendedHomeFile)
@@ -209,7 +211,7 @@ func (rules *ClientCon***REMOVED***gLoadingRules) Load() (*clientcmdapi.Con***RE
 	mapCon***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
 
 	for _, kubecon***REMOVED***g := range kubecon***REMOVED***gs {
-		mergo.Merge(mapCon***REMOVED***g, kubecon***REMOVED***g)
+		mergo.MergeWithOverwrite(mapCon***REMOVED***g, kubecon***REMOVED***g)
 	}
 
 	// merge all of the struct values in the reverse order so that priority is given correctly
@@ -217,14 +219,14 @@ func (rules *ClientCon***REMOVED***gLoadingRules) Load() (*clientcmdapi.Con***RE
 	nonMapCon***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
 	for i := len(kubecon***REMOVED***gs) - 1; i >= 0; i-- {
 		kubecon***REMOVED***g := kubecon***REMOVED***gs[i]
-		mergo.Merge(nonMapCon***REMOVED***g, kubecon***REMOVED***g)
+		mergo.MergeWithOverwrite(nonMapCon***REMOVED***g, kubecon***REMOVED***g)
 	}
 
 	// since values are overwritten, but maps values are not, we can merge the non-map con***REMOVED***g on top of the map con***REMOVED***g and
 	// get the values we expect.
 	con***REMOVED***g := clientcmdapi.NewCon***REMOVED***g()
-	mergo.Merge(con***REMOVED***g, mapCon***REMOVED***g)
-	mergo.Merge(con***REMOVED***g, nonMapCon***REMOVED***g)
+	mergo.MergeWithOverwrite(con***REMOVED***g, mapCon***REMOVED***g)
+	mergo.MergeWithOverwrite(con***REMOVED***g, nonMapCon***REMOVED***g)
 
 	if rules.ResolvePaths() {
 		if err := ResolveLocalPaths(con***REMOVED***g); err != nil {
@@ -354,7 +356,7 @@ func LoadFromFile(***REMOVED***lename string) (*clientcmdapi.Con***REMOVED***g, 
 	if err != nil {
 		return nil, err
 	}
-	glog.V(6).Infoln("Con***REMOVED***g loaded from ***REMOVED***le", ***REMOVED***lename)
+	klog.V(6).Infoln("Con***REMOVED***g loaded from ***REMOVED***le", ***REMOVED***lename)
 
 	// set LocationOfOrigin on every Cluster, User, and Context
 	for key, obj := range con***REMOVED***g.AuthInfos {
@@ -420,7 +422,7 @@ func WriteToFile(con***REMOVED***g clientcmdapi.Con***REMOVED***g, ***REMOVED***
 
 func lockFile(***REMOVED***lename string) error {
 	// TODO: ***REMOVED***nd a way to do this with actual ***REMOVED***le locks. Will
-	// probably need seperate solution for windows and linux.
+	// probably need separate solution for windows and Linux.
 
 	// Make sure the dir exists before we try to create a lock ***REMOVED***le.
 	dir := ***REMOVED***lepath.Dir(***REMOVED***lename)
@@ -557,7 +559,12 @@ func GetClusterFileReferences(cluster *clientcmdapi.Cluster) []*string {
 }
 
 func GetAuthInfoFileReferences(authInfo *clientcmdapi.AuthInfo) []*string {
-	return []*string{&authInfo.ClientCerti***REMOVED***cate, &authInfo.ClientKey, &authInfo.TokenFile}
+	s := []*string{&authInfo.ClientCerti***REMOVED***cate, &authInfo.ClientKey, &authInfo.TokenFile}
+	// Only resolve exec command if it isn't PATH based.
+	if authInfo.Exec != nil && strings.ContainsRune(authInfo.Exec.Command, ***REMOVED***lepath.Separator) {
+		s = append(s, &authInfo.Exec.Command)
+	}
+	return s
 }
 
 // ResolvePaths updates the given refs to be absolute paths, relative to the given base directory
@@ -609,4 +616,18 @@ func MakeRelative(path, base string) (string, error) {
 		return rel, nil
 	}
 	return path, nil
+}
+
+// deduplicate removes any duplicated values and returns a new slice, keeping the order unchanged
+func deduplicate(s []string) []string {
+	encountered := map[string]bool{}
+	ret := make([]string, 0)
+	for i := range s {
+		if encountered[s[i]] {
+			continue
+		}
+		encountered[s[i]] = true
+		ret = append(ret, s[i])
+	}
+	return ret
 }
