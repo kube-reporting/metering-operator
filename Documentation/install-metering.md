@@ -33,8 +33,8 @@ If you do not wish to modify the Operator Metering configuration, a minimal conf
 
 For Openshift 3.11 or later, Prometheus is installed by default through cluster monitoring in the openshift-monitoring namespace.
 
-If you're not using Openshift, then you will need to use OLM or the manual install method.
-In this case if you are not using a [kube-prometheus][kube-prometheus] installation, or your Prometheus service is not named `prometheus-k8s` and in the `monitoring` namespace, then you must customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
+If you're not using Openshift, then you will need to use the manual install method.
+In this case you must customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
 
 ## Install Methods
 
@@ -42,12 +42,13 @@ There are multiple installation methods depending on your Kubernetes platform an
 
 ### Manual install scripts
 
-Manual installation is generally the recommended install method until OLM can be used.
+Manual installation is generally the recommended install method unless OLM can be used, or if you need to run a custom version of metering rather than what OLM has available.
 For instructions on installing using our manual install scripts follow the [manual installation guide][manual-install].
 
 ### Operator Lifecycle Manager
 
-In a future release, OLM will be a supported installation method that will be the primary method of installation on Openshift 4.
+OLM is currently only supported on Openshift 4.0.
+For instructions on installing using OLM follow the [OLM install guide][olm-install].
 
 ## Verifying operation
 

@@ -1,82 +1,135 @@
 # Installation using Operator Lifecycle Manager (OLM)
 
-Before you begin please make sure that the [Operator Lifecycle Manager][install-olm] version 0.4.0 or greater is installed in the cluster before running this guide.
-It must be installed using the `upstream` method.
+Currently Metering via OLM is only supported on Openshift 4.x via the Openshift Marketplace.
+If you want to install metering into a non-Openshift Kubernetes cluster, please use the [manual installation documentation][manual-install].
 
 ## Install
 
-First, start by creating your namespace:
+### Install Metering Operator
+
+Installing the metering-operator is done by creating a `Subscription` resource in a namespace with a `CatalogSource` containing the `metering` package.
+
+Currently we advise metering is installed into it's own namespace which requires some setup.
+
+First, start by creating the `openshift-metering` namespace:
 
 ```
-export METERING_NAMESPACE=metering
-kubectl create ns $METERING_NAMESPACE
+kubectl create ns openshift-metering
 ```
 
-### Configuration
+Next a `CatalogSourceConfig` needs to be added to the `openshift-marketplace` namespace.
+This results in a `CatalogSource` containing the `metering` OLM package being created in the `openshift-metering` namespace.
+
+Download the `metering-operators` [metering.catalogsourceconfig.yaml][metering-catalogsourceconfig] and install it into the `openshift-marketplace` namespace:
+
+```
+kubectl apply -n openshift-marketplace -f metering.catalogsourceconfig.yaml
+```
+
+After it is created, confirm a new `CatalogSource` is created in the `openshift-metering` namespace:
+
+```
+kubectl -n openshift-metering get catalogsources
+NAME                 NAME     TYPE       PUBLISHER   AGE
+metering-operators   Custom   internal   Custom      5s
+```
+
+You should also see a pod with a name resembling `metering-operators-12345` in the namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
+
+```
+kubectl -n openshift-metering get pods
+NAME                       READY   STATUS    RESTARTS   AGE
+metering-operators-xmdb9   1/1     Running   0          7s
+```
+
+Next, you will create an `OperatorGroup` in your namespace that restricts the namespaces the operator will monitor to the `openshift-metering` namespace.
+
+Download the `metering-operators` [metering.operatorgroup.yaml][metering-operatorgroup] and install it into the `openshift-metering` namespace:
+
+```
+kubectl -n openshift-metering apply -f metering.operatorgroup.yaml
+```
+
+Lastly, create a `Subscription` to install the metering-operator.
+
+Download the [metering.subscription.yaml][metering-subscription] and install it into the `openshift-metering` namespace:
+
+
+```
+kubectl -n openshift-metering apply -f metering.subscription.yaml
+```
+
+Once the subscription is created, OLM will create all the required resources for the metering-operator to run.
+This step takes a bit longer than others, within a few minutes the metering-operator pod should be created.
+Verify the metering-operator has been created and is running:
+
+```
+kubectl -n openshift-metering get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+metering-operator-c7545d555-h5m6x   2/2     Running   0          32s
+metering-operators-bvpf7            1/1     Running   0          80s
+```
+
+
+### Install Metering
+
+Once the metering-operator is installed, we can now use it to install the rest of the Metering stack by configuring a `Metering` CR.
+
+#### Configuration
 
 All of the supported configuration options are documented in [configuring metering][configuring-metering].
 In this document, we will refer to your configuration as your `metering.yaml`.
 
-### Install Operator Metering with Configuration
+To start, download the example [default.yaml][default-config] Metering resource and save it as `metering.yaml`, and make any additional customizations you require.
 
-Installation is a two step process. First, install the Metering Helm operator. Then, install the `Metering` resource that defines the configuration.
+#### Install Metering Custom Resource
 
-To start, download the [Metering subscription][metering-subscription] and save it as `metering.subscription.yaml`, and download your [Metering][example-config] resource and save it as `metering.yaml`.
-
-The subscription is used by the Operator Lifecycle Management and Catalog operators to install CRDs and the Metering Helm operator.
-
-Install the subscription into the cluster:
+To install all the components that make up Metering, install your `metering.yaml` into the cluster:
 
 ```
-kubectl create -n $METERING_NAMESPACE -f metering.subscription.yaml
+kubectl -n openshift-metering apply -f metering.yaml
 ```
 
-This causes the operator-lifecycle-manager (OLM) to create an `InstallPlan` resource named after the `Subscription`.
-The `InstallPlan` references a `ClusterServiceVersion` within it's catalog which describes the Metering Helm operator Deployment, Role, ServiceAccount, and CRD resources that need to be created.
-The OLM operator will read the `ClusterServiceVersion` from it's catalog, and then create a `ClusterServiceVersion` named after our `InstallPlan`.
-Once the `ClusterServiceVersion` exists, the operator creates the deployment containing our Metering Helm operator.
-
-
-To verify this, run the following command:
+Within a minute you should see resources being created in your namespace:
 
 ```
-kubectl get -n $METERING_NAMESPACE subscription-v1s,installplan-v1s,clusterserviceversion-v1s
+kubectl -n openshift-metering get pods
+NAME                                  READY   STATUS              RESTARTS   AGE
+hdfs-datanode-0                       0/1     Init:0/1            0          25s
+hdfs-namenode-0                       0/1     ContainerCreating   0          25s
+hive-metastore-0                      0/1     ContainerCreating   0          25s
+hive-server-0                         0/1     ContainerCreating   0          25s
+metering-operator-c7545d555-h5m6x     2/2     Running             0          105s
+metering-operators-bvpf7              1/1     Running             0          2m33s
+presto-coordinator-584789c6b-kpfpc    0/1     Init:0/1            0          25s
+reporting-operator-5c8db66985-9ghz4   0/1     Running             0          25s
 ```
 
-You should see something like this in the output:
+It can take several minutes for all the pods to become "Ready".
+Many pods rely on other components to function before they themselves can be considered ready.
+Some pods may restart if other pods take too long to start, this is okay and can be expected during installation.
+
+Eventually your pod output should look like this:
 
 ```
-NAME                                                           AGE
-subscription-v1.app.coreos.com/metering-operator.v0.6.0        4m
-
-NAME                                                                        AGE
-installplan-v1.app.coreos.com/install-metering-operator.v0.6.0-jhrr4        4m
-
-NAME                                                                    AGE
-clusterserviceversion-v1.app.coreos.com/metering-operator.v0.6.0        4m
+NAME                                  READY   STATUS    RESTARTS   AGE
+hdfs-datanode-0                       1/1     Running   0          7m24s
+hdfs-namenode-0                       1/1     Running   0          7m24s
+hive-metastore-0                      1/1     Running   0          7m24s
+hive-server-0                         1/1     Running   1          7m24s
+metering-operator-c7545d555-h5m6x     2/2     Running   0          8m44s
+metering-operators-bvpf7              1/1     Running   0          9m32s
+presto-coordinator-584789c6b-kpfpc    1/1     Running   0          7m24s
+reporting-operator-5c8db66985-9ghz4   1/1     Running   0          7m24s
 ```
 
-**Note: The Subscription, and InstallPlan resources declare an intent to perform an installation once. This means they do not ensure the ClusterServiceVersion exists after creating it the first time, and deleting them will not result in the operator being uninstalled. For details on uninstall, see [Uninstalling Metering](#uninstalling-metering).**
+Once all pods are ready, you can begin using Metering to collect and Report on your cluster.
+For further reading on using metering, see the [using metering documentation][using-metering]
 
-Finally, install the `Metering` resource, which causes the Metering Helm operator to install and configure Metering and its dependencies.
-
-```
-kubectl create -n $METERING_NAMESPACE -f metering.yaml
-```
-
-## Uninstall
-
-The operator-lifecycle-manager (OLM) operator does not automatically uninstall the operator deployment when you delete a `Subscription` or `InstallPlan` in order to avoid accidental deletions of components when removing a subscription, such as if you no longer want automatic updates.
-This means subscriptions orphan their `ClusterServiceVersions` when deleted, and that we must explicitly delete the `ClusterServiceVersions` it created to do an uninstall.
-
-To perform an uninstall, you must first delete the subscription, and then delete the related `ClusterServiceVersions` as the commands below demonstrate:
-
-```
-kubectl delete -n $METERING_NAMESPACE -f metering.subscription.yaml
-kubectl delete -n $METERING_NAMESPACE clusterserviceversion-v1s -l operator-metering=true
-```
-
-[install-olm]: https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#install-the-latest-released-version-of-olm-for-upstream-kubernetes
-[metering-subscription]: ../manifests/deploy/openshift/alm/metering.subscription.yaml
+[manual-install]: manual-install.md
+[metering-catalogsourceconfig]: ../manifests/deploy/openshift/olm/metering.catalogsourceconfig.yaml
+[metering-operatorgroup]: ../manifests/deploy/openshift/olm/metering.operatorgroup.yaml
+[metering-subscription]: ../manifests/deploy/openshift/olm/metering.subscription.yaml
 [configuring-metering]: metering-config.md
-[example-config]: ../manifests/metering-config/default.yaml
+[default-config]: ../manifests/metering-config/default.yaml
+[using-metering]: using-metering.md
