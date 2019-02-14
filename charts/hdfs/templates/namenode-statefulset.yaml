@@ -50,7 +50,7 @@ spec:
     app: hdfs-namenode
 ---
 
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: hdfs-namenode
@@ -63,6 +63,12 @@ spec:
   replicas: 1
   updateStrategy:
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hdfs-namenode
+{{- if .Values.spec.namenode.labels }}
+{{ toYaml .Values.spec.namenode.labels | indent 6 }}
+{{- end }}
   template:
     metadata:
       labels:
