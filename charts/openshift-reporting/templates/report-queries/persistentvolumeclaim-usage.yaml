@@ -132,14 +132,20 @@ spec:
   - name: ReportingStart
   - name: ReportingEnd
   query: |
-        SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
-        FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
-        FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
-        ON phase.namespace=usage.namespace
-        AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
-        AND phase.timestamp=usage.timestamp
-        ORDER BY timestamp
-        LIMIT 25;
+    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
+    FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
+    FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
+    ON phase.namespace=usage.namespace
+    AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
+    AND phase.timestamp=usage.timestamp
+    WHERE phase.dt >= '2019-02-12'
+    AND phase.dt <= '2019-02-13'
+    AND phase.timestamp <= timestamp '2019-02-16 00:00:00.000'
+    AND phase.timestamp >= timestamp '2019-02-14 00:00:00.000'
+    AND phase.namespace = 'metering-ci2-openshift-continuous-upgrade-master'
+    AND phase.persistentvolumeclaim = 'hdfs-datanode-data-hdfs-datanode-0'
+    ORDER BY timestamp
+    LIMIT 10;
 
 # /*
 #           timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
