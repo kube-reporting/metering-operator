@@ -10,8 +10,8 @@ source "${ROOT_DIR}/hack/common.sh"
 TMP_DIR="$(mktemp -d)"
 
 # Used in deploy.sh
-export DOCKER_USERNAME="$DOCKER_CREDS_USR"
-export DOCKER_PASSWORD="$DOCKER_CREDS_PSW"
+export DOCKER_USERNAME="${DOCKER_CREDS_USR:-}"
+export DOCKER_PASSWORD="${DOCKER_CREDS_PSW:-}"
 
 unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"

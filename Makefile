@@ -32,12 +32,12 @@ PRESTO_IMAGE_TAG = metering-0.212
 HIVE_IMAGE_TAG = metering-2.3.3
 HDFS_IMAGE_TAG = metering-3.1.1
 
-METERING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(METERING_OPERATOR_IMAGE_NAME)
-REPORTING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(REPORTING_OPERATOR_IMAGE_NAME)
-METERING_SRC_IMAGE = $(DOCKER_BASE_URL)/$(METERING_SRC_IMAGE_NAME)
-PRESTO_IMAGE = $(DOCKER_BASE_URL)/$(PRESTO_IMAGE_NAME)
-HIVE_IMAGE = $(DOCKER_BASE_URL)/$(HIVE_IMAGE_NAME)
-HDFS_IMAGE = $(DOCKER_BASE_URL)/$(HDFS_IMAGE_NAME)
+METERING_OPERATOR_IMAGE_REPO = $(DOCKER_BASE_URL)/$(METERING_OPERATOR_IMAGE_NAME)
+REPORTING_OPERATOR_IMAGE_REPO = $(DOCKER_BASE_URL)/$(REPORTING_OPERATOR_IMAGE_NAME)
+METERING_SRC_IMAGE_REPO = $(DOCKER_BASE_URL)/$(METERING_SRC_IMAGE_NAME)
+PRESTO_IMAGE_REPO = $(DOCKER_BASE_URL)/$(PRESTO_IMAGE_NAME)
+HIVE_IMAGE_REPO = $(DOCKER_BASE_URL)/$(HIVE_IMAGE_NAME)
+HDFS_IMAGE_REPO = $(DOCKER_BASE_URL)/$(HDFS_IMAGE_NAME)
 
 # by default we build using docker, and assume building an image uses typical
 # docker args and flags (-t, -f, and the build context positional arg.)
@@ -137,7 +137,7 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-all: fmt unit docker-build-all
+all: fmt unit metering-manifests docker-build-all
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
@@ -213,18 +213,18 @@ DOCKER_PULL_TARGETS := $(addsuffix -docker-pull, $(DOCKER_PUSH_NAMES))
 # ex: metering-operator -> metering_helm_operator
 # 3) Uppercases letters
 # ex: metering_helm_operator -> METERING_HELM_OPERATOR
-# 4) Appends _IMAGE
-# ex: METERING_HELM_OPERATOR -> METERING_OPERATOR_IMAGE
+# 4) Appends _IMAGE_REPO
+# ex: METERING_HELM_OPERATOR -> METERING_OPERATOR_IMAGE_REPO
 # That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
 
 $(DOCKER_PUSH_TARGETS)::
-	$(MAKE) docker-push IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-push IMAGE_NAME=$($(addsuffix _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
 
 $(DOCKER_TAG_TARGETS)::
-	$(MAKE) docker-tag IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-tag IMAGE_NAME=$($(addsuffix _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
 
 $(DOCKER_PULL_TARGETS)::
-	$(MAKE) docker-pull IMAGE_NAME=$($(addsuffix _IMAGE, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
+	$(MAKE) docker-pull IMAGE_NAME=$($(addsuffix _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
 
 docker-build-all: $(DOCKER_BUILD_TARGETS)
 
@@ -235,13 +235,13 @@ docker-tag-all: $(DOCKER_TAG_TARGETS)
 docker-pull-all: $(DOCKER_PULL_TARGETS)
 
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-src-docker-build: Dockerfile.src
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_SRC_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_SRC_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 # Update dependencies
 vendor: Gopkg.toml
@@ -255,7 +255,7 @@ unit:
 	go test -c -o bin/integration-tests ./test/integration
 
 unit-docker:
-	docker run -i $(METERING_SRC_IMAGE):$(IMAGE_TAG) bash -c 'make unit'
+	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make unit'
 
 # Runs gofmt on all files in project except vendored source and Hive Thrift definitions
 fmt:
@@ -267,8 +267,7 @@ verify: verify-codegen all-charts metering-manifests fmt
 	git diff --stat HEAD --ignore-submodules --exit-code
 
 verify-docker:
-	docker run -i $(METERING_SRC_IMAGE):$(IMAGE_TAG) bash -c 'make verify'
-
+	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make verify'
 
 .PHONY: run-metering-operator-local
 run-metering-operator-local: metering-operator-docker-build
@@ -296,10 +295,10 @@ bin/metering-override-values.yaml:
 bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
 	@mkdir -p bin
 	export \
-		REPORTING_OPERATOR_IMAGE=$(REPORTING_OPERATOR_IMAGE) \
-		PRESTO_IMAGE=$(PRESTO_IMAGE) \
-		HIVE_IMAGE=$(HIVE_IMAGE) \
-		HDFS_IMAGE=$(HDFS_IMAGE) \
+		REPORTING_OPERATOR_IMAGE_REPO=$(REPORTING_OPERATOR_IMAGE_REPO) \
+		PRESTO_IMAGE_REPO=$(PRESTO_IMAGE_REPO) \
+		HIVE_IMAGE_REPO=$(HIVE_IMAGE_REPO) \
+		HDFS_IMAGE_REPO=$(HDFS_IMAGE_REPO) \
 		REPORTING_OPERATOR_IMAGE_TAG=$(REPORTING_OPERATOR_IMAGE_TAG) \
 		PRESTO_IMAGE_TAG=$(PRESTO_IMAGE_TAG) \
 		HIVE_IMAGE_TAG=$(HIVE_IMAGE_TAG) \
@@ -319,7 +318,7 @@ bin/openshift-metering-0.1.0.tgz: $(shell find charts -type f)
 
 metering-manifests:
 	export \
-		METERING_OPERATOR_IMAGE=$(METERING_OPERATOR_IMAGE) \
+		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
 	./hack/generate-metering-manifests.sh
 
@@ -327,7 +326,8 @@ bin/test2json: gotools/test2json/main.go
 	go build -o bin/test2json gotools/test2json/main.go
 
 .PHONY: \
-	test vendor fmt regenerate-hive-thrift thrift-gen \
+	test vendor fmt verify \
+	regenerate-hive-thrift thrift-gen \
 	update-codegen verify-codegen \
 	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
 	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
