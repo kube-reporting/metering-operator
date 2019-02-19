@@ -93,6 +93,52 @@ spec:
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
+  name: "persistentvolumeclaim_usage_with_phase_raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "persistentvolumeclaim-usage-bytes"
+    "persistentvolumeclaim-phase"
+  columns:
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: persistentvolumeclaim
+    type: string
+  - name: phase
+    type: string
+  - name: value
+    type: double
+  - name: persistentvolumeclaim_usage_bytes
+    type: double
+    unit: bytes
+  query: |
+    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
+    FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
+    FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
+    ON phase.namespace=usage.namespace
+    AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
+    AND phase.timestamp=usage.timestamp
+    WHERE phase.dt >= '2019-02-12'
+    AND phase.dt <= '2019-02-13'
+    AND phase.timestamp <= timestamp '2019-02-16 00:00:00.000'
+    AND phase.timestamp >= timestamp '2019-02-14 00:00:00.000'
+    AND phase.namespace = 'metering-ci2-openshift-continuous-upgrade-master'
+    AND phase.persistentvolumeclaim = 'hdfs-datanode-data-hdfs-datanode-0'
+    ORDER BY timestamp
+    LIMIT 10;
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
   name: "persistentvolumeclaim-usage"
   labels:
     operator-metering: "true"
