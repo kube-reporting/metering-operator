@@ -45,10 +45,10 @@ spec:
       spec:
         promsum:
           query: "persistentvolumeclaim-usage-bytes"
-    persistentvolumeclaim-phase:                                                                                                          
-        spec:                                                                                                                               
-          promsum:                                                                                                                          
-            query: "persistentvolumeclaim-phase" 
+    persistentvolumeclaim-phase:
+      spec:
+        promsum:
+          query: "persistentvolumeclaim-phase"                                                                                                       
 
     node-allocatable-memory-bytes:
       spec:
@@ -77,4 +77,3 @@ spec:
     hive:
       tableProperties:
         location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
-
