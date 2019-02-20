@@ -167,7 +167,7 @@ spec:
   - name: ReportingStart
   - name: ReportingEnd
   query: |
-    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
+    SELECT namespace, timestamp, persistentvolumeclaim, phase, phase_value, persistentvolumeclaim_usage_bytes
     FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw"}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
