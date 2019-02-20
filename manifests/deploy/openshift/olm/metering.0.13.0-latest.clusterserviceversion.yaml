@@ -2,16 +2,32 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   name: metering-operator.v0.13.0-latest
-  annotations:
-    tectonic-visibility: openshift-feature
   namespace: placeholder
-  labels:
-    olm-catalog: openshift-feature
-    operator-metering: "true"
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "metering.openshift.io/v1alpha1",
+          "kind": "Metering",
+          "metadata": {
+            "name": "operator-metering"
+          },
+          "spec": {}
+        }
+      ]
+    categories: OpenShift Optional, Monitoring
+    certi***REMOVED***ed: "false"
+    containerImage: quay.io/coreos/metering-helm-operator:0.13.0-latest
+    createdAt: 2019-01-01T11:59:59Z
+    description: '**Metering** can generate reports based on historical usage data from
+      a cluster, providing accountability for how resources have been used.'
+    support: Red Hat, Inc.
 spec:
   displayName: Metering
-  description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
-  keywords: [metering metrics reporting]
+  description: |
+    **Metering** can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
+    Detailed installation documentation can be found [in the operator-metering OLM install documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/olm-install.md).
+  keywords: [metering metrics reporting prometheus chargeback]
   version: 0.13.0-latest
   maturity: alpha
   maintainers:
@@ -20,11 +36,10 @@ spec:
   provider:
     name: Red Hat
   labels:
-    olm-owner-metering: metering-operator
-    olm-status-descriptors: metering-operator.v0.13.0-latest
+    operator-metering: "true"
   selector:
     matchLabels:
-      olm-owner-metering: metering-operator
+      operator-metering: "true"
   installModes:
   - supported: true
     type: OwnNamespace

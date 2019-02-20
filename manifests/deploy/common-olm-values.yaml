@@ -1,8 +1,11 @@
 csv:
   name : metering-operator.vlatest
   displayName: Metering
-  description: Metering can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
-  keywords: ['metering', 'metrics', 'reporting']
+  description: |
+    **Metering** can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
+
+    Detailed installation documentation can be found [in the operator-metering OLM install documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/olm-install.md).
+  keywords: ['metering', 'metrics', 'reporting', 'prometheus', 'chargeback']
   version: latest
   maturity: alpha
   maintainers:
@@ -11,10 +14,9 @@ csv:
   provider:
     name: Red Hat
   labels:
-    olm-status-descriptors: metering-operator.vlatest
-    olm-owner-metering: metering-operator
+    operator-metering: "true"
   matchLabels:
-    olm-owner-metering: metering-operator
+    operator-metering: "true"
   installModes:
   - type: OwnNamespace
     supported: true
