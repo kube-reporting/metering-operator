@@ -1,0 +1,48 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: {{ .Values.csv.name }}
+  namespace: placeholder
+{{- if .Values.annotations }}
+  annotations:
+{{ toYaml .Values.annotations | indent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+{{ toYaml .Values.labels | indent 4 }}
+{{- end }}
+spec:
+  displayName: {{ .Values.csv.displayName }}
+  description: |
+{{ .Values.csv.description | indent 4 }}
+  keywords: {{ .Values.csv.keywords }}
+  version: {{ .Values.csv.version }}
+  maturity: {{ .Values.csv.maturity }}
+  maintainers:
+{{ toYaml .Values.csv.maintainers | indent 4 }}
+  provider:
+{{ toYaml .Values.csv.provider | indent 4 }}
+{{- if .Values.csv.labels }}
+  labels:
+{{ toYaml .Values.csv.labels | indent 4 }}
+{{- end }}
+{{- if .Values.csv.matchLabels }}
+  selector:
+    matchLabels:
+{{ toYaml .Values.csv.matchLabels | indent 6 }}
+{{- end }}
+  installModes:
+{{ toYaml .Values.csv.installModes | indent 2 }}
+  install:
+    strategy: deployment
+    spec:
+{{- if .Values.csv.clusterPermissions }}
+      clusterPermissions:
+{{ toYaml .Values.csv.clusterPermissions | indent 8 }}
+{{- end }}
+      permissions:
+{{ toYaml .Values.csv.permissions | indent 8 }}
+      deployments:
+{{ toYaml .Values.csv.deployments | indent 8 }}
+  customresourcedefinitions:
+{{ toYaml .Values.csv.customresourcedefinitions | indent 4 }}

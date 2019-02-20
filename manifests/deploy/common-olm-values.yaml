@@ -1,0 +1,46 @@
+csv:
+  name : metering-operator.vlatest
+  displayName: Metering
+  description: |
+    **Metering** can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used.
+
+    Detailed installation documentation can be found [in the operator-metering OLM install documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/olm-install.md).
+  keywords: ['metering', 'metrics', 'reporting', 'prometheus', 'chargeback']
+  version: latest
+  maturity: alpha
+  maintainers:
+  - name: Red Hat
+    email: sd-operator-metering@redhat.com
+  provider:
+    name: Red Hat
+  labels:
+    operator-metering: "true"
+  matchLabels:
+    operator-metering: "true"
+  installModes:
+  - type: OwnNamespace
+    supported: true
+  - type: SingleNamespace
+    supported: true
+  - type: MultiNamespace
+    supported: false
+  - type: AllNamespaces
+    supported: false
+
+packageName: metering
+channels:
+- name: alpha
+  currentCSV: metering-operator.vlatest
+
+subscriptionName: metering
+subscriptionChannel: alpha
+subscriptionCatalogSource: metering-operators
+subscriptionCatalogSourceNamespace: openshift-metering
+
+operatorGroupName: metering-operators
+operatorGroupTargetNamespaces: ["openshift-metering"]
+
+catalogSourceConfigName: metering-operators
+catalogSourceConfigNamespace: openshift-marketplace
+catalogTargetNamespace: "openshift-metering"
+
