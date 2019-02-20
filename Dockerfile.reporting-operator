@@ -5,7 +5,7 @@ WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 RUN make reporting-operator-bin RUN_UPDATE_CODEGEN=false CHECK_GO_FILES=false
 
-FROM openshift/origin-base
+FROM openshift/origin-base:v3.11
 
 RUN yum install --setopt=skip_missing_names_on_install=False -y \
         ca-certi***REMOVED***cates bash
