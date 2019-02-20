@@ -1,0 +1,18 @@
+annotations:
+  categories: "OpenShift Optional, Monitoring"
+  certi***REMOVED***ed: "false"
+  support: Red Hat, Inc.
+  createdAt: "2019-01-01T11:59:59Z"
+  containerImage: "quay.io/coreos/metering-helm-operator:latest"
+  description: "**Metering** can generate reports based on historical usage data from a cluster, providing accountability for how resources have been used."
+  alm-examples: |-
+    [
+      {
+        "apiVersion": "metering.openshift.io/v1alpha1",
+        "kind": "Metering",
+        "metadata": {
+          "name": "operator-metering"
+        },
+        "spec": {}
+      }
+    ]

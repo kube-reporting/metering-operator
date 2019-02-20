@@ -1,0 +1,8 @@
+apiVersion: marketplace.redhat.com/v1alpha1
+kind: CatalogSourceCon***REMOVED***g
+metadata:
+ name: {{ .Values.catalogSourceCon***REMOVED***gName }}
+ namespace: {{ .Values.catalogSourceCon***REMOVED***gNamespace }}
+spec:
+  targetNamespace: {{ .Values.catalogTargetNamespace }}
+  packages: {{ .Values.packageName }}

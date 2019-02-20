@@ -165,4 +165,26 @@ export LOCAL_METERING_OPERATOR_RUN_INSTALL=true
 make run-metering-operator-local
 ```
 
+## Install the most recent version available in OLM
+
+There is set of scripts for install/uninstall that automate using the latest version of the `metering` package in OLM: `hack/olm-install.sh` and `hack/olm-uninstall.sh`.
+These scripts work similarly to the `hack/install.sh` and `hack/uninstall.sh` scripts, except they install using OLM.
+
+Set your `METERING_NAMESPACE` and `METERING_CR_FILE` then run the script:
+
+```
+./hack/olm-install.sh
+```
+
+To uninstall:
+
+```
+./hack/olm-uninstall.sh
+```
+
+> *Note*: You must run the olm-uninstall.sh script to uninstall. Not doing may result in inability to re-install correctly.
+
+For more details on what this is doing, see the [OLM install guide][olm-install]
+
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
+[olm-install]: olm-install.md
