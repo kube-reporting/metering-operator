@@ -93,7 +93,7 @@ spec:
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "persistentvolumeclaim_usage_with_phase_raw"
+  name: "persistentvolumeclaim-usage-with-phase-raw"
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
@@ -111,28 +111,24 @@ spec:
     unit: date
   - name: persistentvolumeclaim
     type: string
-  - name: phase
+  - name: phase_value
     type: string
   - name: value
     type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
+  - name: dt
+    type: string
   query: |
-    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
-    FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
-    FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
+    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value AS phase_value, persistentvolumeclaim_usage_bytes,dt
+    FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
+    FULL OUTER JOIN
+    {| generationQueryViewName "persistentvolumeclaim_usage_raw"} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
-    WHERE phase.dt >= '2019-02-12'
-    AND phase.dt <= '2019-02-13'
-    AND phase.timestamp <= timestamp '2019-02-16 00:00:00.000'
-    AND phase.timestamp >= timestamp '2019-02-14 00:00:00.000'
-    AND phase.namespace = 'metering-ci2-openshift-continuous-upgrade-master'
-    AND phase.persistentvolumeclaim = 'hdfs-datanode-data-hdfs-datanode-0'
-    ORDER BY timestamp
-    LIMIT 10;
+
 
 ---
 
@@ -146,52 +142,37 @@ metadata:
 {{ -end }}
 spec:
   reportQueries:
-  - "persistentvolumeclaim-usage-raw"
-  - "persistentvolumeclaim-phase-raw"
+  - "persistentvolumeclaim-usage-with-phase-raw"
   view:
     disabled: true
   columns:
-  - name: period_start
-    type: timestamp
-    unit: date
-  - name: period_end
-    type: timestamp
-    unit: date
   - name: namespace
     type: string
     unit: kubernetes_namespace
+  - name: timestamp
+    type: timestamp
+    unit: date
   - name: persistentvolumeclaim
     type: string
-    unit: kubernetes_persistentvolumeclaim
+  - name: phase_value
+    type: string
+  - name: value
+    type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
-  - name: timeprecision
-    type: double
-    unit: seconds
-  - name: persistentvolumeclaim_usage_byte_seconds
-    type: double
-    unit: byte_seconds
-  - name: timestamp
-    type: timestamp
+  - name: dt
+    type: string
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
   query: |
     SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value, persistentvolumeclaim_usage_bytes
-    FROM view_metering_emoss_persistentvolumeclaim_phase_raw AS phase
-    FULL OUTER JOIN view_metering_emoss_persistentvolumeclaim_usage_raw AS usage
-    ON phase.namespace=usage.namespace
-    AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
-    AND phase.timestamp=usage.timestamp
-    WHERE phase.dt >= '2019-02-12'
-    AND phase.dt <= '2019-02-13'
-    AND phase.timestamp <= timestamp '2019-02-16 00:00:00.000'
-    AND phase.timestamp >= timestamp '2019-02-14 00:00:00.000'
-    AND phase.namespace = 'metering-ci2-openshift-continuous-upgrade-master'
-    AND phase.persistentvolumeclaim = 'hdfs-datanode-data-hdfs-datanode-0'
-    ORDER BY timestamp
-    LIMIT 10;
+    FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw"}
+    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
 
 # /*
 #           timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
