@@ -80,7 +80,7 @@ setOwnerOnReleaseConfigmaps(){
 cleanupOldReleaseConfigmaps() {
     if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
         echo "Getting list of helm release configmaps to delete"
-        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize < 0 then 0 else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$RELEASE_CONFIGMAPS_FILE")"
+        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize <= 0 then empty else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$RELEASE_CONFIGMAPS_FILE")"
         if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
             echo "No release configmaps to delete yet"
         else
