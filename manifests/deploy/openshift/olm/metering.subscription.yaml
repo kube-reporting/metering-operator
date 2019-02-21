@@ -7,3 +7,4 @@ spec:
   name: metering
   source: metering-operators
   sourceNamespace: openshift-metering
+
