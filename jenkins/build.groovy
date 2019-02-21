@@ -134,8 +134,8 @@ spec:
                     container('docker') {
                         ansiColor('xterm') {
                             sh 'make metering-e2e-docker-build CHECK_GO_FILES=false'
-                            sh 'make ci-validate-docker CHECK_GO_FILES=false'
-                            sh 'make test-docker CHECK_GO_FILES=false'
+                            sh 'make verify-docker CHECK_GO_FILES=false'
+                            sh 'make unit-docker CHECK_GO_FILES=false'
                         }
                     }
                 }
