@@ -137,7 +137,7 @@ metadata:
   name: "persistentvolumeclaim-usage"
   labels:
     operator-metering: "true"
-{{ -block "extraMetadata" . }}
+{{- block "extraMetadata" . }}
 {{ -end }}
 spec:
   reportQueries:
