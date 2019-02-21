@@ -6,3 +6,4 @@ metadata:
 spec:
   targetNamespace: openshift-metering
   packages: metering
+
