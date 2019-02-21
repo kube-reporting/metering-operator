@@ -137,8 +137,7 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-# TODO: Add tests
-all: fmt test docker-build-all
+all: fmt unit docker-build-all
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
@@ -248,25 +247,27 @@ metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 vendor: Gopkg.toml
 	dep ensure -v
 
-test:
+test: unit
+
+unit:
 	go test -coverpro***REMOVED***le=$(COVERAGE_OUTFILE) ./pkg/...
 	go test -c -o bin/e2e-tests ./test/e2e
 	go test -c -o bin/integration-tests ./test/integration
 
-test-docker:
-	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make test'
+unit-docker:
+	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make unit'
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: verify-codegen all-charts metering-manifests fmt
+verify: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
-ci-validate-docker:
-	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make ci-validate'
+verify-docker:
+	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make verify'
 
 
 .PHONY: run-metering-operator-local

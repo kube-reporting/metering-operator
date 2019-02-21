@@ -44,13 +44,13 @@ If you want to build OCP images locally see [the Building OCP images document](o
 To run unit tests:
 
 ```
-make test
+make unit
 ```
 
 To run the validation steps CI does:
 
 ```
-make ci-validate
+make verify
 ```
 
 ## Go Dependencies
