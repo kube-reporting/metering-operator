@@ -18,12 +18,8 @@ func (in *AWSBillingDataSource) DeepCopyInto(out *AWSBillingDataSource) {
 	*out = *in
 	if in.Source != nil {
 		in, out := &in.Source, &out.Source
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(S3Bucket)
-			**out = **in
-		}
+		*out = new(S3Bucket)
+		**out = **in
 	}
 	return
 }
@@ -107,11 +103,10 @@ func (in *PrestoTableList) DeepCopyInto(out *PrestoTableList) {
 		in, out := &in.Items, &out.Items
 		*out = make([]*PrestoTable, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(PrestoTable)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(PrestoTable)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -182,27 +177,15 @@ func (in *PrometheusMetricImportStatus) DeepCopyInto(out *PrometheusMetricImport
 	*out = *in
 	if in.LastImportTime != nil {
 		in, out := &in.LastImportTime, &out.LastImportTime
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	if in.EarliestImportedMetricTime != nil {
 		in, out := &in.EarliestImportedMetricTime, &out.EarliestImportedMetricTime
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	if in.NewestImportedMetricTime != nil {
 		in, out := &in.NewestImportedMetricTime, &out.NewestImportedMetricTime
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	return
 }
@@ -222,30 +205,18 @@ func (in *PrometheusMetricsDataSource) DeepCopyInto(out *PrometheusMetricsDataSo
 	*out = *in
 	if in.QueryConfig != nil {
 		in, out := &in.QueryConfig, &out.QueryConfig
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(PrometheusQueryConfig)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(PrometheusQueryConfig)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Storage != nil {
 		in, out := &in.Storage, &out.Storage
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(StorageLocationRef)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(StorageLocationRef)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.PrometheusConfig != nil {
 		in, out := &in.PrometheusConfig, &out.PrometheusConfig
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(PrometheusConnectionConfig)
-			**out = **in
-		}
+		*out = new(PrometheusConnectionConfig)
+		**out = **in
 	}
 	return
 }
@@ -265,30 +236,18 @@ func (in *PrometheusQueryConfig) DeepCopyInto(out *PrometheusQueryConfig) {
 	*out = *in
 	if in.QueryInterval != nil {
 		in, out := &in.QueryInterval, &out.QueryInterval
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(v1.Duration)
-			**out = **in
-		}
+		*out = new(v1.Duration)
+		**out = **in
 	}
 	if in.StepSize != nil {
 		in, out := &in.StepSize, &out.StepSize
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(v1.Duration)
-			**out = **in
-		}
+		*out = new(v1.Duration)
+		**out = **in
 	}
 	if in.ChunkSize != nil {
 		in, out := &in.ChunkSize, &out.ChunkSize
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(v1.Duration)
-			**out = **in
-		}
+		*out = new(v1.Duration)
+		**out = **in
 	}
 	return
 }
@@ -386,11 +345,10 @@ func (in *ReportDataSourceList) DeepCopyInto(out *ReportDataSourceList) {
 		in, out := &in.Items, &out.Items
 		*out = make([]*ReportDataSource, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(ReportDataSource)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(ReportDataSource)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -420,21 +378,13 @@ func (in *ReportDataSourceSpec) DeepCopyInto(out *ReportDataSourceSpec) {
 	*out = *in
 	if in.Promsum != nil {
 		in, out := &in.Promsum, &out.Promsum
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(PrometheusMetricsDataSource)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(PrometheusMetricsDataSource)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.AWSBilling != nil {
 		in, out := &in.AWSBilling, &out.AWSBilling
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(AWSBillingDataSource)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(AWSBillingDataSource)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -454,12 +404,8 @@ func (in *ReportDataSourceStatus) DeepCopyInto(out *ReportDataSourceStatus) {
 	*out = *in
 	if in.PrometheusMetricImportStatus != nil {
 		in, out := &in.PrometheusMetricImportStatus, &out.PrometheusMetricImportStatus
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(PrometheusMetricImportStatus)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(PrometheusMetricImportStatus)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -539,15 +485,11 @@ func (in *ReportGenerationQueryInputValue) DeepCopyInto(out *ReportGenerationQue
 	*out = *in
 	if in.Value != nil {
 		in, out := &in.Value, &out.Value
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(json.RawMessage)
-			if **in != nil {
-				in, out := *in, *out
-				*out = make([]byte, len(*in))
-				copy(*out, *in)
-			}
+		*out = new(json.RawMessage)
+		if **in != nil {
+			in, out := *in, *out
+			*out = make([]byte, len(*in))
+			copy(*out, *in)
 		}
 	}
 	return
@@ -594,11 +536,10 @@ func (in *ReportGenerationQueryList) DeepCopyInto(out *ReportGenerationQueryList
 		in, out := &in.Items, &out.Items
 		*out = make([]*ReportGenerationQuery, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(ReportGenerationQuery)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(ReportGenerationQuery)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -695,11 +636,10 @@ func (in *ReportList) DeepCopyInto(out *ReportList) {
 		in, out := &in.Items, &out.Items
 		*out = make([]*Report, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(Report)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(Report)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -760,11 +700,10 @@ func (in *ReportPrometheusQueryList) DeepCopyInto(out *ReportPrometheusQueryList
 		in, out := &in.Items, &out.Items
 		*out = make([]*ReportPrometheusQuery, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(ReportPrometheusQuery)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(ReportPrometheusQuery)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -810,48 +749,28 @@ func (in *ReportSchedule) DeepCopyInto(out *ReportSchedule) {
 	*out = *in
 	if in.Cron != nil {
 		in, out := &in.Cron, &out.Cron
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportScheduleCron)
-			**out = **in
-		}
+		*out = new(ReportScheduleCron)
+		**out = **in
 	}
 	if in.Hourly != nil {
 		in, out := &in.Hourly, &out.Hourly
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportScheduleHourly)
-			**out = **in
-		}
+		*out = new(ReportScheduleHourly)
+		**out = **in
 	}
 	if in.Daily != nil {
 		in, out := &in.Daily, &out.Daily
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportScheduleDaily)
-			**out = **in
-		}
+		*out = new(ReportScheduleDaily)
+		**out = **in
 	}
 	if in.Weekly != nil {
 		in, out := &in.Weekly, &out.Weekly
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportScheduleWeekly)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ReportScheduleWeekly)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Monthly != nil {
 		in, out := &in.Monthly, &out.Monthly
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportScheduleMonthly)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ReportScheduleMonthly)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -919,12 +838,8 @@ func (in *ReportScheduleMonthly) DeepCopyInto(out *ReportScheduleMonthly) {
 	*out = *in
 	if in.DayOfMonth != nil {
 		in, out := &in.DayOfMonth, &out.DayOfMonth
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(int64)
-			**out = **in
-		}
+		*out = new(int64)
+		**out = **in
 	}
 	return
 }
@@ -944,12 +859,8 @@ func (in *ReportScheduleWeekly) DeepCopyInto(out *ReportScheduleWeekly) {
 	*out = *in
 	if in.DayOfWeek != nil {
 		in, out := &in.DayOfWeek, &out.DayOfWeek
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(string)
-			**out = **in
-		}
+		*out = new(string)
+		**out = **in
 	}
 	return
 }
@@ -969,37 +880,21 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 	*out = *in
 	if in.Schedule != nil {
 		in, out := &in.Schedule, &out.Schedule
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(ReportSchedule)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(ReportSchedule)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.ReportingStart != nil {
 		in, out := &in.ReportingStart, &out.ReportingStart
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	if in.ReportingEnd != nil {
 		in, out := &in.ReportingEnd, &out.ReportingEnd
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	if in.GracePeriod != nil {
 		in, out := &in.GracePeriod, &out.GracePeriod
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(v1.Duration)
-			**out = **in
-		}
+		*out = new(v1.Duration)
+		**out = **in
 	}
 	if in.Inputs != nil {
 		in, out := &in.Inputs, &out.Inputs
@@ -1010,12 +905,8 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 	}
 	if in.Output != nil {
 		in, out := &in.Output, &out.Output
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(StorageLocationRef)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(StorageLocationRef)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -1042,11 +933,7 @@ func (in *ReportStatus) DeepCopyInto(out *ReportStatus) {
 	}
 	if in.LastReportTime != nil {
 		in, out := &in.LastReportTime, &out.LastReportTime
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = (*in).DeepCopy()
-		}
+		*out = (*in).DeepCopy()
 	}
 	return
 }
@@ -1113,11 +1000,10 @@ func (in *StorageLocationList) DeepCopyInto(out *StorageLocationList) {
 		in, out := &in.Items, &out.Items
 		*out = make([]*StorageLocation, len(*in))
 		for i := range *in {
-			if (*in)[i] == nil {
-				(*out)[i] = nil
-			} else {
-				(*out)[i] = new(StorageLocation)
-				(*in)[i].DeepCopyInto((*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(StorageLocation)
+				(*in).DeepCopyInto(*out)
 			}
 		}
 	}
@@ -1147,12 +1033,8 @@ func (in *StorageLocationRef) DeepCopyInto(out *StorageLocationRef) {
 	*out = *in
 	if in.StorageSpec != nil {
 		in, out := &in.StorageSpec, &out.StorageSpec
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(StorageLocationSpec)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(StorageLocationSpec)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -1172,12 +1054,8 @@ func (in *StorageLocationSpec) DeepCopyInto(out *StorageLocationSpec) {
 	*out = *in
 	if in.Hive != nil {
 		in, out := &in.Hive, &out.Hive
-		if *in == nil {
-			*out = nil
-		} else {
-			*out = new(HiveStorage)
-			(*in).DeepCopyInto(*out)
-		}
+		*out = new(HiveStorage)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
