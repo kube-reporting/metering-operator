@@ -133,7 +133,7 @@ spec:
                 dir(env.METERING_SRC_DIR) {
                     container('docker') {
                         ansiColor('xterm') {
-                            sh 'make metering-e2e-docker-build CHECK_GO_FILES=false'
+                            sh 'make metering-src-docker-build'
                             sh 'make verify-docker CHECK_GO_FILES=false'
                             sh 'make unit-docker CHECK_GO_FILES=false'
                         }
