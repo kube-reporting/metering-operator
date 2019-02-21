@@ -41,7 +41,7 @@ metadata:
 spec:
   containers:
   - name: metering-test-runner
-    image: quay.io/coreos/metering-e2e:${params.DEPLOY_TAG ?: env.BRANCH_NAME}
+    image: quay.io/coreos/metering-src:${params.DEPLOY_TAG ?: env.BRANCH_NAME}
     imagePullPolicy: Always
     command:
     - 'cat'
