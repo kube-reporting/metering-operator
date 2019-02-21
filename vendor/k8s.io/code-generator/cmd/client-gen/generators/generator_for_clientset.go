@@ -58,9 +58,9 @@ func (g *genClientset) Imports(c *generator.Context) (imports []string) {
 	imports = append(imports, g.imports.ImportLines()...)
 	for _, group := range g.groups {
 		for _, version := range group.Versions {
-			typedClientPath := ***REMOVED***lepath.Join(g.clientsetPackage, "typed", group.PackageName, version.NonEmpty())
-			groupAlias := strings.ToLower(g.groupGoNames[clientgentypes.GroupVersion{group.Group, version}])
-			imports = append(imports, strings.ToLower(fmt.Sprintf("%s%s \"%s\"", groupAlias, version.NonEmpty(), typedClientPath)))
+			typedClientPath := ***REMOVED***lepath.Join(g.clientsetPackage, "typed", strings.ToLower(group.PackageName), strings.ToLower(version.NonEmpty()))
+			groupAlias := strings.ToLower(g.groupGoNames[clientgentypes.GroupVersion{Group: group.Group, Version: version.Version}])
+			imports = append(imports, fmt.Sprintf("%s%s \"%s\"", groupAlias, strings.ToLower(version.NonEmpty()), typedClientPath))
 		}
 	}
 	return
@@ -71,7 +71,7 @@ func (g *genClientset) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 	// perhaps we can adapt the go2ild framework to this kind of usage.
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 
-	allGroups := clientgentypes.ToGroupVersionPackages(g.groups, g.groupGoNames)
+	allGroups := clientgentypes.ToGroupVersionInfo(g.groups, g.groupGoNames)
 	m := map[string]interface{}{
 		"allGroups":                            allGroups,
 		"Con***REMOVED***g":                               c.Universe.Type(types.Name{Package: "k8s.io/client-go/rest", Name: "Con***REMOVED***g"}),
@@ -83,7 +83,6 @@ func (g *genClientset) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 		"NewDiscoveryClientForCon***REMOVED***gOrDie":     c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClientForCon***REMOVED***gOrDie"}),
 		"NewDiscoveryClient":                   c.Universe.Function(types.Name{Package: "k8s.io/client-go/discovery", Name: "NewDiscoveryClient"}),
 		"flowcontrolNewTokenBucketRateLimiter": c.Universe.Function(types.Name{Package: "k8s.io/client-go/util/flowcontrol", Name: "NewTokenBucketRateLimiter"}),
-		"glogErrorf":                           c.Universe.Function(types.Name{Package: "github.com/golang/glog", Name: "Errorf"}),
 	}
 	sw.Do(clientsetInterface, m)
 	sw.Do(clientsetTemplate, m)
@@ -163,7 +162,6 @@ $range .allGroups$    cs.$.LowerCaseGroupGoName$$.Version$, err =$.PackageAlias$
 $end$
 	cs.DiscoveryClient, err = $.NewDiscoveryClientForCon***REMOVED***g|raw$(&con***REMOVED***gShallowCopy)
 	if err!=nil {
-		$.glogErrorf|raw$("failed to create the DiscoveryClient: %v", err)
 		return nil, err
 	}
 	return &cs, nil

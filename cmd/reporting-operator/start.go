@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	goflag "flag"
 	"fmt"
 	"io/ioutil"
@@ -145,16 +146,16 @@ func startReporting(cmd *cobra.Command, args []string) {
 		cfg.PrometheusDataSourceGlobalImportFromTime = &importFrom
 	}
 
-	signalStopCh := setupSignals()
-	runReporting(logger, cfg, signalStopCh)
+	signalStopCtx := setupSignals()
+	runReporting(logger, cfg, signalStopCtx)
 }
 
-func runReporting(logger log.FieldLogger, cfg operator.Con***REMOVED***g, stopCh <-chan struct{}) {
+func runReporting(logger log.FieldLogger, cfg operator.Con***REMOVED***g, ctx context.Context) {
 	op, err := operator.New(logger, cfg)
 	if err != nil {
 		logger.WithError(err).Fatal("unable to setup reporting-operator")
 	}
-	if err = op.Run(stopCh); err != nil {
+	if err = op.Run(ctx); err != nil {
 		logger.WithError(err).Fatal("error occurred while the reporting-operator was running")
 	}
 	logger.Infof("reporting-operator has stopped")
@@ -185,17 +186,17 @@ func SetFlagsFromEnv(fs *pflag.FlagSet, pre***REMOVED***x string) (err error) {
 	return err
 }
 
-func setupSignals() chan struct{} {
+func setupSignals() context.Context {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		sig := <-sigs
 		log.Infof("got signal %s, performing shutdown", sig)
-		close(stopCh)
+		cancel()
 	}()
-	return stopCh
+	return ctx
 }
 
 func newLogger() log.FieldLogger {

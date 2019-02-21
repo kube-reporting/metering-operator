@@ -20,9 +20,8 @@ import (
 	"io"
 	"sync"
 
-	"github.com/golang/glog"
+	"k8s.io/klog"
 
-	"k8s.io/api/core/v1"
 	restclient "k8s.io/client-go/rest"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
@@ -120,7 +119,7 @@ func (con***REMOVED***g *DeferredLoadingClientCon***REMOVED***g) ClientCon***REM
 
 	// check for in-cluster con***REMOVED***guration and use it
 	if con***REMOVED***g.icc.Possible() {
-		glog.V(4).Infof("Using in-cluster con***REMOVED***guration")
+		klog.V(4).Infof("Using in-cluster con***REMOVED***guration")
 		return con***REMOVED***g.icc.ClientCon***REMOVED***g()
 	}
 
@@ -145,7 +144,7 @@ func (con***REMOVED***g *DeferredLoadingClientCon***REMOVED***g) Namespace() (st
 
 	if len(ns) > 0 {
 		// if we got a non-default namespace from the kubecon***REMOVED***g, use it
-		if ns != v1.NamespaceDefault {
+		if ns != "default" {
 			return ns, false, nil
 		}
 
@@ -157,7 +156,7 @@ func (con***REMOVED***g *DeferredLoadingClientCon***REMOVED***g) Namespace() (st
 		}
 	}
 
-	glog.V(4).Infof("Using in-cluster namespace")
+	klog.V(4).Infof("Using in-cluster namespace")
 
 	// allow the namespace from the service account token directory to be used.
 	return con***REMOVED***g.icc.Namespace()

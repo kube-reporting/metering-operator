@@ -174,6 +174,9 @@ func convertStruct(result url.Values, st reflect.Type, sv reflect.Value) {
 			kind = ft.Kind()
 			if !***REMOVED***eld.IsNil() {
 				***REMOVED***eld = reflect.Indirect(***REMOVED***eld)
+				// If the ***REMOVED***eld is non-nil, it should be added to params
+				// and the omitempty should be overwite to false
+				omitempty = false
 			}
 		}
 

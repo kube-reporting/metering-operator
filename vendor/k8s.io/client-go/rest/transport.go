@@ -18,8 +18,10 @@ package rest
 
 import (
 	"crypto/tls"
+	"errors"
 	"net/http"
 
+	"k8s.io/client-go/plugin/pkg/client/auth/exec"
 	"k8s.io/client-go/transport"
 )
 
@@ -58,25 +60,10 @@ func HTTPWrappersForCon***REMOVED***g(con***REMOVED***g *Con***REMOVED***g, rt h
 
 // TransportCon***REMOVED***g converts a client con***REMOVED***g to an appropriate transport con***REMOVED***g.
 func (c *Con***REMOVED***g) TransportCon***REMOVED***g() (*transport.Con***REMOVED***g, error) {
-	wt := c.WrapTransport
-	if c.AuthProvider != nil {
-		provider, err := GetAuthProvider(c.Host, c.AuthProvider, c.AuthCon***REMOVED***gPersister)
-		if err != nil {
-			return nil, err
-		}
-		if wt != nil {
-			previousWT := wt
-			wt = func(rt http.RoundTripper) http.RoundTripper {
-				return provider.WrapTransport(previousWT(rt))
-			}
-		} ***REMOVED*** {
-			wt = provider.WrapTransport
-		}
-	}
-	return &transport.Con***REMOVED***g{
+	conf := &transport.Con***REMOVED***g{
 		UserAgent:     c.UserAgent,
 		Transport:     c.Transport,
-		WrapTransport: wt,
+		WrapTransport: c.WrapTransport,
 		TLS: transport.TLSCon***REMOVED***g{
 			Insecure:   c.Insecure,
 			ServerName: c.ServerName,
@@ -89,7 +76,6 @@ func (c *Con***REMOVED***g) TransportCon***REMOVED***g() (*transport.Con***REMOV
 		},
 		Username:    c.Username,
 		Password:    c.Password,
-		CacheDir:    c.CacheDir,
 		BearerToken: c.BearerToken,
 		Impersonate: transport.ImpersonationCon***REMOVED***g{
 			UserName: c.Impersonate.UserName,
@@ -97,5 +83,34 @@ func (c *Con***REMOVED***g) TransportCon***REMOVED***g() (*transport.Con***REMOV
 			Extra:    c.Impersonate.Extra,
 		},
 		Dial: c.Dial,
-	}, nil
+	}
+
+	if c.ExecProvider != nil && c.AuthProvider != nil {
+		return nil, errors.New("execProvider and authProvider cannot be used in combination")
+	}
+
+	if c.ExecProvider != nil {
+		provider, err := exec.GetAuthenticator(c.ExecProvider)
+		if err != nil {
+			return nil, err
+		}
+		if err := provider.UpdateTransportCon***REMOVED***g(conf); err != nil {
+			return nil, err
+		}
+	}
+	if c.AuthProvider != nil {
+		provider, err := GetAuthProvider(c.Host, c.AuthProvider, c.AuthCon***REMOVED***gPersister)
+		if err != nil {
+			return nil, err
+		}
+		wt := conf.WrapTransport
+		if wt != nil {
+			conf.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+				return provider.WrapTransport(wt(rt))
+			}
+		} ***REMOVED*** {
+			conf.WrapTransport = provider.WrapTransport
+		}
+	}
+	return conf, nil
 }

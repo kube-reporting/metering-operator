@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/golang/glog"
+	"k8s.io/klog"
 
 	restclient "k8s.io/client-go/rest"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -68,7 +68,9 @@ func (o *PathOptions) GetEnvVarFiles() []string {
 		return []string{}
 	}
 
-	return ***REMOVED***lepath.SplitList(envVarValue)
+	***REMOVED***leList := ***REMOVED***lepath.SplitList(envVarValue)
+	// prevent the same path load multiple times
+	return deduplicate(***REMOVED***leList)
 }
 
 func (o *PathOptions) GetLoadingPrecedence() []string {
@@ -218,6 +220,9 @@ func ModifyCon***REMOVED***g(con***REMOVED***gAccess Con***REMOVED***gAccess, ne
 		}
 	}
 
+	// seenCon***REMOVED***gs stores a map of con***REMOVED***g source ***REMOVED***lenames to computed con***REMOVED***g objects
+	seenCon***REMOVED***gs := map[string]*clientcmdapi.Con***REMOVED***g{}
+
 	for key, context := range newCon***REMOVED***g.Contexts {
 		startingContext, exists := startingCon***REMOVED***g.Contexts[key]
 		if !reflect.DeepEqual(context, startingContext) || !exists {
@@ -226,15 +231,28 @@ func ModifyCon***REMOVED***g(con***REMOVED***gAccess Con***REMOVED***gAccess, ne
 				destinationFile = con***REMOVED***gAccess.GetDefaultFilename()
 			}
 
-			con***REMOVED***gToWrite, err := getCon***REMOVED***gFromFile(destinationFile)
-			if err != nil {
-				return err
+			// we only obtain a fresh con***REMOVED***g object from its source ***REMOVED***le
+			// if we have not seen it already - this prevents us from
+			// reading and writing to the same number of ***REMOVED***les repeatedly
+			// when multiple / all contexts share the same destination ***REMOVED***le.
+			con***REMOVED***gToWrite, seen := seenCon***REMOVED***gs[destinationFile]
+			if !seen {
+				var err error
+				con***REMOVED***gToWrite, err = getCon***REMOVED***gFromFile(destinationFile)
+				if err != nil {
+					return err
+				}
+				seenCon***REMOVED***gs[destinationFile] = con***REMOVED***gToWrite
 			}
-			con***REMOVED***gToWrite.Contexts[key] = context
 
-			if err := WriteToFile(*con***REMOVED***gToWrite, destinationFile); err != nil {
-				return err
-			}
+			con***REMOVED***gToWrite.Contexts[key] = context
+		}
+	}
+
+	// actually persist con***REMOVED***g object changes
+	for destinationFile, con***REMOVED***gToWrite := range seenCon***REMOVED***gs {
+		if err := WriteToFile(*con***REMOVED***gToWrite, destinationFile); err != nil {
+			return err
 		}
 	}
 
@@ -465,7 +483,7 @@ func getCon***REMOVED***gFromFile(***REMOVED***lename string) (*clientcmdapi.Con
 func GetCon***REMOVED***gFromFileOrDie(***REMOVED***lename string) *clientcmdapi.Con***REMOVED***g {
 	con***REMOVED***g, err := getCon***REMOVED***gFromFile(***REMOVED***lename)
 	if err != nil {
-		glog.FatalDepth(1, err)
+		klog.FatalDepth(1, err)
 	}
 
 	return con***REMOVED***g

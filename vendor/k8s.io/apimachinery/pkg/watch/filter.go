@@ -62,11 +62,7 @@ func (fw ****REMOVED***lteredWatch) Stop() {
 // loop waits for new values, ***REMOVED***lters them, and resends them.
 func (fw ****REMOVED***lteredWatch) loop() {
 	defer close(fw.result)
-	for {
-		event, ok := <-fw.incoming.ResultChan()
-		if !ok {
-			break
-		}
+	for event := range fw.incoming.ResultChan() {
 		***REMOVED***ltered, keep := fw.f(event)
 		if keep {
 			fw.result <- ***REMOVED***ltered

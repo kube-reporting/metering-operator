@@ -24,10 +24,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/golang/glog"
 	"github.com/imdario/mergo"
+	"k8s.io/klog"
 
-	"k8s.io/api/core/v1"
 	restclient "k8s.io/client-go/rest"
 	clientauth "k8s.io/client-go/tools/auth"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -100,6 +99,26 @@ func NewInteractiveClientCon***REMOVED***g(con***REMOVED***g clientcmdapi.Con***
 	return &DirectClientCon***REMOVED***g{con***REMOVED***g, contextName, overrides, fallbackReader, con***REMOVED***gAccess, promptedCredentials{}}
 }
 
+// NewClientCon***REMOVED***gFromBytes takes your kubecon***REMOVED***g and gives you back a ClientCon***REMOVED***g
+func NewClientCon***REMOVED***gFromBytes(con***REMOVED***gBytes []byte) (ClientCon***REMOVED***g, error) {
+	con***REMOVED***g, err := Load(con***REMOVED***gBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DirectClientCon***REMOVED***g{*con***REMOVED***g, "", &Con***REMOVED***gOverrides{}, nil, nil, promptedCredentials{}}, nil
+}
+
+// RESTCon***REMOVED***gFromKubeCon***REMOVED***g is a convenience method to give back a restcon***REMOVED***g from your kubecon***REMOVED***g bytes.
+// For programmatic access, this is what you want 80% of the time
+func RESTCon***REMOVED***gFromKubeCon***REMOVED***g(con***REMOVED***gBytes []byte) (*restclient.Con***REMOVED***g, error) {
+	clientCon***REMOVED***g, err := NewClientCon***REMOVED***gFromBytes(con***REMOVED***gBytes)
+	if err != nil {
+		return nil, err
+	}
+	return clientCon***REMOVED***g.ClientCon***REMOVED***g()
+}
+
 func (con***REMOVED***g *DirectClientCon***REMOVED***g) RawCon***REMOVED***g() (clientcmdapi.Con***REMOVED***g, error) {
 	return con***REMOVED***g.con***REMOVED***g, nil
 }
@@ -107,7 +126,7 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) RawCon***REMOVED***g() (
 // ClientCon***REMOVED***g implements ClientCon***REMOVED***g
 func (con***REMOVED***g *DirectClientCon***REMOVED***g) ClientCon***REMOVED***g() (*restclient.Con***REMOVED***g, error) {
 	// check that getAuthInfo, getContext, and getCluster do not return an error.
-	// Do this before checking if the curent con***REMOVED***g is usable in the event that an
+	// Do this before checking if the current con***REMOVED***g is usable in the event that an
 	// AuthInfo, Context, or Cluster con***REMOVED***g with user-de***REMOVED***ned names are not found.
 	// This provides a user with the immediate cause for error if one is found
 	con***REMOVED***gAuthInfo, err := con***REMOVED***g.getAuthInfo()
@@ -156,10 +175,6 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) ClientCon***REMOVED***g(
 	// only try to read the auth information if we are secure
 	if restclient.IsCon***REMOVED***gTransportTLS(*clientCon***REMOVED***g) {
 		var err error
-
-		// mergo is a ***REMOVED***rst write wins for map value and a last writing wins for interface values
-		// NOTE: This behavior changed with https://github.com/imdario/mergo/commit/d304790b2ed594794496464fadd89d2bb266600a.
-		//       Our mergo.Merge version is older than this change.
 		var persister restclient.AuthProviderCon***REMOVED***gPersister
 		if con***REMOVED***g.con***REMOVED***gAccess != nil {
 			authInfoName, _ := con***REMOVED***g.getAuthInfoName()
@@ -169,13 +184,13 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) ClientCon***REMOVED***g(
 		if err != nil {
 			return nil, err
 		}
-		mergo.Merge(clientCon***REMOVED***g, userAuthPartialCon***REMOVED***g)
+		mergo.MergeWithOverwrite(clientCon***REMOVED***g, userAuthPartialCon***REMOVED***g)
 
 		serverAuthPartialCon***REMOVED***g, err := getServerIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***gAuthInfo, con***REMOVED***gClusterInfo)
 		if err != nil {
 			return nil, err
 		}
-		mergo.Merge(clientCon***REMOVED***g, serverAuthPartialCon***REMOVED***g)
+		mergo.MergeWithOverwrite(clientCon***REMOVED***g, serverAuthPartialCon***REMOVED***g)
 	}
 
 	return clientCon***REMOVED***g, nil
@@ -195,14 +210,14 @@ func getServerIdenti***REMOVED***cationPartialCon***REMOVED***g(con***REMOVED***
 	con***REMOVED***gClientCon***REMOVED***g.CAFile = con***REMOVED***gClusterInfo.Certi***REMOVED***cateAuthority
 	con***REMOVED***gClientCon***REMOVED***g.CAData = con***REMOVED***gClusterInfo.Certi***REMOVED***cateAuthorityData
 	con***REMOVED***gClientCon***REMOVED***g.Insecure = con***REMOVED***gClusterInfo.InsecureSkipTLSVerify
-	mergo.Merge(mergedCon***REMOVED***g, con***REMOVED***gClientCon***REMOVED***g)
+	mergo.MergeWithOverwrite(mergedCon***REMOVED***g, con***REMOVED***gClientCon***REMOVED***g)
 
 	return mergedCon***REMOVED***g, nil
 }
 
 // clientauth.Info object contain both user identi***REMOVED***cation and server identi***REMOVED***cation.  We want different precedence orders for
 // both, so we have to split the objects and merge them separately
-// we want this order of precedence for user identifcation
+// we want this order of precedence for user identi***REMOVED***cation
 // 1.  con***REMOVED***gAuthInfo minus auth-path (the ***REMOVED***nal result of command line flags and merged .kubecon***REMOVED***g ***REMOVED***les)
 // 2.  con***REMOVED***gAuthInfo.auth-path (this ***REMOVED***le can contain information that conflicts with #1, and we want #1 to win the priority)
 // 3.  if there is not enough information to identify the user, load try the ~/.kubernetes_auth ***REMOVED***le
@@ -219,6 +234,7 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getUserIdenti***REMOVED*
 			return nil, err
 		}
 		mergedCon***REMOVED***g.BearerToken = string(tokenBytes)
+		mergedCon***REMOVED***g.BearerTokenFile = con***REMOVED***gAuthInfo.TokenFile
 	}
 	if len(con***REMOVED***gAuthInfo.Impersonate) > 0 {
 		mergedCon***REMOVED***g.Impersonate = restclient.ImpersonationCon***REMOVED***g{
@@ -241,6 +257,9 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getUserIdenti***REMOVED*
 		mergedCon***REMOVED***g.AuthProvider = con***REMOVED***gAuthInfo.AuthProvider
 		mergedCon***REMOVED***g.AuthCon***REMOVED***gPersister = persistAuthCon***REMOVED***g
 	}
+	if con***REMOVED***gAuthInfo.Exec != nil {
+		mergedCon***REMOVED***g.ExecProvider = con***REMOVED***gAuthInfo.Exec
+	}
 
 	// if there still isn't enough information to authenticate the user, try prompting
 	if !canIdentifyUser(*mergedCon***REMOVED***g) && (fallbackReader != nil) {
@@ -257,8 +276,8 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getUserIdenti***REMOVED*
 		promptedCon***REMOVED***g := makeUserIdenti***REMOVED***cationCon***REMOVED***g(*promptedAuthInfo)
 		previouslyMergedCon***REMOVED***g := mergedCon***REMOVED***g
 		mergedCon***REMOVED***g = &restclient.Con***REMOVED***g{}
-		mergo.Merge(mergedCon***REMOVED***g, promptedCon***REMOVED***g)
-		mergo.Merge(mergedCon***REMOVED***g, previouslyMergedCon***REMOVED***g)
+		mergo.MergeWithOverwrite(mergedCon***REMOVED***g, promptedCon***REMOVED***g)
+		mergo.MergeWithOverwrite(mergedCon***REMOVED***g, previouslyMergedCon***REMOVED***g)
 		con***REMOVED***g.promptedCredentials.username = mergedCon***REMOVED***g.Username
 		con***REMOVED***g.promptedCredentials.password = mergedCon***REMOVED***g.Password
 	}
@@ -291,7 +310,8 @@ func canIdentifyUser(con***REMOVED***g restclient.Con***REMOVED***g) bool {
 	return len(con***REMOVED***g.Username) > 0 ||
 		(len(con***REMOVED***g.CertFile) > 0 || len(con***REMOVED***g.CertData) > 0) ||
 		len(con***REMOVED***g.BearerToken) > 0 ||
-		con***REMOVED***g.AuthProvider != nil
+		con***REMOVED***g.AuthProvider != nil ||
+		con***REMOVED***g.ExecProvider != nil
 }
 
 // Namespace implements ClientCon***REMOVED***g
@@ -314,7 +334,7 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) Namespace() (string, boo
 	}
 
 	if len(con***REMOVED***gContext.Namespace) == 0 {
-		return v1.NamespaceDefault, false, nil
+		return "default", false, nil
 	}
 
 	return con***REMOVED***gContext.Namespace, false, nil
@@ -400,11 +420,11 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getContext() (clientcmda
 
 	mergedContext := clientcmdapi.NewContext()
 	if con***REMOVED***gContext, exists := contexts[contextName]; exists {
-		mergo.Merge(mergedContext, con***REMOVED***gContext)
+		mergo.MergeWithOverwrite(mergedContext, con***REMOVED***gContext)
 	} ***REMOVED*** if required {
 		return clientcmdapi.Context{}, fmt.Errorf("context %q does not exist", contextName)
 	}
-	mergo.Merge(mergedContext, con***REMOVED***g.overrides.Context)
+	mergo.MergeWithOverwrite(mergedContext, con***REMOVED***g.overrides.Context)
 
 	return *mergedContext, nil
 }
@@ -416,11 +436,11 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getAuthInfo() (clientcmd
 
 	mergedAuthInfo := clientcmdapi.NewAuthInfo()
 	if con***REMOVED***gAuthInfo, exists := authInfos[authInfoName]; exists {
-		mergo.Merge(mergedAuthInfo, con***REMOVED***gAuthInfo)
+		mergo.MergeWithOverwrite(mergedAuthInfo, con***REMOVED***gAuthInfo)
 	} ***REMOVED*** if required {
 		return clientcmdapi.AuthInfo{}, fmt.Errorf("auth info %q does not exist", authInfoName)
 	}
-	mergo.Merge(mergedAuthInfo, con***REMOVED***g.overrides.AuthInfo)
+	mergo.MergeWithOverwrite(mergedAuthInfo, con***REMOVED***g.overrides.AuthInfo)
 
 	return *mergedAuthInfo, nil
 }
@@ -431,13 +451,13 @@ func (con***REMOVED***g *DirectClientCon***REMOVED***g) getCluster() (clientcmda
 	clusterInfoName, required := con***REMOVED***g.getClusterName()
 
 	mergedClusterInfo := clientcmdapi.NewCluster()
-	mergo.Merge(mergedClusterInfo, con***REMOVED***g.overrides.ClusterDefaults)
+	mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***g.overrides.ClusterDefaults)
 	if con***REMOVED***gClusterInfo, exists := clusterInfos[clusterInfoName]; exists {
-		mergo.Merge(mergedClusterInfo, con***REMOVED***gClusterInfo)
+		mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***gClusterInfo)
 	} ***REMOVED*** if required {
 		return clientcmdapi.Cluster{}, fmt.Errorf("cluster %q does not exist", clusterInfoName)
 	}
-	mergo.Merge(mergedClusterInfo, con***REMOVED***g.overrides.ClusterInfo)
+	mergo.MergeWithOverwrite(mergedClusterInfo, con***REMOVED***g.overrides.ClusterInfo)
 	// An override of --insecure-skip-tls-verify=true and no accompanying CA/CA data should clear already-set CA/CA data
 	// otherwise, a kubecon***REMOVED***g containing a CA reference would return an error that "CA and insecure-skip-tls-verify couldn't both be set"
 	caLen := len(con***REMOVED***g.overrides.ClusterInfo.Certi***REMOVED***cateAuthority)
@@ -474,7 +494,7 @@ func (con***REMOVED***g *inClusterClientCon***REMOVED***g) ClientCon***REMOVED**
 	}
 
 	// in-cluster con***REMOVED***gs only takes a host, token, or CA ***REMOVED***le
-	// if any of them were individually provided, ovewrite anything ***REMOVED***
+	// if any of them were individually provided, overwrite anything ***REMOVED***
 	if con***REMOVED***g.overrides != nil {
 		if server := con***REMOVED***g.overrides.ClusterInfo.Server; len(server) > 0 {
 			icc.Host = server
@@ -526,12 +546,12 @@ func (con***REMOVED***g *inClusterClientCon***REMOVED***g) Possible() bool {
 // to the default con***REMOVED***g.
 func BuildCon***REMOVED***gFromFlags(masterUrl, kubecon***REMOVED***gPath string) (*restclient.Con***REMOVED***g, error) {
 	if kubecon***REMOVED***gPath == "" && masterUrl == "" {
-		glog.Warningf("Neither --kubecon***REMOVED***g nor --master was speci***REMOVED***ed.  Using the inClusterCon***REMOVED***g.  This might not work.")
+		klog.Warningf("Neither --kubecon***REMOVED***g nor --master was speci***REMOVED***ed.  Using the inClusterCon***REMOVED***g.  This might not work.")
 		kubecon***REMOVED***g, err := restclient.InClusterCon***REMOVED***g()
 		if err == nil {
 			return kubecon***REMOVED***g, nil
 		}
-		glog.Warning("error creating inClusterCon***REMOVED***g, falling back to default con***REMOVED***g: ", err)
+		klog.Warning("error creating inClusterCon***REMOVED***g, falling back to default con***REMOVED***g: ", err)
 	}
 	return NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
 		&ClientCon***REMOVED***gLoadingRules{ExplicitPath: kubecon***REMOVED***gPath},

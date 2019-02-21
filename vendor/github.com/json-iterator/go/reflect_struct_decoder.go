@@ -2,10 +2,11 @@ package jsoniter
 
 import (
 	"fmt"
-	"github.com/modern-go/reflect2"
 	"io"
 	"strings"
 	"unsafe"
+
+	"github.com/modern-go/reflect2"
 )
 
 func decoderOfStruct(ctx *ctx, typ reflect2.Type) ValDecoder {
@@ -31,6 +32,15 @@ func decoderOfStruct(ctx *ctx, typ reflect2.Type) ValDecoder {
 	for k, binding := range bindings {
 		***REMOVED***elds[k] = binding.Decoder.(*structFieldDecoder)
 	}
+
+	if !ctx.caseSensitive() {
+		for k, binding := range bindings {
+			if _, found := ***REMOVED***elds[strings.ToLower(k)]; !found {
+				***REMOVED***elds[strings.ToLower(k)] = binding.Decoder.(*structFieldDecoder)
+			}
+		}
+	}
+
 	return createStructDecoder(ctx, typ, ***REMOVED***elds)
 }
 
@@ -41,12 +51,13 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 	knownHash := map[int64]struct{}{
 		0: {},
 	}
+
 	switch len(***REMOVED***elds) {
 	case 0:
 		return &skipObjectDecoder{typ}
 	case 1:
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -60,7 +71,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder1 *structFieldDecoder
 		var ***REMOVED***eldDecoder2 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -83,7 +94,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder2 *structFieldDecoder
 		var ***REMOVED***eldDecoder3 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -114,7 +125,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder3 *structFieldDecoder
 		var ***REMOVED***eldDecoder4 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -151,7 +162,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder4 *structFieldDecoder
 		var ***REMOVED***eldDecoder5 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -194,7 +205,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder5 *structFieldDecoder
 		var ***REMOVED***eldDecoder6 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -243,7 +254,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder6 *structFieldDecoder
 		var ***REMOVED***eldDecoder7 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -298,7 +309,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder7 *structFieldDecoder
 		var ***REMOVED***eldDecoder8 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -359,7 +370,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder8 *structFieldDecoder
 		var ***REMOVED***eldDecoder9 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -426,7 +437,7 @@ func createStructDecoder(ctx *ctx, typ reflect2.Type, ***REMOVED***elds map[stri
 		var ***REMOVED***eldDecoder9 *structFieldDecoder
 		var ***REMOVED***eldDecoder10 *structFieldDecoder
 		for ***REMOVED***eldName, ***REMOVED***eldDecoder := range ***REMOVED***elds {
-			***REMOVED***eldHash := calcHash(***REMOVED***eldName)
+			***REMOVED***eldHash := calcHash(***REMOVED***eldName, ctx.caseSensitive())
 			_, known := knownHash[***REMOVED***eldHash]
 			if known {
 				return &generalStructDecoder{typ, ***REMOVED***elds, false}
@@ -489,12 +500,15 @@ func (decoder *generalStructDecoder) Decode(ptr unsafe.Pointer, iter *Iterator) 
 	if !iter.readObjectStart() {
 		return
 	}
-	decoder.decodeOneField(ptr, iter)
-	for iter.nextToken() == ',' {
+	var c byte
+	for c = ','; c == ','; c = iter.nextToken() {
 		decoder.decodeOneField(ptr, iter)
 	}
 	if iter.Error != nil && iter.Error != io.EOF {
 		iter.Error = fmt.Errorf("%v.%s", decoder.typ, iter.Error.Error())
+	}
+	if c != '}' {
+		iter.ReportError("struct Decode", `expect }, but found `+string([]byte{c}))
 	}
 }
 
@@ -505,13 +519,13 @@ func (decoder *generalStructDecoder) decodeOneField(ptr unsafe.Pointer, iter *It
 		***REMOVED***eldBytes := iter.ReadStringAsSlice()
 		***REMOVED***eld = *(*string)(unsafe.Pointer(&***REMOVED***eldBytes))
 		***REMOVED***eldDecoder = decoder.***REMOVED***elds[***REMOVED***eld]
-		if ***REMOVED***eldDecoder == nil {
+		if ***REMOVED***eldDecoder == nil && !iter.cfg.caseSensitive {
 			***REMOVED***eldDecoder = decoder.***REMOVED***elds[strings.ToLower(***REMOVED***eld)]
 		}
 	} ***REMOVED*** {
 		***REMOVED***eld = iter.ReadString()
 		***REMOVED***eldDecoder = decoder.***REMOVED***elds[***REMOVED***eld]
-		if ***REMOVED***eldDecoder == nil {
+		if ***REMOVED***eldDecoder == nil && !iter.cfg.caseSensitive {
 			***REMOVED***eldDecoder = decoder.***REMOVED***elds[strings.ToLower(***REMOVED***eld)]
 		}
 	}
