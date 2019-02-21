@@ -377,40 +377,40 @@ spec:
                 terminationGracePeriodSeconds: 30
   customresourcedefinitions:
     owned:
-    - description: An instance of Metering
+    - description: An instance of Metering with high-level configuration
       displayName: Metering
       kind: Metering
       name: meterings.metering.openshift.io
       version: v1alpha1
-    - description: A table within PrestoDB
-      displayName: Metering Presto Table
-      kind: PrestoTable
-      name: prestotables.metering.openshift.io
-      version: v1alpha1
-    - description: A resource describing a source of data for usage by Report Generation
-        Queries
-      displayName: Metering data source
-      kind: ReportDataSource
-      name: reportdatasources.metering.openshift.io
-      version: v1alpha1
-    - description: A SQL query used by Metering to generate reports
-      displayName: Metering generation query
-      kind: ReportGenerationQuery
-      name: reportgenerationqueries.metering.openshift.io
-      version: v1alpha1
-    - description: A Prometheus query by Metering to do metering
-      displayName: Metering prometheus query
-      kind: ReportPrometheusQuery
-      name: reportprometheusqueries.metering.openshift.io
-      version: v1alpha1
-    - description: A metering report summarizes metrics based on the query specified
+    - description: A scheduled or on-off Metering Report summarizes metrics based on the query specified
       displayName: Metering Report
       kind: Report
       name: reports.metering.openshift.io
       version: v1alpha1
-    - description: Represents a configurable storage location for Metering to store metering
+    - description: A SQL query used by Metering to generate Reports. Used in conjunction with a custom report that is not included out of the box.
+      displayName: Metering Generation Query
+      kind: ReportGenerationQuery
+      name: reportgenerationqueries.metering.openshift.io
+      version: v1alpha1
+    - description: A Prometheus query by Metering to do metering. Used in conjunction with a custom report that is not included out of the box.
+      displayName: Metering Prometheus Query
+      kind: ReportPrometheusQuery
+      name: reportprometheusqueries.metering.openshift.io
+      version: v1alpha1
+    - description: Represents a configurable storage location for Metering to store its data
         and report data
-      displayName: Metering storage location
+      displayName: Metering Storage Location
       kind: StorageLocation
       name: storagelocations.metering.openshift.io
+      version: v1alpha1
+    - description: Used under-the-hood. A table within PrestoDB.
+      displayName: Metering Presto Table
+      kind: PrestoTable
+      name: prestotables.metering.openshift.io
+      version: v1alpha1
+    - description: Used under-the-hood. A resource describing a source of data for usage by Report Generation
+        Queries
+      displayName: Metering Data Source
+      kind: ReportDataSource
+      name: reportdatasources.metering.openshift.io
       version: v1alpha1
