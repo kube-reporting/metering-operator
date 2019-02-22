@@ -19,7 +19,7 @@ DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
 METERING_OPERATOR_IMAGE_NAME = metering-helm-operator
 REPORTING_OPERATOR_IMAGE_NAME = metering-reporting-operator
-METERING_E2E_IMAGE_NAME = metering-e2e
+METERING_SRC_IMAGE_NAME = metering-src
 PRESTO_IMAGE_NAME = presto
 HIVE_IMAGE_NAME = hive
 HDFS_IMAGE_NAME = hadoop
@@ -34,7 +34,7 @@ HDFS_IMAGE_TAG = metering-3.1.1
 
 METERING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(METERING_OPERATOR_IMAGE_NAME)
 REPORTING_OPERATOR_IMAGE = $(DOCKER_BASE_URL)/$(REPORTING_OPERATOR_IMAGE_NAME)
-METERING_E2E_IMAGE = $(DOCKER_BASE_URL)/$(METERING_E2E_IMAGE_NAME)
+METERING_SRC_IMAGE = $(DOCKER_BASE_URL)/$(METERING_SRC_IMAGE_NAME)
 PRESTO_IMAGE = $(DOCKER_BASE_URL)/$(PRESTO_IMAGE_NAME)
 HIVE_IMAGE = $(DOCKER_BASE_URL)/$(HIVE_IMAGE_NAME)
 HDFS_IMAGE = $(DOCKER_BASE_URL)/$(HDFS_IMAGE_NAME)
@@ -119,7 +119,7 @@ endif
 DOCKER_COMMON_NAMES := \
 	reporting-operator \
 	metering-operator \
-	metering-e2e
+	metering-src
 
 DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
 DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
@@ -137,8 +137,7 @@ TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
-# TODO: Add tests
-all: fmt test docker-build-all
+all: fmt unit docker-build-all
 
 # Usage:
 #	make docker-build DOCKERFILE= IMAGE_NAME=
@@ -238,8 +237,8 @@ docker-pull-all: $(DOCKER_PULL_TARGETS)
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
-metering-e2e-docker-build: Docker***REMOVED***le.e2e
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_E2E_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+metering-src-docker-build: Docker***REMOVED***le.src
+	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_SRC_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
@@ -248,25 +247,27 @@ metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 vendor: Gopkg.toml
 	dep ensure -v
 
-test:
+test: unit
+
+unit:
 	go test -coverpro***REMOVED***le=$(COVERAGE_OUTFILE) ./pkg/...
 	go test -c -o bin/e2e-tests ./test/e2e
 	go test -c -o bin/integration-tests ./test/integration
 
-test-docker:
-	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make test'
+unit-docker:
+	docker run -i $(METERING_SRC_IMAGE):$(IMAGE_TAG) bash -c 'make unit'
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
 # validates no unstaged changes exist
-ci-validate: verify-codegen all-charts metering-manifests fmt
+verify: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code
 
-ci-validate-docker:
-	docker run -i $(METERING_E2E_IMAGE):$(IMAGE_TAG) bash -c 'make ci-validate'
+verify-docker:
+	docker run -i $(METERING_SRC_IMAGE):$(IMAGE_TAG) bash -c 'make verify'
 
 
 .PHONY: run-metering-operator-local
@@ -333,7 +334,7 @@ bin/test2json: gotools/test2json/main.go
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	metering-test-docker \
-	metering-e2e-docker-build \
+	metering-src-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	penshift-metering chart \
 	bin/metering-override-values.yaml \

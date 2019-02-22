@@ -10,7 +10,6 @@ RUN INSTALL_PKGS="curl jq-1.6-2.el7 faq" && \
     rm -rf /var/cache/yum
 
 RUN mkdir -p /out
-VOLUME /out
 
 ENV HELM_VERSION 2.8.0
 RUN curl \
@@ -46,4 +45,5 @@ WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 RUN make bin/test2json
 
-CMD ["hack/e2e.sh"]
+VOLUME /out
+CMD ["/bin/bash"]
