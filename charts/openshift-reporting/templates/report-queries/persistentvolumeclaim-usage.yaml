@@ -101,7 +101,7 @@ metadata:
 spec:
   reportDataSources:
   - "persistentvolumeclaim-usage-bytes"
-    "persistentvolumeclaim-phase"
+  - "persistentvolumeclaim-phase"
   columns:
   - name: namespace
     type: string
@@ -153,6 +153,7 @@ spec:
     unit: date
   - name: persistentvolumeclaim
     type: string
+    unit: kubernetes_persistentvolumeclaim
   - name: phase_value
     type: string
   - name: value
