@@ -8,10 +8,8 @@ FROM openshift/origin-release:golang-1.10 as build
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
 
 # remove base image jq and install newer jq + faq
-# oniguruma-devel comes from epel-release
 RUN INSTALL_PKGS="jq-1.6-2.el7 faq" \
     && yum -y remove jq \
-    && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS \
     && yum clean all \
@@ -37,9 +35,7 @@ USER root
 # our copy of faq and jq
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
 
-# oniguruma-devel comes from epel-release
 RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certificates socat kubernetes-client" \
-    && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
     && yum clean all \
