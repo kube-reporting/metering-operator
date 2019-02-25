@@ -23,6 +23,8 @@ spec:
     prometheusDatasourceMaxQueryRangeDuration: null
     prometheusDatasourceMaxImportBack***REMOVED***llDuration: null
     prometheusDatasourceImportFrom: null
+    prometheusCAFile: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+    prometheusBearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
     logLevel: "info"
     logReports: "false"

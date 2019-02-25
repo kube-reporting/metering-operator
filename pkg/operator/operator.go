@@ -49,9 +49,7 @@ const (
 	connBackoff         = time.Second * 15
 	maxConnRetries      = 3
 	defaultResyncPeriod = time.Minute * 15
-
-	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
-	prestoUsername       = "reporting-operator"
+	prestoUsername      = "reporting-operator"
 
 	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
 	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
@@ -79,9 +77,11 @@ func (cfg *TLSCon***REMOVED***g) Valid() error {
 }
 
 type PrometheusCon***REMOVED***g struct {
-	Address       string
-	SkipTLSVerify bool
-	BearerToken   string
+	Address         string
+	SkipTLSVerify   bool
+	BearerToken     string
+	BearerTokenFile string
+	CAFile          string
 }
 
 type Con***REMOVED***g struct {
@@ -598,17 +598,19 @@ func (op *Reporting) Run(ctx context.Context) error {
 }
 
 func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	kubeTransportCon***REMOVED***g, err := op.kubeCon***REMOVED***g.TransportCon***REMOVED***g()
-	if err != nil {
-		return nil, err
-	}
-
-	transportCon***REMOVED***g := *kubeTransportCon***REMOVED***g
-
-	if _, err := os.Stat(serviceServingCAFile); err == nil {
-		// use the service serving CA for prometheus
-		transportCon***REMOVED***g.TLS.CAFile = serviceServingCAFile
-		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	transportCon***REMOVED***g := &transport.Con***REMOVED***g{}
+	if op.cfg.PrometheusCon***REMOVED***g.CAFile != "" {
+		if _, err := os.Stat(op.cfg.PrometheusCon***REMOVED***g.CAFile); err == nil {
+			// Use the con***REMOVED***gured CA for communicating to Prometheus
+			transportCon***REMOVED***g.TLS.CAFile = op.cfg.PrometheusCon***REMOVED***g.CAFile
+			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusCon***REMOVED***g.CAFile)
+		} ***REMOVED*** {
+			return nil, err
+		}
+	} ***REMOVED*** {
+		op.logger.Infof("using system CAs for Prometheus")
+		transportCon***REMOVED***g.TLS.CAData = nil
+		transportCon***REMOVED***g.TLS.CAFile = ""
 	}
 
 	if op.cfg.PrometheusCon***REMOVED***g.SkipTLSVerify {
@@ -619,8 +621,11 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	if op.cfg.PrometheusCon***REMOVED***g.BearerToken != "" {
 		transportCon***REMOVED***g.BearerToken = op.cfg.PrometheusCon***REMOVED***g.BearerToken
 	}
+	if op.cfg.PrometheusCon***REMOVED***g.BearerTokenFile != "" {
+		transportCon***REMOVED***g.BearerTokenFile = op.cfg.PrometheusCon***REMOVED***g.BearerTokenFile
+	}
 
-	roundTripper, err := transport.New(&transportCon***REMOVED***g)
+	roundTripper, err := transport.New(transportCon***REMOVED***g)
 	if err != nil {
 		return nil, err
 	}
