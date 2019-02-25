@@ -85,16 +85,21 @@ For more details on con***REMOVED***guration options, most are documented in the
 
 You can override the metering-operator image using a combination of 3 environment variables:
 
-Set `USE_CUSTOM_METERING_OPERATOR=true` to enable the custom behavior and then set `CUSTOM_METERING_OPERATOR_IMAGE` to the image repository you wish to use, and set `CUSTOM_METERING_OPERATOR_IMAGE_TAG` to the image tag you want.
-If you only want to change the image tag, then leave `CUSTOM_METERING_OPERATOR_IMAGE` unset.
+Set `METERING_OPERATOR_IMAGE_REPO` to the image repository you wish to use, and set `METERING_OPERATOR_IMAGE_TAG` to the image tag you want.
+If you only want to change the image tag, then leave `METERING_OPERATOR_IMAGE_REPO` unset.
 
 For example:
 
 ```
-export USE_CUSTOM_METERING_OPERATOR=true
-export CUSTOM_METERING_OPERATOR_IMAGE=internal-registry.example.org:6443/someorg/metering-helm-operator
-export CUSTOM_METERING_OPERATOR_IMAGE_TAG=0.13.0
+export METERING_OPERATOR_IMAGE_REPO=internal-registry.example.org:6443/someorg/metering-helm-operator
+export METERING_OPERATOR_IMAGE_TAG=0.13.0
 ./hack/openshift-install.sh
+```
+
+You can also it in a single line:
+
+```
+METERING_OPERATOR_IMAGE_TAG=pr-123 ./hack/openshift-install.sh
 ```
 
 ## Run reporting operator locally

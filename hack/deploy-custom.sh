@@ -20,6 +20,8 @@ export CUSTOM_OLM_OVERRIDE_VALUES
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+export METERING_OPERATOR_IMAGE_TAG="${DEPLOY_TAG}"
+
 echo "Creating metering manifests"
 export MANIFEST_OUTPUT_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 "$ROOT_DIR/hack/create-metering-manifests.sh"

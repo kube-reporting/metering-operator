@@ -2,8 +2,17 @@
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
+source "${ROOT_DIR}/hack/lib/customize-manifests.sh"
 
 set +e
+
+TMPDIR="$(mktemp -d)"
+# shellcheck disable=SC2064
+trap "rm -rf $TMPDIR" EXIT SIGINT
+
+cp -r "$INSTALLER_MANIFESTS_DIR" "$TMPDIR"
+customizeMeteringInstallManifests "$TMPDIR"
+
 
 msg "Removing Metering Resource"
 kube-remove \
@@ -11,41 +20,22 @@ kube-remove \
 
 msg "Removing metering-operator"
 kube-remove \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-deployment.yaml"
+    "$TMPDIR/metering-operator-deployment.yaml"
 
 msg "Removing metering-operator service account and RBAC resources"
+kubectl delete \
+    -f "$TMPDIR/metering-operator-rolebinding.yaml" \
+    -f "$TMPDIR/metering-operator-role.yaml"
+
 kube-remove \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-rolebinding.yaml" \
-    "$INSTALLER_MANIFESTS_DIR/metering-operator-role.yaml" \
     "$INSTALLER_MANIFESTS_DIR/metering-operator-service-account.yaml"
 
-
-if [ "${METERING_UNINSTALL_REPORTING_OPERATOR_CLUSTERROLEBINDING}" == "true" ]; then
+if [ "${METERING_UNINSTALL_CLUSTERROLEBINDING}" == "true" ]; then
     msg "Removing metering-operator Cluster level RBAC resources"
 
-    TMPDIR="$(mktemp -d)"
-    # shellcheck disable=SC2064
-    trap "rm -rf $TMPDIR" EXIT
-
-    # we modify the name of these resources to be unique by namespace, and
-    # to set the ServiceAccount subject namespace, since it's cluster
-    # scoped.  updating the name is to avoid conflicting with others also
-    # using this script to install.
-    # shellcheck disable=SC2016
-    "$FAQ_BIN" -f yaml -o yaml -M -c -r '.metadata.name=$namespace + "-" + .metadata.name | .subjects[0].namespace=$namespace | .roleRef.name=.metadata.name' \
-        --arg namespace "$METERING_NAMESPACE" \
-        "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrolebinding.yaml" \
-        > "$TMPDIR/metering-operator-clusterrolebinding.yaml"
-
-    # shellcheck disable=SC2016
-    "$FAQ_BIN" -f yaml -o yaml -M -c -r '.metadata.name=$namespace + "-" + .metadata.name' \
-        --arg namespace "$METERING_NAMESPACE" \
-        "$INSTALLER_MANIFESTS_DIR/metering-operator-clusterrole.yaml" \
-        > "$TMPDIR/metering-operator-clusterrole.yaml"
-
-    kube-remove \
-        "$TMPDIR/metering-operator-clusterrole.yaml" \
-        "$TMPDIR/metering-operator-clusterrolebinding.yaml"
+    kubectl delete \
+        -f "$TMPDIR/metering-operator-clusterrole.yaml" \
+        -f "$TMPDIR/metering-operator-clusterrolebinding.yaml"
 ***REMOVED***
 
 
@@ -54,7 +44,7 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
 ***REMOVED***
     msg "Removing Custom Resource De***REMOVED***nitions"
     kube-remove \
-        manifests/custom-resource-de***REMOVED***nitions
+        "$MANIFESTS_DIR/custom-resource-de***REMOVED***nitions"
 ***REMOVED***
 
 if [ "$DELETE_PVCS" == "true" ]; then
