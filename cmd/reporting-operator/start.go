@@ -73,6 +73,8 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
 	startCmd.Flags().BoolVar(&cfg.PrometheusConfig.SkipTLSVerify, "prometheus-skip-tls-verify", false, "Skip TLS verification")
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.BearerToken, "prometheus-bearer-token", "", "Bearer token to authenticate against Prometheus.")
+	startCmd.Flags().StringVar(&cfg.PrometheusConfig.BearerTokenFile, "prometheus-bearer-token-file", "", "File containing bearer token to authenticate against Prometheus. Takes precedence over prometheus-bearer-token.")
+	startCmd.Flags().StringVar(&cfg.PrometheusConfig.CAFile, "prometheus-ca-file", "", "The path to the certificate authority to use to connect to Prometheus. If empty, defaults to system CAs")
 
 	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")

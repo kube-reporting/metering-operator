@@ -40,6 +40,9 @@ data:
 {{- if .Values.spec.config.prometheusDatasourceImportFrom }}
   prometheus-datasource-import-from: {{ .Values.spec.config.prometheusDatasourceImportFrom | quote }}
 {{- end }}
+{{- if .Values.spec.config.prometheusBearerTokenFile }}
+  prometheus-bearer-token-file: "{{ .Values.spec.config.prometheusBearerTokenFile }}"
+{{- end }}
 {{- if .Values.spec.config.allNamespaces }}
   all-namespaces: {{ .Values.spec.config.allNamespaces | quote }}
 {{- end }}
