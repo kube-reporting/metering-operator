@@ -284,7 +284,7 @@ The execution of a scheduled report can be tracked using its status ***REMOVED**
 
 The `status` ***REMOVED***eld of a `Report` currently has two ***REMOVED***elds:
 
-- `conditions`: Conditions is an list of conditions, each have a `Type`, `Reason`, and `Message` ***REMOVED***eld. Possible values of a condition's `Type` ***REMOVED***eld are `Running` and `Failure`, indicating the current state of the scheduled report. The `Reason` indicates why its `Condition` is in its current state, with and the `Message` provides a detailed information on the `Reason`.
+- `conditions`: Conditions is a list of conditions, each of which have a `type`, `status`, `reason`, and `message` ***REMOVED***eld. Possible values of a condition's `type` ***REMOVED***eld are `Running` and `Failure`, indicating the current state of the scheduled report. The `reason` indicates why its `condition` is in its current state with it's `status` being either `true`, `false` or `unknown`. The `message` provides a human readable indicating why the condition is in the current state. For detailed information on the `reason` values see [`pkg/apis/metering/v1alpha1/util/report_util.go`](https://github.com/operator-framework/operator-metering/blob/master/pkg/apis/metering/v1alpha1/util/report_util.go#L10).
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
