@@ -5,7 +5,7 @@ set -u
 
 cat <<EOF
 image:
-  repository: ${METERING_OPERATOR_IMAGE}
+  repository: ${METERING_OPERATOR_IMAGE_REPO}
   tag: ${METERING_OPERATOR_IMAGE_TAG}
 EOF
 
