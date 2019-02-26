@@ -14,7 +14,8 @@ spec:
   reporting-operator:
     spec:
       image:
-        tag: "{{ .Values.deployTag }}"
+        repo: "{{ .Values.reportingOperatorDeployRepo }}"
+        tag: "{{ .Values.reportingOperatorDeployTag }}"
 
 {{- if .Values.imagePullSecretName }}
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
