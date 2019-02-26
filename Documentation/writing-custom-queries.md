@@ -193,7 +193,7 @@ ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, n
 
 Now that we have our ***REMOVED***nal query, the time has come to put it into a [ReportGenerationQuery][reportgenerationqueries] resource.
 
-The basic things you need to know when creating a `ReportGenerationQuery` is the query your going to use, the schema for that query, and the `ReportDataSources` or `ReportGenerationQueries` your query depends on.
+The basic things you need to know when creating a `ReportGenerationQuery` is the query you're going to use, the schema for that query, and the `ReportDataSources` or `ReportGenerationQueries` your query depends on.
 
 For our example, we will add the `unready-deployment-replicas` `ReportDataSources` to the `spec.ReportDataSource`, and we'll add the query to `spec.query`.
 The schema, is de***REMOVED***ned in the `spec.columns` ***REMOVED***eld and is basically a list of the columns from the `SELECT` query and their SQL data types.
@@ -322,7 +322,7 @@ kubectl proxy &
 sleep 2
 curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
 ```
-If your using Openshift, you'll need to change the url to the following:
+If you are using Openshift, you'll need to change the url to the following:
 ```
 http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv
 ```

@@ -26,7 +26,7 @@ $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/install.sh
 ```
 
-If your using Openshift, use openshift-install.sh:
+If you're using Openshift, use openshift-install.sh:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER
@@ -44,7 +44,7 @@ $ export METERING_NAMESPACE=metering-$USER
 $ ./hack/uninstall.sh
 ```
 
-If your using Openshift, use openshift-uninstall.sh:
+If you're using Openshift, use openshift-uninstall.sh:
 
 ```
 $ export METERING_NAMESPACE=metering-$USER

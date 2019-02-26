@@ -94,7 +94,7 @@ Each of them is built slightly differently.
 # OCP builds
 
 OCP builds are done by a combination of systems within the Red Hat internal network.
-Many links below will require your on the Red Hat network in some form (the VPN is a good option).
+Many links below will require you to be on the Red Hat network in some form (the VPN is a good option).
 
 The major components are:
 - [Openshift Build System (OSBS)][osbs]

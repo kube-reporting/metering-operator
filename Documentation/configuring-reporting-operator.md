@@ -24,7 +24,7 @@ spec:
 
 ## Exposing the reporting API
 
-There are two ways to expose the reporting API depending on if your using regular Kubernetes, or Openshift.
+There are two ways to expose the reporting API depending on if you're using regular Kubernetes, or Openshift.
 
 For Openshift, you can expose a [Route][route], and for anything ***REMOVED*** you can use regular [Load Balancer][load-balancer-svc] or [Node Port][node-port-svc] [Kubernetes services][kube-svc].
 
