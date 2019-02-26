@@ -44,7 +44,7 @@ For the example, we're going to try to answer the following question.
 
 To answer this question, we're going to use the `kube_deployment_status_replicas_unavailable` metric which tells us how many unready replicas a particular deployment has at a given moment in time.
 
-Next, we need to ***REMOVED***gure out what information we care about from this metric, as a lot of it's not particularly useful to us.
+Next, we need to ***REMOVED***gure out what information we care about from this metric, as a lot of it is not particularly useful to us.
 The most relevant information available in this metric is the `namespace`, `deployment` labels and the actual value of the metric.
 
 To strip out everything besides this information, the following Prometheus query [sums](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators) the value of the metric grouped by the `namespace` and `deployment`.

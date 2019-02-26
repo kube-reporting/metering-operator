@@ -1,7 +1,7 @@
 # Jenkins
 
 Jenkins is heavily used by Metering for continuous integration.
-It's primary duties are:
+Its primary duties are:
 
 - Building the metering binary
 - Running metering unit tests
