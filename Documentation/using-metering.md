@@ -82,7 +82,7 @@ points to the Kubernetes service. (See the upstream documentation on
 http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
 ```
 
-If your using Openshift, you'll need to change to the following, which uses the `openshift-metering` namespace, and which uses HTTPS by default:
+If you are using Openshift, you'll need to change to the following, which uses the `openshift-metering` namespace, and which uses HTTPS by default:
 
 ```
 http://127.0.0.1:8001/api/v1/namespaces/metering/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
