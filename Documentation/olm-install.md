@@ -9,7 +9,7 @@ If you want to install metering into a non-Openshift Kubernetes cluster, please 
 
 Installing the metering-operator is done by creating a `Subscription` resource in a namespace with a `CatalogSource` containing the `metering` package.
 
-Currently we advise metering is installed into it's own namespace which requires some setup.
+Currently we advise metering is installed into its own namespace which requires some setup.
 
 First, start by creating the `openshift-metering` namespace:
 
