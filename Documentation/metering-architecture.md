@@ -100,7 +100,7 @@ A `ReportPrometheusQuery` is basically just a Prometheus query. All `ReportProme
 
 For user-docs containing a description of the fields, and examples, see [ReportGenerationQueries][reportgenerationqueries].
 
-When the metering operator sees a new `ReportGenerationQuery` in it's namespace, it will check if the `spec.view.disabled` field is true, if it is, it doesn't do anything with these queries on creation.
+When the metering operator sees a new `ReportGenerationQuery` in its namespace, it will check if the `spec.view.disabled` field is true, if it is, it doesn't do anything with these queries on creation.
 If it's false, then it will create a database view.
 
 ### Report
@@ -111,7 +111,7 @@ When a `Report` is created, and it sees the creation event, it does the followin
 
 - Retrieve the `ReportGenerationQuery` for the Report.
 - For each `ReportGenerationQuery` from the `spec.reportQueries` and `spec.dynamicReportQueries` fields, retrieve them, and then do the same for each of those queries until we have all the required `ReportGenerationQueries`
-- Validate the `ReportDataSources` that each query depends on has it's table created.
+- Validate the `ReportDataSources` that each query depends on has its table created.
 - Update the Report status to indicate we're beginning to generate the report.
 - Evaluate the `ReportGenerationQuery` template, passing the StartPeriod & EndPeriod into the template context.
 - Create a database table using Hive named after the Report This table is either configured to use HDFS or S3 based on the Report's StorageLocation.

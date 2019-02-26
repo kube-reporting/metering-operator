@@ -37,7 +37,7 @@ This URL `/api/v2/reports/openshift-metering/namespace-cpu-request/full?format=j
 
 ### V2 Reports Table
 
- The `/api/v2/reports/{namespace}/{name}/table` endpoint returns reports in either CSV, JSON, or tabular format.  tableHidden is a boolean and controls if a column should be shown when displayed in a table. If it's true, then the /api/v2/reports/{namespace}/{name}/table endpoint will omit this column and it's values from the response (in all formats).
+ The `/api/v2/reports/{namespace}/{name}/table` endpoint returns reports in either CSV, JSON, or tabular format.  tableHidden is a boolean and controls if a column should be shown when displayed in a table. If it's true, then the /api/v2/reports/{namespace}/{name}/table endpoint will omit this column and its values from the response (in all formats).
 
  This URL  `/api/v2/reports/openshift-metering/namespace-cpu-request/table?format=json` returns
 

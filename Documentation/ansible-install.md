@@ -23,7 +23,7 @@ openshift_metering_config:
 
 ## Install
 
-Installing using the openshift-metering playbook will install the metering operator and it's components into the `openshift-metering` namespace.
+Installing using the openshift-metering playbook will install the metering operator and its components into the `openshift-metering` namespace.
 
 Installation is just running the install playbook:
 

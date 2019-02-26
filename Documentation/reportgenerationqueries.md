@@ -18,7 +18,7 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `dynamicReportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on, that have `view.disabled` set to true, these are queries that depend on the `.Report` variable. Queries in the list can be re-used by injecting them into the current query using the `renderReportGenerationQuery` template function.
 - `view`: This section controls options related to creating a view from the `query` when the `ReportGenerationQuery` resource is created.
     - `view.disabled`: This is false by default, and if set to true, it will prevent the default behavior of creating a database view using the contents of the `query`. This cannot be true if `dynamicReportQueries` is non-empty or if the `query` depends on the `.Report` templating variables.
-- `inputs`: A list of inputs this report query accepts to control it's behavior.
+- `inputs`: A list of inputs this report query accepts to control its behavior.
   - `name`: The name used to refer to the input in the `Report` or `ScheduledReport` `spec.inputs` and within the queries template variables (see below).
   - `required`: A boolean indicating if this input is required for the query to run. Defaults to false.
   - `type`: An optional type indicating what data type this input takes. Available options are `string`, `time`, and `int`. If left empty, it defaults to `string`.
@@ -43,7 +43,7 @@ Below is a list of the available template functions and descriptions on what the
 
 - `dataSourceTableName`: Takes a one argument, a string representing a `ReportDataSource` name and outputs a string which is the corresponding table name of the `ReportDataSource` specified.
 - `generationQueryViewName`: Takes one argument, a string representing a `ReportGenerationQuery` name and outputs a string which is the corresponding view name of the `ReportGenerationQuery` specified.
-- `renderReportGenerationQuery`: Takes two arguments, a string representing a `ReportGenerationQuery` name, the template context (usually this is just `.` in the template), and returns a string containing the specified `ReportGenerationQuery` in it's rendered form, using the 2nd argument as the context for the template rendering.
+- `renderReportGenerationQuery`: Takes two arguments, a string representing a `ReportGenerationQuery` name, the template context (usually this is just `.` in the template), and returns a string containing the specified `ReportGenerationQuery` in its rendered form, using the 2nd argument as the context for the template rendering.
 - `prestoTimestamp`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp. Usually this is used on `.Report.ReportingStart` and `.Report.ReportingEnd`.
 - `billingPeriodFormat`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp that can be used for comparing to `awsBilling` an ReportDataSource's `partition_start` and `partition_stop` columns.
 
