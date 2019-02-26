@@ -8,7 +8,7 @@ Con***REMOVED***guring the operator is done primarily within a `Metering` CR's `
 Depending on how you installed Metering, the default Prometheus URL varies.
 If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
 Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
-If your not Openshift or using [kube-prometheus][kube-prometheus] on non-openshift clusters, then you will need to override the `reporting-operator.con***REMOVED***g.prometheusURL` con***REMOVED***guration option.
+If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.con***REMOVED***g.prometheusURL` con***REMOVED***guration option.
 
 Below is an example of con***REMOVED***guring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
@@ -158,3 +158,4 @@ When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide you
 [expose-route-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/expose-route.yaml
 [basic-auth-rfc]: https://tools.ietf.org/html/rfc7617
 [advanced-auth-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/advanced-auth.yaml
+[kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
