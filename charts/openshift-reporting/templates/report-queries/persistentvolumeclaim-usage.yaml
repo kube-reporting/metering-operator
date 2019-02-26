@@ -40,3 +40,52 @@ spec:
         "timestamp",
         dt
     FROM {| dataSourceTableName "persistentvolumeclaim-phase" |}
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-usage-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "persistentvolumeclaim-usage-bytes"
+  columns:
+  - name: namespace
+    type: string
+  - name: persistentvolumeclaim
+    type: string
+  - name: labels
+    type: map<string, string>
+    tableHidden: true
+  - name: persistentvolumeclaim_usage_bytes
+    type: double
+    unit: bytes
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: persistentvolumeclaim_usage_byte_seconds
+    type: double
+    unit: byte_seconds
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: dt
+    type: string
+  query: |
+    SELECT
+        labels['exported_namespace'] as namespace,
+        labels['persistentvolumeclaim'] as persistentvolumeclaim,
+        labels,
+        amount as persistentvolumeclaim_usage_bytes,
+        timeprecision,
+        amount * timeprecision as persistentvolumeclaim_usage_byte_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName "persistentvolumeclaim-usage-bytes" |}
+    
+---
