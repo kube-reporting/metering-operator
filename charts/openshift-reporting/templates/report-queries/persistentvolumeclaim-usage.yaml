@@ -87,5 +87,44 @@ spec:
         "timestamp",
         dt
     FROM {| dataSourceTableName "persistentvolumeclaim-usage-bytes" |}
-    
+
 ---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-usage-with-phase-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "persistentvolumeclaim-usage-bytes"
+  - "persistentvolumeclaim-phase"
+  columns:
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: persistentvolumeclaim
+    type: string
+  - name: phase_value
+    type: string
+  - name: value
+    type: double
+  - name: persistentvolumeclaim_usage_bytes
+    type: double
+    unit: bytes
+  - name: dt
+    type: string
+  query: |
+    SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value AS phase_value, persistentvolumeclaim_usage_bytes,dt
+    FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
+    FULL OUTER JOIN
+    {| generationQueryViewName "persistentvolumeclaim_usage_raw"} AS usage
+    ON phase.namespace=usage.namespace
+    AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
+    AND phase.timestamp=usage.timestamp
