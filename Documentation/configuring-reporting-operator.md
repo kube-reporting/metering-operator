@@ -146,7 +146,7 @@ In this document, most examples will prefer this method.
 
 #### Basic Authentication (username/password)
 
-If `reporting-operator.spec.authProxy.htpasswdData` is non-empty, it's contents must be that of an [htpasswd ***REMOVED***le](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
+If `reporting-operator.spec.authProxy.htpasswdData` is non-empty, its contents must be that of an [htpasswd ***REMOVED***le](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
 When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
