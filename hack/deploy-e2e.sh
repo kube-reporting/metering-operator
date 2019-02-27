@@ -5,13 +5,12 @@ DIR=$(dirname "${BASH_SOURCE}")
 ROOT_DIR="$DIR/.."
 source "${ROOT_DIR}/hack/common.sh"
 
-: "${DEPLOY_TAG:?}"
+: "${METERING_OPERATOR_DEPLOY_REPO:?}"
+: "${REPORTING_OPERATOR_DEPLOY_REPO:?}"
+: "${METERING_OPERATOR_DEPLOY_TAG:?}"
+: "${REPORTING_OPERATOR_DEPLOY_TAG:?}"
 
 TMP_DIR="$(mktemp -d)"
-
-# Used in deploy.sh
-export DOCKER_USERNAME="${DOCKER_CREDS_USR:-}"
-export DOCKER_PASSWORD="${DOCKER_CREDS_PSW:-}"
 
 unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
@@ -28,7 +27,7 @@ export METERING_CREATE_PULL_SECRET
 : "${AWS_BILLING_BUCKET:=}"
 : "${AWS_BILLING_BUCKET_PREFIX:=}"
 : "${AWS_BILLING_BUCKET_REGION:=}"
-: "${METERING_CREATE_PULL_SECRET:=true}"
+: "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${TERMINATION_GRACE_PERIOD_SECONDS:=0}"
 : "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
@@ -41,7 +40,8 @@ export METERING_CREATE_PULL_SECRET
 : "${CUR_DATE:=$(date +%s)}"
 
 HELM_ARGS=(\
-    --set "deployTag=${DEPLOY_TAG}" \
+    --set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_DEPLOY_REPO}" \
+    --set "reportingOperatorDeployTag=${REPORTING_OPERATOR_DEPLOY_TAG}" \
     --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
     --set "disablePromsum=${DISABLE_PROMSUM}" \
     --set "awsAccessKeyId=${AWS_ACCESS_KEY_ID}" \
@@ -77,21 +77,13 @@ CR_SPEC=$("$FAQ_BIN" -f yaml -o yaml -M -c -r '{ cr: {spec: .spec} }' "$CUSTOM_M
 
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 image:
-  tag: ${DEPLOY_TAG}
+  repo: ${METERING_OPERATOR_DEPLOY_REPO}
+  tag: ${METERING_OPERATOR_DEPLOY_TAG}
 annotations: { "metering.deploy-custom/deploy-time": "${CUR_DATE}" }
 reconcileIntervalSeconds: 5
 ${CR_SPEC}
 EOF
 
-cat <<EOF > "$CUSTOM_OLM_OVERRIDE_VALUES"
-name: metering-operator.v${DEPLOY_TAG}
-spec:
-  version: ${DEPLOY_TAG}
-  labels:
-    olm-status-descriptors: metering-operator.v${DEPLOY_TAG}
-    olm-owner-metering: metering-operator
-  matchLabels:
-    olm-owner-metering: metering-operator
-EOF
+touch "$CUSTOM_OLM_OVERRIDE_VALUES"
 
 "$DIR/deploy-custom.sh"

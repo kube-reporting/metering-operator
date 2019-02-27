@@ -66,7 +66,8 @@ spec:
         environment {
             GOPATH                      = "/go"
             METERING_SRC_DIR            = "/go/src/github.com/operator-framework/operator-metering"
-            DEPLOY_TAG                  = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+            METERING_OPERATOR_DEPLOY_TAG = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
+            REPORTING_OPERATOR_DEPLOY_TAG = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
             OUTPUT_DEPLOY_LOG_STDOUT    = "true"
             OUTPUT_TEST_LOG_STDOUT      = "true"
             OUTPUT_DIR                  = "test_output"
@@ -142,6 +143,9 @@ private def runScript() {
         ansiColor('xterm') {
             timeout(20) {
                 sh '''#!/bin/bash -ex
+                export METERING_CREATE_PULL_SECRET=true
+                export DOCKER_USERNAME="${DOCKER_CREDS_USR:-}"
+                export DOCKER_PASSWORD="${DOCKER_CREDS_PSW:-}"
                 cd $METERING_SRC_DIR
                 $SCRIPT
                 '''
