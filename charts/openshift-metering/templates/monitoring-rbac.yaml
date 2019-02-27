@@ -1,10 +1,10 @@
-{{- if .Values.monitoring.enabled }}
+{{- if and .Values.monitoring.enabled .Values.monitoring.createRBAC }}
 # Grant Prometheus permissions to discover our services, endpoints, and pods so
 # it can ***REMOVED***gure out what needs to be monitored.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: prometheus-k8s
+  name: metering-prometheus-k8s
 {{- block "extraMetadata" . }}
 {{- end }}
 rules:
@@ -24,13 +24,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: prometheus-k8s
+  name: metering-prometheus-k8s
 {{- block "extraMetadata" . }}
 {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: prometheus-k8s
+  name: metering-prometheus-k8s
 subjects:
 - kind: ServiceAccount
   name: prometheus-k8s
