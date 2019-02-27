@@ -12,6 +12,9 @@ OCP_RELEASE_TAG = v4.0
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
+# these are directories/files which get auto-generated or get reformated by
+# gofmt
+VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
 
 IMAGE_REPOSITORY = quay.io
 IMAGE_ORG = coreos
@@ -267,10 +270,10 @@ e2e:
 fmt:
 	find . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
 
-# validates no unstaged changes exist
+# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
 verify: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
-	git diff --stat HEAD --ignore-submodules --exit-code
+	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
 verify-docker:
 	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make verify'
