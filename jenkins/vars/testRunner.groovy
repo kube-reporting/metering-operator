@@ -54,7 +54,6 @@ spec:
             timestamps()
             overrideIndexTriggers(false)
             disableConcurrentBuilds()
-            skipDefaultCheckout()
             buildDiscarder(logRotator(
                 artifactDaysToKeepStr: '14',
                 artifactNumToKeepStr: '30',
@@ -64,8 +63,8 @@ spec:
         }
 
         environment {
-            GOPATH                      = "/go"
-            METERING_SRC_DIR            = "/go/src/github.com/operator-framework/operator-metering"
+            GOPATH            = "${env.WORKSPACE}/go"
+            METERING_SRC_DIR  = "${env.WORKSPACE}/go/src/github.com/operator-framework/operator-metering"
             METERING_OPERATOR_DEPLOY_TAG = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
             REPORTING_OPERATOR_DEPLOY_TAG = "${params.DEPLOY_TAG ?: env.BRANCH_NAME}"
             OUTPUT_DEPLOY_LOG_STDOUT    = "true"
@@ -84,6 +83,19 @@ spec:
         }
 
         stages {
+            stage('Prepare') {
+                steps {
+                    container('metering-test-runner') {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: scm.branches,
+                            extensions: scm.extensions + [[$class: 'RelativeTargetDirectory', relativeTargetDir: env.METERING_SRC_DIR]],
+                            userRemoteCon***REMOVED***gs: scm.userRemoteCon***REMOVED***gs
+                        ])
+                    }
+                }
+            }
+
             stage('Run Tests') {
                 environment {
                     KUBECONFIG                        = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
