@@ -23,10 +23,15 @@ echo Starting hive port-forward
 kubectl -n "$METERING_NAMESPACE" \
     port-forward "svc/hive-server" 9992:10000 &
 
-echo Starting Prometheus port-forward
-kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
-    port-forward "svc/${METERING_PROMETHEUS_SVC}" \
-    9993:"${METERING_PROMETHEUS_SVC_PORT}" &
+if [[ -v METERING_PROMETHEUS_HOST ]]; then
+    echo Skipping Prometheus port-forward
+***REMOVED***
+    echo Starting Prometheus port-forward
+    : "${METERING_PROMETHEUS_HOST:=127.0.0.1:9993}"
+    kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
+        port-forward "svc/${METERING_PROMETHEUS_SVC}" \
+        9993:"${METERING_PROMETHEUS_SVC_PORT}" &
+***REMOVED***
 
 sleep 6
 
@@ -44,7 +49,7 @@ set -x
     --namespace "$METERING_NAMESPACE" \
     --presto-host "127.0.0.1:9991" \
     --hive-host "127.0.0.1:9992" \
-    --prometheus-host "${METERING_PROMETHEUS_SCHEME}://127.0.0.1:9993" \
+    --prometheus-host "${METERING_PROMETHEUS_SCHEME}://${METERING_PROMETHEUS_HOST}" \
     "${ARGS[@]}" &
 
 wait
