@@ -257,6 +257,12 @@ unit:
 unit-docker:
 	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make unit'
 
+integration:
+	hack/integration.sh
+
+e2e:
+	hack/e2e.sh
+
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
 	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
