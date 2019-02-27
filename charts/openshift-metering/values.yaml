@@ -20,6 +20,7 @@ permissions:
 monitoring:
   enabled: true
   namespace: openshift-monitoring
+  createRBAC: true
 
 openshift-reporting:
   enabled: true
