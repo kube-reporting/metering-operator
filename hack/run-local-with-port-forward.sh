@@ -10,6 +10,8 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_PROMETHEUS_SVC:=prometheus-k8s}"
 : "${METERING_PROMETHEUS_SVC_PORT:=9091}"
 : "${METERING_PROMETHEUS_SCHEME:=https}"
+: "${METERING_PROMETHEUS_HOST:=127.0.0.1:9993}"
+: "${METERING_PROMETHEUS_PORT_FORWARD:=true}"
 
 set -e -o pipefail
 trap 'jobs -p | xargs kill' EXIT
@@ -23,14 +25,13 @@ echo Starting hive port-forward
 kubectl -n "$METERING_NAMESPACE" \
     port-forward "svc/hive-server" 9992:10000 &
 
-if [[ -v METERING_PROMETHEUS_HOST ]]; then
-    echo Skipping Prometheus port-forward
-***REMOVED***
+if [ "$METERING_PROMETHEUS_PORT_FORWARD" == "true" ]; then
     echo Starting Prometheus port-forward
-    : "${METERING_PROMETHEUS_HOST:=127.0.0.1:9993}"
     kubectl -n "$METERING_PROMETHEUS_NAMESPACE" \
         port-forward "svc/${METERING_PROMETHEUS_SVC}" \
         9993:"${METERING_PROMETHEUS_SVC_PORT}" &
+***REMOVED***
+    echo Skipping Prometheus port-forward
 ***REMOVED***
 
 sleep 6
