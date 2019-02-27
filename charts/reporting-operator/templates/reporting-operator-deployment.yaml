@@ -156,6 +156,10 @@ spec:
               name: reporting-operator-config
               key: prometheus-datasource-import-from
               optional: true
+{{- /* neither specified = no auth used; both specified = error; either = correct & authenticated */ -}}
+{{- if and .Values.spec.config.prometheusImporter.auth.tokenSecret.enabled .Values.spec.config.prometheusImporter.auth.useServiceAccountToken  }}
+  {{ fail "cannot use both token from secret and token from service account" }}
+{{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN_FILE
           valueFrom:
             configMapKeyRef:
@@ -289,6 +293,11 @@ spec:
         - mountPath: /etc/proxy/authenticated-emails
           name: authenticated-emails-secret
 {{- end }}
+{{- if .Values.spec.config.tokenSecret.enabled }}
+        - mountPath: /var/run/reporting-operator/token
+          name: prometheus-bearer-token
+          subPath: token
+{{- end }}
 {{- end }}
       volumes:
 {{- if .Values.spec.config.tls.enabled }}
@@ -312,6 +321,11 @@ spec:
       - name: authenticated-emails-secret
         secret:
           secretName: {{ .Values.spec.authProxy.authenticatedEmailsSecretName }}
+{{- end }}
+{{- if .Values.spec.config.tokenSecret.enabled }}
+      - name: prometheus-bearer-token
+        secret:
+          secretName: {{ .Values.spec.config.tokenSecret.name }}
 {{- end }}
 {{- end }}
       restartPolicy: Always

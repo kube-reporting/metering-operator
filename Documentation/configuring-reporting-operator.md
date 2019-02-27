@@ -3,7 +3,7 @@
 reporting-operator is responsible for collecting data from Prometheus, storing the metrics in Presto, running report queries against Presto, and exposing their results via an HTTP API.
 Configuring the operator is done primarily within a `Metering` CR's `spec.reporting-operator.spec` section.
 
-## Prometheus URL
+## Prometheus connection
 
 Depending on how you installed Metering, the default Prometheus URL varies.
 If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
@@ -20,7 +20,33 @@ spec:
         prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
-> Note: currently we do not support https connections or authentication to Prometheus except for in Openshift, but support for it is being developed.
+To secure the connection to Prometheus, the default Metering installation uses the Openshift certificate authority. If your Prometheus instance uses a different CA, the path to the CA file can be referenced with the `prometheusCAFile` option:
+
+```
+spec:
+  reporting-operator:
+    spec:
+      config:
+        prometheusCAFile: "/path/to/my/ca.crt"
+```
+
+Alternatively, to use the system certificate authorities for publicly valid certificates, it can be set to `""`.
+
+Reporting-operator can also be configured to use a specified bearer token to auth with Prometheus:
+
+```
+spec:
+  reporting-operator:
+    spec:
+      config:
+        prometheusImporter:
+          auth:
+            useServiceAccountToken: false
+            tokenSecret:
+              enabled: true
+              create: true
+              value: "abc-123"
+```
 
 ## Exposing the reporting API
 

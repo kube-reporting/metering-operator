@@ -40,8 +40,10 @@ data:
 {{- if .Values.spec.config.prometheusDatasourceImportFrom }}
   prometheus-datasource-import-from: {{ .Values.spec.config.prometheusDatasourceImportFrom | quote }}
 {{- end }}
-{{- if .Values.spec.config.prometheusBearerTokenFile }}
-  prometheus-bearer-token-file: "{{ .Values.spec.config.prometheusBearerTokenFile }}"
+{{- if .Values.spec.config.prometheusImporter.auth.useServiceAccountToken }}
+  prometheus-bearer-token-file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+{{- else }}
+  prometheus-bearer-token-file: "/var/run/reporting-operator/token"
 {{- end }}
 {{- if .Values.spec.config.allNamespaces }}
   all-namespaces: {{ .Values.spec.config.allNamespaces | quote }}
