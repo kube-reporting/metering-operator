@@ -124,7 +124,7 @@ spec:
     SELECT phase.namespace, phase.timestamp, phase.persistentvolumeclaim, phase.phase, phase.value AS phase_value, persistentvolumeclaim_usage_bytes,dt
     FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
     FULL OUTER JOIN
-    {| generationQueryViewName "persistentvolumeclaim_usage_raw"} AS usage
+    {| generationQueryViewName "persistentvolumeclaim_usage_raw" |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
@@ -168,7 +168,7 @@ spec:
   - name: ReportingEnd
   query: |
     SELECT namespace, timestamp, persistentvolumeclaim, phase, phase_value, persistentvolumeclaim_usage_bytes
-    FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw"}
+    FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
