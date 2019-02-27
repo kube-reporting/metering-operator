@@ -122,7 +122,7 @@ Next, run the install script for your platform (see above).
 After running the install script, ***REMOVED***gure out where your Prometheus pod is running.
 By default the `run-reporting-operator-local` Make***REMOVED***le target assumes that the pod is in the `openshift-monitoring` namespace and can be queried using the label selector `app=prometheus`.
 
-If you're Prometheus is located somewhere, ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus.
+If your Prometheus is located somewhere ***REMOVED***, you can override the defaults using the environment variables `METERING_PROMETHEUS_NAMESPACE` and `METERING_PROMTHEUS_LABEL_SELECTOR` to the namespace your Prometheus pod is in, and the label selector for querying Prometheus. Alternatively, if you wish to specify your Prometheus with a host, set `METERING_PROMETHEUS_PORT_FORWARD` to false and `METERING_PROMETHEUS_HOST` to the host/port of your instance.
 
 Ex (these are the defaults):
 ```
