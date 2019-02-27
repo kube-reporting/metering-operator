@@ -156,6 +156,16 @@ spec:
               name: reporting-operator-config
               key: prometheus-datasource-import-from
               optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: prometheus-bearer-token-file
+              optional: true
+{{- if .Values.spec.config.prometheusCAFile }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
+          value: {{ .Values.spec.config.prometheusCAFile }}
+{{- end }}
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
             configMapKeyRef:

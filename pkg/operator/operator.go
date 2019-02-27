@@ -49,9 +49,7 @@ const (
 	connBackoff         = time.Second * 15
 	maxConnRetries      = 3
 	defaultResyncPeriod = time.Minute * 15
-
-	serviceServingCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
-	prestoUsername       = "reporting-operator"
+	prestoUsername      = "reporting-operator"
 
 	DefaultPrometheusQueryInterval                       = time.Minute * 5  // Query Prometheus every 5 minutes
 	DefaultPrometheusQueryStepSize                       = time.Minute      // Query data from Prometheus at a 60 second resolution (one data point per minute max)
@@ -79,9 +77,11 @@ func (cfg *TLSConfig) Valid() error {
 }
 
 type PrometheusConfig struct {
-	Address       string
-	SkipTLSVerify bool
-	BearerToken   string
+	Address         string
+	SkipTLSVerify   bool
+	BearerToken     string
+	BearerTokenFile string
+	CAFile          string
 }
 
 type Config struct {
@@ -598,17 +598,19 @@ func (op *Reporting) Run(ctx context.Context) error {
 }
 
 func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
-	kubeTransportConfig, err := op.kubeConfig.TransportConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	transportConfig := *kubeTransportConfig
-
-	if _, err := os.Stat(serviceServingCAFile); err == nil {
-		// use the service serving CA for prometheus
-		transportConfig.TLS.CAFile = serviceServingCAFile
-		op.logger.Infof("using %s as CA for Prometheus", serviceServingCAFile)
+	transportConfig := &transport.Config{}
+	if op.cfg.PrometheusConfig.CAFile != "" {
+		if _, err := os.Stat(op.cfg.PrometheusConfig.CAFile); err == nil {
+			// Use the configured CA for communicating to Prometheus
+			transportConfig.TLS.CAFile = op.cfg.PrometheusConfig.CAFile
+			op.logger.Infof("using %s as CA for Prometheus", op.cfg.PrometheusConfig.CAFile)
+		} else {
+			return nil, err
+		}
+	} else {
+		op.logger.Infof("using system CAs for Prometheus")
+		transportConfig.TLS.CAData = nil
+		transportConfig.TLS.CAFile = ""
 	}
 
 	if op.cfg.PrometheusConfig.SkipTLSVerify {
@@ -619,8 +621,11 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	if op.cfg.PrometheusConfig.BearerToken != "" {
 		transportConfig.BearerToken = op.cfg.PrometheusConfig.BearerToken
 	}
+	if op.cfg.PrometheusConfig.BearerTokenFile != "" {
+		transportConfig.BearerTokenFile = op.cfg.PrometheusConfig.BearerTokenFile
+	}
 
-	roundTripper, err := transport.New(&transportConfig)
+	roundTripper, err := transport.New(transportConfig)
 	if err != nil {
 		return nil, err
 	}
