@@ -18,8 +18,8 @@ set -e
 # can be deploy.sh, deploy-custom.sh, deploy-e2e.sh, deploy-integration.sh
 : "${DEPLOY_SCRIPT:=deploy.sh}"
 : "${TEST_OUTPUT_PATH:=/out}"
-: "${OUTPUT_TEST_LOG_STDOUT:=false}"
-: "${OUTPUT_DEPLOY_LOG_STDOUT:=false}"
+: "${OUTPUT_TEST_LOG_STDOUT:=true}"
+: "${OUTPUT_DEPLOY_LOG_STDOUT:=true}"
 : "${OUTPUT_POD_LOG_STDOUT:=false}"
 : "${ENABLE_AWS_BILLING:=false}"
 : "${ENABLE_AWS_BILLING_TEST:=false}"
