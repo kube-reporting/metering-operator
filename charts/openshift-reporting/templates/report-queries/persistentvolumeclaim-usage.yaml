@@ -156,10 +156,10 @@ spec:
   - name: persistentvolumeclaim
     type: string
     unit: kubernetes_persistentvolumeclaim
+  - name: phase
+    type: string
   - name: phase_value
     type: string
-  - name: value
-    type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
