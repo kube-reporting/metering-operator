@@ -11,7 +11,7 @@ For details on different types of con***REMOVED***guration read the relevant doc
   - [node selectors](common-con***REMOVED***guration.md#node-selectors)
   - [image repositories and tags](common-con***REMOVED***guration.md#image-repositories-and-tags)
 - [con***REMOVED***guring reporting-operator](con***REMOVED***guring-reporting-operator.md)
-  - [set the Prometheus URL](con***REMOVED***guring-reporting-operator.md#prometheus-url)
+  - [set Prometheus connection con***REMOVED***guration](con***REMOVED***guring-reporting-operator.md#prometheus-connection)
   - [exposing the reporting API](con***REMOVED***guring-reporting-operator.md#exposing-the-reporting-api)
   - [con***REMOVED***guring Authentication on Openshift](con***REMOVED***guring-reporting-operator.md#openshift-authentication)
 - [con***REMOVED***guring storage](con***REMOVED***guring-storage.md)
