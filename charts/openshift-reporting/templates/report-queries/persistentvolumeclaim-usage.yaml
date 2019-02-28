@@ -163,8 +163,6 @@ spec:
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
-  - name: dt
-    type: string
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
