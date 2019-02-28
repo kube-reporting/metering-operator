@@ -114,8 +114,6 @@ spec:
   - name: phase
     type: string
   - name: phase_value
-    type: string
-  - name: value
     type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
@@ -159,7 +157,7 @@ spec:
   - name: phase
     type: string
   - name: phase_value
-    type: string
+    type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
