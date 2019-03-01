@@ -3,6 +3,9 @@ kind: Metering
 metadata:
   name: "{{ .Values.deployPlatform }}-metering"
 spec:
+  monitoring:
+    enabled: false
+
   openshift-reporting:
     spec:
       awsBillingReportDataSource:
