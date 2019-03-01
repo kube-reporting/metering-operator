@@ -48,7 +48,7 @@ spec:
     persistentvolumeclaim-phase:
       spec:
         promsum:
-          query: "persistentvolumeclaim-phase"                                                                                                       
+          query: "persistentvolumeclaim-phase"
 
     node-allocatable-memory-bytes:
       spec:
