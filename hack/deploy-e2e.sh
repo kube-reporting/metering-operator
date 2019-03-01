@@ -13,10 +13,11 @@ source "${ROOT_DIR}/hack/common.sh"
 TMP_DIR="$(mktemp -d)"
 
 unset METERING_CR_FILE
-export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr-${DEPLOY_TAG}.yaml"
-export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values-${DEPLOY_TAG}.yaml"}
-export CUSTOM_OLM_OVERRIDE_VALUES=${CUSTOM_OLM_OVERRIDE_VALUES:-"$TMP_DIR/custom-olm-values-${DEPLOY_TAG}.yaml"}
+export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr.yaml"
+export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-helm-operator-values.yaml"}
+export CUSTOM_OLM_OVERRIDE_VALUES=${CUSTOM_OLM_OVERRIDE_VALUES:-"$TMP_DIR/custom-olm-values.yaml"}
 
+export DEPLOY_PLATFORM
 export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
 
