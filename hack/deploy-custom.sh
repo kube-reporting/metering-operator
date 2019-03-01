@@ -3,7 +3,6 @@ set -e
 
 : "${DEPLOY_PLATFORM:?must be set to openshift}"
 
-
 export INSTALL_METHOD="${DEPLOY_PLATFORM}-direct"
 export DELETE_PVCS=${DELETE_PVCS:-true}
 
