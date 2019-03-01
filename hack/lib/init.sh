@@ -35,6 +35,6 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${METERING_INSTALL_CLUSTERROLEBINDING:=true}"
 : "${METERING_OPERATOR_IMAGE_REPO:="quay.io/coreos/metering-helm-operator"}"
 : "${METERING_OPERATOR_IMAGE_TAG:="$METERING_VERSION"}"
-: "${REPORTING_OPERATOR_IMAGE_REPO:="quay.io/coreos/reporting-operator"}"
+: "${REPORTING_OPERATOR_IMAGE_REPO:="quay.io/coreos/metering-reporting-operator"}"
 : "${REPORTING_OPERATOR_IMAGE_TAG:="$METERING_VERSION"}"
 : "${FAQ_BIN:=faq}"
