@@ -24,7 +24,15 @@ spec:
     prometheusDatasourceMaxImportBack***REMOVED***llDuration: null
     prometheusDatasourceImportFrom: null
     prometheusCAFile: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
-    prometheusBearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+    prometheusImporter:
+      auth:
+        useServiceAccountToken: true
+        tokenSecret:
+          enabled: false
+          create: false
+          name: reporting-operator-prometheus-bearer-secrets
+          value: ""
 
     logLevel: "info"
     logReports: "false"
