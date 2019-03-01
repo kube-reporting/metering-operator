@@ -45,5 +45,4 @@ WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 RUN make bin/test2json
 
-VOLUME /out
 CMD ["/bin/bash"]
