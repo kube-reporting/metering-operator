@@ -95,7 +95,6 @@ endif
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
-COVERAGE_OUTFILE := coverage.out
 
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
@@ -253,11 +252,9 @@ vendor: Gopkg.toml
 test: unit
 
 unit:
-	go test -coverpro***REMOVED***le=$(COVERAGE_OUTFILE) ./pkg/...
-	go test -c -o bin/e2e-tests ./test/e2e
-	go test -c -o bin/integration-tests ./test/integration
+	hack/unit.sh
 
-unit-docker:
+unit-docker: metering-src-docker-build
 	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make unit'
 
 integration:
@@ -275,7 +272,7 @@ verify: verify-codegen all-charts metering-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
-verify-docker:
+verify-docker: metering-src-docker-build
 	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make verify'
 
 .PHONY: run-metering-operator-local

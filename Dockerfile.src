@@ -44,5 +44,6 @@ COPY . /go/src/github.com/operator-framework/operator-metering
 WORKDIR /go/src/github.com/operator-framework/operator-metering
 
 RUN make bin/test2json
+RUN go get -u github.com/jstemmer/go-junit-report
 
 CMD ["/bin/bash"]

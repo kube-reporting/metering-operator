@@ -33,3 +33,4 @@ _tmp
 /reporting-operator-local
 bin/*
 coverage.out
+junit-metering.xml
