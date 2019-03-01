@@ -50,6 +50,5 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
 else
     msg "Removing Custom Resource Definitions"
-    kube-remove \
-        "$MANIFESTS_DIR/custom-resource-definitions"
+    kube-remove "$CRD_DIR"
 fi

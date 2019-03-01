@@ -32,8 +32,7 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
 fi
 
 msg "Installing Custom Resource Definitions"
-kube-install \
-    "$MANIFESTS_DIR/custom-resource-definitions"
+kube-install "$CRD_DIR"
 
 msg "Installing Metering Catalog Source Config"
 kubectl apply -f \
