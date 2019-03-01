@@ -34,3 +34,5 @@ _tmp
 bin/*
 coverage.out
 junit-metering.xml
+e2e-docker
+test-output

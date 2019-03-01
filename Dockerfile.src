@@ -40,10 +40,12 @@ RUN curl \
 
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
-COPY . /go/src/github.com/operator-framework/operator-metering
-WORKDIR /go/src/github.com/operator-framework/operator-metering
+COPY gotools /go/src/gotools
 
-RUN make bin/test2json
+ENV TEST2JSON_BIN /go/bin/test2json
+RUN go build -o $TEST2JSON_BIN /go/src/gotools/test2json/main.go \
+        && chmod +x $TEST2JSON_BIN
+
 RUN go get -u github.com/jstemmer/go-junit-report
 
 CMD ["/bin/bash"]

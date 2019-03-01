@@ -5,6 +5,7 @@ set -e
 : "${METERING_NAMESPACE:?}"
 
 : "${TEST_SCRIPT:?}"
+: "${TEST2JSON_BIN:="$ROOT_DIR/bin/test2json"}"
 
 : "${TEST_TAP_FILE:=tests.tap}"
 : "${TEST_LOG_FILE:=tests.txt}"
@@ -45,10 +46,12 @@ DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
 DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
 
 mkdir -p "$TEST_OUTPUT_DIR" "$LOG_DIR" "$REPORTS_DIR"
-touch "$TEST_LOG_FILE_PATH"
-touch "$TEST_TAP_FILE_PATH"
-touch "$DEPLOY_LOG_FILE_PATH"
-touch "$DEPLOY_POD_LOGS_LOG_FILE_PATH"
+
+OUTPUT_FILES=( "$TEST_LOG_FILE_PATH" "$TEST_TAP_FILE_PATH" "$DEPLOY_LOG_FILE_PATH" "$DEPLOY_POD_LOGS_LOG_FILE_PATH" )
+
+# delete any existing output between runs
+rm -f "${OUTPUT_FILES[@]}"
+touch "${OUTPUT_FILES[@]}"
 
 # fail with the last non-zero exit code (preserves test fail exit code)
 set -o pipefail
@@ -134,7 +137,7 @@ if [ "$TEST_METERING" == "true" ]; then
 
     "$TEST_SCRIPT" 2>&1 \
         | tee -a "$TEST_LOG_FILE_PATH" \
-        | "$ROOT_DIR/bin/test2json" \
+        | "$TEST2JSON_BIN" \
         | tee -a "${TEST_LOG_FILE_PATH}.json" \
         | "$FAQ_BIN" -f json -o json -M -c -r -s -F "$ROOT_DIR/hack/tap-output.jq" \
         | tee -a "$TEST_TAP_FILE_PATH"
