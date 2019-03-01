@@ -17,7 +17,7 @@ set -e
 : "${CLEANUP_METERING:=true}"
 # can be deploy.sh, deploy-custom.sh, deploy-e2e.sh, deploy-integration.sh
 : "${DEPLOY_SCRIPT:=deploy.sh}"
-: "${TEST_OUTPUT_PATH:=/out}"
+: "${TEST_OUTPUT_PATH:="$(mktemp -d)"}"
 : "${OUTPUT_TEST_LOG_STDOUT:=true}"
 : "${OUTPUT_DEPLOY_LOG_STDOUT:=true}"
 : "${OUTPUT_POD_LOG_STDOUT:=false}"
