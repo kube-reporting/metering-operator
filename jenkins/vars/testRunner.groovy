@@ -75,10 +75,9 @@ spec:
             // use the OVERRIDE_NAMESPACE if speci***REMOVED***ed, otherwise set namespace to pre***REMOVED***x + BRANCH_NAME
             METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: defaultNamespace}"
             SCRIPT                      = "${pipelineParams.testScript}"
-            // we set CLEANUP_METERING to false and instead handle cleanup on
-            // our own, so that if there's a test timeout, we can still capture
-            // pod logs
-            CLEANUP_METERING            = "false"
+            // we set CLEANUP_METERING_NAMESPACE to false and instead handle cleanup on
+            // our own
+            CLEANUP_METERING_NAMESPACE            = "false"
             DOCKER_CREDS                = credentials('quay-coreos-jenkins-push')
         }
 
@@ -88,7 +87,6 @@ spec:
                     KUBECONFIG                        = credentials("${pipelineParams.kubecon***REMOVED***gCredentialsID}")
                     TEST_OUTPUT_DIR                   = "${env.OUTPUT_DIR}/${commonPre***REMOVED***x}-tests"
                     TEST_OUTPUT_PATH                  = "${env.WORKSPACE}/${env.TEST_OUTPUT_DIR}"
-                    FINAL_POD_LOGS_LOG_FILE_PATH      = "${env.TEST_OUTPUT_PATH}/logs/***REMOVED***nal-pod-descriptions-logs.log"
                     DEPLOY_PLATFORM                   = "${pipelineParams.deployPlatform}"
                     METERING_HTTPS_API                = "${pipelineParams.meteringHttpsAPI ?: false}"
                     METERING_CREATE_PULL_SECRET       = "true"
@@ -104,7 +102,6 @@ spec:
                     }
                     cleanup {
                         script {
-                            captureLogs()
                             if (alwaysSkipNamespaceCleanup || params.SKIP_NS_CLEANUP) {
                                 echo 'Skipping namespace cleanup'
                             } ***REMOVED*** {
@@ -151,13 +148,6 @@ private def runScript() {
                 '''
             }
         }
-    }
-}
-
-private def captureLogs() {
-    container('metering-test-runner') {
-        echo "Capturing pod logs"
-        sh 'set -e; cd $METERING_SRC_DIR && mkdir -p $(dirname $FINAL_POD_LOGS_LOG_FILE_PATH) && ./hack/capture-pod-logs.sh $METERING_NAMESPACE > $FINAL_POD_LOGS_LOG_FILE_PATH'
     }
 }
 

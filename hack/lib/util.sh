@@ -67,32 +67,3 @@ function uninstall_metering() {
     ***REMOVED***
 }
 
-# Taken and modi***REMOVED***ed slightly from https://github.com/kubernetes/charts/blob/f1711c220988b69e530263dc924eaed0a759e441/test/changed.sh#L42
-capture_pod_logs() {
-    NS="$(sanetize_namespace "$1")"
-    echo "Capturing logs for $NS"
-    # List all logs for all containers in all pods for the namespace which was
-    PODS="$(kubectl get pods --no-headers --namespace "$NS")"
-    echo '===Pods==='
-    echo "$PODS"
-    echo "$PODS" | awk '{ print $1 }' | while read -r pod; do
-        if [[ -n "$pod" ]]; then
-            printf '===Details from pod %s:===\n' "$pod"
-
-            printf '...Description of pod %s:...\n' "$pod"
-            kubectl describe pod --namespace "$NS" "$pod" || true
-            printf '...End of description for pod %s...\n\n' "$pod"
-
-            # There can be multiple containers within a pod. We need to iterate
-            # over each of those
-            containers=$(kubectl get pods -o jsonpath="{.spec.containers[*].name}" --namespace "$NS" "$pod")
-            for container in $containers; do
-                printf -- '---Logs from container %s in pod %s:---\n' "$container" "$pod"
-                kubectl logs --namespace "$METERING_NAMESPACE" -c "$container" "$pod" || true
-                printf -- '---End of logs for container %s in pod %s---\n\n' "$container" "$pod"
-            done
-
-            printf '===End of details for pod %s===\n\n' "$pod"
-        ***REMOVED***
-    done
-}

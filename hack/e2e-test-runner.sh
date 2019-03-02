@@ -10,11 +10,10 @@ set -e
 : "${TEST_LOG_FILE:=tests.txt}"
 : "${DEPLOY_LOG_FILE:=deploy.log}"
 : "${DEPLOY_POD_LOGS_LOG_FILE:=pod-logs.log}"
-: "${FINAL_POD_LOGS_LOG_FILE:=***REMOVED***nal-pod-descriptions-logs.log}"
 
 : "${DEPLOY_METERING:=true}"
 : "${TEST_METERING:=true}"
-: "${CLEANUP_METERING:=true}"
+: "${CLEANUP_METERING_NAMESPACE:=true}"
 # can be deploy.sh, deploy-custom.sh, deploy-e2e.sh, deploy-integration.sh
 : "${DEPLOY_SCRIPT:=deploy.sh}"
 : "${TEST_OUTPUT_PATH:="$(mktemp -d)"}"
@@ -38,20 +37,18 @@ echo "\$TEST_OUTPUT_PATH=$TEST_OUTPUT_PATH"
 
 REPORTS_DIR=$TEST_OUTPUT_PATH/reports
 LOG_DIR=$TEST_OUTPUT_PATH/logs
-TEST_OUT_DIR=$TEST_OUTPUT_PATH/tests
+TEST_OUTPUT_DIR=$TEST_OUTPUT_PATH/tests
 
-TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUT_DIR/$TEST_LOG_FILE}"
-TEST_TAP_FILE_PATH="${TEST_TAP_FILE_PATH:-$TEST_OUT_DIR/$TEST_TAP_FILE}"
+TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_LOG_FILE}"
+TEST_TAP_FILE_PATH="${TEST_TAP_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_TAP_FILE}"
 DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
 DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
-FINAL_POD_LOGS_LOG_FILE_PATH="${FINAL_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$FINAL_POD_LOGS_LOG_FILE}"
 
-mkdir -p $TEST_OUT_DIR $LOG_DIR $REPORTS_DIR
+mkdir -p "$TEST_OUTPUT_DIR" "$LOG_DIR" "$REPORTS_DIR"
 touch "$TEST_LOG_FILE_PATH"
 touch "$TEST_TAP_FILE_PATH"
 touch "$DEPLOY_LOG_FILE_PATH"
 touch "$DEPLOY_POD_LOGS_LOG_FILE_PATH"
-touch "$FINAL_POD_LOGS_LOG_FILE_PATH"
 
 # fail with the last non-zero exit code (preserves test fail exit code)
 set -o pipefail
@@ -61,26 +58,53 @@ export DELETE_PVCS=true
 export TEST_RESULT_REPORT_OUTPUT_DIRECTORY="$REPORTS_DIR"
 
 function cleanup() {
+    exit_status=$?
+
     echo "Performing cleanup"
 
-    if [ -n "$FINAL_POD_LOGS_LOG_FILE" ]; then
-        echo "Capturing ***REMOVED***nal pod logs"
-        capture_pod_logs "$METERING_NAMESPACE" >> "$FINAL_POD_LOGS_LOG_FILE_PATH"
-        echo "Finished capturing ***REMOVED***nal pod logs"
-    ***REMOVED***
+    echo "Storing pod descriptions and logs at $LOG_DIR"
+    echo "Capturing pod descriptions"
+    PODS="$(kubectl get pods --no-headers --namespace "$METERING_NAMESPACE")"
+    echo "$PODS" | awk '{ print $1 }' | while read -r pod; do
+        if [[ -n "$pod" ]]; then
+            echo "Capturing pod $pod description"
+            if ! kubectl describe pod --namespace "$METERING_NAMESPACE" "$pod" >> "$LOG_DIR/${pod}-description.txt"; then
+                echo "Error capturing pod $pod description"
+            ***REMOVED***
+        ***REMOVED***
+    done
 
-    echo "Deleting namespace"
-    kubectl delete ns "$METERING_NAMESPACE" || true
+    echo "Capturing pod logs"
+    echo "$PODS" | awk '{ print $1 }' | while read -r pod; do
+        # There can be multiple containers within a pod. We need to iterate
+        # over each of those
+        containers=$(kubectl get pods -o jsonpath="{.spec.containers[*].name}" --namespace "$METERING_NAMESPACE" "$pod")
+        for container in $containers; do
+            echo "Capturing pod $pod container $container logs"
+            if ! kubectl logs --namespace "$METERING_NAMESPACE" -c "$container" "$pod" >> "$LOG_DIR/${pod}-${container}.log"; then
+                echo "Error capturing pod $pod container $container logs"
+            ***REMOVED***
+        done
+    done
+
+
+    if [ "$CLEANUP_METERING_NAMESPACE" == "true" ]; then
+        echo "Deleting namespace"
+        kubectl delete ns "$METERING_NAMESPACE" || true
+    ***REMOVED***
 
     # kill any background jobs, such as stern
     jobs -p | xargs kill
     # Wait for any jobs
     wait
+
+    exit "$exit_status"
 }
 
 if [ "$DEPLOY_METERING" == "true" ]; then
     if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
-        echo "Capturing pod logs"
+        echo "Streaming pod logs"
+        echo "Storing logs at $DEPLOY_POD_LOGS_LOG_FILE_PATH"
         if [ "$OUTPUT_POD_LOG_STDOUT" == "true" ]; then
             stern --timestamps -n "$METERING_NAMESPACE" '.*' | tee -a "$DEPLOY_POD_LOGS_LOG_FILE_PATH" &
         ***REMOVED***
@@ -88,11 +112,10 @@ if [ "$DEPLOY_METERING" == "true" ]; then
         ***REMOVED***
     ***REMOVED***
 
-    if [ "$CLEANUP_METERING" == "true" ]; then
-        trap cleanup EXIT SIGINT
-    ***REMOVED***
+    trap cleanup EXIT
 
     echo "Deploying Metering"
+    echo "Storing deploy logs at $DEPLOY_LOG_FILE_PATH"
     if [ "$OUTPUT_DEPLOY_LOG_STDOUT" == "true" ]; then
         "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" | tee -a "$DEPLOY_LOG_FILE_PATH" 2>&1
     ***REMOVED***
@@ -103,6 +126,7 @@ if [ "$DEPLOY_METERING" == "true" ]; then
 if [ "$TEST_METERING" == "true" ]; then
     echo "Running tests"
 
+    echo "Storing test results at $TEST_OUTPUT_DIR"
 
     if [ "$OUTPUT_TEST_LOG_STDOUT" == "true" ]; then
         tail -f "$TEST_LOG_FILE_PATH" &
