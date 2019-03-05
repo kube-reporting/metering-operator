@@ -268,7 +268,7 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, end.Format(presto.TimestampFormat))
 	}
 
-	rows, err := presto.GetRows(queryer, tableName, PromsumPrestoAllColumns)
+	rows, err := presto.GetRowsWhere(queryer, tableName, PromsumPrestoAllColumns, whereClause)
 	if err != nil {
 		return nil, err
 	}
