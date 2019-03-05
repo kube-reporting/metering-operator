@@ -1,0 +1,11 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: "machine-cpu-cores-by-cluster-id"
+  labels:
+    telemeter-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  query: |
+    sum(machine_cpu_cores) by (_id)
