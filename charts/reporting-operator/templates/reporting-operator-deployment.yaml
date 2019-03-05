@@ -293,7 +293,7 @@ spec:
         - mountPath: /etc/proxy/authenticated-emails
           name: authenticated-emails-secret
 {{- end }}
-{{- if .Values.spec.config.tokenSecret.enabled }}
+{{- if .Values.spec.config.prometheusImporter.auth.tokenSecret.enabled }}
         - mountPath: /var/run/reporting-operator/token
           name: prometheus-bearer-token
           subPath: token
