@@ -1,38 +1,48 @@
 package util
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
 
 const (
-	// Failure report conditions:
-	//
-	// GenerateReportErrorReason is added to a Report when an error
-	// occurs while generating the report data.
-	GenerateReportErrorReason = "GenerateReportError"
+	// Running true
 
-	// FailedValidationReason is added to a Report when the
-	// Report is invalid or it's ReportGenerationQuery is invalid or
-	// not ready
-	FailedValidationReason = "FailedValidation"
-
-	// Running report conditions:
-
-	// ScheduledReason is added to a Report when it's reached the next
-	// reporting time in it's schedule.
+	// ScheduledReason is set when the report is running due to it's schedule
+	// and the current time is beyond the next reporting period end.
 	ScheduledReason = "Scheduled"
-	// ValidatingReportReason is added to a Report when the
-	// report is being validated
-	ValidatingReportReason = "ValidatingReport"
-	// ReportPeriodWaitingReason is added to a Report when the report
-	// has to wait until the next scheduled reporting time.
-	ReportPeriodWaitingReason = "ReportPeriodNotFinished"
-	// ReportPeriodFinishedReason is added to a Report when the report
-	// has had it's report processed up until it's reportingEnd.
-	ReportPeriodFinishedReason = "ReportPeriodFinished"
+
+	// RunImmediatelyReason is set when the report is running because it's
+	// spec.runImmediately is true.
+	RunImmediatelyReason = "RunImmediately"
+
+	// Running false
+
+	// ReportingPeriodWaitingReason is set when a report is not running because it is
+	// waiting for the next period of time in it's schedule to elapse.
+	ReportingPeriodWaitingReason = "ReportingPeriodWaiting"
+
+	// ReportFinishedReason is set in the report has generated report results
+	// for all periods between reportingStart and reportingEnd, according to
+	// it's con***REMOVED***gured schedule. Run-once reports are ***REMOVED***nished after their
+	// execution.
+	ReportFinishedReason = "Finished"
+
+	// InvalidReportReason is added to a Report when the
+	// Report is invalid or it's ReportGenerationQuery is invalid.
+	InvalidReportReason = "InvalidReport"
+
+	// ReportingPeriodUnmetDependenciesReason is set when a Report cannot run
+	// because it's dependencies (ReportGenerationQueries dependencies on
+	// ReportDataSources, ReportGenerationQueries, and other Reports) do not
+	// have data available for the reporting period currently being processed.
+	ReportingPeriodUnmetDependenciesReason = "ReportingPeriodUnmetDependencies"
+
+	// GenerateReportFailedReason is set when a Report is not running because
+	// it previously failed when generating results previously.
+	GenerateReportFailedReason = "GenerateReportFailed"
 )
 
 // NewReportCondition creates a new report condition.

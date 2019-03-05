@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
@@ -523,13 +524,12 @@ func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 
 // queueDependentReportGenerationQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the dataSource
 func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
-	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(dataSource.Namespace)
-	queries, err := queryLister.List(metav1.ListOptions{})
+	queries, err := op.reportGenerationQueryLister.ReportGenerationQueries(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
 		return err
 	}
 
-	for _, query := range queries.Items {
+	for _, query := range queries {
 		// look at the list ReportDataSource of dependencies
 		for _, dependency := range query.Spec.DataSources {
 			if dependency == dataSource.Name {
@@ -538,6 +538,31 @@ func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSour
 				break
 			}
 		}
+	}
+	return nil
+}
+
+func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.ReportDataSource) error {
+	reports, err := op.reportLister.Reports(dataSource.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	for _, report := range reports {
+		deps, err := op.getReportDependencies(report)
+		if err != nil {
+			return err
+		}
+
+		// If this report has a dependency on the passed in dataSource, queue
+		// it
+		for _, depDataSource := range deps.ReportDataSources {
+			if depDataSource.Name == dataSource.Name {
+				op.enqueueReport(report)
+				break
+			}
+		}
+
 	}
 	return nil
 }

@@ -70,9 +70,9 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 		if err != nil {
 			return false, err
 		}
-		cond := meteringutil.GetReportCondition(newReport.Status, meteringv1alpha1.ReportFailure)
-		if cond != nil && cond.Status == v1.ConditionTrue {
-			return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
+		cond := meteringutil.GetReportCondition(newReport.Status, meteringv1alpha1.ReportRunning)
+		if cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringutil.GenerateReportFailedReason {
+			return false, fmt.Errorf("report is not running, reason: %s, message: %s", cond.Reason, cond.Message)
 		}
 
 		if newReport.Status.TableName == "" {
