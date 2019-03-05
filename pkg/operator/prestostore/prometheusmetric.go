@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/operator-framework/operator-metering/pkg/db"
+	"github.com/operator-framework/operator-metering/pkg/hive"
+	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
@@ -22,13 +24,32 @@ const (
 var (
 	defaultQueryBufferPool = NewBufferPool(defaultPrestoQueryCap)
 
-	promsumColumns = []presto.Column{
+	PromsumHiveTableColumns = []hive.Column{
 		{Name: "amount", Type: "double"},
 		{Name: "timestamp", Type: "timestamp"},
 		{Name: "timePrecision", Type: "double"},
-		{Name: "labels", Type: "map(varchar, varchar)"},
+		{Name: "labels", Type: "map<string, string>"},
 	}
+	PromsumHivePartitionColumns = []hive.Column{
+		{Name: "dt", Type: "string"},
+	}
+
+	// Initialized by init()
+	PromsumPrestoTableColumn, PromsumPrestoPartitionColumns, PromsumPrestoAllColumns []presto.Column
 )
+
+func init() {
+	var err error
+	PromsumPrestoTableColumn, err = reportingutil.HiveColumnsToPrestoColumns(PromsumHiveTableColumns)
+	if err != nil {
+		panic(err)
+	}
+	PromsumPrestoPartitionColumns, err = reportingutil.HiveColumnsToPrestoColumns(PromsumHivePartitionColumns)
+	if err != nil {
+		panic(err)
+	}
+	PromsumPrestoAllColumns = append(PromsumPrestoTableColumn, PromsumPrestoPartitionColumns...)
+}
 
 func NewBufferPool(capacity int) sync.Pool {
 	return sync.Pool{
@@ -109,6 +130,7 @@ type PrometheusMetric struct {
 	Amount    float64           `json:"amount"`
 	StepSize  time.Duration     `json:"stepSize"`
 	Timestamp time.Time         `json:"timestamp"`
+	Dt        string            `json:"dt"`
 }
 
 // storePrometheusMetricsWithBuffer handles storing Prometheus metrics into the
@@ -240,7 +262,7 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, end.Format(presto.TimestampFormat))
 	}
 
-	rows, err := presto.GetRows(queryer, tableName, promsumColumns)
+	rows, err := presto.GetRows(queryer, tableName, PromsumPrestoAllColumns)
 	if err != nil {
 		return nil, err
 	}
@@ -249,8 +271,9 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 	for i, row := range rows {
 		rowLabels := row["labels"].(map[string]interface{})
 		rowAmount := row["amount"].(float64)
-		rowTimePrecision := row["timeprecision"].(float64)
+		rowTimePrecision := row["timePrecision"].(float64)
 		rowTimestamp := row["timestamp"].(time.Time)
+		dt := row["dt"].(string)
 
 		labels := make(map[string]string)
 		for key, value := range rowLabels {
@@ -265,6 +288,7 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 			Amount:    rowAmount,
 			StepSize:  time.Duration(rowTimePrecision) * time.Second,
 			Timestamp: rowTimestamp,
+			Dt:        dt,
 		}
 		results[i] = metric
 	}
