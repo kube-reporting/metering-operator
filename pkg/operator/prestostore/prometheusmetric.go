@@ -19,19 +19,25 @@ const (
 	// statement can contain before Presto will error due to the payload being
 	// too large.
 	defaultPrestoQueryCap = 1000000
+
+	amountColumnName        = "amount"
+	timestampColumnName     = "timestamp"
+	timePrecisionColumnName = "timePrecision"
+	labelsColumnName        = "labels"
+	dtColumnName            = "dt"
 )
 
 var (
 	defaultQueryBufferPool = NewBufferPool(defaultPrestoQueryCap)
 
 	PromsumHiveTableColumns = []hive.Column{
-		{Name: "amount", Type: "double"},
-		{Name: "timestamp", Type: "timestamp"},
-		{Name: "timePrecision", Type: "double"},
-		{Name: "labels", Type: "map<string, string>"},
+		{Name: amountColumnName, Type: "double"},
+		{Name: timestampColumnName, Type: "timestamp"},
+		{Name: timePrecisionColumnName, Type: "double"},
+		{Name: labelsColumnName, Type: "map<string, string>"},
 	}
 	PromsumHivePartitionColumns = []hive.Column{
-		{Name: "dt", Type: "string"},
+		{Name: dtColumnName, Type: "string"},
 	}
 
 	// Initialized by init()
@@ -269,11 +275,11 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 
 	results := make([]*PrometheusMetric, len(rows))
 	for i, row := range rows {
-		rowLabels := row["labels"].(map[string]interface{})
-		rowAmount := row["amount"].(float64)
-		rowTimePrecision := row["timePrecision"].(float64)
-		rowTimestamp := row["timestamp"].(time.Time)
-		dt := row["dt"].(string)
+		rowLabels := row[labelsColumnName].(map[string]interface{})
+		rowAmount := row[amountColumnName].(float64)
+		rowTimePrecision := row[timePrecisionColumnName].(float64)
+		rowTimestamp := row[timestampColumnName].(time.Time)
+		dt := row[dtColumnName].(string)
 
 		labels := make(map[string]string)
 		for key, value := range rowLabels {
