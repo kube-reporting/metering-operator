@@ -935,6 +935,10 @@ func (in *ReportStatus) DeepCopyInto(out *ReportStatus) {
 		in, out := &in.LastReportTime, &out.LastReportTime
 		*out = (*in).DeepCopy()
 	}
+	if in.NextReportTime != nil {
+		in, out := &in.NextReportTime, &out.NextReportTime
+		*out = (*in).DeepCopy()
+	}
 	return
 }
 

@@ -1,7 +1,7 @@
 package v1alpha1
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -116,6 +116,7 @@ type ReportScheduleMonthly struct {
 type ReportStatus struct {
 	Conditions     []ReportCondition `json:"conditions,omitempty"`
 	LastReportTime *meta.Time        `json:"lastReportTime,omitempty"`
+	NextReportTime *meta.Time        `json:"nextReportTime,omitempty"`
 	TableName      string            `json:"tableName"`
 }
 
@@ -142,5 +143,4 @@ type ReportConditionType string
 
 const (
 	ReportRunning ReportConditionType = "Running"
-	ReportFailure ReportConditionType = "Failure"
 )
