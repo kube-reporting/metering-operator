@@ -2,6 +2,7 @@ name: helm-operator
 
 cr:
   create: false
+  spec: {}
 
 crd:
   create: false

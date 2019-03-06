@@ -12,7 +12,5 @@ metadata:
 {{ toYaml .Values.cr.labels | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.cr.spec }}
 {{ toYaml .Values.cr.spec | indent 2 }}
-{{- end }}
 {{- end -}}
