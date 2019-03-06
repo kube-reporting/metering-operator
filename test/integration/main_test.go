@@ -161,6 +161,23 @@ var (
 			comparisonColumnNames:        []string{"node_allocatable_memory_byte_seconds", "pod_request_memory_byte_seconds", "memory_used_percent", "memory_unused_percent"},
 			timeout:                      reportTestTimeout,
 		},
+		{
+			name:      "persistentvolumeclaim-usage",
+			queryName: "persistentvolumeclaim-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "persistentvolumeclaim-phase",
+					FileName:       "testdata/datasources/persistentvolumenclain-phase.json",
+				},
+				{
+					DatasourceName: "persistentvolumenclaim-usage-bytes",
+					FileName:       "testdata/datasources/persistentvolumeclaim-usage-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/node-memory-utilization.json",
+			comparisonColumnNames:        []string{"persistentvolumeclaim_usage_bytes"},
+			timeout:                      reportTestTimeout,
+		},
 	}
 )
 
