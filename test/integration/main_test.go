@@ -170,7 +170,7 @@ var (
 					FileName:       "testdata/datasources/persistentvolumenclaim-phase.json",
 				},
 				{
-					DatasourceName: "persistentvolumenclaim-usage-bytes",
+					DatasourceName: "persistentvolumeclaim-usage-bytes",
 					FileName:       "testdata/datasources/persistentvolumeclaim-usage-bytes.json",
 				},
 			},
