@@ -3,3 +3,4 @@ kind: Metering
 metadata:
   name: operator-metering
 spec:
+  {}
