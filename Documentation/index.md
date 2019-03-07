@@ -17,6 +17,7 @@
     - [storing data in s3](configuring-storage.md#storing-data-in-s3)
   - [configuring the Hive metastore](configuring-hive-metastore.md)
   - [configuring aws billing correlation for cost correlation](configuring-aws-billing.md)
+  - [configuring for use with Telemeter](configuring-telemeter.md)
 - [Using Metering](using-metering.md)
 - [Resource Tuning](tuning.md)
 - [Troubleshooting](troubleshooting-metering.md)
