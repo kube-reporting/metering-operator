@@ -17,6 +17,7 @@
     - [storing data in s3](con***REMOVED***guring-storage.md#storing-data-in-s3)
   - [con***REMOVED***guring the Hive metastore](con***REMOVED***guring-hive-metastore.md)
   - [con***REMOVED***guring aws billing correlation for cost correlation](con***REMOVED***guring-aws-billing.md)
+  - [con***REMOVED***guring for use with Telemeter](con***REMOVED***guring-telemeter.md)
 - [Using Metering](using-metering.md)
 - [Resource Tuning](tuning.md)
 - [Troubleshooting](troubleshooting-metering.md)
