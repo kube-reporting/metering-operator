@@ -3,6 +3,7 @@ name: metering-operator
 cr:
   create: true
   name: "operator-metering"
+  spec: {}
 
 crd:
   create: true
