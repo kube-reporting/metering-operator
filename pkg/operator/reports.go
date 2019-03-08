@@ -2,6 +2,7 @@ package operator
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -214,7 +216,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
 
 	if runningCond == nil {
-		logger.Infof("new report, beginning ")
+		logger.Infof("new report, validating report")
 	} ***REMOVED*** if runningCond.Reason == cbutil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
 		// Found an already ***REMOVED***nished runOnce report. Log that we're not
 		// re-processing runOnce reports after they're previously ***REMOVED***nished
@@ -241,6 +243,9 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	// Validate the ReportGenerationQuery is set
 	if report.Spec.GenerationQueryName == "" {
 		return op.setReportStatusInvalidReport(report, "must set spec.generationQuery")
+	}
+	if report.Spec.ReportingStart == nil {
+		return op.setReportStatusInvalidReport(report, "must set spec.reportingStart")
 	}
 	// Validate the reportingStart and reportingEnd make sense and are set when
 	// required.
@@ -323,25 +328,19 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return err
 		}
 	} ***REMOVED*** {
-		var gracePeriod time.Duration
-		if report.Spec.GracePeriod != nil {
-			gracePeriod = report.Spec.GracePeriod.Duration
-		} ***REMOVED*** {
-			gracePeriod = op.getDefaultReportGracePeriod()
-			logger.Debugf("Report has no gracePeriod con***REMOVED***gured, falling back to defaultGracePeriod: %s", gracePeriod)
-		}
-
+		gracePeriod := op.getReportGracePeriod(report)
 		// Check if it's time to generate the report
 		if reportExecutionTime := reportPeriod.periodEnd.Add(gracePeriod); reportExecutionTime.After(now) {
 			waitTime := reportExecutionTime.Sub(now)
 			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, reportExecutionTime)
 			logger.Infof(waitMsg+". waiting %s", waitTime)
 
-			if runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
+			if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
 				op.enqueueReportAfter(report, waitTime)
 				return nil
 			}
 
+			var err error
 			report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg))
 			if err != nil {
 				return err
@@ -352,14 +351,61 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			op.enqueueReportAfter(report, waitTime)
 			return nil
 		}
+	}
 
-		runningMsg := fmt.Sprintf("Report Scheduled: reached end of last reporting period [%s to %s].", reportPeriod.periodStart, reportPeriod.periodEnd)
-		logger.Infof(runningMsg + " Running now.")
-
-		report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionTrue, cbutil.ScheduledReason, runningMsg))
-		if err != nil {
-			return err
+	var unmetDataSourceDependendencies []string
+	// validate all ReportDataSources that the Report depends on have indicated
+	// they have data available that covers the current reportingPeriod
+	for _, dataSource := range queryDependencies.ReportDataSources {
+		if dataSource.Spec.Promsum != nil {
+			if dataSource.Status.PrometheusMetricImportStatus == nil || dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time.Before(reportPeriod.periodEnd) {
+				// queue the dataSource and store the list of reports so we can
+				// add information to the Report's status on what's currently
+				// not ready
+				op.enqueueReportDataSource(dataSource)
+				unmetDataSourceDependendencies = append(unmetDataSourceDependendencies, dataSource.Name)
+			}
 		}
+	}
+
+	var unmetReportDependendencies []string
+	for _, subReport := range queryDependencies.Reports {
+		if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
+			op.enqueueReport(subReport)
+			unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
+		}
+	}
+
+	if len(unmetDataSourceDependendencies) != 0 || len(unmetReportDependendencies) != 0 {
+		unmetMsg := "The following Report dependencies do not have data currently available for the reportPeriod being processed: "
+		if len(unmetDataSourceDependendencies) != 0 {
+			// sort so the message is reproducible
+			sort.Strings(unmetDataSourceDependendencies)
+			unmetMsg += fmt.Sprintf("ReportDataSources: %s.", strings.Join(unmetDataSourceDependendencies, ", "))
+		}
+		if len(unmetReportDependendencies) != 0 {
+			// sort so the message is reproducible
+			sort.Strings(unmetReportDependendencies)
+			unmetMsg += fmt.Sprintf(" Reports: %s.", strings.Join(unmetReportDependendencies, ", "))
+		}
+
+		// If the previous condition is unmet dependencies, check if the
+		// message changes, and only update if it does
+		if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
+			logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, cbutil.ReportingPeriodUnmetDependenciesReason)
+			return nil
+		}
+		logger.Warnf(unmetMsg)
+		_, err := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
+		return err
+	}
+
+	runningMsg := fmt.Sprintf("Report Scheduled: reached end of reporting period [%s to %s].", reportPeriod.periodStart, reportPeriod.periodEnd)
+	logger.Infof(runningMsg + " Running now.")
+
+	report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionTrue, cbutil.ScheduledReason, runningMsg))
+	if err != nil {
+		return err
 	}
 
 	tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
@@ -398,6 +444,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	genReportFailedCounter := generateReportFailedCounter.With(metricLabels)
 	genReportDurationObserver := generateReportDurationHistogram.With(metricLabels)
 
+	logger.Infof("generating Report %s using query %s and periodStart: %s, periodEnd: %s", report.Name, genQuery.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
 	err = op.reportGenerator.GenerateReport(
@@ -426,12 +474,21 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return fmt.Errorf("failed to generateReport for Report %s, err: %v", report.Name, err)
 	}
 
+	logger.Infof("successfully generated Report %s using query %s and periodStart: %s, periodEnd: %s", report.Name, genQuery.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+
 	// Update the LastReportTime on the report status
 	report.Status.LastReportTime = &metav1.Time{Time: reportPeriod.periodEnd}
 
-	// determine the next reportTime, if it's not a run-once report and then
-	// queue the report for that time
-	if report.Spec.Schedule != nil {
+	// check if we've reached the con***REMOVED***gured ReportingEnd, and if so, update
+	// the status to indicate the report has ***REMOVED***nished
+	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
+		msg := fmt.Sprintf("Report has ***REMOVED***nished reporting. Report has reached the con***REMOVED***gured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
+		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportFinishedReason, msg)
+		cbutil.SetReportCondition(&report.Status, *runningCond)
+		logger.Infof(msg)
+	} ***REMOVED*** if report.Spec.Schedule != nil {
+		// determine the next reportTime, if it's not a run-once report and then
+		// queue the report for that time
 		reportSchedule, err := getSchedule(report.Spec.Schedule)
 		if err != nil {
 			return err
@@ -443,26 +500,17 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		report.Status.NextReportTime = &metav1.Time{Time: nextReportPeriod.periodEnd}
 
 		// calculate the time to reprocess after queuing
-		var gracePeriod time.Duration
-		if report.Spec.GracePeriod != nil {
-			gracePeriod = report.Spec.GracePeriod.Duration
-		} ***REMOVED*** {
-			gracePeriod = op.getDefaultReportGracePeriod()
-		}
+		gracePeriod := op.getReportGracePeriod(report)
 
 		now = op.clock.Now().UTC()
 		nextRunTime := nextReportPeriod.periodEnd.Add(gracePeriod)
 		waitTime := nextRunTime.Sub(now)
-		op.enqueueReportAfter(report, waitTime)
-	}
 
-	// check if we've reached the con***REMOVED***gured ReportingEnd, and if so, update
-	// the status to indicate the report has ***REMOVED***nished
-	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
-		msg := fmt.Sprintf("Report has ***REMOVED***nished reporting. Report has reached the con***REMOVED***gured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
-		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportFinishedReason, msg)
+		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
+		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg)
 		cbutil.SetReportCondition(&report.Status, *runningCond)
-		logger.Infof(msg)
+		logger.Infof(waitMsg+". waiting %s", waitTime)
+		op.enqueueReportAfter(report, waitTime)
 	}
 
 	// Update the status
@@ -475,7 +523,9 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	if err := op.queueDependentReportGenerationQueriesForReport(report); err != nil {
 		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of Report %s", report.Name)
 	}
-
+	if err := op.queueDependentReportsForReport(report); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of Report %s", report.Name)
+	}
 	return nil
 }
 
@@ -592,6 +642,14 @@ func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg st
 	return err
 }
 
+func (op *Reporting) getReportGracePeriod(report *cbTypes.Report) time.Duration {
+	if report.Spec.GracePeriod != nil {
+		return report.Spec.GracePeriod.Duration
+	} ***REMOVED*** {
+		return op.getDefaultReportGracePeriod()
+	}
+}
+
 func (op *Reporting) getReportGenerationQueryForReport(report *cbTypes.Report) (*cbTypes.ReportGenerationQuery, error) {
 	return op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 }
@@ -607,4 +665,30 @@ func (op *Reporting) getReportDependencies(report *cbTypes.Report) (*reporting.R
 		reporting.NewReportListerGetter(op.reportLister),
 		genQuery,
 	)
+}
+
+func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) error {
+	// Look for all reports in the namespace
+	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	// for each report in the namespace, ***REMOVED***nd ones that depend on the report
+	// passed into the function.
+	for _, otherReport := range reports {
+		deps, err := op.getReportDependencies(otherReport)
+		if err != nil {
+			return err
+		}
+		// If this otherReport has a dependency on the passed in report, queue
+		// it
+		for _, dep := range deps.Reports {
+			if dep.Name == report.Name {
+				op.enqueueReport(otherReport)
+				break
+			}
+		}
+	}
+	return nil
 }

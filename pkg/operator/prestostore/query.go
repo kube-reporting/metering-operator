@@ -3,6 +3,7 @@ package prestostore
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -31,11 +32,6 @@ type PrometheusImportResults struct {
 func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prometheusMetricsStorer PrometheusMetricsStorer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Con***REMOVED***g, allowIncompleteChunks bool) (PrometheusImportResults, error) {
 	metricsCollectors.ImportsRunningGauge.Inc()
 
-	logger = logger.WithFields(logrus.Fields{
-		"startTime": startTime,
-		"endTime":   endTime,
-	})
-
 	queryRangeDuration := endTime.Sub(startTime)
 	if cfg.MaxQueryRangeDuration != 0 && queryRangeDuration > cfg.MaxQueryRangeDuration {
 		newEndTime := startTime.Add(cfg.MaxQueryRangeDuration)
@@ -54,21 +50,21 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 	}()
 
 	timeRanges := getTimeRangesChunked(startTime, endTime, cfg.ChunkSize, cfg.StepSize, cfg.MaxTimeRanges, allowIncompleteChunks)
-	var importResults PrometheusImportResults
-	metricsCount := 0
 
+	var importResults PrometheusImportResults
 	if len(timeRanges) == 0 {
 		logger.Infof("no time ranges to query yet for table %s", cfg.PrestoTableName)
 		return importResults, nil
-	} ***REMOVED*** {
-		begin := timeRanges[0].Start.UTC()
-		end := timeRanges[len(timeRanges)-1].End.UTC()
-		logger := logger.WithFields(logrus.Fields{
-			"rangeBegin": begin,
-			"rangeEnd":   end,
-		})
-		logger.Debugf("querying for data between %s and %s (chunks: %d)", begin, end, len(timeRanges))
 	}
+
+	metricsCount := 0
+	startTime = timeRanges[0].Start.UTC()
+	endTime = timeRanges[len(timeRanges)-1].End.UTC()
+	logger = logger.WithFields(logrus.Fields{
+		"startTime": startTime,
+		"endTime":   endTime,
+	})
+	logger.Debugf("querying for data between %s and %s (chunks: %d)", startTime, endTime, len(timeRanges))
 
 	for _, timeRange := range timeRanges {
 		// check for cancellation
@@ -136,6 +132,10 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 				return importResults, fmt.Errorf("failed to store Prometheus metrics into table %s for the range %v to %v: %v",
 					cfg.PrestoTableName, promQueryBegin, promQueryEnd, err)
 			}
+			// Ensure the metrics are sorted by timestamp
+			sort.Slice(metrics, func(i, j int) bool {
+				return metrics[i].Timestamp.Before(metrics[j].Timestamp)
+			})
 			importResults.Metrics = metrics
 			logger.Debugf("stored %d metrics for time range %s to %s into Presto table %s (took %s)", numMetrics, promQueryBegin, promQueryEnd, cfg.PrestoTableName, prestoStoreDuration)
 			metricsCollectors.MetricsImportedCounter.Add(float64(numMetrics))
@@ -149,10 +149,11 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 		begin := importResults.ProcessedTimeRanges[0].Start.UTC()
 		end := importResults.ProcessedTimeRanges[len(timeRanges)-1].End.UTC()
 		logger.Infof("stored a total of %d metrics for data between %s and %s into %s", metricsCount, begin, end, cfg.PrestoTableName)
+		return importResults, nil
 	} ***REMOVED*** {
 		logger.Infof("no time ranges processed for %s", cfg.PrestoTableName)
+		return importResults, nil
 	}
-	return importResults, nil
 }
 
 func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool) []prom.Range {
