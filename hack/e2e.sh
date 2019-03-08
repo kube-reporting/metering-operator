@@ -2,11 +2,12 @@
 set -e
 
 : "${KUBECONFIG:?}"
-export METERING_NAMESPACE="${METERING_NAMESPACE:=metering-e2e}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 source "${ROOT_DIR}/hack/lib/tests.sh"
+
+export METERING_NAMESPACE="${METERING_E2E_NAMESPACE:=${METERING_NAMESPACE}-e2e}"
 
 export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-e2e.sh}"
 export TEST_SCRIPT="$ROOT_DIR/hack/run-e2e-tests.sh"
