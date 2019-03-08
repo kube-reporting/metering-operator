@@ -173,6 +173,23 @@ var (
 			timeout:                      reportTestTimeout,
 			parallel:                     true,
 		},
+		{
+			name:      "persistentvolumeclaim-usage",
+			queryName: "persistentvolumeclaim-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "persistentvolumeclaim-phase",
+					FileName:       "testdata/datasources/persistentvolumeclaim-phase.json",
+				},
+				{
+					DatasourceName: "persistentvolumeclaim-usage-bytes",
+					FileName:       "testdata/datasources/persistentvolumeclaim-usage-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/persistentvolumeclaim-usage.json",
+			comparisonColumnNames:        []string{"persistentvolumeclaim_usage_bytes"},
+			timeout:                      reportTestTimeout,
+		},
 	}
 )
 
