@@ -39,14 +39,15 @@ type PrometheusImporter struct {
 	clock                 clock.Clock
 	cfg                   Config
 
-	metricsCollectors ImporterMetricsCollectors
-
 	// importLock ensures only one import is running at a time, protecting the
 	// lastTimestamp and metrics fields
 	importLock sync.Mutex
 
 	// lastTimestamp is the lastTimestamp stored for this PrometheusImporter
 	lastTimestamp *time.Time
+
+	// metricsCollectors contains metrics instrumentation types.
+	metricsCollectors ImporterMetricsCollectors
 }
 
 type Config struct {
