@@ -179,6 +179,10 @@ func (in *PrometheusMetricImportStatus) DeepCopyInto(out *PrometheusMetricImport
 		in, out := &in.LastImportTime, &out.LastImportTime
 		*out = (*in).DeepCopy()
 	}
+	if in.ImportDataEndTime != nil {
+		in, out := &in.ImportDataEndTime, &out.ImportDataEndTime
+		*out = (*in).DeepCopy()
+	}
 	if in.EarliestImportedMetricTime != nil {
 		in, out := &in.EarliestImportedMetricTime, &out.EarliestImportedMetricTime
 		*out = (*in).DeepCopy()
