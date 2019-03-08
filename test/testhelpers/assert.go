@@ -60,10 +60,10 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 					break
 				}
 			}
-			if isCompareColumn {
-				assert.InEpsilonf(t, actualValue, expectedValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
+			if isCompareColumn && expectedValue != 0.0 {
+				assert.InEpsilonf(t, expectedValue, actualValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
 			} else {
-				assert.Equal(t, actualValue, expectedValue, "expected column values between actual and expected rows to be the same")
+				assert.Equal(t, expectedValue, actualValue, "expected column values between actual and expected rows to be the same")
 			}
 		}
 	}
