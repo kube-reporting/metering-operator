@@ -275,7 +275,6 @@ while true; do
             echo "Nothing has changed for $FULL_RESOURCE_NAME"
         else
             echo "$CRD $FULL_RESOURCE_NAME has been modified"
-            echo "$RESOURCE_RESOURCE_VERSION" > "$RESOURCE_VERSION_FILE"
 
             writeReleaseOwnerValuesFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
             writeReleaseConfigMapOwnerPatchFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
@@ -285,6 +284,8 @@ while true; do
             echo "Running helm upgrade for release $RELEASE_NAME"
             if helmUpgrade "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" "${HELM_ARGS[@]}" | tee "$UPGRADE_RESULT_DIRECTORY/$RELEASE_NAME.txt"; then
                 echo "Error occurred when processing $FULL_RESOURCE_NAME"
+            else
+                echo "$RESOURCE_RESOURCE_VERSION" > "$RESOURCE_VERSION_FILE"
             fi
 
             writeReleaseConfigmapsFile "$RESOURCE_NAME"
