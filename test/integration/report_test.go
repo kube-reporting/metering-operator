@@ -7,31 +7,37 @@ import (
 	"time"
 
 	"github.com/operator-framework/operator-metering/test/testhelpers"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+type reportsProduceCorrectDataForInputTestCase struct {
+	name                         string
+	queryName                    string
+	dataSources                  []testDatasource
+	expectedReportOutputFileName string
+	comparisonColumnNames        []string
+	timeout                      time.Duration
+	parallel                     bool
+}
 
 func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd time.Time, testCases []reportsProduceCorrectDataForInputTestCase) {
 	require.NotZero(t, reportStart, "reportStart should not be zero")
 	require.NotZero(t, reportEnd, "reportEnd should not be zero")
-
+	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 	for _, test := range testCases {
 		// Fix closure captures
 		name := test.name
 		test := test
 		t.Run(name, func(t *testing.T) {
-
-			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
+			if test.parallel {
+				t.Parallel()
+			}
 
 			report := testFramework.NewSimpleReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
 
-			defer func() {
-				t.Logf("deleting scheduled report %s", report.Name)
-				err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
-				assert.NoError(t, err, "expected delete scheduled report to succeed")
-			}()
-
-			testFramework.RequireReportSuccessfullyRuns(t, report, time.Minute)
+			reportRunTimeout := 10 * time.Minute
+			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
+			testFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
 			// read expected results from a file
 			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
@@ -41,6 +47,8 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 			err = json.Unmarshal(expectedReportData, &expectedResults)
 			require.NoError(t, err)
 
+			resultTimeout := time.Minute
+			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
 			actualResults := testFramework.GetReportResults(t, report, time.Minute)
 
 			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
