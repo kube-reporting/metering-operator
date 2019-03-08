@@ -1,0 +1,16 @@
+spec:
+  defaultReportDataSources:
+    machine-cpu-cores-by-cluster-id:
+      spec:
+        promsum:
+          query: "machine-cpu-cores-by-cluster-id"
+
+  defaultStorage:
+    create: true
+    name: "hive-hdfs"
+    isDefault: true
+    type: "hive"
+    hive:
+      tableProperties:
+        location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
+
