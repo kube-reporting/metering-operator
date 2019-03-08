@@ -12,7 +12,7 @@ set -x
 go test \
     -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
-    -timeout 20m \
+    -timeout 15m \
     "./test/integration" \
     -namespace "${METERING_NAMESPACE}" \
     -kubeconfig "${KUBECONFIG}" \
