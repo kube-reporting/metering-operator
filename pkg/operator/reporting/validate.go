@@ -162,19 +162,14 @@ func GetGenerationQueryDependencies(
 	if err != nil {
 		return nil, err
 	}
-	viewQueries, viewQueriesDataSources, err := GetDependentViewGenerationQueries(queryGetter, dataSourceGetter, generationQuery)
-	if err != nil {
-		return nil, err
-	}
-	dynamicQueries, dynamicQueriesDataSources, err := GetDependentDynamicGenerationQueries(queryGetter, dataSourceGetter, generationQuery)
+	viewQueries, dynamicQueries, queriesDataSources, err := GetDependentGenerationQueries(queryGetter, dataSourceGetter, generationQuery)
 	if err != nil {
 		return nil, err
 	}
 
 	allDataSources := [][]*metering.ReportDataSource{
 		dataSourceDeps,
-		viewQueriesDataSources,
-		dynamicQueriesDataSources,
+		queriesDataSources,
 	}
 
 	// deduplicate the list of ReportDataSources
@@ -195,6 +190,19 @@ func GetGenerationQueryDependencies(
 		return nil, err
 	}
 
+	sort.Slice(viewQueries, func(i, j int) bool {
+		return viewQueries[i].Name < viewQueries[j].Name
+	})
+	sort.Slice(dynamicQueries, func(i, j int) bool {
+		return dynamicQueries[i].Name < dynamicQueries[j].Name
+	})
+	sort.Slice(dataSources, func(i, j int) bool {
+		return dataSources[i].Name < dataSources[j].Name
+	})
+	sort.Slice(reports, func(i, j int) bool {
+		return reports[i].Name < reports[j].Name
+	})
+
 	return &ReportGenerationQueryDependencies{
 		ReportGenerationQueries:        viewQueries,
 		DynamicReportGenerationQueries: dynamicQueries,
@@ -203,45 +211,30 @@ func GetGenerationQueryDependencies(
 	}, nil
 }
 
-func GetDependentViewGenerationQueries(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
+func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
 	viewReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
 	dataSourcesAccumulator := make(map[string]*metering.ReportDataSource)
-	err := GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, generationQuery, 0, maxDepth, viewReportQueriesAccumulator, dataSourcesAccumulator, false)
+	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
+
+	err := GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, generationQuery, 0, maxDepth, viewReportQueriesAccumulator, dynamicReportQueriesAccumulator, dataSourcesAccumulator)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	viewQueries := make([]*metering.ReportGenerationQuery, 0, len(viewReportQueriesAccumulator))
 	for _, query := range viewReportQueriesAccumulator {
 		viewQueries = append(viewQueries, query)
 	}
-	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourcesAccumulator))
-	for _, ds := range dataSourcesAccumulator {
-		dataSources = append(dataSources, ds)
-	}
-
-	return viewQueries, dataSources, nil
-}
-
-func GetDependentDynamicGenerationQueries(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
-	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
-	dataSourcesAccumulator := make(map[string]*metering.ReportDataSource)
-	err := GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, generationQuery, 0, maxDepth, dynamicReportQueriesAccumulator, dataSourcesAccumulator, true)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	dynamicQueries := make([]*metering.ReportGenerationQuery, 0, len(dynamicReportQueriesAccumulator))
 	for _, query := range dynamicReportQueriesAccumulator {
 		dynamicQueries = append(dynamicQueries, query)
 	}
-
 	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourcesAccumulator))
 	for _, ds := range dataSourcesAccumulator {
 		dataSources = append(dataSources, ds)
 	}
 
-	return dynamicQueries, dataSources, nil
+	return viewQueries, dynamicQueries, dataSources, nil
 }
 
 type reportGenerationQueryGetter interface {
@@ -266,34 +259,43 @@ func NewReportGenerationQueryClientGetter(getter meteringClient.ReportGeneration
 	})
 }
 
-func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource, dynamicQueries bool) error {
+func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
 	}
-	var queries []string
-	if dynamicQueries {
-		queries = generationQuery.Spec.DynamicReportQueries
-	} else {
-		queries = generationQuery.Spec.ReportQueries
+	loopInput := []struct {
+		accum      map[string]*metering.ReportGenerationQuery
+		queryNames []string
+	}{
+		{
+			accum:      viewQueriesAccumulator,
+			queryNames: generationQuery.Spec.ReportQueries,
+		},
+		{
+			accum:      dynamicQueriesAccumulator,
+			queryNames: generationQuery.Spec.DynamicReportQueries,
+		},
 	}
-	for _, queryName := range queries {
-		if _, exists := queriesAccumulator[queryName]; exists {
-			continue
+	for _, input := range loopInput {
+		for _, queryName := range input.queryNames {
+			if _, exists := input.accum[queryName]; exists {
+				continue
+			}
+			genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
+			if err != nil {
+				return err
+			}
+			// get dependent ReportDataSources
+			err = GetDependentDataSourcesMemoized(dataSourceGetter, genQuery, dataSourceAccumulator)
+			if err != nil {
+				return err
+			}
+			err = GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, genQuery, depth+1, maxDepth, viewQueriesAccumulator, dynamicQueriesAccumulator, dataSourceAccumulator)
+			if err != nil {
+				return err
+			}
+			input.accum[genQuery.Name] = genQuery
 		}
-		genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
-		if err != nil {
-			return err
-		}
-		// get dependent ReportDataSources
-		err = GetDependentDataSourcesMemoized(dataSourceGetter, genQuery, dataSourceAccumulator)
-		if err != nil {
-			return err
-		}
-		err = GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, genQuery, depth+1, maxDepth, queriesAccumulator, dataSourceAccumulator, dynamicQueries)
-		if err != nil {
-			return err
-		}
-		queriesAccumulator[genQuery.Name] = genQuery
 	}
 	return nil
 }
