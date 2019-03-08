@@ -167,7 +167,7 @@ var (
 			dataSources: []testDatasource{
 				{
 					DatasourceName: "persistentvolumeclaim-phase",
-					FileName:       "testdata/datasources/persistentvolumenclaim-phase.json",
+					FileName:       "testdata/datasources/persistentvolumeclaim-phase.json",
 				},
 				{
 					DatasourceName: "persistentvolumeclaim-usage-bytes",
