@@ -77,7 +77,7 @@ spec:
             SCRIPT                      = "${pipelineParams.testScript}"
             // we set CLEANUP_METERING_NAMESPACE to false and instead handle cleanup on
             // our own
-            CLEANUP_METERING_NAMESPACE            = "false"
+            CLEANUP_METERING_NAMESPACE            = "true"
             DOCKER_CREDS                = credentials('quay-coreos-jenkins-push')
         }
 
