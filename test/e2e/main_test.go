@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -50,8 +51,12 @@ func TestMain(m *testing.M) {
 }
 
 func TestReportingProducesData(t *testing.T) {
-	hourlySchedule := &meteringv1alpha1.ReportSchedule{
-		Period: meteringv1alpha1.ReportPeriodHourly,
+	// cron schedule to run every minute
+	cronSchedule := &meteringv1alpha1.ReportSchedule{
+		Period: meteringv1alpha1.ReportPeriodCron,
+		Cron: &meteringv1alpha1.ReportScheduleCron{
+			Expression: fmt.Sprintf("*/1 * * * *"),
+		},
 	}
 
 	queries := []struct {
@@ -88,10 +93,10 @@ func TestReportingProducesData(t *testing.T) {
 	var reportsProduceDataTestCases []reportProducesDataTestCase
 
 	for _, query := range queries {
-		reportHourlyTestCase := reportProducesDataTestCase{
-			name:          query.queryName + "-hourly",
+		reportcronTestCase := reportProducesDataTestCase{
+			name:          query.queryName + "-cron",
 			queryName:     query.queryName,
-			schedule:      hourlySchedule,
+			schedule:      cronSchedule,
 			newReportFunc: testFramework.NewSimpleReport,
 			skip:          query.skip,
 			parallel:      !query.nonParallel,
@@ -105,12 +110,13 @@ func TestReportingProducesData(t *testing.T) {
 			parallel:      !query.nonParallel,
 		}
 
-		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportHourlyTestCase, reportRunOnceTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportcronTestCase, reportRunOnceTestCase)
 	}
 
-	// Align to nearest hour the hourly schedule runs on the hour
-	periodEnd := time.Now().UTC().Truncate(time.Hour)
-	periodStart := periodEnd.Add(-time.Hour)
+	// Align to the nearest minute
+	periodEnd := time.Now().UTC().Truncate(time.Minute)
+	// start the report 5 minutes ago
+	periodStart := periodEnd.Add(-5 * time.Minute)
 
 	testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
 }
