@@ -132,7 +132,7 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 	require.NoError(t, err, "expected Report to have 1 row of results before timing out")
 	assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
-	***REMOVED***leName := path.Join(f.ReportOutputDirectory, fmt.Sprintf("%s-scheduled-report.json", report.Name))
+	***REMOVED***leName := path.Join(f.ReportOutputDirectory, fmt.Sprintf("%s.json", report.Name))
 	err = ioutil.WriteFile(***REMOVED***leName, reportData, os.ModePerm)
 	require.NoError(t, err, "expected writing report results to disk not to error")
 	return reportResults
