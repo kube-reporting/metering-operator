@@ -23,7 +23,7 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 
 			t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 
-			report := testFramework.NewSimpleReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
+			report := testFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
 
 			defer func() {
 				t.Logf("deleting scheduled report %s", report.Name)
