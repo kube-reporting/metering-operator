@@ -33,7 +33,7 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 				t.Parallel()
 			}
 
-			report := testFramework.NewSimpleReport(test.name+"-runonce", test.queryName, nil, &reportStart, &reportEnd)
+			report := testFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
 
 			reportRunTimeout := 10 * time.Minute
 			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
