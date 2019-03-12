@@ -140,7 +140,7 @@ spec:
 private def runScript() {
     container('metering-test-runner') {
         ansiColor('xterm') {
-            timeout(20) {
+            timeout(25) {
                 sh '''#!/bin/bash -ex
                 export METERING_CREATE_PULL_SECRET=true
                 export DOCKER_USERNAME="${DOCKER_CREDS_USR:-}"
