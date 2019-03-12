@@ -4,9 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/test/framework"
-	"github.com/stretchr/testify/assert"
 )
 
 type reportProducesDataTestCase struct {
@@ -14,12 +15,12 @@ type reportProducesDataTestCase struct {
 	queryName     string
 	schedule      *meteringv1alpha1.ReportSchedule
 	newReportFunc func(name, queryName string, schedule *meteringv1alpha1.ReportSchedule, start, end *time.Time) *meteringv1alpha1.Report
-	timeout       time.Duration
 	skip          bool
+	parallel      bool
 }
 
-func testReportsProduceData(t *testing.T, testFramework *framework.Framework, periodStart, periodEnd time.Time, testCases []reportProducesDataTestCase) {
-	t.Logf("periodStart: %s, periodEnd: %s", periodStart, periodEnd)
+func testReportsProduceData(t *testing.T, testFramework *framework.Framework, reportStart, reportEnd time.Time, testCases []reportProducesDataTestCase) {
+	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
 	for _, test := range testCases {
 		name := test.name
 		// Fix closure captures
@@ -29,30 +30,18 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, pe
 				t.Skip("test configured to be skipped")
 				return
 			}
-
-			// set reportStart to the nearest hour since the hourly
-			// report will align to the hour
-			reportStart := periodStart.Truncate(time.Hour)
-			reportEnd := periodEnd.Truncate(time.Hour)
-
-			// if truncation causes them to be the same, set reportStart to 1
-			// hour before reportEnd
-			if reportEnd.Equal(reportStart) {
-				reportStart.Add(-time.Hour)
+			if test.parallel {
+				t.Parallel()
 			}
 
-			t.Logf("report reportingStart: %s, reportingEnd: %s", reportStart, reportEnd)
-
 			report := test.newReportFunc(test.name, test.queryName, test.schedule, &reportStart, &reportEnd)
-			defer func() {
-				t.Logf("deleting scheduled report %s", report.Name)
-				err := testFramework.MeteringClient.Reports(testFramework.Namespace).Delete(report.Name, nil)
-				assert.NoError(t, err, "expected delete scheduled report to succeed")
-			}()
+			reportRunTimeout := 10 * time.Minute
+			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
+			testFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
-			testFramework.RequireReportSuccessfullyRuns(t, report, time.Minute)
-			reportResults := testFramework.GetReportResults(t, report, time.Minute)
-
+			resultTimeout := time.Minute
+			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
+			reportResults := testFramework.GetReportResults(t, report, resultTimeout)
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 		})
 	}

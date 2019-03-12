@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
@@ -92,15 +93,8 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 	default:
 		err = fmt.Errorf("ReportDataSource %s: improperly configured missing promsum or awsBilling configuration", dataSource.Name)
 	}
-	if err != nil {
-		return err
-	}
+	return err
 
-	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
-		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
-	}
-
-	return nil
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
@@ -122,15 +116,23 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		logger.Infof("new Prometheus ReportDataSource discovered")
 		storage := dataSource.Spec.Promsum.Storage
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
+		logger.Infof("creating table %s", tableName)
 		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, prestostore.PromsumHiveTableColumns, prestostore.PromsumHivePartitionColumns)
 		if err != nil {
 			return err
 		}
+		logger.Infof("created table %s", tableName)
 
 		dataSource, err = op.updateDataSourceTableName(logger, dataSource, tableName)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to update ReportDataSource TableName field %q", tableName)
 			return err
+		}
+
+		// Queue queries that depend on this when the tables created, as they
+		// may be pending initialization.
+		if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
+			logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
 		}
 
 		// instead of immediately importing, return early after creating the
@@ -193,7 +195,11 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	// default to importing at the configured import interval
 	importDelay := op.getQueryIntervalForReportDataSource(dataSource)
 
-	var earliestImportedMetricTime, newestImportedMetricTime *metav1.Time
+	var (
+		earliestImportedMetricTime,
+		newestImportedMetricTime,
+		importDataEndTime *metav1.Time
+	)
 	if dataSource.Status.PrometheusMetricImportStatus != nil {
 		if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime != nil {
 			earliestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime
@@ -201,40 +207,55 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime != nil {
 			newestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime
 		}
+		if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime != nil {
+			importDataEndTime = dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime
+		}
 	}
 
 	// determine if we need to adjust our next import and update the status
 	// information if we've imported new metrics.
 	if numResultsImported != 0 {
-		firstTimeRange := results.ProcessedTimeRanges[0]
+		// This is the last timeRange we processed, and we use the End time on
+		// this to determine what time range the importer attempted to import
+		// up until, for tracking our process
 		lastTimeRange := results.ProcessedTimeRanges[len(results.ProcessedTimeRanges)-1]
-		earliestTS := firstTimeRange.Start
+
+		// These are the first and last metric from the import, which we use to
+		// determine the data we've actually imported, versus what we've asked
+		// for.
+		firstMetric := results.Metrics[0]
+		lastMetric := results.Metrics[len(results.Metrics)-1]
 
 		// if there is no existing timestamp then this must be the first import
 		// and we should set the earliestImportedMetricTime
 		if earliestImportedMetricTime == nil {
-			earliestImportedMetricTime = &metav1.Time{earliestTS}
-		} else if earliestImportedMetricTime.After(earliestTS) {
+			earliestImportedMetricTime = &metav1.Time{firstMetric.Timestamp}
+		} else if earliestImportedMetricTime.After(firstMetric.Timestamp) {
 			dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
 			// TODO(chance): Look at adding an error to the status.
 			return nil // strop processing this ReportDataSource
 		}
 
-		lastTS := lastTimeRange.End
-		if newestImportedMetricTime == nil || newestImportedMetricTime.Time.Before(lastTS) {
-			newestImportedMetricTime = &metav1.Time{lastTS}
+		if newestImportedMetricTime == nil || newestImportedMetricTime.Time.Before(lastMetric.Timestamp) {
+			newestImportedMetricTime = &metav1.Time{lastMetric.Timestamp}
+		}
+
+		// Update the timestamp which records the latest we've attempted to query
+		// up until.
+		if importDataEndTime == nil || importDataEndTime.Time.Before(lastTimeRange.End) {
+			importDataEndTime = &metav1.Time{lastTimeRange.End}
 		}
 		// the data we collected is farther back than 1.5 their chunkSize, so requeue sooner
 		// since we're backlogged. We use 1.5 because being behind 1 full chunk
 		// is typical, but we shouldn't be 2 full chunks after catching up
 		backlogDetectionDuration := time.Duration(1.5*importerCfg.ChunkSize.Seconds()) * time.Second
-		backlogDuration := op.clock.Now().Sub(lastTS)
+		backlogDuration := op.clock.Now().Sub(newestImportedMetricTime.Time)
 		if backlogDuration > backlogDetectionDuration {
 			// import delay has jitter so that processing backlogged
 			// ReportDataSources happens in a more randomized order to allow
 			// all of them to get processed when the queue is blocked.
 			importDelay = wait.Jitter(5*time.Second, 2)
-			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, lastTS, backlogDuration, importDelay)
+			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, newestImportedMetricTime.Time, backlogDuration, importDelay)
 		}
 	}
 
@@ -242,6 +263,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	dataSource.Status.PrometheusMetricImportStatus = &cbTypes.PrometheusMetricImportStatus{
 		EarliestImportedMetricTime: earliestImportedMetricTime,
 		NewestImportedMetricTime:   newestImportedMetricTime,
+		ImportDataEndTime:          importDataEndTime,
 		LastImportTime:             &metav1.Time{importTime},
 	}
 	dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
@@ -250,8 +272,9 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 
 	nextImport := op.clock.Now().Add(importDelay).UTC()
-	logger.Infof("queuing Prometheus ReportDataSource %s to importing data again in %s at %s", dataSource.Name, importDelay, nextImport)
+	logger.Infof("queuing Prometheus ReportDataSource %s to import data again in %s at %s", dataSource.Name, importDelay, nextImport)
 	op.enqueueReportDataSourceAfter(dataSource, importDelay)
+	op.queueDependentsOfDataSource(dataSource)
 	return nil
 }
 
@@ -318,6 +341,8 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 	logger.Infof("queuing AWSBilling ReportDataSource %s to update partitions again in %s at %s", dataSource.Name, partitionUpdateInterval, nextUpdate)
 	op.enqueueReportDataSourceAfter(dataSource, partitionUpdateInterval)
+
+	op.queueDependentsOfDataSource(dataSource)
 	return nil
 }
 
@@ -409,7 +434,6 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 	}
 
 	logger.Infof("finished updating partitions for prestoTable %q", prestoTable.Name)
-
 	return nil
 }
 
@@ -523,13 +547,12 @@ func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 
 // queueDependentReportGenerationQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the dataSource
 func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
-	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(dataSource.Namespace)
-	queries, err := queryLister.List(metav1.ListOptions{})
+	queries, err := op.reportGenerationQueryLister.ReportGenerationQueries(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
 		return err
 	}
 
-	for _, query := range queries.Items {
+	for _, query := range queries {
 		// look at the list ReportDataSource of dependencies
 		for _, dependency := range query.Spec.DataSources {
 			if dependency == dataSource.Name {
@@ -540,4 +563,42 @@ func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSour
 		}
 	}
 	return nil
+}
+
+func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.ReportDataSource) error {
+	// Look at reports in the namespace of this dataSource
+	reports, err := op.reportLister.Reports(dataSource.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	// For each report in the dataSource's namespace, check for reports that
+	// have a dependency on the provided dataSource
+	for _, report := range reports {
+		deps, err := op.getReportDependencies(report)
+		if err != nil {
+			return err
+		}
+
+		// If this report has a dependency on the passed in dataSource, queue
+		// it
+		for _, depDataSource := range deps.ReportDataSources {
+			if depDataSource.Name == dataSource.Name {
+				op.enqueueReport(report)
+				break
+			}
+		}
+
+	}
+	return nil
+}
+
+func (op *Reporting) queueDependentsOfDataSource(dataSource *cbTypes.ReportDataSource) {
+	logger := op.logger.WithFields(log.Fields{"reportDataSource": dataSource.Name, "namespace": dataSource.Namespace})
+	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
+	}
+	if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+	}
 }

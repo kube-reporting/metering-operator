@@ -8,30 +8,20 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/operator"
 	"github.com/operator-framework/operator-metering/test/framework"
 )
 
 var (
 	testFramework *framework.Framework
 
-	reportTestTimeout         = 5 * time.Minute
 	reportTestOutputDirectory string
 	runAWSBillingTests        bool
 )
 
 func init() {
-	if reportTestTimeoutStr := os.Getenv("REPORT_TEST_TIMEOUT"); reportTestTimeoutStr != "" {
-		var err error
-		reportTestTimeout, err = time.ParseDuration(reportTestTimeoutStr)
-		if err != nil {
-			log.Fatalf("Invalid REPORT_TEST_TIMEOUT: %v", err)
-		}
-	}
 	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
 	if reportTestOutputDirectory == "" {
 		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
@@ -59,14 +49,15 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestReportingE2E(t *testing.T) {
+func TestReportingProducesData(t *testing.T) {
 	hourlySchedule := &meteringv1alpha1.ReportSchedule{
 		Period: meteringv1alpha1.ReportPeriodHourly,
 	}
 
 	queries := []struct {
-		queryName string
-		skip      bool
+		queryName   string
+		skip        bool
+		nonParallel bool
 	}{
 		{queryName: "namespace-cpu-request"},
 		{queryName: "namespace-cpu-usage"},
@@ -89,9 +80,9 @@ func TestReportingE2E(t *testing.T) {
 		{queryName: "cluster-memory-utilization"},
 		{queryName: "namespace-memory-utilization"},
 		{queryName: "namespace-cpu-utilization"},
-		{queryName: "pod-cpu-request-aws", skip: !runAWSBillingTests},
-		{queryName: "pod-memory-request-aws", skip: !runAWSBillingTests},
-		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests},
+		{queryName: "pod-cpu-request-aws", skip: !runAWSBillingTests, nonParallel: true},
+		{queryName: "pod-memory-request-aws", skip: !runAWSBillingTests, nonParallel: true},
+		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests, nonParallel: true},
 	}
 
 	var reportsProduceDataTestCases []reportProducesDataTestCase
@@ -102,57 +93,24 @@ func TestReportingE2E(t *testing.T) {
 			queryName:     query.queryName,
 			schedule:      hourlySchedule,
 			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
 			skip:          query.skip,
+			parallel:      !query.nonParallel,
 		}
 		reportRunOnceTestCase := reportProducesDataTestCase{
 			name:          query.queryName + "-runonce",
 			queryName:     query.queryName,
 			schedule:      nil, // runOnce
 			newReportFunc: testFramework.NewSimpleReport,
-			timeout:       reportTestTimeout,
 			skip:          query.skip,
+			parallel:      !query.nonParallel,
 		}
 
-		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportHourlyTestCase)
-		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportRunOnceTestCase)
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportHourlyTestCase, reportRunOnceTestCase)
 	}
 
-	t.Run("TestReportingProducesResults", func(t *testing.T) {
-		// validate all the ReportDataSources for our tests exist before running
-		// collect
-		var queries []string
-		waitTimeout := time.Minute
+	// Align to nearest hour the hourly schedule runs on the hour
+	periodEnd := time.Now().UTC().Truncate(time.Hour)
+	periodStart := periodEnd.Add(-time.Hour)
 
-		// We wait for all ReportDataSources before anything else since even if
-		// we don't use them, the collect endpoint will attempt to collect data
-		// for all ReportDataSources
-		_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
-		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
-
-		seenQuery := make(map[string]struct{})
-		for _, test := range reportsProduceDataTestCases {
-			if test.skip {
-				continue
-			}
-			if _, ok := seenQuery[test.queryName]; ok {
-				continue
-			}
-			seenQuery[test.queryName] = struct{}{}
-			queries = append(queries, test.queryName)
-		}
-
-		// validate all ReportGenerationQueries and ReportDataSources that are
-		// used by our test cases are initialized
-		testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
-
-		var periodStart, periodEnd time.Time
-		var collectResp operator.CollectPromsumDataResponse
-		periodStart, periodEnd, collectResp = testFramework.CollectMetricsOnce(t)
-		testFramework.RequireReportDataSourcesForQueryHaveData(t, queries, collectResp)
-
-		t.Run("TestReportsProduceData", func(t *testing.T) {
-			testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
-		})
-	})
+	testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
 }

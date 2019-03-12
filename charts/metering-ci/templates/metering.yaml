@@ -31,9 +31,28 @@ spec:
 {{- end }}
 
       config:
+        logLevel: "debug"
         disablePromsum: {{ .Values.disablePromsum }}
         awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
         awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
+
+        # hard code to 2 hours in tests since tests run hourly scheduled tests
+        # and need more than 1 hours worth of data to ensure we have enough for
+        # the reports to produce results
+        prometheusDatasourceMaxImportBackfillDuration: "2h"
+
+        # increase the poll interval for tests so that the Reports can run
+        # sooner
+        promsumPollInterval: "30s"
+
+        # increase the chunk size and prom query size decreases the number of
+        # imports we need to do to catch up
+        prometheusDatasourceMaxQueryRangeDuration: "15m"
+        promsumChunkSize: "15m"
+
+        # for efficiency, we don't need data at the default 60 second
+        # resolution, and we can use a slightly higher resolution for tests
+        promsumStepSize: "5m"
 
   presto:
     spec:

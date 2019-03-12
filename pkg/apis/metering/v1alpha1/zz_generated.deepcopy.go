@@ -179,6 +179,10 @@ func (in *PrometheusMetricImportStatus) DeepCopyInto(out *PrometheusMetricImport
 		in, out := &in.LastImportTime, &out.LastImportTime
 		*out = (*in).DeepCopy()
 	}
+	if in.ImportDataEndTime != nil {
+		in, out := &in.ImportDataEndTime, &out.ImportDataEndTime
+		*out = (*in).DeepCopy()
+	}
 	if in.EarliestImportedMetricTime != nil {
 		in, out := &in.EarliestImportedMetricTime, &out.EarliestImportedMetricTime
 		*out = (*in).DeepCopy()
@@ -891,11 +895,6 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 		in, out := &in.ReportingEnd, &out.ReportingEnd
 		*out = (*in).DeepCopy()
 	}
-	if in.GracePeriod != nil {
-		in, out := &in.GracePeriod, &out.GracePeriod
-		*out = new(v1.Duration)
-		**out = **in
-	}
 	if in.Inputs != nil {
 		in, out := &in.Inputs, &out.Inputs
 		*out = make(ReportGenerationQueryInputValues, len(*in))
@@ -933,6 +932,10 @@ func (in *ReportStatus) DeepCopyInto(out *ReportStatus) {
 	}
 	if in.LastReportTime != nil {
 		in, out := &in.LastReportTime, &out.LastReportTime
+		*out = (*in).DeepCopy()
+	}
+	if in.NextReportTime != nil {
+		in, out := &in.NextReportTime, &out.NextReportTime
 		*out = (*in).DeepCopy()
 	}
 	return

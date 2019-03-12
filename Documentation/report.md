@@ -20,7 +20,7 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   generationQuery: "pod-cpu-request"
-  gracePeriod: "5m"
+  reportingStart: "2018-07-01T00:00:00Z"
   schedule:
     period: "hourly"
     hourly:
@@ -40,7 +40,6 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   generationQuery: "pod-cpu-request"
-  gracePeriod: "5m"
   reportingStart: "2018-07-01T00:00:00Z"
   reportingEnd: "2018-07-31T00:00:00Z"
 ```
@@ -49,6 +48,8 @@ spec:
 
 Names the `ReportGenerationQuery` used to generate the report.
 The generation query controls the schema of the report as well how the results are processed.
+
+*`generationQuery` is a required field.*
 
 Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
@@ -178,9 +179,12 @@ For cron periods, normal cron expressions are valid:
 ### reportingStart
 
 To support running a Report against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
-One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time. This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
+One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time.
+This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
 
 As an example of how to use this field, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your Report, you could create a report with the following values:
+
+*`reportingStart` is a required field. *
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
@@ -189,7 +193,6 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   generationQuery: "pod-cpu-request"
-  gracePeriod: "5m"
   schedule:
     period: "hourly"
   reportingStart: "2018-01-01T00:00:00Z"
@@ -212,29 +215,15 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   generationQuery: "pod-cpu-request"
-  gracePeriod: "5m"
   schedule:
     period: "weekly"
   reportingStart: "2018-07-01T00:00:00Z"
   reportingEnd: "2018-07-31T00:00:00Z"
 ```
 
-### gracePeriod
-
-Sets the period of time after `reportingEnd` that the report will be run.
-This value is `5m` by default.
-
-By default, a report waits until its scheduled period has elapsed or until it has reached the reportingEnd if the schedule isn't set (run-once).
-The gracePeriod is added to the period or reporting end time and that value is used to determine when the report should execute.
-The grace period is not used if `runImmediately` is true.
-
-This field is particularly useful with AWS Billing Reports,
-which may get their latest information up to 24 hours after the billing period
-has ended.
-
 ### runImmediately
 
-Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
+Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingEnd` setting.
 For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing.
 
 ### Inputs

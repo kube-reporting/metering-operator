@@ -300,33 +300,6 @@ func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGene
 	return nil
 }
 
-func GetDependentGenerationQueriesMemoized(queryGetter reportGenerationQueryGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, queriesAccumulator map[string]*metering.ReportGenerationQuery, dynamicQueries bool) error {
-	if depth >= maxDepth {
-		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
-	}
-	var queries []string
-	if dynamicQueries {
-		queries = generationQuery.Spec.DynamicReportQueries
-	} else {
-		queries = generationQuery.Spec.ReportQueries
-	}
-	for _, queryName := range queries {
-		if _, exists := queriesAccumulator[queryName]; exists {
-			continue
-		}
-		genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
-		if err != nil {
-			return err
-		}
-		err = GetDependentGenerationQueriesMemoized(queryGetter, genQuery, depth+1, maxDepth, queriesAccumulator, dynamicQueries)
-		if err != nil {
-			return err
-		}
-		queriesAccumulator[genQuery.Name] = genQuery
-	}
-	return nil
-}
-
 type reportDataSourceGetter interface {
 	getReportDataSource(namespace, name string) (*metering.ReportDataSource, error)
 }

@@ -74,6 +74,8 @@ spec:
             METERING_CREATE_PULL_SECRET = "true"
             // use the OVERRIDE_NAMESPACE if specified, otherwise set namespace to prefix + BRANCH_NAME
             METERING_NAMESPACE          = "${params.OVERRIDE_NAMESPACE ?: defaultNamespace}"
+            METERING_E2E_NAMESPACE      = "${METERING_NAMESPACE}"
+            METERING_INTEGRATION_NAMESPACE = "${METERING_NAMESPACE}"
             SCRIPT                      = "${pipelineParams.testScript}"
             // we set CLEANUP_METERING_NAMESPACE to false and instead handle cleanup on
             // our own

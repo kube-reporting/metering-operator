@@ -73,7 +73,7 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 		if reporting.IsUninitializedDependencyError(err) {
 			logger.Warnf("unable to validate ReportGenerationQuery %s, has uninitialized dependencies: %v", generationQuery.Name, err)
 			// We do not return an error because we do not need to requeue this
-			// query. instead we can wait until this queries uninitialized
+			// query. Instead we can wait until this queries uninitialized
 			// dependencies become initialized. After they're initialized they
 			// will queue anything that depends on them, including this query.
 			return nil
@@ -102,10 +102,12 @@ func (op *Reporting) handleReportGenerationQuery(logger log.FieldLogger, generat
 			return err
 		}
 
+		logger.Infof("creating view %s", viewName)
 		err = op.prestoViewCreator.CreateView(viewName, renderedQuery)
 		if err != nil {
 			return fmt.Errorf("error creating view %s for ReportGenerationQuery %s: %v", viewName, generationQuery.Name, err)
 		}
+		logger.Infof("created view %s", viewName)
 
 		err = op.updateReportQueryViewName(logger, generationQuery, viewName)
 		if err != nil {

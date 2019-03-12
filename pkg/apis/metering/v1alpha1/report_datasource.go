@@ -64,7 +64,16 @@ type ReportDataSourceStatus struct {
 }
 
 type PrometheusMetricImportStatus struct {
-	LastImportTime             *meta.Time `json:"lastImportTime,omitempty"`
+	// LastImportTime is the time the import last import was ran.
+	LastImportTime *meta.Time `json:"lastImportTime,omitempty"`
+
+	// ImportDataEndTime is the end of the time last time range queried.
+	ImportDataEndTime *meta.Time `json:"importDataEndTime,omitempty"`
+
+	// EarliestImportedMetricTime is the timestamp for the earliest metric
+	// imported for this ReportDataSource.
 	EarliestImportedMetricTime *meta.Time `json:"earliestImportedMetricTime,omitempty"`
-	NewestImportedMetricTime   *meta.Time `json:"newestImportedMetricTime,omitempty"`
+	// NewestImportedMetricTime is the timestamp for the newest metric
+	// imported for this ReportDataSource.
+	NewestImportedMetricTime *meta.Time `json:"newestImportedMetricTime,omitempty"`
 }

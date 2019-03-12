@@ -690,14 +690,6 @@ func (op *Reporting) isInitialized() bool {
 	return initialized
 }
 
-func (op *Reporting) getDefaultReportGracePeriod() time.Duration {
-	if op.cfg.PrometheusQueryConfig.QueryInterval.Duration > op.cfg.PrometheusQueryConfig.ChunkSize.Duration {
-		return op.cfg.PrometheusQueryConfig.QueryInterval.Duration
-	} else {
-		return op.cfg.PrometheusQueryConfig.ChunkSize.Duration
-	}
-}
-
 func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, error) {
 	client, err := promapi.NewClient(promConfig)
 	if err != nil {

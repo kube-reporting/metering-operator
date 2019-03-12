@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	types "k8s.io/apimachinery/pkg/types"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
@@ -35,6 +37,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/namespace-cpu-request.json",
 			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "namespace-cpu-usage",
@@ -48,6 +51,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/namespace-cpu-usage.json",
 			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "namespace-memory-request",
@@ -61,6 +65,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/namespace-memory-request.json",
 			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "namespace-memory-usage",
@@ -74,6 +79,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/namespace-memory-usage.json",
 			comparisonColumnNames:        []string{"pod_usage_memory_core_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "pod-cpu-request",
@@ -87,6 +93,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/pod-cpu-request.json",
 			comparisonColumnNames:        []string{"pod_request_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "pod-cpu-usage",
@@ -100,6 +107,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/pod-cpu-usage.json",
 			comparisonColumnNames:        []string{"pod_usage_cpu_core_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "pod-memory-request",
@@ -113,6 +121,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/pod-memory-request.json",
 			comparisonColumnNames:        []string{"pod_request_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "pod-memory-usage",
@@ -126,6 +135,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/pod-memory-usage.json",
 			comparisonColumnNames:        []string{"pod_usage_memory_byte_seconds"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "node-cpu-utilization",
@@ -143,6 +153,7 @@ var (
 			expectedReportOutputFileName: "testdata/reports/node-cpu-utilization.json",
 			comparisonColumnNames:        []string{"node_allocatable_cpu_core_seconds", "pod_request_cpu_core_seconds", "cpu_used_percent", "cpu_unused_percent"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 		{
 			name:      "node-memory-utilization",
@@ -160,18 +171,10 @@ var (
 			expectedReportOutputFileName: "testdata/reports/node-memory-utilization.json",
 			comparisonColumnNames:        []string{"node_allocatable_memory_byte_seconds", "pod_request_memory_byte_seconds", "memory_used_percent", "memory_unused_percent"},
 			timeout:                      reportTestTimeout,
+			parallel:                     true,
 		},
 	}
 )
-
-type reportsProduceCorrectDataForInputTestCase struct {
-	name                         string
-	queryName                    string
-	dataSources                  []testDatasource
-	expectedReportOutputFileName string
-	comparisonColumnNames        []string
-	timeout                      time.Duration
-}
 
 type testDatasource struct {
 	DatasourceName string
@@ -204,72 +207,81 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestReportingIntegration(t *testing.T) {
-	t.Run("TestReportsProduceCorrectData", func(t *testing.T) {
-		var queries []string
-		waitTimeout := time.Minute
+func TestReportingProducesCorrectDataForInput(t *testing.T) {
+	var queries []string
+	waitTimeout := time.Minute
 
-		_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
-		require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
+	t.Logf("Waiting for ReportDataSources tables to be created")
+	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
+	require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
-		for _, test := range testReportsProduceCorrectDataForInputTestCases {
-			queries = append(queries, test.queryName)
-		}
+	for _, test := range testReportsProduceCorrectDataForInputTestCases {
+		queries = append(queries, test.queryName)
+	}
 
-		// validate all ReportGenerationQueries and ReportDataSources that are
-		// used by the test cases are initialized
-		testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
+	// validate all ReportGenerationQueries and ReportDataSources that are
+	// used by the test cases are initialized
+	t.Logf("Waiting for ReportGenerationQueries tables to become ready")
+	testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
 
-		var reportStart, reportEnd time.Time
-		dataSourcesSubmitted := make(map[string]struct{})
+	var reportStart, reportEnd time.Time
+	dataSourcesSubmitted := make(map[string]struct{})
 
-		for _, test := range testReportsProduceCorrectDataForInputTestCases {
-			for _, dataSource := range test.dataSources {
-				if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
-					// wait for the datasource table to exist
-					_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, test.timeout)
-					require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
+	// Inject all the dataSources we require for each test case
+	t.Logf("Pushing fixture metrics required for tests into metering")
+	for _, test := range testReportsProduceCorrectDataForInputTestCases {
+		for _, dataSource := range test.dataSources {
+			if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
+				// wait for the datasource table to exist
+				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, test.timeout)
+				require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
 
-					metricsFile, err := os.Open(dataSource.FileName)
+				metricsFile, err := os.Open(dataSource.FileName)
+				require.NoError(t, err)
+
+				decoder := json.NewDecoder(metricsFile)
+
+				_, err = decoder.Token()
+				require.NoError(t, err)
+
+				var metrics []*prestostore.PrometheusMetric
+				for decoder.More() {
+					var metric prestostore.PrometheusMetric
+					err = decoder.Decode(&metric)
 					require.NoError(t, err)
-
-					decoder := json.NewDecoder(metricsFile)
-
-					_, err = decoder.Token()
-					require.NoError(t, err)
-
-					var metrics []*prestostore.PrometheusMetric
-					for decoder.More() {
-						var metric prestostore.PrometheusMetric
-						err = decoder.Decode(&metric)
-						require.NoError(t, err)
-						if reportStart.IsZero() || metric.Timestamp.Before(reportStart) {
-							reportStart = metric.Timestamp
-						}
-						if metric.Timestamp.After(reportEnd) {
-							reportEnd = metric.Timestamp
-						}
-						metrics = append(metrics, &metric)
-						// batch store metrics in amounts of 100
-						if len(metrics) >= 100 {
-							err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
-							require.NoError(t, err)
-							metrics = nil
-						}
+					if reportStart.IsZero() || metric.Timestamp.Before(reportStart) {
+						reportStart = metric.Timestamp
 					}
-					// flush any metrics left over
-					if len(metrics) != 0 {
-						err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
-						require.NoError(t, err)
+					if metric.Timestamp.After(reportEnd) {
+						reportEnd = metric.Timestamp
 					}
-
-					dataSourcesSubmitted[dataSource.DatasourceName] = struct{}{}
+					metrics = append(metrics, &metric)
+					// batch store metrics in amounts of 100
+					if len(metrics) >= 100 {
+						err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
+						require.NoError(t, err)
+						metrics = nil
+					}
 				}
+				// flush any metrics left over
+				if len(metrics) != 0 {
+					err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
+					require.NoError(t, err)
+				}
+
+				reportEndStr := reportEnd.UTC().Format(time.RFC3339)
+				reportStartStr := reportStart.UTC().Format(time.RFC3339)
+				nowStr := time.Now().UTC().Format(time.RFC3339)
+				jsonPatch := []byte(fmt.Sprintf(
+					`[{ "op": "add", "path": "/status/prometheusMetricImportStatus", "value": { "importDataEndTime": "%s", "earliestImportedMetricTime": "%s", "newestImportedMetricTime": "%s", "lastImportTime": "%s" } } ]`,
+					reportEndStr, reportStartStr, reportEndStr, nowStr))
+				_, err = testFramework.MeteringClient.ReportDataSources(testFramework.Namespace).Patch(dataSource.DatasourceName, types.JSONPatchType, jsonPatch)
+				require.NoError(t, err)
+
+				dataSourcesSubmitted[dataSource.DatasourceName] = struct{}{}
 			}
 		}
+	}
 
-		t.Run("TestReportsProduceCorrectDataForInput", func(t *testing.T) {
-			testReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
-		})
-	})
+	testReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
 }
