@@ -328,11 +328,10 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return err
 		}
 	} else {
-		gracePeriod := op.getReportGracePeriod(report)
 		// Check if it's time to generate the report
-		if reportExecutionTime := reportPeriod.periodEnd.Add(gracePeriod); reportExecutionTime.After(now) {
-			waitTime := reportExecutionTime.Sub(now)
-			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, reportExecutionTime)
+		if reportPeriod.periodEnd.After(now) {
+			waitTime := reportPeriod.periodEnd.Sub(now)
+			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, reportPeriod.periodEnd)
 			logger.Infof(waitMsg+". waiting %s", waitTime)
 
 			if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
@@ -500,13 +499,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		report.Status.NextReportTime = &metav1.Time{Time: nextReportPeriod.periodEnd}
 
 		// calculate the time to reprocess after queuing
-		gracePeriod := op.getReportGracePeriod(report)
-
 		now = op.clock.Now().UTC()
-		nextRunTime := nextReportPeriod.periodEnd.Add(gracePeriod)
+		nextRunTime := nextReportPeriod.periodEnd
 		waitTime := nextRunTime.Sub(now)
 
-		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s] with gracePeriod: %s. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, gracePeriod, nextRunTime)
+		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, nextRunTime)
 		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg)
 		cbutil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(waitMsg+". waiting %s", waitTime)
@@ -640,14 +637,6 @@ func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg st
 	cond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.InvalidReportReason, msg)
 	_, err := op.updateReportStatus(report, cond)
 	return err
-}
-
-func (op *Reporting) getReportGracePeriod(report *cbTypes.Report) time.Duration {
-	if report.Spec.GracePeriod != nil {
-		return report.Spec.GracePeriod.Duration
-	} else {
-		return op.getDefaultReportGracePeriod()
-	}
 }
 
 func (op *Reporting) getReportGenerationQueryForReport(report *cbTypes.Report) (*cbTypes.ReportGenerationQuery, error) {

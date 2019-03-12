@@ -11,7 +11,6 @@ spec:
     value: cluster-cpu-usage-hourly
   schedule:
     period: "hourly"
-  gracePeriod: 1h # delay running 1 hour so the usage and capacity report has time to run
 
 ---
 
@@ -28,5 +27,4 @@ spec:
     value: cluster-memory-usage-hourly
   schedule:
     period: "hourly"
-  gracePeriod: 1h # delay running 1 hour so the usage and capacity report has time to run
 

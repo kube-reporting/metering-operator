@@ -895,11 +895,6 @@ func (in *ReportSpec) DeepCopyInto(out *ReportSpec) {
 		in, out := &in.ReportingEnd, &out.ReportingEnd
 		*out = (*in).DeepCopy()
 	}
-	if in.GracePeriod != nil {
-		in, out := &in.GracePeriod, &out.GracePeriod
-		*out = new(v1.Duration)
-		**out = **in
-	}
 	if in.Inputs != nil {
 		in, out := &in.Inputs, &out.Inputs
 		*out = make(ReportGenerationQueryInputValues, len(*in))

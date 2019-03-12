@@ -221,22 +221,9 @@ spec:
   reportingEnd: "2018-07-31T00:00:00Z"
 ```
 
-### gracePeriod
-
-Sets the period of time after `reportingEnd` that the report will be run.
-This value is `5m` by default.
-
-By default, a report waits until its scheduled period has elapsed or until it has reached the reportingEnd if the schedule isn't set (run-once).
-The gracePeriod is added to the period or reporting end time and that value is used to determine when the report should execute.
-The grace period is not used if `runImmediately` is true.
-
-This field is particularly useful with AWS Billing Reports,
-which may get their latest information up to 24 hours after the billing period
-has ended.
-
 ### runImmediately
 
-Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `gracePeriod` or `reportingEnd` flag settings.
+Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingEnd` setting.
 For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing.
 
 ### Inputs
