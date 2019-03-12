@@ -39,6 +39,10 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
 			testFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
+			resultTimeout := time.Minute
+			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
+			actualResults := testFramework.GetReportResults(t, report, resultTimeout)
+
 			// read expected results from a file
 			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
 			require.NoError(t, err)
@@ -46,10 +50,6 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 			var expectedResults []map[string]interface{}
 			err = json.Unmarshal(expectedReportData, &expectedResults)
 			require.NoError(t, err)
-
-			resultTimeout := time.Minute
-			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
-			actualResults := testFramework.GetReportResults(t, report, time.Minute)
 
 			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
 		})
