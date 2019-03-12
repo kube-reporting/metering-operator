@@ -10,7 +10,6 @@ spec:
     value: cluster-cpu-capacity-hourly
   schedule:
     period: "daily"
-  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
 
 ---
 
@@ -26,4 +25,3 @@ spec:
     value: cluster-memory-capacity-hourly
   schedule:
     period: "daily"
-  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run

@@ -186,7 +186,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 
 	if r.FormValue("ignore_failed") != "true" {
-		if cond := cbutil.GetReportCondition(report.Status, api.ReportFailure); cond != nil && cond.Status == v1.ConditionTrue {
+		if cond := cbutil.GetReportCondition(report.Status, api.ReportRunning); cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == cbutil.GenerateReportFailedReason {
 			logger.Errorf("report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			return

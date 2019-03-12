@@ -9,7 +9,6 @@ spec:
     value: cluster-cpu-utilization-hourly
   schedule:
     period: "daily"
-  gracePeriod: 2h # delay running 2 hours so that the hourly report has time to run
 
 ---
 
@@ -24,4 +23,3 @@ spec:
     value: cluster-memory-utilization-hourly
   schedule:
     period: "daily"
-  gracePeriod: 2h # delay running 2 hours so that the hourly report has time to run

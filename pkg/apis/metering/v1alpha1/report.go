@@ -1,7 +1,7 @@
 package v1alpha1
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -43,18 +43,14 @@ type ReportSpec struct {
 	// will be generated.
 	ReportingEnd *meta.Time `json:"reportingEnd,omitempty"`
 
-	// GracePeriod controls how long after each period to wait until running
-	// the report
-	GracePeriod *meta.Duration `json:"gracePeriod,omitempty"`
-
 	// OverwriteExistingData controls whether or not to delete any existing
 	// data in the report table before the scheduled report runs. Useful for
 	// having a report that is just a snapshot of the most recent data rather
 	// than a log of all runs before it.
 	OverwriteExistingData bool `json:"overwriteExistingData,omitempty"`
 
-	// RunImmediately will run the report immediately, ignoring ReportingStart,
-	// ReportingEnd and GracePeriod.
+	// RunImmediately will run the report immediately, ignoring ReportingStart
+	// and, ReportingEnd.
 	RunImmediately bool `json:"runImmediately,omitempty"`
 
 	// Inputs are the inputs to the ReportGenerationQuery
@@ -116,6 +112,7 @@ type ReportScheduleMonthly struct {
 type ReportStatus struct {
 	Conditions     []ReportCondition `json:"conditions,omitempty"`
 	LastReportTime *meta.Time        `json:"lastReportTime,omitempty"`
+	NextReportTime *meta.Time        `json:"nextReportTime,omitempty"`
 	TableName      string            `json:"tableName"`
 }
 
@@ -142,5 +139,4 @@ type ReportConditionType string
 
 const (
 	ReportRunning ReportConditionType = "Running"
-	ReportFailure ReportConditionType = "Failure"
 )

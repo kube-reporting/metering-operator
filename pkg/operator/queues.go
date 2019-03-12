@@ -185,15 +185,18 @@ func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 	prevReportGenerationQuery := prev.(*cbTypes.ReportGenerationQuery)
 	logger := op.logger.WithFields(log.Fields{"reportGenerationQuery": curReportGenerationQuery.Name, "namespace": curReportGenerationQuery.Namespace})
 
-	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
-		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
-		// Two different versions of the same reportGenerationQuery will always have
-		// different ResourceVersions.
-		logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
-		return
-	}
-	if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
-		logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+	// Only skip queuing if we're not missing a view
+	if curReportGenerationQuery.Spec.View.Disabled && curReportGenerationQuery.Status.ViewName != "" {
+		if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
+			// Periodic resyncs will send update events for all known ReportGenerationQuerys.
+			// Two different versions of the same reportGenerationQuery will always have
+			// different ResourceVersions.
+			logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+			return
+		}
+		if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
+			logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+		}
 	}
 
 	logger.Infof("updating ReportGenerationQuery %s/%s", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)

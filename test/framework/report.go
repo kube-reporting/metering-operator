@@ -10,6 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,8 +20,6 @@ import (
 
 	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	meteringutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func (f *Framework) CreateMeteringReport(report *meteringv1alpha1.Report) error {
@@ -56,45 +57,32 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 	err := f.MeteringClient.Reports(f.Namespace).Delete(report.Name, nil)
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
-	}, "failed to ensure scheduled report doesn't exist before creating scheduled report")
+	}, "failed to ensure Report doesn't exist before creating")
 
-	t.Logf("creating scheduled report %s", report.Name)
+	t.Logf("creating Report %s", report.Name)
 	err = f.CreateMeteringReport(report)
-	require.NoError(t, err, "creating scheduled report should succeed")
+	require.NoError(t, err, "creating Report should succeed")
 
-	reportEnd := report.Spec.ReportingEnd.Time
-
-	err = wait.PollImmediate(time.Second*5, waitTimeout, func() (bool, error) {
+	prevLogMsg := ""
+	err = wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
 		// poll the status
-		newReport, err := f.GetMeteringReport(report.Name)
+		report, err := f.GetMeteringReport(report.Name)
 		if err != nil {
 			return false, err
 		}
-		cond := meteringutil.GetReportCondition(newReport.Status, meteringv1alpha1.ReportFailure)
-		if cond != nil && cond.Status == v1.ConditionTrue {
-			return false, fmt.Errorf("report is failed, reason: %s, message: %s", cond.Reason, cond.Message)
+		cond := meteringutil.GetReportCondition(report.Status, meteringv1alpha1.ReportRunning)
+		if cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringutil.ReportFinishedReason {
+			return true, nil
 		}
 
-		if newReport.Status.TableName == "" {
-			t.Logf("Report %s table isn't created yet, status: %+v", report.Name, newReport.Status)
-			return false, nil
+		newLogMsg := fmt.Sprintf("Report %s not ***REMOVED***nished, status: %s", report.Name, spew.Sprintf("%v", report.Status))
+		if newLogMsg != prevLogMsg {
+			t.Log(newLogMsg)
 		}
-
-		// If the last reportTime is updated, that means this report
-		// has been run at least once.
-		if newReport.Status.LastReportTime == nil {
-			t.Logf("report LastReportTime is unset")
-			return false, nil
-		}
-		t.Logf("report LastReportTime: %s", newReport.Status.LastReportTime)
-		if !(newReport.Status.LastReportTime.Time.After(reportEnd) || newReport.Status.LastReportTime.Time.Equal(reportEnd)) {
-			t.Logf("LastReportTime %s newReport.Status.LastReportTime is not >= reportEnd %s", newReport.Status.LastReportTime, reportEnd)
-			return false, nil
-		}
-		return true, nil
+		prevLogMsg = newLogMsg
+		return false, nil
 	})
-	require.NoError(t, err, "expected getting Report to not timeout")
-
+	require.NoErrorf(t, err, "expected Report to ***REMOVED***nished within %s timeout", waitTimeout)
 }
 
 func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) []map[string]interface{} {
@@ -106,7 +94,7 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 		"namespace": report.Namespace,
 		"format":    "json",
 	}
-	err := wait.PollImmediate(time.Second*5, waitTimeout, func() (bool, error) {
+	err := wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
 		req := f.NewReportingOperatorSVCRequest("/api/v1/reports/get", queryParams)
 		result := req.Do()
 		resp, err := result.Raw()
@@ -115,7 +103,7 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 		var statusCode int
 		result.StatusCode(&statusCode)
 		if statusCode == http.StatusAccepted {
-			t.Logf("report is still running")
+			t.Logf("Report %s is still running", report.Name)
 			return false, nil
 		}
 
@@ -123,10 +111,6 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 		err = json.Unmarshal(resp, &reportResults)
 		require.NoError(t, err, "expected to unmarshal response")
 		reportData = resp
-		if len(reportResults) == 0 {
-			t.Logf("Report %s has 0 results", report.Name)
-			return false, nil
-		}
 		return true, nil
 	})
 	require.NoError(t, err, "expected Report to have 1 row of results before timing out")
