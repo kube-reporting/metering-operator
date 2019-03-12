@@ -102,7 +102,6 @@ spec:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
   reportingStart: '2018-10-09T00:00:00Z'
-  gracePeriod: "10m" # wait for sub-query to ***REMOVED***nish
   schedule:
     period: "daily"
 ```

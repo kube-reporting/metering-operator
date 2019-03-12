@@ -6,7 +6,6 @@ spec:
   generationQuery: "namespace-memory-usage"
   schedule:
     period: "daily"
-  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
 
 ---
 
@@ -18,4 +17,3 @@ spec:
   generationQuery: "namespace-cpu-usage"
   schedule:
     period: "daily"
-  gracePeriod: 1h # delay running 1 hour so that the hourly report has time to run
