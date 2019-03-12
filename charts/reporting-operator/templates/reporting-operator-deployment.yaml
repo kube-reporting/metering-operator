@@ -236,12 +236,17 @@ spec:
 {{ toYaml .Values.spec.readinessProbe | indent 10 }}
         livenessProbe:
 {{ toYaml .Values.spec.livenessProbe | indent 10 }}
-{{- if .Values.spec.con***REMOVED***g.tls.enabled }}
         volumeMounts:
+{{- if .Values.spec.con***REMOVED***g.tls.enabled }}
         - name: api-tls
           mountPath: /tls
         - name: metrics-tls
           mountPath: /metrics-tls
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
+        - mountPath: /var/run/reporting-operator/token
+          name: prometheus-bearer-token
+          subPath: token
 {{- end }}
 {{- if .Values.spec.authProxy.enabled }}
       - name: reporting-operator-auth-proxy
@@ -293,11 +298,6 @@ spec:
         - mountPath: /etc/proxy/authenticated-emails
           name: authenticated-emails-secret
 {{- end }}
-{{- if .Values.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
-        - mountPath: /var/run/reporting-operator/token
-          name: prometheus-bearer-token
-          subPath: token
-{{- end }}
 {{- end }}
       volumes:
 {{- if .Values.spec.con***REMOVED***g.tls.enabled }}
@@ -322,11 +322,11 @@ spec:
         secret:
           secretName: {{ .Values.spec.authProxy.authenticatedEmailsSecretName }}
 {{- end }}
+{{- end }}
 {{- if .Values.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
       - name: prometheus-bearer-token
         secret:
           secretName: {{ .Values.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.name }}
-{{- end }}
 {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
