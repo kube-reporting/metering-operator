@@ -255,7 +255,13 @@ unit:
 	hack/unit.sh
 
 unit-docker: metering-src-docker-build
-	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make unit'
+	docker run \
+		--rm \
+		-t \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make unit
 
 integration:
 	hack/integration.sh
@@ -273,7 +279,13 @@ verify: verify-codegen all-charts metering-manifests fmt
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
 verify-docker: metering-src-docker-build
-	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make verify'
+	docker run \
+		--rm \
+		-t \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make verify
 
 .PHONY: run-metering-operator-local
 run-metering-operator-local: metering-operator-docker-build
