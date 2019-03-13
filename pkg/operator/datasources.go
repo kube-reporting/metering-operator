@@ -190,7 +190,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	if err != nil {
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
-	numResultsImported := len(results.ProcessedTimeRanges)
+	numResultsImported := len(results.Metrics)
 
 	// default to importing at the con***REMOVED***gured import interval
 	importDelay := op.getQueryIntervalForReportDataSource(dataSource)
