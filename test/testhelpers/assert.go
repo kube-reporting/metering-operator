@@ -42,7 +42,7 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 		actualColumns := actualRow.Keys()
 		expectedColumns := expectedRow.Keys()
 
-		assert.Equal(t, actualColumns, expectedColumns, "expecting key iteration between actual and expected to be the same")
+		assert.Equal(t, expectedColumns, actualColumns, "expecting key iteration between actual and expected to be the same")
 		for _, column := range actualColumns {
 
 			actualValue, actualExists := actualRow.Get(column)
