@@ -150,9 +150,9 @@ if [ "$DEPLOY_METERING" == "true" ]; then
     echo "Deploying Metering"
     echo "Storing deploy logs at $DEPLOY_LOG_FILE_PATH"
     if [ "$OUTPUT_DEPLOY_LOG_STDOUT" == "true" ]; then
-        "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" | tee -a "$DEPLOY_LOG_FILE_PATH" 2>&1
+        time "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" | tee -a "$DEPLOY_LOG_FILE_PATH" 2>&1
     ***REMOVED***
-        "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" > "$DEPLOY_LOG_FILE_PATH" 2>&1
+        time "$ROOT_DIR/hack/${DEPLOY_SCRIPT}" > "$DEPLOY_LOG_FILE_PATH" 2>&1
     ***REMOVED***
 ***REMOVED***
 
@@ -163,7 +163,7 @@ if [ "$TEST_METERING" == "true" ]; then
     set +o pipefail
     echo "Running tests"
     # Log the results and store in a ***REMOVED***le
-    "$TEST_SCRIPT" 2>&1 | tee "$TEST_LOG_FILE_PATH"; TEST_EXIT_CODE=${PIPESTATUS[0]}
+    time "$TEST_SCRIPT" 2>&1 | tee "$TEST_LOG_FILE_PATH"; TEST_EXIT_CODE=${PIPESTATUS[0]}
 
     echo "Converting test results"
     # turn the results into json
