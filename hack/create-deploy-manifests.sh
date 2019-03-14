@@ -65,12 +65,6 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
-    -x "templates/crd.yaml" \
-    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$CRD_DIR/metering.crd.yaml"
-
-helm template "$CHART" \
-    "${VALUES_ARGS[@]}" \
     -x "templates/cr.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$OUTPUT_DIR/metering.yaml"

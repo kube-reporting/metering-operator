@@ -1,4 +1,4 @@
-{{- if and .Values.crd.create .Values.cr.create -}}
+{{- if .Values.cr.create -}}
 apiVersion: {{ printf "%s/%s" .Values.crd.apiGroup .Values.crd.apiVersion }}
 kind: {{ .Values.crd.kind }}
 metadata:
