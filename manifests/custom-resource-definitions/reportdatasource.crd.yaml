@@ -3,8 +3,9 @@ kind: CustomResourceDefinition
 metadata:
   name: reportdatasources.metering.openshift.io
   annotations:
-    catalog.app.coreos.com/displayName: "Metering data source"
-    catalog.app.coreos.com/description: "A resource describing a source of data for usage by Report Generation Queries"
+    catalog.app.coreos.com/displayName: Metering Data Source
+    catalog.app.coreos.com/description: A resource describing a source of data for usage by Report Generation Queries.
+    catalog.app.coreos.com/weight: "4"
 spec:
   group: metering.openshift.io
   version: v1alpha1
