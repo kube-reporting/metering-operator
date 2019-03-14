@@ -1,0 +1,144 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "nodes-by-type-raw"
+  labels:
+    telemeter-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportDataSources:
+  - "nodes-by-type"
+  columns:
+  - name: node_count
+    type: double
+    unit: nodes
+  - name: node_seconds
+    type: double
+    unit: node_seconds
+  - name: cluster_uuid
+    type: string
+    unit: uuid
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: timeprecision
+    type: double
+    unit: seconds
+  - name: instance_type
+    type: string
+  - name: compute
+    type: boolean
+  - name: master
+    type: boolean
+  - name: dt
+    type: string
+  query: |
+      SELECT amount as node_count,
+          amount * timeprecision as node_seconds,
+          element_at(labels, 'label_beta_kubernetes_io_instance_type') as instance_type,
+          element_at(labels, '_id') as cluster_uuid,
+          CAST(element_at(labels, 'label_node_role_kubernetes_io_compute') AS BOOLEAN) as compute,
+          CAST(element_at(labels, 'label_node_role_kubernetes_io_master') AS BOOLEAN) as master,
+          timestamp,
+          timeprecision,
+          dt
+      FROM {| dataSourceTableName "nodes-by-type" |}
+
+---
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "compute-nodes-by-type"
+  labels:
+    telemeter-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "nodes-by-type-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: cluster_uuid
+    type: string
+    unit: uuid
+  - name: node_seconds
+    type: double
+    unit: node_seconds
+  - name: instance_type
+    type: string
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  query: |
+    SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+      sum(node_seconds) as node_seconds,
+      cluster_uuid,
+      instance_type as instance_type
+    FROM {| generationQueryViewName "nodes-by-type-raw" |}
+    WHERE compute
+    AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+    GROUP BY cluster_id
+    GROUP BY instance_type
+    ORDER BY node_seconds DESC
+
+---
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "master-nodes-by-type"
+  labels:
+    telemeter-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "nodes-by-type-raw"
+  view:
+    disabled: true
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: cluster_uuid
+    type: string
+    unit: uuid
+  - name: node_seconds
+    type: double
+    unit: node_seconds
+  - name: instance_type
+    type: string
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  query: |
+    SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+      sum(node_seconds) as node_seconds,
+      cluster_uuid,
+      instance_type as instance_type
+    FROM {| generationQueryViewName "nodes-by-type-raw" |}
+    WHERE master
+    AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+    GROUP BY cluster_id
+    GROUP BY instance_type
+    ORDER BY node_seconds DESC

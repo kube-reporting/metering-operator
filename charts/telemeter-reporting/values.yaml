@@ -1,9 +1,13 @@
 spec:
   defaultReportDataSources:
-    machine-cpu-cores-by-cluster-id:
+    vcpus-by-role:
       spec:
         promsum:
-          query: "machine-cpu-cores-by-cluster-id"
+          query: "vcpus-by-role"
+    nodes-by-type:
+      spec:
+        promsum:
+          query: "nodes-by-type"
 
   defaultStorage:
     create: true

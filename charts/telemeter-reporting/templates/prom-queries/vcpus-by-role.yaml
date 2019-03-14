@@ -1,0 +1,7 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportPrometheusQuery
+metadata:
+  name: vcpus-by-role
+spec:
+  query: |
+    cluster:cluster_capacity_cpu_cores:sum

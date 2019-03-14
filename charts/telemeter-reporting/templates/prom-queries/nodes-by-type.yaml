@@ -1,11 +1,11 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
-  name: "machine-cpu-cores-by-cluster-id"
+  name: nodes-by-type
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   query: |
-    sum(machine_cpu_cores) by (_id)
+    cluster:node_instance_type_count:sum
