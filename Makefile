@@ -245,6 +245,10 @@ metering-src-docker-build: Docker***REMOVED***le.src
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
 
+# Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
+fmt:
+	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
+
 # Update dependencies
 vendor: Gopkg.toml
 	dep ensure -v
@@ -255,17 +259,57 @@ unit:
 	hack/unit.sh
 
 unit-docker: metering-src-docker-build
-	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make unit'
+	docker run \
+		--rm \
+		-t \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make unit
 
 integration:
 	hack/integration.sh
 
+integration-docker: metering-src-docker-build
+	docker run \
+		--name metering-integration-docker \
+		-t \
+		-e METERING_NAMESPACE \
+		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
+		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e KUBECONFIG=/kubecon***REMOVED***g \
+		-e TEST_OUTPUT_PATH=/out \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(KUBECONFIG):/kubecon***REMOVED***g \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		-v /out \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make integration
+	rm -rf bin/integration-docker-test-output
+	docker cp metering-integration-docker:/out bin/integration-docker-test-output
+	docker rm metering-integration-docker
+
 e2e:
 	hack/e2e.sh
 
-# Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
-fmt:
-	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
+e2e-docker: metering-src-docker-build
+	docker run \
+		--name metering-e2e-docker \
+		-t \
+		-e METERING_NAMESPACE \
+		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
+		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e KUBECONFIG=/kubecon***REMOVED***g \
+		-e TEST_OUTPUT_PATH=/out \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(KUBECONFIG):/kubecon***REMOVED***g \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		-v /out \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make e2e
+	rm -rf bin/e2e-docker-test-output
+	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
+	docker rm metering-e2e-docker
 
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
 verify: verify-codegen all-charts metering-manifests fmt
@@ -273,7 +317,13 @@ verify: verify-codegen all-charts metering-manifests fmt
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
 verify-docker: metering-src-docker-build
-	docker run -i $(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) bash -c 'make verify'
+	docker run \
+		--rm \
+		-t \
+		-w /go/src/github.com/operator-framework/operator-metering \
+		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
+		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		make verify
 
 .PHONY: run-metering-operator-local
 run-metering-operator-local: metering-operator-docker-build
