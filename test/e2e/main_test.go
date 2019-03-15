@@ -69,6 +69,7 @@ func TestReportingProducesData(t *testing.T) {
 		{queryName: "namespace-memory-request"},
 		{queryName: "namespace-persistentvolumeclaim-request"},
 		{queryName: "namespace-memory-usage"},
+		{queryName: "persistentvolumeclaim-usage"},
 		{queryName: "pod-cpu-request"},
 		{queryName: "pod-cpu-usage"},
 		{queryName: "pod-memory-request"},

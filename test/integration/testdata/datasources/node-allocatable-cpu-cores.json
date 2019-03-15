@@ -1,632 +1,674 @@
 [
   {
-    "labels": {
-      "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
-      "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
-      "service": "kube-state-metrics"
-    },
-    "amount": 2,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
-    "labels": {
-      "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
-      "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
-      "service": "kube-state-metrics"
-    },
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:00:00Z"
+  },
+  {
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:01:00Z"
+  },
+  {
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:02:00Z"
+  },
+  {
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:03:00Z"
+  },
+  {
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:00:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
-    "labels": {
-      "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
-      "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
-      "service": "kube-state-metrics"
-    },
-    "amount": 2,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
-  },
-  {
-    "labels": {
-      "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
-      "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
-      "service": "kube-state-metrics"
-    },
     "amount": 4,
-    "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
-  },
-  {
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
+    "timestamp": "2019-03-11T20:05:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:01:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:00:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:02:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:01:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:03:00Z"
+    "timestamp": "2019-03-11T20:02:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:03:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:04:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-19-81.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-03c46c8aceb9b02bb",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-32-6.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-08d930eb80c14fe39",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-43-217.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-0c73ae62a2d023722",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-48-130.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0a8c2c37c838b9ed0",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-51-221.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-0547bcf923665d04b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:04:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-57-189.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1b/i-00225f6ca32d0d552",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-1168",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
       "service": "kube-state-metrics"
     },
-    "amount": 4,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:05:00Z"
   },
   {
+    "amount": 8,
+    "dt": "2019-03-11",
     "labels": {
       "endpoint": "https-main",
-      "instance": "10.2.9.13:8443",
+      "instance": "172.16.5.137:8443",
       "job": "kube-state-metrics",
-      "namespace": "tectonic-system",
-      "node": "ip-10-0-9-222.us-west-1.compute.internal",
-      "pod": "kube-state-metrics-6c84987c86-rmxkv",
-      "provider_id": "aws:///us-west-1a/i-00e606873cccc014b",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-137l",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
       "service": "kube-state-metrics"
     },
-    "amount": 2,
     "stepSize": 60000000000,
-    "timestamp": "2018-04-13T00:05:00Z"
+    "timestamp": "2019-03-11T20:05:00Z"
+  },
+  {
+    "amount": 8,
+    "dt": "2019-03-11",
+    "labels": {
+      "endpoint": "https-main",
+      "instance": "172.16.5.137:8443",
+      "job": "kube-state-metrics",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-5q7p",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "service": "kube-state-metrics"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:05:00Z"
+  },
+  {
+    "amount": 8,
+    "dt": "2019-03-11",
+    "labels": {
+      "endpoint": "https-main",
+      "instance": "172.16.5.137:8443",
+      "job": "kube-state-metrics",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-7d6s",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "service": "kube-state-metrics"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:05:00Z"
+  },
+  {
+    "amount": 8,
+    "dt": "2019-03-11",
+    "labels": {
+      "endpoint": "https-main",
+      "instance": "172.16.5.137:8443",
+      "job": "kube-state-metrics",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-gpdl",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "service": "kube-state-metrics"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:05:00Z"
+  },
+  {
+    "amount": 8,
+    "dt": "2019-03-11",
+    "labels": {
+      "endpoint": "https-main",
+      "instance": "172.16.5.137:8443",
+      "job": "kube-state-metrics",
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-z7vm",
+      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "service": "kube-state-metrics"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-11T20:05:00Z"
   }
 ]
