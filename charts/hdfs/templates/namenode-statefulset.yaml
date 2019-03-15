@@ -5,6 +5,7 @@ metadata:
   name: hdfs-namenode
   labels:
     app: hdfs-namenode
+    hdfs: namenode
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -14,6 +15,7 @@ spec:
   clusterIP: None
   selector:
     app: hdfs-namenode
+    hdfs: namenode
 
 ---
 
@@ -23,6 +25,7 @@ metadata:
   name: hdfs-namenode-proxy
   labels:
     app: hdfs-namenode
+    hdfs: namenode
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -31,6 +34,7 @@ spec:
     name: fs
   selector:
     app: hdfs-namenode
+    hdfs: namenode
 
 ---
 # A headless service for the web interface.
@@ -40,6 +44,7 @@ metadata:
   name: hdfs-namenode-web
   labels:
     app: hdfs-namenode
+    hdfs: namenode
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -48,6 +53,7 @@ spec:
     name: web
   selector:
     app: hdfs-namenode
+    hdfs: namenode
 ---
 
 apiVersion: apps/v1
@@ -56,6 +62,7 @@ metadata:
   name: hdfs-namenode
   labels:
     app: hdfs-namenode
+    hdfs: namenode
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
@@ -66,6 +73,7 @@ spec:
   selector:
     matchLabels:
       app: hdfs-namenode
+      hdfs: namenode
 {{- if .Values.spec.namenode.labels }}
 {{ toYaml .Values.spec.namenode.labels | indent 6 }}
 {{- end }}
@@ -73,6 +81,7 @@ spec:
     metadata:
       labels:
         app: hdfs-namenode
+        hdfs: namenode
 {{- if .Values.spec.namenode.labels }}
 {{ toYaml .Values.spec.namenode.labels | indent 8 }}
 {{- end }}
@@ -176,6 +185,7 @@ spec:
       name: "hdfs-namenode-data"
       labels:
         app: hdfs-namenode
+        hdfs: namenode
     spec:
       accessModes: ["ReadWriteOnce"]
       storageClassName: {{ .Values.spec.namenode.storage.class }}
