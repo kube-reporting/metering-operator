@@ -1,3 +1,9 @@
+# need helm CLI for ***REMOVED***nal image
+FROM quay.io/coreos/helm:latest as helm
+
+# image needs kubectl, so we copy `oc` from cli image to use as kubectl.
+FROM openshift/origin-cli as cli
+
 FROM openshift/origin-release:golang-1.10
 
 # our copy of faq and jq
@@ -9,25 +15,10 @@ RUN INSTALL_PKGS="curl jq-1.6-2.el7 faq" && \
     yum clean all && \
     rm -rf /var/cache/yum
 
-RUN mkdir -p /out
+COPY --from=cli /usr/bin/oc /usr/bin/oc
+RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
-ENV HELM_VERSION 2.8.0
-RUN curl \
-    --silent \
-    --show-error \
-    --location \
-    "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
-    | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
-    && chmod +x /usr/local/bin/helm
-
-env KUBERNETES_VERSION 1.11.0
-RUN curl \
-    --silent \
-    --show-error \
-    --location \
-    "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl" \
-    -o /usr/local/bin/kubectl \
-    && chmod +x /usr/local/bin/kubectl
+COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 
 ENV STERN_VERSION 1.6.0
 RUN curl \
