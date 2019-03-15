@@ -33,16 +33,15 @@ spec:
     type: string
   query: |
     SELECT
+        labels['exported_namespace'] as namespace,
         element_at(labels, 'exported_namespace') as namespace,
         labels['persistentvolumeclaim'] as persistentvolumeclaim,
         labels,
         amount as persistentvolumeclaim_capacity_bytes,
-        timeprecision,
-        amount * timeprecision as persistentvolumeclaim_capacity_byte_seconds,
+@@ -42,3 +42,46 @@ spec:
         "timestamp",
         dt
     FROM {| dataSourceTableName "persistentvolumeclaim-capacity-bytes" |}
-
 ---
 
 apiVersion: metering.openshift.io/v1alpha1
