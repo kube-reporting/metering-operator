@@ -1,4028 +1,4094 @@
 [
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "node-exporter-d7x4z"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "node-exporter-rsqg6"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "node-exporter-lfftk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "node-exporter-hm968"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "node-exporter-d27kb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "node-exporter-5h5bb"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "node-exporter-qfdwc"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "node-exporter-trf87"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "node-exporter-752gp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "node-exporter-xfbsz"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "node-exporter-8sf7d"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 20971520,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "node-exporter-b68v5"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "node-exporter-x7pdm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 41943040,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "reporting-operator-f6cbf7978-zpz7l"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "cluster-monitoring-operator-6465f8fbc7-j5ng9"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "reporting-operator-68c6d4bdb7-jx2r5"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "reporting-operator-7bff58f9c9-bq7vv"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 52428800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "reporting-operator-854c4495d9-77pxh"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "reporting-operator-598c846dd9-qbfzh"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "reporting-operator-854c4495d9-5htqt"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-755cc859df-z8z7h"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "reporting-operator-68c6d4bdb7-7xws6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 52428800,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "cluster-monitoring-operator-6465f8fbc7-2lhbb"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "prometheus-k8s-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 62914560,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 62914560,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "prometheus-k8s-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 78643200,
-    "dt": "2019-03-11",
+    "amount": 62914560,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "prometheus-k8s-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-9f968bdd9-qr972"
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "metering-operator-d4c79cfcc-dsm5b"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-79b4b94ff6-j6q28"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 78643200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "metering-operator-6cd498c559-ldg68"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-emoss",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "metering-operator-7bc76c48b9-xfhhg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-78db69b6bc-lcjxl"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-d4c79cfcc-xdqk4"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "metering-operator-79b4b94ff6-rqjmb"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 78643200,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "metering-operator-78db69b6bc-84qdg"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "console-5bcb69f49f-n7bdp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-web-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "webconsole-7df4f9f689-42kpb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-web-console",
-      "node": "metering-ci-3-ig-m-91kw",
-      "pod": "webconsole-7df4f9f689-42kpb"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "console-5bcb69f49f-n7bdp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-web-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "webconsole-7df4f9f689-42kpb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-console",
-      "node": "metering-ci-3-ig-m-91kw",
-      "pod": "console-5bcb69f49f-n7bdp"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "console-5bcb69f49f-n7bdp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-web-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "webconsole-7df4f9f689-42kpb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "console-5bcb69f49f-n7bdp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-web-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "webconsole-7df4f9f689-42kpb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-web-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "webconsole-7df4f9f689-42kpb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-console",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "console-5bcb69f49f-n7bdp"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 104857600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "grafana-6b9f85786f-rnqnb"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 104857600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-console",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "console-5bcb69f49f-n7bdp"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 104857600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-web-console",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "webconsole-7df4f9f689-42kpb"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 104857600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "grafana-6b9f85786f-8g6jt"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "sdn-6q4m8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "sdn-rjqlq"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "sdn-jd7tm"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "sdn-4t5n7"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "sdn-jf6r5"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "sdn-x8tbg"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "sdn-npbmk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "sdn-6mdf6"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "sdn-ssnxk"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "sdn-lngnx"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "sdn-kxzlf"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 209715200,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "sdn-wq8ll"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "sdn-c65vl"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "alertmanager-main-2"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 220200960,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "alertmanager-main-1"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 220200960,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-mvz5",
       "pod": "alertmanager-main-2"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-qq08",
       "pod": "alertmanager-main-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-mvz5",
       "pod": "alertmanager-main-2"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-qq08",
       "pod": "alertmanager-main-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-mvz5",
       "pod": "alertmanager-main-2"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-qq08",
       "pod": "alertmanager-main-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-mvz5",
       "pod": "alertmanager-main-2"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-qq08",
       "pod": "alertmanager-main-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-mvz5",
       "pod": "alertmanager-main-2"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-qq08",
       "pod": "alertmanager-main-1"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 220200960,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "alertmanager-main-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 220200960,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "alertmanager-main-2"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 220200960,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "openshift-monitoring",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "alertmanager-main-1"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hdfs-datanode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 262144000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hdfs-datanode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 262144000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hdfs-datanode-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 262144000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hdfs-datanode-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hdfs-datanode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 262144000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 262144000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hdfs-datanode-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 262144000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "docker-registry-1-lr7bd"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "docker-registry-1-n92br"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 268435456,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "default",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "router-1-h6sdw"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "router-1-9dgxn"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-m-91kw",
-      "pod": "ovs-5jdcb"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-m-91kw",
-      "pod": "ovs-5jdcb"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
       "node": "metering-ci-3-ig-m-91kw",
       "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "ovs-g4hks"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "ovs-4r8qd"
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "ovs-956t5"
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "ovs-9bg5z"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "ovs-dkncj"
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 314572800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "openshift-sdn",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "ovs-58cbr"
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-m-91kw",
+      "pod": "ovs-5jdcb"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "ovs-dqbk8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "ovs-gdzww"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "ovs-dfjm8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "ovs-rgm6j"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "ovs-s9dvq"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "amount": 314572800,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
+      "namespace": "openshift-sdn",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "ovs-29zh8"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 367001600,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
-  },
-  {
-    "amount": 367001600,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hdfs-namenode-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 367001600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 367001600,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 367001600,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "hdfs-namenode-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-server-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 524288000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-server-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 524288000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 524288000,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-server-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 524288000,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-server-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hdfs-namenode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 681574400,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "hive-metastore-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 681574400,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-kgpx",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 681574400,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "hive-metastore-0"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 838860800,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-g0s3",
       "pod": "hdfs-datanode-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hive-metastore-0"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "hive-metastore-0"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 1572864000,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-8p04",
       "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "hive-metastore-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "amount": 1572864000,
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "hive-server-0"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
-    "labels": {
-      "namespace": "metering",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-57497f869-29fdw"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
-  },
-  {
-    "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "telemeter-tschuy",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "presto-coordinator-694d4bc86-k6zdd"
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "presto-coordinator-7c7f57955b-jswlh"
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 2147483648,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
-      "namespace": "metering-emoss",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "presto-coordinator-c5b88f47b-ph6cj"
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "telemeter-tschuy",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "presto-coordinator-694d4bc86-crs7m"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-7c7f57955b-tlmrw"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-tschuy",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "presto-coordinator-b669fb545-hwf4h"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 2147483648,
+    "dt": "2019-03-18",
+    "labels": {
+      "namespace": "metering-chancez",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "presto-coordinator-7546ddcbd-pn4z6"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
   }
 ]

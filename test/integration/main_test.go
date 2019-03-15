@@ -190,6 +190,19 @@ var (
 			comparisonColumnNames:        []string{"persistentvolumeclaim_usage_bytes"},
 			timeout:                      reportTestTimeout,
 		},
+		{
+			name:      "persistentvolumeclaim-capacity",
+			queryName: "persistentvolumeclaim-capacity",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "persistentvolumeclaim-capacity-bytes",
+					FileName:       "testdata/datasources/persistentvolumeclaim-capacity-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/persistentvolumeclaim-capacity.json",
+			comparisonColumnNames:        []string{"persistentvolumeclaim_capacity_bytes"},
+			timeout:                      reportTestTimeout,
+		},
 	}
 )
 

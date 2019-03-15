@@ -1,9 +1,9 @@
 [
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -16,10 +16,10 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -32,10 +32,10 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -48,10 +48,10 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -64,10 +64,10 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -80,10 +80,10 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -96,10 +96,10 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -112,10 +112,10 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -128,10 +128,10 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -144,10 +144,10 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -160,10 +160,10 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -176,10 +176,10 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -192,10 +192,10 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -208,10 +208,10 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -224,10 +224,10 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -240,10 +240,10 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.12:10250",
@@ -256,10 +256,10 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.9:10250",
@@ -272,10 +272,10 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 6295552,
+    "amount": 2046640128,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.11:10250",
@@ -288,298 +288,58 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 26779648,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
       "job": "kubelet",
       "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
       "service": "kubelet"
     },
     "stepSize": 60000000000,
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 26779648,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "telemeter-tschuy",
       "instance": "10.138.0.12:10250",
       "job": "kubelet",
       "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 26779648,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 26779648,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 26779648,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 26779648,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 27217920,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
       "service": "kubelet"
     },
     "stepSize": 60000000000,
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 27217920,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 27217920,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 27217920,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 27217920,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 27217920,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.13:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 28372992,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
+      "instance": "10.138.0.14:10250",
       "job": "kubelet",
       "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
       "service": "kubelet"
     },
     "stepSize": 60000000000,
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 28372992,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 28372992,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 28372992,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 28372992,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 28372992,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hive-metastore-db-data",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 31485952,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -592,10 +352,138 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 31485952,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -608,10 +496,138 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 31485952,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -624,10 +640,138 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 31485952,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -640,10 +784,138 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 31485952,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -656,10 +928,138 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 31485952,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.10:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-chancez",
       "instance": "10.138.0.11:10250",
@@ -672,10 +1072,106 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 5150212096,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "telemeter-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-tschuy",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 5150212096,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-chancez",
+      "instance": "10.138.0.13:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hive-metastore-db-data",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -688,10 +1184,26 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 21003583488,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -704,10 +1216,26 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 21003583488,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -720,10 +1248,26 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 21003583488,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -736,10 +1280,26 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 21003583488,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -752,10 +1312,26 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 54284288,
+    "amount": 21003583488,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
+      "instance": "10.138.0.14:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:05:00Z"
+  },
+  {
+    "amount": 21003583488,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.14:10250",
@@ -768,586 +1344,10 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 65646592,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 65646592,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 65695744,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 65695744,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 65802240,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 65818624,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-chancez",
-      "instance": "10.138.0.10:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 250396672,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 350916608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 422563840,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 422588416,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 422588416,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 422596608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 422596608,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 422649856,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "telemeter-tschuy",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 438460416,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 438476800,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 438550528,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 438550528,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 438620160,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 438620160,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-tschuy",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-datanode-data-hdfs-datanode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 1094742016,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 1094742016,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 1095790592,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 1095790592,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 1095790592,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 1095790592,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
-      "instance": "10.138.0.14:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "hdfs-namenode-data-hdfs-namenode-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:05:00Z"
-  },
-  {
-    "amount": 1471401984,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1360,10 +1360,10 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 1471401984,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1376,10 +1376,10 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 1471549440,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1392,10 +1392,10 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 1471557632,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1408,10 +1408,10 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 1471557632,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1424,10 +1424,10 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 1471574016,
+    "amount": 31572529152,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "metering-ci2-openshift-continuous-upgrade-master",
       "instance": "10.138.0.13:10250",
@@ -1440,10 +1440,26 @@
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "openshift-monitoring",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:00:00Z"
+  },
+  {
+    "amount": 52710309888,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.10:10250",
@@ -1456,10 +1472,26 @@
     "timestamp": "2019-03-18T16:00:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "openshift-monitoring",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:01:00Z"
+  },
+  {
+    "amount": 52710309888,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.10:10250",
@@ -1472,10 +1504,26 @@
     "timestamp": "2019-03-18T16:01:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "openshift-monitoring",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:02:00Z"
+  },
+  {
+    "amount": 52710309888,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.10:10250",
@@ -1488,10 +1536,26 @@
     "timestamp": "2019-03-18T16:02:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "openshift-monitoring",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:03:00Z"
+  },
+  {
+    "amount": 52710309888,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.10:10250",
@@ -1504,10 +1568,26 @@
     "timestamp": "2019-03-18T16:03:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
+      "endpoint": "https-metrics",
+      "exported_namespace": "openshift-monitoring",
+      "instance": "10.138.0.12:10250",
+      "job": "kubelet",
+      "namespace": "kube-system",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "service": "kubelet"
+    },
+    "stepSize": 60000000000,
+    "timestamp": "2019-03-18T16:04:00Z"
+  },
+  {
+    "amount": 52710309888,
+    "dt": "2019-03-18",
+    "labels": {
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
       "instance": "10.138.0.10:10250",
@@ -1520,112 +1600,32 @@
     "timestamp": "2019-03-18T16:04:00Z"
   },
   {
-    "amount": 5524279296,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.10:10250",
+      "instance": "10.138.0.12:10250",
       "job": "kubelet",
       "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-1",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
       "service": "kubelet"
     },
     "stepSize": 60000000000,
     "timestamp": "2019-03-18T16:05:00Z"
   },
   {
-    "amount": 5741199360,
+    "amount": 52710309888,
     "dt": "2019-03-18",
     "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
+      "__name__": "kubelet_volume_stats_capacity_bytes",
       "endpoint": "https-metrics",
       "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
+      "instance": "10.138.0.10:10250",
       "job": "kubelet",
       "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:00:00Z"
-  },
-  {
-    "amount": 5741199360,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:01:00Z"
-  },
-  {
-    "amount": 5741199360,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:02:00Z"
-  },
-  {
-    "amount": 5741199360,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:03:00Z"
-  },
-  {
-    "amount": 5741199360,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
-      "service": "kubelet"
-    },
-    "stepSize": 60000000000,
-    "timestamp": "2019-03-18T16:04:00Z"
-  },
-  {
-    "amount": 5741199360,
-    "dt": "2019-03-18",
-    "labels": {
-      "__name__": "kubelet_volume_stats_used_bytes",
-      "endpoint": "https-metrics",
-      "exported_namespace": "openshift-monitoring",
-      "instance": "10.138.0.12:10250",
-      "job": "kubelet",
-      "namespace": "kube-system",
-      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-0",
+      "persistentvolumeclaim": "prometheus-k8s-db-prometheus-k8s-1",
       "service": "kubelet"
     },
     "stepSize": 60000000000,
