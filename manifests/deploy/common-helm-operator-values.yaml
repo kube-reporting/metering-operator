@@ -6,7 +6,7 @@ cr:
   spec: {}
 
 crd:
-  create: true
+  create: false
   apiGroup: metering.openshift.io
   apiVersion: v1alpha1
 
@@ -14,10 +14,6 @@ crd:
   singular: metering
   kind: Metering
   listKind: MeteringList
-
-  annotations:
-    catalog.app.coreos.com/displayName: "Metering"
-    catalog.app.coreos.com/description: "An instance of Metering"
 
 targetNamespacesDownwardAPIValueFrom:
   ***REMOVED***eldRef:
