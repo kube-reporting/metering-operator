@@ -2,3 +2,4 @@ packageName: metering
 channels:
 - currentCSV: metering-operator.v0.13.0-latest
   name: alpha
+

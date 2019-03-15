@@ -36,6 +36,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.annotations['olm.targetNamespaces']
+
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:
@@ -100,3 +101,4 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       serviceAccount: metering-operator
+

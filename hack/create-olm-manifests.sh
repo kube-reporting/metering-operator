@@ -47,7 +47,7 @@ fi
 mkdir -p "$OUTPUT_DIR"
 
 JQ_CRD_SCRIPT=$(cat <<EOF
-sort_by(.metadata.name) |
+sort_by(.metadata.annotations["catalog.app.coreos.com/weight"]) |
 {
     csv: {
         customresourcedefinitions: {
