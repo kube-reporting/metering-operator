@@ -1,13 +1,13 @@
 spec:
   defaultReportDataSources:
-    vcpus-by-role:
+    cpus-by-node-role:
       spec:
         promsum:
-          query: "vcpus-by-role"
-    nodes-by-type:
+          query: "cpus-by-node-role"
+    nodes-by-instance-type:
       spec:
         promsum:
-          query: "nodes-by-type"
+          query: "nodes-by-instance-type"
 
   defaultStorage:
     create: true

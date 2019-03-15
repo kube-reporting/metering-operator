@@ -1,7 +1,7 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportPrometheusQuery
 metadata:
-  name: nodes-by-type
+  name: nodes-by-instance-type
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}

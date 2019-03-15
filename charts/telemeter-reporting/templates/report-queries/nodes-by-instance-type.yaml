@@ -1,14 +1,14 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "nodes-by-type-raw"
+  name: "nodes-by-instance-type-raw"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportDataSources:
-  - "nodes-by-type"
+  - "nodes-by-instance-type"
   columns:
   - name: node_count
     type: double
@@ -43,20 +43,20 @@ spec:
           timestamp,
           timeprecision,
           dt
-      FROM {| dataSourceTableName "nodes-by-type" |}
+      FROM {| dataSourceTableName "nodes-by-instance-type" |}
 
 ---
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "compute-nodes-by-type"
+  name: "compute-nodes-by-instance-type"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "nodes-by-type-raw"
+  - "nodes-by-instance-type-raw"
   view:
     disabled: true
   columns:
@@ -84,7 +84,7 @@ spec:
       sum(node_seconds) as node_seconds,
       cluster_uuid,
       instance_type as instance_type
-    FROM {| generationQueryViewName "nodes-by-type-raw" |}
+    FROM {| generationQueryViewName "nodes-by-instance-type-raw" |}
     WHERE compute
     AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
@@ -98,14 +98,14 @@ spec:
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "master-nodes-by-type"
+  name: "master-nodes-by-instance-type"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "nodes-by-type-raw"
+  - "nodes-by-instance-type-raw"
   view:
     disabled: true
   columns:
@@ -133,7 +133,7 @@ spec:
       sum(node_seconds) as node_seconds,
       cluster_uuid,
       instance_type as instance_type
-    FROM {| generationQueryViewName "nodes-by-type-raw" |}
+    FROM {| generationQueryViewName "nodes-by-instance-type-raw" |}
     WHERE master
     AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'

@@ -1,19 +1,19 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "vcpus-by-role-raw"
+  name: "cpus-by-node-role-raw"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportDataSources:
-  - "vcpus-by-role"
+  - "cpus-by-node-role"
   columns:
-  - name: vcpu_cores
+  - name: cpu_cores
     type: double
     unit: cpu_cores
-  - name: vcpu_core_seconds
+  - name: cpu_core_seconds
     type: double
     unit: cpu_core_seconds
   - name: cluster_uuid
@@ -32,28 +32,28 @@ spec:
   - name: dt
     type: string
   query: |
-      SELECT amount as vcpu_cores,
-          amount * timeprecision as vcpu_core_seconds,
+      SELECT amount as cpu_cores,
+          amount * timeprecision as cpu_core_seconds,
           element_at(labels, '_id') as cluster_uuid,
           CAST(element_at(labels, 'label_node_role_kubernetes_io_compute') AS BOOLEAN) as compute,
           CAST(element_at(labels, 'label_node_role_kubernetes_io_master') AS BOOLEAN) as master,
           timestamp,
           timeprecision,
           dt
-      FROM {| dataSourceTableName "vcpus-by-role" |}
+      FROM {| dataSourceTableName "cpus-by-node-role" |}
 
 ---
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "compute-vcpus-by-role"
+  name: "compute-cpus-by-node-role"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "vcpus-by-role-raw"
+  - "cpus-by-node-role-raw"
   view:
     disabled: true
   columns:
@@ -66,7 +66,7 @@ spec:
   - name: cluster_uuid
     type: string
     unit: uuid
-  - name: vcpu_core_seconds
+  - name: cpu_core_seconds
     type: double
     unit: cpu_core_seconds
   inputs:
@@ -76,29 +76,29 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      sum(vcpu_core_seconds) as vcpu_core_seconds,
+      sum(cpu_core_seconds) as cpu_core_seconds,
       cluster_uuid
-    FROM {| generationQueryViewName "vcpus-by-role-raw" |}
+    FROM {| generationQueryViewName "cpus-by-node-role-raw" |}
     WHERE compute
     AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY cluster_uuid
-    ORDER BY vcpu_core_seconds DESC
+    ORDER BY cpu_core_seconds DESC
 
 ---
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "master-vcpus-by-role"
+  name: "master-cpus-by-node-role"
   labels:
     telemeter-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
   reportQueries:
-  - "vcpus-by-role-raw"
+  - "cpus-by-node-role-raw"
   view:
     disabled: true
   columns:
@@ -111,9 +111,9 @@ spec:
   - name: cluster_uuid
     type: string
     unit: uuid
-  - name: vcpu_core_seconds
+  - name: cpu_core_seconds
     type: double
-    unit: vcpu_core_seconds
+    unit: cpu_core_seconds
   inputs:
   - name: ReportingStart
   - name: ReportingEnd
@@ -121,13 +121,13 @@ spec:
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      sum(vcpu_core_seconds) as vcpu_core_seconds,
+      sum(cpu_core_seconds) as cpu_core_seconds,
       cluster_uuid
-    FROM {| generationQueryViewName "vcpus-by-role-raw" |}
+    FROM {| generationQueryViewName "cpus-by-node-role-raw" |}
     WHERE master
     AND "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY cluster_id
-    ORDER BY vcpu_core_seconds DESC
+    ORDER BY cpu_core_seconds DESC
