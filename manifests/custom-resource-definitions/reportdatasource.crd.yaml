@@ -27,6 +27,12 @@ spec:
   - name: Newest Metric
     type: string
     JSONPath: .status.prometheusMetricImportStatus.newestImportedMetricTime
+  - name: Import Start
+    type: string
+    JSONPath: .status.prometheusMetricImportStatus.importDataStartTime
+  - name: Import End
+    type: string
+    JSONPath: .status.prometheusMetricImportStatus.importDataEndTime
   - name: Last Import Time
     type: string
     JSONPath: .status.prometheusMetricImportStatus.lastImportTime
