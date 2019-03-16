@@ -25,6 +25,13 @@ image:
   pullPolicy: Always
 
 serviceAccountName: metering-operator
+resources:
+  requests:
+    memory: "100Mi"
+    cpu: "50m"
+  limits:
+    memory: "100Mi"
+    cpu: "50m"
 
 rbac:
   clusterRoleName: metering-operator
