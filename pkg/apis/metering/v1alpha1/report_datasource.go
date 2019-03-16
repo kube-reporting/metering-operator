@@ -67,6 +67,8 @@ type PrometheusMetricImportStatus struct {
 	// LastImportTime is the time the import last import was ran.
 	LastImportTime *meta.Time `json:"lastImportTime,omitempty"`
 
+	// ImportDataStartTime is the start of the time first time range queried.
+	ImportDataStartTime *meta.Time `json:"importDataStartTime,omitempty"`
 	// ImportDataEndTime is the end of the time last time range queried.
 	ImportDataEndTime *meta.Time `json:"importDataEndTime,omitempty"`
 

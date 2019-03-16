@@ -53,7 +53,7 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 
 	var importResults PrometheusImportResults
 	if len(timeRanges) == 0 {
-		logger.Infof("no time ranges to query yet for table %s", cfg.PrestoTableName)
+		logger.Debugf("no time ranges to query yet for table %s", cfg.PrestoTableName)
 		return importResults, nil
 	}
 
