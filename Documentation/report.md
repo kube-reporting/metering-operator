@@ -223,8 +223,8 @@ spec:
 
 ### runImmediately
 
-Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingEnd` setting.
-For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing.
+Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingStart` or `reportingEnd` values, and without checking if there is any data for the report period.
+For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing and all reportPeriods between `reportingStart` and `reportingEnd`.
 
 ### Inputs
 
