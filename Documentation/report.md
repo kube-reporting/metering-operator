@@ -7,7 +7,9 @@ Metering produces reports derived from usage data sources which can be used in f
 
 A single `Report` resource represents a report which is updated with new information according to a schedule.
 Reports with a `spec.schedule` field set are always running, and will track what time periods it has collected data for, ensuring that if Metering is shutdown or unavailable for an extended period of time, it will backfill the data starting where it left off.
-If it's unset, then the Report will run once for the time specified by the reportingStart and reportingEnd.
+If the schedule is unset, then the Report will run once for the time specified by the reportingStart and reportingEnd.
+By default, reports will wait for ReportDataSources to have the progressed in their import process to cover the report period being processed.
+If the report has a schedule, it will wait until the period currently being processed has been covered by the import process.
 
 ## Example Report with a Schedule
 
@@ -223,8 +225,8 @@ spec:
 
 ### runImmediately
 
-Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingEnd` setting.
-For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing.
+Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingStart` or `reportingEnd` values, and without checking if there is any data for the report period.
+For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing and all reportPeriods between `reportingStart` and `reportingEnd`.
 
 ### Inputs
 
