@@ -185,96 +185,94 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return err
 	}
 
-	importTime := op.clock.Now().UTC()
+	if dataSource.Status.PrometheusMetricImportStatus == nil {
+		dataSource.Status.PrometheusMetricImportStatus = &cbTypes.PrometheusMetricImportStatus{}
+	}
+
+	// record the lastImportTime
+	dataSource.Status.PrometheusMetricImportStatus.LastImportTime = &metav1.Time{op.clock.Now().UTC()}
+
+	// run the import
 	results, err := importer.ImportFromLastTimestamp(context.Background(), allowIncompleteChunks)
 	if err != nil {
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
-	numResultsImported := len(results.Metrics)
 
-	// default to importing at the con***REMOVED***gured import interval
+	// Default to importing at the con***REMOVED***gured import interval.
 	importDelay := op.getQueryIntervalForReportDataSource(dataSource)
 
-	var (
-		earliestImportedMetricTime,
-		newestImportedMetricTime,
-		importDataEndTime *metav1.Time
-	)
-	if dataSource.Status.PrometheusMetricImportStatus != nil {
-		if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime != nil {
-			earliestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime
-		}
-		if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime != nil {
-			newestImportedMetricTime = dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime
-		}
-		if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime != nil {
-			importDataEndTime = dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime
-		}
-	}
-
-	// determine if we need to adjust our next import and update the status
-	// information if we've imported new metrics.
-	if numResultsImported != 0 {
+	if len(results.ProcessedTimeRanges) == 0 {
+		logger.Warnf("no time ranges processed for ReportDataSource %s", dataSource.Name)
+	} ***REMOVED*** {
 		// This is the last timeRange we processed, and we use the End time on
 		// this to determine what time range the importer attempted to import
 		// up until, for tracking our process
+		***REMOVED***rstTimeRange := results.ProcessedTimeRanges[0]
 		lastTimeRange := results.ProcessedTimeRanges[len(results.ProcessedTimeRanges)-1]
 
-		// These are the ***REMOVED***rst and last metric from the import, which we use to
-		// determine the data we've actually imported, versus what we've asked
-		// for.
-		***REMOVED***rstMetric := results.Metrics[0]
-		lastMetric := results.Metrics[len(results.Metrics)-1]
-
-		// if there is no existing timestamp then this must be the ***REMOVED***rst import
-		// and we should set the earliestImportedMetricTime
-		if earliestImportedMetricTime == nil {
-			earliestImportedMetricTime = &metav1.Time{***REMOVED***rstMetric.Timestamp}
-		} ***REMOVED*** if earliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
-			dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
-			// TODO(chance): Look at adding an error to the status.
-			return nil // strop processing this ReportDataSource
+		// Update the timestamp which records the ***REMOVED***rst timestamp we attempted
+		// to query from.
+		if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || ***REMOVED***rstTimeRange.Start.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
+			dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime = &metav1.Time{***REMOVED***rstTimeRange.Start}
 		}
-
-		if newestImportedMetricTime == nil || newestImportedMetricTime.Time.Before(lastMetric.Timestamp) {
-			newestImportedMetricTime = &metav1.Time{lastMetric.Timestamp}
-		}
-
 		// Update the timestamp which records the latest we've attempted to query
 		// up until.
-		if importDataEndTime == nil || importDataEndTime.Time.Before(lastTimeRange.End) {
-			importDataEndTime = &metav1.Time{lastTimeRange.End}
+		if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time.Before(lastTimeRange.End) {
+			dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime = &metav1.Time{lastTimeRange.End}
 		}
-		// the data we collected is farther back than 1.5 their chunkSize, so requeue sooner
+
+		// The data we collected is farther back than 1.5 their chunkSize, so requeue sooner
 		// since we're backlogged. We use 1.5 because being behind 1 full chunk
-		// is typical, but we shouldn't be 2 full chunks after catching up
+		// is typical, but we shouldn't be 2 full chunks after catching up.
 		backlogDetectionDuration := time.Duration(1.5*importerCfg.ChunkSize.Seconds()) * time.Second
-		backlogDuration := op.clock.Now().Sub(newestImportedMetricTime.Time)
+		backlogDuration := op.clock.Now().Sub(dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time)
 		if backlogDuration > backlogDetectionDuration {
 			// import delay has jitter so that processing backlogged
 			// ReportDataSources happens in a more randomized order to allow
 			// all of them to get processed when the queue is blocked.
 			importDelay = wait.Jitter(5*time.Second, 2)
-			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, newestImportedMetricTime.Time, backlogDuration, importDelay)
+			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time, backlogDuration, importDelay)
 		}
-	}
 
-	// Update the status to indicate where we are in the metric import process
-	dataSource.Status.PrometheusMetricImportStatus = &cbTypes.PrometheusMetricImportStatus{
-		EarliestImportedMetricTime: earliestImportedMetricTime,
-		NewestImportedMetricTime:   newestImportedMetricTime,
-		ImportDataEndTime:          importDataEndTime,
-		LastImportTime:             &metav1.Time{importTime},
-	}
-	dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
-	if err != nil {
-		return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSource.Name, err)
+		if len(results.Metrics) != 0 {
+			// These are the ***REMOVED***rst and last metric from the import, which we use to
+			// determine the data we've actually imported, versus what we've asked
+			// for.
+			***REMOVED***rstMetric := results.Metrics[0]
+			lastMetric := results.Metrics[len(results.Metrics)-1]
+
+			// if there is no existing timestamp then this must be the ***REMOVED***rst import
+			// and we should set the earliestImportedMetricTime
+			if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime == nil {
+				dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime = &metav1.Time{***REMOVED***rstMetric.Timestamp}
+			} ***REMOVED*** if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
+				dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
+				// TODO(chance): Look at adding an error to the status.
+				return nil // strop processing this ReportDataSource
+			}
+
+			if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime == nil || lastMetric.Timestamp.After(dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime.Time) {
+				dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime = &metav1.Time{lastMetric.Timestamp}
+			}
+
+			if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
+				logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
+			}
+			if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+				logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+			}
+		}
+
+		// Update the status to indicate where we are in the metric import process
+		dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+		if err != nil {
+			return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSource.Name, err)
+		}
 	}
 
 	nextImport := op.clock.Now().Add(importDelay).UTC()
 	logger.Infof("queuing Prometheus ReportDataSource %s to import data again in %s at %s", dataSource.Name, importDelay, nextImport)
 	op.enqueueReportDataSourceAfter(dataSource, importDelay)
-	op.queueDependentsOfDataSource(dataSource)
 	return nil
 }
 
@@ -342,7 +340,12 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	logger.Infof("queuing AWSBilling ReportDataSource %s to update partitions again in %s at %s", dataSource.Name, partitionUpdateInterval, nextUpdate)
 	op.enqueueReportDataSourceAfter(dataSource, partitionUpdateInterval)
 
-	op.queueDependentsOfDataSource(dataSource)
+	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
+	}
+	if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+	}
 	return nil
 }
 
@@ -591,14 +594,4 @@ func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.Repo
 
 	}
 	return nil
-}
-
-func (op *Reporting) queueDependentsOfDataSource(dataSource *cbTypes.ReportDataSource) {
-	logger := op.logger.WithFields(log.Fields{"reportDataSource": dataSource.Name, "namespace": dataSource.Namespace})
-	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
-		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
-	}
-	if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
-		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
-	}
 }
