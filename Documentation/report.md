@@ -183,10 +183,9 @@ For cron periods, normal cron expressions are valid:
 To support running a Report against existing data, you can set the `spec.reportingStart` field to a RFC3339 timestamp to tell the Report to run according to its `schedule` starting from `reportingStart` rather than the current time.
 One important thing to understand is that this will result in the reporting-operator running many queries in succession for each interval in the schedule that's between the `reportingStart` time and the current time.
 This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
+If `reportingStart` is left unset, the Report will run at the next full reportingPeriod after the time the report is created.
 
 As an example of how to use this field, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your Report, you could create a report with the following values:
-
-*`reportingStart` is a required field. *
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
