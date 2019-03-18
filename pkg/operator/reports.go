@@ -244,9 +244,6 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	if report.Spec.GenerationQueryName == "" {
 		return op.setReportStatusInvalidReport(report, "must set spec.generationQuery")
 	}
-	if report.Spec.ReportingStart == nil {
-		return op.setReportStatusInvalidReport(report, "must set spec.reportingStart")
-	}
 	// Validate the reportingStart and reportingEnd make sense and are set when
 	// required.
 	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
@@ -293,8 +290,15 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			if report.Spec.ReportingStart != nil {
 				logger.Infof("no last report time for report, using spec.reportingStart %s as starting point", report.Spec.ReportingStart.Time)
 				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Spec.ReportingStart.Time)
+			} else if report.Status.NextReportTime != nil {
+				logger.Infof("no last report time for report, using status.nextReportTime %s as starting point", report.Status.NextReportTime.Time)
+				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.NextReportTime.Time)
 			} else {
-				return op.setReportStatusInvalidReport(report, "must set spec.reportingStart")
+				// the current period, [now, nextScheduledTime]
+				currentPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, now)
+				// the next full report period from [nextScheduledTime, nextScheduledTime+1]
+				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, currentPeriod.periodEnd)
+				report.Status.NextReportTime = &metav1.Time{reportPeriod.periodStart}
 			}
 		}
 	} else {
@@ -559,11 +563,11 @@ func getRunOnceReportPeriod(report *cbTypes.Report) (*reportPeriod, error) {
 }
 
 func getNextReportPeriod(schedule reportSchedule, period cbTypes.ReportPeriod, lastScheduled time.Time) *reportPeriod {
-	periodStart := lastScheduled
+	periodStart := lastScheduled.UTC()
 	periodEnd := schedule.Next(periodStart)
 	return &reportPeriod{
-		periodEnd:   periodEnd.Truncate(time.Millisecond).UTC(),
 		periodStart: periodStart.Truncate(time.Millisecond).UTC(),
+		periodEnd:   periodEnd.Truncate(time.Millisecond).UTC(),
 	}
 }
 
