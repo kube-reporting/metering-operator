@@ -67,12 +67,7 @@ spec:
         - name: RELEASE_HISTORY_LIMIT
           value: "3"
         resources:
-          requests:
-            memory: "25Mi"
-            cpu: "50m"
-          limits:
-            memory: "25Mi"
-            cpu: "50m"
+{{ toYaml .Values.resources | indent 10 }}
       - name: tiller
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         args: ["tiller"]

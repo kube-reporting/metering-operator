@@ -32,7 +32,6 @@ trap setNeedsExit SIGINT SIGTERM
 CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
 CR_DIRECTORY=/tmp/custom-resources
 UPGRADE_RESULT_DIRECTORY=/tmp/helm-upgrade-result
-RESOURCE_VERSIONS_DIRECTORY=/tmp/resource-versions
 OWNER_PATCH_FILE=/tmp/owner-patch.json
 OWNER_VALUES_FILE=/tmp/owner-values.yaml
 RELEASE_CONFIGMAPS_FILE=/tmp/release-configmaps.json
@@ -137,18 +136,21 @@ helmUpgrade() {
     RELEASE_NAME=$1
     CHART_LOCATION=$2
     NAMESPACE=$3
-    helm upgrade \
+    if helm upgrade \
         --install \
         --namespace "$NAMESPACE" \
-        --wait="$HELM_WAIT" \
         --force \
+        --wait="$HELM_WAIT" \
         --timeout="$HELM_WAIT_TIMEOUT" \
         "$RELEASE_NAME"\
         "$CHART_LOCATION" \
-        "${@:4}"
-    HELM_EXIT_CODE=$?
-    if [ $HELM_EXIT_CODE != 0 ]; then
-        echo "helm upgrade failed, exit code: $HELM_EXIT_CODE"
+        "${@:4}";
+    then
+        echo "Helm upgrade succeeded"
+        return 0
+    else
+        echo "Helm upgrade failed"
+        return 1
     fi
 }
 
@@ -233,7 +235,7 @@ while true; do
         RESOURCE_UID="$(jq -Mcr '.metadata.uid' "$CR_FILE")"
         RESOURCE_API_VERSION="$(jq -Mcr '.apiVersion' "$CR_FILE")"
         RESOURCE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CR_FILE")"
-        RESOURCE_VALUES="$(jq -Mcr '.spec // empty' "$CR_FILE")"
+        RESOURCE_VALUES="$(jq -Mcr '.spec // {}' "$CR_FILE")"
         CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CR_FILE")"
         # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
         CHART="${CHART_LOCATION:-$HELM_CHART_PATH}"
@@ -259,22 +261,21 @@ while true; do
             HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
         fi
 
-        if [ -z "$RESOURCE_VALUES" ]; then
-            echo "No values for $FULL_RESOURCE_NAME, using default values"
-        else
-            VALUES_FILE="/tmp/$RESOURCE_NAMESPACE-$RESOURCE_NAME-values.yaml"
-            echo -E "$RESOURCE_VALUES" > "$VALUES_FILE"
+        VALUES_FILE="/tmp/$RESOURCE_NAMESPACE-$RESOURCE_NAME-values.yaml"
+        NEW_VALUES_FILE="/tmp/$RESOURCE_NAMESPACE-$RESOURCE_NAME-values-NEW.yaml"
 
-            HELM_ARGS+=("-f" "$VALUES_FILE")
-        fi
+        echo -E "$RESOURCE_VALUES" > "$NEW_VALUES_FILE"
 
-        mkdir -p "$RESOURCE_VERSIONS_DIRECTORY"
-        RESOURCE_VERSION_FILE="$RESOURCE_VERSIONS_DIRECTORY/$RESOURCE_NAMESPACE-$RESOURCE_NAME.resourceVersion"
-        # If the resource version for this Release CR hasn't changed, we can skip running helm upgrade.
-        if [[ -s "$RESOURCE_VERSION_FILE" && "$(cat "$RESOURCE_VERSION_FILE")" == "$RESOURCE_RESOURCE_VERSION" ]]; then
+        # If the spec for this CR hasn't changed, we can skip running helm upgrade.
+        if [[ -a "$VALUES_FILE" && "$(cat "$VALUES_FILE")" == "$(cat "$NEW_VALUES_FILE")" ]]; then
             echo "Nothing has changed for $FULL_RESOURCE_NAME"
         else
-            echo "$CRD $FULL_RESOURCE_NAME has been modified"
+            if [ -a "$VALUES_FILE" ]; then
+                echo "$CRD $FULL_RESOURCE_NAME has been modified"
+            else
+                echo "New $CRD $FULL_RESOURCE_NAME"
+            fi
+            HELM_ARGS+=("-f" "$NEW_VALUES_FILE")
 
             writeReleaseOwnerValuesFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
             writeReleaseConfigMapOwnerPatchFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
@@ -282,15 +283,23 @@ while true; do
 
             mkdir -p "$UPGRADE_RESULT_DIRECTORY"
             echo "Running helm upgrade for release $RELEASE_NAME"
-            if helmUpgrade "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" "${HELM_ARGS[@]}" | tee "$UPGRADE_RESULT_DIRECTORY/$RELEASE_NAME.txt"; then
-                echo "Error occurred when processing $FULL_RESOURCE_NAME"
-            else
-                echo "$RESOURCE_RESOURCE_VERSION" > "$RESOURCE_VERSION_FILE"
-            fi
+            if helmUpgrade "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" "${HELM_ARGS[@]}"; then
+                # store the last version that we were able to process so we can
+                # compare new specs against it later
+                mv -f "$NEW_VALUES_FILE" "$VALUES_FILE"
+                echo "Updating $CRD $FULL_RESOURCE_NAME status"
+                kubectl \
+                    -n "$RESOURCE_NAMESPACE" \
+                    patch "$RESOURCE_KIND" "$RESOURCE_NAME" \
+                    --type json \
+                    -p '[{"op": "add", "path": "/status", "value":{}},{"op": "add", "path": "/status/observedVersion", "value":"'"$RESOURCE_RESOURCE_VERSION"'"}]'
 
-            writeReleaseConfigmapsFile "$RESOURCE_NAME"
-            setOwnerOnReleaseConfigmaps
-            cleanupOldReleaseConfigmaps
+                writeReleaseConfigmapsFile "$RELEASE_NAME"
+                setOwnerOnReleaseConfigmaps
+                cleanupOldReleaseConfigmaps
+            else
+                echo "Error occurred when processing $FULL_RESOURCE_NAME"
+            fi
         fi
         checkExit
     done
