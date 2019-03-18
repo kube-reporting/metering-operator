@@ -14,8 +14,8 @@ if [ -n "${IMAGE_FORMAT:-}" ]; then
 
     # image tags are the ${component} in the $IMAGE_FORMAT: registry.svc.ci.openshift.org/ci-op-<input-hash>/stable:${component}
     # for metering-operator and reporting-operator being tested in ci, these are unchanging
-    export METERING_OPERATOR_DEPLOY_TAG="metering-operator"
-    export REPORTING_OPERATOR_DEPLOY_TAG="reporting-operator"
+    export METERING_OPERATOR_DEPLOY_TAG="metering-helm-operator"
+    export REPORTING_OPERATOR_DEPLOY_TAG="metering-reporting-operator"
 else
     # use the _DEPLOY_ values if set already, otherwise use default image repo/tags
     export METERING_OPERATOR_DEPLOY_REPO="${METERING_OPERATOR_DEPLOY_REPO:-$METERING_OPERATOR_IMAGE_REPO}"
