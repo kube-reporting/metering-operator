@@ -31,7 +31,7 @@ import (
 var (
 	testRandSeed               = rand.NewSource(0)
 	testRand                   = rand.New(testRandSeed)
-	noopPrometheusImporterFunc = func(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error) {
+	noopPrometheusImporterFunc = func(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
 		return nil, nil
 	}
 	testLogger = logrus.New()
