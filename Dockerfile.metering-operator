@@ -1,5 +1,8 @@
 # build image needs the helm-cli from the helm image
-FROM quay.io/coreos/helm:metering-v2.8.2 as helm
+FROM quay.io/coreos/helm:latest as helm
+
+# ***REMOVED***nal image needs kubectl, so we copy `oc` from cli image to use as kubectl.
+FROM openshift/origin-cli as cli
 
 # build image builds our charts
 FROM openshift/origin-release:golang-1.10 as build
@@ -30,7 +33,7 @@ RUN make \
     bin/metering-override-values.yaml
 
 # metering-helm-operator is below
-FROM quay.io/coreos/helm:metering-v2.8.2
+FROM quay.io/coreos/helm:latest
 
 USER root
 
@@ -38,12 +41,15 @@ USER root
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
 
 # oniguruma-devel comes from epel-release
-RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates socat kubernetes-client" \
+RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates socat" \
     && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
     && yum clean all \
     && rm -rf /var/cache/yum
+
+COPY --from=cli /usr/bin/oc /usr/bin/oc
+RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
 EXPOSE 44134
 ENV HELM_HOST 127.0.0.1:44134

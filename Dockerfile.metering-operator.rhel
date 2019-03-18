@@ -1,6 +1,9 @@
 # build image needs the helm-cli from the helm image
 FROM openshift/ose-metering-helm:v4.0 as helm
 
+# ***REMOVED***nal image needs kubectl, so we copy `oc` from cli image to use as kubectl.
+FROM openshift/ose-cli as cli
+
 # build image builds our charts
 FROM openshift/golang-builder:1.10 AS build
 
@@ -28,11 +31,14 @@ RUN make \
 FROM openshift/ose-metering-helm:v4.0
 
 USER root
-RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates socat kubernetes-client" \
+RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates socat" \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
     && yum clean all \
     && rm -rf /var/cache/yum
+
+COPY --from=cli /usr/bin/oc /usr/bin/oc
+RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
 EXPOSE 44134
 ENV HELM_HOST 127.0.0.1:44134

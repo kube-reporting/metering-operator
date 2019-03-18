@@ -21,6 +21,7 @@ image:
 
 serviceAccountName: helm-operator
 imagePullSecrets: []
+resources: {}
 
 rbac:
   roleName: helm-operator
