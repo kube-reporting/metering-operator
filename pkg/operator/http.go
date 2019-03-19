@@ -93,6 +93,7 @@ func newRouter(
 	router.HandleFunc(APIV2ReportsEndpointPre***REMOVED***x+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{namespace}/{datasourceName}", srv.storePromsumDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{namespace}/{datasourceName}", srv.fetchPromsumDataHandler)
 
@@ -493,6 +494,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	namespace := chi.URLParam(r, "namespace")
+	dsName := chi.URLParam(r, "datasource")
 
 	decoder := json.NewDecoder(r.Body)
 	var req CollectPromsumDataRequest
@@ -507,7 +509,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 
 	logger.Debugf("collecting promsum data for ReportDataSources in namespace %s between %s and %s", namespace, start.Format(time.RFC3339), end.Format(time.RFC3339))
 
-	results, err := srv.collectorFunc(context.Background(), namespace, start, end)
+	results, err := srv.collectorFunc(context.Background(), namespace, dsName, start, end)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to collect prometheus data: %v", err)
 		return

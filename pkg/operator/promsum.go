@@ -153,7 +153,7 @@ func init() {
 	prometheus.MustRegister(prometheusReportDatasourceRunningImportsGauge)
 }
 
-type prometheusImporterFunc func(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error)
+type prometheusImporterFunc func(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error)
 
 type prometheusImportResults struct {
 	ReportDataSource     string `json:"reportDataSource"`
@@ -161,7 +161,7 @@ type prometheusImportResults struct {
 	MetricsImportedCount int    `json:"metricsImportedCount"`
 }
 
-func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace string, start, end time.Time) ([]*prometheusImportResults, error) {
+func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
 	reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -179,6 +179,10 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 	for _, reportDataSource := range reportDataSources.Items {
 		reportDataSource := reportDataSource
 		if reportDataSource.Spec.Promsum == nil {
+			continue
+		}
+
+		if dsName != "" && dsName != reportDataSource.Name {
 			continue
 		}
 
