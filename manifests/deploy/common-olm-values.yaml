@@ -20,7 +20,7 @@ csv:
 
     ### Before you start
 
-    Metering runs a big data stack to crunch your data and requires at least 4GB of RAM and 2 CPU cores. At least one Node should have 2GB of RAM and 1 CPU core. Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
+    Metering runs a big data stack to crunch your data and requires at least 4GB of RAM and 4 CPU cores. At least one Node should have 2GB of RAM and 2 CPU cores. Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
     ### Common Con***REMOVED***gurations
 
