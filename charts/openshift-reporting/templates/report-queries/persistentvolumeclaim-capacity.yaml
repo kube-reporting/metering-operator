@@ -33,7 +33,7 @@ spec:
     type: string
   query: |
     SELECT
-        labels['exported_namespace'] as namespace,
+        element_at(labels, 'exported_namespace') as namespace,
         labels['persistentvolumeclaim'] as persistentvolumeclaim,
         labels,
         amount as persistentvolumeclaim_capacity_bytes,
@@ -42,3 +42,46 @@ spec:
         "timestamp",
         dt
     FROM {| dataSourceTableName "persistentvolumeclaim-capacity-bytes" |}
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportGenerationQuery
+metadata:
+  name: "persistentvolumeclaim-capacity"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  reportQueries:
+  - "persistentvolumeclaim-capacity-raw"
+  view:
+    disabled: true
+  columns:
+  - name: namespace
+    type: string
+    unit: kubernetes_namespace
+  - name: timestamp
+    type: timestamp
+    unit: date
+  - name: persistentvolumeclaim
+    type: string
+    unit: kubernetes_persistentvolumeclaim
+  - name: persistentvolumeclaim_capacity_bytes
+    type: double
+    unit: bytes
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
+  query: |
+    SELECT
+      namespace,
+      timestamp,
+      persistentvolumeclaim,
+      persistentvolumeclaim_capacity_bytes
+    FROM {| generationQueryViewName "persistentvolumeclaim-capacity-raw" |}
+    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
+    AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
+    AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
