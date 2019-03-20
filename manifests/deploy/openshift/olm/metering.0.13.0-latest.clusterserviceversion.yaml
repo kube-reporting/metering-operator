@@ -13,6 +13,19 @@ metadata:
             "name": "operator-metering"
           },
           "spec": {}
+        },
+        {
+          "apiVersion": "metering.openshift.io/v1alpha1",
+          "kind": "Report",
+          "metadata": {
+            "name": "namespace-memory-usage-hourly"
+          },
+          "spec": {
+            "generationQuery": "namespace-memory-usage",
+            "schedule": {
+              "period": "hourly"
+            }
+          }
         }
       ]
     categories: OpenShift Optional, Monitoring
