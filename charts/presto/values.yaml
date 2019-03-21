@@ -16,6 +16,9 @@ spec:
       nodeSchedulerIncludeCoordinator: true
       metastoreTimeout: null
 
+      connectors:
+        extraConnectorFiles: []
+
     coordinator:
       terminationGracePeriodSeconds: 30
       con***REMOVED***g:
