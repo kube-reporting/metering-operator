@@ -118,9 +118,9 @@ When a `Report` is created, and it sees the creation event, it does the followin
 - Execute the query using Presto.
 - Update the Report status that everything succeeded.
 
-[presto-overview]: https://prestodb.io/docs/current/overview/use-cases.html
+[presto-overview]: https://prestosql.io/docs/current/overview/use-cases.html
 [hive-overview]: https://cwiki.apache.org/confluence/display/Hive/Home#Home-ApacheHive
-[presto-connector]: https://prestodb.io/docs/current/overview/concepts.html#connector
+[presto-connector]: https://prestosql.io/docs/current/overview/concepts.html#connector
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
 [metering-aws-billing-conf]: metering-config.md#aws-billing-correlation
 [storagelocations]: storagelocations.md
