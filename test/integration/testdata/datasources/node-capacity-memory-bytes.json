@@ -1,674 +1,674 @@
 [
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 15599968256,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
       "node": "metering-ci-3-ig-m-91kw",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
       "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-m-91kw",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:00:00Z"
+    "timestamp": "2019-03-18T16:00:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:01:00Z"
+    "timestamp": "2019-03-18T16:01:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:02:00Z"
+    "timestamp": "2019-03-18T16:02:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:03:00Z"
+    "timestamp": "2019-03-18T16:03:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:04:00Z"
+    "timestamp": "2019-03-18T16:04:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-1168",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-1168",
+      "node": "metering-ci-3-ig-n-8p04",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-8p04",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-137l",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-137l",
+      "node": "metering-ci-3-ig-n-dkdn",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-dkdn",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-5q7p",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-5q7p",
+      "node": "metering-ci-3-ig-n-g0s3",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-g0s3",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-7d6s",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-7d6s",
+      "node": "metering-ci-3-ig-n-kgpx",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-kgpx",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-gpdl",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-gpdl",
+      "node": "metering-ci-3-ig-n-mvz5",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-mvz5",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   },
   {
     "amount": 31452758016,
-    "dt": "2019-03-11",
+    "dt": "2019-03-18",
     "labels": {
       "endpoint": "https-main",
-      "instance": "172.16.5.137:8443",
+      "instance": "172.16.2.35:8443",
       "job": "kube-state-metrics",
       "namespace": "openshift-monitoring",
-      "node": "metering-ci-3-ig-n-z7vm",
-      "pod": "kube-state-metrics-7449d589bc-nh95h",
-      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-z7vm",
+      "node": "metering-ci-3-ig-n-qq08",
+      "pod": "kube-state-metrics-7449d589bc-rzqnx",
+      "provider_id": "gce://openshift-gce-devel/us-west1-a/metering-ci-3-ig-n-qq08",
       "service": "kube-state-metrics"
     },
     "stepSize": 60000000000,
-    "timestamp": "2019-03-11T20:05:00Z"
+    "timestamp": "2019-03-18T16:05:00Z"
   }
 ]
