@@ -82,6 +82,23 @@ var (
 			parallel:                     true,
 		},
 		{
+			name:      "namespace-persistentvolumeclaim-usage",
+			queryName: "namespace-persistentvolumeclaim-usage",
+			dataSources: []testDatasource{
+				{
+					DatasourceName: "persistentvolumeclaim-phase",
+					FileName:       "testdata/datasources/persistentvolumeclaim-phase.json",
+				},
+				{
+					DatasourceName: "persistentvolumeclaim-usage-bytes",
+					FileName:       "testdata/datasources/persistentvolumeclaim-usage-bytes.json",
+				},
+			},
+			expectedReportOutputFileName: "testdata/reports/namespace-persistentvolumeclaim-usage.json",
+			comparisonColumnNames:        []string{"persistentvolumeclaim_usage_bytes"},
+			timeout:                      reportTestTimeout,
+		},
+		{
 			name:      "pod-cpu-request",
 			queryName: "pod-cpu-request",
 			dataSources: []testDatasource{
