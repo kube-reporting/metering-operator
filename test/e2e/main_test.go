@@ -69,6 +69,7 @@ func TestReportingProducesData(t *testing.T) {
 		{queryName: "namespace-cpu-usage"},
 		{queryName: "namespace-memory-request"},
 		{queryName: "namespace-persistentvolumeclaim-request"},
+		{queryName: "namespace-persistentvolumeclaim-usage"},
 		{queryName: "namespace-memory-usage"},
 		{queryName: "persistentvolumeclaim-usage"},
 		{queryName: "persistentvolumeclaim-capacity"},
