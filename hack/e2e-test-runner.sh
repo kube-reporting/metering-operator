@@ -11,7 +11,6 @@
 : "${DEPLOY_LOG_FILE:=deploy.log}"
 : "${DEPLOY_POD_LOGS_LOG_FILE:=pod-logs.log}"
 
-
 : "${DEPLOY_METERING:=true}"
 : "${TEST_METERING:=true}"
 : "${CLEANUP_METERING_NAMESPACE:=true}"
@@ -27,6 +26,8 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 source "${ROOT_DIR}/hack/lib/tests.sh"
+
+: "${TEST2JSON_BIN:="$ROOT_DIR/bin/test2json"}"
 
 export METERING_NAMESPACE
 export KUBECONFIG
@@ -182,7 +183,7 @@ if [ "$TEST_METERING" == "true" ]; then
 
     echo "Converting test results"
     # turn the results into json
-    "$ROOT_DIR/bin/test2json" < "$TEST_LOG_FILE_PATH"  > "${TEST_LOG_FILE_PATH}.json"
+    "$TEST2JSON_BIN" < "$TEST_LOG_FILE_PATH"  > "${TEST_LOG_FILE_PATH}.json"
 
     # turn the json results into tap output
     "$FAQ_BIN" -f json -o json -M -c -r -s -F "$ROOT_DIR/hack/tap-output.jq" < "${TEST_LOG_FILE_PATH}.json" > "$TEST_TAP_FILE_PATH"
