@@ -14,3 +14,4 @@ hdfsNamenodeMemory: null
 hiveMetastoreStorageSize: null
 hiveMetastoreMemory: null
 hiveMetastoreCpu: null
+reportingOperatorReplicas: 1

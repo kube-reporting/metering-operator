@@ -26,6 +26,7 @@
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
+source "${ROOT_DIR}/hack/lib/tests.sh"
 
 export METERING_NAMESPACE
 export KUBECONFIG
@@ -126,6 +127,20 @@ function cleanup() {
         kubectl delete ns "$METERING_NAMESPACE" || true
     ***REMOVED***
 
+    if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
+        echo "Stopping local reporting-operator"
+        [ -s "$REPORTING_OPERATOR_PID_FILE" ] && kill "$(cat "$REPORTING_OPERATOR_PID_FILE")" || true
+        rm -f "$REPORTING_OPERATOR_PID_FILE"
+    ***REMOVED***
+
+    if [ "$DEPLOY_METERING_OPERATOR_LOCAL" == "true" ]; then
+        echo "Stopping local metering-operator"
+        [ -s "$METERING_OPERATOR_PID_FILE" ] && kill "$(cat "$METERING_OPERATOR_PID_FILE")" || true
+        rm -f "$METERING_OPERATOR_PID_FILE"
+        docker rm -f metering-operator || true
+    ***REMOVED***
+
+    echo "Stopping background jobs"
     # kill any background jobs, such as stern
     kill $(jobs -rp)
     # Wait for any jobs

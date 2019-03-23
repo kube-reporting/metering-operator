@@ -3,7 +3,6 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/../..
 source "${ROOT_DIR}/hack/common.sh"
 
-
 # IMAGE_FORMAT comes from ci-operator https://github.com/openshift/ci-operator/blob/master/TEMPLATES.md#image_format
 if [ -n "${IMAGE_FORMAT:-}" ]; then
     # TEST_IMAGE_REPO is the image repo, which is everything before the ":${component}" value in
@@ -22,4 +21,10 @@ if [ -n "${IMAGE_FORMAT:-}" ]; then
     export REPORTING_OPERATOR_DEPLOY_REPO="${REPORTING_OPERATOR_DEPLOY_REPO:-$REPORTING_OPERATOR_IMAGE_REPO}"
     export METERING_OPERATOR_DEPLOY_TAG="${METERING_OPERATOR_DEPLOY_TAG:-$METERING_OPERATOR_IMAGE_TAG}"
     export REPORTING_OPERATOR_DEPLOY_TAG="${REPORTING_OPERATOR_DEPLOY_TAG:-$REPORTING_OPERATOR_IMAGE_TAG}"
+***REMOVED***
+
+if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
+    export METERING_HTTPS_API="false"
+    export METERING_REPORTING_API_URL="http://127.0.0.1:8080"
+    export METERING_USE_KUBE_PROXY_FOR_REPORTING_API="false"
 ***REMOVED***

@@ -31,6 +31,7 @@ export METERING_CREATE_PULL_SECRET
 : "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${TERMINATION_GRACE_PERIOD_SECONDS:=0}"
+: "${REPORTING_OPERATOR_REPLICAS:=1}"
 : "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
 : "${HDFS_NAMENODE_MEMORY:=}"
 : "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
@@ -40,7 +41,12 @@ export METERING_CREATE_PULL_SECRET
 : "${HIVE_METASTORE_CPU:=}"
 : "${CUR_DATE:=$(date +%s)}"
 
+if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
+    REPORTING_OPERATOR_REPLICAS=0
+***REMOVED***
+
 HELM_ARGS=(\
+    --set "reportingOperatorReplicas=${REPORTING_OPERATOR_REPLICAS}" \
     --set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_DEPLOY_REPO}" \
     --set "reportingOperatorDeployTag=${REPORTING_OPERATOR_DEPLOY_TAG}" \
     --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
