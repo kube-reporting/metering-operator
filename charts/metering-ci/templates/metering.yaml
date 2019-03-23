@@ -16,6 +16,7 @@ spec:
 
   reporting-operator:
     spec:
+      replicas: "{{ .Values.reportingOperatorReplicas }}"
       image:
         repository: "{{ .Values.reportingOperatorDeployRepo }}"
         tag: "{{ .Values.reportingOperatorDeployTag }}"

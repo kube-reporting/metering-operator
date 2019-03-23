@@ -270,6 +270,10 @@ unit-docker: metering-src-docker-build
 integration:
 	hack/integration.sh
 
+integration-local: reporting-operator-local metering-operator-docker-build
+	docker rm -f metering-operator reporting-operator || true
+	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
+
 integration-docker: metering-src-docker-build
 	docker run \
 		--name metering-integration-docker \
@@ -291,6 +295,10 @@ integration-docker: metering-src-docker-build
 
 e2e:
 	hack/e2e.sh
+
+e2e-local: reporting-operator-local metering-operator-docker-build
+	docker rm -f metering-operator reporting-operator || true
+	$(MAKE) e2e DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
 
 e2e-docker: metering-src-docker-build
 	docker run \
@@ -335,9 +343,8 @@ reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_OUT=$(REPORTING_OPERATOR_BIN_OUT_LOCAL) GOOS=$(shell go env GOOS)
 
 .PHONY: run-reporting-operator-local
-run-reporting-operator-local:
-	$(MAKE) reporting-operator-local
-	./hack/run-local-with-port-forward.sh $(REPORTING_OPERATOR_ARGS)
+run-reporting-operator-local: reporting-operator-local
+	./hack/run-reporting-operator-local.sh $(REPORTING_OPERATOR_ARGS)
 
 $(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
 	$(MAKE) build-reporting-operator

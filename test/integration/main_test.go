@@ -227,10 +227,12 @@ func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	ns := flag.String("namespace", "metering-ci", "test namespace")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
+	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", true, "If true, uses kubernetes API proxy to access reportingAPI")
+	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
 	flag.Parse()
 
 	var err error
-	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI); err != nil {
+	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *reportingAPIURL); err != nil {
 		logrus.Fatalf("failed to setup framework: %v\n", err)
 	}
 
@@ -239,10 +241,8 @@ func TestMain(m *testing.M) {
 
 func TestReportingProducesCorrectDataForInput(t *testing.T) {
 	var queries []string
-	waitTimeout := time.Minute * 2
-
 	t.Logf("Waiting for ReportDataSources tables to be created")
-	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
+	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 2*time.Minute)
 	require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
 	for _, test := range testReportsProduceCorrectDataForInputTestCases {
@@ -252,7 +252,7 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 	// validate all ReportGenerationQueries and ReportDataSources that are
 	// used by the test cases are initialized
 	t.Logf("Waiting for ReportGenerationQueries tables to become ready")
-	testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, waitTimeout)
+	testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, 2*time.Minute)
 
 	var reportStart, reportEnd time.Time
 	dataSourcesSubmitted := make(map[string]struct{})
@@ -263,7 +263,7 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 		for _, dataSource := range test.dataSources {
 			if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
 				// wait for the datasource table to exist
-				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, test.timeout)
+				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, time.Minute)
 				require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
 
 				metricsFile, err := os.Open(dataSource.FileName)
@@ -288,14 +288,14 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 					metrics = append(metrics, &metric)
 					// batch store metrics in amounts of 100
 					if len(metrics) >= 100 {
-						err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
+						err := testFramework.StoreDataSourceData(t, dataSource.DatasourceName, metrics)
 						require.NoError(t, err)
 						metrics = nil
 					}
 				}
 				// flush any metrics left over
 				if len(metrics) != 0 {
-					err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
+					err = testFramework.StoreDataSourceData(t, dataSource.DatasourceName, metrics)
 					require.NoError(t, err)
 				}
 
