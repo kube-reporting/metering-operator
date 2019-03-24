@@ -352,16 +352,19 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return nil
 		}
 
-		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies []string
+		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
 		// Validate all ReportDataSources that the Report depends on have indicated
 		// they have data available that covers the current reportPeriod.
 		for _, dataSource := range queryDependencies.ReportDataSources {
 			if dataSource.Spec.Promsum != nil {
-				if dataSource.Status.PrometheusMetricImportStatus != nil {
-					// queue the dataSource and store the list of reports so we can
-					// add information to the Report's status on what's currently
-					// not ready
-					queue := false
+				// queue the dataSource and store the list of reports so we can
+				// add information to the Report's status on what's currently
+				// not ready
+				queue := false
+				if dataSource.Status.PrometheusMetricImportStatus == nil {
+					unstartedDataSourceDependencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
+					queue = true
+				} ***REMOVED*** {
 					// reportPeriod lower bound not covered
 					if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
 						queue = true
@@ -372,9 +375,9 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 						queue = true
 						unmetDataEndDataSourceDependendencies = append(unmetDataEndDataSourceDependendencies, dataSource.Name)
 					}
-					if queue {
-						op.enqueueReportDataSource(dataSource)
-					}
+				}
+				if queue {
+					op.enqueueReportDataSource(dataSource)
 				}
 			}
 		}
@@ -389,10 +392,15 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			}
 		}
 
-		if len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 || len(unmetReportDependendencies) != 0 {
+		if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 || len(unmetReportDependendencies) != 0 {
 			unmetMsg := "The following Report dependencies do not have data currently available for the current reportPeriod being processed:"
-			if len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 {
+			if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 {
 				var msgs []string
+				if len(unstartedDataSourceDependencies) != 0 {
+					// sort so the message is reproducible
+					sort.Strings(unstartedDataSourceDependencies)
+					msgs = append(msgs, fmt.Sprintf("no data: [%s]", strings.Join(unstartedDataSourceDependencies, ", ")))
+				}
 				if len(unmetDataStartDataSourceDependendencies) != 0 {
 					// sort so the message is reproducible
 					sort.Strings(unmetDataStartDataSourceDependendencies)
