@@ -111,10 +111,6 @@ spec:
     unit: date
   - name: persistentvolumeclaim
     type: string
-  - name: phase
-    type: string
-  - name: phase_value
-    type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
@@ -122,16 +118,17 @@ spec:
     type: string
   query: |
     SELECT
-      phase.namespace,
-      phase.timestamp,
-      phase.persistentvolumeclaim,
-      phase.phase, phase.value AS phase_value, persistentvolumeclaim_usage_bytes,
-      phase.dt
+      min(phase.namespace) AS namespace,
+      phase.timestamp AS timestamp,
+      min(phase.persistentvolumeclaim) AS persistentvolumeclaim,
+      min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes,
+      min(phase.dt) AS dt
     FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
     FULL OUTER JOIN {| generationQueryViewName "persistentvolumeclaim-usage-raw" |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
+    GROUP BY phase.timestamp
 
 ---
 
@@ -149,19 +146,17 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
   - name: namespace
     type: string
     unit: kubernetes_namespace
-  - name: timestamp
-    type: timestamp
-    unit: date
   - name: persistentvolumeclaim
     type: string
     unit: kubernetes_persistentvolumeclaim
-  - name: phase
-    type: string
-  - name: phase_value
-    type: double
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
@@ -170,14 +165,14 @@ spec:
   - name: ReportingEnd
   query: |
     SELECT
+      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
       namespace,
-      timestamp,
       persistentvolumeclaim,
-      phase,
-      phase_value,
-      persistentvolumeclaim_usage_bytes
+      sum(persistentvolumeclaim_usage_bytes)
     FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
+    GROUP BY namespace, persistentvolumeclaim
