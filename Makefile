@@ -271,7 +271,6 @@ integration:
 	hack/integration.sh
 
 integration-local: reporting-operator-local metering-operator-docker-build
-	docker rm -f metering-operator reporting-operator || true
 	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
 
 integration-docker: metering-src-docker-build
@@ -297,7 +296,6 @@ e2e:
 	hack/e2e.sh
 
 e2e-local: reporting-operator-local metering-operator-docker-build
-	docker rm -f metering-operator reporting-operator || true
 	$(MAKE) e2e DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
 
 e2e-docker: metering-src-docker-build

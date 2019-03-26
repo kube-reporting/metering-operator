@@ -93,6 +93,10 @@ type Con***REMOVED***g struct {
 
 	Kubecon***REMOVED***g string
 
+	APIListen     string
+	MetricsListen string
+	PprofListen   string
+
 	HiveHost                string
 	PrestoHost              string
 	DisablePromsum          bool
@@ -328,10 +332,10 @@ func (op *Reporting) Run(ctx context.Context) error {
 	op.logger.Info("starting Metering operator")
 
 	promServer := &http.Server{
-		Addr:    ":8082",
+		Addr:    op.cfg.MetricsListen,
 		Handler: promhttp.Handler(),
 	}
-	pprofServer := newPprofServer()
+	pprofServer := newPprofServer(op.cfg.PprofListen)
 
 	// start these servers at the beginning some pprof and metrics are
 	// available before the reporting operator is ready
@@ -341,10 +345,10 @@ func (op *Reporting) Run(ctx context.Context) error {
 		defer wg.Done()
 		var srvErr error
 		if op.cfg.MetricsTLSCon***REMOVED***g.UseTLS {
-			op.logger.Infof("Prometheus metrics server listening with TLS on 127.0.0.1:8082")
+			op.logger.Infof("Prometheus metrics server listening with TLS on %s", op.cfg.MetricsListen)
 			srvErr = promServer.ListenAndServeTLS(op.cfg.MetricsTLSCon***REMOVED***g.TLSCert, op.cfg.MetricsTLSCon***REMOVED***g.TLSKey)
 		} ***REMOVED*** {
-			op.logger.Infof("Prometheus metrics server listening on 127.0.0.1:8082")
+			op.logger.Infof("Prometheus metrics server listening on %s", op.cfg.MetricsListen)
 			srvErr = promServer.ListenAndServe()
 		}
 		op.logger.WithError(srvErr).Info("Prometheus metrics server exited")
@@ -352,7 +356,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	}()
 	go func() {
 		defer wg.Done()
-		op.logger.Infof("pprof server started")
+		op.logger.Infof("pprof server listening on %s", op.cfg.PprofListen)
 		srvErr := pprofServer.ListenAndServe()
 		op.logger.WithError(srvErr).Info("pprof server exited")
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
@@ -457,7 +461,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
 
 	httpServer := &http.Server{
-		Addr:    ":8080",
+		Addr:    op.cfg.APIListen,
 		Handler: apiRouter,
 	}
 
@@ -470,7 +474,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
 			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSCon***REMOVED***g.TLSCert, op.cfg.APITLSCon***REMOVED***g.TLSKey)
 		} ***REMOVED*** {
-			op.logger.Infof("HTTP API server listening on 127.0.0.1:8080")
+			op.logger.Infof("HTTP API server listening on %s", op.cfg.APIListen)
 			srvErr = httpServer.ListenAndServe()
 		}
 		op.logger.WithError(srvErr).Info("HTTP API server exited")

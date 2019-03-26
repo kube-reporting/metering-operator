@@ -138,7 +138,7 @@ function cleanup() {
         echo "Stopping local metering-operator"
         [ -s "$METERING_OPERATOR_PID_FILE" ] && kill "$(cat "$METERING_OPERATOR_PID_FILE")" || true
         rm -f "$METERING_OPERATOR_PID_FILE"
-        docker rm -f metering-operator || true
+        docker rm -f "$METERING_OPERATOR_CONTAINER_NAME" || true
     ***REMOVED***
 
     echo "Stopping background jobs"
@@ -147,6 +147,7 @@ function cleanup() {
     # Wait for any jobs
     wait 2>/dev/null
 
+    echo "Exiting test runner"
     exit "$exit_status"
 }
 

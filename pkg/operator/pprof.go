@@ -5,7 +5,7 @@ import (
 	"net/http/pprof"
 )
 
-func newPprofServer() *http.Server {
+func newPprofServer(addr string) *http.Server {
 	pprofMux := http.NewServeMux()
 
 	pprofMux.HandleFunc("/debug/pprof/", pprof.Index)
@@ -15,7 +15,7 @@ func newPprofServer() *http.Server {
 	pprofMux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
 	return &http.Server{
-		Addr:    "127.0.0.1:6060",
+		Addr:    addr,
 		Handler: pprofMux,
 	}
 }

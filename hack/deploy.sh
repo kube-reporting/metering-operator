@@ -125,7 +125,7 @@ if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
         --prometheus-bearer-token "$REPORTING_OPERATOR_PROMETHEUS_TOKEN" "${REPORTING_OPERATOR_ARGS:-}" > "$REPORTING_OPERATOR_LOG_FILE" &
     echo $! > "$REPORTING_OPERATOR_PID_FILE"
 
-    until curl -s --fail "http://127.0.0.1:8080/healthy" > /dev/null; do
+    until curl -s --fail "http://${REPORTING_OPERATOR_API_LISTEN}/healthy" > /dev/null; do
         echo "waiting for local reporting-operator to become healthy"
         sleep 5
     done
