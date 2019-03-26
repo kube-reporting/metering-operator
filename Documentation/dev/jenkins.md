@@ -13,7 +13,7 @@ Its primary duties are:
 
 ## Pull-Requests
 
-Everytime you submit a pull-request, jenkins will perform all of the above steps automatically.
+Every time you submit a pull-request, Jenkins will perform all of the above steps automatically.
 If any step fails, it will generally stop at that point immediately and mark the commit as failing in Github.
 
 ### Pull-request debugging
