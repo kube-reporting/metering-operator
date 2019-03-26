@@ -11,6 +11,7 @@ load_version_vars
 : "${METERING_CHART:=/openshift-metering-0.1.0.tgz}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
+: "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
 
 set -ex
 
@@ -20,7 +21,7 @@ if [ "$LOCAL_METERING_OPERATOR_RUN_INSTALL" == "true" ]; then
 fi
 
 docker run \
-    --name metering-operator \
+    --name "${METERING_OPERATOR_CONTAINER_NAME}" \
     --rm \
     -u 0:0 \
     -v "$KUBECONFIG:/kubeconfig" \

@@ -68,6 +68,11 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.OwnNamespace, "namespace", "", "namespace the operator is running in, if empty, will attempt to detect namespace if running in a pod.")
 	startCmd.Flags().BoolVar(&cfg.AllNamespaces, "all-namespaces", false, "if true, reporting-operator monitors all namespaces.")
 	startCmd.Flags().StringSliceVar(&cfg.TargetNamespaces, "target-namespaces", nil, "the namespaces for reporting-operator to watch for resources, if empty defaults to the value of --namespace, or all namespaces if --all-namespaces is specified.")
+
+	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "0.0.0.0:8080", "ip:port to listen on for the httpAPI")
+	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "0.0.0.0:8081", "ip:port to listen on for the httpAPI")
+	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the httpAPI")
+
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
