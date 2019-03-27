@@ -53,6 +53,41 @@ To run the validation steps CI does:
 make verify
 ```
 
+### Running e2e/integration tests locally
+
+There's 2 ways to run integration and e2e tests locally.
+The first option runs the main operators locally (and the rest of the components into the cluster), and runs tests against the local reporting-operator, and the second option deploys everything into the cluster, and runs tests against the reporting-operator in the cluster.
+
+The first option can be broken down in a few steps:
+
+- Build the metering-operator docker image
+- Build the reporting-operator binary locally
+- Run a customized manual install for tests, skipping metering-operator and reporting-operator
+- Run metering-operator locally via Docker
+- Run reporting-operator locally as a native Go binary
+- Configure everything to properly communicate
+- Run tests against the local reporting-operator
+
+You can run one of the following commands to run either e2e or integration tests locally which will do the above steps, testing against a local reporting-operator:
+
+```
+make e2e-local TEST_OUTPUT_PATH=/tmp/metering_e2e_output
+make integration-local TEST_OUTPUT_PATH=/tmp/metering_integration_output
+```
+
+The second option is similar, but doesn't run reporting-operator or metering-operator locally, but instead deploys them into the cluster just like CI does.
+The steps can be broken down into:
+
+- Run a customized manual install for tests
+- Run tests against the deployed reporting-operator running in the cluster
+
+Replace `pr-1234` with your image tag (usually built by CI), and run one of the following commands to run e2e or integration tests locally against fully deployed metering stack:
+
+```
+make e2e REPORTING_OPERATOR_DEPLOY_TAG=pr-1234 METERING_OPERATOR_DEPLOY_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_e2e_output
+make integration REPORTING_OPERATOR_DEPLOY_TAG=pr-1234 METERING_OPERATOR_DEPLOY_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_integration_output
+```
+
 ## Go Dependencies
 
 We use [dep](https://golang.github.io/dep/docs/introduction.html) for managing
