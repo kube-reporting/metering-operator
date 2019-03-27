@@ -239,7 +239,7 @@ func TestMain(m *testing.M) {
 
 func TestReportingProducesCorrectDataForInput(t *testing.T) {
 	var queries []string
-	waitTimeout := time.Minute
+	waitTimeout := time.Minute * 2
 
 	t.Logf("Waiting for ReportDataSources tables to be created")
 	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, waitTimeout)
