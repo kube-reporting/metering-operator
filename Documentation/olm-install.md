@@ -30,16 +30,20 @@ After it is created, confirm a new `CatalogSource` is created in the `openshift-
 
 ```
 kubectl -n openshift-metering get catalogsources
-NAME                 NAME     TYPE       PUBLISHER   AGE
-metering-operators   Custom   internal   Custom      5s
+NAME                 NAME     TYPE   PUBLISHER   AGE
+metering-operators   Custom   grpc   Custom      7s
 ```
 
-You should also see a pod with a name resembling `metering-operators-12345` in the namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
+You should also see a pod with a name resembling `metering-operators-12345` in the `openshift-marketplace` namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
 
 ```
-kubectl -n openshift-metering get pods
-NAME                       READY   STATUS    RESTARTS   AGE
-metering-operators-xmdb9   1/1     Running   0          7s
+kubectl -n openshift-marketplace get pods
+NAME                                    READY   STATUS    RESTARTS   AGE
+certified-operators-77b9986c5f-b7ndr    1/1     Running   0          25m
+community-operators-7d57677987-88477    1/1     Running   0          25m
+marketplace-operator-77dd7759cc-4thqm   1/1     Running   0          25m
+metering-operators-784f4ccccc-ctdxd     1/1     Running   0          43s
+redhat-operators-569bcbb8c5-7v2kw       1/1     Running   0          25m
 ```
 
 Next, you will create an `OperatorGroup` in your namespace that restricts the namespaces the operator will monitor to the `openshift-metering` namespace.
