@@ -95,22 +95,18 @@ func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Repo
 		"format":    "json",
 	}
 	err := wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
-		req := f.NewReportingOperatorSVCRequest("/api/v1/reports/get", queryParams)
-		result := req.Do()
-		resp, err := result.Raw()
+		respBody, respCode, err := f.ReportingOperatorRequest("/api/v1/reports/get", queryParams)
 		require.NoError(t, err, "fetching Report results should be successful")
 
-		var statusCode int
-		result.StatusCode(&statusCode)
-		if statusCode == http.StatusAccepted {
+		if respCode == http.StatusAccepted {
 			t.Logf("Report %s is still running", report.Name)
 			return false, nil
 		}
 
-		require.Equal(t, http.StatusOK, statusCode, "http response status code should be ok")
-		err = json.Unmarshal(resp, &reportResults)
+		require.Equal(t, http.StatusOK, respCode, "http response status code should be ok")
+		err = json.Unmarshal(respBody, &reportResults)
 		require.NoError(t, err, "expected to unmarshal response")
-		reportData = resp
+		reportData = respBody
 		return true, nil
 	})
 	require.NoError(t, err, "expected Report to have 1 row of results before timing out")

@@ -3,7 +3,6 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/../..
 source "${ROOT_DIR}/hack/common.sh"
 
-
 # IMAGE_FORMAT comes from ci-operator https://github.com/openshift/ci-operator/blob/master/TEMPLATES.md#image_format
 if [ -n "${IMAGE_FORMAT:-}" ]; then
     # TEST_IMAGE_REPO is the image repo, which is everything before the ":${component}" value in
