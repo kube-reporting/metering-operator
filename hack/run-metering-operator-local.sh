@@ -11,6 +11,7 @@ load_version_vars
 : "${METERING_CHART:=/openshift-metering-0.1.0.tgz}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
+: "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
 
 set -ex
 
@@ -20,8 +21,7 @@ if [ "$LOCAL_METERING_OPERATOR_RUN_INSTALL" == "true" ]; then
 fi
 
 docker run \
-    -it \
-    --name metering-operator \
+    --name "${METERING_OPERATOR_CONTAINER_NAME}" \
     --rm \
     -u 0:0 \
     -v "$KUBECONFIG:/kubeconfig" \
@@ -38,4 +38,14 @@ docker run \
     -e TILLER_NAMESPACE="$METERING_NAMESPACE" \
     -e TILLER_HISTORY_MAX="3" \
     "${METERING_OPERATOR_IMAGE}" \
-    bash -c 'tiller & sleep 2 && run-operator.sh'
+    bash -c '
+    cleanup() {
+        echo "Got signal!"
+        trap - SIGINT SIGTERM # clear the trap
+        kill -- -$$ # Sends SIGTERM to child/sub processes
+    }
+    trap cleanup SIGINT SIGTERM
+    tiller &
+    run-operator.sh &
+    wait
+    '

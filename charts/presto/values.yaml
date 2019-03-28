@@ -148,23 +148,21 @@ spec:
         size: "5Gi"
 
       readinessProbe:
-       initialDelaySeconds: 60
-       timeoutSeconds: 15
-       periodSeconds: 20
-       successThreshold: 1
-       failureThreshold: 3
-       tcpSocket:
-         port: 9083
+        initialDelaySeconds: 60
+        timeoutSeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        failureThreshold: 3
+        tcpSocket:
+          port: 9083
       livenessProbe:
-       initialDelaySeconds: 90
-       timeoutSeconds: 15
-       periodSeconds: 30
-       successThreshold: 1
-       failureThreshold: 3
-       tcpSocket:
-         port: 9083
-
-      livenessProbe: {}
+        initialDelaySeconds: 90
+        timeoutSeconds: 15
+        periodSeconds: 30
+        successThreshold: 1
+        failureThreshold: 3
+        tcpSocket:
+          port: 9083
 
       nodeSelector: {}
       tolerations: []
@@ -185,21 +183,22 @@ spec:
           cpu: "100m"
 
       readinessProbe:
-       initialDelaySeconds: 60
-       timeoutSeconds: 15
-       periodSeconds: 20
-       successThreshold: 1
-       failureThreshold: 3
-       tcpSocket:
-         port: 10000
+        initialDelaySeconds: 60
+        timeoutSeconds: 15
+        periodSeconds: 20
+        successThreshold: 1
+        failureThreshold: 3
+        tcpSocket:
+          port: 10000
       livenessProbe:
-       initialDelaySeconds: 90
-       timeoutSeconds: 15
-       periodSeconds: 30
-       successThreshold: 1
-       failureThreshold: 3
-       tcpSocket:
-         port: 10000
+        # hive server depends on hive metastore so give it more time
+        initialDelaySeconds: 300
+        timeoutSeconds: 15
+        periodSeconds: 30
+        successThreshold: 1
+        failureThreshold: 3
+        tcpSocket:
+          port: 10000
 
       nodeSelector: {}
       tolerations: []

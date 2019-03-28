@@ -40,10 +40,12 @@ func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	ns := flag.String("namespace", "metering-ci", "test namespace")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
+	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", true, "If true, uses kubernetes API proxy to access reportingAPI")
+	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
 	flag.Parse()
 
 	var err error
-	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI); err != nil {
+	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *reportingAPIURL); err != nil {
 		logrus.Fatalf("failed to setup framework: %v\n", err)
 	}
 
