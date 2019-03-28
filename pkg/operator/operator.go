@@ -432,12 +432,13 @@ func (op *Reporting) Run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
 	}
-	newTableProperties, err := addTableNameToLocation(*tableProperties, "metering_health_check")
+	healthCheckTableName := "metering_health_check"
+	newTableProperties, err := addTableNameToLocation(*tableProperties, healthCheckTableName)
 	if err != nil {
 		return err
 	}
 
-	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, newTableProperties)
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, healthCheckTableName, newTableProperties)
 	if op.cfg.DisableWriteHealthCheck {
 		op.testWriteToPrestoFunc = func() bool {
 			op.logger.Debugf("configured to skip checking ability to write to presto")
