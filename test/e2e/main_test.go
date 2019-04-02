@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
@@ -117,10 +116,5 @@ func TestReportingProducesData(t *testing.T) {
 		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportcronTestCase, reportRunOnceTestCase)
 	}
 
-	// Align to the nearest minute
-	periodEnd := time.Now().UTC().Truncate(time.Minute)
-	// start the report 5 minutes ago
-	periodStart := periodEnd.Add(-5 * time.Minute)
-
-	testReportsProduceData(t, testFramework, periodStart, periodEnd, reportsProduceDataTestCases)
+	testReportsProduceData(t, testFramework, reportsProduceDataTestCases)
 }
