@@ -1,8 +1,8 @@
 spec:
   presto:
     image:
-      repository: quay.io/coreos/presto
-      tag: metering-0.212
+      repository: quay.io/openshift/origin-metering-presto
+      tag: latest
       pullPolicy: Always
 
     securityContext:
@@ -102,8 +102,8 @@ spec:
 
   hive:
     image:
-      repository: quay.io/coreos/hive
-      tag: metering-2.3.3
+      repository: quay.io/openshift/origin-metering-hive
+      tag: latest
       pullPolicy: Always
 
     con***REMOVED***g:
