@@ -97,6 +97,8 @@ spec:
         - name: hdfs-config
           mountPath: /hadoop-config
 {{- end}}
+        - name: hive-home-conf
+          mountPath: /opt/hive/conf
         # openshift requires volumeMounts for VOLUMEs in a Dockerfile
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
@@ -135,6 +137,8 @@ spec:
         configMap:
           name: {{ .Values.spec.hive.config.hdfsConfigMapName }}
 {{- end }}
+      - name: hive-home-conf
+        emptyDir: {}
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Dockerfile have a corresponding volumeMount
       - name: hive-warehouse-empty

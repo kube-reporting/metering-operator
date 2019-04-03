@@ -82,4 +82,6 @@ connector.name=jmx
       name: "{{ .Values.spec.config.awsCredentialsSecretName }}"
       key: aws-secret-access-key
       optional: true
+- name: HIVE_HOME
+  value: /opt/hive
 {{- end }}
