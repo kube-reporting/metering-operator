@@ -1,4 +1,4 @@
-apiVersion: marketplace.redhat.com/v1alpha1
+apiVersion: operators.coreos.com/v1
 kind: CatalogSourceConfig
 metadata:
  name: metering-operators

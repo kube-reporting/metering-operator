@@ -100,5 +100,5 @@ operatorGroupTargetNamespaces: ["openshift-metering"]
 
 catalogSourceConfigName: metering-operators
 catalogSourceConfigNamespace: openshift-marketplace
-catalogTargetNamespace: "openshift-metering"
+catalogTargetNamespace: openshift-metering
 
