@@ -1,15 +1,17 @@
-# Installation using Operator Lifecycle Manager (OLM)
+# Manual Installation using Operator Lifecycle Manager (OLM)
 
 Currently Metering via OLM is only supported on Openshift 4.x via the Openshift Marketplace.
 If you want to install metering into a non-Openshift Kubernetes cluster, please use the [manual installation documentation][manual-install].
 
 ## Install
 
+This will cover installing the metering-operator via the openshift-marketplace using `kubectl`/`oc` and will then create a Metering resource defining the configuration for the metering-operator to use to install the rest of the Metering stack.
+
 ### Install Metering Operator
 
 Installing the metering-operator is done by creating a `Subscription` resource in a namespace with a `CatalogSource` containing the `metering` package.
 
-Currently we advise metering is installed into its own namespace which requires some setup.
+Currently we require that metering is installed into its own namespace which requires some setup.
 
 First, start by creating the `openshift-metering` namespace:
 
@@ -71,9 +73,7 @@ Verify the metering-operator has been created and is running:
 kubectl -n openshift-metering get pods
 NAME                                READY   STATUS    RESTARTS   AGE
 metering-operator-c7545d555-h5m6x   2/2     Running   0          32s
-metering-operators-bvpf7            1/1     Running   0          80s
 ```
-
 
 ### Install Metering
 
