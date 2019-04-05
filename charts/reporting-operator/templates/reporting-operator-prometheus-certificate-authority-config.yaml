@@ -1,0 +1,12 @@
+{{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.create }}
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: {{ .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  {{ .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}: {{ .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.value }}
+{{- end }}

@@ -42,7 +42,9 @@ spec:
     spec:
       con***REMOVED***g:
         prometheusURL: "https://telemeter.api.mycompany.com"
-        prometheusCAFile: "/path/to/my/ca.crt" # or "" to validate against system certi***REMOVED***cate authorities
+        prometheusCerti***REMOVED***cateAuthority:
+          # use system certi***REMOVED***cates instead of cluster service account
+          useServiceAccountCA: false
         prometheusImporter:
           auth:
             # don't use in-cluster token authentication; instead use provided token
