@@ -1,0 +1,12 @@
+{{- if .Values.spec.config.prometheusCertificateAuthority.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.spec.config.prometheusCertificateAuthority.configMap.name }}
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  {{ .Values.spec.config.prometheusCertificateAuthority.configMap.filename }}: {{ .Values.spec.config.prometheusCertificateAuthority.configMap.value }}
+{{- end }}
