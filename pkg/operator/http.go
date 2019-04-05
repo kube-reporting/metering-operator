@@ -529,14 +529,34 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	namespace := chi.URLParam(r, "namespace")
 
 	decoder := json.NewDecoder(r.Body)
-	var req StorePromsumDataRequest
-	err := decoder.Decode(&req)
+
+	// read opening bracket
+	_, err := decoder.Token()
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
 		return
 	}
 
-	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), []*prestostore.PrometheusMetric(req))
+	var metrics []*prestostore.PrometheusMetric
+	// while the array contains values
+	for decoder.More() {
+		var m prestostore.PrometheusMetric
+		err = decoder.Decode(&m)
+		if err != nil {
+			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+			return
+		}
+		metrics = append(metrics, &m)
+	}
+
+	// read closing bracket
+	_, err = decoder.Token()
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		return
+	}
+
+	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), metrics)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
