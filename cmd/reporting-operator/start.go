@@ -70,7 +70,7 @@ func init() {
 	startCmd.Flags().StringSliceVar(&cfg.TargetNamespaces, "target-namespaces", nil, "the namespaces for reporting-operator to watch for resources, if empty defaults to the value of --namespace, or all namespaces if --all-namespaces is specified.")
 
 	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "0.0.0.0:8080", "ip:port to listen on for the httpAPI")
-	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "0.0.0.0:8081", "ip:port to listen on for the httpAPI")
+	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "0.0.0.0:8082", "ip:port to listen on for the httpAPI")
 	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the httpAPI")
 
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
