@@ -4,6 +4,11 @@ If you want to install metering without OLM, using what's currently in master, *
 Next, decide which namespace you want to install Metering into, and set the `METERING_NAMESPACE` environment variable to the namespace you want to use.
 By default, if it's unset, it will use the `metering` namespace.
 
+## Versioning
+
+By default, a manual install will deploy the latest build of master.
+If you want to use a speci***REMOVED***c version, checkout a git tag for the version you want to use before installing, or follow the instructions for [installing with a custom metering operator image][#install-with-a-custom-metering-operator-image].
+
 ## Requirements
 
 Our installation scripts are written in bash, and utilize a few non-standard tools to interact with yaml and json ***REMOVED***les.
