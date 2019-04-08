@@ -118,17 +118,17 @@ spec:
     type: string
   query: |
     SELECT
-      min(phase.namespace) AS namespace,
+      phase.namespace AS namespace,
       phase.timestamp AS timestamp,
-      min(phase.persistentvolumeclaim) AS persistentvolumeclaim,
+      phase.persistentvolumeclaim AS persistentvolumeclaim,
       min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes,
-      min(phase.dt) AS dt
+      phase.dt AS dt
     FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
     FULL OUTER JOIN {| generationQueryViewName "persistentvolumeclaim-usage-raw" |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
-    GROUP BY phase.timestamp
+    GROUP BY phase.timestamp, phase.dt, phase.namespace, phase.persistentvolumeclaim
 
 ---
 
