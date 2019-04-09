@@ -14,17 +14,19 @@ type PrestoHealthChecker struct {
 	queryer      db.Queryer
 	tableManager TableManager
 
+	tableName       string
 	tableProperties hive.TableProperties
 	// ensures only at most a single testRead query is running against Presto
 	// at one time
 	healthCheckSingleFlight singleflight.Group
 }
 
-func NewPrestoHealthChecker(logger logrus.FieldLogger, queryer db.Queryer, tableManager TableManager, tableProperties hive.TableProperties) *PrestoHealthChecker {
+func NewPrestoHealthChecker(logger logrus.FieldLogger, queryer db.Queryer, tableManager TableManager, tableName string, tableProperties hive.TableProperties) *PrestoHealthChecker {
 	return &PrestoHealthChecker{
 		logger:          logger,
 		queryer:         queryer,
 		tableManager:    tableManager,
+		tableName:       tableName,
 		tableProperties: tableProperties,
 	}
 }
@@ -62,25 +64,24 @@ func (checker *PrestoHealthChecker) TestReadFromPresto() bool {
 
 func (checker *PrestoHealthChecker) TestWriteToPresto() bool {
 	logger := checker.logger.WithField("component", "testWriteToPresto")
-	const tableName = "operator_health_check"
 	columns := []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}}
 
 	params := hive.TableParameters{
-		Name:         tableName,
+		Name:         checker.tableName,
 		Columns:      columns,
 		IgnoreExists: true,
 	}
 	err := checker.tableManager.CreateTable(params, checker.tableProperties)
 	if err != nil {
-		logger.WithError(err).Errorf("cannot create Presto table %s", tableName)
+		logger.WithError(err).Errorf("cannot create Presto table %s", checker.tableName)
 		return false
 	}
 
 	// Hive does not support timezones, and now() returns a
 	// TIMESTAMP WITH TIMEZONE so we cast the return of now() to a TIMESTAMP.
-	err = presto.InsertInto(checker.queryer, tableName, "VALUES (cast(now() AS TIMESTAMP))")
+	err = presto.InsertInto(checker.queryer, checker.tableName, "VALUES (cast(now() AS TIMESTAMP))")
 	if err != nil {
-		logger.WithError(err).Errorf("cannot insert into Presto table %s", tableName)
+		logger.WithError(err).Errorf("cannot insert into Presto table %s", checker.tableName)
 		return false
 	}
 	return true
