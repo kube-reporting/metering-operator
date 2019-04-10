@@ -20,17 +20,27 @@ spec:
         prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
-To secure the connection to Prometheus, the default Metering installation uses the Openshift certi***REMOVED***cate authority. If your Prometheus instance uses a different CA, the path to the CA ***REMOVED***le can be referenced with the `prometheusCAFile` option:
+To secure the connection to Prometheus, the default Metering installation uses the Openshift certi***REMOVED***cate authority. If your Prometheus instance uses a different CA, the CA can be injected through a Con***REMOVED***gMap:
 
 ```
 spec:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        prometheusCAFile: "/path/to/my/ca.crt"
+        prometheusCerti***REMOVED***cateAuthority:
+          useServiceAccountCA: false
+          con***REMOVED***gMap:
+            enabled: true
+            create: true
+            name: reporting-operator-certi***REMOVED***cate-authority-con***REMOVED***g
+            ***REMOVED***lename: "internal-ca.crt"
+            value: |
+              -----BEGIN CERTIFICATE-----
+              (snip)
+              -----END CERTIFICATE-----
 ```
 
-Alternatively, to use the system certi***REMOVED***cate authorities for publicly valid certi***REMOVED***cates, it can be set to `""`.
+Alternatively, to use the system certi***REMOVED***cate authorities for publicly valid certi***REMOVED***cates, set both `useServiceAccountCA` and `con***REMOVED***gMap.enabled` to false.
 
 Reporting-operator can also be con***REMOVED***gured to use a speci***REMOVED***ed bearer token to auth with Prometheus:
 

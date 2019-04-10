@@ -166,9 +166,16 @@ spec:
               name: reporting-operator-con***REMOVED***g
               key: prometheus-bearer-token-***REMOVED***le
               optional: true
-{{- if .Values.spec.con***REMOVED***g.prometheusCAFile }}
+{{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.useServiceAccountCA }}
+  {{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+    {{ fail "Cannot both use serviceAccount CA and CA from con***REMOVED***gMap" }}
+  {{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
-          value: {{ .Values.spec.con***REMOVED***g.prometheusCAFile }}
+          value: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
+          value: "/var/run/reporting-operator/ca/{{ .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}"
 {{- end }}
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
@@ -243,6 +250,10 @@ spec:
         - name: metrics-tls
           mountPath: /metrics-tls
 {{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+        - name: prometheus-certi***REMOVED***cate-authority
+          mountPath: /var/run/reporting-operator/ca/
+{{- end }}
 {{- if .Values.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
         - mountPath: /var/run/reporting-operator/token
           name: prometheus-bearer-token
@@ -304,6 +315,11 @@ spec:
       - name: api-tls
         secret:
           secretName: {{ .Values.spec.con***REMOVED***g.tls.secretName }}
+{{- end }}
+{{- if .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+      - name: prometheus-certi***REMOVED***cate-authority
+        con***REMOVED***gMap:
+          name: {{ .Values.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
 {{- end }}
 {{- if .Values.spec.con***REMOVED***g.metricsTLS.enabled }}
       - name: metrics-tls
