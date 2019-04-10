@@ -1,6 +1,7 @@
 package framework
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -18,13 +19,20 @@ func (f *Framework) GetMeteringReportDataSource(name string) (*meteringv1alpha1.
 
 func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportDataSource, error) {
 	t.Helper()
-	return f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *meteringv1alpha1.ReportDataSource) (bool, error) {
+	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *meteringv1alpha1.ReportDataSource) (bool, error) {
 		if ds.Status.TableName == "" {
 			t.Logf("ReportDataSource %s table is not created yet", name)
 			return false, nil
 		}
 		return true, nil
 	})
+	if err != nil {
+		if err == wait.ErrWaitTimeout {
+			return nil, fmt.Errorf("timed out waiting for ReportDataSource %s table", name)
+		}
+		return nil, err
+	}
+	return ds, nil
 }
 
 func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*meteringv1alpha1.ReportDataSource, error) {
