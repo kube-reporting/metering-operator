@@ -17,6 +17,7 @@ func (f *Framework) GetMeteringReportDataSource(name string) (*meteringv1alpha1.
 }
 
 func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportDataSource, error) {
+	t.Helper()
 	return f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *meteringv1alpha1.ReportDataSource) (bool, error) {
 		if ds.Status.TableName == "" {
 			t.Logf("ReportDataSource %s table is not created yet", name)
@@ -27,6 +28,7 @@ func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name stri
 }
 
 func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*meteringv1alpha1.ReportDataSource, error) {
+	t.Helper()
 	var reportDataSources []*meteringv1alpha1.ReportDataSource
 	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		reportDataSourcesList, err := f.MeteringClient.ReportDataSources(f.Namespace).List(meta.ListOptions{})
@@ -44,6 +46,7 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 }
 
 func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *meteringv1alpha1.ReportDataSource) (bool, error)) (*meteringv1alpha1.ReportDataSource, error) {
+	t.Helper()
 	var ds *meteringv1alpha1.ReportDataSource
 	return ds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error

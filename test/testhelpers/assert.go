@@ -11,6 +11,7 @@ import (
 const reportComparisionEpsilon = 0.0001
 
 func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interface{}, comparisonColumnNames []string) {
+	t.Helper()
 	// turn the list of expected results maps into a list of ordered maps
 	expectedResults := make([]*orderedmap.OrderedMap, len(expected))
 	for i, item := range expected {
