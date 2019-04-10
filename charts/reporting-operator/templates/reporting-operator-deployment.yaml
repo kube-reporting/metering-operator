@@ -166,9 +166,16 @@ spec:
               name: reporting-operator-config
               key: prometheus-bearer-token-file
               optional: true
-{{- if .Values.spec.config.prometheusCAFile }}
+{{- if .Values.spec.config.prometheusCertificateAuthority.useServiceAccountCA }}
+  {{- if .Values.spec.config.prometheusCertificateAuthority.configMap.enabled }}
+    {{ fail "Cannot both use serviceAccount CA and CA from configMap" }}
+  {{- end }}
         - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
-          value: {{ .Values.spec.config.prometheusCAFile }}
+          value: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+{{- end }}
+{{- if .Values.spec.config.prometheusCertificateAuthority.configMap.enabled }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
+          value: "/var/run/reporting-operator/ca/{{ .Values.spec.config.prometheusCertificateAuthority.configMap.filename }}"
 {{- end }}
         - name: REPORTING_OPERATOR_PRESTO_HOST
           valueFrom:
@@ -243,6 +250,10 @@ spec:
         - name: metrics-tls
           mountPath: /metrics-tls
 {{- end }}
+{{- if .Values.spec.config.prometheusCertificateAuthority.configMap.enabled }}
+        - name: prometheus-certificate-authority
+          mountPath: /var/run/reporting-operator/ca/
+{{- end }}
 {{- if .Values.spec.config.prometheusImporter.auth.tokenSecret.enabled }}
         - mountPath: /var/run/reporting-operator/token
           name: prometheus-bearer-token
@@ -304,6 +315,11 @@ spec:
       - name: api-tls
         secret:
           secretName: {{ .Values.spec.config.tls.secretName }}
+{{- end }}
+{{- if .Values.spec.config.prometheusCertificateAuthority.configMap.enabled }}
+      - name: prometheus-certificate-authority
+        configMap:
+          name: {{ .Values.spec.config.prometheusCertificateAuthority.configMap.name }}
 {{- end }}
 {{- if .Values.spec.config.metricsTLS.enabled }}
       - name: metrics-tls

@@ -23,7 +23,16 @@ spec:
     prometheusDatasourceMaxQueryRangeDuration: null
     prometheusDatasourceMaxImportBackfillDuration: null
     prometheusDatasourceImportFrom: null
-    prometheusCAFile: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+
+    prometheusCertificateAuthority:
+      # to use system CAs, set both to false
+      useServiceAccountCA: true
+      configMap:
+        enabled: false
+        create: false
+        name: reporting-operator-certificate-authority-config
+        filename: ""
+        value: ""
 
     prometheusImporter:
       auth:

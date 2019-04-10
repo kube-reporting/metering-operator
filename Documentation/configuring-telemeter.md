@@ -42,7 +42,9 @@ spec:
     spec:
       config:
         prometheusURL: "https://telemeter.api.mycompany.com"
-        prometheusCAFile: "/path/to/my/ca.crt" # or "" to validate against system certificate authorities
+        prometheusCertificateAuthority:
+          # use system certificates instead of cluster service account
+          useServiceAccountCA: false
         prometheusImporter:
           auth:
             # don't use in-cluster token authentication; instead use provided token
