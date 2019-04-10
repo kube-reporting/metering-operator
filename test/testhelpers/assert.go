@@ -28,7 +28,7 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 		require.NoError(t, err)
 	}
 
-	require.Len(t, expectedResults, len(actualResults), "new should have same number of rows as existing report")
+	require.Equal(t, len(expectedResults), len(actualResults), "new should have same number of rows as existing report")
 
 	// now that we have a slice of ordered maps, we should be able to
 	// iterate over each row, and for each row, iterate over all
@@ -64,7 +64,7 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 			if isCompareColumn && expectedValue != 0.0 {
 				assert.InEpsilonf(t, expectedValue, actualValue, reportComparisionEpsilon, "expected column %q value to be within delta of expected row", column)
 			} ***REMOVED*** {
-				assert.Equal(t, expectedValue, actualValue, "expected column values between actual and expected rows to be the same")
+				assert.Equal(t, expectedValue, actualValue, "expected column %q values between actual and expected rows to be the same", column)
 			}
 		}
 	}
