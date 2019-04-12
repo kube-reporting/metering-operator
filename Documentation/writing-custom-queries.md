@@ -217,14 +217,14 @@ spec:
     type: string
   - name: deployment
     type: string
-  - name: total_replica_unready_seconds,
+  - name: total_replica_unready_seconds
     type: double
-  - name: avg_replica_unready_seconds,
+  - name: avg_replica_unready_seconds
     type: double
   query: |
     SELECT
-        labels['namespace'] as namespace,
-        labels['deployment'] as deployment,
+        labels['namespace'] AS namespace,
+        labels['deployment'] AS deployment,
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
     FROM {| dataSourceTableName "unready-deployment-replicas" |}
@@ -245,6 +245,18 @@ AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.Repo
 
 Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, we should collect data with timestamps equal to or greater than the start time and less than the end time, as seen in the example above.
 
+In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema de***REMOVED***nition: `period_start` and `period_end`. Both of these columns will be of type `timestamp`, which requires us to add an additional ***REMOVED***eld, `spec.input`, to our `ReportGenerationQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
+Lastly, we need to update the SELECT portion of the `spec.query` ***REMOVED***eld:
+
+```
+query: |
+  SELECT
+    timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
+    timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+    labels['namespace'] AS namespace,
+    ...
+```
+
 As we begin accessing variables in the `ReportGenerationQuery`, we now have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
 Once we add this ***REMOVED***lter to our query and update our `spec.view.disabled` to true, we get the ***REMOVED***nal version of our ReportGenerationQuery.
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportgenerationquery.yaml`:
@@ -260,6 +272,10 @@ spec:
   view:
     disabled: true
   columns:
+  - name: period_start
+    type: timestamp
+  - name: period_end
+    type: timestamp
   - name: namespace
     type: string
   - name: deployment
@@ -268,10 +284,15 @@ spec:
     type: double
   - name: avg_replica_unready_seconds
     type: double
+  inputs:
+  - name: ReportingStart
+  - name: ReportingEnd
   query: |
     SELECT
-        labels['namespace'] as namespace,
-        labels['deployment'] as deployment,
+        timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
+        timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
+        labels['namespace'] AS namespace,
+        labels['deployment'] AS deployment,
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
     FROM {| dataSourceTableName "unready-deployment-replicas" |}
