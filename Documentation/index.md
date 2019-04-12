@@ -1,7 +1,6 @@
 # Operator Metering
 
 - [Installing Metering](install-metering.md)
-  - [Openshift install using openshift-ansible](ansible-install.md)
   - [Kubernetes install using Operator Lifecycle Manager](olm-install.md)
   - [Manual install scripts](manual-install.md)
 - [Metering con***REMOVED***guration options](metering-con***REMOVED***g.md)
