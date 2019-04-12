@@ -68,7 +68,7 @@ $ kubectl proxy
 ```
 
 The URL used to fetch a report changes based on the report's name and format.
-The `format` parameter may be either `csv` or `json`. The URL scheme is:
+The `format` parameter may be either `csv`, `json`, or `tab`. The URL scheme is:
 
 ```
 /api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
@@ -76,16 +76,16 @@ The `format` parameter may be either `csv` or `json`. The URL scheme is:
 
 Using `kubectl proxy` requires that the URL be accessed through a prefix that
 points to the Kubernetes service. (See the upstream documentation on
-[Manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes Metering is deployed in the `metering` namespace.
+[manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes that Metering is deployed in the `metering` namespace:
 
 ```
-http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
+http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/http:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
 ```
 
-If you are using Openshift, you'll need to change to the following, which uses the `openshift-metering` namespace, and which uses HTTPS by default:
+If you are using Openshift, you'll need to change to the following, which uses the `openshift-metering` namespace and HTTPS by default:
 
 ```
-http://127.0.0.1:8001/api/v1/namespaces/metering/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
+http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
 ```
 
 For example, the results of a report with the name `namespace-cpu-request` report can be fetched in
