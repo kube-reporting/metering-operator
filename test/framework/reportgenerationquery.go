@@ -19,6 +19,7 @@ func (f *Framework) GetMeteringReportGenerationQuery(name string) (*metering.Rep
 }
 
 func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportGenerationQuery, error) {
+	t.Helper()
 	var reportQuery *metering.ReportGenerationQuery
 	return reportQuery, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
@@ -39,6 +40,7 @@ func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name stri
 }
 
 func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
+	t.Helper()
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
@@ -85,6 +87,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 }
 
 func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPromsumDataResponse) {
+	t.Helper()
 	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
 	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)

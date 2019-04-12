@@ -54,6 +54,7 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1
 }
 
 func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) {
+	t.Helper()
 	err := f.MeteringClient.Reports(f.Namespace).Delete(report.Name, nil)
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
@@ -86,6 +87,7 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 }
 
 func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) []map[string]interface{} {
+	t.Helper()
 	var reportResults []map[string]interface{}
 	var reportData []byte
 

@@ -189,9 +189,6 @@ if [ "$TEST_METERING" == "true" ]; then
     # turn the json results into tap output
     "$FAQ_BIN" -f json -o json -M -c -r -s -F "$ROOT_DIR/hack/tap-output.jq" < "${TEST_LOG_FILE_PATH}.json" > "$TEST_TAP_FILE_PATH"
 
-    # Log the tap results too
-    cat "$TEST_TAP_FILE_PATH"
-
     # if go-junit-report is installed, create a junit report also
     if command -v go-junit-report >/dev/null 2>&1; then
         go-junit-report < "$TEST_LOG_FILE_PATH" > "${TEST_JUNIT_REPORT_FILE_PATH}"
