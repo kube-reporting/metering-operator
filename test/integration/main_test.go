@@ -305,14 +305,14 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 					metrics = append(metrics, &metric)
 					// batch store metrics in amounts of 100
 					if len(metrics) >= 100 {
-						err := testFramework.StoreDataSourceData(t, dataSource.DatasourceName, metrics)
+						err := testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
 						require.NoError(t, err)
 						metrics = nil
 					}
 				}
 				// flush any metrics left over
 				if len(metrics) != 0 {
-					err = testFramework.StoreDataSourceData(t, dataSource.DatasourceName, metrics)
+					err = testFramework.StoreDataSourceData(dataSource.DatasourceName, metrics)
 					require.NoError(t, err)
 				}
 
