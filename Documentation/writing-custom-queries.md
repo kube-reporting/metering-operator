@@ -1,6 +1,6 @@
 # Writing Custom Report Prometheus Queries and Report Generation Queries
 
-One of the main goals of Operator Metering is to be flexible, and extendible.
+One of the main goals of Operator Metering is to be flexible, and extensible.
 The way this has been done is to use Kubernetes Custom Resources as a way of letting users add to, or expand upon the built-in reports and metrics that the operator already has.
 
 The primary Custom Resources that allow this are the [ReportPrometheusQuery][reportprometheusqueries], [ReportDataSource][reportdatasources], and the [ReportGenerationQuery][reportgenerationqueries].
@@ -8,7 +8,7 @@ It's highly recommended you read the documentation on each of these resources be
 
 A ReportDataSource combined with a ReportPrometheusQueries cause Operator Metering to collect additional Prometheus Metrics by allowing users to write custom Prometheus queries and store the metrics collected for analysis with a ReportGenerationQuery.
 
-This guide is going to be structured so that you begin by collecting new Prometheus Metrics, and then end by writing custom SQL queries that analyze these metrics.
+This guide is going to be structured such that you begin by collecting new Prometheus Metrics, and by the end you will be writing custom SQL queries that analyze these metrics.
 
 ## Setup
 
@@ -16,7 +16,7 @@ This guide assumes you've already [installed Metering][install-metering] and hav
 
 > This guide assumes you've set the `METERING_NAMESPACE` environment variable to the namespace your Operator Metering installation is running. All resources must be created in that namespace for the operator to view and access them.
 
-Many of the examples below, will have you run a Prometheus query outside of the Metering operator.
+Many of the examples below, you will have you run a Prometheus query outside of the Metering operator.
 The easiest way to do this is open a port-forward to your Prometheus pod in your cluster.
 Below is a command that will open up a port-forward, exposing Prometheus on `127.0.0.1:9090`.
 
@@ -33,7 +33,7 @@ If you get a 404, it's possible your Prometheus is behind an ingress controller,
 For the purposes of this guide, we are going to report on the `kube_deployment_status_replicas_unavailable` metric that is produced by `kube-state-metrics`, which should be available in your Prometheus instance if you're using the prometheus-operator in some form.
 
 To validate, open your web browser to your Prometheus UI that we set up earlier and in the box above the `Execute` button, enter in `kube_deployment_status_replicas_unavailable`, and hit the `Execute` button.
-You should see a list of metrics show up, if you have an empty list, it's possible you don't have `kube-state-metrics` running, or there's a con***REMOVED***guration issue with Prometheus.
+You should see a list of metrics show up. If you have an empty list, it's possible that you don't have `kube-state-metrics` running, or there's a con***REMOVED***guration issue with Prometheus.
 
 ## Collecting additional Prometheus metrics
 
@@ -44,7 +44,7 @@ For the example, we're going to try to answer the following question.
 
 To answer this question, we're going to use the `kube_deployment_status_replicas_unavailable` metric which tells us how many unready replicas a particular deployment has at a given moment in time.
 
-Next, we need to ***REMOVED***gure out what information we care about from this metric, as a lot of it is not particularly useful to us.
+Next, we need to ***REMOVED***gure out what information we care about from this metric, as a lot of it's not particularly useful to us.
 The most relevant information available in this metric is the `namespace`, `deployment` labels and the actual value of the metric.
 
 To strip out everything besides this information, the following Prometheus query [sums](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators) the value of the metric grouped by the `namespace` and `deployment`.
@@ -70,7 +70,7 @@ spec:
     sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)
 ```
 
-Creating the ReportPrometheusQuery only makes the query available for use, but doesn't actually cause the metrics to be collected, to cause a Metric to be collected you need to create a [ReportDataSource][reportdatasources] with a `spec.promsum` section con***REMOVED***gured to use the ReportPrometheusQuery of your choice.
+Creating the ReportPrometheusQuery only makes the query available for use, but doesn't actually cause the metrics to be collected. To allow a Metric to be collected, you need to create a [ReportDataSource][reportdatasources] with a `spec.promsum` section con***REMOVED***gured to use the ReportPrometheusQuery of your choice.
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportdatasource.yaml`:
 
 ```
@@ -103,7 +103,7 @@ After you have a session run the following query:
 show tables;
 ```
 
-This should give you a list of Database Tables created in Presto, you should see quite a few entries, and among them `datasource_unready_deployment_replicas` should be in the list, if it is not, it's possible the table has not be created yet, or there was an error.
+This should give you a list of Database Tables created in Presto, and you should see quite a few entries. Among these entries, `datasource_unready_deployment_replicas` should be in the list, and if it's not, it's possible the table has not be created yet, or there was an error.
 In this case, you should [check the metering operator logs][reporting-operator-logs] for errors.
 
 If the table does exist, it may take up to 5 minutes (the default collection interval) before any data exists in the table.
@@ -141,9 +141,9 @@ Now that we have a database table that we can experiment with, we can begin to a
 > What is the average and total amount of time that a particular deployment's replicas are unready?
 
 To answer this, we need to do a few things:
-- for each timestamp, ***REMOVED***nd the time each individual pod was unready
+- for each timestamp, ***REMOVED***nd the time each individual pod was unready.
 - divide up, or group the results by the deployment.
-- ***REMOVED***nd the average and total duration pods are unready for each deployment
+- ***REMOVED***nd the average and total duration pods are unready for each deployment.
 
 We'll start with getting the unready time at an individual metric level.
 Since the `amount` corresponds to the number of unready pods at that moment in time, and the `timeprecision` gives how long the metric was that value, we just need to multiply the `amount` (number of pods) by the `timeprecision` (length of time it was at that value):
@@ -196,7 +196,7 @@ Now that we have our ***REMOVED***nal query, the time has come to put it into a 
 The basic things you need to know when creating a `ReportGenerationQuery` is the query you're going to use, the schema for that query, and the `ReportDataSources` or `ReportGenerationQueries` your query depends on.
 
 For our example, we will add the `unready-deployment-replicas` `ReportDataSources` to the `spec.ReportDataSource`, and we'll add the query to `spec.query`.
-The schema, is de***REMOVED***ned in the `spec.columns` ***REMOVED***eld and is basically a list of the columns from the `SELECT` query and their SQL data types.
+The schema, which is de***REMOVED***ned in the `spec.columns` ***REMOVED***eld, is basically a list of the columns from the `SELECT` query and their SQL data types.
 The column information is what the operator uses to create the table when a report is being generated.
 If this doesn't match the query, there will be issues when running the query and trying to store the data into the database.
 
@@ -236,17 +236,17 @@ However, the above example is missing one crucial bit, and that's the ability to
 To handle this, the `.Report` variable is accessible within templates and contains a `.Report.StartPeriod` and `.Report.EndPeriod` ***REMOVED***eld which will be ***REMOVED***lled in with values corresponding to the Report's reporting period.
 We can use these variables in a `WHERE` clause within our query to ***REMOVED***lter the results to those time ranges.
 
-The `WHERE` clause generally for this generally looks the same for all `ReportGenerationQueries` that expect to be used by a Report:
+The `WHERE` clause generally looks the same for all `ReportGenerationQueries` that expect to be used by a Report:
 
 ```
 WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
 AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
 ```
 
-Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, should collect data with timestamps equal to or greater than the start time and less than the end time, as seen above.
+Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, we should collect data with timestamps equal to or greater than the start time and less than the end time, as seen in the example above.
 
-Once we begin accessing variables in the `ReportGenerationQuery` this means we have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
-Adding this ***REMOVED***lter to our query and updating our `spec.view.disabled` to true and we get the ***REMOVED***nal version of our ReportGenerationQuery.
+As we begin accessing variables in the `ReportGenerationQuery`, we now have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
+Once we add this ***REMOVED***lter to our query and update our `spec.view.disabled` to true, we get the ***REMOVED***nal version of our ReportGenerationQuery.
 Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportgenerationquery.yaml`:
 
 ```
@@ -309,7 +309,7 @@ Next, let's create the report and let the operator generate the results:
 kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-report.yaml
 ```
 
-Taking a report may take a while, but you can check on the report's status by reading the `status` ***REMOVED***eld from output of the command below:
+Creating a report may take a while, but you can check on the report's status by reading the `status` ***REMOVED***eld from output of the command below:
 
 ```
 kubectl -n $METERING_NAMESPACE get report unready-deployment-replicas -o json
@@ -353,12 +353,12 @@ Creating and using reports is covered in more detail in the [Using Metering docu
 
 Here's a summary of what we did in this guide:
 
-- We wrote a Prometheus query that collects metrics on unready deployment replicas
-- We created a `ReportPrometheusQuery` containing this query
-- We created a `ReportDataSource` that gave us a Presto table containing the metrics from our Prometheus query
-- We wrote a Presto SQL query that calculates the average and total number of seconds pods are unready for each deployment
-- We wrote a `ReportGenerationQuery` that does our calculation, and handles ***REMOVED***ltering the results to a Reports con***REMOVED***gured time range
-- We created a `Report` that uses our `ReportGenerationQuery`
+- We wrote a Prometheus query that collects metrics on unready deployment replicas.
+- We created a `ReportPrometheusQuery` containing this query.
+- We created a `ReportDataSource` that gave us a Presto table containing the metrics from our Prometheus query.
+- We wrote a Presto SQL query that calculates the average and total number of seconds that pods are unready for each deployment.
+- We wrote a `ReportGenerationQuery` that does our calculation, and handles ***REMOVED***ltering the results to a Report's con***REMOVED***gured time range.
+- We created a `Report` that uses our `ReportGenerationQuery`.
 - We checked that the Report ***REMOVED***nished, and then fetched the results from the metering operator HTTP API.
 
 [reportdatasources]: reportdatasources.md

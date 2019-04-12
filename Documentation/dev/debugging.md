@@ -14,7 +14,7 @@ export METERING_NAMESPACE=your-namespace
 The command below will follow the logs of the reporting-operator.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
+kubectl -n $METERING_NAMESPACE get pods  -l app=reporting-operator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
 ```
 
 ## Query Presto using presto-cli
@@ -22,7 +22,7 @@ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut 
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
+kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
@@ -66,7 +66,7 @@ presto:default>
 The following will open up an interactive beeline session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Hive pod.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=hive,hive=server -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE exec -it {} -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
+kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
@@ -108,7 +108,7 @@ The Presto web UI can be very useful when debugging.
 It will show what queries are running, which have succeeded, and which queries have failed.
 
 ```
-kubectl get pods -n $METERING_NAMESPACE -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
+kubectl -n $METERING_NAMESPACE get pods  -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
 ```
 
 You can now open http://127.0.0.1:8080 in your browser window to view the Presto web interface.
@@ -116,7 +116,7 @@ You can now open http://127.0.0.1:8080 in your browser window to view the Presto
 ## Port-forward to Hive web UI
 
 ```
-kubectl -n $METERING_NAMESPACE port-forward hive-0 10002
+kubectl -n $METERING_NAMESPACE port-forward hive-server-0 10002
 ```
 
 You can now open http://127.0.0.1:10002 in your browser window to view the Hive web interface.
@@ -127,16 +127,16 @@ You can now open http://127.0.0.1:10002 in your browser window to view the Hive 
 To the namenode:
 
 ```
-kubectl -n $METERING_NAMESPACE port-forward hdfs-namenode-0 50070
+kubectl -n $METERING_NAMESPACE port-forward hdfs-namenode-0 9870
 ```
 
-You can now open http://127.0.0.1:50070 in your browser window to view the HDFS web interface.
+You can now open http://127.0.0.1:9870 in your browser window to view the HDFS web interface.
 
 
 To the ***REMOVED***rst datanode:
 
 ```
-kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 50075
+kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 9864
 ```
 
-To check other datanodes, runt he above command, replacing `hdfs-datanode-0` with the pod you want to view information on.
+To check other datanodes, run the above command, replacing `hdfs-datanode-0` with the pod you want to view information on.
