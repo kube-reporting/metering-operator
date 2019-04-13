@@ -54,10 +54,8 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "persistentvolumeclaim-capacity-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -84,7 +82,7 @@ spec:
       namespace,
       persistentvolumeclaim,
       sum(persistentvolumeclaim_capacity_bytes) AS persistentvolumeclaim_capacity_bytes
-    FROM {| generationQueryViewName "persistentvolumeclaim-capacity-raw" |}
+    FROM {| dataSourceTableName "persistentvolumeclaim-capacity-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'

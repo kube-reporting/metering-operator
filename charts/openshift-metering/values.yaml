@@ -3,12 +3,13 @@ global:
 
 defaultStorage:
   create: true
-  name: "hive-hdfs"
+  name: "hive"
   isDefault: true
   type: "hive"
   hive:
-    tableProperties:
-      location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
+    # Unmanaged because "default" database is created by Hive, not us.
+    unmanagedDatabase: true
+    databaseName: "default"
 
 permissions:
   meteringViewers: []
