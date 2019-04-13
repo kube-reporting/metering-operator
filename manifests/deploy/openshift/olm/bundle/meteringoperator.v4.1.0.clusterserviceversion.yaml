@@ -523,8 +523,9 @@ spec:
       kind: ReportPrometheusQuery
       name: reportprometheusqueries.metering.openshift.io
       version: v1alpha1
-    - description: A resource describing a source of data for usage by Report Generation
-        Queries.
+    - description: Used under-the-hood. A resource a database table in Presto. Use by
+        ReportGenerationQueries to determine what tables exist, and by the HTTP API to
+        determine how to query a table.
       displayName: Metering Data Source
       kind: ReportDataSource
       name: reportdatasources.metering.openshift.io
@@ -540,5 +541,10 @@ spec:
       displayName: Metering Presto Table
       kind: PrestoTable
       name: prestotables.metering.openshift.io
+      version: v1alpha1
+    - description: Used under-the-hood. A resource a database table in Hive.
+      displayName: Metering Hive Table
+      kind: HiveTable
+      name: hivetables.metering.openshift.io
       version: v1alpha1
 
