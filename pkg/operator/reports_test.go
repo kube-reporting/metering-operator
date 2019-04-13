@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -245,7 +244,7 @@ func TestValidateReport(t *testing.T) {
 	)
 
 	ds1 := testhelpers.NewReportDataSource("datasource1", testNamespace)
-	ds1.Status.TableName = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
+	ds1.Status.TableRef = v1.LocalObjectReference{Name: "initialized-datasource"}
 
 	testValidQuery := &metering.ReportGenerationQuery{
 		ObjectMeta: metav1.ObjectMeta{

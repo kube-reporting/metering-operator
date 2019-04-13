@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -13,36 +14,16 @@ import (
 )
 
 func TestValidateGenerationQueryDependencies(t *testing.T) {
-	reportQueryViewUnset := testhelpers.NewReportGenerationQuery("uninitialized-query", "default", nil)
-	reportQueryViewDisabled := testhelpers.NewReportGenerationQuery("query-view-disabled", "default", nil)
-	reportQueryViewDisabled.Spec.View.Disabled = true
-	reportQueryViewSet := testhelpers.NewReportGenerationQuery("initialized-query", "default", nil)
-	reportQueryViewSet.Status.ViewName = reportingutil.GenerationQueryViewName("test-ns", "initialized-query")
-
+	// reportQuery := testhelpers.NewReportGenerationQuery("uninitialized-query", "default", nil)
 	dataSourceTableUnset := testhelpers.NewReportDataSource("uninitialized-datasource", "default")
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
-	dataSourceTableSet.Status.TableName = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
+	dataSourceTableSet.Status.TableRef.Name = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
 
 	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{}, nil, false)
 	reportTableSet := testhelpers.NewReport("initialized-report", "default", "some-query", nil, nil, metering.ReportStatus{
-		TableName: reportingutil.ReportTableName("test-ns", "initialized-report"),
+		TableRef: v1.LocalObjectReference{Name: reportingutil.ReportTableName("test-ns", "initialized-report")},
 	}, nil, false)
 
-	// we keep a set of our test objects here since we re-use them in different
-	// combinations in the test cases
-	uninitializedQueries := []*metering.ReportGenerationQuery{
-		reportQueryViewUnset,
-	}
-	disabledViewQueries := []*metering.ReportGenerationQuery{
-		reportQueryViewDisabled,
-	}
-	combinedUninitializedQueries := []*metering.ReportGenerationQuery{
-		reportQueryViewUnset,
-		reportQueryViewDisabled,
-	}
-	initializedQueries := []*metering.ReportGenerationQuery{
-		reportQueryViewSet,
-	}
 	uninitializedDataSources := []*metering.ReportDataSource{
 		dataSourceTableUnset,
 	}
@@ -63,74 +44,46 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		"no dependencies results in no errors": {
 			deps: ReportGenerationQueryDependencies{},
 		},
-		"ReportGenerationQueryDependencies dependencies with their view created is valid": {
+		"ReportGenerationQueryDependencies dependencies on other queries is valid": {
 			deps: ReportGenerationQueryDependencies{
-				ReportGenerationQueries: initializedQueries,
+				// ReportGenerationQueries: initializedQueries,
 			},
 		},
-		"ReportGenerationQuery dependencies missing their status.viewName unset is a validation error": {
-			deps: ReportGenerationQueryDependencies{
-				ReportGenerationQueries: uninitializedQueries,
-			},
-			expectErr: true,
-		},
-		// if view is disabled, then it should be a DynamicReportQueries
-		// dependency, not a regular one
-		"ReportGenerationQuery dependencies with view disabled is invalid": {
-			deps: ReportGenerationQueryDependencies{
-				ReportGenerationQueries: disabledViewQueries,
-			},
-			expectErr: true,
-		},
-		"DynamicReportGenerationQuery dependencies with view disabled is valid": {
-			deps: ReportGenerationQueryDependencies{
-				DynamicReportGenerationQueries: disabledViewQueries,
-			},
-		},
-		"multiple invalid/uninitialized ReportGenerationQuery dependencies is a validation error": {
-			deps: ReportGenerationQueryDependencies{
-				ReportGenerationQueries: combinedUninitializedQueries,
-			},
-			expectErr: true,
-		},
-		"ReportDataSource dependencies with status.tableName unset is a validation error": {
+		"ReportDataSource dependencies with status.tableRef.name unset is a validation error": {
 			deps: ReportGenerationQueryDependencies{
 				ReportDataSources: uninitializedDataSources,
 			},
 			expectErr: true,
 		},
-		"ReportDataSource dependencies with status.tableName set is valid": {
+		"ReportDataSource dependencies with status.tableRef.name set is valid": {
 			deps: ReportGenerationQueryDependencies{
 				ReportDataSources: initializedDataSources,
 			},
 		},
-		"Report dependencies with status.tableName unset is a validation error": {
+		"Report dependencies with status.tableRef.name unset is a validation error": {
 			deps: ReportGenerationQueryDependencies{
 				Reports: uninitializedReports,
 			},
 			expectErr: true,
 		},
-		"Report dependencies with status.tableName set is valid": {
+		"Report dependencies with status.tableRef.name set is valid": {
 			deps: ReportGenerationQueryDependencies{
 				Reports: initializedReports,
 			},
 		},
 		"mixing valid and invalid dependencies is a validation error": {
 			deps: ReportGenerationQueryDependencies{
-				Reports:                 uninitializedReports,
-				ReportGenerationQueries: combinedUninitializedQueries,
-				ReportDataSources:       uninitializedDataSources,
-				// disabledViewQueries is ***REMOVED***ne for dynamic queries
-				DynamicReportGenerationQueries: disabledViewQueries,
+				Reports: uninitializedReports,
+				// ReportGenerationQueries: initializedQueries,
+				ReportDataSources: uninitializedDataSources,
 			},
 			expectErr: true,
 		},
 		"mixing valid dependencies is a valid": {
 			deps: ReportGenerationQueryDependencies{
-				Reports:                        uninitializedReports,
-				ReportGenerationQueries:        initializedQueries,
-				ReportDataSources:              initializedDataSources,
-				DynamicReportGenerationQueries: disabledViewQueries,
+				Reports: uninitializedReports,
+				// ReportGenerationQueries: initializedQueries,
+				ReportDataSources: initializedDataSources,
 			},
 			expectErr: true,
 		},
@@ -170,9 +123,6 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 				"datasource1",
 				"datasource2",
 			},
-			ReportQueries: []string{
-				"query1",
-			},
 			DynamicReportQueries: []string{
 				"dynamicquery1",
 				"dynamicquery2",
@@ -188,9 +138,6 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 		Spec: metering.ReportGenerationQuerySpec{
 			DataSources: []string{
 				"datasource3",
-			},
-			ReportQueries: []string{
-				"query2",
 			},
 		},
 	}
@@ -224,11 +171,7 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 			Name:      "dynamicquery2",
 			Namespace: testNs,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			ReportQueries: []string{
-				"query3",
-			},
-		},
+		Spec: metering.ReportGenerationQuerySpec{},
 	}
 
 	query3 := &metering.ReportGenerationQuery{
@@ -245,10 +188,7 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 
 	expectedDeps := &ReportGenerationQueryDependencies{
 		ReportDataSources: []*metering.ReportDataSource{
-			ds1, ds2, ds3, ds4, ds5, ds6,
-		},
-		ReportGenerationQueries: []*metering.ReportGenerationQuery{
-			query1, query2, query3,
+			ds1, ds2, ds4,
 		},
 		DynamicReportGenerationQueries: []*metering.ReportGenerationQuery{
 			dynamicquery1, dynamicquery2,

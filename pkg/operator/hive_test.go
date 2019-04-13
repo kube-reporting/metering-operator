@@ -6,32 +6,32 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/presto"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 func TestGetPartitionChanges(t *testing.T) {
 	tests := []struct {
 		name             string
-		current          []cbTypes.TablePartition
-		desired          []cbTypes.TablePartition
-		expectedToRemove []cbTypes.TablePartition
-		expectedToAdd    []cbTypes.TablePartition
-		expectedToUpdate []cbTypes.TablePartition
+		current          []cbTypes.HiveTablePartition
+		desired          []cbTypes.HiveTablePartition
+		expectedToRemove []cbTypes.HiveTablePartition
+		expectedToAdd    []cbTypes.HiveTablePartition
+		expectedToUpdate []cbTypes.HiveTablePartition
 	}{
 		{
 			name: "current and desired are same",
-			current: []cbTypes.TablePartition{
+			current: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.TablePartition{
+			desired: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
@@ -41,18 +41,18 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "empty current should have desired in to add list",
-			desired: []cbTypes.TablePartition{
+			desired: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
 					Location: "foobar",
 				},
 			},
-			expectedToAdd: []cbTypes.TablePartition{
+			expectedToAdd: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
@@ -62,18 +62,18 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "desired is empty and current should be removed",
-			current: []cbTypes.TablePartition{
+			current: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
 					Location: "foobar",
 				},
 			},
-			expectedToRemove: []cbTypes.TablePartition{
+			expectedToRemove: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
@@ -83,27 +83,27 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "desired matches and replaces current",
-			current: []cbTypes.TablePartition{
+			current: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.TablePartition{
+			desired: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
 					Location: "***REMOVED***zbuzz",
 				},
 			},
-			expectedToUpdate: []cbTypes.TablePartition{
+			expectedToUpdate: []cbTypes.HiveTablePartition{
 				{
-					PartitionSpec: presto.PartitionSpec{
+					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
 						"end":   "20170201",
 					},
@@ -115,7 +115,8 @@ func TestGetPartitionChanges(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			changes := getPartitionChanges(test.current, test.desired)
+			partitionColumns := []hive.Column{{Name: "start", Type: "string"}, {Name: "end", Type: "string"}}
+			changes := getPartitionChanges(partitionColumns, test.current, test.desired)
 			assert.Equal(t, test.expectedToAdd, changes.toAddPartitions, "to add should match expected to add")
 			assert.Equal(t, test.expectedToRemove, changes.toRemovePartitions, "to remove should match expected to remove")
 		})

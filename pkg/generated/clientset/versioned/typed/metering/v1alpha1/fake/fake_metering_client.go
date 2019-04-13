@@ -12,6 +12,10 @@ type FakeMeteringV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeMeteringV1alpha1) HiveTables(namespace string) v1alpha1.HiveTableInterface {
+	return &FakeHiveTables{c, namespace}
+}
+
 func (c *FakeMeteringV1alpha1) PrestoTables(namespace string) v1alpha1.PrestoTableInterface {
 	return &FakePrestoTables{c, namespace}
 }

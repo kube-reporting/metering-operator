@@ -11,6 +11,7 @@ import (
 
 type MeteringV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	HiveTablesGetter
 	PrestoTablesGetter
 	ReportsGetter
 	ReportDataSourcesGetter
@@ -22,6 +23,10 @@ type MeteringV1alpha1Interface interface {
 // MeteringV1alpha1Client is used to interact with features provided by the metering.openshift.io group.
 type MeteringV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *MeteringV1alpha1Client) HiveTables(namespace string) HiveTableInterface {
+	return newHiveTables(c, namespace)
 }
 
 func (c *MeteringV1alpha1Client) PrestoTables(namespace string) PrestoTableInterface {

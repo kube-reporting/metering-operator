@@ -6,6 +6,8 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var ReportGenerationQueryGVK = SchemeGroupVersion.WithKind("ReportGenerationQuery")
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type ReportGenerationQueryList struct {
@@ -28,8 +30,6 @@ type ReportGenerationQuery struct {
 type ReportGenerationQuerySpec struct {
 	Columns              []ReportGenerationQueryColumn          `json:"columns"`
 	Query                string                                 `json:"query"`
-	View                 GenQueryView                           `json:"view"`
-	ReportQueries        []string                               `json:"reportQueries,omitempty"`
 	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
 	DataSources          []string                               `json:"reportDataSources,omitempty"`
 	Reports              []string                               `json:"reports,omitempty"`
@@ -41,12 +41,6 @@ type ReportGenerationQueryColumn struct {
 	Type        string `json:"type"`
 	TableHidden bool   `json:"tableHidden"`
 	Unit        string `json:"unit,omitempty"`
-}
-
-type GenQueryView struct {
-	// Disabled controls whether or not to create a view in presto for this
-	// ReportGenerationQuery
-	Disabled bool `json:"disabled"`
 }
 
 type ReportGenerationQueryInputDe***REMOVED***nition struct {
@@ -63,7 +57,4 @@ type ReportGenerationQueryInputValue struct {
 type ReportGenerationQueryInputValues []ReportGenerationQueryInputValue
 
 type ReportGenerationQueryStatus struct {
-	// ViewName is the name of the view in Presto for this query, if the view
-	// has been created. If it is empty, the view does not exist.
-	ViewName string `json:"viewName,omitempty"`
 }

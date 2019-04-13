@@ -2,6 +2,8 @@
 
 package v1alpha1
 
+type HiveTableExpansion interface{}
+
 type PrestoTableExpansion interface{}
 
 type ReportExpansion interface{}

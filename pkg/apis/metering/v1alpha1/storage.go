@@ -21,7 +21,12 @@ type StorageLocation struct {
 	meta.TypeMeta   `json:",inline"`
 	meta.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec StorageLocationSpec `json:"spec"`
+	Spec   StorageLocationSpec   `json:"spec"`
+	Status StorageLocationStatus `json:"status"`
+}
+
+type StorageLocationRef struct {
+	StorageLocationName string `json:"storageLocationName,omitempty"`
 }
 
 type StorageLocationSpec struct {
@@ -29,10 +34,23 @@ type StorageLocationSpec struct {
 }
 
 type HiveStorage struct {
-	TableProperties TableProperties `json:"tableProperties"`
+	UnmanagedDatabase      bool                               `json:"unmanagedDatabase"`
+	DatabaseName           string                             `json:"databaseName"`
+	Location               string                             `json:"location,omitempty"`
+	DefaultTableProperties *HiveStorageDefaultTableProperties `json:"defaultTableProperties,omitempty"`
 }
 
-type StorageLocationRef struct {
-	StorageLocationName string               `json:"storageLocationName,omitempty"`
-	StorageSpec         *StorageLocationSpec `json:"spec,omitempty"`
+type HiveStorageDefaultTableProperties struct {
+	SerdeFormat        string            `json:"serdeFormat,omitempty"`
+	FileFormat         string            `json:"***REMOVED***leFormat,omitempty"`
+	SerdeRowProperties map[string]string `json:"serdeRowProperties,omitempty"`
+}
+
+type StorageLocationStatus struct {
+	Hive HiveStorageStatus `json:"hive,omitempty"`
+}
+
+type HiveStorageStatus struct {
+	DatabaseName string `json:"databaseName"`
+	Location     string `json:"location,omitempty"`
 }

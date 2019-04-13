@@ -16,8 +16,16 @@ import (
 )
 
 type ReportQueryTemplateContext struct {
-	Report                  *ReportTemplateInfo
-	DynamicDependentQueries []*cbTypes.ReportGenerationQuery
+	Namespace               string
+	Reports                 []*cbTypes.Report
+	ReportQuery             *cbTypes.ReportGenerationQuery
+	ReportGenerationQueries []*cbTypes.ReportGenerationQuery
+	ReportDataSources       []*cbTypes.ReportDataSource
+	PrestoTables            []*cbTypes.PrestoTable
+}
+
+type TemplateContext struct {
+	Report ReportTemplateInfo
 }
 
 type ReportTemplateInfo struct {
@@ -26,64 +34,95 @@ type ReportTemplateInfo struct {
 	Inputs         map[string]interface{}
 }
 
-func newQueryTemplate(queryTemplate, namespace string) (*template.Template, error) {
-	var templateFuncMap = template.FuncMap{
-		"prestoTimestamp":                 PrestoTimestamp,
-		"billingPeriodTimestamp":          reportingutil.BillingPeriodTimestamp,
-		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
-		"reportTableName":                 reportTableNameWithNamespaceFunc(namespace),
-		"dataSourceTableName":             dataSourceTableNameWithNamespaceFunc(namespace),
-		"generationQueryViewName":         generationQueryViewNameWithNamespaceFunc(namespace),
-		"renderReportGenerationQuery":     renderReportGenerationQueryFunc(namespace),
+func (ctx *ReportQueryTemplateContext) dataSourceTableName(name string) (string, error) {
+	for _, ds := range ctx.ReportDataSources {
+		if ds.Name == name {
+			if ds.Status.TableRef.Name == "" {
+				return "", fmt.Errorf("%s tableRef is empty", ds.Name)
+			}
+			for _, prestoTable := range ctx.PrestoTables {
+				if prestoTable.Name == ds.Status.TableRef.Name {
+					return reportingutil.FullyQuali***REMOVED***edTableName(prestoTable), nil
+				}
+			}
+			return "", fmt.Errorf("tableRef PrestoTable %s not found", ds.Status.TableRef.Name)
+		}
+	}
+	return "", fmt.Errorf("ReportDataSource %s dependency not found", name)
+}
+
+func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, error) {
+	for _, r := range ctx.Reports {
+		if r.Name == name {
+			if r.Status.TableRef.Name == "" {
+				return "", fmt.Errorf("%s tableRef is empty", r.Name)
+			}
+			for _, prestoTable := range ctx.PrestoTables {
+				if prestoTable.Name == r.Status.TableRef.Name {
+					return reportingutil.FullyQuali***REMOVED***edTableName(prestoTable), nil
+				}
+			}
+			return "", fmt.Errorf("tableRef PrestoTable %s not found", r.Status.TableRef.Name)
+		}
+	}
+	return "", fmt.Errorf("Report %s dependency not found", name)
+}
+
+func (ctx *ReportQueryTemplateContext) renderReportGenerationQuery(name string, tmplCtx TemplateContext) (string, error) {
+	var reportQuery *cbTypes.ReportGenerationQuery
+	for _, q := range ctx.ReportGenerationQueries {
+		if q.Name == name {
+			reportQuery = q
+			break
+		}
+	}
+	if reportQuery == nil {
+		return "", fmt.Errorf("unknown ReportGenerationQuery %s", name)
 	}
 
-	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(queryTemplate)
+	// copy context and replace the query we're rendering
+	newCtx := *ctx
+	newCtx.ReportQuery = reportQuery
+
+	renderedQuery, err := RenderQuery(&newCtx, tmplCtx)
+	if err != nil {
+		return "", fmt.Errorf("unable to render query %s, err: %v", name, err)
+	}
+	return renderedQuery, nil
+}
+
+func (ctx *ReportQueryTemplateContext) newQueryTemplate() (*template.Template, error) {
+	var templateFuncMap = template.FuncMap{
+		"prestoTimestamp":                 PrestoTimestamp,
+		"billingPeriodTimestamp":          reportingutil.AWSBillingPeriodTimestamp,
+		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
+		"reportTableName":                 ctx.reportTableName,
+		"dataSourceTableName":             ctx.dataSourceTableName,
+		"renderReportGenerationQuery":     ctx.renderReportGenerationQuery,
+	}
+
+	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(ctx.ReportQuery.Spec.Query)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
 	return tmpl, nil
 }
 
-func RenderQuery(query, namespace string, tmplCtx *ReportQueryTemplateContext) (string, error) {
-	tmpl, err := newQueryTemplate(query, namespace)
+func RenderQuery(ctx *ReportQueryTemplateContext, tmplCtx TemplateContext) (string, error) {
+	tmpl, err := ctx.newQueryTemplate()
 	if err != nil {
 		return "", err
 	}
 	return renderTemplate(tmpl, tmplCtx)
 }
 
-func renderTemplate(tmpl *template.Template, tmplCtx *ReportQueryTemplateContext) (string, error) {
+func renderTemplate(tmpl *template.Template, tmplCtx TemplateContext) (string, error) {
 	var buf bytes.Buffer
 	err := tmpl.Execute(&buf, tmplCtx)
 	if err != nil {
 		return "", fmt.Errorf("error executing template: %v", err)
 	}
 	return buf.String(), nil
-}
-
-func renderReportGenerationQueryFunc(namespace string) func(string, *ReportQueryTemplateContext) (string, error) {
-	return func(queryName string, tmplCtx *ReportQueryTemplateContext) (string, error) {
-		return renderReportGenerationQuery(queryName, namespace, tmplCtx)
-	}
-}
-
-func renderReportGenerationQuery(queryName, namespace string, tmplCtx *ReportQueryTemplateContext) (string, error) {
-	var query string
-	for _, q := range tmplCtx.DynamicDependentQueries {
-		if q.Name == queryName {
-			query = q.Spec.Query
-			break
-		}
-	}
-	if query == "" {
-		return "", fmt.Errorf("unknown ReportGenerationQuery %s", queryName)
-	}
-
-	renderedQuery, err := RenderQuery(query, namespace, tmplCtx)
-	if err != nil {
-		return "", fmt.Errorf("unable to render query %s, err: %v", queryName, err)
-	}
-	return renderedQuery, nil
 }
 
 func TimestampFormat(input interface{}, format string) (string, error) {
@@ -111,22 +150,4 @@ func PrometheusMetricPartitionFormat(input interface{}) (string, error) {
 
 func PrestoTimestamp(input interface{}) (string, error) {
 	return TimestampFormat(input, presto.TimestampFormat)
-}
-
-func dataSourceTableNameWithNamespaceFunc(namespace string) func(string) string {
-	return func(name string) string {
-		return reportingutil.DataSourceTableName(namespace, name)
-	}
-}
-
-func reportTableNameWithNamespaceFunc(namespace string) func(string) string {
-	return func(name string) string {
-		return reportingutil.ReportTableName(namespace, name)
-	}
-}
-
-func generationQueryViewNameWithNamespaceFunc(namespace string) func(string) string {
-	return func(name string) string {
-		return reportingutil.GenerationQueryViewName(namespace, name)
-	}
 }

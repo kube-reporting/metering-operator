@@ -18,6 +18,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
@@ -358,6 +359,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return op.setReportStatusInvalidReport(report, err.Error())
 	}
 
+	reportQueryInputs, err := reporting.ValidateReportGenerationQueryInputs(genQuery, report.Spec.Inputs)
+	if err != nil {
+		return op.setReportStatusInvalidReport(report, fmt.Sprintf("failed to validate ReportGenerationQuery %s inputs: %s", genQuery.Name, err))
+	}
+
 	now := op.clock.Now().UTC()
 
 	// get the report's reporting period
@@ -488,24 +494,86 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return err
 	}
 
-	tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
+	var prestoTable *cbTypes.PrestoTable
 	// if tableName isn't set, this report is still new and we should make sure
 	// no tables exist already in case of a previously failed cleanup.
-	if report.Status.TableName == "" {
-		logger.Debugf("dropping table %s", tableName)
-		err = op.tableManager.DropTable(tableName, true)
+	if report.Status.TableRef.Name != "" {
+		prestoTable, err = op.prestoTableLister.PrestoTables(report.Namespace).Get(report.Status.TableRef.Name)
 		if err != nil {
-			return fmt.Errorf("unable to drop table %s before creating for Report %s: %v", tableName, report.Name, err)
+			return fmt.Errorf("unable to get PrestoTable %s for Report %s, %s", report.Status.TableRef, report.Name, err)
+		}
+		logger.Infof("Report %s table already exists, tableName: %s", report.Name, prestoTable.Status.TableName)
+	} ***REMOVED*** {
+		tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
+		hiveStorage, err := op.getHiveStorage(report.Spec.Output, report.Namespace)
+		if err != nil {
+			return fmt.Errorf("storage incorrectly con***REMOVED***gured for Report %s, err: %v", report.Name, err)
+		}
+		if hiveStorage.Status.Hive.DatabaseName == "" {
+			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 
-		columns := reportingutil.GenerateHiveColumns(genQuery)
-		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns, nil)
-		if err != nil {
-			logger.WithError(err).Error("error creating report table for report")
-			return err
+		params := hive.TableParameters{
+			Database: hiveStorage.Status.Hive.DatabaseName,
+			Name:     tableName,
+			Columns:  reportingutil.GenerateHiveColumns(genQuery),
+		}
+		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
+			params.SerdeFormat = hiveStorage.Spec.Hive.DefaultTableProperties.SerdeFormat
+			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
+			params.SerdeRowProperties = hiveStorage.Spec.Hive.DefaultTableProperties.SerdeRowProperties
 		}
 
-		report.Status.TableName = tableName
+		logger.Infof("creating table %s", tableName)
+		hiveTable, err := op.createHiveTableCR(report, cbTypes.ReportGVK, params, false, nil)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+
+		logger.Infof("created table %s", tableName)
+		dataSourceName := fmt.Sprintf("report-%s", report.Name)
+		logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, prestoTable.Status.TableName)
+		ownerRef := metav1.NewControllerRef(prestoTable, cbTypes.PrestoTableGVK)
+		newReportDataSource := &cbTypes.ReportDataSource{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ReportDataSource",
+				APIVersion: cbTypes.ReportDataSourceGVK.GroupVersion().String(),
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      dataSourceName,
+				Namespace: prestoTable.Namespace,
+				Labels:    prestoTable.ObjectMeta.Labels,
+				OwnerReferences: []metav1.OwnerReference{
+					*ownerRef,
+				},
+			},
+			Spec: cbTypes.ReportDataSourceSpec{
+				PrestoTable: &cbTypes.PrestoTableDataSource{
+					TableRef: v1.LocalObjectReference{
+						Name: prestoTable.Name,
+					},
+				},
+			},
+		}
+		_, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Create(newReportDataSource)
+		if err != nil {
+			if apierrors.IsAlreadyExists(err) {
+				logger.Infof("ReportDataSource %s already exists", dataSourceName)
+			} ***REMOVED*** {
+				return fmt.Errorf("error creating PrestoTable ReportDataSource %s: %s", dataSourceName, err)
+			}
+		}
+		logger.Infof("created PrestoTable ReportDataSource %s", dataSourceName)
+
+		report.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update Report status with tableName")
@@ -513,11 +581,53 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		}
 	}
 
+	prestoTables, err := op.prestoTableLister.PrestoTables(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	datasources, err := op.reportDataSourceLister.ReportDataSources(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	queries, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	queryCtx := &reporting.ReportQueryTemplateContext{
+		Namespace:               report.Namespace,
+		ReportQuery:             genQuery,
+		Reports:                 reports,
+		ReportGenerationQueries: queries,
+		ReportDataSources:       datasources,
+		PrestoTables:            prestoTables,
+	}
+	tmplCtx := reporting.TemplateContext{
+		Report: reporting.ReportTemplateInfo{
+			ReportingStart: &reportPeriod.periodStart,
+			ReportingEnd:   &reportPeriod.periodEnd,
+			Inputs:         reportQueryInputs,
+		},
+	}
+
+	// Render the query template
+	query, err := reporting.RenderQuery(queryCtx, tmplCtx)
+	if err != nil {
+		return err
+	}
+
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
 		"namespace":             report.Namespace,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
-		"table_name":            tableName,
+		"table_name":            prestoTable.Status.TableName,
 	}
 
 	genReportTotalCounter := generateReportTotalCounter.With(metricLabels)
@@ -528,19 +638,10 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.reportGenerator.GenerateReport(
-		tableName,
-		report.Namespace,
-		&reportPeriod.periodStart,
-		&reportPeriod.periodEnd,
-		genQuery,
-		queryDependencies.DynamicReportGenerationQueries,
-		report.Spec.Inputs,
-		report.Spec.OverwriteExistingData,
-	)
+	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	err = op.reportGenerator.GenerateReport(tableName, query, report.Spec.OverwriteExistingData)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
-
 	if err != nil {
 		genReportFailedCounter.Inc()
 		// update the status to Failed with message containing the
@@ -714,7 +815,7 @@ func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg st
 		return nil
 	}
 
-	logger.Errorf("Report %s failed validation: %s", report.Name, msg)
+	logger.Warnf("Report %s failed validation: %s", report.Name, msg)
 	cond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.InvalidReportReason, msg)
 	_, err := op.updateReportStatus(report, cond)
 	return err
