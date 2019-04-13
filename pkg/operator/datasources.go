@@ -502,10 +502,7 @@ func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger,
 			return err
 		}
 
-		columns, err := reportingutil.GeneratePrestoColumns(generationQuery)
-		if err != nil {
-			return fmt.Errorf("error converting ReportGenerationQuery columns to Presto columns for ReportGenerationQuery %s: %v", generationQuery.Name, err)
-		}
+		columns := reportingutil.GeneratePrestoColumns(generationQuery)
 		logger.Infof("creating view %s", viewName)
 		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportGenerationQueryGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
 		if err != nil {
