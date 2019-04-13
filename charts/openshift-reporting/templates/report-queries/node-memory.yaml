@@ -9,17 +9,17 @@ metadata:
 spec:
   columns:
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: node_capacity_memory_bytes
     type: double
     unit: byte_seconds
   - name: resource_id
     tableHidden: true
-    type: string
+    type: varchar
   - name: timeprecision
     type: double
     unit: seconds
@@ -30,7 +30,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: NodeCapacityMemoryBytesDataSourceName
     type: ReportDataSource
@@ -63,10 +63,10 @@ spec:
     type: timestamp
     unit: date
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: resource_id
-    type: string
+    type: varchar
   - name: node_capacity_memory_byte_seconds
     type: double
     unit: memory_byte_seconds
@@ -103,17 +103,17 @@ metadata:
 spec:
   columns:
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: node_allocatable_memory_bytes
     type: double
     unit: bytes
   - name: resource_id
     tableHidden: true
-    type: string
+    type: varchar
   - name: timeprecision
     type: double
     unit: seconds
@@ -124,7 +124,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: NodeAllocatableMemoryBytesDataSourceName
     type: ReportDataSource
@@ -157,10 +157,10 @@ spec:
     type: timestamp
     unit: date
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: resource_id
-    type: string
+    type: varchar
   - name: node_allocatable_memory_byte_seconds
     type: double
     unit: memory_byte_seconds

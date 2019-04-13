@@ -10,7 +10,7 @@ metadata:
 spec:
   columns:
   - name: resource_id
-    type: string
+    type: varchar
   - name: usage_start_date
     type: timestamp
   - name: usage_end_date
@@ -18,9 +18,9 @@ spec:
   - name: period_cost
     type: double
   - name: partition_start
-    type: string
+    type: varchar
   - name: partition_stop
-    type: string
+    type: varchar
   inputs:
   - name: NodeMemoryAllocatableRawDataSourceName
     type: ReportDataSource
@@ -57,7 +57,7 @@ metadata:
 spec:
   columns:
   - name: resource_id
-    type: string
+    type: varchar
   - name: usage_start_date
     type: timestamp
   - name: usage_end_date
@@ -65,9 +65,9 @@ spec:
   - name: period_cost
     type: double
   - name: partition_start
-    type: string
+    type: varchar
   - name: partition_stop
-    type: string
+    type: varchar
   - name: period_percent
     type: double
   - name: period_start

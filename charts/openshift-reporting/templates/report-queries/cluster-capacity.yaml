@@ -12,7 +12,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   - name: cpu_cores
     type: double
   - name: cpu_core_seconds
@@ -103,7 +103,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   - name: memory_bytes
     type: double
   - name: memory_byte_seconds

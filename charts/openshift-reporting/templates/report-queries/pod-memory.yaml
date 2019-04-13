@@ -9,17 +9,17 @@ metadata:
 spec:
   columns:
   - name: pod
-    type: string
+    type: varchar
     unit: kubernetes_pod
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: pod_request_memory_bytes
     type: double
     unit: bytes
@@ -33,7 +33,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PodRequestMemoryBytesDataSourceName
     type: ReportDataSource
@@ -62,17 +62,17 @@ metadata:
 spec:
   columns:
   - name: pod
-    type: string
+    type: varchar
     unit: kubernetes_pod
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: pod_usage_memory_bytes
     type: double
     unit: bytes
@@ -86,7 +86,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PodUsageMemoryBytesDataSourceName
     type: ReportDataSource
@@ -121,13 +121,13 @@ spec:
     type: timestamp
     unit: date
   - name: pod
-    type: string
+    type: varchar
     unit: kubernetes_pod
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: data_start
     type: timestamp
@@ -181,13 +181,13 @@ spec:
     type: timestamp
     unit: date
   - name: pod
-    type: string
+    type: varchar
     unit: kubernetes_pod
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: data_start
     type: timestamp
@@ -241,7 +241,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: data_start
     type: timestamp
@@ -305,7 +305,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: data_start
     type: timestamp
@@ -369,7 +369,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: pod_usage_memory_byte_seconds
     type: double

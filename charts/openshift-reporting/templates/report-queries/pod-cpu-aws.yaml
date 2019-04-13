@@ -16,11 +16,11 @@ spec:
     type: timestamp
     unit: date
   - name: pod
-    type: string
+    type: varchar
   - name: namespace
-    type: string
+    type: varchar
   - name: node
-    type: string
+    type: varchar
   - name: data_start
     type: timestamp
   - name: data_end
@@ -109,11 +109,11 @@ spec:
     type: timestamp
     unit: date
   - name: pod
-    type: string
+    type: varchar
   - name: namespace
-    type: string
+    type: varchar
   - name: node
-    type: string
+    type: varchar
   - name: data_start
     type: timestamp
   - name: data_end
