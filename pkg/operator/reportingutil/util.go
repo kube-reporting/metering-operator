@@ -72,8 +72,12 @@ func GenerateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column 
 	return columns
 }
 
-func GeneratePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) ([]presto.Column, error) {
-	return HiveColumnsToPrestoColumns(GenerateHiveColumns(genQuery))
+func GeneratePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Column {
+	var columns []presto.Column
+	for _, col := range genQuery.Spec.Columns {
+		columns = append(columns, presto.Column{Name: col.Name, Type: col.Type})
+	}
+	return columns
 }
 
 func HiveColumnsToPrestoColumns(columns []hive.Column) ([]presto.Column, error) {
@@ -88,21 +92,28 @@ func HiveColumnsToPrestoColumns(columns []hive.Column) ([]presto.Column, error) 
 	return newCols, nil
 }
 
+func PrestoColumnsToHiveColumns(columns []presto.Column) ([]hive.Column, error) {
+	var err error
+	newCols := make([]hive.Column, len(columns))
+	for i, col := range columns {
+		newCols[i], err = PrestoColumnToHiveColumn(col)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return newCols, nil
+}
+
 func SimpleHiveColumnTypeToPrestoColumnType(colType string) string {
-	switch strings.ToUpper(colType) {
-	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT":
-		return "BIGINT"
-	case "FLOAT", "DOUBLE":
-		return "DOUBLE"
-	case "STRING", "VARCHAR":
+	colType = strings.ToUpper(colType)
+	switch colType {
+	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT",
+		"FLOAT", "DOUBLE", "BOOLEAN",
+		"VARCHAR", "CHAR",
+		"DATE", "TIME", "TIMESTAMP", "BINARY":
+		return colType
+	case "STRING":
 		return "VARCHAR"
-	case "TIMESTAMP":
-		return "TIMESTAMP"
-	case "BOOLEAN":
-		return "BOOLEAN"
-	case "DECIMAL", "NUMERIC", "CHAR":
-		// explicitly not visible to Presto tables according to Presto docs
-		return ""
 	}
 	return ""
 }
@@ -158,4 +169,73 @@ func HiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 		}
 	}
 	return presto.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
+}
+
+func SimplePrestoColumnTypeToHiveColumnType(colType string) string {
+	colType = strings.ToUpper(colType)
+	switch colType {
+	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT",
+		"FLOAT", "DOUBLE", "BOOLEAN",
+		"CHAR",
+		"DATE", "TIME", "TIMESTAMP", "BINARY":
+		return colType
+	case "REAL":
+		return "FLOAT"
+	case "VARCHAR":
+		return "STRING"
+	}
+	return ""
+}
+
+func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
+	colType := SimplePrestoColumnTypeToHiveColumnType(column.Type)
+	if colType != "" {
+		return hive.Column{
+			Name: column.Name,
+			Type: colType,
+		}, nil
+	} else {
+		colType = strings.ToUpper(column.Type)
+		switch {
+		case strings.Contains(colType, "MAP"):
+			// does not support maps with arrays inside them
+			if strings.Contains(colType, "ARRAY") {
+				return hive.Column{}, fmt.Errorf("cannot convert map containing array into map for Presto, column: %q, type: %q", column.Name, column.Type)
+			}
+			beginMapIndex := strings.Index(colType, "(")
+			endMapIndex := strings.Index(colType, ")")
+			if beginMapIndex == -1 || endMapIndex == -1 {
+				return hive.Column{}, fmt.Errorf("unable to find matching (, ) pair for column %q, type: %q", column.Name, column.Type)
+			}
+			if beginMapIndex+1 >= len(colType) {
+				return hive.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
+			}
+			mapComponents := colType[beginMapIndex+1 : endMapIndex]
+			mapComponentsSplit := strings.SplitN(mapComponents, ",", 2)
+			if len(mapComponentsSplit) != 2 {
+				return hive.Column{}, fmt.Errorf("invalid map definition in column type, column %q, type: %q", column.Name, column.Type)
+			}
+			keyType := strings.TrimSpace(mapComponentsSplit[0])
+			valueType := strings.TrimSpace(mapComponentsSplit[1])
+
+			hiveKeyType := SimplePrestoColumnTypeToHiveColumnType(keyType)
+			hiveValueType := SimplePrestoColumnTypeToHiveColumnType(valueType)
+			if hiveKeyType == "" {
+				return hive.Column{}, fmt.Errorf("invalid hive map key type: %q", keyType)
+			}
+			if hiveValueType == "" {
+				return hive.Column{}, fmt.Errorf("invalid hive map value type: %q", valueType)
+			}
+			mapColType := fmt.Sprintf("MAP<%s,%s>", hiveKeyType, hiveValueType)
+
+			return hive.Column{
+				Name: column.Name,
+				Type: mapColType,
+			}, nil
+
+		case strings.Contains(colType, "ARRAY"):
+			// currently unsupported
+		}
+	}
+	return hive.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
 }

@@ -507,10 +507,15 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 
+		cols, err := reportingutil.PrestoColumnsToHiveColumns(reportingutil.GeneratePrestoColumns(genQuery))
+		if err != nil {
+			return fmt.Errorf("unable to convert Presto columns to Hive columns: %s", err)
+		}
+
 		params := hive.TableParameters{
 			Database: hiveStorage.Status.Hive.DatabaseName,
 			Name:     tableName,
-			Columns:  reportingutil.GenerateHiveColumns(genQuery),
+			Columns:  cols,
 		}
 		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
 			params.SerdeFormat = hiveStorage.Spec.Hive.DefaultTableProperties.SerdeFormat
