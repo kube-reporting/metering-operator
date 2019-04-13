@@ -14,3 +14,7 @@ spec:
     plural: prestotables
     singular: prestotable
     kind: PrestoTable
+  additionalPrinterColumns:
+  - name: Table Name
+    type: string
+    JSONPath: .status.tableName
