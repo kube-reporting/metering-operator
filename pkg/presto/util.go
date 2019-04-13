@@ -31,6 +31,29 @@ func GetRowsWhere(queryer db.Queryer, tableName string, columns []Column, whereC
 	return ExecuteSelect(queryer, GenerateGetRowsSQLWithWhere(tableName, columns, whereClause))
 }
 
+func CreateTable(queryer db.Queryer, catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool) error {
+	query := generateCreateTableSQL(catalog, schema, tableName, columns, comment, properties, ignoreExists)
+	_, err := queryer.Query(query)
+	return err
+}
+
+func CreateTableAs(queryer db.Queryer, catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool, query string) error {
+	finalQuery := generateCreateTableAsSQL(catalog, schema, tableName, columns, comment, properties, ignoreExists, query)
+	_, err := queryer.Query(finalQuery)
+	return err
+}
+
+func DropTable(queryer db.Queryer, catalog, schema, tableName string, ignoreNotExists bool) error {
+	ifExists := ""
+	if ignoreNotExists {
+		ifExists = "IF EXISTS"
+	}
+	table := FullyQuaifiedTableName(catalog, schema, tableName)
+	query := fmt.Sprintf("DROP TABLE %s %s", ifExists, table)
+	_, err := queryer.Query(query)
+	return err
+}
+
 func CreateView(queryer db.Queryer, catalog, schema, viewName string, query string, replace bool) error {
 	fullQuery := "CREATE"
 	if replace {
@@ -40,6 +63,17 @@ func CreateView(queryer db.Queryer, catalog, schema, viewName string, query stri
 	view := FullyQuaifiedTableName(catalog, schema, viewName)
 	finalQuery := fmt.Sprintf(fullQuery, view, query)
 	_, err := queryer.Query(finalQuery)
+	return err
+}
+
+func DropView(queryer db.Queryer, catalog, schema, viewName string, ignoreNotExists bool) error {
+	ifExists := ""
+	if ignoreNotExists {
+		ifExists = "IF EXISTS"
+	}
+	view := FullyQuaifiedTableName(catalog, schema, viewName)
+	query := fmt.Sprintf("DROP VIEW %s %s", ifExists, view)
+	_, err := queryer.Query(query)
 	return err
 }
 
@@ -64,6 +98,14 @@ func GenerateQuotedColumnsListSQL(columns []Column) string {
 	return columnsSQL
 }
 
+func generateColumnDefinitionListSQL(columns []Column) string {
+	c := make([]string, len(columns))
+	for i, col := range columns {
+		c[i] = fmt.Sprintf("`%s` %s", col.Name, col.Type)
+	}
+	return strings.Join(c, ",")
+}
+
 func GenerateOrderBySQL(columns []Column) string {
 	var quotedColumns []string
 	for _, col := range columns {
@@ -86,6 +128,65 @@ func FullyQuaifiedTableName(catalog, schema, tableName string) string {
 	return fmt.Sprintf("%s.%s.%s", catalog, schema, tableName)
 }
 
+func generateCreateTableSQL(catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool) string {
+	ifNotExists := ""
+	if ignoreExists {
+		ifNotExists = "IF NOT EXISTS"
+	}
+
+	columnsStr := generateColumnDefinitionListSQL(columns)
+
+	propsStr := ""
+	if len(properties) != 0 {
+		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
+	}
+
+	table := FullyQuaifiedTableName(catalog, schema, tableName)
+
+	sqlStr := `CREATE TABLE %s
+%s (
+	%s
+)
+%s
+%s`
+	return fmt.Sprintf(sqlStr, ifNotExists, table, columnsStr, propsStr)
+}
+
+func generateCreateTableAsSQL(catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool, query string) string {
+	ifNotExists := ""
+	if ignoreExists {
+		ifNotExists = "IF NOT EXISTS"
+	}
+
+	columnsStr := ""
+	if columns != nil {
+		columnsStr = GenerateQuotedColumnsListSQL(columns)
+	}
+
+	propsStr := ""
+	if len(properties) != 0 {
+		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
+	}
+
+	table := FullyQuaifiedTableName(catalog, schema, tableName)
+
+	sqlStr := `CREATE TABLE %s
+%s (
+	%s
+)
+%s
+%s
+AS %s`
+	return fmt.Sprintf(sqlStr, ifNotExists, table, columnsStr, propsStr, comment, query)
+}
+
+func generatePropertiesSQL(props map[string]string) (propsTxt string) {
+	var propList []string
+	for k, v := range props {
+		propList = append(propList, fmt.Sprintf("%s = %s", k, v))
+	}
+	return strings.Join(propList, ", ")
+}
 
 func FormatInsertQuery(target, query string) string {
 	return fmt.Sprintf("INSERT INTO %s %s", target, query)
