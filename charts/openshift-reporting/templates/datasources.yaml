@@ -29,4 +29,18 @@ spec:
       bucket: "{{ .Values.spec.awsBillingReportDataSource.bucket }}"
       pre***REMOVED***x: "{{ .Values.spec.awsBillingReportDataSource.pre***REMOVED***x }}"
       region: "{{ .Values.spec.awsBillingReportDataSource.region }}"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "aws-ec2-billing-data-raw-raw"
+  labels:
+    operator-metering: "true"
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  generationQueryView:
+    queryName: "aws-ec2-billing-data-raw-raw"
 {{- end }}

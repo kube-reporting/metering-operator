@@ -8,13 +8,11 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "pod-memory-request-raw"
   - "node-memory-allocatable-raw"
   dynamicReportQueries:
   - "aws-ec2-billing-data"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -53,7 +51,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
+      FROM {| dataSourceTableName "node-memory-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -66,7 +64,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-      FROM {| generationQueryViewName "pod-memory-request-raw" |}
+      FROM {| dataSourceTableName "pod-memory-request-raw" |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -99,13 +97,11 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "pod-memory-usage-raw"
   - "node-memory-allocatable-raw"
   dynamicReportQueries:
   - "aws-ec2-billing-data"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -144,7 +140,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
+      FROM {| dataSourceTableName "node-memory-allocatable-raw" |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -157,7 +153,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
-      FROM {| generationQueryViewName "pod-memory-usage-raw" |}
+      FROM {| dataSourceTableName "pod-memory-usage-raw" |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'

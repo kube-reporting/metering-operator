@@ -10,8 +10,6 @@ spec:
   dynamicReportQueries:
   - cluster-cpu-capacity
   - cluster-cpu-usage
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -102,8 +100,6 @@ spec:
   dynamicReportQueries:
   - cluster-memory-capacity
   - cluster-memory-usage
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp

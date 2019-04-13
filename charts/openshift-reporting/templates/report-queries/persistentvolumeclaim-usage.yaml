@@ -99,7 +99,7 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "persistentvolumeclaim-usage-raw"
   - "persistentvolumeclaim-phase-raw"
   columns:
@@ -123,8 +123,8 @@ spec:
       phase.persistentvolumeclaim AS persistentvolumeclaim,
       min(persistentvolumeclaim_usage_bytes) AS persistentvolumeclaim_usage_bytes,
       phase.dt AS dt
-    FROM {| generationQueryViewName "persistentvolumeclaim-phase-raw" |} AS phase
-    FULL OUTER JOIN {| generationQueryViewName "persistentvolumeclaim-usage-raw" |} AS usage
+    FROM {| dataSourceTableName "persistentvolumeclaim-phase-raw" |} AS phase
+    FULL OUTER JOIN {| dataSourceTableName "persistentvolumeclaim-usage-raw" |} AS usage
     ON phase.namespace=usage.namespace
     AND phase.persistentvolumeclaim=usage.persistentvolumeclaim
     AND phase.timestamp=usage.timestamp
@@ -141,10 +141,8 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "persistentvolumeclaim-usage-with-phase-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -170,7 +168,7 @@ spec:
       namespace,
       persistentvolumeclaim,
       sum(persistentvolumeclaim_usage_bytes)
-    FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw" |}
+    FROM {| dataSourceTableName "persistentvolumeclaim-usage-with-phase-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -188,10 +186,8 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
+  reportDataSources:
   - "persistentvolumeclaim-usage-with-phase-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -213,7 +209,7 @@ spec:
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
       namespace,
       sum(persistentvolumeclaim_usage_bytes)
-    FROM {| generationQueryViewName "persistentvolumeclaim-usage-with-phase-raw" |}
+    FROM {| dataSourceTableName "persistentvolumeclaim-usage-with-phase-raw" |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
