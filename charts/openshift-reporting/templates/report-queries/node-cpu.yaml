@@ -9,16 +9,16 @@ metadata:
 spec:
   columns:
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: node_capacity_cpu_cores
     type: double
     unit: cpu_cores
   - name: resource_id
-    type: string
+    type: varchar
   - name: timeprecision
     type: double
     unit: seconds
@@ -29,7 +29,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: NodeCapacityCpuCoresDataSourceName
     type: ReportDataSource
@@ -62,10 +62,10 @@ spec:
     type: timestamp
     unit: date
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: resource_id
-    type: string
+    type: varchar
   - name: node_capacity_cpu_core_seconds
     type: double
     unit: cpu_core_seconds
@@ -102,16 +102,16 @@ metadata:
 spec:
   columns:
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: node_allocatable_cpu_cores
     type: double
     unit: cpu_cores
   - name: resource_id
-    type: string
+    type: varchar
   - name: timeprecision
     type: double
     unit: seconds
@@ -122,7 +122,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: NodeAllocatableCpuCoresDataSourceName
     type: ReportDataSource
@@ -155,10 +155,10 @@ spec:
     type: timestamp
     unit: date
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: resource_id
-    type: string
+    type: varchar
   - name: node_allocatable_cpu_core_seconds
     type: double
     unit: cpu_core_seconds

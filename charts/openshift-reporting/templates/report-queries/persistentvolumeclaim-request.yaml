@@ -10,18 +10,18 @@ spec:
   columns:
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolume
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolume
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: storageclass
-    type: string
+    type: varchar
     unit: kubernetes_storageclass
   - name: volume_request_storage_bytes
     type: double
@@ -36,7 +36,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PersistentvolumeclaimRequestBytesDataSourceName
     type: ReportDataSource
@@ -72,16 +72,16 @@ spec:
     type: timestamp
     unit: date
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolume
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolume
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: storageclass
-    type: string
+    type: varchar
     unit: kubernetes_storageclass
   - name: data_start
     type: timestamp
@@ -136,7 +136,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: data_start
     type: timestamp

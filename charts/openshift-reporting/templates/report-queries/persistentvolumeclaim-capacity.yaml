@@ -9,12 +9,12 @@ metadata:
 spec:
   columns:
   - name: namespace
-    type: string
+    type: varchar
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: persistentvolumeclaim_capacity_bytes
     type: double
     unit: bytes
@@ -28,7 +28,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PersistentvolumeclaimCapacityBytesDataSourceName
     type: ReportDataSource
@@ -62,10 +62,10 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolumeclaim_capacity_bytes
     type: double

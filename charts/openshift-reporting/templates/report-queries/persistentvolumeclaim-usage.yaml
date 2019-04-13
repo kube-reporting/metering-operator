@@ -9,16 +9,16 @@ metadata:
 spec:
   columns:
   - name: namespace
-    type: string
+    type: varchar
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: value
     type: double
   - name: phase
-    type: string
+    type: varchar
   - name: timeprecision
     type: double
     unit: seconds
@@ -26,7 +26,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PersistentvolumeclaimPhaseDataSourceName
     type: ReportDataSource
@@ -54,12 +54,12 @@ metadata:
 spec:
   columns:
   - name: namespace
-    type: string
+    type: varchar
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
   - name: labels
     tableHidden: true
-    type: map<string, string>
+    type: map<varchar, varchar>
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
@@ -73,7 +73,7 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PersistentvolumeclaimUsageBytesDataSourceName
     type: ReportDataSource
@@ -101,18 +101,18 @@ metadata:
 spec:
   columns:
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: timestamp
     type: timestamp
     unit: date
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
   - name: persistentvolumeclaim_usage_bytes
     type: double
     unit: bytes
   - name: dt
-    type: string
+    type: varchar
   inputs:
   - name: PersistentvolumeclaimUsageRawDataSourceName
     type: ReportDataSource
@@ -150,10 +150,10 @@ spec:
   - name: period_end
     type: timestamp
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolumeclaim_usage_bytes
     type: double
@@ -198,7 +198,7 @@ spec:
   - name: period_end
     type: timestamp
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: persistentvolumeclaim_usage_bytes
     type: double
