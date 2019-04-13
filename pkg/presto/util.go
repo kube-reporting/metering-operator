@@ -31,13 +31,14 @@ func GetRowsWhere(queryer db.Queryer, tableName string, columns []Column, whereC
 	return ExecuteSelect(queryer, GenerateGetRowsSQLWithWhere(tableName, columns, whereClause))
 }
 
-func CreateView(queryer db.Queryer, viewName string, query string, replace bool) error {
+func CreateView(queryer db.Queryer, catalog, schema, viewName string, query string, replace bool) error {
 	fullQuery := "CREATE"
 	if replace {
 		fullQuery += " OR REPLACE"
 	}
 	fullQuery += " VIEW %s AS %s"
-	finalQuery := fmt.Sprintf(fullQuery, viewName, query)
+	view := FullyQuaifiedTableName(catalog, schema, viewName)
+	finalQuery := fmt.Sprintf(fullQuery, view, query)
 	_, err := queryer.Query(finalQuery)
 	return err
 }
@@ -80,6 +81,11 @@ func GenerateOrderBySQL(columns []Column) string {
 	}
 	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }
+
+func FullyQuaifiedTableName(catalog, schema, tableName string) string {
+	return fmt.Sprintf("%s.%s.%s", catalog, schema, tableName)
+}
+
 
 func FormatInsertQuery(target, query string) string {
 	return fmt.Sprintf("INSERT INTO %s %s", target, query)
