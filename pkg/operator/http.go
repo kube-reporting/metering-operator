@@ -557,6 +557,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 
 	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), metrics)
 	if err != nil {
+		logger.WithError(err).Errorf("unable to store promsum metrics: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
 	}
@@ -595,6 +596,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	}
 	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(datasourceTable, startTime, endTime)
 	if err != nil {
+		logger.WithError(err).Errorf("error querying for datasource: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
 	}
