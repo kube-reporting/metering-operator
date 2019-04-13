@@ -61,6 +61,8 @@ presto:
         tag: 4.1
       securityContext:
         fsGroup: null
+      config:
+        metastoreWarehouseDir: "hdfs://hdfs-namenode-proxy:9820/operator_metering/default_hive_warehouse/"
 hdfs:
   enabled: true
   spec:
