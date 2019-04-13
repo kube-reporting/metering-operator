@@ -26,9 +26,6 @@ spec:
   - name: Failed
     type: string
     JSONPath: .status.conditions[?(@.type=="Failure")].reason
-  - name: Table Name
-    type: string
-    JSONPath: .status.tableName
   - name: Last Report Time
     type: string
     JSONPath: .status.lastReportTime

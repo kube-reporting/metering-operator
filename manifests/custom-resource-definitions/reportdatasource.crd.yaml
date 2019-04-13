@@ -4,7 +4,7 @@ metadata:
   name: reportdatasources.metering.openshift.io
   annotations:
     catalog.app.coreos.com/displayName: Metering Data Source
-    catalog.app.coreos.com/description: A resource describing a source of data for usage by Report Generation Queries.
+    catalog.app.coreos.com/description: Used under-the-hood. A resource a database table in Presto. Use by ReportGenerationQueries to determine what tables exist, and by the HTTP API to determine how to query a table.
     catalog.app.coreos.com/weight: "4"
 spec:
   group: metering.openshift.io
@@ -18,9 +18,6 @@ spec:
     - datasource
     - datasources
   additionalPrinterColumns:
-  - name: Table Name
-    type: string
-    JSONPath: .status.tableName
   - name: Earliest Metric
     type: string
     JSONPath: .status.prometheusMetricImportStatus.earliestImportedMetricTime
