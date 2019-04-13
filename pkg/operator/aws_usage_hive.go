@@ -99,11 +99,11 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hive table for ReportDataSource %s: %s", dataSource.Name, err)
 	}
-	hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+	hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 30*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hive table for ReportDataSource %s: %s", dataSource.Name, err)
 	}
-	_, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+	_, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 30*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 	}

@@ -246,9 +246,9 @@ func isReportFinished(logger log.FieldLogger, report *cbTypes.Report) bool {
 func validateReport(
 	report *cbTypes.Report,
 	queryGetter reporting.ReportGenerationQueryGetter,
-	reportDataSourceGetter reporting.ReportDataSourceGetter,
-	reportGetter reporting.ReportGetter, handler *reporting.UninitialiedDependendenciesHandler,
-) (*cbTypes.ReportGenerationQuery, *reporting.ReportGenerationQueryDependencies, error) {
+	depResolver DependencyResolver,
+	handler *reporting.UninitialiedDependendenciesHandler,
+) (*cbTypes.ReportGenerationQuery, *reporting.DependencyResolutionResult, error) {
 	// Validate the ReportGenerationQuery is set
 	if report.Spec.GenerationQueryName == "" {
 		return nil, nil, errors.New("must set spec.generationQuery")
@@ -273,18 +273,19 @@ func validateReport(
 	}
 
 	// Validate the dependencies of this Report's query exist
-	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
-		queryGetter,
-		reportDataSourceGetter,
-		reportGetter,
-		genQuery,
-		handler,
-	)
+	dependencyResult, err := depResolver.ResolveDependencies(
+		genQuery.Namespace,
+		genQuery.Spec.Inputs,
+		report.Spec.Inputs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to resolve ReportGenerationQuery dependencies %s: %v", genQuery.Name, err)
+	}
+	err = reporting.ValidateGenerationQueryDependencies(dependencyResult.Dependencies, handler)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to validate ReportGenerationQuery dependencies %s: %v", genQuery.Name, err)
 	}
 
-	return genQuery, queryDependencies, nil
+	return genQuery, dependencyResult, nil
 }
 
 // getReportPeriod determines a Report's reporting period based off the report parameter's fields.
@@ -350,18 +351,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
 	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
-	reportDataSourceGetter := reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister)
-	reportGetter := reporting.NewReportListerGetter(op.reportLister)
 
 	// validate that Report contains valid Spec fields
-	genQuery, queryDependencies, err := validateReport(report, queryGetter, reportDataSourceGetter, reportGetter, op.uninitialiedDependendenciesHandler())
+	genQuery, dependencyResult, err := validateReport(report, queryGetter, op.dependencyResolver, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return op.setReportStatusInvalidReport(report, err.Error())
-	}
-
-	reportQueryInputs, err := reporting.ValidateReportGenerationQueryInputs(genQuery, report.Spec.Inputs)
-	if err != nil {
-		return op.setReportStatusInvalidReport(report, fmt.Sprintf("failed to validate ReportGenerationQuery %s inputs: %s", genQuery.Name, err))
 	}
 
 	now := op.clock.Now().UTC()
@@ -409,7 +403,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
 		// Validate all ReportDataSources that the Report depends on have indicated
 		// they have data available that covers the current reportPeriod.
-		for _, dataSource := range queryDependencies.ReportDataSources {
+		for _, dataSource := range dependencyResult.Dependencies.ReportDataSources {
 			if dataSource.Spec.Promsum != nil {
 				// queue the dataSource and store the list of reports so we can
 				// add information to the Report's status on what's currently
@@ -439,7 +433,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// Validate all sub-reports that the Report depends on have reported on the
 		// current reportPeriod
 		var unmetReportDependendencies []string
-		for _, subReport := range queryDependencies.Reports {
+		for _, subReport := range dependencyResult.Dependencies.Reports {
 			if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
 				op.enqueueReport(subReport)
 				unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
@@ -529,11 +523,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		if err != nil {
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
 		}
-		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
 		if err != nil {
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
 		}
-		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 10*time.Second)
+		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
 		if err != nil {
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
 		}
@@ -613,7 +607,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		Report: reporting.ReportTemplateInfo{
 			ReportingStart: &reportPeriod.periodStart,
 			ReportingEnd:   &reportPeriod.periodEnd,
-			Inputs:         reportQueryInputs,
+			Inputs:         dependencyResult.InputValues,
 		},
 	}
 
@@ -779,29 +773,6 @@ func reportNeedsFinalizer(report *cbTypes.Report) bool {
 	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil)
 }
 
-// queueDependentReportGenerationQueriesForReport will queue all
-// ReportGenerationQueries in the namespace which have a dependency on the
-// report
-func (op *Reporting) queueDependentReportGenerationQueriesForReport(report *cbTypes.Report) error {
-	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(report.Namespace)
-	queries, err := queryLister.List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, query := range queries.Items {
-		// look at the list Report of dependencies
-		for _, dependency := range query.Spec.Reports {
-			if dependency == report.Name {
-				// this query depends on the Report passed in
-				op.enqueueReportGenerationQuery(query)
-				break
-			}
-		}
-	}
-	return nil
-}
-
 func (op *Reporting) updateReportStatus(report *cbTypes.Report, cond *cbTypes.ReportCondition) (*cbTypes.Report, error) {
 	cbutil.SetReportCondition(&report.Status, *cond)
 	return op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
@@ -827,18 +798,7 @@ func GetReportGenerationQueryForReport(report *cbTypes.Report, queryGetter repor
 }
 
 func (op *Reporting) getReportDependencies(report *cbTypes.Report) (*reporting.ReportGenerationQueryDependencies, error) {
-	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
-
-	genQuery, err := GetReportGenerationQueryForReport(report, queryGetter)
-	if err != nil {
-		return nil, err
-	}
-	return reporting.GetGenerationQueryDependencies(
-		queryGetter,
-		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
-		genQuery,
-	)
+	return op.getGenerationQueryDependencies(report.Namespace, report.Spec.GenerationQueryName, report.Spec.Inputs)
 }
 
 func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) error {
@@ -860,6 +820,34 @@ func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) erro
 		for _, dep := range deps.Reports {
 			if dep.Name == report.Name {
 				op.enqueueReport(otherReport)
+				break
+			}
+		}
+	}
+	return nil
+}
+
+// queueDependentReportGenerationQueriesForReport will queue all
+// ReportGenerationQueries in the namespace which have a dependency on the
+// report
+func (op *Reporting) queueDependentReportGenerationQueriesForReport(report *cbTypes.Report) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(report.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// For every query in the namespace, lookup it's dependencies, and if
+		// it has a dependency on the passed in Report, requeue it
+		deps, err := op.getGenerationQueryDependencies(query.Namespace, query.Name, nil)
+		if err != nil {
+			return err
+		}
+		for _, dependency := range deps.Reports {
+			if dependency.Name == report.Name {
+				// this query depends on the Report passed in
+				op.enqueueReportGenerationQuery(query)
 				break
 			}
 		}

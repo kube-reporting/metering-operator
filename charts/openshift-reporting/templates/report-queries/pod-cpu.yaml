@@ -1,14 +1,12 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-request-raw"
+  name: pod-cpu-request-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-request-cpu-cores"
   columns:
   - name: pod
     type: string
@@ -20,8 +18,8 @@ spec:
     type: string
     unit: kubernetes_node
   - name: labels
-    type: map<string, string>
     tableHidden: true
+    type: map<string, string>
   - name: pod_request_cpu_cores
     type: double
     unit: cpu_cores
@@ -36,32 +34,32 @@ spec:
     unit: date
   - name: dt
     type: string
+  inputs:
+  - name: PodRequestCpuCoresDataSourceName
+    type: ReportDataSource
+    default: pod-request-cpu-cores
   query: |
-      SELECT labels['pod'] as pod,
-          labels['namespace'] as namespace,
-          element_at(labels, 'node') as node,
-          labels,
-          amount as pod_request_cpu_cores,
-          timeprecision,
-          amount * timeprecision as pod_request_cpu_core_seconds,
-          "timestamp",
-          dt
-      FROM {| dataSourceTableName "pod-request-cpu-cores" |}
-      WHERE element_at(labels, 'node') IS NOT NULL
-
+    SELECT labels['pod'] as pod,
+        labels['namespace'] as namespace,
+        element_at(labels, 'node') as node,
+        labels,
+        amount as pod_request_cpu_cores,
+        timeprecision,
+        amount * timeprecision as pod_request_cpu_core_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName .Report.Inputs.PodRequestCpuCoresDataSourceName |}
+    WHERE element_at(labels, 'node') IS NOT NULL
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-usage-raw"
+  name: pod-cpu-usage-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-usage-cpu-cores"
   columns:
   - name: pod
     type: string
@@ -73,8 +71,8 @@ spec:
     type: string
     unit: kubernetes_node
   - name: labels
-    type: map<string, string>
     tableHidden: true
+    type: map<string, string>
   - name: pod_usage_cpu_cores
     type: double
     unit: cpu_cores
@@ -89,32 +87,32 @@ spec:
     unit: date
   - name: dt
     type: string
+  inputs:
+  - name: PodUsageCpuCoresDataSourceName
+    type: ReportDataSource
+    default: pod-usage-cpu-cores
   query: |
-      SELECT labels['pod'] as pod,
-          labels['namespace'] as namespace,
-          element_at(labels, 'node') as node,
-          labels,
-          amount as pod_usage_cpu_cores,
-          timeprecision,
-          amount * timeprecision as pod_usage_cpu_core_seconds,
-          "timestamp",
-          dt
-      FROM {| dataSourceTableName "pod-usage-cpu-cores" |}
-      WHERE element_at(labels, 'node') IS NOT NULL
-
+    SELECT labels['pod'] as pod,
+        labels['namespace'] as namespace,
+        element_at(labels, 'node') as node,
+        labels,
+        amount as pod_usage_cpu_cores,
+        timeprecision,
+        amount * timeprecision as pod_usage_cpu_core_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName .Report.Inputs.PodUsageCpuCoresDataSourceName |}
+    WHERE element_at(labels, 'node') IS NOT NULL
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-request"
+  name: pod-cpu-request
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-cpu-request-raw"
   columns:
   - name: period_start
     type: timestamp
@@ -142,7 +140,12 @@ spec:
     unit: cpu_core_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PodCpuRequestRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-request-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -153,27 +156,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
-    FROM {| dataSourceTableName "pod-cpu-request-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PodCpuRequestRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-cpu-usage"
+  name: pod-cpu-usage
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-cpu-usage-raw"
   columns:
   - name: period_start
     type: timestamp
@@ -201,7 +200,12 @@ spec:
     unit: cpu_core_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PodCpuUsageRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-usage-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -212,27 +216,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
-    FROM {| dataSourceTableName "pod-cpu-usage-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "namespace-cpu-request"
+  name: namespace-cpu-request
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-cpu-request-raw"
   columns:
   - name: period_start
     type: timestamp
@@ -254,8 +254,14 @@ spec:
     unit: core_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: NamespaceCPURequestReportName
+    type: Report
+  - name: PodCpuRequestRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-request-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -274,27 +280,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(pod_request_cpu_core_seconds) as pod_request_cpu_core_seconds
-    FROM {| dataSourceTableName "pod-cpu-request-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PodCpuRequestRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
     {|- end |}
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "namespace-cpu-usage"
+  name: namespace-cpu-usage
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-cpu-usage-raw"
   columns:
   - name: period_start
     type: timestamp
@@ -316,8 +318,14 @@ spec:
     unit: core_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: NamespaceCPUUsageReportName
+    type: Report
+  - name: PodCpuUsageRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-usage-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -336,29 +344,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
-    FROM {| dataSourceTableName "pod-cpu-usage-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
     {|- end |}
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "namespace-cpu-utilization"
+  name: namespace-cpu-utilization
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  dynamicReportQueries:
-  - "namespace-cpu-request"
-  - "namespace-cpu-usage"
-  - "cluster-cpu-capacity"
   columns:
   - name: period_start
     type: timestamp
@@ -383,17 +385,31 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: NamespaceCPURequestReportName
+    type: Report
   - name: NamespaceCPUUsageReportName
+    type: Report
   - name: ClusterCpuCapacityReportName
+    type: Report
+  - name: NamespaceCpuRequestQueryName
+    type: ReportGenerationQuery
+    default: namespace-cpu-request
+  - name: NamespaceCpuUsageQueryName
+    type: ReportGenerationQuery
+    default: namespace-cpu-usage
+  - name: ClusterCpuCapacityQueryName
+    type: ReportGenerationQuery
+    default: cluster-cpu-capacity
   query: |
     WITH cluster_cpu_capacity AS (
-      {| renderReportGenerationQuery "cluster-cpu-capacity" . |}
+      {| renderReportGenerationQuery .Report.Inputs.ClusterCpuCapacityQueryName . |}
     ), namespace_cpu_usage AS (
-      {| renderReportGenerationQuery "namespace-cpu-usage" . |}
+      {| renderReportGenerationQuery .Report.Inputs.NamespaceCpuUsageQueryName . |}
     ), namespace_cpu_request AS (
-      {| renderReportGenerationQuery "namespace-cpu-request" . |}
+      {| renderReportGenerationQuery .Report.Inputs.NamespaceCpuRequestQueryName . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,

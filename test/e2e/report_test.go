@@ -43,7 +43,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 			reportGetter := reporting.NewReportClientGetter(testFramework.MeteringClient)
 
 			// get all the datasources for the query used in our report
-			dependencies, err := reporting.GetGenerationQueryDependencies(queryGetter, dsGetter, reportGetter, genQuery)
+			dependencies, err := reporting.GetGenerationQueryDependencies(queryGetter, dsGetter, reportGetter, genQuery, nil)
 			require.NoError(t, err, "datasources for query should exist")
 
 			require.NotEqual(t, 0, len(dependencies.ReportDataSources), "Report should have at least 1 datasource dependency")
