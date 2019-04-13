@@ -4,14 +4,14 @@ metadata:
   name: "operator-metering"
 spec:
   defaultStorage:
-    create: true
-    name: "local-storage"
-    isDefault: true
     type: "hive"
     hive:
-      tableProperties:
-        # do not change this
-        location: "/user/hive/warehouse"
+      # instructs reporting-operator to create a new database in Hive
+      unmanagedDatabase: false
+      # feel free to adjust the database name  and location
+      databaseName: "metering-nfs"
+      location: "/user/hive/warehouse"
+
   presto:
     spec:
       con***REMOVED***g:
@@ -20,6 +20,13 @@ spec:
           storage:
             # change REPLACEME to the name of your PVC
             persistentVolumeClaimStorageClass: REPLACEME
-
+            # mountPath must match the value of the location speci***REMOVED***ed above.
+            mountPath: "/user/hive/warehouse"
+      hive:
+        con***REMOVED***g:
+          # set to false when spec.hdfs.enabled is false
+          useHdfsCon***REMOVED***gMap: false
+          # Replace this with your path
+          metastoreWarehouseDir: "/user/hive/warehouse"
   hdfs:
     enabled: false
