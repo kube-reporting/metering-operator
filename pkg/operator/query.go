@@ -194,5 +194,5 @@ type prestoViewCreator struct {
 }
 
 func (c *prestoViewCreator) CreateView(viewName, query string) error {
-	return presto.CreateView(c.queryer, viewName, query, true)
+	return presto.CreateView(c.queryer, "hive", "", viewName, query, true)
 }
