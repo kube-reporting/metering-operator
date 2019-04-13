@@ -2,17 +2,12 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-memory-request-aws"
+  name: pod-memory-request-aws
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-memory-request-raw"
-  - "node-memory-allocatable-raw"
-  dynamicReportQueries:
-  - "aws-ec2-billing-data"
   columns:
   - name: period_start
     type: timestamp
@@ -38,10 +33,21 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PodMemoryRequestRawDataSourceName
+    type: ReportDataSource
+    default: pod-memory-request-raw
+  - name: NodeMemoryAllocatableRawDataSourceName
+    type: ReportDataSource
+    default: node-memory-allocatable-raw
+  - name: AwsEc2BillingDataQueryName
+    type: ReportGenerationQuery
+    default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery "aws-ec2-billing-data" . |}
+      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
@@ -51,7 +57,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| dataSourceTableName "node-memory-allocatable-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.NodeMemoryAllocatableRawDataSourceName |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -64,7 +70,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-      FROM {| dataSourceTableName "pod-memory-request-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.PodMemoryRequestRawDataSourceName |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -85,23 +91,16 @@ spec:
       aws_billing_sum.cluster_cost * cluster_usage.pod_memory_usage_percent as pod_cost
     FROM cluster_usage
     CROSS JOIN aws_billing_sum
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-memory-usage-aws"
+  name: pod-memory-usage-aws
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "pod-memory-usage-raw"
-  - "node-memory-allocatable-raw"
-  dynamicReportQueries:
-  - "aws-ec2-billing-data"
   columns:
   - name: period_start
     type: timestamp
@@ -127,10 +126,21 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PodMemoryUsageRawDataSourceName
+    type: ReportDataSource
+    default: pod-memory-usage-raw
+  - name: NodeMemoryAllocatableRawDataSourceName
+    type: ReportDataSource
+    default: node-memory-allocatable-raw
+  - name: AwsEc2BillingDataQueryName
+    type: ReportGenerationQuery
+    default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery "aws-ec2-billing-data" . |}
+      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
@@ -140,7 +150,7 @@ spec:
       SELECT min("timestamp") as node_allocatable_data_start,
         max("timestamp") as node_allocatable_data_end,
         sum(node_allocatable_memory_byte_seconds) as node_allocatable_memory_byte_seconds
-      FROM {| dataSourceTableName "node-memory-allocatable-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.NodeMemoryAllocatableRawDataSourceName |}
         WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
         AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
         AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -153,7 +163,7 @@ spec:
              min("timestamp") as data_start,
              max("timestamp") as data_end,
              sum(pod_usage_memory_byte_seconds) as pod_usage_memory_byte_seconds
-      FROM {| dataSourceTableName "pod-memory-usage-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.PodMemoryUsageRawDataSourceName |}
       WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -174,4 +184,4 @@ spec:
       aws_billing_sum.cluster_cost * cluster_usage.pod_memory_usage_percent as pod_cost
     FROM cluster_usage
     CROSS JOIN aws_billing_sum
-{{- end -}}
+{{- end }}

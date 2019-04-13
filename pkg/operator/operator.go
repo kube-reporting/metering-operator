@@ -147,6 +147,7 @@ type Reporting struct {
 	reportResultsRepo     prestostore.ReportResultsRepo
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportGenerator       reporting.ReportGenerator
+	dependencyResolver    DependencyResolver
 
 	prestoTableManager   reporting.PrestoTableManager
 	hiveDatabaseManager  reporting.HiveDatabaseManager
@@ -272,6 +273,12 @@ func newReportingOperator(
 		storageLocationQueue,
 	}
 
+	depResolver := reporting.NewDependencyResolver(
+		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryInformer.Lister()),
+		reporting.NewReportDataSourceListerGetter(reportDataSourceInformer.Lister()),
+		reporting.NewReportListerGetter(reportInformer.Lister()),
+	)
+
 	op := &Reporting{
 		logger:         logger,
 		cfg:            cfg,
@@ -288,6 +295,8 @@ func newReportingOperator(
 		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
 		reportLister:                reportInformer.Lister(),
 		storageLocationLister:       storageLocationInformer.Lister(),
+
+		dependencyResolver: depResolver,
 
 		queueList:                  queueList,
 		reportQueue:                reportQueue,
@@ -688,4 +697,8 @@ func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOV
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
+}
+
+type DependencyResolver interface {
+	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportGenerationQueryInputDe***REMOVED***nition, inputVals []cbTypes.ReportGenerationQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }

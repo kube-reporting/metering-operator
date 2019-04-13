@@ -1,22 +1,20 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "persistentvolumeclaim-capacity-raw"
+  name: persistentvolumeclaim-capacity-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "persistentvolumeclaim-capacity-bytes"
   columns:
   - name: namespace
     type: string
   - name: persistentvolumeclaim
     type: string
   - name: labels
-    type: map<string, string>
     tableHidden: true
+    type: map<string, string>
   - name: persistentvolumeclaim_capacity_bytes
     type: double
     unit: bytes
@@ -31,6 +29,10 @@ spec:
     unit: date
   - name: dt
     type: string
+  inputs:
+  - name: PersistentvolumeclaimCapacityBytesDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-capacity-bytes
   query: |
     SELECT
         coalesce(element_at(labels, 'exported_namespace'), element_at(labels, 'namespace')) as namespace,
@@ -41,21 +43,17 @@ spec:
         amount * timeprecision as persistentvolumeclaim_capacity_byte_seconds,
         "timestamp",
         dt
-    FROM {| dataSourceTableName "persistentvolumeclaim-capacity-bytes" |}
-
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimCapacityBytesDataSourceName |}
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "persistentvolumeclaim-capacity"
+  name: persistentvolumeclaim-capacity
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "persistentvolumeclaim-capacity-raw"
   columns:
   - name: period_start
     type: timestamp
@@ -74,7 +72,12 @@ spec:
     unit: bytes
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PersistentvolumeclaimCapacityRawDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-capacity-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -82,7 +85,7 @@ spec:
       namespace,
       persistentvolumeclaim,
       sum(persistentvolumeclaim_capacity_bytes) AS persistentvolumeclaim_capacity_bytes
-    FROM {| dataSourceTableName "persistentvolumeclaim-capacity-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimCapacityRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'

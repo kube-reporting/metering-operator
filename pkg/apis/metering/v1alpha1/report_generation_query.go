@@ -28,12 +28,9 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	Columns              []ReportGenerationQueryColumn          `json:"columns"`
-	Query                string                                 `json:"query"`
-	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
-	DataSources          []string                               `json:"reportDataSources,omitempty"`
-	Reports              []string                               `json:"reports,omitempty"`
-	Inputs               []ReportGenerationQueryInputDe***REMOVED***nition `json:"inputs,omitempty"`
+	Columns []ReportGenerationQueryColumn          `json:"columns"`
+	Query   string                                 `json:"query"`
+	Inputs  []ReportGenerationQueryInputDe***REMOVED***nition `json:"inputs,omitempty"`
 }
 
 type ReportGenerationQueryColumn struct {
@@ -44,9 +41,10 @@ type ReportGenerationQueryColumn struct {
 }
 
 type ReportGenerationQueryInputDe***REMOVED***nition struct {
-	Name     string `json:"name"`
-	Required bool   `json:"required"`
-	Type     string `json:"type,omitempty"`
+	Name     string           `json:"name"`
+	Required bool             `json:"required"`
+	Type     string           `json:"type,omitempty"`
+	Default  *json.RawMessage `json:"default,omitempty"`
 }
 
 type ReportGenerationQueryInputValue struct {
