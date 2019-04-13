@@ -44,6 +44,9 @@ REPORT_RESULTS_DIR=$TEST_OUTPUT_PATH/report_results
 REPORTS_DIR=$TEST_OUTPUT_PATH/reports
 DATASOURCES_DIR=$TEST_OUTPUT_PATH/reportdatasources
 REPORTGENERATIONQUERIES_DIR=$TEST_OUTPUT_PATH/reportgenerationqueries
+HIVETABLES_DIR=$TEST_OUTPUT_PATH/hivetables
+PRESTOTABLES_DIR=$TEST_OUTPUT_PATH/prestotables
+STORAGELOCATIONS_DIR=$TEST_OUTPUT_PATH/storagelocations
 
 TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_LOG_FILE}"
 TEST_TAP_FILE_PATH="${TEST_TAP_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_TAP_FILE}"
@@ -51,7 +54,7 @@ TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TE
 DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
 DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
 
-mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTGENERATIONQUERIES_DIR"
+mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTGENERATIONQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
 
 export SKIP_DELETE_CRDS=true
 export DELETE_PVCS=true
@@ -89,6 +92,40 @@ function cleanup() {
             ***REMOVED***
         done
     done <<< "$PODS"
+
+
+    echo "Capturing Metering StorageLocations"
+    STORAGELOCATIONS="$(kubectl get storagelocations --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
+    while read -r storagelocation; do
+        if [[ -n "$storagelocation" ]]; then
+            echo "Capturing StorageLocation $storagelocation as json"
+            if ! kubectl get storagelocation "$storagelocation" --namespace "$METERING_NAMESPACE" -o json > "$STORAGELOCATIONS_DIR/${storagelocation}.json"; then
+                echo "Error getting $storagelocation as json"
+            ***REMOVED***
+        ***REMOVED***
+    done <<< "$STORAGELOCATIONS"
+
+    echo "Capturing Metering PrestoTables"
+    PRESTOTABLES="$(kubectl get prestotables --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
+    while read -r prestotable; do
+        if [[ -n "$prestotable" ]]; then
+            echo "Capturing PrestoTable $prestotable as json"
+            if ! kubectl get prestotable "$prestotable" --namespace "$METERING_NAMESPACE" -o json > "$PRESTOTABLES_DIR/${prestotable}.json"; then
+                echo "Error getting $prestotable as json"
+            ***REMOVED***
+        ***REMOVED***
+    done <<< "$PRESTOTABLES"
+
+    echo "Capturing Metering HiveTables"
+    HIVETABLES="$(kubectl get hivetables --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
+    while read -r hivetable; do
+        if [[ -n "$hivetable" ]]; then
+            echo "Capturing HiveTable $hivetable as json"
+            if ! kubectl get hivetable "$hivetable" --namespace "$METERING_NAMESPACE" -o json > "$HIVETABLES_DIR/${hivetable}.json"; then
+                echo "Error getting $hivetable as json"
+            ***REMOVED***
+        ***REMOVED***
+    done <<< "$HIVETABLES"
 
     echo "Capturing Metering ReportDataSources"
     DATASOURCES="$(kubectl get reportdatasources --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
