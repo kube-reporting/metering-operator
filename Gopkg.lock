@@ -735,7 +735,7 @@
   version = "kubernetes-1.13.3"
 
 [[projects]]
-  digest = "1:4b51f480ae0b1b401eb343db1807601fd45f827ec16c4dfe3275e74fd47b78a1"
+  digest = "1:bc4bdf71828feb216a0d43d1f68908dceaf61427720d7ee70bb529a4c9338ab3"
   name = "k8s.io/gengo"
   packages = [
     "args",
@@ -749,7 +749,7 @@
     "types",
   ]
   pruneopts = "NUT"
-  revision = "0689ccc1d7d65d9dd1bedcc3b0b1ed7df91ba266"
+  revision = "b90029ef6cd877cb3f422d75b3a07707e3aac6b7"
 
 [[projects]]
   digest = "1:c263611800c3a97991dbcf9d3bc4de390f6224aaa8ca0a7226a9d734f65a416a"
