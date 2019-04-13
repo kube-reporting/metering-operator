@@ -4,13 +4,20 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
 
-var resourceNameReplacer = strings.NewReplacer("-", "_", ".", "_")
+var (
+	resourceNameReplacer = strings.NewReplacer("-", "_", ".", "_")
+
+	// AWSUsagePartitionDateStringLayout is the format used to partition
+	// AWSUsage partition key
+	AWSUsagePartitionDateStringLayout = "20060102"
+)
 
 func DataSourceTableName(namespace, dataSourceName string) string {
 	return fmt.Sprintf("datasource_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(dataSourceName))
@@ -20,16 +27,37 @@ func ReportTableName(namespace, reportName string) string {
 	return fmt.Sprintf("report_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(reportName))
 }
 
-func GenerationQueryViewName(namespace, queryName string) string {
-	return fmt.Sprintf("view_%s_%s", resourceNameReplacer.Replace(namespace), resourceNameReplacer.Replace(queryName))
-}
-
-func PrestoTableResourceNameFromKind(kind, namespace, name string) string {
+func TableResourceNameFromKind(kind, namespace, name string) string {
 	return strings.ToLower(fmt.Sprintf("%s-%s-%s", kind, namespace, name))
 }
 
-func BillingPeriodTimestamp(date time.Time) string {
+func AWSBillingPeriodTimestamp(date time.Time) string {
 	return date.Format(AWSUsagePartitionDateStringLayout)
+}
+
+func FullyQualifiedTableName(prestoTable *cbTypes.PrestoTable) string {
+	return presto.FullyQuaifiedTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName)
+}
+
+func IsValidSQLIdentifier(id string) bool {
+	if len(id) == 0 {
+		return false
+	}
+
+	// First character must be a letter or underscore
+	firstChar := rune(id[0])
+	if !unicode.IsLetter(firstChar) && firstChar != '_' {
+		return false
+	}
+
+	// Everything else character must be a letter, digit or underscore
+	rest := id[1:]
+	for _, r := range rest {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+			return false
+		}
+	}
+	return true
 }
 
 func TruncateToMinute(t time.Time) time.Time {

@@ -12,29 +12,43 @@ type Column struct {
 	Type string `json:"type"`
 }
 
-type TableParameters struct {
-	Name         string   `json:"name"`
-	Columns      []Column `json:"columns"`
-	Partitions   []Column `json:"partitions,omitempty"`
-	IgnoreExists bool     `json:"ignoreExists"`
+type SortColumn struct {
+	Name      string `json:"name"`
+	Decending *bool  `json:"decending,omitempty"`
 }
 
-type TableProperties struct {
+type TableParameters struct {
+	Database      string       `json:"database,omitempty"`
+	Name          string       `json:"name"`
+	Columns       []Column     `json:"columns"`
+	PartitionedBy []Column     `json:"partitionedBy,omitempty"`
+	ClusteredBy   []string     `json:"clusteredBy,omitempty"`
+	SortedBy      []SortColumn `json:"sortedBy,omitempty"`
+	NumBuckets    int          `json:"numBuckets,omitempty"`
+
 	Location           string            `json:"location,omitempty"`
 	SerdeFormat        string            `json:"serdeFormat,omitempty"`
 	FileFormat         string            `json:"fileFormat,omitempty"`
 	SerdeRowProperties map[string]string `json:"serdeRowProperties,omitempty"`
+	Properties         map[string]string `json:"properties,omitempty"`
 	External           bool              `json:"external,omitempty"`
 }
 
-func ExecuteCreateTable(queryer db.Queryer, params TableParameters, properties TableProperties) error {
-	query := generateCreateTableSQL(params, properties)
+type TablePartition struct {
+	Location      string        `json:"location"`
+	PartitionSpec PartitionSpec `json:"partitionSpec"`
+}
+
+type PartitionSpec map[string]string
+
+func ExecuteCreateTable(queryer db.Queryer, params TableParameters, ignoreExists bool) error {
+	query := generateCreateTableSQL(params, ignoreExists)
 	_, err := queryer.Query(query)
 	return err
 }
 
-func ExecuteDropTable(queryer db.Queryer, tableName string, ignoreNotExists bool) error {
-	query := generateDropTableSQL(tableName, ignoreNotExists, true)
+func ExecuteDropTable(queryer db.Queryer, dbName, tableName string, ignoreNotExists bool) error {
+	query := generateDropTableSQL(dbName, tableName, ignoreNotExists, false)
 	_, err := queryer.Query(query)
 	return err
 }

@@ -22,7 +22,6 @@ import (
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/test/testhelpers"
@@ -126,7 +125,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -155,7 +154,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -195,7 +194,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -240,7 +239,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -399,7 +398,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -449,7 +448,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -480,7 +479,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -547,7 +546,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -682,7 +681,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -733,7 +732,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -764,7 +763,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -831,7 +830,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []hive.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",

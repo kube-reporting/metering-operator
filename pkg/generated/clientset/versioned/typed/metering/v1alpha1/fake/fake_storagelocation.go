@@ -84,6 +84,18 @@ func (c *FakeStorageLocations) Update(storageLocation *v1alpha1.StorageLocation)
 	return obj.(*v1alpha1.StorageLocation), err
 }
 
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+func (c *FakeStorageLocations) UpdateStatus(storageLocation *v1alpha1.StorageLocation) (*v1alpha1.StorageLocation, error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewUpdateSubresourceAction(storagelocationsResource, "status", c.ns, storageLocation), &v1alpha1.StorageLocation{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha1.StorageLocation), err
+}
+
 // Delete takes name of the storageLocation and deletes it. Returns an error if one occurs.
 func (c *FakeStorageLocations) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.

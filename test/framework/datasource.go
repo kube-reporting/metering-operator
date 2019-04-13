@@ -20,7 +20,7 @@ func (f *Framework) GetMeteringReportDataSource(name string) (*meteringv1alpha1.
 func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportDataSource, error) {
 	t.Helper()
 	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *meteringv1alpha1.ReportDataSource) (bool, error) {
-		if ds.Status.TableName == "" {
+		if ds.Status.TableRef.Name == "" {
 			t.Logf("ReportDataSource %s table is not created yet", name)
 			return false, nil
 		}
@@ -44,7 +44,7 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 		reportDataSources = reportDataSourcesList.Items
 
 		for _, ds := range reportDataSources {
-			if ds.Status.TableName == "" {
+			if ds.Status.TableRef.Name == "" {
 				t.Logf("ReportDataSource %s table is not created yet", ds.Name)
 				return false, nil
 			}
