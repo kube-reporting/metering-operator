@@ -2,6 +2,7 @@ package operator
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -40,7 +40,6 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/presto"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
@@ -366,40 +365,14 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	op.logger.Infof("setting up DB connections")
 
-	var (
-		prestoQueryer db.Queryer
-		hiveQueryer   db.Queryer
-	)
-
-	// Use errgroup to setup both hive and presto connections
-	// at the sametime, waiting for both to be ready before continuing.
-	// if either errors, we return the ***REMOVED***rst error
-	var g errgroup.Group
-	g.Go(func() error {
-		var err error
-		connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
-		prestoConn, err := presto.NewPrestoConnWithRetry(ctx, op.logger, connStr, connBackoff, maxConnRetries)
-		if err != nil {
-			return err
-		}
-		prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
-		return nil
-	})
-	g.Go(func() error {
-		var err error
-		reconnectingHiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
-		if err != nil {
-			return err
-		}
-		hiveQueryer = db.NewLoggingQueryer(reconnectingHiveQueryer, op.logger, op.cfg.LogDDLQueries)
-		return nil
-	})
-	err := g.Wait()
+	connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
+	prestoQueryer, err := sql.Open("presto", connStr)
 	if err != nil {
 		return err
 	}
-
 	defer prestoQueryer.Close()
+
+	hiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
 	defer hiveQueryer.Close()
 
 	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusCon***REMOVED***g.Address)
@@ -419,12 +392,17 @@ func (op *Reporting) Run(ctx context.Context) error {
 		bufferPool := prestostore.NewBufferPool(op.cfg.PrestoMaxQueryLength)
 		prestoQueryBufferPool = &bufferPool
 	}
-	op.reportResultsRepo = prestostore.NewReportResultsRepo(prestoQueryer)
-	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
-	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer, prestoQueryBufferPool)
-	op.prestoViewCreator = &prestoViewCreator{queryer: prestoQueryer}
 
-	hiveTableManager := reporting.NewHiveTableManager(hiveQueryer)
+	loggingDMLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDMLQueries)
+	loggingDDLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDDLQueries)
+	loggingDDLHiveQueryer := db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+
+	op.reportResultsRepo = prestostore.NewReportResultsRepo(loggingDMLPrestoQueryer)
+	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(loggingDMLPrestoQueryer, prestoQueryBufferPool)
+	op.prestoViewCreator = &prestoViewCreator{queryer: loggingDDLPrestoQueryer}
+
+	hiveTableManager := reporting.NewHiveTableManager(loggingDDLHiveQueryer)
 	op.tableManager = hiveTableManager
 	op.awsTablePartitionManager = hiveTableManager
 
