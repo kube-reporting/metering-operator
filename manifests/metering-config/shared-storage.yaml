@@ -5,13 +5,13 @@ metadata:
 spec:
   defaultStorage:
     create: true
-     name: "local-storage"
-     isDefault: true
-     type: "hive"
-     hive:
-       tableProperties:
-         # do not change this
-         location: "/user/hive/warehouse"
+    name: "local-storage"
+    isDefault: true
+    type: "hive"
+    hive:
+      tableProperties:
+        # do not change this
+        location: "/user/hive/warehouse"
   presto:
     spec:
       con***REMOVED***g:
