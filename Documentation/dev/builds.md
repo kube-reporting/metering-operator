@@ -9,7 +9,7 @@ Each of them is built slightly differently.
   - origin
     - source is https://github.com/operator-framework/operator-metering
     - Dockerfile is `Dockerfile.reporting-operator`
-    - Docker image is [quay.io/coreos/metering-reporting-operator](https://quay.io/repository/coreos/metering-reporting-operator)
+    - Docker image is [quay.io/openshift/origin-metering-reporting-operator](https://quay.io/repository/openshift/origin-metering-reporting-operator)
     - Built by this repos Jenkins CI.
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-reporting-operator/
@@ -25,7 +25,7 @@ Each of them is built slightly differently.
   - origin
     - Source: https://github.com/operator-framework/operator-metering
     - Dockerfile is `Dockerfile.metering-operator`
-    - Docker image is [quay.io/coreos/metering-helm-operator](https://quay.io/repository/coreos/metering-helm-operator)
+    - Docker image is [quay.io/openshift/origin-metering-helm-operator](https://quay.io/repository/openshift/origin-metering-helm-operator)
     - Built by this repos Jenkins CI.
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm-operator/
@@ -39,7 +39,7 @@ Each of them is built slightly differently.
   - origin
     - Source is https://github.com/operator-framework/helm/blob/metering-v2.8.2
     - Dockerfile is https://github.com/operator-framework/helm/blob/metering-v2.8.2/Dockerfile
-    - Docker image is [quay.io/coreos/helm](https://quay.io/repository/coreos/helm)
+    - Docker image is [quay.io/openshift/origin-metering-helm](https://quay.io/repository/openshift/origin-metering-helm)
     - Built by quay.io
   - OCP
     - Source is  http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm/
@@ -53,7 +53,7 @@ Each of them is built slightly differently.
   - origin
     - Source is https://github.com/operator-framework/presto/tree/metering-0.212
     - Dockerfile is https://github.com/operator-framework/presto/blob/metering-0.212/Dockerfile
-    - Docker image is [quay.io/coreos/presto](https://quay.io/repository/coreos/presto)
+    - Docker image is [quay.io/openshift/origin-metering-presto](https://quay.io/repository/openshift/origin-metering-presto)
     - Built by quay.io
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/presto/
@@ -67,7 +67,7 @@ Each of them is built slightly differently.
   - origin
     - Source is https://github.com/operator-framework/hive/tree/metering-2.3.3
     - Dockerfile is https://github.com/operator-framework/hive/tree/metering-2.3.3/Dockerfile
-    - Docker image is [quay.io/coreos/hive](https://quay.io/repository/coreos/hive)
+    - Docker image is [quay.io/openshift/origin-metering-hive](https://quay.io/repository/openshift/origin-metering-hive)
     - Built by quay.io
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hive/
@@ -81,7 +81,7 @@ Each of them is built slightly differently.
   - origin
     - Source is https://github.com/operator-framework/hadoop/tree/metering-3.1.1
     - Dockerfile is https://github.com/operator-framework/hadoop/tree/metering-3.1.1/Dockerfile
-    - Docker image is [quay.io/coreos/hadoop](https://quay.io/repository/coreos/hadoop)
+    - Docker image is [quay.io/openshift/origin-metering-hadoop](https://quay.io/repository/openshift/origin-metering-hadoop)
     - Built by quay.io
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hadoop/
