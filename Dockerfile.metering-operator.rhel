@@ -24,8 +24,7 @@ RUN make \
     RUN_UPDATE_CODEGEN=false \
     CHECK_GO_FILES=false \
     OCP_BUILD=true \
-    bin/openshift-metering-0.1.0.tgz \
-    bin/metering-override-values.yaml
+    bin/openshift-metering-0.1.0.tgz
 
 # metering-helm-operator is below
 FROM openshift/ose-metering-helm:v4.0
@@ -44,13 +43,11 @@ EXPOSE 44134
 ENV HELM_HOST 127.0.0.1:44134
 
 ENV HOME /tmp
-ENV EXTRA_VALUES_FILE /metering-override-values.yaml
 
 COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
 COPY images/helm-operator/get_owner.sh /usr/local/bin/get_owner.sh
 
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/openshift-metering-0.1.0.tgz /
-COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/metering-override-values.yaml /
 
 CMD ["run-operator.sh"]
 USER 2001

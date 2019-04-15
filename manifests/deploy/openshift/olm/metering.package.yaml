@@ -1,5 +1,5 @@
 packageName: metering
 channels:
-- currentCSV: metering-operator.v0.14.0-latest
-  name: alpha
+- currentCSV: metering-operator.v4.1.0
+  name: preview
 

@@ -6,5 +6,5 @@ spec:
   reporting-operator:
     spec:
       image:
-        repository: quay.io/coreos/metering-reporting-operator
+        repository: quay.io/openshift/origin-metering-reporting-operator
         tag: latest

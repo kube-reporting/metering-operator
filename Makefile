@@ -3,12 +3,6 @@ SHELL := /bin/bash
 ROOT_DIR:= $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include build/check_de***REMOVED***ned.mk
 
-GIT_SHA    := $(shell git rev-parse HEAD)
-GIT_TAG    := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-RELEASE_TAG := $(shell hack/print-version.sh)
-IMAGE_TAG = $(GIT_SHA)
-OCP_RELEASE_TAG = v4.0
-
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
@@ -17,80 +11,19 @@ REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
 
 IMAGE_REPOSITORY = quay.io
-IMAGE_ORG = coreos
+IMAGE_ORG = openshift
 DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
-METERING_OPERATOR_IMAGE_NAME = metering-helm-operator
-REPORTING_OPERATOR_IMAGE_NAME = metering-reporting-operator
-METERING_SRC_IMAGE_NAME = metering-src
-PRESTO_IMAGE_NAME = presto
-HIVE_IMAGE_NAME = hive
-HDFS_IMAGE_NAME = hadoop
+METERING_SRC_IMAGE_REPO=$(DOCKER_BASE_URL)/metering-src
+METERING_SRC_IMAGE_TAG=latest
 
-# these image tags are used in the rendering over the metering chart override
-# values
-METERING_OPERATOR_IMAGE_TAG = $(RELEASE_TAG)
-REPORTING_OPERATOR_IMAGE_TAG = $(RELEASE_TAG)
-PRESTO_IMAGE_TAG = metering-0.212
-HIVE_IMAGE_TAG = metering-2.3.3
-HDFS_IMAGE_TAG = metering-3.1.1
+REPORTING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-reporting-operator
+REPORTING_OPERATOR_IMAGE_TAG=latest
+METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-helm-operator
+METERING_OPERATOR_IMAGE_TAG=latest
 
-METERING_OPERATOR_IMAGE_REPO = $(DOCKER_BASE_URL)/$(METERING_OPERATOR_IMAGE_NAME)
-REPORTING_OPERATOR_IMAGE_REPO = $(DOCKER_BASE_URL)/$(REPORTING_OPERATOR_IMAGE_NAME)
-METERING_SRC_IMAGE_REPO = $(DOCKER_BASE_URL)/$(METERING_SRC_IMAGE_NAME)
-PRESTO_IMAGE_REPO = $(DOCKER_BASE_URL)/$(PRESTO_IMAGE_NAME)
-HIVE_IMAGE_REPO = $(DOCKER_BASE_URL)/$(HIVE_IMAGE_NAME)
-HDFS_IMAGE_REPO = $(DOCKER_BASE_URL)/$(HDFS_IMAGE_NAME)
-
-# by default we build using docker, and assume building an image uses typical
-# docker args and flags (-t, -f, and the build context positional arg.)
-DOCKER_BUILD_CMD = docker build $(DOCKER_BUILD_ARGS)
-
-# extra arguments that can be passed to docker build
-DOCKER_BUILD_ARGS ?=
-
-# use https://github.com/openshift/imagebuilder as our docker client
-USE_IMAGEBUILDER ?= false
-# if this is an OCP build, this enables rhel docker***REMOVED***les
-OCP_BUILD ?= false
-
-ifeq ($(USE_IMAGEBUILDER), true)
-	DOCKER_BUILD_CMD = imagebuilder
-ifeq ($(OCP_BUILD), true)
-	# used to enable RHEL repos that have the packages we need
-	REPO_MNT = $(ROOT_DIR)/hack/ocp-util/redhat.repo:/etc/yum.repos.d/redhat.repo
-	# used to disable subscription-manager in the docker builds
-	SUB_MGR_MNT = $(ROOT_DIR)/hack/ocp-util/subscription-manager.conf:/etc/yum/pluginconf.d/subscription-manager.conf
-	DOCKER_BUILD_CMD = imagebuilder -mount $(REPO_MNT) -mount $(SUB_MGR_MNT)
-endif
-endif
-
-# default Docker***REMOVED***les
-METERING_OPERATOR_DOCKERFILE = Docker***REMOVED***le.metering-operator
-REPORTING_OPERATOR_DOCKERFILE = Docker***REMOVED***le.reporting-operator
-
-# override our Docker***REMOVED***les to rhel docker***REMOVED***les
-# and update the image names in the chart override values
-ifeq ($(OCP_BUILD), true)
-	IMAGE_REPOSITORY = registry.access.redhat.com
-	IMAGE_ORG = openshift4
-	METERING_OPERATOR_IMAGE_NAME = ose-metering-helm-operator
-	REPORTING_OPERATOR_IMAGE_NAME = ose-metering-reporting-operator
-	PRESTO_IMAGE_NAME = ose-presto
-	HIVE_IMAGE_NAME = ose-hive
-	HDFS_IMAGE_NAME = ose-hadoop
-
-	IMAGE_TAG = $(OCP_RELEASE_TAG)
-
-	METERING_OPERATOR_IMAGE_TAG = $(OCP_RELEASE_TAG)
-	REPORTING_OPERATOR_IMAGE_TAG = $(OCP_RELEASE_TAG)
-	PRESTO_IMAGE_TAG = $(OCP_RELEASE_TAG)
-	HIVE_IMAGE_TAG = $(OCP_RELEASE_TAG)
-	HDFS_IMAGE_TAG = $(OCP_RELEASE_TAG)
-
-	METERING_OPERATOR_DOCKERFILE = Docker***REMOVED***le.metering-operator.rhel
-	REPORTING_OPERATOR_DOCKERFILE = Docker***REMOVED***le.reporting-operator.rhel
-endif
+REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
+METERING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-operator
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
@@ -118,132 +51,22 @@ ifeq ($(RUN_UPDATE_CODEGEN), true)
 	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
 endif
 
-DOCKER_COMMON_NAMES := \
-	reporting-operator \
-	metering-operator \
-	metering-src
-
-DOCKER_BUILD_NAMES = $(DOCKER_COMMON_NAMES)
-DOCKER_TAG_NAMES = $(DOCKER_COMMON_NAMES)
-DOCKER_PUSH_NAMES = $(DOCKER_COMMON_NAMES)
-
-PULL_TAG_IMAGE_SOURCE ?= false
-USE_LATEST_TAG ?= false
-USE_RELEASE_TAG = true
-PUSH_RELEASE_TAG = false
-
-DOCKER_BUILD_CONTEXT = $(dir $(DOCKERFILE))
-TAG_IMAGE_SOURCE = $(IMAGE_NAME):$(GIT_SHA)
-
 # Hive Git repository for Thrift de***REMOVED***nitions
 HIVE_REPO := "git://git.apache.org/hive.git"
 HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
 
 all: fmt unit metering-manifests docker-build-all
 
-# Usage:
-#	make docker-build DOCKERFILE= IMAGE_NAME=
-
-docker-build:
-	$(DOCKER_BUILD_CMD) -t $(IMAGE_NAME):$(GIT_SHA) -f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
-ifdef BRANCH_TAG
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(BRANCH_TAG)
-endif
-ifdef DEPLOY_TAG
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(DEPLOY_TAG)
-endif
-ifneq ($(GIT_TAG),)
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(GIT_TAG)
-endif
-ifeq ($(USE_RELEASE_TAG), true)
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=$(RELEASE_TAG)
-endif
-ifeq ($(USE_LATEST_TAG), true)
-	$(MAKE) docker-tag IMAGE_NAME=$(IMAGE_NAME) IMAGE_TAG=latest
-endif
-
-# Usage:
-#	make docker-tag SOURCE_IMAGE=$(IMAGE_NAME):$(GIT_SHA) IMAGE_NAME= IMAGE_TAG=
-docker-tag:
-ifeq ($(PULL_TAG_IMAGE_SOURCE), true)
-	$(MAKE) docker-pull IMAGE=$(TAG_IMAGE_SOURCE)
-endif
-	docker tag $(TAG_IMAGE_SOURCE) $(IMAGE_NAME):$(IMAGE_TAG)
-
-# Usage:
-#	make docker-pull IMAGE=
-
-docker-pull:
-	docker pull $(IMAGE)
-
-# Usage:
-#	make docker-push IMAGE_NAME= IMAGE_TAG=
-
-docker-push:
-	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-ifeq ($(PUSH_RELEASE_TAG), true)
-	docker push $(IMAGE_NAME):$(RELEASE_TAG)
-endif
-ifeq ($(USE_LATEST_TAG), true)
-	docker push $(IMAGE_NAME):latest
-endif
-ifneq ($(GIT_TAG),)
-	docker push $(IMAGE_NAME):$(GIT_TAG)
-endif
-ifdef BRANCH_TAG
-	docker push $(IMAGE_NAME):$(BRANCH_TAG)
-endif
-ifdef DEPLOY_TAG
-	docker push $(IMAGE_NAME):$(DEPLOY_TAG)
-endif
-
-# These generate new make targets like metering-operator-docker-build
-# which can be invoked.
-DOCKER_BUILD_TARGETS := $(addsuf***REMOVED***x -docker-build, $(DOCKER_BUILD_NAMES))
-DOCKER_PUSH_TARGETS := $(addsuf***REMOVED***x -docker-push, $(DOCKER_PUSH_NAMES))
-DOCKER_TAG_TARGETS := $(addsuf***REMOVED***x -docker-tag, $(DOCKER_TAG_NAMES))
-DOCKER_PULL_TARGETS := $(addsuf***REMOVED***x -docker-pull, $(DOCKER_PUSH_NAMES))
-
-# The steps below run for each value of $(DOCKER_TARGETS) effectively, generating multiple Make targets.
-# To make it easier to follow, each step will include an example after the evaluation.
-# The example will be using the metering-operator targets as it's example.
-#
-# The pattern/string manipulation below does the following (starting from the inner most expression):
-# 1) strips -docker-push, -docker-tag, or -docker-pull from the target name ($@) giving us the non suf***REMOVED***xed value from $(TARGETS)
-# ex: metering-operator-docker-build -> metering-operator
-# 2) Replaces - with _
-# ex: metering-operator -> metering_helm_operator
-# 3) Uppercases letters
-# ex: metering_helm_operator -> METERING_HELM_OPERATOR
-# 4) Appends _IMAGE_REPO
-# ex: METERING_HELM_OPERATOR -> METERING_OPERATOR_IMAGE_REPO
-# That gives us the value for the docker-build, docker-tag, or docker-push IMAGE_NAME variable.
-
-$(DOCKER_PUSH_TARGETS)::
-	$(MAKE) docker-push IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-push,,$@)) | tr a-z A-Z)))
-
-$(DOCKER_TAG_TARGETS)::
-	$(MAKE) docker-tag IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-tag,,$@)) | tr a-z A-Z)))
-
-$(DOCKER_PULL_TARGETS)::
-	$(MAKE) docker-pull IMAGE_NAME=$($(addsuf***REMOVED***x _IMAGE_REPO, $(shell echo $(subst -,_,$(subst -docker-pull,,$@)) | tr a-z A-Z)))
-
-docker-build-all: $(DOCKER_BUILD_TARGETS)
-
-docker-push-all: $(DOCKER_PUSH_TARGETS)
-
-docker-tag-all: $(DOCKER_TAG_TARGETS)
-
-docker-pull-all: $(DOCKER_PULL_TARGETS)
+docker-build-all: reporting-operator-docker-build metering-operator-docker-build
 
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(REPORTING_OPERATOR_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	docker build -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 metering-src-docker-build: Docker***REMOVED***le.src
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_SRC_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	docker build -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
-	$(MAKE) docker-build DOCKERFILE=$< IMAGE_NAME=$(METERING_OPERATOR_IMAGE_REPO) DOCKER_BUILD_CONTEXT=$(ROOT_DIR)
+	docker build -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
@@ -264,7 +87,7 @@ unit-docker: metering-src-docker-build
 		-t \
 		-w /go/src/github.com/operator-framework/operator-metering \
 		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
-		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
 integration:
@@ -286,7 +109,7 @@ integration-docker: metering-src-docker-build
 		-v $(KUBECONFIG):/kubecon***REMOVED***g \
 		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
 		-v /out \
-		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make integration
 	rm -rf bin/integration-docker-test-output
 	docker cp metering-integration-docker:/out bin/integration-docker-test-output
@@ -311,7 +134,7 @@ e2e-docker: metering-src-docker-build
 		-v $(KUBECONFIG):/kubecon***REMOVED***g \
 		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
 		-v /out \
-		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make e2e
 	rm -rf bin/e2e-docker-test-output
 	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
@@ -328,7 +151,7 @@ verify-docker: metering-src-docker-build
 		-t \
 		-w /go/src/github.com/operator-framework/operator-metering \
 		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
-		$(METERING_SRC_IMAGE_REPO):$(IMAGE_TAG) \
+		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make verify
 
 .PHONY: run-metering-operator-local
@@ -351,20 +174,6 @@ build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPE
 	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
-
-bin/metering-override-values.yaml:
-bin/metering-override-values.yaml: ./hack/render-metering-chart-override-values.sh
-	@mkdir -p bin
-	export \
-		REPORTING_OPERATOR_IMAGE_REPO=$(REPORTING_OPERATOR_IMAGE_REPO) \
-		PRESTO_IMAGE_REPO=$(PRESTO_IMAGE_REPO) \
-		HIVE_IMAGE_REPO=$(HIVE_IMAGE_REPO) \
-		HDFS_IMAGE_REPO=$(HDFS_IMAGE_REPO) \
-		REPORTING_OPERATOR_IMAGE_TAG=$(REPORTING_OPERATOR_IMAGE_TAG) \
-		PRESTO_IMAGE_TAG=$(PRESTO_IMAGE_TAG) \
-		HIVE_IMAGE_TAG=$(HIVE_IMAGE_TAG) \
-		HDFS_IMAGE_TAG=$(HDFS_IMAGE_TAG); \
-	./hack/render-metering-chart-override-values.sh > bin/metering-override-values.yaml
 
 CHART_DEPS := bin/openshift-metering-0.1.0.tgz
 
@@ -390,16 +199,12 @@ bin/test2json: gotools/test2json/main.go
 	test vendor fmt verify \
 	regenerate-hive-thrift thrift-gen \
 	update-codegen verify-codegen \
-	$(DOCKER_BUILD_TARGETS) $(DOCKER_PUSH_TARGETS) \
-	$(DOCKER_TAG_TARGETS) $(DOCKER_PULL_TARGETS) \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
 	metering-test-docker \
 	metering-src-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
-	penshift-metering chart \
-	bin/metering-override-values.yaml \
-	metering-manifests bill-of-materials.json \
+	metering-manifests \
 	install-kube-prometheus-helm
 
 update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
@@ -430,9 +235,6 @@ pkg/hive/hive_thrift: thrift/TCLIService.thrift thrift-gen
 thrift-gen:
 	thrift -gen go:package_pre***REMOVED***x=${GO_PKG}/pkg/hive,package=hive_thrift -out pkg/hive thrift/TCLIService.thrift
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./pkg/hive/hive_thrift/...`; do rm -rf $$i; done
-
-bill-of-materials.json: bill-of-materials.override.json
-	license-bill-of-materials --override-***REMOVED***le $(ROOT_DIR)/bill-of-materials.override.json ./... > $(ROOT_DIR)/bill-of-materials.json
 
 kube-prometheus-helm-install:
 	@echo "KUBECONFIG: $(KUBECONFIG)"
