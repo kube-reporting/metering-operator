@@ -5,6 +5,7 @@ set -o pipefail
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
+
 TMPDIR="$(mktemp -d)"
 
 CHART="$ROOT_DIR/charts/metering-olm"
@@ -99,7 +100,6 @@ JQ_RBAC_SCRIPT=$(cat <<EOF
 }
 EOF
 )
-
 # ***REMOVED***nd gets all the CRD ***REMOVED***les, and execs faq with -s (slurp) to put them all in
 # array to be processed by the $JQ_CRD_SCRIPT
 ***REMOVED***nd "$CRD_DIR" \
@@ -157,12 +157,28 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$TMP_CSV"
 
-# Rename the ***REMOVED***le with it's version in it, and move it to the ***REMOVED***nal destination
 CSV_VERSION="$("$FAQ_BIN" -M -c -r -o json '.spec.version' "$TMP_CSV" )"
-CSV_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.${CSV_VERSION}.clusterserviceversion.yaml"
+
+CSV_BUNDLE_DIR="$OUTPUT_DIR/bundle"
+
+PACKAGE_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/metering.package.yaml"
+CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
+
+SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
+CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
+OPERATORGROUP_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.operatorgroup.yaml"
+
+mkdir -p "$CSV_BUNDLE_DIR"
+
+# Rename the ***REMOVED***le with it's version in it, and move it to the ***REMOVED***nal destination
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 
-PACKAGE_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.package.yaml"
+# copy CRDs to the bundle dir
+***REMOVED***nd "$CRD_DIR" \
+    -type f \
+    -exec cp {} "$CSV_BUNDLE_DIR" \;
+
+# render the package ***REMOVED***le
 helm template "$CHART" \
     -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
@@ -170,7 +186,7 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
-SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
+# render the example subscription ***REMOVED***le
 helm template "$CHART" \
     -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
@@ -178,7 +194,7 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$SUBSCRIPTION_MANIFEST_DESTINATION"
 
-CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
+# render the example catalogsourcecon***REMOVED***g ***REMOVED***le
 helm template "$CHART" \
     -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
@@ -186,7 +202,7 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$CATALOGSOURCECONFIG_MANIFEST_DESTINATION"
 
-OPERATORGROUP_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.operatorgroup.yaml"
+# render the example operatorgroup ***REMOVED***le
 helm template "$CHART" \
     -f "$TMPDIR/olm-values.yaml" \
     "${VALUES_ARGS[@]}" \
