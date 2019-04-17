@@ -9,11 +9,17 @@ FROM openshift/origin-release:golang-1.10
 # our copy of faq and jq
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
 
-RUN INSTALL_PKGS="curl jq-1.6-2.el7 faq" && \
+RUN INSTALL_PKGS="curl jq-1.6-2.el7 faq rh-python36" && \
+    yum -y install centos-release-scl && \
     yum -y remove jq && \
     yum install --setopt=skip_missing_names_on_install=False -y $INSTALL_PKGS && \
     yum clean all && \
     rm -rf /var/cache/yum
+
+RUN scl enable rh-python36 'pip install operator-courier'
+
+COPY hack/scl-operator-courier.sh /usr/local/bin/operator-courier
+RUN chmod +x /usr/local/bin/operator-courier
 
 COPY --from=cli /usr/bin/oc /usr/bin/oc
 RUN ln -s /usr/bin/oc /usr/bin/kubectl
