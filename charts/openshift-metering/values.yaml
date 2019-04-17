@@ -43,8 +43,6 @@ reporting-operator:
     metricsService:
       annotations:
         "service.alpha.openshift.io/serving-cert-secret-name": "reporting-operator-metrics-tls-secrets"
-    image:
-      tag: latest
 
 presto:
   spec:

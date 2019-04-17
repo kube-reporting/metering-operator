@@ -3,10 +3,7 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-load_version_vars
 
-: "${METERING_OPERATOR_IMAGE_REPO:=quay.io/coreos/metering-helm-operator}"
-: "${METERING_OPERATOR_IMAGE_TAG:=$METERING_VERSION}"
 : "${METERING_OPERATOR_IMAGE:=${METERING_OPERATOR_IMAGE_REPO}:${METERING_OPERATOR_IMAGE_TAG}}"
 : "${METERING_CHART:=/openshift-metering-0.1.0.tgz}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"

@@ -13,9 +13,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 MANIFESTS_DIR="$ROOT_DIR/manifests"
 
 source "${ROOT_DIR}/hack/lib/util.sh"
-source "${ROOT_DIR}/hack/lib/version.sh"
-
-load_version_vars
 
 : "${CREATE_NAMESPACE:=true}"
 : "${SKIP_DELETE_CRDS:=true}"
@@ -33,10 +30,10 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${CRD_DIR:=$MANIFESTS_DIR/custom-resource-definitions}"
 : "${METERING_UNINSTALL_CLUSTERROLEBINDING:=true}"
 : "${METERING_INSTALL_CLUSTERROLEBINDING:=true}"
-: "${METERING_OPERATOR_IMAGE_REPO:="quay.io/coreos/metering-helm-operator"}"
-: "${METERING_OPERATOR_IMAGE_TAG:="$METERING_VERSION"}"
-: "${REPORTING_OPERATOR_IMAGE_REPO:="quay.io/coreos/metering-reporting-operator"}"
-: "${REPORTING_OPERATOR_IMAGE_TAG:="$METERING_VERSION"}"
+: "${METERING_OPERATOR_IMAGE_REPO:="quay.io/openshift/origin-metering-helm-operator"}"
+: "${METERING_OPERATOR_IMAGE_TAG:="latest"}"
+: "${REPORTING_OPERATOR_IMAGE_REPO:="quay.io/openshift/origin-metering-reporting-operator"}"
+: "${REPORTING_OPERATOR_IMAGE_TAG:="latest"}"
 : "${FAQ_BIN:=faq}"
 : "${DEPLOY_REPORTING_OPERATOR_LOCAL:=false}"
 : "${DEPLOY_METERING_OPERATOR_LOCAL:=false}"

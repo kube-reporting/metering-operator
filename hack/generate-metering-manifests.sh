@@ -14,6 +14,6 @@ export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-valu
 "$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 
 export CUSTOM_OLM_OVERRIDE_VALUES="$TMPDIR/override-olm-values.yaml"
-"$ROOT_DIR/hack/render-olm-override-values.sh" > "$CUSTOM_OLM_OVERRIDE_VALUES"
+touch "$CUSTOM_OLM_OVERRIDE_VALUES"
 
 "$ROOT_DIR/hack/create-metering-manifests.sh"
