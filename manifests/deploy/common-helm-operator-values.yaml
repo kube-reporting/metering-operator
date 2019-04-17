@@ -20,7 +20,7 @@ targetNamespacesDownwardAPIValueFrom:
     ***REMOVED***eldPath: "metadata.annotations['olm.targetNamespaces']"
 
 image:
-  repository: quay.io/coreos/metering-helm-operator
+  repository: quay.io/openshift/origin-metering-helm-operator
   tag: latest
   pullPolicy: Always
 

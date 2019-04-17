@@ -1,5 +1,5 @@
 # need helm CLI for ***REMOVED***nal image
-FROM quay.io/coreos/helm:latest as helm
+FROM quay.io/openshift/origin-metering-helm:latest as helm
 
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli as cli

@@ -15,7 +15,7 @@ crd:
   listKind: HelmReleaseList
 
 image:
-  repository: quay.io/coreosinc/helm-operator
+  repository: "mustbereplaced"
   tag: latest
   pullPolicy: Always
 
