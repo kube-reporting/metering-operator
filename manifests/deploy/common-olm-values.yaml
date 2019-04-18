@@ -193,7 +193,7 @@ channels:
   currentCSV: metering-operator.v4.1.0
 
 subscriptionName: metering
-subscriptionChannel: alpha
+subscriptionChannel: preview
 subscriptionCatalogSource: metering-operators
 subscriptionCatalogSourceNamespace: openshift-metering
 
