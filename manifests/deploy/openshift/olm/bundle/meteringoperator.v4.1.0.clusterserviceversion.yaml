@@ -45,11 +45,11 @@ metadata:
               },
               {
                 "name": "namespace",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "deployment",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "total_replica_unready_seconds",
@@ -133,7 +133,7 @@ metadata:
               },
               {
                 "name": "currency",
-                "type": "string"
+                "type": "varchar"
               }
             ],
             "createTableAs": true,
@@ -159,39 +159,39 @@ metadata:
             "columns": [
               {
                 "name": "host",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "identity",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "user",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "time",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "request",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "status",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "size",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "referer",
-                "type": "string"
+                "type": "varchar"
               },
               {
                 "name": "agent",
-                "type": "string"
+                "type": "varchar"
               }
             ],
             "***REMOVED***leFormat": "TEXTFILE",
