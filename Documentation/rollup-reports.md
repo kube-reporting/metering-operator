@@ -1,10 +1,13 @@
 # Guide: Roll-Up Reports
 
-Often, it makes sense to report on data collected in other reports, called roll-up reports. Roll-up reports can combine datatypes (memory *and* CPU usage per namespace) and can combine smaller periods of time into larger ones — for instance, in an environment where a large amount of data is collected, splitting up processing over a month instead of waiting for the end of the month can be an effective way to spread out compute time and get a quicker ***REMOVED***nal report.
+Often, it makes sense to report on data collected in other reports, called roll-up reports.
+Roll-up reports can combine datatypes (memory *and* CPU usage per namespace) and can combine smaller periods of time into larger ones — for instance, in an environment where a large amount of data is collected, splitting up processing over a month instead of waiting for the end of the month can be an effective way to spread out compute time and get a quicker ***REMOVED***nal report.
 
-Currently, there are no built-in roll-up reports. Therefore, a custom roll-up report requires a custom generation query. In the following guide, we will create a daily report that aggregates hourly reports:
+In the following guide, we will create a daily report that aggregates hourly reports.
 
 ## 1. Create the sub-report
+
+First, create the hourly report that will be aggregated:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
@@ -20,21 +23,18 @@ spec:
 
 ## 2. Create the aggregation query
 
-To aggregate the reports together, we need a query that will retrieve the data from the report we wish to aggregate. This report is essentially a duplicate of the original `namespace-cpu-usage` query. 
-It contains a few a custom inputs: `NamespaceCPUUsageReportName` that we use to pass the name of our sub-report in:
+To aggregate the reports together, we need a query that will retrieve the data from the report we wish to aggregate.
+The query below is a copy of the built-in `namespace-cpu-usage` query provided to demonstrate how aggregation can be done.
+It contains a few a custom inputs: most importantly, `NamespaceCPUUsageReportName` is the input we can use to pass name of our sub-report in:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "namespace-cpu-usage"
+  name: namespace-cpu-usage
   labels:
     operator-metering: "true"
 spec:
-  reportQueries:
-  - "pod-cpu-usage-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -43,7 +43,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: data_start
     type: timestamp
@@ -56,8 +56,14 @@ spec:
     unit: core_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: NamespaceCPUUsageReportName
+    type: Report
+  - name: PodCpuUsageRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-usage-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -76,7 +82,7 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
-    FROM {| generationQueryViewName "pod-cpu-usage-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
@@ -89,15 +95,16 @@ Note the use of the macro `reportTableName`, which will automatically get the pr
 
 ## 3. Create the aggregator report
 
-We now have a sub-report and a query that can read data from other reports. We can create a `Report` that uses that custom generation query with the sub-report:
+We now have a sub-report and a query that can read data from other reports.
+We can create a `Report` that uses that custom generation query with the sub-report:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
 kind: Report
 metadata:
-  name: namespace-cpu-usage-daily-aggregate
+  name: namespace-cpu-usage-daily
 spec:
-  generationQuery: "namespace-cpu-usage-aggregated"
+  generationQuery: "namespace-cpu-usage"
   inputs:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"

@@ -10,18 +10,14 @@ When writing a [report](report.md) you can specify the query it will use by sett
 - `query`: A [SQL SELECT statement][presto-select]. This SQL statement supports [go templates][go-templates] and provides additional custom functions speci***REMOVED***c to Operator Metering (de***REMOVED***ned in the [templating](#templating) section below).
 - `columns`: A list of columns that match the schema of the results of the query. The order of these columns must match the order of the columns returned by the SELECT statement. Columns have 3 ***REMOVED***elds, `name`, `type`, and `unit`. Each ***REMOVED***eld is covered in more detail below.
   - `name`: This is the name of the column returned in the `SELECT` statement.
-  - `type`: This is the [Hive][hive-types] column type. Currently due to implementation details, column types are expressed using hive types. In the future, this will likely be switched to using the Presto native types. This also has an effect that queries with columns containing complex types such as `maps` or `arrays` cannot be used by `Reports`.
+  - `type`: This is the [Presto][presto-types] column type.
   - `unit`: Unit refers to the unit of measurement of the column.
   - `tableHidden`: Takes a boolean, when true, hides the column from report results depending on the format and endpoint. See [api docs for details][apiTable].
-- `reportDataSources`: This is a list of `ReportDataSource` resources that this `ReportGenerationQuery` depends on. These data sources can be referenced as database tables in the `query` using the `dataSourceTableName` template function.
-- `reportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on that have `view.disabled` set to false. Queries in this list can be re-used by querying the database view created, and using `generationQueryViewName` templating function to reference the view by name.
-- `dynamicReportQueries`: This is a list of other `ReportGenerationQuery` resources that this `ReportGenerationQuery` depends on, that have `view.disabled` set to true, these are queries that depend on the `.Report` variable. Queries in the list can be re-used by injecting them into the current query using the `renderReportGenerationQuery` template function.
-- `view`: This section controls options related to creating a view from the `query` when the `ReportGenerationQuery` resource is created.
-    - `view.disabled`: This is false by default, and if set to true, it will prevent the default behavior of creating a database view using the contents of the `query`. This cannot be true if `dynamicReportQueries` is non-empty or if the `query` depends on the `.Report` templating variables.
-- `inputs`: A list of inputs this report query accepts to control its behavior.
+- `inputs`: A list of inputs this report query accepts to control its behavior. For more in depth details, see the [query inputs](#query-inputs) section.
   - `name`: The name used to refer to the input in the `Report` or `ScheduledReport` `spec.inputs` and within the queries template variables (see below).
   - `required`: A boolean indicating if this input is required for the query to run. Defaults to false.
-  - `type`: An optional type indicating what data type this input takes. Available options are `string`, `time`, and `int`. If left empty, it defaults to `string`.
+  - `type`: An optional type indicating what data type this input takes. Available options are `string`, `time`, and `int`, `ReportDataSource`, `ReportGenerationQuery`, and `Report`. If left empty, it defaults to `string`. For more details, see the [query input types](#query-input-types) section.
+  - `default`: An optional default value to use if unspeci***REMOVED***ed.
 
 ## Templating
 
@@ -34,21 +30,45 @@ Most of these functions are for referring to other resources such as `ReportData
 - `Report`: This object has two ***REMOVED***elds, `ReportingStart` and `ReportingEnd` which are the value of the `spec.reportingStart` and `spec.reportingEnd` for a `Report`. For a `Report` with a `spec.schedule` set, the values map to the speci***REMOVED***c period being collected when the `Report` runs.
   - `ReportingStart`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause.
   - `ReportingEnd`: A [time.Time][go-time] object that is generally used to ***REMOVED***lter the results of a `SELECT` query using a `WHERE` clause. Built-in queries select datapoints matching `ReportingStart <= timestamp > ReportingEnd`.
-- `DynamicDependentQueries`: This is a list of `ReportGenerationQuery` objects that were listed in the `spec.dynamicReportQueries` ***REMOVED***eld. Generally this list isn't directly referenced in query, but is used indirectly with the `renderReportGenerationQuery` [template function](#template-functions).
-- `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report's `spec.inputs`. The values type is based on the report queries input de***REMOVED***nition [type](#***REMOVED***elds), and defaults to string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time] automatically.
+  - `Inputs`: This is a `map[string]interface{}` of inputs passed in via the Report's `spec.inputs`. The values type is based on the report queries input de***REMOVED***nition [type](#***REMOVED***elds), and defaults to string unless the input's name is `ReportingStart` or `ReportingEnd`, in which case it's converted to a [time.Time][go-time] automatically.
+
+#### Query Inputs
+
+Within the template context, the `.Report.Inputs` template variable contains a map where each key is the name of an input de***REMOVED***ned by the ReportGenerationQueries `spec.inputs`.
+The value of an input depends on a if the user speci***REMOVED***ed a value in their `Report` or `ReportDataSource`, or if there is a default value de***REMOVED***ned.
+
+- Depending on what is referencing the ReportGenerationQuery: The value comes from a `Report`'s `spec.inputs` or from a `ReportDataSource`'s `spec.generationQueryView.inputs`.
+- If not provided, it will use the `default` value as de***REMOVED***ned the the ReportGenerationQueries `spec.inputs`, if one exists.
+- Otherwise: the zero value for the type, according to Go's zero value rules.
+
+##### Query Input types
+
+Each input can have a different `type`, which determines how the input should be processed.
+
+Available options are `string`, `time`, and `int`, `ReportDataSource`, `ReportGenerationQuery`, and `Report`.
+If left empty, it defaults to `string`.
+
+For each of these types, the behavior varies:
+
+- `string`: Strings are passed through directly.
+- `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
+- `int`: An int value is passed through as a Go [int][https://golang.org/pkg/builtin/#int].
+- `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasource] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources speci***REMOVED***ed exist.
+- `ReportGenerationQuery`: A string value referencing the name of a [ReportGenerationQuery][reportgenerationquery] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportGenerationQuery` inputs are validated by checking that all the ReportGenerationQuerys speci***REMOVED***ed exist.
+- `Report`: A string value referencing the name of a [Report][report] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `Report` inputs are validated by checking that all the Reports speci***REMOVED***ed exist.
 
 ### Template functions
 
 Below is a list of the available template functions and descriptions on what they do.
 
-- `dataSourceTableName`: Takes a one argument, a string representing a `ReportDataSource` name and outputs a string which is the corresponding table name of the `ReportDataSource` speci***REMOVED***ed.
-- `generationQueryViewName`: Takes one argument, a string representing a `ReportGenerationQuery` name and outputs a string which is the corresponding view name of the `ReportGenerationQuery` speci***REMOVED***ed.
-- `renderReportGenerationQuery`: Takes two arguments, a string representing a `ReportGenerationQuery` name, the template context (usually this is just `.` in the template), and returns a string containing the speci***REMOVED***ed `ReportGenerationQuery` in its rendered form, using the 2nd argument as the context for the template rendering.
+- `dataSourceTableName`: Takes a one argument, a string referencing a `ReportDataSource` by name, and outputs a string which is the corresponding table name of the `ReportDataSource` speci***REMOVED***ed.
+- `reportTableName`: Takes a one argument, a string referencing a `Report` by name, and outputs a string which is the corresponding table name of the `Report` speci***REMOVED***ed.
+- `renderReportGenerationQuery`: Takes two arguments, a string referencing a `ReportGenerationQuery` by name, the template context (usually this is just `.` in the template), and returns a string containing the speci***REMOVED***ed `ReportGenerationQuery` in its rendered form, using the 2nd argument as the context for the template rendering.
 - `prestoTimestamp`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp. Usually this is used on `.Report.ReportingStart` and `.Report.ReportingEnd`.
+- `prometheusMetricPartitionFormat`: Takes a [time.Time][go-time] object as the argument, and outputs a string in the form of `year-month-day`, eg: `2006-01-02`. Usually this is used on `.Report.ReportingStart` and `.Report.ReportingEnd`.
 - `billingPeriodFormat`: Takes a [time.Time][go-time] object as the argument, and outputs a string timestamp that can be used for comparing to `awsBilling` an ReportDataSource's `partition_start` and `partition_stop` columns.
 
-In addition to the above functions, the reporting-operator includes all of the functions from [Sprig - useful template functions for Go templates.
-][sprig].
+In addition to the above functions, the reporting-operator includes all of the functions from [Sprig - useful template functions for Go templates.][sprig].
 
 ## Example ReportGenerationQueries
 
@@ -56,10 +76,8 @@ Before going into examples, there's an important convention that all the built-i
 
 The convention I am referring to is the fact that there are quite a few ReportGenerationQueries suf***REMOVED***xed with `-raw` in their `metadata.name`.
 These queries are not intended to be used by Reports, but are intended to be purely for re-use.
-Currently, these queries suf***REMOVED***xed with `-raw` in their name are generally only ever used as database views that are referenced in other queries.
-Additionally, due to implementation reasons, the `types` within the `columns` are using [Hive column types][hive-types] instead of the Presto column types.
-This has a negative effect the results in being unable to use `ReportGenerationQueries` containing with complex types (array, maps) with `Reports`, which is why the `ReportGenerationQueries` that are _not_ suf***REMOVED***xed in `-raw` never expose those types in their output.
-
+Currently, these queries suf***REMOVED***xed with `-raw` in their name are generally have no ***REMOVED***ltering and are used by [ReportDataSources to create views][view-datasources].
+Additionally, `-raw` queries often expose complex types (array, maps) which are incompatible with `Reports`, which is why the `ReportGenerationQueries` that are _not_ suf***REMOVED***xed in `-raw` never expose those types in their columns list.
 
 The example below is a built-in `ReportGenerationQuery` that is installed with Operator Metering by default.
 The query is not intended to be used by Reports, but instead is intended to be re-used by other `ReportGenerationQueries`, which is why it only does simple extraction of ***REMOVED***elds, and calculations.
@@ -70,25 +88,23 @@ The important things to note with this query is that it's querying a database ta
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "pod-memory-request-raw"
+  name: pod-memory-request-raw
   labels:
     operator-metering: "true"
 spec:
-  reportDataSources:
-  - "pod-request-memory-bytes"
   columns:
   - name: pod
-    type: string
+    type: varchar
     unit: kubernetes_pod
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: node
-    type: string
+    type: varchar
     unit: kubernetes_node
   - name: labels
-    type: map<string, string>
     tableHidden: true
+    type: map<string, string>
   - name: pod_request_memory_bytes
     type: double
     unit: bytes
@@ -101,73 +117,28 @@ spec:
   - name: timestamp
     type: timestamp
     unit: date
+  - name: dt
+    type: varchar
+  inputs:
+  - name: PodRequestMemoryBytesDataSourceName
+    type: ReportDataSource
+    default: pod-request-memory-bytes
   query: |
-      SELECT labels['pod'] as pod,
-          labels['namespace'] as namespace,
-          element_at(labels, 'node') as node,
-          labels,
-          amount as pod_request_memory_bytes,
-          timeprecision,
-          amount * timeprecision as pod_request_memory_byte_seconds,
-          "timestamp"
-      FROM {| dataSourceTableName "pod-request-memory-bytes" |}
-      WHERE element_at(labels, 'node') IS NOT NULL
+    SELECT labels['pod'] as pod,
+        labels['namespace'] as namespace,
+        element_at(labels, 'node') as node,
+        labels,
+        amount as pod_request_memory_bytes,
+        timeprecision,
+        amount * timeprecision as pod_request_memory_byte_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName .Report.Inputs.PodRequestMemoryBytesDataSourceName |}
+    WHERE element_at(labels, 'node') IS NOT NULL
 ```
 
 This next example is also one of the built-in `ReportGenerationQueries`.
 This example, unlike the previous is designed to be used with Reports.
-It summarizes the information exposed in the example above by Kubernetes namespace, and reduces the output ***REMOVED***elds down to the ones that matter for this speci***REMOVED***c use-case.
-
-The important things to note with this example is that it's depending on the previous `ReportGenerationQuery` and referencing the database view by using the `generationQueryViewName` template function.
-
-```yaml
-apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
-metadata:
-  name: "namespace-memory-request"
-  labels:
-    operator-metering: "true"
-spec:
-  reportQueries:
-  - "pod-memory-request-raw"
-  view:
-    disabled: true
-  columns:
-  - name: period_start
-    type: timestamp
-    unit: date
-  - name: period_end
-    type: timestamp
-    unit: date
-  - name: namespace
-    type: string
-    unit: kubernetes_namespace
-  - name: data_start
-    type: timestamp
-    unit: date
-  - name: data_end
-    type: timestamp
-    unit: date
-  - name: pod_request_memory_byte_seconds
-    type: double
-    unit: byte_seconds
-  inputs:
-  - name: ReportingStart
-  - name: ReportingEnd
-  query: |
-    SELECT
-      timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
-      timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
-      namespace,
-      min("timestamp") as data_start,
-      max("timestamp") as data_end,
-      sum(pod_request_memory_byte_seconds) as pod_request_memory_byte_seconds
-    FROM {| generationQueryViewName "pod-memory-request-raw" |}
-    WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
-    AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
-    GROUP BY namespace
-    ORDER BY pod_request_memory_byte_seconds DESC
-```
 
 ## Modifying Columns For Report Display
 
@@ -184,8 +155,14 @@ To query report results using the reporting-operator API for tableHidden endpoin
 
 [apiTable]: api.md#v2-reports-table
 [presto-select]: https://prestodb.io/docs/current/sql/select.html
-[hive-types]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-Overview
+[presto-types]: https://prestosql.io/docs/current/language/types.html
 [presto-functions]: https://prestodb.io/docs/current/functions.html
 [go-templates]: https://golang.org/pkg/text/template/
 [go-time]: https://golang.org/pkg/time/#Time
 [sprig]: https://masterminds.github.io/sprig/
+[view-datasources]: datasources.md#ReportGenerationQuery-View-Datasource
+[storagelocations]: storagelocations.md
+[reportdatasources]: reportdatasources.md
+[reportprometheusqueries]: reportprometheusqueries.md
+[reportgenerationqueries]: reportgenerationqueries.md
+[reports]: report.md

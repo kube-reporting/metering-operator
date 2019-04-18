@@ -9,12 +9,12 @@ Refer to the [Metering Con***REMOVED***guration doc](metering-con***REMOVED***g.
 ## Fields
 
 - `hive`: If this section is present, then the `StorageLocation` will be con***REMOVED***gured to store data in Presto by creating the table using Hive server.
-  - 'tableProperties': Contains con***REMOVED***guration options for creating tables using Hive.
-    - `location`: The ***REMOVED***lesystem URL for Presto and Hive to use. This can be an `hdfs://` or `s3a://` ***REMOVED***lesystem URL.
-    - `***REMOVED***leFormat`: The format used for storing ***REMOVED***les in the ***REMOVED***lesystem. See the [Hive Documentation on File Storage Format for a list of options and more details][hiveFileFormat].
-    - `serdeFormat`: The [SerDe][hiveSerde] class for Hive to use to serialize and deserialize rows when ***REMOVED***leFormat is `TEXTFILE`. See the [Hive Documentation on Row Formats & SerDe for more details][hiveSerdeFormat].
-    - `serdeRowProperties`: Additional properties used to con***REMOVED***gure `serdeFormat`. See the [Hive Documentation on Row Formats & SerDe for more details][hiveSerdeFormat].
-    - `external`: If speci***REMOVED***ed, con***REMOVED***gures the table as an external table with existing data. If speci***REMOVED***ed `location` is required. When tables using this storage are dropped, the contents are not deleted. See the [Hive documentation on External tables for more information][hiveExternalTables].
+  - `databaseName`: The name of the database within hive.
+  - `unmanagedDatabase`: If true, then this StorageLocation will not be actively managed, and the databaseName is expected to already exist in Hive. If false, this will cause the reporting-operator to create the Database in Hive.
+  - `location`: The ***REMOVED***lesystem URL for Presto and Hive to use for the database. This can be an `hdfs://` or `s3a://` ***REMOVED***lesystem URL.
+  - 'defaultTableProperties': Optional: Contains con***REMOVED***guration options for creating tables using Hive.
+    - `***REMOVED***leFormat`: Optional: The ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***lesystem. See the [Hive Documentation on File Storage Format for a list of options and more details][hiveFileFormat].
+    - `rowFormat`: Optional: Controls the [Hive row format][hiveRowFormat]. This controls how Hive serializes and deserializes rows. See the [Hive Documentation on Row Formats & SerDe for more details][hiveRowFormat].
 
 ## Example StorageLocation
 
@@ -25,11 +25,13 @@ As you can see, it's con***REMOVED***gured to use HDFS and supplies no additiona
 apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
-  name: local
+  name: hive
   labels:
     operator-metering: "true"
   spec:
     hive:
+      databaseName: default
+      unmanagedDatabase: true
       location: "hdfs://hdfs-namenode-proxy:8020"
 ```
 
@@ -45,6 +47,8 @@ metadata:
     operator-metering: "true"
   spec:
     hive:
+      databaseName: example_s3_storage
+      unmanagedDatabase: false
       location: "s3a://bucket-name/path/within/bucket"
 ```
 
@@ -57,17 +61,17 @@ If more than one resource with the annotation exists, an error will be logged an
 apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
-  name: local
+  name: example-s3-storage
   labels:
     operator-metering: "true"
   annotations:
     storagelocation.metering.openshift.io/is-default: "true"
   spec:
     hive:
+      databaseName: example_s3_storage
+      unmanagedDatabase: false
       location: "s3a://bucket-name/path/within/bucket"
 ```
 
 [hiveFileFormat]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
-[hiveSerdeFormat]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe
-[hiveSerde]: https://cwiki.apache.org/confluence/display/Hive/SerDe
-[hiveExternalTables]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-ExternalTables
+[hiveRowFormat]: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe
