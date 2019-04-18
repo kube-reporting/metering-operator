@@ -201,7 +201,8 @@ The column information is what the operator uses to create the table when a repo
 If this doesn't match the query, there will be issues when running the query and trying to store the data into the database.
 
 Below is an example of our final query from the steps above put into a `ReportGenerationQuery`.
-One thing to note is we replaced `FROM datasource_unready_deployment_replicas` with `FROM {| dataSourceTableName "unready-deployment-replicas" |}` to avoid hard coding the table name.
+One thing to note is we replaced `FROM datasource_unready_deployment_replicas` with `{| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}` and added an `inputs` configuration to avoid hard coding the table name.
+By using inputs, we can override the default ReportDataSource used and by marking it as `type: ReportDataSource`, it will be considered a dependency and will ensure it exists before running.
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
 ```
@@ -210,24 +211,26 @@ kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
 spec:
-  reportDataSources:
-  - "unready-deployment-replicas"
   columns:
   - name: namespace
-    type: string
+    type: varchar
   - name: deployment
-    type: string
+    type: varchar
   - name: total_replica_unready_seconds
     type: double
   - name: avg_replica_unready_seconds
     type: double
+  inputs:
+  - name: UnreadyDeploymentReplicasDataSourceName
+    type: ReportDataSource
+    default: unready-deployment-replicas
   query: |
     SELECT
         labels['namespace'] AS namespace,
         labels['deployment'] AS deployment,
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
-    FROM {| dataSourceTableName "unready-deployment-replicas" |}
+    FROM {| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}
     GROUP BY labels['namespace'], labels['deployment']
     ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
 ```
@@ -257,8 +260,7 @@ query: |
     ...
 ```
 
-As we begin accessing variables in the `ReportGenerationQuery`, we now have to set `spec.view.disabled` to `true` because our query is now dynamic and depends on user-input, meaning we cannot create a view.
-Once we add this filter to our query and update our `spec.view.disabled` to true, we get the final version of our ReportGenerationQuery.
+Once we add these columns filters to our query we get the final version of our ReportGenerationQuery.
 Save the snippet below into a file named `unready-deployment-replicas-reportgenerationquery.yaml`:
 
 ```
@@ -267,26 +269,27 @@ kind: ReportGenerationQuery
 metadata:
   name: "unready-deployment-replicas"
 spec:
-  reportDataSources:
-  - "unready-deployment-replicas"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
   - name: period_end
     type: timestamp
   - name: namespace
-    type: string
+    type: varchar
   - name: deployment
-    type: string
+    type: varchar
   - name: total_replica_unready_seconds
     type: double
   - name: avg_replica_unready_seconds
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: UnreadyDeploymentReplicasDataSourceName
+    type: ReportDataSource
+    default: unready-deployment-replicas
   query: |
     SELECT
         timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
@@ -295,7 +298,7 @@ spec:
         labels['deployment'] AS deployment,
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
-    FROM {| dataSourceTableName "unready-deployment-replicas" |}
+    FROM {| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     GROUP BY labels['namespace'], labels['deployment']
