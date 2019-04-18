@@ -141,9 +141,12 @@ e2e-docker: metering-src-docker-build
 	docker rm metering-e2e-docker
 
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen all-charts metering-manifests fmt
+verify: verify-codegen all-charts verify-manifests fmt
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
+
+verify-manifests: metering-manifests
+	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
 
 verify-docker: metering-src-docker-build
 	docker run \

@@ -20,8 +20,12 @@ spec:
   maturity: {{ .Values.csv.maturity }}
   maintainers:
 {{ toYaml .Values.csv.maintainers | indent 4 }}
+  links:
+{{ toYaml .Values.csv.links | indent 4 }}
   provider:
 {{ toYaml .Values.csv.provider | indent 4 }}
+  icon:
+{{ toYaml .Values.csv.icon | indent 4 }}
 {{- if .Values.csv.labels }}
   labels:
 {{ toYaml .Values.csv.labels | indent 4 }}
