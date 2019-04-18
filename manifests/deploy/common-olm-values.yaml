@@ -126,19 +126,20 @@ annotations:
           ],
           "inputs": [
             {
-              "name": "ReportingStart"
+              "name": "ReportingStart",
+              "type": "time"
             },
             {
-              "name": "ReportingEnd"
+              "name": "ReportingEnd",
+              "type": "time"
+            },
+            {
+              "default": "unready-deployment-replicas",
+              "name": "UnreadyDeploymentReplicasDataSourceName",
+              "type": "ReportDataSource"
             }
           ],
-          "query": "SELECT\n    timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,\n    timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,\n    labels['namespace'] AS namespace,\n    labels['deployment'] AS deployment,\n    sum(amount * \"timeprecision\") AS total_replica_unready_seconds,\n    avg(amount * \"timeprecision\") AS avg_replica_unready_seconds\nFROM {| dataSourceTableName \"unready-deployment-replicas\" |}\nWHERE \"timestamp\" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'\nAND \"timestamp\" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'\nGROUP BY labels['namespace'], labels['deployment']\nORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC\n",
-          "reportDataSources": [
-            "unready-deployment-replicas"
-          ],
-          "view": {
-            "disabled": true
-          }
+          "query": "SELECT\n    timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,\n    timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,\n    labels['namespace'] AS namespace,\n    labels['deployment'] AS deployment,\n    sum(amount * \"timeprecision\") AS total_replica_unready_seconds,\n    avg(amount * \"timeprecision\") AS avg_replica_unready_seconds\nFROM {| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}\nWHERE \"timestamp\" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'\nAND \"timestamp\" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'\nGROUP BY labels['namespace'], labels['deployment']\nORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC\n"
         }
       },
       {
@@ -171,9 +172,9 @@ annotations:
         },
         "spec": {
           "hive": {
-            "tableProperties": {
-              "location": "s3a://bucketName/path/in/bucket"
-            }
+            "databaseName": "metering-s3",
+            "location": "s3a://bucketName/pathInBucket",
+            "unmanagedDatabase": true
           }
         }
       },
@@ -181,9 +182,88 @@ annotations:
         "apiVersion": "metering.openshift.io/v1alpha1",
         "kind": "PrestoTable",
         "metadata": {
-          "name": "sample-do-not-create-manually"
+          "name": "example-baremetal-cost"
         },
-        "spec": {}
+        "spec": {
+          "catalog": "hive",
+          "columns": [
+            {
+              "name": "cost_per_gigabyte_hour",
+              "type": "double"
+            },
+            {
+              "name": "cost_per_cpu_hour",
+              "type": "double"
+            },
+            {
+              "name": "currency",
+              "type": "string"
+            }
+          ],
+          "createTableAs": true,
+          "query": "SELECT * FROM (\n  VALUES (10.00, 50.00, 'USD')\n) AS t (cost_per_gigabyte_hour, cost_per_cpu_hour, currency)\n",
+          "schema": "default",
+          "tableName": "example_baremetal_cost"
+        }
+      },
+      {
+        "apiVersion": "metering.openshift.io/v1alpha1",
+        "kind": "HiveTable",
+        "metadata": {
+          "name": "apache-log",
+          "annotations": {
+            "reference": "based on the RegEx example from https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe"
+          }
+        },
+        "spec": {
+          "databaseName": "default",
+          "tableName": "apache_log",
+          "external": true,
+          "location": "s3://my-bucket/apache_logs",
+          "columns": [
+            {
+              "name": "host",
+              "type": "string"
+            },
+            {
+              "name": "identity",
+              "type": "string"
+            },
+            {
+              "name": "user",
+              "type": "string"
+            },
+            {
+              "name": "time",
+              "type": "string"
+            },
+            {
+              "name": "request",
+              "type": "string"
+            },
+            {
+              "name": "status",
+              "type": "string"
+            },
+            {
+              "name": "size",
+              "type": "string"
+            },
+            {
+              "name": "referer",
+              "type": "string"
+            },
+            {
+              "name": "agent",
+              "type": "string"
+            }
+          ],
+          "***REMOVED***leFormat": "TEXTFILE",
+          "serdeFormat": "org.apache.hadoop.hive.serde2.RegexSerDe",
+          "serdeRowProperties": {
+            "input.regex": "([^]*) ([^]*) ([^]*) (-|\\[^\\]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\".*\") ([^ \"]*|\".*\"))?"
+          }
+        }
       }
     ]
 
