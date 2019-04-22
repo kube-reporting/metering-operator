@@ -20,9 +20,9 @@ type ReportGenerationQueryDependencies struct {
 }
 
 func GetAndValidateGenerationQueryDependencies(
-	queryGetter reportGenerationQueryGetter,
-	dataSourceGetter reportDataSourceGetter,
-	reportGetter reportGetter,
+	queryGetter ReportGenerationQueryGetter,
+	dataSourceGetter ReportDataSourceGetter,
+	reportGetter ReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
 	handler *UninitialiedDependendenciesHandler,
 ) (*ReportGenerationQueryDependencies, error) {
@@ -149,9 +149,9 @@ func (e *reportGenerationQueryDependenciesValidationError) Error() string {
 }
 
 func GetGenerationQueryDependencies(
-	queryGetter reportGenerationQueryGetter,
-	dataSourceGetter reportDataSourceGetter,
-	reportGetter reportGetter,
+	queryGetter ReportGenerationQueryGetter,
+	dataSourceGetter ReportDataSourceGetter,
+	reportGetter ReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
 ) (*ReportGenerationQueryDependencies, error) {
 	dataSourceDeps, err := GetDependentDataSources(dataSourceGetter, generationQuery)
@@ -207,7 +207,7 @@ func GetGenerationQueryDependencies(
 	}, nil
 }
 
-func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
+func GetDependentGenerationQueries(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
 	viewReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
 	dataSourcesAccumulator := make(map[string]*metering.ReportDataSource)
 	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
@@ -233,7 +233,7 @@ func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, data
 	return viewQueries, dynamicQueries, dataSources, nil
 }
 
-func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
+func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
 	}
@@ -255,7 +255,7 @@ func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGene
 			if _, exists := input.accum[queryName]; exists {
 				continue
 			}
-			genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
+			genQuery, err := queryGetter.GetReportGenerationQuery(generationQuery.Namespace, queryName)
 			if err != nil {
 				return err
 			}
@@ -274,12 +274,12 @@ func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGene
 	return nil
 }
 
-func GetDependentDataSourcesMemoized(dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
+func GetDependentDataSourcesMemoized(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
 	for _, dataSourceName := range generationQuery.Spec.DataSources {
 		if _, exists := dataSourceAccumulator[dataSourceName]; exists {
 			continue
 		}
-		dataSource, err := dataSourceGetter.getReportDataSource(generationQuery.Namespace, dataSourceName)
+		dataSource, err := dataSourceGetter.GetReportDataSource(generationQuery.Namespace, dataSourceName)
 		if err != nil {
 			return err
 		}
@@ -288,7 +288,7 @@ func GetDependentDataSourcesMemoized(dataSourceGetter reportDataSourceGetter, ge
 	return nil
 }
 
-func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
+func GetDependentDataSources(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
 	dataSourceAccumulator := make(map[string]*metering.ReportDataSource)
 	err := GetDependentDataSourcesMemoized(dataSourceGetter, generationQuery, dataSourceAccumulator)
 	if err != nil {
@@ -301,10 +301,10 @@ func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generation
 	return dataSources, nil
 }
 
-func GetDependentReports(reportGetter reportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
+func GetDependentReports(reportGetter ReportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
 	reports := make([]*metering.Report, len(generationQuery.Spec.Reports))
 	for i, reportName := range generationQuery.Spec.Reports {
-		report, err := reportGetter.getReport(generationQuery.Namespace, reportName)
+		report, err := reportGetter.GetReport(generationQuery.Namespace, reportName)
 		if err != nil {
 			return nil, err
 		}
