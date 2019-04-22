@@ -3,7 +3,7 @@ kind: Subscription
 metadata:
   name: metering
 spec:
-  channel: alpha
+  channel: preview
   name: metering
   source: metering-operators
   sourceNamespace: openshift-metering
