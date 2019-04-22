@@ -298,7 +298,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 				currentPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, now)
 				// the next full report period from [nextScheduledTime, nextScheduledTime+1]
 				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, currentPeriod.periodEnd)
-				report.Status.NextReportTime = &metav1.Time{reportPeriod.periodStart}
+				report.Status.NextReportTime = &metav1.Time{Time: reportPeriod.periodStart}
 			}
 		}
 	} ***REMOVED*** {
