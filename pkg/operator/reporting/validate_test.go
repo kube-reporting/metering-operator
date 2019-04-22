@@ -275,7 +275,7 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 	}
 	reportStore := make(map[string]*metering.Report)
 
-	queryGetter := reportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
+	queryGetter := ReportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
 		query, ok := queryStore[namespace+"/"+name]
 		if ok {
 			return query, nil
@@ -283,7 +283,7 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 			return nil, errors.NewNotFound(metering.Resource("ReportGenerationQuery"), name)
 		}
 	})
-	dataSourceGetter := reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
+	dataSourceGetter := ReportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
 		dataSource, ok := dataSourceStore[namespace+"/"+name]
 		if ok {
 			return dataSource, nil
@@ -291,7 +291,7 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 			return nil, errors.NewNotFound(metering.Resource("ReportDataSource"), name)
 		}
 	})
-	reportGetter := reportGetterFunc(func(namespace, name string) (*metering.Report, error) {
+	reportGetter := ReportGetterFunc(func(namespace, name string) (*metering.Report, error) {
 		report, ok := reportStore[namespace+"/"+name]
 		if ok {
 			return report, nil
