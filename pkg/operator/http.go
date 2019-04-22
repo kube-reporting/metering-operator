@@ -49,9 +49,9 @@ type server struct {
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportResultsGetter   prestostore.ReportResultsGetter
 
-	reportLister                 listers.ReportLister
-	reportGenerationQuerieLister listers.ReportGenerationQueryLister
-	prestoTableLister            listers.PrestoTableLister
+	reportLister                listers.ReportLister
+	reportGenerationQueryLister listers.ReportGenerationQueryLister
+	prestoTableLister           listers.PrestoTableLister
 }
 
 type requestLogger struct {
@@ -69,7 +69,7 @@ func newRouter(
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	reportLister listers.ReportLister,
-	reportGenerationQuerieLister listers.ReportGenerationQueryLister,
+	reportGenerationQueryLister listers.ReportGenerationQueryLister,
 	prestoTableLister listers.PrestoTableLister,
 ) chi.Router {
 	router := chi.NewRouter()
@@ -79,14 +79,14 @@ func newRouter(
 	router.Use(prometheusMiddleware)
 
 	srv := &server{
-		logger:                       logger,
-		rand:                         rand,
-		collectorFunc:                collectorFunc,
-		prometheusMetricsRepo:        prometheusMetricsRepo,
-		reportResultsGetter:          reportResultsGetter,
-		reportLister:                 reportLister,
-		reportGenerationQuerieLister: reportGenerationQuerieLister,
-		prestoTableLister:            prestoTableLister,
+		logger:                      logger,
+		rand:                        rand,
+		collectorFunc:               collectorFunc,
+		prometheusMetricsRepo:       prometheusMetricsRepo,
+		reportResultsGetter:         reportResultsGetter,
+		reportLister:                reportLister,
+		reportGenerationQueryLister: reportGenerationQueryLister,
+		prestoTableLister:           prestoTableLister,
 	}
 
 	router.HandleFunc(APIV2ReportsEndpointPre***REMOVED***x+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
@@ -194,7 +194,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		}
 	}
 
-	reportQuery, err := srv.reportGenerationQuerieLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -321,7 +321,7 @@ func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []pres
 func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/tab-separated-values")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.tsv", name))
-	var padding int = 2
+	padding := 2
 	paddingStr := r.FormValue("padding")
 	if paddingStr != "" {
 		var err error

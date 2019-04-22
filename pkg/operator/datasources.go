@@ -395,14 +395,15 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
 	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
 
-	var toRemove []cbTypes.TablePartition = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
-	var toAdd []cbTypes.TablePartition = append(changes.toAddPartitions, changes.toUpdatePartitions...)
-	// We do removals then additions so that updates are supported as a combination of remove + add partition
+	var toRemove = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
+	var toAdd = append(changes.toAddPartitions, changes.toUpdatePartitions...)
 
+	// We do removals then additions so that updates are supported as a combination of remove + add partition
 	tableName := prestoTable.Status.Parameters.Name
 	for _, p := range toRemove {
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
+
 		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
 		err = op.awsTablePartitionManager.DropPartition(tableName, start, end)
 		if err != nil {
@@ -415,6 +416,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitio
 	for _, p := range toAdd {
 		start := p.PartitionSpec["start"]
 		end := p.PartitionSpec["end"]
+
 		// This partition doesn't exist in hive. Create it.
 		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
 		err = op.awsTablePartitionManager.AddPartition(tableName, start, end, p.Location)
