@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -257,48 +256,13 @@ func TestGetGenerationQueryDependencies(t *testing.T) {
 		Reports: []*metering.Report{},
 	}
 
-	dataSourceStore := map[string]*metering.ReportDataSource{
-		"test-ns/datasource1": ds1,
-		"test-ns/datasource2": ds2,
-		"test-ns/datasource3": ds3,
-		"test-ns/datasource4": ds4,
-		"test-ns/datasource5": ds5,
-		"test-ns/datasource6": ds6,
-	}
-	queryStore := map[string]*metering.ReportGenerationQuery{
-		"test-ns/test-query":    testQuery,
-		"test-ns/query1":        query1,
-		"test-ns/query2":        query2,
-		"test-ns/query3":        query3,
-		"test-ns/dynamicquery1": dynamicquery1,
-		"test-ns/dynamicquery2": dynamicquery2,
-	}
-	reportStore := make(map[string]*metering.Report)
-
-	queryGetter := ReportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
-		query, ok := queryStore[namespace+"/"+name]
-		if ok {
-			return query, nil
-		} ***REMOVED*** {
-			return nil, errors.NewNotFound(metering.Resource("ReportGenerationQuery"), name)
-		}
+	dataSourceGetter := testhelpers.NewReportDataSourceStore([]*metering.ReportDataSource{
+		ds1, ds2, ds3, ds4, ds5, ds6,
 	})
-	dataSourceGetter := ReportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
-		dataSource, ok := dataSourceStore[namespace+"/"+name]
-		if ok {
-			return dataSource, nil
-		} ***REMOVED*** {
-			return nil, errors.NewNotFound(metering.Resource("ReportDataSource"), name)
-		}
+	queryGetter := testhelpers.NewReportGenerationQueryStore([]*metering.ReportGenerationQuery{
+		testQuery, query1, query2, query3, dynamicquery1, dynamicquery2,
 	})
-	reportGetter := ReportGetterFunc(func(namespace, name string) (*metering.Report, error) {
-		report, ok := reportStore[namespace+"/"+name]
-		if ok {
-			return report, nil
-		} ***REMOVED*** {
-			return nil, errors.NewNotFound(metering.Resource("Report"), name)
-		}
-	})
+	reportGetter := testhelpers.NewReportStore(nil)
 
 	deps, err := GetGenerationQueryDependencies(
 		queryGetter,
