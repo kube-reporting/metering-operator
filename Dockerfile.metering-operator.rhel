@@ -48,7 +48,7 @@ COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
 COPY images/helm-operator/get_owner.sh /usr/local/bin/get_owner.sh
 
 COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/openshift-metering-0.1.0.tgz /
-COPY manifests/deploy/openshift/olm/metering /manifests
+COPY manifests/deploy/openshift/olm/bundle /manifests
 
 CMD ["run-operator.sh"]
 USER 2001
