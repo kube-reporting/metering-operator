@@ -62,6 +62,7 @@ func (op *Reporting) getStorageSpec(logger log.FieldLogger, storage *cbTypes.Sto
 	} else if storage.StorageSpec != nil { // Storage location is inlined in the datastore
 		storageSpec = *storage.StorageSpec
 	}
+
 	return storageSpec, nil
 }
 
@@ -73,7 +74,7 @@ func (op *Reporting) getHiveTableProperties(logger log.FieldLogger, storage *cbT
 	if storageSpec.Hive != nil {
 		props := hive.TableProperties(storageSpec.Hive.TableProperties)
 		return &props, nil
-	} else {
-		return nil, fmt.Errorf("incorrect storage configuration, must configure spec.hive")
 	}
+
+	return nil, fmt.Errorf("incorrect storage configuration, must configure spec.hive")
 }
