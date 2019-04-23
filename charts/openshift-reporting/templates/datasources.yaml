@@ -13,8 +13,7 @@ spec:
 {{- end }}
 
 ---
-
-{{- if .Values.spec.awsBillingReportDataSource.enabled -}}
+{{ if .Values.spec.awsBillingReportDataSource.enabled -}}
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportDataSource
 metadata:
