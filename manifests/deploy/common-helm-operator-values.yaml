@@ -21,7 +21,7 @@ targetNamespacesDownwardAPIValueFrom:
 
 image:
   repository: quay.io/openshift/origin-metering-helm-operator
-  tag: latest
+  tag: v4.0
   pullPolicy: Always
 
 serviceAccountName: metering-operator
