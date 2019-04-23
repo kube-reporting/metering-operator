@@ -16,7 +16,7 @@ spec:
   description: |
 {{ .Values.csv.description | indent 4 }}
   keywords: {{ .Values.csv.keywords }}
-  version: {{ .Values.csv.version }}
+  version: {{ .Values.csv.version | quote }}
   maturity: {{ .Values.csv.maturity }}
   maintainers:
 {{ toYaml .Values.csv.maintainers | indent 4 }}

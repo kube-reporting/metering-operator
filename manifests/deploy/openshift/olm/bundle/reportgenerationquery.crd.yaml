@@ -5,7 +5,7 @@ metadata:
   annotations:
     catalog.app.coreos.com/displayName: Metering Generation Query
     catalog.app.coreos.com/description: A SQL query used by Metering to generate reports.
-    catalog.app.coreos.com/weight: 2
+    catalog.app.coreos.com/weight: "2"
 spec:
   group: metering.openshift.io
   version: v1alpha1
