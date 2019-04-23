@@ -78,7 +78,7 @@ spec:
     type: string
   query: |
     SELECT
-        element_at(labels, 'exported_namespace') as namespace,
+        coalesce(element_at(labels, 'exported_namespace'), element_at(labels, 'namespace')) as namespace,
         labels['persistentvolumeclaim'] as persistentvolumeclaim,
         labels,
         amount as persistentvolumeclaim_usage_bytes,
