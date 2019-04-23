@@ -532,7 +532,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 			OnStartedLeading: func(ctx context.Context) {
 				op.logger.Infof("became leader")
 				op.logger.Info("starting Metering workers")
-				op.startWorkers(wg, ctx)
+				op.startWorkers(&wg, ctx)
 				op.logger.Infof("Metering workers started, watching for reports...")
 			},
 			OnStoppedLeading: func() {
@@ -641,7 +641,7 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 	})
 }
 
-func (op *Reporting) startWorkers(wg sync.WaitGroup, ctx context.Context) {
+func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
 	stopCh := ctx.Done()
 
 	wg.Add(1)

@@ -190,7 +190,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 
 	// record the lastImportTime
-	dataSource.Status.PrometheusMetricImportStatus.LastImportTime = &metav1.Time{op.clock.Now().UTC()}
+	dataSource.Status.PrometheusMetricImportStatus.LastImportTime = &metav1.Time{Time: op.clock.Now().UTC()}
 
 	// run the import
 	results, err := importer.ImportFromLastTimestamp(context.Background(), allowIncompleteChunks)
@@ -213,12 +213,12 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		// Update the timestamp which records the ***REMOVED***rst timestamp we attempted
 		// to query from.
 		if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || ***REMOVED***rstTimeRange.Start.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
-			dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime = &metav1.Time{***REMOVED***rstTimeRange.Start}
+			dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime = &metav1.Time{Time: ***REMOVED***rstTimeRange.Start}
 		}
 		// Update the timestamp which records the latest we've attempted to query
 		// up until.
 		if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time.Before(lastTimeRange.End) {
-			dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime = &metav1.Time{lastTimeRange.End}
+			dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime = &metav1.Time{Time: lastTimeRange.End}
 		}
 
 		// The data we collected is farther back than 1.5 their chunkSize, so requeue sooner
@@ -244,7 +244,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			// if there is no existing timestamp then this must be the ***REMOVED***rst import
 			// and we should set the earliestImportedMetricTime
 			if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime == nil {
-				dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime = &metav1.Time{***REMOVED***rstMetric.Timestamp}
+				dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime = &metav1.Time{Time: ***REMOVED***rstMetric.Timestamp}
 			} ***REMOVED*** if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
 				dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
 				// TODO(chance): Look at adding an error to the status.
@@ -252,7 +252,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			}
 
 			if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime == nil || lastMetric.Timestamp.After(dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime.Time) {
-				dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime = &metav1.Time{lastMetric.Timestamp}
+				dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime = &metav1.Time{Time: lastMetric.Timestamp}
 			}
 
 			if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
