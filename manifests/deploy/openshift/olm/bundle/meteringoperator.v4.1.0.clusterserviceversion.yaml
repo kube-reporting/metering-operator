@@ -166,7 +166,7 @@ spec:
     * **Con***REMOVED***gure AWS Billing Data Source** - To assign Pod $$ costs on AWS, create a [read-only IAM user](https://github.com/operator-framework/operator-metering/blob/master/Documentation/con***REMOVED***guring-aws-billing.md) ([example-policy](https://github.com/operator-framework/operator-metering/blob/master/Documentation/aws/read-only.json)) and [con***REMOVED***gure Metering](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-con***REMOVED***g/aws-billing.yaml) to use it.
 
   keywords: [metering metrics reporting prometheus chargeback]
-  version: 4.1.0
+  version: "4.1.0"
   maturity: alpha
   maintainers:
     - email: sd-operator-metering@redhat.com
@@ -502,11 +502,6 @@ spec:
 
   customresourcede***REMOVED***nitions:
     owned:
-    - description: A SQL query used by Metering to generate reports.
-      displayName: Metering Generation Query
-      kind: ReportGenerationQuery
-      name: reportgenerationqueries.metering.openshift.io
-      version: v1alpha1
     - description: An instance of Metering with high-level con***REMOVED***guration
       displayName: Metering
       kind: Metering
@@ -517,6 +512,11 @@ spec:
       displayName: Metering Report
       kind: Report
       name: reports.metering.openshift.io
+      version: v1alpha1
+    - description: A SQL query used by Metering to generate reports.
+      displayName: Metering Generation Query
+      kind: ReportGenerationQuery
+      name: reportgenerationqueries.metering.openshift.io
       version: v1alpha1
     - description: A Prometheus query that Metering can use to collect metrics.
       displayName: Metering Prometheus Query
