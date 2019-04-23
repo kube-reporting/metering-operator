@@ -86,7 +86,7 @@ type PrometheusMetricsRepo interface {
 
 type prometheusMetricRepo struct {
 	queryer         db.Queryer
-	queryBufferPool sync.Pool
+	queryBufferPool *sync.Pool
 }
 
 func NewPrometheusMetricsRepo(queryer db.Queryer, queryBufferPool *sync.Pool) *prometheusMetricRepo {
@@ -95,7 +95,7 @@ func NewPrometheusMetricsRepo(queryer db.Queryer, queryBufferPool *sync.Pool) *p
 	}
 	return &prometheusMetricRepo{
 		queryer:         queryer,
-		queryBufferPool: *queryBufferPool,
+		queryBufferPool: queryBufferPool,
 	}
 }
 

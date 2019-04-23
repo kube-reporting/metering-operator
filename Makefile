@@ -140,8 +140,11 @@ e2e-docker: metering-src-docker-build
 	docker cp metering-e2e-docker:/out bin/e2e-docker-test-output
 	docker rm metering-e2e-docker
 
+vet:
+	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
+
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen all-charts verify-manifests fmt
+verify: verify-codegen all-charts verify-manifests fmt vet
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
