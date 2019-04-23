@@ -7,11 +7,7 @@ import (
 	"strings"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringClient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
-	meteringListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 )
 
 const maxDepth = 100
@@ -24,9 +20,9 @@ type ReportGenerationQueryDependencies struct {
 }
 
 func GetAndValidateGenerationQueryDependencies(
-	queryGetter reportGenerationQueryGetter,
-	dataSourceGetter reportDataSourceGetter,
-	reportGetter reportGetter,
+	queryGetter ReportGenerationQueryGetter,
+	dataSourceGetter ReportDataSourceGetter,
+	reportGetter ReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
 	handler *UninitialiedDependendenciesHandler,
 ) (*ReportGenerationQueryDependencies, error) {
@@ -153,9 +149,9 @@ func (e *reportGenerationQueryDependenciesValidationError) Error() string {
 }
 
 func GetGenerationQueryDependencies(
-	queryGetter reportGenerationQueryGetter,
-	dataSourceGetter reportDataSourceGetter,
-	reportGetter reportGetter,
+	queryGetter ReportGenerationQueryGetter,
+	dataSourceGetter ReportDataSourceGetter,
+	reportGetter ReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
 ) (*ReportGenerationQueryDependencies, error) {
 	dataSourceDeps, err := GetDependentDataSources(dataSourceGetter, generationQuery)
@@ -211,7 +207,7 @@ func GetGenerationQueryDependencies(
 	}, nil
 }
 
-func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
+func GetDependentGenerationQueries(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
 	viewReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
 	dataSourcesAccumulator := make(map[string]*metering.ReportDataSource)
 	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
@@ -237,29 +233,7 @@ func GetDependentGenerationQueries(queryGetter reportGenerationQueryGetter, data
 	return viewQueries, dynamicQueries, dataSources, nil
 }
 
-type reportGenerationQueryGetter interface {
-	getReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error)
-}
-
-type reportGenerationQueryGetterFunc func(string, string) (*metering.ReportGenerationQuery, error)
-
-func (f reportGenerationQueryGetterFunc) getReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error) {
-	return f(namespace, name)
-}
-
-func NewReportGenerationQueryListerGetter(lister meteringListers.ReportGenerationQueryLister) reportGenerationQueryGetter {
-	return reportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
-		return lister.ReportGenerationQueries(namespace).Get(name)
-	})
-}
-
-func NewReportGenerationQueryClientGetter(getter meteringClient.ReportGenerationQueriesGetter) reportGenerationQueryGetter {
-	return reportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
-		return getter.ReportGenerationQueries(namespace).Get(name, metav1.GetOptions{})
-	})
-}
-
-func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGenerationQueryGetter, dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
+func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
 	if depth >= maxDepth {
 		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
 	}
@@ -281,7 +255,7 @@ func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGene
 			if _, exists := input.accum[queryName]; exists {
 				continue
 			}
-			genQuery, err := queryGetter.getReportGenerationQuery(generationQuery.Namespace, queryName)
+			genQuery, err := queryGetter.GetReportGenerationQuery(generationQuery.Namespace, queryName)
 			if err != nil {
 				return err
 			}
@@ -300,34 +274,12 @@ func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter reportGene
 	return nil
 }
 
-type reportDataSourceGetter interface {
-	getReportDataSource(namespace, name string) (*metering.ReportDataSource, error)
-}
-
-type reportDataSourceGetterFunc func(string, string) (*metering.ReportDataSource, error)
-
-func (f reportDataSourceGetterFunc) getReportDataSource(namespace, name string) (*metering.ReportDataSource, error) {
-	return f(namespace, name)
-}
-
-func NewReportDataSourceListerGetter(lister meteringListers.ReportDataSourceLister) reportDataSourceGetter {
-	return reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
-		return lister.ReportDataSources(namespace).Get(name)
-	})
-}
-
-func NewReportDataSourceClientGetter(getter meteringClient.ReportDataSourcesGetter) reportDataSourceGetter {
-	return reportDataSourceGetterFunc(func(namespace, name string) (*metering.ReportDataSource, error) {
-		return getter.ReportDataSources(namespace).Get(name, metav1.GetOptions{})
-	})
-}
-
-func GetDependentDataSourcesMemoized(dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
+func GetDependentDataSourcesMemoized(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
 	for _, dataSourceName := range generationQuery.Spec.DataSources {
 		if _, exists := dataSourceAccumulator[dataSourceName]; exists {
 			continue
 		}
-		dataSource, err := dataSourceGetter.getReportDataSource(generationQuery.Namespace, dataSourceName)
+		dataSource, err := dataSourceGetter.GetReportDataSource(generationQuery.Namespace, dataSourceName)
 		if err != nil {
 			return err
 		}
@@ -336,7 +288,7 @@ func GetDependentDataSourcesMemoized(dataSourceGetter reportDataSourceGetter, ge
 	return nil
 }
 
-func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
+func GetDependentDataSources(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
 	dataSourceAccumulator := make(map[string]*metering.ReportDataSource)
 	err := GetDependentDataSourcesMemoized(dataSourceGetter, generationQuery, dataSourceAccumulator)
 	if err != nil {
@@ -349,32 +301,10 @@ func GetDependentDataSources(dataSourceGetter reportDataSourceGetter, generation
 	return dataSources, nil
 }
 
-type reportGetter interface {
-	getReport(namespace, name string) (*metering.Report, error)
-}
-
-type reportGetterFunc func(string, string) (*metering.Report, error)
-
-func (f reportGetterFunc) getReport(namespace, name string) (*metering.Report, error) {
-	return f(namespace, name)
-}
-
-func NewReportListerGetter(lister meteringListers.ReportLister) reportGetter {
-	return reportGetterFunc(func(namespace, name string) (*metering.Report, error) {
-		return lister.Reports(namespace).Get(name)
-	})
-}
-
-func NewReportClientGetter(getter meteringClient.ReportsGetter) reportGetter {
-	return reportGetterFunc(func(namespace, name string) (*metering.Report, error) {
-		return getter.Reports(namespace).Get(name, metav1.GetOptions{})
-	})
-}
-
-func GetDependentReports(reportGetter reportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
+func GetDependentReports(reportGetter ReportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
 	reports := make([]*metering.Report, len(generationQuery.Spec.Reports))
 	for i, reportName := range generationQuery.Spec.Reports {
-		report, err := reportGetter.getReport(generationQuery.Namespace, reportName)
+		report, err := reportGetter.GetReport(generationQuery.Namespace, reportName)
 		if err != nil {
 			return nil, err
 		}
