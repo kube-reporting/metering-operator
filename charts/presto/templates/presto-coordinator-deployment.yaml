@@ -78,7 +78,6 @@ spec:
         env:
         - name: JAVA_MAX_MEM_RATIO
           value: "{{ .Values.spec.presto.coordinator.con***REMOVED***g.jvm.percentMemoryLimitAsHeap }}"
-          optional: true
 {{- include "presto-common-env" . | indent 8 }}
         ports:
         - name: http

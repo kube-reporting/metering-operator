@@ -198,7 +198,7 @@ spec:
       - name: namenode-empty
         emptyDir: {}
       - name: hadoop-logs
-        mountPath: /opt/hadoop/logs
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-datanode-data"
