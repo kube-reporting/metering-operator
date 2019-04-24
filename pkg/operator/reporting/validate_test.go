@@ -23,10 +23,10 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
 	dataSourceTableSet.Status.TableName = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
 
-	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{})
+	reportTableUnset := testhelpers.NewReport("uninitialized-report", "default", "some-query", nil, nil, metering.ReportStatus{}, nil, false)
 	reportTableSet := testhelpers.NewReport("initialized-report", "default", "some-query", nil, nil, metering.ReportStatus{
 		TableName: reportingutil.ReportTableName("test-ns", "initialized-report"),
-	})
+	}, nil, false)
 
 	// we keep a set of our test objects here since we re-use them in different
 	// combinations in the test cases
