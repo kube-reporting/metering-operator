@@ -1,0 +1,17 @@
+{{- if and .Values.presto.spec.config.sharedVolume.enabled .Values.presto.spec.config.sharedVolume.createPVC }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hive-warehouse-data
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  accessModes:
+  - ReadWriteMany
+{{- if .Values.presto.spec.config.sharedVolume.storage.persistentVolumeClaimStorageClass }}
+  storageClassName: {{ .Values.presto.spec.config.sharedVolume.storage.persistentVolumeClaimStorageClass }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.presto.spec.config.sharedVolume.storage.persistentVolumeClaimSize }}
+{{- end }}

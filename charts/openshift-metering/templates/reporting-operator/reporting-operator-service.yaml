@@ -1,0 +1,52 @@
+{{- $operatorValues :=  index .Values "reporting-operator" -}}
+kind: Service
+apiVersion: v1
+metadata:
+  name: reporting-operator
+  labels:
+    app: reporting-operator
+{{- if $operatorValues.spec.service.annotations }}
+  annotations:
+{{ toYaml $operatorValues.spec.service.annotations | indent 4 }}
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  type: "{{ $operatorValues.spec.service.type }}"
+  selector:
+    app: reporting-operator
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+{{- if $operatorValues.spec.authProxy.enabled }}
+    targetPort: auth-proxy
+{{- else }}
+    targetPort: http
+{{- end }}
+{{- if and (eq (lower $operatorValues.spec.service.type) "nodeport" "loadbalancer") $operatorValues.spec.service.nodePort }}
+    nodePort: {{ $operatorValues.spec.service.nodePort }}
+{{- end }}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: reporting-operator-metrics
+  labels:
+    app: reporting-operator
+    metrics: "true"
+{{- if $operatorValues.spec.metricsService.annotations }}
+  annotations:
+{{ toYaml $operatorValues.spec.metricsService.annotations | indent 4 }}
+{{- end }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  selector:
+    app: reporting-operator
+  ports:
+  - protocol: TCP
+    port: 8082
+    targetPort: metrics
+    name: metrics
