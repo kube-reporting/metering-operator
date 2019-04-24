@@ -144,7 +144,7 @@ vet:
 	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
 
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen all-charts verify-manifests fmt vet
+verify: verify-codegen verify-manifests fmt vet
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
@@ -180,17 +180,6 @@ build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPE
 	@:$(call check_de***REMOVED***ned, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
-
-CHART_DEPS := bin/openshift-metering-0.1.0.tgz
-
-all-charts: $(CHART_DEPS)
-
-openshift-metering-chart: bin/openshift-metering-0.1.0.tgz
-
-bin/openshift-metering-0.1.0.tgz: $(shell ***REMOVED***nd charts -type f)
-	@echo "Packaging openshift-metering chart dependencies"
-	@mkdir -p bin && mkdir -p charts/openshift-metering/charts && hack/extract_helm_dep_repos.sh charts/openshift-metering/requirements.yaml | xargs -I {} helm package --save=false -d charts/openshift-metering/charts charts/openshift-metering/{}
-	helm package --save=false -d bin charts/openshift-metering
 
 metering-manifests:
 	export \
@@ -242,12 +231,3 @@ thrift-gen:
 	thrift -gen go:package_pre***REMOVED***x=${GO_PKG}/pkg/hive,package=hive_thrift -out pkg/hive thrift/TCLIService.thrift
 	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./pkg/hive/hive_thrift/...`; do rm -rf $$i; done
 
-kube-prometheus-helm-install:
-	@echo "KUBECONFIG: $(KUBECONFIG)"
-	helm ls
-	helm version
-	helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
-	helm upgrade --install --namespace monitoring prometheus-operator coreos/prometheus-operator --wait
-	# set https to false on kubelets for GKE and set the fullnameOverride for the
-	# Prometheus resource so our service has a consistent name.
-	helm upgrade --install --namespace monitoring kube-prometheus coreos/kube-prometheus -f hack/kube-prometheus-helm-values.yaml --wait

@@ -5,7 +5,7 @@ source "${ROOT_DIR}/hack/common.sh"
 
 
 : "${METERING_OPERATOR_IMAGE:=${METERING_OPERATOR_IMAGE_REPO}:${METERING_OPERATOR_IMAGE_TAG}}"
-: "${METERING_CHART:=/openshift-metering-0.1.0.tgz}"
+: "${METERING_CHART:=/openshift-metering}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
 : "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
