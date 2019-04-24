@@ -20,7 +20,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: metering-operator
-        image: "quay.io/openshift/origin-metering-helm-operator:v4.0"
+        image: "quay.io/openshift/origin-metering-helm-operator:4.1"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
         env:
@@ -62,7 +62,7 @@ spec:
             memory: 100Mi
 
       - name: tiller
-        image: "quay.io/openshift/origin-metering-helm-operator:v4.0"
+        image: "quay.io/openshift/origin-metering-helm-operator:4.1"
         args: ["tiller"]
         imagePullPolicy: Always
         env:
