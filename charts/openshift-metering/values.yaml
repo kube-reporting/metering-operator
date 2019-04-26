@@ -27,6 +27,8 @@ openshift-reporting:
 
 reporting-operator:
   spec:
+    image:
+      tag: 4.1
     con***REMOVED***g:
       prometheusURL: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
       tls:
@@ -47,16 +49,22 @@ reporting-operator:
 presto:
   spec:
     presto:
+      image:
+        tag: 4.1
       con***REMOVED***g:
         maxQueryLength: "10000000"
       securityContext:
         fsGroup: null
     hive:
+      image:
+        tag: 4.1
       securityContext:
         fsGroup: null
 hdfs:
   enabled: true
   spec:
+    image:
+      tag: 4.1
     con***REMOVED***g:
       datanodeDataDirPerms: "775"
 
