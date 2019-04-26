@@ -279,6 +279,8 @@ spec:
         - -client-secret-***REMOVED***le=/var/run/secrets/kubernetes.io/serviceaccount/token
         - -cookie-secret-***REMOVED***le=/etc/proxy/cookie-secret/cookie-secret-seed
         - -request-logging=true
+        - -skip-auth-regex=^/healthy$
+        - -skip-auth-regex=^/ready$
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -openshift-service-account=reporting-operator
