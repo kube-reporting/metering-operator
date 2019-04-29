@@ -1,0 +1,5 @@
+---
+- version: v1alpha1
+  group: metering.openshift.io
+  kind: MeteringCon***REMOVED***g
+  role: /opt/ansible/roles/meteringcon***REMOVED***g
