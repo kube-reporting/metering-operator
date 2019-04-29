@@ -1,0 +1,19 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: meteringconfigs.metering.openshift.io
+spec:
+  group: metering.openshift.io
+  names:
+    kind: MeteringConfig
+    listKind: MeteringConfigList
+    plural: meteringconfigs
+    singular: meteringconfig
+  scope: Namespaced
+  subresources:
+    status: {}
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
