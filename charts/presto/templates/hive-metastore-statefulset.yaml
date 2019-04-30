@@ -72,7 +72,6 @@ spec:
           value: {{ upper .Values.spec.hive.metastore.config.logLevel | quote}}
         - name: JAVA_MAX_MEM_RATIO
           value: "{{ .Values.spec.hive.metastore.config.jvm.percentMemoryLimitAsHeap }}"
-          optional: true
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:
