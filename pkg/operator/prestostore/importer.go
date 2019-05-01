@@ -153,7 +153,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 
 	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, cfg, allowIncompleteChunks)
 	if err != nil {
-		importer.logger.WithError(err).Error("error collecting metrics")
+		importer.logger.WithFields(logrus.Fields{"startTime": startTime, "endTime": endTime}).WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our importer.lastTimestamp
 		importer.lastTimestamp = nil
