@@ -115,7 +115,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 	}{
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -143,7 +143,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -184,7 +184,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -229,7 +229,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
 					Name: "timestamp",
@@ -385,7 +385,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -435,7 +435,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -466,7 +466,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -515,7 +515,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-not-specified": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLFull(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: format",
@@ -524,7 +524,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLFull(namespace, testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
@@ -533,7 +533,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -667,7 +667,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 	}{
 		"report-finished-with-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -719,7 +719,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-finished-no-results": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -750,7 +750,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-finished-db-errored": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
@@ -799,7 +799,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-not-specified": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLTable(namespace, testReportName),
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following fields are missing or empty: format",
@@ -808,7 +808,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-format-non-existent": {
 			reportName:            testReportName,
-			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:                testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:               apiReportV2URLTable(namespace, testReportName) + "?format=doesntexist",
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "format must be one of: csv, json or tabular",
@@ -817,7 +817,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
-			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}),
+			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
 			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
 				{
