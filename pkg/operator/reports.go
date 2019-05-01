@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -207,11 +208,8 @@ type reportPeriod struct {
 	periodStart time.Time
 }
 
-// runReport takes a report, and generates reporting data
-// according the report's schedule. If the next scheduled reporting period
-// hasn't elapsed, runReport will requeue the resource for a time when
-// the period has elapsed.
-func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) error {
+// isReportFinished checks the running condition of the report parameter and returns true if the report has previously run
+func isReportFinished(logger log.FieldLogger, report *cbTypes.Report) bool {
 	// check if this report was previously ***REMOVED***nished
 	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
 
@@ -222,7 +220,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// re-processing runOnce reports after they're previously ***REMOVED***nished
 		if report.Spec.Schedule == nil {
 			logger.Infof("Report %s is a previously ***REMOVED***nished run-once report, not re-processing", report.Name)
-			return nil
+			return true
 		}
 		// log some messages to indicate we're processing what was a previously ***REMOVED***nished report
 
@@ -236,43 +234,77 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		} ***REMOVED*** {
 			// return without processing because the report is complete
 			logger.Infof("Report %s is already ***REMOVED***nished: %s", report.Name, runningCond.Message)
-			return nil
+			return true
 		}
 	}
 
+	return false
+}
+
+// validateReport takes a Report structure and checks if it contains valid ***REMOVED***elds
+func validateReport(
+	report *cbTypes.Report,
+	queryGetter reporting.ReportGenerationQueryGetter,
+	reportDataSourceGetter reporting.ReportDataSourceGetter,
+	reportGetter reporting.ReportGetter, handler *reporting.UninitialiedDependendenciesHandler,
+) (*cbTypes.ReportGenerationQuery, *reporting.ReportGenerationQueryDependencies, error) {
 	// Validate the ReportGenerationQuery is set
 	if report.Spec.GenerationQueryName == "" {
-		return op.setReportStatusInvalidReport(report, "must set spec.generationQuery")
-	}
-	// Validate the reportingStart and reportingEnd make sense and are set when
-	// required.
-	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
-		return op.setReportStatusInvalidReport(report, fmt.Sprintf("spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time))
-	}
-	if report.Spec.ReportingEnd == nil && report.Spec.RunImmediately {
-		return op.setReportStatusInvalidReport(report, "spec.reportingEnd must be set if report.spec.runImmediately is true")
+		return nil, nil, errors.New("must set spec.generationQuery")
 	}
 
-	// Validate the ReportGenerationQuery used exists
-	genQuery, err := op.getReportGenerationQueryForReport(report)
+	// Validate the reportingStart and reportingEnd make sense and are set when
+	// required
+	if report.Spec.ReportingStart != nil && report.Spec.ReportingEnd != nil && (report.Spec.ReportingStart.Time.After(report.Spec.ReportingEnd.Time) || report.Spec.ReportingStart.Time.Equal(report.Spec.ReportingEnd.Time)) {
+		return nil, nil, fmt.Errorf("spec.reportingEnd (%s) must be after spec.reportingStart (%s)", report.Spec.ReportingEnd.Time, report.Spec.ReportingStart.Time)
+	}
+	if report.Spec.ReportingEnd == nil && report.Spec.RunImmediately {
+		return nil, nil, errors.New("spec.reportingEnd must be set if report.spec.runImmediately is true")
+	}
+
+	// Validate the ReportGenerationQuery that the Report used exists
+	genQuery, err := GetReportGenerationQueryForReport(report, queryGetter)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to get report generation query")
 		if apierrors.IsNotFound(err) {
-			return op.setReportStatusInvalidReport(report, fmt.Sprintf("ReportGenerationQuery %s does not exist", report.Spec.GenerationQueryName))
+			return nil, nil, fmt.Errorf("ReportGenerationQuery (%s) does not exist", report.Spec.GenerationQueryName)
 		}
-		return err
+		return nil, nil, fmt.Errorf("failed to get report generation query")
 	}
 
 	// Validate the dependencies of this Report's query exist
 	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
-		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
-		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
+		queryGetter,
+		reportDataSourceGetter,
+		reportGetter,
 		genQuery,
-		op.uninitialiedDependendenciesHandler(),
+		handler,
 	)
 	if err != nil {
-		return op.setReportStatusInvalidReport(report, fmt.Sprintf("failed to validate ReportGenerationQuery dependencies %s: %v", genQuery.Name, err))
+		return nil, nil, fmt.Errorf("failed to validate ReportGenerationQuery dependencies %s: %v", genQuery.Name, err)
+	}
+
+	return genQuery, queryDependencies, nil
+}
+
+// runReport takes a report, and generates reporting data
+// according the report's schedule. If the next scheduled reporting period
+// hasn't elapsed, runReport will requeue the resource for a time when
+// the period has elapsed.
+func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) error {
+	// check if the report was previously ***REMOVED***nished; store result in bool
+	if reportFinished := isReportFinished(logger, report); reportFinished {
+		return nil
+	}
+
+	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
+	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
+	reportDataSourceGetter := reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister)
+	reportGetter := reporting.NewReportListerGetter(op.reportLister)
+
+	// validate that Report contains valid Spec ***REMOVED***elds
+	genQuery, queryDependencies, err := validateReport(report, queryGetter, reportDataSourceGetter, reportGetter, op.uninitialiedDependendenciesHandler())
+	if err != nil {
+		return op.setReportStatusInvalidReport(report, err.Error())
 	}
 
 	now := op.clock.Now().UTC()
@@ -672,17 +704,20 @@ func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg st
 	return err
 }
 
-func (op *Reporting) getReportGenerationQueryForReport(report *cbTypes.Report) (*cbTypes.ReportGenerationQuery, error) {
-	return op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+// GetReportGenerationQueryForReport returns the ReportGenerationQuery that was used in the Report parameter
+func GetReportGenerationQueryForReport(report *cbTypes.Report, queryGetter reporting.ReportGenerationQueryGetter) (*cbTypes.ReportGenerationQuery, error) {
+	return queryGetter.GetReportGenerationQuery(report.Namespace, report.Spec.GenerationQueryName)
 }
 
 func (op *Reporting) getReportDependencies(report *cbTypes.Report) (*reporting.ReportGenerationQueryDependencies, error) {
-	genQuery, err := op.getReportGenerationQueryForReport(report)
+	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
+
+	genQuery, err := GetReportGenerationQueryForReport(report, queryGetter)
 	if err != nil {
 		return nil, err
 	}
 	return reporting.GetGenerationQueryDependencies(
-		reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister),
+		queryGetter,
 		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
 		reporting.NewReportListerGetter(op.reportLister),
 		genQuery,

@@ -11,7 +11,8 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
 
-func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status v1alpha1.ReportStatus) *v1alpha1.Report {
+// NewReport creates a mock report used for testing purposes.
+func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *time.Time, status v1alpha1.ReportStatus, schedule *v1alpha1.ReportSchedule, runImmediately bool) *v1alpha1.Report {
 	var start, end *meta.Time
 	if reportStart != nil {
 		start = &meta.Time{*reportStart}
@@ -28,6 +29,8 @@ func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *ti
 			GenerationQueryName: testQueryName,
 			ReportingStart:      start,
 			ReportingEnd:        end,
+			Schedule:            schedule,
+			RunImmediately:      runImmediately,
 		},
 		Status: status,
 	}
