@@ -142,6 +142,11 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 		importer.logger.Infof("no data in table %s: backfilling from %s until %s", cfg.PrestoTableName, startTime, endTime)
 	}
 
+	if startTime.After(endTime) {
+		importer.logger.Infof("import for table %s too early, skipping import", cfg.PrestoTableName)
+		return &PrometheusImportResults{}, nil
+	}
+
 	// If the startTime is too far back, we should limit this run to
 	// cfg.MaxQueryRangeDuration so that if we're stopped for an
 	// extended amount of time, this function won't return a slice with too
