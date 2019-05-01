@@ -464,6 +464,14 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			logger.WithError(err).Errorf("unable to update Report status with tableName")
 			return err
 		}
+
+		// queue dependents so that they're aware the table now exists
+		if err := op.queueDependentReportGenerationQueriesForReport(report); err != nil {
+			logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of Report %s", report.Name)
+		}
+		if err := op.queueDependentReportsForReport(report); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of Report %s", report.Name)
+		}
 	}
 
 	var runningMsg, runningReason string
