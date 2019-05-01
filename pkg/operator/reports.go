@@ -531,7 +531,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// current reportPeriod
 		var unmetReportDependendencies []string
 		for _, subReport := range dependencyResult.Dependencies.Reports {
-			if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
+			if subReport.Status.LastReportTime != nil && subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
 				op.enqueueReport(subReport)
 				unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
 			}
