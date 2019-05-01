@@ -6,6 +6,8 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${REPORTING_OPERATOR_BIN_OUT:=$ROOT_DIR/bin/reporting-operator-local}"
 : "${METERING_NAMESPACE:?}"
 
+: "${METERING_USE_SERVICE_ACCOUNT_AS_PROM_TOKEN:=true}"
+
 : "${METERING_PROMETHEUS_NAMESPACE:=openshift-monitoring}"
 : "${METERING_PROMETHEUS_SVC:=prometheus-k8s}"
 : "${METERING_PROMETHEUS_SVC_PORT:=9091}"
@@ -42,11 +44,18 @@ if [ "$METERING_PROMETHEUS_PORT_FORWARD" == "true" ]; then
 
 sleep 6
 
-ARGS=("$@")
+ARGS=()
 
 if [ "$METERING_PROMETHEUS_SCHEME" == "https" ]; then
     ARGS+=(--prometheus-skip-tls-verify)
 ***REMOVED***
+
+if [ "$METERING_USE_SERVICE_ACCOUNT_AS_PROM_TOKEN" == "true" ]; then
+    REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN="$(oc serviceaccounts -n "$METERING_NAMESPACE" get-token reporting-operator)"
+    export REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN
+***REMOVED***
+
+ARGS+=( "$@" )
 
 echo Starting reporting-operator
 set -x

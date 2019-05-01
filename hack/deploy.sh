@@ -63,7 +63,6 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
 
 if [ "$DEPLOY_METERING_OPERATOR_LOCAL" == "true" ]; then
     echo "Deploying metering-operator-locally"
-    rm -f /tmp/metering-operator.log
     nohup "$ROOT_DIR/hack/run-metering-operator-local.sh" > "$METERING_OPERATOR_LOG_FILE" &
     echo $! > "$METERING_OPERATOR_PID_FILE"
     (( BASE_DEPLOY_EXPECTED_POD_COUNT-- ))
@@ -110,19 +109,18 @@ echo "metering pods are all ready"
 
 if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
     echo "Getting reporting-operator service account"
-    REPORTING_OPERATOR_PROMETHEUS_TOKEN=""
-    while [ -z "$REPORTING_OPERATOR_PROMETHEUS_TOKEN" ]; do
-        # semi-colon matters
-        REPORTING_OPERATOR_PROMETHEUS_TOKEN="$(oc -n "$METERING_NAMESPACE" serviceaccounts get-token reporting-operator)" || true
+    export METERING_USE_SERVICE_ACCOUNT_AS_PROM_TOKEN=false
+    export REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN=""
+    while [ -z "$REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN" ]; do
+        REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN="$(oc -n "$METERING_NAMESPACE" serviceaccounts get-token reporting-operator)" || true
         echo "Waiting for reporting-operator service account"
         sleep 5
     done
 
-    rm -f /tmp/reporting-operator.log
     echo "Deploying report-operator-locally"
     nohup "$ROOT_DIR/hack/run-reporting-operator-local.sh" \
         --namespace "$METERING_NAMESPACE" \
-        --prometheus-bearer-token "$REPORTING_OPERATOR_PROMETHEUS_TOKEN" "${REPORTING_OPERATOR_ARGS:-}" > "$REPORTING_OPERATOR_LOG_FILE" &
+        "${REPORTING_OPERATOR_ARGS:-}" > "$REPORTING_OPERATOR_LOG_FILE" &
     echo $! > "$REPORTING_OPERATOR_PID_FILE"
 
     until curl -s --fail "http://${REPORTING_OPERATOR_API_LISTEN}/healthy" > /dev/null; do
