@@ -372,122 +372,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		"overwriteExisting": report.Spec.OverwriteExistingData,
 	})
 
-	var runningMsg, runningReason string
-	if report.Spec.RunImmediately {
-		runningReason = cbutil.RunImmediatelyReason
-		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
-	} ***REMOVED*** {
-		// Check if it's time to generate the report
-		if reportPeriod.periodEnd.After(now) {
-			waitTime := reportPeriod.periodEnd.Sub(now)
-			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, reportPeriod.periodEnd)
-			logger.Infof(waitMsg+". waiting %s", waitTime)
-
-			if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
-				op.enqueueReportAfter(report, waitTime)
-				return nil
-			}
-
-			var err error
-			report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg))
-			if err != nil {
-				return err
-			}
-
-			// we requeue this for later when the period we need to report on next
-			// has elapsed
-			op.enqueueReportAfter(report, waitTime)
-			return nil
-		}
-
-		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
-		// Validate all ReportDataSources that the Report depends on have indicated
-		// they have data available that covers the current reportPeriod.
-		for _, dataSource := range dependencyResult.Dependencies.ReportDataSources {
-			if dataSource.Spec.Promsum != nil {
-				// queue the dataSource and store the list of reports so we can
-				// add information to the Report's status on what's currently
-				// not ready
-				queue := false
-				if dataSource.Status.PrometheusMetricImportStatus == nil {
-					unstartedDataSourceDependencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
-					queue = true
-				} ***REMOVED*** {
-					// reportPeriod lower bound not covered
-					if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
-						queue = true
-						unmetDataStartDataSourceDependendencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
-					}
-					// reportPeriod upper bound is not covered
-					if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || reportPeriod.periodEnd.After(dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time) {
-						queue = true
-						unmetDataEndDataSourceDependendencies = append(unmetDataEndDataSourceDependendencies, dataSource.Name)
-					}
-				}
-				if queue {
-					op.enqueueReportDataSource(dataSource)
-				}
-			}
-		}
-
-		// Validate all sub-reports that the Report depends on have reported on the
-		// current reportPeriod
-		var unmetReportDependendencies []string
-		for _, subReport := range dependencyResult.Dependencies.Reports {
-			if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
-				op.enqueueReport(subReport)
-				unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
-			}
-		}
-
-		if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 || len(unmetReportDependendencies) != 0 {
-			unmetMsg := "The following Report dependencies do not have data currently available for the current reportPeriod being processed:"
-			if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 {
-				var msgs []string
-				if len(unstartedDataSourceDependencies) != 0 {
-					// sort so the message is reproducible
-					sort.Strings(unstartedDataSourceDependencies)
-					msgs = append(msgs, fmt.Sprintf("no data: [%s]", strings.Join(unstartedDataSourceDependencies, ", ")))
-				}
-				if len(unmetDataStartDataSourceDependendencies) != 0 {
-					// sort so the message is reproducible
-					sort.Strings(unmetDataStartDataSourceDependendencies)
-					msgs = append(msgs, fmt.Sprintf("periodStart %s is before importDataStartTime of [%s]", reportPeriod.periodStart, strings.Join(unmetDataStartDataSourceDependendencies, ", ")))
-				}
-				if len(unmetDataEndDataSourceDependendencies) != 0 {
-					// sort so the message is reproducible
-					sort.Strings(unmetDataEndDataSourceDependendencies)
-					msgs = append(msgs, fmt.Sprintf("periodEnd %s is after importDataEndTime of [%s]", reportPeriod.periodEnd, strings.Join(unmetDataEndDataSourceDependendencies, ", ")))
-				}
-				unmetMsg += fmt.Sprintf(" ReportDataSources: %s", strings.Join(msgs, ", "))
-			}
-			if len(unmetReportDependendencies) != 0 {
-				// sort so the message is reproducible
-				sort.Strings(unmetReportDependendencies)
-				unmetMsg += fmt.Sprintf(" Reports: lastReportTime not prior to periodEnd %s: [%s]", reportPeriod.periodEnd, strings.Join(unmetReportDependendencies, ", "))
-			}
-
-			// If the previous condition is unmet dependencies, check if the
-			// message changes, and only update if it does
-			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
-				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, cbutil.ReportingPeriodUnmetDependenciesReason)
-				return nil
-			}
-			logger.Warnf(unmetMsg)
-			_, err := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
-			return err
-		}
-
-		runningReason = cbutil.ScheduledReason
-		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
-	}
-	logger.Infof(runningMsg + " Running now.")
-
-	report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
-	if err != nil {
-		return err
-	}
-
+	// create the table before we check to see if the report has dependencies
+	// that are missing data
 	var prestoTable *cbTypes.PrestoTable
 	// if tableName isn't set, this report is still new and we should make sure
 	// no tables exist already in case of a previously failed cleanup.
@@ -578,6 +464,122 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			logger.WithError(err).Errorf("unable to update Report status with tableName")
 			return err
 		}
+	}
+
+	var runningMsg, runningReason string
+	if report.Spec.RunImmediately {
+		runningReason = cbutil.RunImmediatelyReason
+		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+	} ***REMOVED*** {
+		// Check if it's time to generate the report
+		if reportPeriod.periodEnd.After(now) {
+			waitTime := reportPeriod.periodEnd.Sub(now)
+			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, reportPeriod.periodEnd)
+			logger.Infof(waitMsg+". waiting %s", waitTime)
+
+			if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
+				op.enqueueReportAfter(report, waitTime)
+				return nil
+			}
+
+			var err error
+			report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg))
+			if err != nil {
+				return err
+			}
+
+			// we requeue this for later when the period we need to report on next
+			// has elapsed
+			op.enqueueReportAfter(report, waitTime)
+			return nil
+		}
+
+		runningReason = cbutil.ScheduledReason
+		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+
+		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
+		// Validate all ReportDataSources that the Report depends on have indicated
+		// they have data available that covers the current reportPeriod.
+		for _, dataSource := range dependencyResult.Dependencies.ReportDataSources {
+			if dataSource.Spec.Promsum != nil {
+				// queue the dataSource and store the list of reports so we can
+				// add information to the Report's status on what's currently
+				// not ready
+				queue := false
+				if dataSource.Status.PrometheusMetricImportStatus == nil {
+					unstartedDataSourceDependencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
+					queue = true
+				} ***REMOVED*** {
+					// reportPeriod lower bound not covered
+					if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
+						queue = true
+						unmetDataStartDataSourceDependendencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
+					}
+					// reportPeriod upper bound is not covered
+					if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || reportPeriod.periodEnd.After(dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time) {
+						queue = true
+						unmetDataEndDataSourceDependendencies = append(unmetDataEndDataSourceDependendencies, dataSource.Name)
+					}
+				}
+				if queue {
+					op.enqueueReportDataSource(dataSource)
+				}
+			}
+		}
+
+		// Validate all sub-reports that the Report depends on have reported on the
+		// current reportPeriod
+		var unmetReportDependendencies []string
+		for _, subReport := range dependencyResult.Dependencies.Reports {
+			if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
+				op.enqueueReport(subReport)
+				unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
+			}
+		}
+
+		if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 || len(unmetReportDependendencies) != 0 {
+			unmetMsg := "The following Report dependencies do not have data currently available for the current reportPeriod being processed:"
+			if len(unstartedDataSourceDependencies) != 0 || len(unmetDataStartDataSourceDependendencies) != 0 || len(unmetDataEndDataSourceDependendencies) != 0 {
+				var msgs []string
+				if len(unstartedDataSourceDependencies) != 0 {
+					// sort so the message is reproducible
+					sort.Strings(unstartedDataSourceDependencies)
+					msgs = append(msgs, fmt.Sprintf("no data: [%s]", strings.Join(unstartedDataSourceDependencies, ", ")))
+				}
+				if len(unmetDataStartDataSourceDependendencies) != 0 {
+					// sort so the message is reproducible
+					sort.Strings(unmetDataStartDataSourceDependendencies)
+					msgs = append(msgs, fmt.Sprintf("periodStart %s is before importDataStartTime of [%s]", reportPeriod.periodStart, strings.Join(unmetDataStartDataSourceDependendencies, ", ")))
+				}
+				if len(unmetDataEndDataSourceDependendencies) != 0 {
+					// sort so the message is reproducible
+					sort.Strings(unmetDataEndDataSourceDependendencies)
+					msgs = append(msgs, fmt.Sprintf("periodEnd %s is after importDataEndTime of [%s]", reportPeriod.periodEnd, strings.Join(unmetDataEndDataSourceDependendencies, ", ")))
+				}
+				unmetMsg += fmt.Sprintf(" ReportDataSources: %s", strings.Join(msgs, ", "))
+			}
+			if len(unmetReportDependendencies) != 0 {
+				// sort so the message is reproducible
+				sort.Strings(unmetReportDependendencies)
+				unmetMsg += fmt.Sprintf(" Reports: lastReportTime not prior to periodEnd %s: [%s]", reportPeriod.periodEnd, strings.Join(unmetReportDependendencies, ", "))
+			}
+
+			// If the previous condition is unmet dependencies, check if the
+			// message changes, and only update if it does
+			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
+				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, cbutil.ReportingPeriodUnmetDependenciesReason)
+				return nil
+			}
+			logger.Warnf(unmetMsg)
+			_, err := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
+			return err
+		}
+	}
+	logger.Infof(runningMsg + " Running now.")
+
+	report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
+	if err != nil {
+		return err
 	}
 
 	prestoTables, err := op.prestoTableLister.PrestoTables(report.Namespace).List(labels.Everything())
