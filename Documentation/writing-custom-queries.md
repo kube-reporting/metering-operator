@@ -15,6 +15,7 @@ This guide is going to be structured such that you begin by collecting new Prome
 This guide assumes you've already [installed Metering][install-metering] and have Prometheus in your cluster.
 
 > This guide assumes you've set the `METERING_NAMESPACE` environment variable to the namespace your Operator Metering installation is running. All resources must be created in that namespace for the operator to view and access them.
+> Additionally, in some cases, the value of `$METERING_NAMESPACE` will be used directly and the command you need to run may need to be adjusted based on your value. To make it clear where you will need to adjust your values, we will assume the value of "$METERING_NAMESPACE" is `your-namespace`.
 
 Many of the examples below, you will have you run a Prometheus query outside of the Metering operator.
 The easiest way to do this is open a port-forward to your Prometheus pod in your cluster.
@@ -103,20 +104,21 @@ After you have a session run the following query:
 show tables;
 ```
 
-This should give you a list of Database Tables created in Presto, and you should see quite a few entries. Among these entries, `datasource_unready_deployment_replicas` should be in the list, and if it's not, it's possible the table has not be created yet, or there was an error.
+This should give you a list of Database Tables created in Presto, and you should see quite a few entries.
+Among these entries, `datasource_your_namespace_unready_deployment_replicas` should be in the list (replacing `your_namespace` with the value of `$METERING_NAMESPACE` with `-` replaced with `_`), and if it's not, it's possible the table has not be created yet, or there was an error.
 In this case, you should [check the metering operator logs][reporting-operator-logs] for errors.
 
 If the table does exist, it may take up to 5 minutes (the default collection interval) before any data exists in the table.
 To check if our data has started getting collected, we can check by issuing a `SELECT` query on our table to see if any rows exist:
 
 ```
-SELECT * FROM datasource_unready_deployment_replicas LIMIT 10;
+SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
 ```
 
 If at least one row shows up, then everything is working correctly, an example of the output expected is shown below:
 
 ```
-presto:default> SELECT * FROM datasource_unready_deployment_replicas LIMIT 10;
+presto:default> SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
  amount |        timestamp        | timeprecision |                                 labels
 --------+-------------------------+---------------+-------------------------------------------------------------------------
     0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=alm-operator}
@@ -153,7 +155,7 @@ SELECT
     labels['namespace'] as namespace,
     labels['deployment'] as deployment,
     amount * "timeprecision" as pod_unready_seconds
-FROM datasource_unready_deployment_replicas
+FROM datasource_your_namespace_unready_deployment_replicas
 ORDER BY pod_unready_seconds DESC, namespace ASC, deployment ASC;
 ```
 
@@ -167,7 +169,7 @@ The query below uses the `GROUP BY` clause to create a list of deployments by na
 SELECT
     labels['namespace'] as namespace,
     labels['deployment'] as deployment
-FROM datasource_unready_deployment_replicas
+FROM datasource_your_namespace_unready_deployment_replicas
 GROUP BY labels['namespace'], labels['deployment']
 ORDER BY namespace ASC, deployment ASC;
 ```
@@ -184,7 +186,7 @@ SELECT
     labels['deployment'] as deployment,
     sum(amount * "timeprecision") AS total_replica_unready_seconds,
     avg(amount * "timeprecision") AS avg_replica_unready_seconds
-FROM datasource_unready_deployment_replicas
+FROM datasource_your_namespace_unready_deployment_replicas
 GROUP BY labels['namespace'], labels['deployment']
 ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC;
 ```
@@ -201,7 +203,7 @@ The column information is what the operator uses to create the table when a repo
 If this doesn't match the query, there will be issues when running the query and trying to store the data into the database.
 
 Below is an example of our final query from the steps above put into a `ReportGenerationQuery`.
-One thing to note is we replaced `FROM datasource_unready_deployment_replicas` with `{| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}` and added an `inputs` configuration to avoid hard coding the table name.
+One thing to note is we replaced `FROM datasource_your_namespace_unready_deployment_replicas` with `{| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}` and added an `inputs` configuration to avoid hard coding the table name.
 By using inputs, we can override the default ReportDataSource used and by marking it as `type: ReportDataSource`, it will be considered a dependency and will ensure it exists before running.
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
