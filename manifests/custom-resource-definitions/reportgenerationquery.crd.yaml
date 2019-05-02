@@ -17,9 +17,6 @@ spec:
     shortNames:
     - rgq
   additionalPrinterColumns:
-  - name: View Disabled
-    type: string
-    JSONPath: .spec.view.disabled
   - name: Age
     type: date
     JSONPath: .metadata.creationTimestamp
