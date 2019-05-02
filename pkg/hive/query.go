@@ -59,9 +59,9 @@ func generateCreateTableSQL(params TableParameters, ignoreExists bool) string {
 		}
 	}
 
-	serdeFormatStr := ""
-	if params.SerdeFormat != "" && params.SerdeRowProperties != nil {
-		serdeFormatStr = fmt.Sprintf("ROW FORMAT SERDE '%s' WITH SERDEPROPERTIES (%s)", params.SerdeFormat, generateProperties(params.SerdeRowProperties))
+	rowFormatStr := ""
+	if params.RowFormat != "" {
+		rowFormatStr = fmt.Sprintf("ROW FORMAT %s", strings.TrimSpace(params.RowFormat))
 	}
 	format := ""
 	if params.FileFormat != "" {
@@ -72,8 +72,8 @@ func generateCreateTableSQL(params TableParameters, ignoreExists bool) string {
 		location = fmt.Sprintf(`LOCATION "%s"`, params.Location)
 	}
 	tblProps := ""
-	if params.Properties != nil {
-		tblProps = fmt.Sprintf("TBLPROPERTIES(%s)", params.Properties)
+	if params.TableProperties != nil {
+		tblProps = fmt.Sprintf("TBLPROPERTIES(%s)", params.TableProperties)
 	}
 	return fmt.Sprintf(
 		`CREATE %s TABLE %s
@@ -84,7 +84,7 @@ func generateCreateTableSQL(params TableParameters, ignoreExists bool) string {
 		tableType, ifNotExists,
 		tableName, columnsStr, partitionedBy,
 		clusteredBy, sortedBy, intoBuckets,
-		serdeFormatStr, format, location,
+		rowFormatStr, format, location,
 		tblProps,
 	)
 }
@@ -157,13 +157,4 @@ func generateSortedByColumnListSQL(columns []SortColumn) string {
 
 func escapeColumn(columnName, columnType string) string {
 	return fmt.Sprintf("`%s` %s", columnName, columnType)
-}
-
-// generateProperties returns a formatted a set of SerDe properties for a Hive query.
-func generateProperties(props map[string]string) string {
-	var propList []string
-	for k, v := range props {
-		propList = append(propList, fmt.Sprintf(`'%s' = '%s'`, k, v))
-	}
-	return strings.Join(propList, ", ")
 }

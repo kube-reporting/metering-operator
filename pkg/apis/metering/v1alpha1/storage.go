@@ -41,9 +41,8 @@ type HiveStorage struct {
 }
 
 type HiveStorageDefaultTableProperties struct {
-	SerdeFormat        string            `json:"serdeFormat,omitempty"`
-	FileFormat         string            `json:"***REMOVED***leFormat,omitempty"`
-	SerdeRowProperties map[string]string `json:"serdeRowProperties,omitempty"`
+	RowFormat  string `json:"rowFormat,omitempty"`
+	FileFormat string `json:"***REMOVED***leFormat,omitempty"`
 }
 
 type StorageLocationStatus struct {

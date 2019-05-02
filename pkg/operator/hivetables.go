@@ -117,19 +117,18 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.
 			})
 		}
 		params := hive.TableParameters{
-			Database:           hiveTable.Spec.DatabaseName,
-			Name:               hiveTable.Spec.TableName,
-			Columns:            hiveTable.Spec.Columns,
-			PartitionedBy:      hiveTable.Spec.PartitionedBy,
-			ClusteredBy:        hiveTable.Spec.ClusteredBy,
-			SortedBy:           newSortedBy,
-			NumBuckets:         hiveTable.Spec.NumBuckets,
-			Location:           hiveTable.Spec.Location,
-			SerdeFormat:        hiveTable.Spec.SerdeFormat,
-			FileFormat:         hiveTable.Spec.FileFormat,
-			SerdeRowProperties: hiveTable.Spec.SerdeRowProperties,
-			Properties:         hiveTable.Spec.Properties,
-			External:           hiveTable.Spec.External,
+			Database:        hiveTable.Spec.DatabaseName,
+			Name:            hiveTable.Spec.TableName,
+			Columns:         hiveTable.Spec.Columns,
+			PartitionedBy:   hiveTable.Spec.PartitionedBy,
+			ClusteredBy:     hiveTable.Spec.ClusteredBy,
+			SortedBy:        newSortedBy,
+			NumBuckets:      hiveTable.Spec.NumBuckets,
+			Location:        hiveTable.Spec.Location,
+			RowFormat:       hiveTable.Spec.RowFormat,
+			FileFormat:      hiveTable.Spec.FileFormat,
+			TableProperties: hiveTable.Spec.TableProperties,
+			External:        hiveTable.Spec.External,
 		}
 		err := op.hiveTableManager.CreateTable(params, true)
 		if err != nil {
@@ -146,10 +145,9 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.
 		hiveTable.Status.SortedBy = hiveTable.Spec.SortedBy
 		hiveTable.Status.NumBuckets = hiveTable.Spec.NumBuckets
 		hiveTable.Status.Location = hiveTable.Spec.Location
-		hiveTable.Status.SerdeFormat = hiveTable.Spec.SerdeFormat
+		hiveTable.Status.RowFormat = hiveTable.Spec.RowFormat
 		hiveTable.Status.FileFormat = hiveTable.Spec.FileFormat
-		hiveTable.Status.SerdeRowProperties = hiveTable.Spec.SerdeRowProperties
-		hiveTable.Status.Properties = hiveTable.Spec.Properties
+		hiveTable.Status.TableProperties = hiveTable.Spec.TableProperties
 		hiveTable.Status.External = hiveTable.Spec.External
 		hiveTable.Status.Partitions = hiveTable.Spec.Partitions
 		hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
@@ -356,8 +354,8 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 			SortedBy:         newSortedBy,
 			NumBuckets:       params.NumBuckets,
 			Location:         params.Location,
-			SerdeFormat:      params.SerdeFormat,
-			Properties:       params.Properties,
+			RowFormat:        params.RowFormat,
+			TableProperties:  params.TableProperties,
 			External:         params.External,
 			ManagePartitions: managePartitions,
 			Partitions:       newPartitions,

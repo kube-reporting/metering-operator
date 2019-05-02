@@ -26,12 +26,11 @@ type TableParameters struct {
 	SortedBy      []SortColumn `json:"sortedBy,omitempty"`
 	NumBuckets    int          `json:"numBuckets,omitempty"`
 
-	Location           string            `json:"location,omitempty"`
-	SerdeFormat        string            `json:"serdeFormat,omitempty"`
-	FileFormat         string            `json:"***REMOVED***leFormat,omitempty"`
-	SerdeRowProperties map[string]string `json:"serdeRowProperties,omitempty"`
-	Properties         map[string]string `json:"properties,omitempty"`
-	External           bool              `json:"external,omitempty"`
+	Location        string            `json:"location,omitempty"`
+	RowFormat       string            `json:"rowFormat,omitempty"`
+	FileFormat      string            `json:"***REMOVED***leFormat,omitempty"`
+	TableProperties map[string]string `json:"tableProperties,omitempty"`
+	External        bool              `json:"external,omitempty"`
 }
 
 type TablePartition struct {

@@ -404,9 +404,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			Columns:  cols,
 		}
 		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
-			params.SerdeFormat = hiveStorage.Spec.Hive.DefaultTableProperties.SerdeFormat
+			params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
 			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
-			params.SerdeRowProperties = hiveStorage.Spec.Hive.DefaultTableProperties.SerdeRowProperties
 		}
 
 		logger.Infof("creating table %s", tableName)
