@@ -286,6 +286,57 @@ func validateReport(
 	return genQuery, queryDependencies, nil
 }
 
+// getReportPeriod determines a Report's reporting period based off the report parameter's ***REMOVED***elds.
+// Returns a pointer to a reportPeriod structure if no error was encountered, ***REMOVED*** panic or return an error.
+func getReportPeriod(now time.Time, logger log.FieldLogger, report *cbTypes.Report) (*reportPeriod, error) {
+	var reportPeriod *reportPeriod
+
+	// check if the report's schedule spec is set
+	if report.Spec.Schedule != nil {
+		reportSchedule, err := getSchedule(report.Spec.Schedule)
+		if err != nil {
+			return nil, err
+		}
+
+		if report.Status.LastReportTime != nil {
+			reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.LastReportTime.Time)
+		} ***REMOVED*** {
+			if report.Spec.ReportingStart != nil {
+				logger.Infof("no last report time for report, using spec.reportingStart %s as starting point", report.Spec.ReportingStart.Time)
+				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Spec.ReportingStart.Time)
+			} ***REMOVED*** if report.Status.NextReportTime != nil {
+				logger.Infof("no last report time for report, using status.nextReportTime %s as starting point", report.Status.NextReportTime.Time)
+				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.NextReportTime.Time)
+			} ***REMOVED*** {
+				// the current period, [now, nextScheduledTime]
+				currentPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, now)
+				// the next full report period from [nextScheduledTime, nextScheduledTime+1]
+				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, currentPeriod.periodEnd)
+				report.Status.NextReportTime = &metav1.Time{Time: reportPeriod.periodStart}
+			}
+		}
+	} ***REMOVED*** {
+		var err error
+		// if there's the Spec.Schedule ***REMOVED***eld is unset, then the report must be a run-once report
+		reportPeriod, err = getRunOnceReportPeriod(report)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if reportPeriod.periodStart.After(reportPeriod.periodEnd) {
+		panic("periodStart should never come after periodEnd")
+	}
+
+	if report.Spec.ReportingEnd != nil && reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
+		logger.Debugf("calculated Report periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
+		// we need to truncate the reportPeriod to align with the reportingEnd
+		reportPeriod.periodEnd = report.Spec.ReportingEnd.Time
+	}
+
+	return reportPeriod, nil
+}
+
 // runReport takes a report, and generates reporting data
 // according the report's schedule. If the next scheduled reporting period
 // hasn't elapsed, runReport will requeue the resource for a time when
@@ -309,45 +360,10 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	now := op.clock.Now().UTC()
 
-	var reportPeriod *reportPeriod
-	if report.Spec.Schedule != nil {
-		reportSchedule, err := getSchedule(report.Spec.Schedule)
-		if err != nil {
-			return err
-		}
-
-		if report.Status.LastReportTime != nil {
-			reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.LastReportTime.Time)
-		} ***REMOVED*** {
-			if report.Spec.ReportingStart != nil {
-				logger.Infof("no last report time for report, using spec.reportingStart %s as starting point", report.Spec.ReportingStart.Time)
-				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Spec.ReportingStart.Time)
-			} ***REMOVED*** if report.Status.NextReportTime != nil {
-				logger.Infof("no last report time for report, using status.nextReportTime %s as starting point", report.Status.NextReportTime.Time)
-				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, report.Status.NextReportTime.Time)
-			} ***REMOVED*** {
-				// the current period, [now, nextScheduledTime]
-				currentPeriod := getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, now)
-				// the next full report period from [nextScheduledTime, nextScheduledTime+1]
-				reportPeriod = getNextReportPeriod(reportSchedule, report.Spec.Schedule.Period, currentPeriod.periodEnd)
-				report.Status.NextReportTime = &metav1.Time{Time: reportPeriod.periodStart}
-			}
-		}
-	} ***REMOVED*** {
-		reportPeriod, err = getRunOnceReportPeriod(report)
-		if err != nil {
-			return err
-		}
-	}
-
-	if reportPeriod.periodStart.After(reportPeriod.periodEnd) {
-		panic("periodStart should never come after periodEnd")
-	}
-
-	if report.Spec.ReportingEnd != nil && reportPeriod.periodEnd.After(report.Spec.ReportingEnd.Time) {
-		logger.Debugf("calculated Report periodEnd %s goes beyond spec.reportingEnd %s, setting periodEnd to reportingEnd", reportPeriod.periodEnd, report.Spec.ReportingEnd.Time)
-		// we need to truncate the reportPeriod to align with the reportingEnd
-		reportPeriod.periodEnd = report.Spec.ReportingEnd.Time
+	// get the report's reporting period
+	reportPeriod, err := getReportPeriod(now, logger, report)
+	if err != nil {
+		return err
 	}
 
 	logger = logger.WithFields(log.Fields{

@@ -335,3 +335,99 @@ func TestValidateReport(t *testing.T) {
 		})
 	}
 }
+
+func TestGetReportPeriod(t *testing.T) {
+	const (
+		testNamespace  = "default"
+		testReportName = "test-report"
+		testQueryName  = "test-query"
+	)
+
+	invalidSchedule := &metering.ReportSchedule{
+		Period: metering.ReportPeriodCron,
+		Cron:   nil,
+	}
+
+	validSchedule := &metering.ReportSchedule{
+		Period: metering.ReportPeriodCron,
+		Cron:   &metering.ReportScheduleCron{Expression: "5 4 * * *"},
+	}
+
+	reportStart := &time.Time{}
+	reportEndTmp := reportStart.AddDate(0, 1, 0)
+	reportEnd := &reportEndTmp
+	lastReportTime := &metav1.Time{Time: reportStart.AddDate(0, 0, 0)}
+	nextReportTime := &metav1.Time{Time: reportStart.AddDate(0, 1, 0)}
+
+	testTable := []struct {
+		name        string
+		report      *metering.Report
+		expectErr   bool
+		expectPanic bool
+	}{
+		{
+			name:      "invalid report with an unset spec.Schedule ***REMOVED***eld returns an error",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, nil, v1alpha1.ReportStatus{}, nil, false),
+			expectErr: true,
+		},
+		{
+			name:      "valid report with an unset spec.Schedule ***REMOVED***eld returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
+			expectErr: false,
+		},
+		{
+			name:      "invalid schedule with a set spec.Schedule ***REMOVED***eld returns error",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, invalidSchedule, false),
+			expectErr: true,
+		},
+		{
+			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, validSchedule, false),
+			expectErr: false,
+		},
+		{
+			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and a set Spec.Status.LastReportTime returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{LastReportTime: lastReportTime}, validSchedule, false),
+			expectErr: false,
+		},
+		{
+			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and a set Spec.ReportingStart returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, validSchedule, false),
+			expectErr: false,
+		},
+		{
+			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and an unset Spec.ReportingStart returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, v1alpha1.ReportStatus{}, validSchedule, false),
+			expectErr: false,
+		},
+		{
+			name:      "valid schedule with a set spec.Schedule ***REMOVED***eld and an unset Spec.Status.LastReportTime and a set Spec.NextReportTime returns nil",
+			report:    testhelpers.NewReport(testReportName, testNamespace, testQueryName, nil, reportEnd, v1alpha1.ReportStatus{NextReportTime: nextReportTime}, validSchedule, false),
+			expectErr: false,
+		},
+		{
+			name:        "unset Spec.Schedule with reportPeriod.periodStart > reportPeriod.periodEnd returns panic",
+			report:      testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportEnd, reportStart, v1alpha1.ReportStatus{NextReportTime: nextReportTime}, nil, false),
+			expectErr:   false,
+			expectPanic: true,
+		},
+	}
+
+	for _, testCase := range testTable {
+		var mockLogger = logrus.New()
+		testCase := testCase
+
+		t.Run(testCase.name, func(t *testing.T) {
+			if testCase.expectPanic {
+				assert.Panics(t, func() { getReportPeriod(time.Now(), mockLogger, testCase.report) }, "expected the test case would panic, but it did not")
+			} ***REMOVED*** {
+				_, err := getReportPeriod(time.Now(), mockLogger, testCase.report)
+				if testCase.expectErr {
+					assert.Error(t, err, "expected that getting the report period  would return a non-nil error")
+				} ***REMOVED*** {
+					assert.Nil(t, err, "expected that getting the report period would return a nil error")
+				}
+			}
+		})
+	}
+}
