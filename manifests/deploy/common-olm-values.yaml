@@ -216,53 +216,50 @@ annotations:
           }
         },
         "spec": {
-          "databaseName": "default",
-          "tableName": "apache_log",
-          "external": true,
-          "location": "s3://my-bucket/apache_logs",
           "columns": [
             {
               "name": "host",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "identity",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "user",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "time",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "request",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "status",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "size",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "referer",
-              "type": "varchar"
+              "type": "string"
             },
             {
               "name": "agent",
-              "type": "varchar"
+              "type": "string"
             }
           ],
+          "databaseName": "default",
+          "external": true,
           "fileFormat": "TEXTFILE",
-          "serdeFormat": "org.apache.hadoop.hive.serde2.RegexSerDe",
-          "serdeRowProperties": {
-            "input.regex": "([^]*) ([^]*) ([^]*) (-|\\[^\\]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\".*\") ([^ \"]*|\".*\"))?"
-          }
+          "location": "s3a://my-bucket/apache_logs",
+          "rowFormat": "SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'\nWITH SERDEPROPERTIES (\n  \"input.regex\" = \"([^ ]*) ([^ ]*) ([^ ]*) (-|\\\\[[^\\\\]]*\\\\]) ([^ \\\"]*|\\\"[^\\\"]*\\\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \\\"]*|\\\"[^\\\"]*\\\") ([^ \\\"]*|\\\"[^\\\"]*\\\"))?\"\n)\n",
+          "tableName": "apache_log"
         }
       }
     ]
