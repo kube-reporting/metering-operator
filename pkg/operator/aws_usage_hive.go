@@ -15,20 +15,20 @@ import (
 )
 
 const (
-	// AWSUsageHiveSerde is the Hadoop serialization/deserialization implementation used with AWS billing data.
-	AWSUsageHiveSerde = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
+	// AWSUsageHiveRowFormat is the Hadoop serialization/deserialization implementation used with AWS billing data.
+	AWSUsageHiveRowFormat = `
+SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+    "serialization.format" = ",",
+    "field.delim"          = ",",
+    "collection.delim"     = "undefined",
+    "mapkey.delim"         = "undefined",
+    "timestamp.formats"    = "yyyy-MM-dd'T'HH:mm:ssZ"
+)
+`
 )
 
 var (
-	// AWSUsageHiveSerdeProps configure the SerDe used with AWS Billing Data.
-	AWSUsageHiveSerdeProps = map[string]string{
-		"serialization.format": ",",
-		"field.delim":          ",",
-		"collection.delim":     "undefined",
-		"mapkey.delim":         "undefined",
-		"timestamp.formats":    "yyyy-MM-dd'T'HH:mm:ssZ",
-	}
-
 	AWSUsageHivePartitions = []hive.Column{
 		{Name: "billing_period_start", Type: "string"},
 		{Name: "billing_period_end", Type: "string"},
@@ -83,15 +83,14 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	}
 
 	params := hive.TableParameters{
-		Database:           dbName,
-		Name:               tableName,
-		Columns:            columns,
-		PartitionedBy:      AWSUsageHivePartitions,
-		Location:           location,
-		FileFormat:         "textfile",
-		SerdeFormat:        AWSUsageHiveSerde,
-		SerdeRowProperties: AWSUsageHiveSerdeProps,
-		External:           true,
+		Database:      dbName,
+		Name:          tableName,
+		Columns:       columns,
+		PartitionedBy: AWSUsageHivePartitions,
+		Location:      location,
+		FileFormat:    "textfile",
+		RowFormat:     AWSUsageHiveRowFormat,
+		External:      true,
 	}
 
 	logger.Infof("creating Hive table %s", tableName)
