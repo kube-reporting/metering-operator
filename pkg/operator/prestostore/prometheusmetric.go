@@ -30,31 +30,31 @@ const (
 var (
 	defaultQueryBufferPool = NewBufferPool(defaultPrestoQueryCap)
 
-	PromsumHiveTableColumns = []hive.Column{
+	PrometheusMetricHiveTableColumns = []hive.Column{
 		{Name: amountColumnName, Type: "double"},
 		{Name: timestampColumnName, Type: "timestamp"},
 		{Name: timePrecisionColumnName, Type: "double"},
 		{Name: labelsColumnName, Type: "map<string, string>"},
 	}
-	PromsumHivePartitionColumns = []hive.Column{
+	PrometheusMetricHivePartitionColumns = []hive.Column{
 		{Name: dtColumnName, Type: "string"},
 	}
 
 	// Initialized by init()
-	PromsumPrestoTableColumn, PromsumPrestoPartitionColumns, PromsumPrestoAllColumns []presto.Column
+	PrometheusMetricPrestoTableColumn, PrometheusMetricPrestoPartitionColumns, PrometheusMetricPrestoAllColumns []presto.Column
 )
 
 func init() {
 	var err error
-	PromsumPrestoTableColumn, err = reportingutil.HiveColumnsToPrestoColumns(PromsumHiveTableColumns)
+	PrometheusMetricPrestoTableColumn, err = reportingutil.HiveColumnsToPrestoColumns(PrometheusMetricHiveTableColumns)
 	if err != nil {
 		panic(err)
 	}
-	PromsumPrestoPartitionColumns, err = reportingutil.HiveColumnsToPrestoColumns(PromsumHivePartitionColumns)
+	PrometheusMetricPrestoPartitionColumns, err = reportingutil.HiveColumnsToPrestoColumns(PrometheusMetricHivePartitionColumns)
 	if err != nil {
 		panic(err)
 	}
-	PromsumPrestoAllColumns = append(PromsumPrestoTableColumn, PromsumPrestoPartitionColumns...)
+	PrometheusMetricPrestoAllColumns = append(PrometheusMetricPrestoTableColumn, PrometheusMetricPrestoPartitionColumns...)
 }
 
 func NewBufferPool(capacity int) sync.Pool {
@@ -268,7 +268,7 @@ func GetPrometheusMetrics(queryer db.Queryer, tableName string, start, end time.
 		whereClause += fmt.Sprintf(`"timestamp" <= timestamp '%s'`, end.Format(presto.TimestampFormat))
 	}
 
-	rows, err := presto.GetRowsWhere(queryer, tableName, PromsumPrestoAllColumns, whereClause)
+	rows, err := presto.GetRowsWhere(queryer, tableName, PrometheusMetricPrestoAllColumns, whereClause)
 	if err != nil {
 		return nil, err
 	}

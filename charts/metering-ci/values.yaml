@@ -1,6 +1,6 @@
 deployPlatform: openshift
 deployTag: master
-disablePromsum: false
+disablePrometheusMetricsImporter: false
 awsAccessKeyID: ""
 awsSecretAccessKey: ""
 enableAwsBilling: false

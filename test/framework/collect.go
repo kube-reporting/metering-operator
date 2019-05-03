@@ -17,7 +17,7 @@ import (
 // imported
 const collectionSize = time.Hour
 
-func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, operator.CollectPromsumDataResponse) {
+func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
 	f.collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTC for timestamps
@@ -33,7 +33,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, oper
 		// collection we want to make.
 		f.reportStart = f.reportEnd.Add(-collectionSize)
 
-		reqParams := operator.CollectPromsumDataRequest{
+		reqParams := operator.CollectPrometheusMetricsDataRequest{
 			StartTime: f.reportStart,
 			EndTime:   f.reportEnd,
 		}
@@ -47,12 +47,12 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, oper
 		require.NoErrorf(t, err, "expected no errors triggering data collection")
 		t.Logf("finished querying %s, took: %s to finish", collectEndpoint, time.Now().UTC().Sub(now))
 		require.NoError(t, err, "reading response body should succeed")
-		var collectResp operator.CollectPromsumDataResponse
+		var collectResp operator.CollectPrometheusMetricsDataResponse
 		err = json.Unmarshal(respBody, &collectResp)
 		require.NoError(t, err, "expected to unmarshal CollectPrometheusData response as JSON")
-		t.Logf("CollectPromsumDataResponse: %s", spew.Sdump(collectResp))
+		t.Logf("CollectPrometheusMetricsDataResponse: %s", spew.Sdump(collectResp))
 		require.NotEmpty(t, collectResp.Results, "expected multiple import results")
-		f.collectPromsumDataResponse = collectResp
+		f.collectPrometheusMetricsDataResponse = collectResp
 	})
-	return f.reportStart, f.reportEnd, f.collectPromsumDataResponse
+	return f.reportStart, f.reportEnd, f.collectPrometheusMetricsDataResponse
 }

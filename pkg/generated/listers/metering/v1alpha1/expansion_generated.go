@@ -42,14 +42,6 @@ type ReportGenerationQueryListerExpansion interface{}
 // ReportGenerationQueryNamespaceLister.
 type ReportGenerationQueryNamespaceListerExpansion interface{}
 
-// ReportPrometheusQueryListerExpansion allows custom methods to be added to
-// ReportPrometheusQueryLister.
-type ReportPrometheusQueryListerExpansion interface{}
-
-// ReportPrometheusQueryNamespaceListerExpansion allows custom methods to be added to
-// ReportPrometheusQueryNamespaceLister.
-type ReportPrometheusQueryNamespaceListerExpansion interface{}
-
 // StorageLocationListerExpansion allows custom methods to be added to
 // StorageLocationLister.
 type StorageLocationListerExpansion interface{}

@@ -32,10 +32,6 @@ func (c *FakeMeteringV1alpha1) ReportGenerationQueries(namespace string) v1alpha
 	return &FakeReportGenerationQueries{c, namespace}
 }
 
-func (c *FakeMeteringV1alpha1) ReportPrometheusQueries(namespace string) v1alpha1.ReportPrometheusQueryInterface {
-	return &FakeReportPrometheusQueries{c, namespace}
-}
-
 func (c *FakeMeteringV1alpha1) StorageLocations(namespace string) v1alpha1.StorageLocationInterface {
 	return &FakeStorageLocations{c, namespace}
 }

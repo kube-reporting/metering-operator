@@ -5,8 +5,9 @@ spec:
   defaultReportDataSources:
     pod-request-cpu-cores:
       spec:
-        promsum:
-          query: "pod-request-cpu-cores"
+        prometheusMetricsImporter:
+          query: |
+            sum(kube_pod_container_resource_requests_cpu_cores) by (pod, namespace, node)
     pod-cpu-request-raw:
       spec:
         generationQueryView:
@@ -14,13 +15,15 @@ spec:
 
     pod-limit-cpu-cores:
       spec:
-        promsum:
-          query: "pod-limit-cpu-cores"
+        prometheusMetricsImporter:
+          query: |
+            sum(kube_pod_container_resource_limits_cpu_cores) by (pod, namespace, node)
 
     pod-usage-cpu-cores:
       spec:
-        promsum:
-          query: "pod-usage-cpu-cores"
+        prometheusMetricsImporter:
+          query: |
+            label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
     pod-cpu-usage-raw:
       spec:
         generationQueryView:
@@ -28,8 +31,10 @@ spec:
 
     pod-request-memory-bytes:
       spec:
-        promsum:
-          query: "pod-request-memory-bytes"
+        prometheusMetricsImporter:
+          query: |
+            sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
+
     pod-memory-request-raw:
       spec:
         generationQueryView:
@@ -37,13 +42,16 @@ spec:
 
     pod-limit-memory-bytes:
       spec:
-        promsum:
-          query: "pod-limit-memory-bytes"
+        prometheusMetricsImporter:
+          query: |
+            sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node)
 
     pod-usage-memory-bytes:
       spec:
-        promsum:
-          query: "pod-usage-memory-bytes"
+        prometheusMetricsImporter:
+          query: |
+            sum(label_replace(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+
     pod-memory-usage-raw:
       spec:
         generationQueryView:
@@ -51,8 +59,9 @@ spec:
 
     persistentvolumeclaim-request-bytes:
       spec:
-        promsum:
-          query: "persistentvolumeclaim-request-bytes"
+        prometheusMetricsImporter:
+          query: |
+            max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
     persistentvolumeclaim-request-raw:
       spec:
         generationQueryView:
@@ -60,13 +69,15 @@ spec:
 
     pod-persistentvolumeclaim-request-info:
       spec:
-        promsum:
-          query: "pod-persistentvolumeclaim-request-info"
+        prometheusMetricsImporter:
+          query: |
+            kube_pod_spec_volumes_persistentvolumeclaims_info
 
     persistentvolumeclaim-capacity-bytes:
       spec:
-        promsum:
-          query: "persistentvolumeclaim-capacity-bytes"
+        prometheusMetricsImporter:
+          query: |
+            kubelet_volume_stats_capacity_bytes
     persistentvolumeclaim-capacity-raw:
       spec:
         generationQueryView:
@@ -74,8 +85,9 @@ spec:
 
     persistentvolumeclaim-usage-bytes:
       spec:
-        promsum:
-          query: "persistentvolumeclaim-usage-bytes"
+        prometheusMetricsImporter:
+          query: |
+            kubelet_volume_stats_used_bytes
     persistentvolumeclaim-usage-raw:
       spec:
         generationQueryView:
@@ -83,13 +95,13 @@ spec:
 
     persistentvolumeclaim-phase:
       spec:
-        promsum:
-          query: "persistentvolumeclaim-phase"
+        prometheusMetricsImporter:
+          query: |
+            kube_persistentvolumeclaim_status_phase
     persistentvolumeclaim-phase-raw:
       spec:
         generationQueryView:
           queryName: "persistentvolumeclaim-phase-raw"
-
     persistentvolumeclaim-usage-with-phase-raw:
       spec:
         generationQueryView:
@@ -98,8 +110,9 @@ spec:
 
     node-allocatable-memory-bytes:
       spec:
-        promsum:
-          query: "node-allocatable-memory-bytes"
+        prometheusMetricsImporter:
+          query: |
+            kube_node_status_allocatable_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
     node-memory-allocatable-raw:
       spec:
         generationQueryView:
@@ -107,8 +120,9 @@ spec:
 
     node-capacity-memory-bytes:
       spec:
-        promsum:
-          query: "node-capacity-memory-bytes"
+        prometheusMetricsImporter:
+          query: |
+            kube_node_status_capacity_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
     node-memory-capacity-raw:
       spec:
         generationQueryView:
@@ -116,8 +130,9 @@ spec:
 
     node-allocatable-cpu-cores:
       spec:
-        promsum:
-          query: "node-allocatable-cpu-cores"
+        prometheusMetricsImporter:
+          query: |
+             kube_node_status_allocatable_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
     node-cpu-allocatable-raw:
       spec:
         generationQueryView:
@@ -125,8 +140,9 @@ spec:
 
     node-capacity-cpu-cores:
       spec:
-        promsum:
-          query: "node-capacity-cpu-cores"
+        prometheusMetricsImporter:
+          query: |
+             kube_node_status_capacity_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
     node-cpu-capacity-raw:
       spec:
         generationQueryView:

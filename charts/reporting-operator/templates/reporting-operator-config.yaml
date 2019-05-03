@@ -14,16 +14,16 @@ data:
   presto-host: {{ .Values.spec.config.prestoHost | quote }}
   hive-host: {{ .Values.spec.config.hiveHost | quote }}
   prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" .Values.spec.config.prometheusURL | quote}}
-  disable-promsum: {{ .Values.spec.config.disablePromsum | quote}}
+  disable-prometheus-metrics-importer: {{ .Values.spec.config.disablePrometheusMetricsImporter | quote}}
   enable-finalizers: {{ .Values.spec.config.enableFinalizers | quote}}
-{{- if .Values.spec.config.promsumPollInterval }}
-  promsum-poll-interval: {{ .Values.spec.config.promsumPollInterval | quote}}
+{{- if .Values.spec.config.prometheusMetricsImporterPollInterval }}
+  prometheus-metrics-importer-poll-interval: {{ .Values.spec.config.prometheusMetricsImporterPollInterval | quote}}
 {{- end }}
-{{- if .Values.spec.config.promsumChunkSize }}
-  promsum-chunk-size: {{ .Values.spec.config.promsumChunkSize | quote}}
+{{- if .Values.spec.config.prometheusMetricsImporterChunkSize }}
+  prometheus-metrics-importer-chunk-size: {{ .Values.spec.config.prometheusMetricsImporterChunkSize | quote}}
 {{- end }}
-{{- if .Values.spec.config.promsumStepSize }}
-  promsum-step-size: {{ .Values.spec.config.promsumStepSize | quote}}
+{{- if .Values.spec.config.prometheusMetricsImporterStepSize }}
+  prometheus-metrics-importer-step-size: {{ .Values.spec.config.prometheusMetricsImporterStepSize | quote}}
 {{- end }}
 {{- if .Values.spec.config.leaderLeaseDuration }}
   leader-lease-duration: {{ .Values.spec.config.leaderLeaseDuration | quote }}
