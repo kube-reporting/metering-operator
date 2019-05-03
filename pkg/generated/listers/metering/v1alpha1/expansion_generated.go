@@ -34,13 +34,13 @@ type ReportDataSourceListerExpansion interface{}
 // ReportDataSourceNamespaceLister.
 type ReportDataSourceNamespaceListerExpansion interface{}
 
-// ReportGenerationQueryListerExpansion allows custom methods to be added to
-// ReportGenerationQueryLister.
-type ReportGenerationQueryListerExpansion interface{}
+// ReportQueryListerExpansion allows custom methods to be added to
+// ReportQueryLister.
+type ReportQueryListerExpansion interface{}
 
-// ReportGenerationQueryNamespaceListerExpansion allows custom methods to be added to
-// ReportGenerationQueryNamespaceLister.
-type ReportGenerationQueryNamespaceListerExpansion interface{}
+// ReportQueryNamespaceListerExpansion allows custom methods to be added to
+// ReportQueryNamespaceLister.
+type ReportQueryNamespaceListerExpansion interface{}
 
 // StorageLocationListerExpansion allows custom methods to be added to
 // StorageLocationLister.

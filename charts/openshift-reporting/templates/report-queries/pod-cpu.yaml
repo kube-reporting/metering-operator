@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-cpu-request-raw
   labels:
@@ -52,7 +52,7 @@ spec:
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-cpu-usage-raw
   labels:
@@ -105,7 +105,7 @@ spec:
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-cpu-request
   labels:
@@ -165,7 +165,7 @@ spec:
     ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-cpu-usage
   labels:
@@ -225,7 +225,7 @@ spec:
     ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-cpu-request
   labels:
@@ -289,7 +289,7 @@ spec:
     {|- end |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-cpu-usage
   labels:
@@ -353,7 +353,7 @@ spec:
     {|- end |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-cpu-utilization
   labels:
@@ -395,21 +395,21 @@ spec:
   - name: ClusterCpuCapacityReportName
     type: Report
   - name: NamespaceCpuRequestQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: namespace-cpu-request
   - name: NamespaceCpuUsageQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: namespace-cpu-usage
   - name: ClusterCpuCapacityQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-cpu-capacity
   query: |
     WITH cluster_cpu_capacity AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterCpuCapacityQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterCpuCapacityQueryName . |}
     ), namespace_cpu_usage AS (
-      {| renderReportGenerationQuery .Report.Inputs.NamespaceCpuUsageQueryName . |}
+      {| renderReportQuery .Report.Inputs.NamespaceCpuUsageQueryName . |}
     ), namespace_cpu_request AS (
-      {| renderReportGenerationQuery .Report.Inputs.NamespaceCpuRequestQueryName . |}
+      {| renderReportQuery .Report.Inputs.NamespaceCpuRequestQueryName . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,

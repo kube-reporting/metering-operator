@@ -21,7 +21,7 @@ kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
-  generationQuery: "pod-cpu-request"
+  query: "pod-cpu-request"
   reportingStart: "2018-07-01T00:00:00Z"
   schedule:
     period: "hourly"
@@ -41,22 +41,22 @@ kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
-  generationQuery: "pod-cpu-request"
+  query: "pod-cpu-request"
   reportingStart: "2018-07-01T00:00:00Z"
   reportingEnd: "2018-07-31T00:00:00Z"
 ```
 
-### generationQuery
+### query
 
-Names the `ReportGenerationQuery` used to generate the report.
-The generation query controls the schema of the report as well how the results are processed.
+Names the `ReportQuery` used to generate the report.
+The report query controls the schema of the report as well how the results are processed.
 
-*`generationQuery` is a required ***REMOVED***eld.*
+*`query` is a required ***REMOVED***eld.*
 
-Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
+Use `kubectl` to obtain a list of available `ReportQuery` objects:
 
  ```
- kubectl -n $METERING_NAMESPACE get reportgenerationqueries
+ kubectl -n $METERING_NAMESPACE get reportqueries
 NAME                                         AGE
 cluster-cpu-capacity                         23m
 cluster-cpu-capacity-raw                     23m
@@ -105,7 +105,7 @@ pod-memory-usage                             23m
 pod-memory-usage-raw                         23m
 ```
 
-ReportGenerationQueries with the `-raw` suf***REMOVED***x are used by other ReportGenerationQueries to build more complex queries, and should not be used directly for reports.
+ReportQueries with the `-raw` suf***REMOVED***x are used by other ReportQueries to build more complex queries, and should not be used directly for reports.
 
 `namespace-` pre***REMOVED***xed queries aggregate Pod CPU/memory requests by namespace, providing a list of namespaces and their overall usage based on resource requests.
 
@@ -120,11 +120,11 @@ The `aws-ec2-billing-data` report is used by other queries, and should not be us
 For a complete list of ***REMOVED***elds each report query produces, use `kubectl` to get the object as JSON, and check the `columns` ***REMOVED***eld:
 
 ```
-kubectl -n $METERING_NAMESPACE get reportgenerationqueries namespace-memory-request -o json
+kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o json
 
 {
     "apiVersion": "metering.openshift.io/v1alpha1",
-    "kind": "ReportGenerationQuery",
+    "kind": "ReportQuery",
     "metadata": {
         "name": "namespace-memory-request",
         "namespace": "metering"
@@ -220,7 +220,7 @@ kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
-  generationQuery: "pod-cpu-request"
+  query: "pod-cpu-request"
   schedule:
     period: "hourly"
   reportingStart: "2018-01-01T00:00:00Z"
@@ -242,7 +242,7 @@ kind: Report
 metadata:
   name: pod-cpu-request-hourly
 spec:
-  generationQuery: "pod-cpu-request"
+  query: "pod-cpu-request"
   schedule:
     period: "weekly"
   reportingStart: "2018-07-01T00:00:00Z"
@@ -256,7 +256,7 @@ For reports with a schedule set, it will not wait for each period's reportingEnd
 
 ### Inputs
 
-The `spec.inputs` ***REMOVED***eld of a Report can be used to override or set values de***REMOVED***ned in a [ReportGenerationQuery's spec.input ***REMOVED***eld][query-inputs].
+The `spec.inputs` ***REMOVED***eld of a Report can be used to override or set values de***REMOVED***ned in a [ReportQuery's spec.input ***REMOVED***eld][query-inputs].
 
 It is a list of name-value pairs:
 
@@ -273,8 +273,8 @@ For an example of how this can be used, see it in action [in a roll-up report](r
 
 Report data is stored in the database much like metrics themselves, and can thus be used in aggregated or roll-up reports. A simple use case for a roll-up report is to spread the time required to produce a report over a longer period of time: instead of requiring a monthly report to query and add all data over an entire month, the task can be split into daily reports that each run over a thirtieth of the data.
 
-A custom roll-up report requires a custom generation query.
-The ReportGenerationQuery template processor provides a function: `reportTableName` that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query).
+A custom roll-up report requires a custom report query.
+The ReportQuery template processor provides a function: `reportTableName` that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query).
 
 Below is an snippet taken from a built-in query:
 
@@ -305,7 +305,7 @@ spec:
 ```
 # aggregated-report.yaml
 spec:
-  generationQuery: "namespace-cpu-usage"
+  query: "namespace-cpu-usage"
   inputs:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
@@ -323,4 +323,4 @@ The `status` ***REMOVED***eld of a `Report` currently has two ***REMOVED***elds:
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
-[query-inputs]: reportgenerationqueries.md#query-inputs
+[query-inputs]: reportqueries.md#query-inputs

@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-cpu-usage-raw
   labels:
@@ -34,7 +34,7 @@ spec:
     GROUP BY "timestamp", dt
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-cpu-usage
   labels:
@@ -90,7 +90,7 @@ spec:
     {|- end |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-memory-usage-raw
   labels:
@@ -125,7 +125,7 @@ spec:
     GROUP BY "timestamp", dt
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-memory-usage
   labels:

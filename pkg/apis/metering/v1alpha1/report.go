@@ -27,9 +27,9 @@ type Report struct {
 }
 
 type ReportSpec struct {
-	// GenerationQueryName speci***REMOVED***es the ReportGenerationQuery to execute when
+	// QueryName speci***REMOVED***es the ReportQuery to execute when
 	// the report runs.
-	GenerationQueryName string `json:"generationQuery"`
+	QueryName string `json:"query"`
 
 	// Schedule con***REMOVED***gures when the report runs.
 	Schedule *ReportSchedule `json:"schedule,omitempty"`
@@ -55,8 +55,8 @@ type ReportSpec struct {
 	// and, ReportingEnd.
 	RunImmediately bool `json:"runImmediately,omitempty"`
 
-	// Inputs are the inputs to the ReportGenerationQuery
-	Inputs ReportGenerationQueryInputValues `json:"inputs,omitempty"`
+	// Inputs are the inputs to the ReportQuery
+	Inputs ReportQueryInputValues `json:"inputs,omitempty"`
 
 	// Output is the storage location where results are sent.
 	Output *StorageLocationRef `json:"output,omitempty"`

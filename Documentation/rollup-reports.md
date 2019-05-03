@@ -15,7 +15,7 @@ kind: Report
 metadata:
   name: namespace-cpu-usage-hourly
 spec:
-  generationQuery: "namespace-cpu-usage"
+  query: "namespace-cpu-usage"
   reportingStart: '2018-10-09T00:00:00Z'
   schedule:
     period: "hourly"
@@ -29,7 +29,7 @@ It contains a few a custom inputs: most importantly, `NamespaceCPUUsageReportNam
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-cpu-usage
   labels:
@@ -96,7 +96,7 @@ Note the use of the macro `reportTableName`, which will automatically get the pr
 ## 3. Create the aggregator report
 
 We now have a sub-report and a query that can read data from other reports.
-We can create a `Report` that uses that custom generation query with the sub-report:
+We can create a `Report` that uses that custom report query with the sub-report:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
@@ -104,7 +104,7 @@ kind: Report
 metadata:
   name: namespace-cpu-usage-daily
 spec:
-  generationQuery: "namespace-cpu-usage"
+  query: "namespace-cpu-usage"
   inputs:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"

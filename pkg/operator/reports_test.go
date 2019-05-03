@@ -255,13 +255,13 @@ func TestValidateReport(t *testing.T) {
 		return &v
 	}
 
-	testValidQuery := &metering.ReportGenerationQuery{
+	testValidQuery := &metering.ReportQuery{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      testQueryName,
 			Namespace: testNamespace,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+		Spec: metering.ReportQuerySpec{
+			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -272,13 +272,13 @@ func TestValidateReport(t *testing.T) {
 		},
 	}
 
-	testInvalidQuery := &metering.ReportGenerationQuery{
+	testInvalidQuery := &metering.ReportQuery{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      testInvalidQueryName,
 			Namespace: testNamespace,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+		Spec: metering.ReportQuerySpec{
+			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -289,13 +289,13 @@ func TestValidateReport(t *testing.T) {
 		},
 	}
 
-	testInvalidQuery2 := &metering.ReportGenerationQuery{
+	testInvalidQuery2 := &metering.ReportQuery{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      testInvalidQueryName2,
 			Namespace: testNamespace,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+		Spec: metering.ReportQuerySpec{
+			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
 				{
 					Name:     "ds",
 					Type:     "ReportDataSource",
@@ -307,7 +307,7 @@ func TestValidateReport(t *testing.T) {
 	}
 
 	dataSourceGetter := testhelpers.NewReportDataSourceStore([]*metering.ReportDataSource{ds1, ds2})
-	queryGetter := testhelpers.NewReportGenerationQueryStore([]*metering.ReportGenerationQuery{testValidQuery, testInvalidQuery, testInvalidQuery2})
+	queryGetter := testhelpers.NewReportQueryStore([]*metering.ReportQuery{testValidQuery, testInvalidQuery, testInvalidQuery2})
 	reportGetter := testhelpers.NewReportStore(nil)
 	dependencyResolver := reporting.NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter)
 
@@ -322,10 +322,10 @@ func TestValidateReport(t *testing.T) {
 		expectErrMsg string
 	}{
 		{
-			name:         "empty spec.generationQuery returns err",
+			name:         "empty spec.query returns err",
 			report:       testhelpers.NewReport(testReportName, testNamespace, "", reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			expectErr:    true,
-			expectErrMsg: "must set spec.generationQuery",
+			expectErrMsg: "must set spec.query",
 		},
 		{
 			name:         "spec.ReportingStart > spec.ReportingEnd returns err",
@@ -340,22 +340,22 @@ func TestValidateReport(t *testing.T) {
 			expectErrMsg: "spec.reportingEnd must be set if report.spec.runImmediately is true",
 		},
 		{
-			name:         "spec.GenerationQueryName does not exist returns err",
+			name:         "spec.QueryName does not exist returns err",
 			report:       testhelpers.NewReport(testReportName, testNamespace, testNonExistentQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("ReportGenerationQuery (%s) does not exist", testNonExistentQueryName),
+			expectErrMsg: fmt.Sprintf("ReportQuery (%s) does not exist", testNonExistentQueryName),
 		},
 		{
 			name:         "valid report with missing DataSource returns error",
 			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, true),
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("failed to resolve ReportGenerationQuery dependencies %s: %s", testInvalidQueryName, "ReportDataSource.metering.openshift.io \"this-does-not-exist\" not found"),
+			expectErrMsg: fmt.Sprintf("failed to resolve ReportQuery dependencies %s: %s", testInvalidQueryName, "ReportDataSource.metering.openshift.io \"this-does-not-exist\" not found"),
 		},
 		{
 			name:         "valid report with uninitalized DataSource returns error",
 			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName2, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, true),
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("failed to validate ReportGenerationQuery dependencies %s: ReportGenerationQueryDependencyValidationError: uninitialized ReportDataSource dependencies: %s", testInvalidQueryName2, ds2.Name),
+			expectErrMsg: fmt.Sprintf("failed to validate ReportQuery dependencies %s: ReportQueryDependencyValidationError: uninitialized ReportDataSource dependencies: %s", testInvalidQueryName2, ds2.Name),
 		},
 		{
 			name:         "valid report with valid DataSource returns nil",

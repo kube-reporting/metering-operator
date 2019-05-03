@@ -23,7 +23,7 @@ func TestDependencyResolver(t *testing.T) {
 	ds2 := testhelpers.NewReportDataSource("datasource2", testNs)
 	ds3 := testhelpers.NewReportDataSource("datasource4", testNs)
 
-	testInputs := []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+	testInputs := []metering.ReportQueryInputDe***REMOVED***nition{
 		{
 			Name:     "ds1",
 			Type:     "ReportDataSource",
@@ -38,25 +38,25 @@ func TestDependencyResolver(t *testing.T) {
 		},
 		{
 			Name:     "q1",
-			Type:     "ReportGenerationQuery",
+			Type:     "ReportQuery",
 			Required: true,
 			Default:  newDefault(`"query1"`),
 		},
 		{
 			Name:     "q2",
-			Type:     "ReportGenerationQuery",
+			Type:     "ReportQuery",
 			Required: true,
 			Default:  newDefault(`"query2"`),
 		},
 	}
 
-	query1 := &metering.ReportGenerationQuery{
+	query1 := &metering.ReportQuery{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      "query1",
 			Namespace: testNs,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+		Spec: metering.ReportQuerySpec{
+			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
 				{
 					Name:     "ds3",
 					Type:     "ReportDataSource",
@@ -67,16 +67,16 @@ func TestDependencyResolver(t *testing.T) {
 		},
 	}
 
-	query2 := &metering.ReportGenerationQuery{
+	query2 := &metering.ReportQuery{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      "query2",
 			Namespace: testNs,
 		},
-		Spec: metering.ReportGenerationQuerySpec{
-			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+		Spec: metering.ReportQuerySpec{
+			Inputs: []metering.ReportQueryInputDe***REMOVED***nition{
 				{
 					Name:     "q3",
-					Type:     "ReportGenerationQuery",
+					Type:     "ReportQuery",
 					Required: true,
 					Default:  newDefault(`"query3"`),
 				},
@@ -84,19 +84,19 @@ func TestDependencyResolver(t *testing.T) {
 		},
 	}
 
-	query3 := &metering.ReportGenerationQuery{
+	query3 := &metering.ReportQuery{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      "query3",
 			Namespace: testNs,
 		},
-		Spec: metering.ReportGenerationQuerySpec{},
+		Spec: metering.ReportQuerySpec{},
 	}
 
-	expectedDeps := &ReportGenerationQueryDependencies{
+	expectedDeps := &ReportQueryDependencies{
 		ReportDataSources: []*metering.ReportDataSource{
 			ds1, ds2, ds3,
 		},
-		ReportGenerationQueries: []*metering.ReportGenerationQuery{
+		ReportQueries: []*metering.ReportQuery{
 			query1, query2, query3,
 		},
 		Reports: []*metering.Report{},
@@ -105,7 +105,7 @@ func TestDependencyResolver(t *testing.T) {
 	dataSourceGetter := testhelpers.NewReportDataSourceStore([]*metering.ReportDataSource{
 		ds1, ds2, ds3,
 	})
-	queryGetter := testhelpers.NewReportGenerationQueryStore([]*metering.ReportGenerationQuery{
+	queryGetter := testhelpers.NewReportQueryStore([]*metering.ReportQuery{
 		query1, query2, query3,
 	})
 	reportGetter := testhelpers.NewReportStore(nil)

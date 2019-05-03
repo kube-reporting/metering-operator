@@ -40,6 +40,6 @@ metadata:
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  generationQueryView:
+  reportQueryView:
     queryName: "aws-ec2-billing-data-raw-raw"
 {{- end }}

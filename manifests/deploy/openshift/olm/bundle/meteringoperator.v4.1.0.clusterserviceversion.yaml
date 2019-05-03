@@ -21,7 +21,7 @@ metadata:
             "name": "unready-deployment-replicas-hourly"
           },
           "spec": {
-            "generationQuery": "unready-deployment-replicas",
+            "query": "unready-deployment-replicas",
             "schedule": {
               "period": "hourly"
             }
@@ -29,7 +29,7 @@ metadata:
         },
         {
           "apiVersion": "metering.openshift.io/v1alpha1",
-          "kind": "ReportGenerationQuery",
+          "kind": "ReportQuery",
           "metadata": {
             "name": "unready-deployment-replicas"
           },
@@ -581,13 +581,13 @@ spec:
       name: reports.metering.openshift.io
       version: v1alpha1
     - description: A SQL query used by Metering to generate reports.
-      displayName: Metering Generation Query
-      kind: ReportGenerationQuery
-      name: reportgenerationqueries.metering.openshift.io
+      displayName: Metering Report Query
+      kind: ReportQuery
+      name: reportqueries.metering.openshift.io
       version: v1alpha1
     - description: Used under-the-hood. A resource a database table in Presto. Use by
-        ReportGenerationQueries to determine what tables exist, and by the HTTP API to
-        determine how to query a table.
+        ReportQueries to determine what tables exist, and by the HTTP API to determine
+        how to query a table.
       displayName: Metering Data Source
       kind: ReportDataSource
       name: reportdatasources.metering.openshift.io
@@ -599,7 +599,7 @@ spec:
       name: storagelocations.metering.openshift.io
       version: v1alpha1
     - description: Used under-the-hood. A resource describing a source of data for usage
-        by Report Generation Queries.
+        by Report Queries.
       displayName: Metering Presto Table
       kind: PrestoTable
       name: prestotables.metering.openshift.io
