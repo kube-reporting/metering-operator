@@ -119,18 +119,19 @@ If at least one row shows up, then everything is working correctly, an example o
 
 ```
 presto:default> SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
- amount |        timestamp        | timeprecision |                                 labels
---------+-------------------------+---------------+-------------------------------------------------------------------------
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=alm-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=catalog-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=reporting-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=metering-testing, deployment=metering-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=container-linux-update-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=default-http-backend}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=default, deployment=etcd-operator}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=etcd-operator}
-    1.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=default, deployment=example}
-    0.0 | 2018-05-18 17:00:00.000 |          60.0 | {namespace=tectonic-system, deployment=grafana}
+ amount |        timestamp        | timeprecision |                              labels                              |     dt
+--------+-------------------------+---------------+------------------------------------------------------------------+------------
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=telemeter-tschuy, deployment=presto-worker}           | 2019-05-03
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=metering-emoss, deployment=metering-operator}         | 2019-05-03
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=openshift-monitoring, deployment=prometheus-operator} | 2019-05-03
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=metering-tschuy, deployment=presto-worker}            | 2019-05-03
+    0.0 | 2019-05-03 16:34:00.000 |          60.0 | {namespace=telemeter-tschuy, deployment=presto-worker}           | 2019-05-03
+    1.0 | 2019-05-03 16:18:00.000 |          60.0 | {namespace=metering-tschuy, deployment=reporting-operator}       | 2019-05-03
+    0.0 | 2019-05-03 16:12:00.000 |          60.0 | {namespace=telemeter-tschuy, deployment=presto-worker}           | 2019-05-03
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=metering-tflannag, deployment=reporting-operator}     | 2019-05-03
+    0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=metering-tflannag, deployment=presto-worker}          | 2019-05-03
+    1.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=metering-chancez, deployment=reporting-operator}      | 2019-05-03
+(10 rows)
 ```
 
 Now, it's time to start talking about our data in terms of SQL.
@@ -147,34 +148,39 @@ To answer this, we need to do a few things:
 - divide up, or group the results by the deployment.
 - find the average and total duration pods are unready for each deployment.
 
-We'll start with getting the unready time at an individual metric level.
+We'll start with getting the unready time at an individual metric level for each timestamp.
 Since the `amount` corresponds to the number of unready pods at that moment in time, and the `timeprecision` gives how long the metric was that value, we just need to multiply the `amount` (number of pods) by the `timeprecision` (length of time it was at that value):
 
 ```
 SELECT
+    "timestamp",
     labels['namespace'] as namespace,
     labels['deployment'] as deployment,
     amount * "timeprecision" as pod_unready_seconds
 FROM datasource_your_namespace_unready_deployment_replicas
-ORDER BY pod_unready_seconds DESC, namespace ASC, deployment ASC;
+ORDER BY pod_unready_seconds DESC, namespace ASC, deployment ASC
+LIMIT 10;
 ```
 
 Next, we need to group our results by the deployment, this can be done using a SQL `GROUP BY` clause.
 One thing we need to consider is a deployment of a specific name can appear in multiple namespaces, so we need to actually group by both namespace, and deployment.
 Additionally a limitation of the `GROUP BY` is that columns not mentioned in the `GROUP BY` clause cannot be in the `SELECT` statement without an aggregation function, so we'll temporarily remove the `pod_unready_seconds` for this, but we'll come back to that shortly.
+Of course we include timestamp again so we can get the value at each time.
 
 The query below uses the `GROUP BY` clause to create a list of deployments by namespace from the metric:
 
 ```
 SELECT
+    "timestamp",
     labels['namespace'] as namespace,
     labels['deployment'] as deployment
 FROM datasource_your_namespace_unready_deployment_replicas
-GROUP BY labels['namespace'], labels['deployment']
-ORDER BY namespace ASC, deployment ASC;
+GROUP BY "timestamp", labels['namespace'], labels['deployment']
+ORDER BY namespace ASC, deployment ASC
+LIMIT 10;
 ```
 
-Next, we want to get the average and total time that each deployment has replicas that are unready.
+Next, we want to get the average and total time that each deployment has replicas that are unready for each timestamp.
 This can be done using the SQL `avg()` and `sum()` aggregation functions.
 Before we can take the average and sum however, we need to figure out what we're averaging or summing, thankfully we already figure this out, it's the `pod_unready_seconds` column from the first SQL query.
 
@@ -182,13 +188,15 @@ Our final query is the following:
 
 ```
 SELECT
+    "timestamp",
     labels['namespace'] as namespace,
     labels['deployment'] as deployment,
     sum(amount * "timeprecision") AS total_replica_unready_seconds,
     avg(amount * "timeprecision") AS avg_replica_unready_seconds
 FROM datasource_your_namespace_unready_deployment_replicas
-GROUP BY labels['namespace'], labels['deployment']
-ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC;
+GROUP BY "timestamp", labels['namespace'], labels['deployment']
+ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
+LIMIT 10;
 ```
 
 ## Writing a ReportGenerationQuery
@@ -214,6 +222,8 @@ metadata:
   name: "unready-deployment-replicas"
 spec:
   columns:
+  - name: timestamp
+    type: timestamp
   - name: namespace
     type: varchar
   - name: deployment
@@ -228,12 +238,13 @@ spec:
     default: unready-deployment-replicas
   query: |
     SELECT
+        "timestamp",
         labels['namespace'] AS namespace,
         labels['deployment'] AS deployment,
         sum(amount * "timeprecision") AS total_replica_unready_seconds,
         avg(amount * "timeprecision") AS avg_replica_unready_seconds
     FROM {| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}
-    GROUP BY labels['namespace'], labels['deployment']
+    GROUP BY "timestamp", labels['namespace'], labels['deployment']
     ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
 ```
 
@@ -250,7 +261,7 @@ AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.Repo
 
 Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classification_of_intervals); that is, we should collect data with timestamps equal to or greater than the start time and less than the end time, as seen in the example above.
 
-In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema definition: `period_start` and `period_end`. Both of these columns will be of type `timestamp`, which requires us to add an additional field, `spec.input`, to our `ReportGenerationQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
+In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema definition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional field, `spec.input`, to our `ReportGenerationQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
 Lastly, we need to update the SELECT portion of the `spec.query` field:
 
 ```
@@ -323,8 +334,8 @@ kind: Report
 metadata:
   name: unready-deployment-replicas
 spec:
-  reportingStart: '2018-01-01T00:00:00Z'
-  reportingEnd: '2018-12-31T23:59:59Z'
+  reportingStart: '2019-01-01T00:00:00Z'
+  reportingEnd: '2019-12-31T23:59:59Z'
   generationQuery: "unready-deployment-replicas"
   runImmediately: true
 ```
@@ -357,19 +368,16 @@ This should output a CSV report that looks similar to this:
 
 ```
 period_start,period_end,namespace,deployment,total_replica_unready_seconds,avg_replica_unready_seconds
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,reporting-operator,3420,13.464566929133857
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,metering-operator,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering-testing,presto,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,etcd-operator,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,example,15240,60
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,test-deploy,15240,60
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,default,test-hostnet-deploy,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,heapster,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-controller-manager,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-dns,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,kube-system,kube-scheduler,0,0
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering,15240,60
-2018-01-01 00:00:00 +0000 UTC,2018-12-31 23:59:59 +0000 UTC,metering,metering-operator,0,0
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,kube-system,tiller-deploy,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,metering-chancez,metering-operator,120.000000,1.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,metering-chancez,presto-coordinator,360.000000,3.050847
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,metering-chancez,presto-worker,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,metering-chancez,reporting-operator,1680.000000,14.237288
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,openshift-monitoring,cluster-monitoring-operator,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,openshift-monitoring,grafana,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,openshift-monitoring,kube-state-metrics,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,openshift-monitoring,prometheus-operator,0.000000,0.000000
+2019-01-01 00:00:00 +0000 UTC,2019-12-31 23:59:59 +0000 UTC,openshift-web-console,webconsole,0.000000,0.000000
 ...
 ```
 
