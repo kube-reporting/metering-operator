@@ -101,8 +101,8 @@ type Con***REMOVED***g struct {
 
 	PrestoMaxQueryLength int
 
-	DisablePromsum   bool
-	EnableFinalizers bool
+	DisablePrometheusMetricsImporter bool
+	EnableFinalizers                 bool
 
 	LogDMLQueries bool
 	LogDDLQueries bool
@@ -132,7 +132,6 @@ type Reporting struct {
 	hiveTableLister             listers.HiveTableLister
 	reportDataSourceLister      listers.ReportDataSourceLister
 	reportGenerationQueryLister listers.ReportGenerationQueryLister
-	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
 	reportLister                listers.ReportLister
 	storageLocationLister       listers.StorageLocationLister
 
@@ -253,7 +252,6 @@ func newReportingOperator(
 	hiveTableInformer := informerFactory.Metering().V1alpha1().HiveTables()
 	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
 	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
-	reportPrometheusQueryInformer := informerFactory.Metering().V1alpha1().ReportPrometheusQueries()
 	reportInformer := informerFactory.Metering().V1alpha1().Reports()
 	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
 
@@ -292,7 +290,6 @@ func newReportingOperator(
 		hiveTableLister:             hiveTableInformer.Lister(),
 		reportDataSourceLister:      reportDataSourceInformer.Lister(),
 		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
-		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
 		reportLister:                reportInformer.Lister(),
 		storageLocationLister:       storageLocationInformer.Lister(),
 

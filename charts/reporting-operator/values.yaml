@@ -15,9 +15,9 @@ spec:
     prestoHost: "presto:8080"
     hiveHost: "hive-server:10000"
 
-    promsumPollInterval: "5m"
-    promsumChunkSize: "5m"
-    promsumStepSize: "60s"
+    prometheusMetricsImporterPollInterval: "5m"
+    prometheusMetricsImporterChunkSize: "5m"
+    prometheusMetricsImporterStepSize: "60s"
 
     prestoMaxQueryLength: null
     prometheusDatasourceMaxQueryRangeDuration: null
@@ -47,7 +47,7 @@ spec:
     logReports: "false"
     logDDLQueries: "false"
     logDMLQueries: "false"
-    disablePromsum: "false"
+    disablePrometheusMetricsImporter: "false"
 
     enableFinalizers: "false"
     leaderLeaseDuration: "60s"

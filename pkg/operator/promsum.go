@@ -24,7 +24,6 @@ var (
 	prometheusReportDatasourceLabels = []string{
 		"reportdatasource",
 		"namespace",
-		"reportprometheusquery",
 		"table_name",
 	}
 
@@ -180,7 +179,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 	var reportDataSourcesToImport []*cbTypes.ReportDataSource
 
 	for _, reportDataSource := range reportDataSources.Items {
-		if reportDataSource.Spec.Promsum == nil {
+		if reportDataSource.Spec.PrometheusMetricsImporter == nil {
 			continue
 		}
 
@@ -199,26 +198,20 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 		reportDataSource := reportDataSource
 		// collect each dataSource concurrently
 		g.Go(func() error {
-			reportPromQuery, err := op.meteringClient.MeteringV1alpha1().ReportPrometheusQueries(reportDataSource.Namespace).Get(reportDataSource.Spec.Promsum.Query, metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-
 			prestoTable, err := op.prestoTableLister.PrestoTables(reportDataSource.Namespace).Get(reportDataSource.Status.TableRef.Name)
 			if err != nil {
 				return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", reportDataSource.Status.TableRef, reportDataSource.Name, err)
 			}
 
 			dataSourceLogger := logger.WithFields(logrus.Fields{
-				"queryName":        reportDataSource.Spec.Promsum.Query,
 				"reportDataSource": reportDataSource.Name,
 				"tableName":        prestoTable.Status.TableName,
 			})
-			importCfg := op.newPromImporterCfg(reportDataSource, reportPromQuery, prestoTable)
+			importCfg := op.newPromImporterCfg(reportDataSource, reportDataSource.Spec.PrometheusMetricsImporter.Query, prestoTable)
 			// ignore any global ImportFrom con***REMOVED***guration since this is an
 			// on-demand import
 			importCfg.ImportFromTime = nil
-			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery, prestoTable)
+			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable)
 
 			select {
 			case semaphore <- struct{}{}:
@@ -231,8 +224,8 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 			}()
 
 			var promConn prom.API
-			if (reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g != nil) && (reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g.URL != "") {
-				promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g.URL)
+			if (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g != nil) && (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g.URL != "") {
+				promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g.URL)
 				if err != nil {
 					return err
 				}
@@ -267,7 +260,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 }
 
 func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTypes.ReportDataSource) time.Duration {
-	queryConf := reportDataSource.Spec.Promsum.QueryCon***REMOVED***g
+	queryConf := reportDataSource.Spec.PrometheusMetricsImporter.QueryCon***REMOVED***g
 	queryInterval := op.cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration
 	if queryConf != nil {
 		if queryConf.QueryInterval != nil {
@@ -277,11 +270,11 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTyp
 	return queryInterval
 }
 
-func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery, prestoTable *cbTypes.PrestoTable) prestostore.Con***REMOVED***g {
+func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, query string, prestoTable *cbTypes.PrestoTable) prestostore.Con***REMOVED***g {
 	chunkSize := op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration
 
-	queryConf := reportDataSource.Spec.Promsum.QueryCon***REMOVED***g
+	queryConf := reportDataSource.Spec.PrometheusMetricsImporter.QueryCon***REMOVED***g
 	if queryConf != nil {
 		if queryConf.ChunkSize != nil {
 			chunkSize = queryConf.ChunkSize.Duration
@@ -311,7 +304,7 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
 
 	return prestostore.Con***REMOVED***g{
-		PrometheusQuery:           reportPromQuery.Spec.Query,
+		PrometheusQuery:           query,
 		PrestoTableName:           tableName,
 		ChunkSize:                 chunkSize,
 		StepSize:                  stepSize,
@@ -322,12 +315,12 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 	}
 }
 
-func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery, prestoTable *cbTypes.PrestoTable, cfg prestostore.Con***REMOVED***g) (*prestostore.PrometheusImporter, error) {
-	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, reportPromQuery, prestoTable)
+func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, prestoTable *cbTypes.PrestoTable, cfg prestostore.Con***REMOVED***g) (*prestostore.PrometheusImporter, error) {
+	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable)
 	var promConn prom.API
 	var err error
-	if (reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g != nil) && (reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g.URL != "") {
-		promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.Promsum.PrometheusCon***REMOVED***g.URL)
+	if (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g != nil) && (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g.URL != "") {
+		promConn, err = op.newPrometheusConnFromURL(reportDataSource.Spec.PrometheusMetricsImporter.PrometheusCon***REMOVED***g.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -338,12 +331,11 @@ func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource
 	return prestostore.NewPrometheusImporter(logger, promConn, op.prometheusMetricsRepo, op.clock, cfg, metricsCollectors), nil
 }
 
-func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.ReportDataSource, reportPromQuery *cbTypes.ReportPrometheusQuery, prestoTable *cbTypes.PrestoTable) prestostore.ImporterMetricsCollectors {
+func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *cbTypes.ReportDataSource, prestoTable *cbTypes.PrestoTable) prestostore.ImporterMetricsCollectors {
 	promLabels := prometheus.Labels{
-		"reportdatasource":      reportDataSource.Name,
-		"namespace":             reportDataSource.Namespace,
-		"reportprometheusquery": reportPromQuery.Name,
-		"table_name":            prestoTable.Status.TableName,
+		"reportdatasource": reportDataSource.Name,
+		"namespace":        reportDataSource.Namespace,
+		"table_name":       prestoTable.Status.TableName,
 	}
 
 	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)

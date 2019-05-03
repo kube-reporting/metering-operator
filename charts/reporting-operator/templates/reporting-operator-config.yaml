@@ -14,16 +14,16 @@ data:
   presto-host: {{ .Values.spec.con***REMOVED***g.prestoHost | quote }}
   hive-host: {{ .Values.spec.con***REMOVED***g.hiveHost | quote }}
   prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" .Values.spec.con***REMOVED***g.prometheusURL | quote}}
-  disable-promsum: {{ .Values.spec.con***REMOVED***g.disablePromsum | quote}}
+  disable-prometheus-metrics-importer: {{ .Values.spec.con***REMOVED***g.disablePrometheusMetricsImporter | quote}}
   enable-***REMOVED***nalizers: {{ .Values.spec.con***REMOVED***g.enableFinalizers | quote}}
-{{- if .Values.spec.con***REMOVED***g.promsumPollInterval }}
-  promsum-poll-interval: {{ .Values.spec.con***REMOVED***g.promsumPollInterval | quote}}
+{{- if .Values.spec.con***REMOVED***g.prometheusMetricsImporterPollInterval }}
+  prometheus-metrics-importer-poll-interval: {{ .Values.spec.con***REMOVED***g.prometheusMetricsImporterPollInterval | quote}}
 {{- end }}
-{{- if .Values.spec.con***REMOVED***g.promsumChunkSize }}
-  promsum-chunk-size: {{ .Values.spec.con***REMOVED***g.promsumChunkSize | quote}}
+{{- if .Values.spec.con***REMOVED***g.prometheusMetricsImporterChunkSize }}
+  prometheus-metrics-importer-chunk-size: {{ .Values.spec.con***REMOVED***g.prometheusMetricsImporterChunkSize | quote}}
 {{- end }}
-{{- if .Values.spec.con***REMOVED***g.promsumStepSize }}
-  promsum-step-size: {{ .Values.spec.con***REMOVED***g.promsumStepSize | quote}}
+{{- if .Values.spec.con***REMOVED***g.prometheusMetricsImporterStepSize }}
+  prometheus-metrics-importer-step-size: {{ .Values.spec.con***REMOVED***g.prometheusMetricsImporterStepSize | quote}}
 {{- end }}
 {{- if .Values.spec.con***REMOVED***g.leaderLeaseDuration }}
   leader-lease-duration: {{ .Values.spec.con***REMOVED***g.leaderLeaseDuration | quote }}

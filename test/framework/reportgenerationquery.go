@@ -73,7 +73,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 	}
 }
 
-func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPromsumDataResponse) {
+func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
 	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
 	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)

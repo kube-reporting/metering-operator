@@ -85,19 +85,9 @@ metadata:
             "name": "unready-deployment-replicas"
           },
           "spec": {
-            "promsum": {
-              "query": "unready-deployment-replicas"
+            "prometheusMetricsImporter": {
+              "query": "sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)\n"
             }
-          }
-        },
-        {
-          "apiVersion": "metering.openshift.io/v1alpha1",
-          "kind": "ReportPrometheusQuery",
-          "metadata": {
-            "name": "unready-deployment-replicas"
-          },
-          "spec": {
-            "query": "sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)\n"
           }
         },
         {
@@ -594,11 +584,6 @@ spec:
       displayName: Metering Generation Query
       kind: ReportGenerationQuery
       name: reportgenerationqueries.metering.openshift.io
-      version: v1alpha1
-    - description: A Prometheus query that Metering can use to collect metrics.
-      displayName: Metering Prometheus Query
-      kind: ReportPrometheusQuery
-      name: reportprometheusqueries.metering.openshift.io
       version: v1alpha1
     - description: Used under-the-hood. A resource a database table in Presto. Use by
         ReportGenerationQueries to determine what tables exist, and by the HTTP API to

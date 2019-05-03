@@ -33,8 +33,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ReportDataSourceList{},
 		&ReportGenerationQuery{},
 		&ReportGenerationQueryList{},
-		&ReportPrometheusQuery{},
-		&ReportPrometheusQueryList{},
 		&StorageLocation{},
 		&StorageLocationList{},
 		&PrestoTable{},

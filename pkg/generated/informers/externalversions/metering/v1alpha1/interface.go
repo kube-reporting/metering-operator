@@ -18,8 +18,6 @@ type Interface interface {
 	ReportDataSources() ReportDataSourceInformer
 	// ReportGenerationQueries returns a ReportGenerationQueryInformer.
 	ReportGenerationQueries() ReportGenerationQueryInformer
-	// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
-	ReportPrometheusQueries() ReportPrometheusQueryInformer
 	// StorageLocations returns a StorageLocationInformer.
 	StorageLocations() StorageLocationInformer
 }
@@ -58,11 +56,6 @@ func (v *version) ReportDataSources() ReportDataSourceInformer {
 // ReportGenerationQueries returns a ReportGenerationQueryInformer.
 func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
 	return &reportGenerationQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// ReportPrometheusQueries returns a ReportPrometheusQueryInformer.
-func (v *version) ReportPrometheusQueries() ReportPrometheusQueryInformer {
-	return &reportPrometheusQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // StorageLocations returns a StorageLocationInformer.
