@@ -16,12 +16,12 @@ import (
 )
 
 type ReportQueryTemplateContext struct {
-	Namespace               string
-	Reports                 []*cbTypes.Report
-	ReportQuery             *cbTypes.ReportGenerationQuery
-	ReportGenerationQueries []*cbTypes.ReportGenerationQuery
-	ReportDataSources       []*cbTypes.ReportDataSource
-	PrestoTables            []*cbTypes.PrestoTable
+	Namespace         string
+	Reports           []*cbTypes.Report
+	ReportQuery       *cbTypes.ReportQuery
+	ReportQueries     []*cbTypes.ReportQuery
+	ReportDataSources []*cbTypes.ReportDataSource
+	PrestoTables      []*cbTypes.PrestoTable
 }
 
 type TemplateContext struct {
@@ -68,16 +68,16 @@ func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, err
 	return "", fmt.Errorf("Report %s dependency not found", name)
 }
 
-func (ctx *ReportQueryTemplateContext) renderReportGenerationQuery(name string, tmplCtx TemplateContext) (string, error) {
-	var reportQuery *cbTypes.ReportGenerationQuery
-	for _, q := range ctx.ReportGenerationQueries {
+func (ctx *ReportQueryTemplateContext) renderReportQuery(name string, tmplCtx TemplateContext) (string, error) {
+	var reportQuery *cbTypes.ReportQuery
+	for _, q := range ctx.ReportQueries {
 		if q.Name == name {
 			reportQuery = q
 			break
 		}
 	}
 	if reportQuery == nil {
-		return "", fmt.Errorf("unknown ReportGenerationQuery %s", name)
+		return "", fmt.Errorf("unknown ReportQuery %s", name)
 	}
 
 	// copy context and replace the query we're rendering
@@ -98,10 +98,10 @@ func (ctx *ReportQueryTemplateContext) newQueryTemplate() (*template.Template, e
 		"prometheusMetricPartitionFormat": PrometheusMetricPartitionFormat,
 		"reportTableName":                 ctx.reportTableName,
 		"dataSourceTableName":             ctx.dataSourceTableName,
-		"renderReportGenerationQuery":     ctx.renderReportGenerationQuery,
+		"renderReportQuery":               ctx.renderReportQuery,
 	}
 
-	tmpl, err := template.New("report-generation-query").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(ctx.ReportQuery.Spec.Query)
+	tmpl, err := template.New("reportQueryTemplate").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(ctx.ReportQuery.Spec.Query)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}

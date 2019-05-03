@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-request-raw
   labels:
@@ -56,7 +56,7 @@ spec:
     WHERE element_at(labels, 'volumename') IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-request
   labels:
@@ -120,7 +120,7 @@ spec:
     ORDER BY persistentvolumeclaim, namespace, persistentvolume, storageclass ASC, volume_request_storage_byte_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-persistentvolumeclaim-request
   labels:
@@ -172,7 +172,7 @@ spec:
     ORDER BY volume_request_storage_byte_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-persistentvolumeclaim-request
   labels:

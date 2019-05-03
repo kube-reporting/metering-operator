@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: cluster-cpu-usage-daily
 spec:
-  generationQuery: "cluster-cpu-usage"
+  query: "cluster-cpu-usage"
   # this configures the this report to aggregate the hourly one
   inputs:
   - name: ClusterCpuusageReportName
@@ -18,7 +18,7 @@ kind: Report
 metadata:
   name: cluster-memory-usage-daily
 spec:
-  generationQuery: "cluster-memory-usage"
+  query: "cluster-memory-usage"
   # this configures the this report to aggregate the hourly one
   inputs:
   - name: ClusterMemoryusageReportName

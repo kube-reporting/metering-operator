@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-memory-capacity-raw
   labels:
@@ -47,7 +47,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.NodeCapacityMemoryBytesDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-memory-capacity
   labels:
@@ -93,7 +93,7 @@ spec:
     GROUP BY node, resource_id
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-memory-allocatable-raw
   labels:
@@ -141,7 +141,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.NodeAllocatableMemoryBytesDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-memory-allocatable
   labels:
@@ -187,7 +187,7 @@ spec:
     GROUP BY node, resource_id
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-memory-utilization
   labels:

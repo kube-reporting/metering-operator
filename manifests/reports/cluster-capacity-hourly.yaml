@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: cluster-cpu-capacity-hourly
 spec:
-  generationQuery: "cluster-cpu-capacity"
+  query: "cluster-cpu-capacity"
   schedule:
     period: "hourly"
 
@@ -14,7 +14,7 @@ kind: Report
 metadata:
   name: cluster-memory-capacity-hourly
 spec:
-  generationQuery: "cluster-memory-capacity"
+  query: "cluster-memory-capacity"
   schedule:
     period: "hourly"
 

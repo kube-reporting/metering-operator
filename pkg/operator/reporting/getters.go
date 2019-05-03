@@ -52,24 +52,24 @@ func NewReportClientGetter(getter meteringClient.ReportsGetter) ReportGetter {
 	})
 }
 
-type ReportGenerationQueryGetter interface {
-	GetReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error)
+type ReportQueryGetter interface {
+	GetReportQuery(namespace, name string) (*metering.ReportQuery, error)
 }
 
-type ReportGenerationQueryGetterFunc func(string, string) (*metering.ReportGenerationQuery, error)
+type ReportQueryGetterFunc func(string, string) (*metering.ReportQuery, error)
 
-func (f ReportGenerationQueryGetterFunc) GetReportGenerationQuery(namespace, name string) (*metering.ReportGenerationQuery, error) {
+func (f ReportQueryGetterFunc) GetReportQuery(namespace, name string) (*metering.ReportQuery, error) {
 	return f(namespace, name)
 }
 
-func NewReportGenerationQueryListerGetter(lister meteringListers.ReportGenerationQueryLister) ReportGenerationQueryGetter {
-	return ReportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
-		return lister.ReportGenerationQueries(namespace).Get(name)
+func NewReportQueryListerGetter(lister meteringListers.ReportQueryLister) ReportQueryGetter {
+	return ReportQueryGetterFunc(func(namespace, name string) (*metering.ReportQuery, error) {
+		return lister.ReportQueries(namespace).Get(name)
 	})
 }
 
-func NewReportGenerationQueryClientGetter(getter meteringClient.ReportGenerationQueriesGetter) ReportGenerationQueryGetter {
-	return ReportGenerationQueryGetterFunc(func(namespace, name string) (*metering.ReportGenerationQuery, error) {
-		return getter.ReportGenerationQueries(namespace).Get(name, metav1.GetOptions{})
+func NewReportQueryClientGetter(getter meteringClient.ReportQueriesGetter) ReportQueryGetter {
+	return ReportQueryGetterFunc(func(namespace, name string) (*metering.ReportQuery, error) {
+		return getter.ReportQueries(namespace).Get(name, metav1.GetOptions{})
 	})
 }

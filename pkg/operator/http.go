@@ -49,9 +49,9 @@ type server struct {
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportResultsGetter   prestostore.ReportResultsGetter
 
-	reportLister                listers.ReportLister
-	reportGenerationQueryLister listers.ReportGenerationQueryLister
-	prestoTableLister           listers.PrestoTableLister
+	reportLister      listers.ReportLister
+	reportQueryLister listers.ReportQueryLister
+	prestoTableLister listers.PrestoTableLister
 }
 
 type requestLogger struct {
@@ -69,7 +69,7 @@ func newRouter(
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	reportLister listers.ReportLister,
-	reportGenerationQueryLister listers.ReportGenerationQueryLister,
+	reportQueryLister listers.ReportQueryLister,
 	prestoTableLister listers.PrestoTableLister,
 ) chi.Router {
 	router := chi.NewRouter()
@@ -79,14 +79,14 @@ func newRouter(
 	router.Use(prometheusMiddleware)
 
 	srv := &server{
-		logger:                      logger,
-		rand:                        rand,
-		collectorFunc:               collectorFunc,
-		prometheusMetricsRepo:       prometheusMetricsRepo,
-		reportResultsGetter:         reportResultsGetter,
-		reportLister:                reportLister,
-		reportGenerationQueryLister: reportGenerationQueryLister,
-		prestoTableLister:           prestoTableLister,
+		logger:                logger,
+		rand:                  rand,
+		collectorFunc:         collectorFunc,
+		prometheusMetricsRepo: prometheusMetricsRepo,
+		reportResultsGetter:   reportResultsGetter,
+		reportLister:          reportLister,
+		reportQueryLister:     reportQueryLister,
+		prestoTableLister:     prestoTableLister,
 	}
 
 	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
@@ -194,7 +194,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		}
 	}
 
-	reportQuery, err := srv.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).Get(report.Spec.GenerationQueryName)
+	reportQuery, err := srv.reportQueryLister.ReportQueries(report.Namespace).Get(report.Spec.QueryName)
 	if err != nil {
 		logger.WithError(err).Errorf("error getting report: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
@@ -223,8 +223,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 
 	if !reflect.DeepEqual(queryPrestoColumns, prestoColumns) {
-		logger.Warnf("report columns and table columns don't match, ReportGenerationQuery was likely updated after the report ran")
-		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
+		logger.Warnf("report columns and table columns don't match, ReportQuery was likely updated after the report ran")
+		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
 	tableName := reportingutil.FullyQualifiedTableName(prestoTable)
@@ -248,7 +248,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 }
 
-func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.csv", name))
 	err := writeResultsAsCSV(columns, results, w, ',')
@@ -259,7 +259,7 @@ func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []ap
 	w.WriteHeader(http.StatusOK)
 }
 
-func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []presto.Row, w io.Writer, delimiter rune) error {
+func writeResultsAsCSV(columns []api.ReportQueryColumn, results []presto.Row, w io.Writer, delimiter rune) error {
 	csvWriter := csv.NewWriter(w)
 	csvWriter.Comma = delimiter
 
@@ -312,7 +312,7 @@ func writeResultsAsCSV(columns []api.ReportGenerationQueryColumn, results []pres
 	return csvWriter.Error()
 }
 
-func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/tab-separated-values")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.tsv", name))
 	padding := 2
@@ -339,7 +339,7 @@ func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns 
 	w.WriteHeader(http.StatusOK)
 }
 
-func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s.json", name))
 	newResults := make([]*orderedmap.OrderedMap, len(results))
 	for i, item := range results {
@@ -353,7 +353,7 @@ func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []a
 	writeResponseAsJSON(logger, w, http.StatusOK, newResults)
 }
 
-func writeResultsResponse(logger log.FieldLogger, format, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponse(logger log.FieldLogger, format, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		writeResultsResponseAsJSON(logger, name, columns, results, w, r)
@@ -380,9 +380,9 @@ type ReportResultValues struct {
 }
 
 // convertsToGetReportResults converts Rows returned from `presto.ExecuteSelect` into a GetReportResults
-func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerationQueryColumn) GetReportResults {
+func convertsToGetReportResults(input []presto.Row, columns []api.ReportQueryColumn) GetReportResults {
 	results := GetReportResults{}
-	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
+	columnsMap := make(map[string]api.ReportQueryColumn)
 	for _, column := range columns {
 		columnsMap[column.Name] = column
 	}
@@ -402,9 +402,9 @@ func convertsToGetReportResults(input []presto.Row, columns []api.ReportGenerati
 	return results
 }
 
-func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
-	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
-	var filteredColumns []api.ReportGenerationQueryColumn
+func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	columnsMap := make(map[string]api.ReportQueryColumn)
+	var filteredColumns []api.ReportQueryColumn
 
 	// remove tableHidden columns and their values if the format is tabular or CSV
 
@@ -429,11 +429,11 @@ func writeResultsResponseV1(logger log.FieldLogger, format string, name string, 
 	writeResultsResponse(logger, format, name, filteredColumns, results, w, r)
 }
 
-func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []api.ReportGenerationQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	format = strings.ToLower(format)
 	isTableFormat := format == "csv" || format == "tab" || format == "tabular"
-	columnsMap := make(map[string]api.ReportGenerationQueryColumn)
-	var filteredColumns []api.ReportGenerationQueryColumn
+	columnsMap := make(map[string]api.ReportQueryColumn)
+	var filteredColumns []api.ReportQueryColumn
 
 	// Remove columns and their values from `results` if full is false and the
 	// column's TableHidden is true or if TableHidden is true and we're

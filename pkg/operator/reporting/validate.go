@@ -8,33 +8,33 @@ import (
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
 
-func GetAndValidateGenerationQueryDependencies(
-	queryGetter ReportGenerationQueryGetter,
+func GetAndValidateQueryDependencies(
+	queryGetter ReportQueryGetter,
 	dataSourceGetter ReportDataSourceGetter,
 	reportGetter ReportGetter,
-	generationQuery *metering.ReportGenerationQuery,
-	inputVals []cbTypes.ReportGenerationQueryInputValue,
+	query *metering.ReportQuery,
+	inputVals []cbTypes.ReportQueryInputValue,
 	handler *UninitialiedDependendenciesHandler,
-) (*ReportGenerationQueryDependencies, error) {
-	deps, err := GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, generationQuery, inputVals)
+) (*ReportQueryDependencies, error) {
+	deps, err := GetQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, inputVals)
 	if err != nil {
 		return nil, err
 	}
-	err = ValidateGenerationQueryDependencies(deps, handler)
+	err = ValidateQueryDependencies(deps, handler)
 	if err != nil {
 		return nil, err
 	}
 	return deps, nil
 }
 
-func GetGenerationQueryDependencies(
-	queryGetter ReportGenerationQueryGetter,
+func GetQueryDependencies(
+	queryGetter ReportQueryGetter,
 	dataSourceGetter ReportDataSourceGetter,
 	reportGetter ReportGetter,
-	generationQuery *metering.ReportGenerationQuery,
-	inputVals []cbTypes.ReportGenerationQueryInputValue,
-) (*ReportGenerationQueryDependencies, error) {
-	result, err := NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter).ResolveDependencies(generationQuery.Namespace, generationQuery.Spec.Inputs, inputVals)
+	query *metering.ReportQuery,
+	inputVals []cbTypes.ReportQueryInputValue,
+) (*ReportQueryDependencies, error) {
+	result, err := NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter).ResolveDependencies(query.Namespace, query.Spec.Inputs, inputVals)
 	if err != nil {
 		return nil, err
 	}
@@ -45,11 +45,11 @@ type UninitialiedDependendenciesHandler struct {
 	HandleUninitializedReportDataSource func(*metering.ReportDataSource)
 }
 
-func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies, handler *UninitialiedDependendenciesHandler) error {
-	// if the specified ReportGenerationQuery depends on datasources without a
+func ValidateQueryDependencies(deps *ReportQueryDependencies, handler *UninitialiedDependendenciesHandler) error {
+	// if the specified ReportQuery depends on datasources without a
 	// table, it's invalid
 	var uninitializedDataSources []*metering.ReportDataSource
-	validationErr := new(reportGenerationQueryDependenciesValidationError)
+	validationErr := new(reportQueryDependenciesValidationError)
 	// anything below missing tableName in it's status is uninitialized
 	for _, ds := range deps.ReportDataSources {
 		if ds.Status.TableRef.Name == "" {
@@ -76,22 +76,22 @@ func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies
 }
 
 func IsUninitializedDependencyError(err error) bool {
-	validationErr, ok := err.(*reportGenerationQueryDependenciesValidationError)
+	validationErr, ok := err.(*reportQueryDependenciesValidationError)
 	return ok && (len(validationErr.uninitializedDataSourceNames) != 0 || len(validationErr.uninitializedReportNames) != 0)
 
 }
 
 func IsInvalidDependencyError(err error) bool {
-	_, ok := err.(*reportGenerationQueryDependenciesValidationError)
+	_, ok := err.(*reportQueryDependenciesValidationError)
 	return ok
 }
 
-type reportGenerationQueryDependenciesValidationError struct {
+type reportQueryDependenciesValidationError struct {
 	uninitializedDataSourceNames,
 	uninitializedReportNames []string
 }
 
-func (e *reportGenerationQueryDependenciesValidationError) Error() string {
+func (e *reportQueryDependenciesValidationError) Error() string {
 	var errs []string
 	if len(e.uninitializedDataSourceNames) != 0 {
 		errs = append(errs, fmt.Sprintf("uninitialized ReportDataSource dependencies: %s", strings.Join(e.uninitializedDataSourceNames, ", ")))
@@ -100,7 +100,7 @@ func (e *reportGenerationQueryDependenciesValidationError) Error() string {
 		errs = append(errs, fmt.Sprintf("uninitialized Report dependencies: %s", strings.Join(e.uninitializedReportNames, ", ")))
 	}
 	if len(errs) != 0 {
-		return fmt.Sprintf("ReportGenerationQueryDependencyValidationError: %s", strings.Join(errs, ", "))
+		return fmt.Sprintf("ReportQueryDependencyValidationError: %s", strings.Join(errs, ", "))
 	}
 	panic("zero uninitialized or invalid dependencies")
 }

@@ -11,8 +11,8 @@ import (
 	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
-func TestValidateGenerationQueryDependencies(t *testing.T) {
-	// reportQuery := testhelpers.NewReportGenerationQuery("uninitialized-query", "default", nil)
+func TestValidateQueryDependencies(t *testing.T) {
+	// reportQuery := testhelpers.NewReportQuery("uninitialized-query", "default", nil)
 	dataSourceTableUnset := testhelpers.NewReportDataSource("uninitialized-datasource", "default")
 	dataSourceTableSet := testhelpers.NewReportDataSource("initialized-datasource", "default")
 	dataSourceTableSet.Status.TableRef.Name = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
@@ -36,51 +36,51 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		deps      ReportGenerationQueryDependencies
+		deps      ReportQueryDependencies
 		expectErr bool
 	}{
 		"no dependencies results in no errors": {
-			deps: ReportGenerationQueryDependencies{},
+			deps: ReportQueryDependencies{},
 		},
-		"ReportGenerationQueryDependencies dependencies on other queries is valid": {
-			deps: ReportGenerationQueryDependencies{
-				// ReportGenerationQueries: initializedQueries,
+		"ReportQueryDependencies dependencies on other queries is valid": {
+			deps: ReportQueryDependencies{
+				// ReportQueries: initializedQueries,
 			},
 		},
 		"ReportDataSource dependencies with status.tableRef.name unset is a validation error": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				ReportDataSources: uninitializedDataSources,
 			},
 			expectErr: true,
 		},
 		"ReportDataSource dependencies with status.tableRef.name set is valid": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				ReportDataSources: initializedDataSources,
 			},
 		},
 		"Report dependencies with status.tableRef.name unset is a validation error": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				Reports: uninitializedReports,
 			},
 			expectErr: true,
 		},
 		"Report dependencies with status.tableRef.name set is valid": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				Reports: initializedReports,
 			},
 		},
 		"mixing valid and invalid dependencies is a validation error": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				Reports: uninitializedReports,
-				// ReportGenerationQueries: initializedQueries,
+				// ReportQueries: initializedQueries,
 				ReportDataSources: uninitializedDataSources,
 			},
 			expectErr: true,
 		},
 		"mixing valid dependencies is a valid": {
-			deps: ReportGenerationQueryDependencies{
+			deps: ReportQueryDependencies{
 				Reports: uninitializedReports,
-				// ReportGenerationQueries: initializedQueries,
+				// ReportQueries: initializedQueries,
 				ReportDataSources: initializedDataSources,
 			},
 			expectErr: true,
@@ -91,7 +91,7 @@ func TestValidateGenerationQueryDependencies(t *testing.T) {
 		testName := testName
 		tt := tt
 		t.Run(testName, func(t *testing.T) {
-			err := ValidateGenerationQueryDependencies(&tt.deps, nil)
+			err := ValidateQueryDependencies(&tt.deps, nil)
 			if tt.expectErr {
 				assert.NotNil(t, err, "expected a validation error")
 			} else {

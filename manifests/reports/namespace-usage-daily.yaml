@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: namespace-memory-usage-daily
 spec:
-  generationQuery: "namespace-memory-usage"
+  query: "namespace-memory-usage"
   schedule:
     period: "daily"
 
@@ -14,6 +14,6 @@ kind: Report
 metadata:
   name: namespace-cpu-usage-daily
 spec:
-  generationQuery: "namespace-cpu-usage"
+  query: "namespace-cpu-usage"
   schedule:
     period: "daily"

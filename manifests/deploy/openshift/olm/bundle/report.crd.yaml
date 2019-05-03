@@ -16,7 +16,7 @@ spec:
   additionalPrinterColumns:
   - name: Query
     type: string
-    JSONPath: .spec.generationQuery
+    JSONPath: .spec.query
   - name: Schedule
     type: string
     JSONPath: .spec.schedule.period

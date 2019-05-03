@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-request-raw
   labels:
@@ -52,7 +52,7 @@ spec:
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-usage-raw
   labels:
@@ -105,7 +105,7 @@ spec:
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-request
   labels:
@@ -165,7 +165,7 @@ spec:
     ORDER BY namespace, pod, node ASC, pod_request_memory_byte_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-usage
   labels:
@@ -225,7 +225,7 @@ spec:
     ORDER BY namespace, pod, node ASC, pod_usage_memory_byte_seconds DESC
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-memory-request
   labels:
@@ -289,7 +289,7 @@ spec:
     {|- end |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-memory-usage
   labels:
@@ -353,7 +353,7 @@ spec:
     {|- end |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: namespace-memory-utilization
   labels:
@@ -395,21 +395,21 @@ spec:
   - name: ClusterMemoryCapacityReportName
     type: Report
   - name: NamespaceMemoryRequestQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: namespace-memory-request
   - name: NamespaceMemoryUsageQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: namespace-memory-usage
   - name: ClusterMemoryCapacityQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-memory-capacity
   query: |
     WITH cluster_memory_capacity AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterMemoryCapacityQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterMemoryCapacityQueryName . |}
     ), namespace_memory_usage AS (
-      {| renderReportGenerationQuery .Report.Inputs.NamespaceMemoryUsageQueryName . |}
+      {| renderReportQuery .Report.Inputs.NamespaceMemoryUsageQueryName . |}
     ), namespace_memory_request AS (
-      {| renderReportGenerationQuery .Report.Inputs.NamespaceMemoryRequestQueryName . |}
+      {| renderReportQuery .Report.Inputs.NamespaceMemoryRequestQueryName . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,

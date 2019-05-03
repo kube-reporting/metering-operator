@@ -36,9 +36,9 @@ type ReportDataSourceSpec struct {
 	// PrestoTable CR.
 	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
 
-	// GenerationQueryView  represents a datasource which creates a Presto
-	// view from a ReportGenerationQuery
-	GenerationQueryView *GenerationQueryViewDataSource `json:"generationQueryView,omitempty"`
+	// ReportQueryView  represents a datasource which creates a Presto
+	// view from a ReportQuery
+	ReportQueryView *ReportQueryViewDataSource `json:"reportQueryView,omitempty"`
 }
 
 type AWSBillingDataSource struct {
@@ -73,13 +73,13 @@ type PrestoTableDataSource struct {
 	TableRef v1.LocalObjectReference `json:"tableRef"`
 }
 
-type GenerationQueryViewDataSource struct {
-	// QueryName specifies the ReportGenerationQuery to execute when the report
+type ReportQueryViewDataSource struct {
+	// QueryName specifies the ReportQuery to execute when the report
 	// runs.
 	QueryName string `json:"queryName"`
-	// Inputs are the inputs to the ReportGenerationQuery
-	Inputs  ReportGenerationQueryInputValues `json:"inputs,omitempty"`
-	Storage *StorageLocationRef              `json:"storage,omitempty"`
+	// Inputs are the inputs to the ReportQuery
+	Inputs  ReportQueryInputValues `json:"inputs,omitempty"`
+	Storage *StorageLocationRef    `json:"storage,omitempty"`
 }
 
 type ReportDataSourceStatus struct {

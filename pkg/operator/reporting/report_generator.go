@@ -15,9 +15,9 @@ const (
 )
 
 var (
-	errInvalidTableName                 = errors.New("tableName cannot be empty")
-	errInvalidReportGenerationQueryName = errors.New("reportGenerationQuery cannot be empty")
-	errEmptyQueryField                  = errors.New("ReportGenerationQuery spec.query cannot be empty")
+	errInvalidTableName       = errors.New("tableName cannot be empty")
+	errInvalidReportQueryName = errors.New("reportQuery cannot be empty")
+	errEmptyQueryField        = errors.New("ReportQuery spec.query cannot be empty")
 )
 
 type ReportGenerator interface {
@@ -53,7 +53,7 @@ func (g *reportGenerator) GenerateReport(tableName, query string, deleteExisting
 		}
 	}
 
-	logger.Debugf("StoreReportResults: executing ReportGenerationQuery")
+	logger.Debugf("StoreReportResults: executing ReportQuery")
 	err := g.reportResultsRepo.StoreReportResults(tableName, query)
 	if err != nil {
 		logger.WithError(err).Errorf("creating usage report FAILED!")

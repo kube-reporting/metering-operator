@@ -64,17 +64,17 @@ func TruncateToMinute(t time.Time) time.Time {
 	return t.Truncate(time.Minute)
 }
 
-func GenerateHiveColumns(genQuery *cbTypes.ReportGenerationQuery) []hive.Column {
+func GenerateHiveColumns(query *cbTypes.ReportQuery) []hive.Column {
 	var columns []hive.Column
-	for _, col := range genQuery.Spec.Columns {
+	for _, col := range query.Spec.Columns {
 		columns = append(columns, hive.Column{Name: col.Name, Type: col.Type})
 	}
 	return columns
 }
 
-func GeneratePrestoColumns(genQuery *cbTypes.ReportGenerationQuery) []presto.Column {
+func GeneratePrestoColumns(query *cbTypes.ReportQuery) []presto.Column {
 	var columns []presto.Column
-	for _, col := range genQuery.Spec.Columns {
+	for _, col := range query.Spec.Columns {
 		columns = append(columns, presto.Column{Name: col.Name, Type: col.Type})
 	}
 	return columns

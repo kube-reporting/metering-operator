@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-capacity-raw
   labels:
@@ -46,7 +46,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimCapacityBytesDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-capacity
   labels:
