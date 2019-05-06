@@ -91,9 +91,13 @@ func (f *fakeReportResultsGetter) GetReportResults(tableName string, columns []p
 }
 
 func TestAPIV1ReportsGet(t *testing.T) {
-	const namespace = "default"
-	const testReportName = "test-report"
-	const testQueryName = "test-query"
+	const (
+		namespace       = "default"
+		testReportName  = "test-report"
+		testQueryName   = "test-query"
+		testCatalogName = "hive"
+		testSchemaName  = "default"
+	)
 	reportStart := &time.Time{}
 	reportEndTmp := reportStart.AddDate(0, 1, 0)
 	reportEnd := &reportEndTmp
@@ -125,7 +129,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -154,7 +158,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -194,7 +198,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -239,7 +243,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 					Type: "double",
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -357,10 +361,14 @@ func TestAPIV1ReportsGet(t *testing.T) {
 }
 
 func TestAPIV2ReportsFull(t *testing.T) {
-	const namespace = "default"
-	const testReportName = "test-report"
-	const testQueryName = "test-query"
-	const testFormat = "?format=json"
+	const (
+		namespace       = "default"
+		testReportName  = "test-report"
+		testQueryName   = "test-query"
+		testFormat      = "?format=json"
+		testCatalogName = "hive"
+		testSchemaName  = "default"
+	)
 	reportStart := &time.Time{}
 	reportEndTmp := reportStart.AddDate(0, 1, 0)
 	reportEnd := &reportEndTmp
@@ -398,7 +406,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -448,7 +456,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -479,7 +487,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -546,7 +554,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -639,10 +647,14 @@ func TestAPIV2ReportsFull(t *testing.T) {
 }
 
 func TestAPIV2ReportsTable(t *testing.T) {
-	const namespace = "default"
-	const testReportName = "test-report"
-	const testQueryName = "test-query"
-	const testFormat = "?format=json"
+	const (
+		namespace       = "default"
+		testReportName  = "test-report"
+		testQueryName   = "test-query"
+		testFormat      = "?format=json"
+		testCatalogName = "hive"
+		testSchemaName  = "default"
+	)
 	reportStart := &time.Time{}
 	reportEndTmp := reportStart.AddDate(0, 1, 0)
 	reportEnd := &reportEndTmp
@@ -681,7 +693,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 				},
 			},
 			),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -732,7 +744,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -763,7 +775,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -830,7 +842,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 					TableHidden: false,
 				},
 			}),
-			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, []presto.Column{
+			prestoTable: testhelpers.NewPrestoTable(testReportName, namespace, testCatalogName, testSchemaName, []presto.Column{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
