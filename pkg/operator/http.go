@@ -227,7 +227,12 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	if err != nil {
+		logger.WithError(err).Errorf("prestoTable contains invalid Status ***REMOVED***elds")
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid prestoTable.Status ***REMOVED***elds: %v", err)
+		return
+	}
 	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")

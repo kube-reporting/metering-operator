@@ -207,7 +207,10 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 				"reportDataSource": reportDataSource.Name,
 				"tableName":        prestoTable.Status.TableName,
 			})
-			importCfg := op.newPromImporterCfg(reportDataSource, reportDataSource.Spec.PrometheusMetricsImporter.Query, prestoTable)
+			importCfg, err := op.newPromImporterCfg(reportDataSource, reportDataSource.Spec.PrometheusMetricsImporter.Query, prestoTable)
+			if err != nil {
+				return err
+			}
 			// ignore any global ImportFrom con***REMOVED***guration since this is an
 			// on-demand import
 			importCfg.ImportFromTime = nil
@@ -270,7 +273,7 @@ func (op *Reporting) getQueryIntervalForReportDataSource(reportDataSource *cbTyp
 	return queryInterval
 }
 
-func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, query string, prestoTable *cbTypes.PrestoTable) prestostore.Con***REMOVED***g {
+func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSource, query string, prestoTable *cbTypes.PrestoTable) (prestostore.Con***REMOVED***g, error) {
 	chunkSize := op.cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration
 	stepSize := op.cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration
 
@@ -301,7 +304,10 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 	// it would take to chunk up our MaxQueryRangeDuration.
 	defaultMaxPromTimeRanges := int64(op.cfg.PrometheusDataSourceMaxQueryRangeDuration / chunkSize)
 
-	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	if err != nil {
+		return prestostore.Con***REMOVED***g{}, err
+	}
 
 	return prestostore.Con***REMOVED***g{
 		PrometheusQuery:           query,
@@ -312,7 +318,7 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *cbTypes.ReportDataSour
 		MaxQueryRangeDuration:     op.cfg.PrometheusDataSourceMaxQueryRangeDuration,
 		MaxBack***REMOVED***llImportDuration: op.cfg.PrometheusDataSourceMaxBack***REMOVED***llImportDuration,
 		ImportFromTime:            op.cfg.PrometheusDataSourceGlobalImportFromTime,
-	}
+	}, nil
 }
 
 func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *cbTypes.ReportDataSource, prestoTable *cbTypes.PrestoTable, cfg prestostore.Con***REMOVED***g) (*prestostore.PrometheusImporter, error) {
