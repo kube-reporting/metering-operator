@@ -34,18 +34,3 @@ func (op *Reporting) readinessHandler(w http.ResponseWriter, r *http.Request) {
 
 	writeResponseAsJSON(logger, w, http.StatusOK, statusResponse{Status: "ok"})
 }
-
-// healthinessHandler is the health check for the metering operator. If this
-// fails, the process will be restarted.
-func (op *Reporting) healthinessHandler(w http.ResponseWriter, r *http.Request) {
-	logger := newRequestLogger(op.logger, r, op.rand)
-	if !op.testWriteToPrestoFunc() {
-		writeResponseAsJSON(logger, w, http.StatusInternalServerError,
-			statusResponse{
-				Status:  "not healthy",
-				Details: "cannot write to PrestoDB",
-			})
-		return
-	}
-	writeResponseAsJSON(logger, w, http.StatusOK, statusResponse{Status: "ok"})
-}

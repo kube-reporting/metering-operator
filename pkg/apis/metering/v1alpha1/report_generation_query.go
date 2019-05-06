@@ -6,6 +6,8 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var ReportGenerationQueryGVK = SchemeGroupVersion.WithKind("ReportGenerationQuery")
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type ReportGenerationQueryList struct {
@@ -26,14 +28,9 @@ type ReportGenerationQuery struct {
 }
 
 type ReportGenerationQuerySpec struct {
-	Columns              []ReportGenerationQueryColumn          `json:"columns"`
-	Query                string                                 `json:"query"`
-	View                 GenQueryView                           `json:"view"`
-	ReportQueries        []string                               `json:"reportQueries,omitempty"`
-	DynamicReportQueries []string                               `json:"dynamicReportQueries,omitempty"`
-	DataSources          []string                               `json:"reportDataSources,omitempty"`
-	Reports              []string                               `json:"reports,omitempty"`
-	Inputs               []ReportGenerationQueryInputDefinition `json:"inputs,omitempty"`
+	Columns []ReportGenerationQueryColumn          `json:"columns"`
+	Query   string                                 `json:"query"`
+	Inputs  []ReportGenerationQueryInputDefinition `json:"inputs,omitempty"`
 }
 
 type ReportGenerationQueryColumn struct {
@@ -43,16 +40,11 @@ type ReportGenerationQueryColumn struct {
 	Unit        string `json:"unit,omitempty"`
 }
 
-type GenQueryView struct {
-	// Disabled controls whether or not to create a view in presto for this
-	// ReportGenerationQuery
-	Disabled bool `json:"disabled"`
-}
-
 type ReportGenerationQueryInputDefinition struct {
-	Name     string `json:"name"`
-	Required bool   `json:"required"`
-	Type     string `json:"type,omitempty"`
+	Name     string           `json:"name"`
+	Required bool             `json:"required"`
+	Type     string           `json:"type,omitempty"`
+	Default  *json.RawMessage `json:"default,omitempty"`
 }
 
 type ReportGenerationQueryInputValue struct {
@@ -63,7 +55,4 @@ type ReportGenerationQueryInputValue struct {
 type ReportGenerationQueryInputValues []ReportGenerationQueryInputValue
 
 type ReportGenerationQueryStatus struct {
-	// ViewName is the name of the view in Presto for this query, if the view
-	// has been created. If it is empty, the view does not exist.
-	ViewName string `json:"viewName,omitempty"`
 }

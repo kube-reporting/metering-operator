@@ -69,9 +69,9 @@ func init() {
 	startCmd.Flags().BoolVar(&cfg.AllNamespaces, "all-namespaces", false, "if true, reporting-operator monitors all namespaces.")
 	startCmd.Flags().StringSliceVar(&cfg.TargetNamespaces, "target-namespaces", nil, "the namespaces for reporting-operator to watch for resources, if empty defaults to the value of --namespace, or all namespaces if --all-namespaces is specified.")
 
-	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "0.0.0.0:8080", "ip:port to listen on for the httpAPI")
-	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "0.0.0.0:8082", "ip:port to listen on for the httpAPI")
-	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the httpAPI")
+	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "127.0.0.1:8080", "ip:port to listen on for the reporting API")
+	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "127.0.0.1:8082", "ip:port to listen on for Prometheus metrics")
+	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the pprof debug info")
 
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
@@ -85,7 +85,6 @@ func init() {
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data definition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
 	startCmd.Flags().BoolVar(&cfg.EnableFinalizers, "enable-finalizers", false, "If enabled, then finalizers will be set on some resources to ensure the reporting-operator is able to perform cleanup before the resource is deleted from the API")
-	startCmd.Flags().BoolVar(&cfg.DisableWriteHealthCheck, "disable-write-health-check", false, "if true, the reporting-operator will not attempt to write to presto as a health check")
 
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.QueryInterval.Duration, "promsum-interval", operator.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
 	startCmd.Flags().DurationVar(&cfg.PrometheusQueryConfig.StepSize.Duration, "promsum-step-size", operator.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")

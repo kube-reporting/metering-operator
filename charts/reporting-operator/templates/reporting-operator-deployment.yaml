@@ -1,3 +1,8 @@
+{{/* When using TLS but set probes to use https */}}
+{{- if .Values.spec.config.tls.enabled -}}
+{{- $_ := set .Values.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
+{{- $_ := set .Values.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -226,6 +231,16 @@ spec:
               name: reporting-operator-config
               key: target-namespaces
               optional: true
+        - name: REPORTING_OPERATOR_API_LISTEN
+{{- if .Values.spec.authProxy.enabled }}
+          value: 127.0.0.1:8080
+{{- else }}
+          value: 0.0.0.0:8080
+{{- end }}
+        - name: REPORTING_OPERATOR_METRICS_LISTEN
+          value: 0.0.0.0:8082
+        - name: REPORTING_OPERATOR_PPROF_LISTEN
+          value: 127.0.0.1:6060
         resources:
 {{ toYaml .Values.spec.resources | indent 10 }}
         ports:
@@ -235,14 +250,13 @@ spec:
           containerPort: 6060
         - name: "metrics"
           containerPort: 8082
-{{- if and .Values.spec.config.tls.enabled (not .Values.spec.authProxy.enabled) -}}
-{{- $_ := set .Values.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
-{{- $_ := set .Values.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
-{{- end }}
+{{/* When using auth-proxy, disable probes against the reporting-operator pod since we'll listen on localhost, and we'll configure to probe the auth proxy pod instead */}}
+{{- if not .Values.spec.authProxy.enabled }}
         readinessProbe:
 {{ toYaml .Values.spec.readinessProbe | indent 10 }}
         livenessProbe:
 {{ toYaml .Values.spec.livenessProbe | indent 10 }}
+{{- end }}
         volumeMounts:
 {{- if .Values.spec.config.tls.enabled }}
         - name: api-tls
@@ -272,7 +286,7 @@ spec:
         - -provider=openshift
         - -https-address=:8081
         - -http-address=
-        - -upstream=http://localhost:8080
+        - -upstream=http://127.0.0.1:8080
         - -htpasswd-file=/etc/proxy/htpasswd/auth
         - -tls-cert=/etc/tls/tls.crt
         - -tls-key=/etc/tls/tls.key
@@ -295,6 +309,13 @@ spec:
 {{- if .Values.spec.authProxy.delegateURLsEnabled }}
         - '-openshift-delegate-urls={{- .Values.spec.authProxy.delegateURLsPolicy | trim -}}'
 {{- end }}
+{{/* When using the auth-proxy, configure liveness probes correctly to communicate with the proxy using the auth-proxy port */}}
+{{- $_ := set .Values.spec.readinessProbe.httpGet "port" 8081 }}
+{{- $_ := set .Values.spec.livenessProbe.httpGet "port" 8081 }}
+        readinessProbe:
+{{ toYaml .Values.spec.readinessProbe | indent 10 }}
+        livenessProbe:
+{{ toYaml .Values.spec.livenessProbe | indent 10 }}
         ports:
         - name: auth-proxy
           containerPort: 8081

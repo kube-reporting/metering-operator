@@ -18,6 +18,7 @@ import (
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
@@ -245,9 +246,9 @@ func isReportFinished(logger log.FieldLogger, report *cbTypes.Report) bool {
 func validateReport(
 	report *cbTypes.Report,
 	queryGetter reporting.ReportGenerationQueryGetter,
-	reportDataSourceGetter reporting.ReportDataSourceGetter,
-	reportGetter reporting.ReportGetter, handler *reporting.UninitialiedDependendenciesHandler,
-) (*cbTypes.ReportGenerationQuery, *reporting.ReportGenerationQueryDependencies, error) {
+	depResolver DependencyResolver,
+	handler *reporting.UninitialiedDependendenciesHandler,
+) (*cbTypes.ReportGenerationQuery, *reporting.DependencyResolutionResult, error) {
 	// Validate the ReportGenerationQuery is set
 	if report.Spec.GenerationQueryName == "" {
 		return nil, nil, errors.New("must set spec.generationQuery")
@@ -272,18 +273,19 @@ func validateReport(
 	}
 
 	// Validate the dependencies of this Report's query exist
-	queryDependencies, err := reporting.GetAndValidateGenerationQueryDependencies(
-		queryGetter,
-		reportDataSourceGetter,
-		reportGetter,
-		genQuery,
-		handler,
-	)
+	dependencyResult, err := depResolver.ResolveDependencies(
+		genQuery.Namespace,
+		genQuery.Spec.Inputs,
+		report.Spec.Inputs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to resolve ReportGenerationQuery dependencies %s: %v", genQuery.Name, err)
+	}
+	err = reporting.ValidateGenerationQueryDependencies(dependencyResult.Dependencies, handler)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to validate ReportGenerationQuery dependencies %s: %v", genQuery.Name, err)
 	}
 
-	return genQuery, queryDependencies, nil
+	return genQuery, dependencyResult, nil
 }
 
 // getReportPeriod determines a Report's reporting period based off the report parameter's fields.
@@ -349,11 +351,9 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
 	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
-	reportDataSourceGetter := reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister)
-	reportGetter := reporting.NewReportListerGetter(op.reportLister)
 
 	// validate that Report contains valid Spec fields
-	genQuery, queryDependencies, err := validateReport(report, queryGetter, reportDataSourceGetter, reportGetter, op.uninitialiedDependendenciesHandler())
+	genQuery, dependencyResult, err := validateReport(report, queryGetter, op.dependencyResolver, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		return op.setReportStatusInvalidReport(report, err.Error())
 	}
@@ -371,6 +371,107 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		"periodEnd":         reportPeriod.periodEnd,
 		"overwriteExisting": report.Spec.OverwriteExistingData,
 	})
+
+	// create the table before we check to see if the report has dependencies
+	// that are missing data
+	var prestoTable *cbTypes.PrestoTable
+	// if tableName isn't set, this report is still new and we should make sure
+	// no tables exist already in case of a previously failed cleanup.
+	if report.Status.TableRef.Name != "" {
+		prestoTable, err = op.prestoTableLister.PrestoTables(report.Namespace).Get(report.Status.TableRef.Name)
+		if err != nil {
+			return fmt.Errorf("unable to get PrestoTable %s for Report %s, %s", report.Status.TableRef, report.Name, err)
+		}
+		logger.Infof("Report %s table already exists, tableName: %s", report.Name, prestoTable.Status.TableName)
+	} else {
+		tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
+		hiveStorage, err := op.getHiveStorage(report.Spec.Output, report.Namespace)
+		if err != nil {
+			return fmt.Errorf("storage incorrectly configured for Report %s, err: %v", report.Name, err)
+		}
+		if hiveStorage.Status.Hive.DatabaseName == "" {
+			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
+		}
+
+		cols, err := reportingutil.PrestoColumnsToHiveColumns(reportingutil.GeneratePrestoColumns(genQuery))
+		if err != nil {
+			return fmt.Errorf("unable to convert Presto columns to Hive columns: %s", err)
+		}
+
+		params := hive.TableParameters{
+			Database: hiveStorage.Status.Hive.DatabaseName,
+			Name:     tableName,
+			Columns:  cols,
+		}
+		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
+			params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
+			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
+		}
+
+		logger.Infof("creating table %s", tableName)
+		hiveTable, err := op.createHiveTableCR(report, cbTypes.ReportGVK, params, false, nil)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 20*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
+		}
+
+		logger.Infof("created table %s", tableName)
+		dataSourceName := fmt.Sprintf("report-%s", report.Name)
+		logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, prestoTable.Status.TableName)
+		ownerRef := metav1.NewControllerRef(prestoTable, cbTypes.PrestoTableGVK)
+		newReportDataSource := &cbTypes.ReportDataSource{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "ReportDataSource",
+				APIVersion: cbTypes.ReportDataSourceGVK.GroupVersion().String(),
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      dataSourceName,
+				Namespace: prestoTable.Namespace,
+				Labels:    prestoTable.ObjectMeta.Labels,
+				OwnerReferences: []metav1.OwnerReference{
+					*ownerRef,
+				},
+			},
+			Spec: cbTypes.ReportDataSourceSpec{
+				PrestoTable: &cbTypes.PrestoTableDataSource{
+					TableRef: v1.LocalObjectReference{
+						Name: prestoTable.Name,
+					},
+				},
+			},
+		}
+		_, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Create(newReportDataSource)
+		if err != nil {
+			if apierrors.IsAlreadyExists(err) {
+				logger.Infof("ReportDataSource %s already exists", dataSourceName)
+			} else {
+				return fmt.Errorf("error creating PrestoTable ReportDataSource %s: %s", dataSourceName, err)
+			}
+		}
+		logger.Infof("created PrestoTable ReportDataSource %s", dataSourceName)
+
+		report.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
+		report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+		if err != nil {
+			logger.WithError(err).Errorf("unable to update Report status with tableName")
+			return err
+		}
+
+		// queue dependents so that they're aware the table now exists
+		if err := op.queueDependentReportGenerationQueriesForReport(report); err != nil {
+			logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of Report %s", report.Name)
+		}
+		if err := op.queueDependentReportsForReport(report); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of Report %s", report.Name)
+		}
+	}
 
 	var runningMsg, runningReason string
 	if report.Spec.RunImmediately {
@@ -400,10 +501,13 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return nil
 		}
 
+		runningReason = cbutil.ScheduledReason
+		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+
 		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
 		// Validate all ReportDataSources that the Report depends on have indicated
 		// they have data available that covers the current reportPeriod.
-		for _, dataSource := range queryDependencies.ReportDataSources {
+		for _, dataSource := range dependencyResult.Dependencies.ReportDataSources {
 			if dataSource.Spec.Promsum != nil {
 				// queue the dataSource and store the list of reports so we can
 				// add information to the Report's status on what's currently
@@ -433,8 +537,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// Validate all sub-reports that the Report depends on have reported on the
 		// current reportPeriod
 		var unmetReportDependendencies []string
-		for _, subReport := range queryDependencies.Reports {
-			if subReport.Status.LastReportTime != nil || subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
+		for _, subReport := range dependencyResult.Dependencies.Reports {
+			if subReport.Status.LastReportTime != nil && subReport.Status.LastReportTime.Time.Before(reportPeriod.periodEnd) {
 				op.enqueueReport(subReport)
 				unmetReportDependendencies = append(unmetReportDependendencies, subReport.Name)
 			}
@@ -477,9 +581,6 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			_, err := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
 			return err
 		}
-
-		runningReason = cbutil.ScheduledReason
-		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 	}
 	logger.Infof(runningMsg + " Running now.")
 
@@ -488,36 +589,53 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return err
 	}
 
-	tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
-	// if tableName isn't set, this report is still new and we should make sure
-	// no tables exist already in case of a previously failed cleanup.
-	if report.Status.TableName == "" {
-		logger.Debugf("dropping table %s", tableName)
-		err = op.tableManager.DropTable(tableName, true)
-		if err != nil {
-			return fmt.Errorf("unable to drop table %s before creating for Report %s: %v", tableName, report.Name, err)
-		}
+	prestoTables, err := op.prestoTableLister.PrestoTables(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
 
-		columns := reportingutil.GenerateHiveColumns(genQuery)
-		err = op.createTableForStorage(logger, report, cbTypes.SchemeGroupVersion.WithKind("Report"), report.Spec.Output, tableName, columns, nil)
-		if err != nil {
-			logger.WithError(err).Error("error creating report table for report")
-			return err
-		}
+	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
 
-		report.Status.TableName = tableName
-		report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
-		if err != nil {
-			logger.WithError(err).Errorf("unable to update Report status with tableName")
-			return err
-		}
+	datasources, err := op.reportDataSourceLister.ReportDataSources(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	queries, err := op.reportGenerationQueryLister.ReportGenerationQueries(report.Namespace).List(labels.Everything())
+	if err != nil {
+		return err
+	}
+
+	queryCtx := &reporting.ReportQueryTemplateContext{
+		Namespace:               report.Namespace,
+		ReportQuery:             genQuery,
+		Reports:                 reports,
+		ReportGenerationQueries: queries,
+		ReportDataSources:       datasources,
+		PrestoTables:            prestoTables,
+	}
+	tmplCtx := reporting.TemplateContext{
+		Report: reporting.ReportTemplateInfo{
+			ReportingStart: &reportPeriod.periodStart,
+			ReportingEnd:   &reportPeriod.periodEnd,
+			Inputs:         dependencyResult.InputValues,
+		},
+	}
+
+	// Render the query template
+	query, err := reporting.RenderQuery(queryCtx, tmplCtx)
+	if err != nil {
+		return err
 	}
 
 	metricLabels := prometheus.Labels{
 		"report":                report.Name,
 		"namespace":             report.Namespace,
 		"reportgenerationquery": report.Spec.GenerationQueryName,
-		"table_name":            tableName,
+		"table_name":            prestoTable.Status.TableName,
 	}
 
 	genReportTotalCounter := generateReportTotalCounter.With(metricLabels)
@@ -528,19 +646,10 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	err = op.reportGenerator.GenerateReport(
-		tableName,
-		report.Namespace,
-		&reportPeriod.periodStart,
-		&reportPeriod.periodEnd,
-		genQuery,
-		queryDependencies.DynamicReportGenerationQueries,
-		report.Spec.Inputs,
-		report.Spec.OverwriteExistingData,
-	)
+	tableName := reportingutil.FullyQualifiedTableName(prestoTable)
+	err = op.reportGenerator.GenerateReport(tableName, query, report.Spec.OverwriteExistingData)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))
-
 	if err != nil {
 		genReportFailedCounter.Inc()
 		// update the status to Failed with message containing the
@@ -678,29 +787,6 @@ func reportNeedsFinalizer(report *cbTypes.Report) bool {
 	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil)
 }
 
-// queueDependentReportGenerationQueriesForReport will queue all
-// ReportGenerationQueries in the namespace which have a dependency on the
-// report
-func (op *Reporting) queueDependentReportGenerationQueriesForReport(report *cbTypes.Report) error {
-	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(report.Namespace)
-	queries, err := queryLister.List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, query := range queries.Items {
-		// look at the list Report of dependencies
-		for _, dependency := range query.Spec.Reports {
-			if dependency == report.Name {
-				// this query depends on the Report passed in
-				op.enqueueReportGenerationQuery(query)
-				break
-			}
-		}
-	}
-	return nil
-}
-
 func (op *Reporting) updateReportStatus(report *cbTypes.Report, cond *cbTypes.ReportCondition) (*cbTypes.Report, error) {
 	cbutil.SetReportCondition(&report.Status, *cond)
 	return op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
@@ -714,7 +800,7 @@ func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg st
 		return nil
 	}
 
-	logger.Errorf("Report %s failed validation: %s", report.Name, msg)
+	logger.Warnf("Report %s failed validation: %s", report.Name, msg)
 	cond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.InvalidReportReason, msg)
 	_, err := op.updateReportStatus(report, cond)
 	return err
@@ -726,18 +812,7 @@ func GetReportGenerationQueryForReport(report *cbTypes.Report, queryGetter repor
 }
 
 func (op *Reporting) getReportDependencies(report *cbTypes.Report) (*reporting.ReportGenerationQueryDependencies, error) {
-	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
-
-	genQuery, err := GetReportGenerationQueryForReport(report, queryGetter)
-	if err != nil {
-		return nil, err
-	}
-	return reporting.GetGenerationQueryDependencies(
-		queryGetter,
-		reporting.NewReportDataSourceListerGetter(op.reportDataSourceLister),
-		reporting.NewReportListerGetter(op.reportLister),
-		genQuery,
-	)
+	return op.getGenerationQueryDependencies(report.Namespace, report.Spec.GenerationQueryName, report.Spec.Inputs)
 }
 
 func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) error {
@@ -759,6 +834,34 @@ func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) erro
 		for _, dep := range deps.Reports {
 			if dep.Name == report.Name {
 				op.enqueueReport(otherReport)
+				break
+			}
+		}
+	}
+	return nil
+}
+
+// queueDependentReportGenerationQueriesForReport will queue all
+// ReportGenerationQueries in the namespace which have a dependency on the
+// report
+func (op *Reporting) queueDependentReportGenerationQueriesForReport(report *cbTypes.Report) error {
+	queryLister := op.meteringClient.MeteringV1alpha1().ReportGenerationQueries(report.Namespace)
+	queries, err := queryLister.List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries.Items {
+		// For every query in the namespace, lookup it's dependencies, and if
+		// it has a dependency on the passed in Report, requeue it
+		deps, err := op.getGenerationQueryDependencies(query.Namespace, query.Name, nil)
+		if err != nil {
+			return err
+		}
+		for _, dependency := range deps.Reports {
+			if dependency.Name == report.Name {
+				// this query depends on the Report passed in
+				op.enqueueReportGenerationQuery(query)
 				break
 			}
 		}

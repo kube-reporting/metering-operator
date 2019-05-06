@@ -2,6 +2,7 @@ package operator
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -40,7 +40,6 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/presto"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
@@ -97,13 +96,13 @@ type Config struct {
 	MetricsListen string
 	PprofListen   string
 
-	HiveHost                string
-	PrestoHost              string
-	DisablePromsum          bool
-	DisableWriteHealthCheck bool
-	EnableFinalizers        bool
+	HiveHost   string
+	PrestoHost string
 
 	PrestoMaxQueryLength int
+
+	DisablePromsum   bool
+	EnableFinalizers bool
 
 	LogDMLQueries bool
 	LogDDLQueries bool
@@ -130,6 +129,7 @@ type Reporting struct {
 	informerFactory factory.SharedInformerFactory
 
 	prestoTableLister           listers.PrestoTableLister
+	hiveTableLister             listers.HiveTableLister
 	reportDataSourceLister      listers.ReportDataSourceLister
 	reportGenerationQueryLister listers.ReportGenerationQueryLister
 	reportPrometheusQueryLister listers.ReportPrometheusQueryLister
@@ -141,16 +141,19 @@ type Reporting struct {
 	reportDataSourceQueue      workqueue.RateLimitingInterface
 	reportGenerationQueryQueue workqueue.RateLimitingInterface
 	prestoTableQueue           workqueue.RateLimitingInterface
+	hiveTableQueue             workqueue.RateLimitingInterface
+	storageLocationQueue       workqueue.RateLimitingInterface
 
 	reportResultsRepo     prestostore.ReportResultsRepo
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportGenerator       reporting.ReportGenerator
+	dependencyResolver    DependencyResolver
 
-	prestoViewCreator        PrestoViewCreator
-	tableManager             reporting.TableManager
-	awsTablePartitionManager reporting.AWSTablePartitionManager
+	prestoTableManager   reporting.PrestoTableManager
+	hiveDatabaseManager  reporting.HiveDatabaseManager
+	hiveTableManager     reporting.HiveTableManager
+	hivePartitionManager reporting.HivePartitionManager
 
-	testWriteToPrestoFunc  func() bool
 	testReadFromPrestoFunc func() bool
 
 	promConn prom.API
@@ -178,7 +181,7 @@ func New(logger log.FieldLogger, cfg Config) (*Reporting, error) {
 	logger.Debugf("config: %s", spew.Sprintf("%+v", cfg))
 
 	if cfg.AllNamespaces {
-		logger.Infof("watching all namespaces for metering.openshift.io resourcse")
+		logger.Infof("watching all namespaces for metering.openshift.io resources")
 	} else {
 		logger.Infof("watching namespaces %q for metering.openshift.io resources", cfg.TargetNamespaces)
 	}
@@ -247,6 +250,7 @@ func newReportingOperator(
 	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
 
 	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
+	hiveTableInformer := informerFactory.Metering().V1alpha1().HiveTables()
 	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
 	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
 	reportPrometheusQueryInformer := informerFactory.Metering().V1alpha1().ReportPrometheusQueries()
@@ -257,13 +261,23 @@ func newReportingOperator(
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
 	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
 	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
+	hiveTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "hivetables")
+	storageLocationQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "storagelocation")
 
 	queueList := []workqueue.RateLimitingInterface{
 		reportQueue,
 		reportDataSourceQueue,
 		reportGenerationQueryQueue,
 		prestoTableQueue,
+		hiveTableQueue,
+		storageLocationQueue,
 	}
+
+	depResolver := reporting.NewDependencyResolver(
+		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryInformer.Lister()),
+		reporting.NewReportDataSourceListerGetter(reportDataSourceInformer.Lister()),
+		reporting.NewReportListerGetter(reportInformer.Lister()),
+	)
 
 	op := &Reporting{
 		logger:         logger,
@@ -275,17 +289,22 @@ func newReportingOperator(
 		informerFactory: informerFactory,
 
 		prestoTableLister:           prestoTableInformer.Lister(),
+		hiveTableLister:             hiveTableInformer.Lister(),
 		reportDataSourceLister:      reportDataSourceInformer.Lister(),
 		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
 		reportPrometheusQueryLister: reportPrometheusQueryInformer.Lister(),
 		reportLister:                reportInformer.Lister(),
 		storageLocationLister:       storageLocationInformer.Lister(),
 
+		dependencyResolver: depResolver,
+
 		queueList:                  queueList,
 		reportQueue:                reportQueue,
 		reportDataSourceQueue:      reportDataSourceQueue,
 		reportGenerationQueryQueue: reportGenerationQueryQueue,
 		prestoTableQueue:           prestoTableQueue,
+		hiveTableQueue:             hiveTableQueue,
+		storageLocationQueue:       storageLocationQueue,
 
 		rand:      rand,
 		clock:     clock,
@@ -319,6 +338,18 @@ func newReportingOperator(
 		AddFunc:    op.addPrestoTable,
 		UpdateFunc: op.updatePrestoTable,
 		DeleteFunc: op.deletePrestoTable,
+	}, op.cfg.TargetNamespaces))
+
+	hiveTableInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addHiveTable,
+		UpdateFunc: op.updateHiveTable,
+		DeleteFunc: op.deleteHiveTable,
+	}, op.cfg.TargetNamespaces))
+
+	storageLocationInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addStorageLocation,
+		UpdateFunc: op.updateStorageLocation,
+		DeleteFunc: op.deleteStorageLocation,
 	}, op.cfg.TargetNamespaces))
 
 	return op
@@ -364,43 +395,16 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	go op.informerFactory.Start(ctx.Done())
 
-	op.logger.Infof("setting up DB connections")
+	op.logger.Infof("setting up DB clients")
+	hiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+	defer hiveQueryer.Close()
 
-	var (
-		prestoQueryer db.Queryer
-		hiveQueryer   db.Queryer
-	)
-
-	// Use errgroup to setup both hive and presto connections
-	// at the sametime, waiting for both to be ready before continuing.
-	// if either errors, we return the first error
-	var g errgroup.Group
-	g.Go(func() error {
-		var err error
-		connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
-		prestoConn, err := presto.NewPrestoConnWithRetry(ctx, op.logger, connStr, connBackoff, maxConnRetries)
-		if err != nil {
-			return err
-		}
-		prestoQueryer = db.NewLoggingQueryer(prestoConn, op.logger, op.cfg.LogDMLQueries)
-		return nil
-	})
-	g.Go(func() error {
-		var err error
-		reconnectingHiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
-		if err != nil {
-			return err
-		}
-		hiveQueryer = db.NewLoggingQueryer(reconnectingHiveQueryer, op.logger, op.cfg.LogDDLQueries)
-		return nil
-	})
-	err := g.Wait()
+	connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
+	prestoQueryer, err := sql.Open("presto", connStr)
 	if err != nil {
 		return err
 	}
-
 	defer prestoQueryer.Close()
-	defer hiveQueryer.Close()
 
 	op.promConn, err = op.newPrometheusConnFromURL(op.cfg.PrometheusConfig.Address)
 	if err != nil {
@@ -419,36 +423,24 @@ func (op *Reporting) Run(ctx context.Context) error {
 		bufferPool := prestostore.NewBufferPool(op.cfg.PrestoMaxQueryLength)
 		prestoQueryBufferPool = &bufferPool
 	}
-	op.reportResultsRepo = prestostore.NewReportResultsRepo(prestoQueryer)
+
+	loggingDMLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDMLQueries)
+	loggingDDLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDDLQueries)
+	loggingDDLHiveQueryer := db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+
+	op.reportResultsRepo = prestostore.NewReportResultsRepo(loggingDMLPrestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)
-	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(prestoQueryer, prestoQueryBufferPool)
-	op.prestoViewCreator = &prestoViewCreator{queryer: prestoQueryer}
+	op.prometheusMetricsRepo = prestostore.NewPrometheusMetricsRepo(loggingDMLPrestoQueryer, prestoQueryBufferPool)
 
-	hiveTableManager := reporting.NewHiveTableManager(hiveQueryer)
-	op.tableManager = hiveTableManager
-	op.awsTablePartitionManager = hiveTableManager
+	prestoTableManager := reporting.NewPrestoTableManager(loggingDDLPrestoQueryer)
+	hiveManager := reporting.NewHiveManager(loggingDDLHiveQueryer)
 
-	tableProperties, err := op.getHiveTableProperties(op.logger, nil, "health_check", op.cfg.OwnNamespace)
-	if err != nil {
-		return fmt.Errorf("no default storage configured, unable to setup health checker: %v", err)
-	}
-	healthCheckTableName := "metering_health_check"
-	newTableProperties, err := addTableNameToLocation(*tableProperties, healthCheckTableName)
-	if err != nil {
-		return err
-	}
+	op.prestoTableManager = prestoTableManager
+	op.hiveTableManager = hiveManager
+	op.hiveDatabaseManager = hiveManager
+	op.hivePartitionManager = hiveManager
 
-	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveTableManager, healthCheckTableName, newTableProperties)
-	if op.cfg.DisableWriteHealthCheck {
-		op.testWriteToPrestoFunc = func() bool {
-			op.logger.Debugf("configured to skip checking ability to write to presto")
-			return true
-		}
-	} else {
-		op.testWriteToPrestoFunc = func() bool {
-			return prestoHealthChecker.TestWriteToPrestoSingleFlight()
-		}
-	}
+	prestoHealthChecker := reporting.NewPrestoHealthChecker(op.logger, prestoQueryer, hiveManager, "", "operator_health_check")
 	op.testReadFromPrestoFunc = func() bool {
 		return prestoHealthChecker.TestReadFromPrestoSingleFlight()
 	}
@@ -459,7 +451,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		op.reportLister, op.reportGenerationQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
-	apiRouter.HandleFunc("/healthy", op.healthinessHandler)
+	apiRouter.HandleFunc("/healthy", op.readinessHandler)
 
 	httpServer := &http.Server{
 		Addr:    op.cfg.APIListen,
@@ -482,22 +474,15 @@ func (op *Reporting) Run(ctx context.Context) error {
 		srvErrChan <- fmt.Errorf("HTTP API server error: %v", srvErr)
 	}()
 
-	if op.cfg.DisableWriteHealthCheck {
-		op.logger.Info("configured to skip checking ability to write to presto")
-	} else {
-		// Poll until we can write to presto
-		op.logger.Info("testing ability to write to Presto")
-		err = wait.PollUntil(time.Second*5, func() (bool, error) {
-			if op.testWriteToPrestoFunc() {
-				return true, nil
-			}
-			return false, nil
-		}, ctx.Done())
-		if err != nil {
-			return err
-		}
-		op.logger.Info("writes to Presto are succeeding")
+	// Poll until we can read from presto
+	op.logger.Info("testing ability to read to Presto")
+	err = wait.PollUntil(time.Second*5, func() (bool, error) {
+		return op.testReadFromPrestoFunc(), nil
+	}, ctx.Done())
+	if err != nil {
+		return err
 	}
+	op.logger.Info("writes to Presto are succeeding")
 
 	op.logger.Info("basic initialization completed")
 	op.setInitialized()
@@ -644,42 +629,53 @@ func (op *Reporting) newPrometheusConnFromURL(url string) (prom.API, error) {
 func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
 	stopCh := ctx.Done()
 
-	wg.Add(1)
-	go func() {
-		op.logger.Infof("starting PrestoTable worker")
-		op.runPrestoTableWorker(stopCh)
-		wg.Done()
-		op.logger.Infof("PrestoTable worker stopped")
-	}()
+	startWorker := func(threads int, workerFunc func(id int)) {
+		for i := 0; i < threads; i++ {
+			i := i
 
-	threadiness := 4
-	for i := 0; i < threadiness; i++ {
-		i := i
-
-		wg.Add(1)
-		go func() {
-			op.logger.Infof("starting ReportDataSource worker #%d", i)
-			wait.Until(op.runReportDataSourceWorker, time.Second, stopCh)
-			wg.Done()
-			op.logger.Infof("ReportDataSource worker #%d stopped", i)
-		}()
-
-		wg.Add(1)
-		go func() {
-			op.logger.Infof("starting ReportGenerationQuery worker #%d", i)
-			wait.Until(op.runReportGenerationQueryWorker, time.Second, stopCh)
-			wg.Done()
-			op.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
-		}()
-
-		wg.Add(1)
-		go func() {
-			op.logger.Infof("starting Report worker #%d", i)
-			wait.Until(op.runReportWorker, time.Second, stopCh)
-			wg.Done()
-			op.logger.Infof("Report worker #%d stopped", i)
-		}()
+			wg.Add(1)
+			go func() {
+				workerFunc(i)
+				wg.Done()
+			}()
+		}
 	}
+
+	startWorker(4, func(i int) {
+		op.logger.Infof("starting StorageLocation worker #%d", i)
+		wait.Until(op.runStorageLocationWorker, time.Second, stopCh)
+		op.logger.Infof("StorageLocation worker #%d stopped", i)
+	})
+
+	startWorker(10, func(i int) {
+		op.logger.Infof("starting HiveTable worker #%d", i)
+		wait.Until(op.runHiveTableWorker, time.Second, stopCh)
+		op.logger.Infof("HiveTable worker #%d stopped", i)
+	})
+
+	startWorker(10, func(i int) {
+		op.logger.Infof("starting PrestoTable worker")
+		wait.Until(op.runPrestoTableWorker, time.Second, stopCh)
+		op.logger.Infof("PrestoTable worker stopped")
+	})
+
+	startWorker(8, func(i int) {
+		op.logger.Infof("starting ReportDataSource worker #%d", i)
+		wait.Until(op.runReportDataSourceWorker, time.Second, stopCh)
+		op.logger.Infof("ReportDataSource worker #%d stopped", i)
+	})
+
+	startWorker(4, func(i int) {
+		op.logger.Infof("starting ReportGenerationQuery worker #%d", i)
+		wait.Until(op.runReportGenerationQueryWorker, time.Second, stopCh)
+		op.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
+	})
+
+	startWorker(6, func(i int) {
+		op.logger.Infof("starting Report worker #%d", i)
+		wait.Until(op.runReportWorker, time.Second, stopCh)
+		op.logger.Infof("Report worker #%d stopped", i)
+	})
 }
 
 func (op *Reporting) setInitialized() {
@@ -701,4 +697,8 @@ func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 		return nil, fmt.Errorf("can't connect to prometheus: %v", err)
 	}
 	return prom.NewAPI(client), nil
+}
+
+type DependencyResolver interface {
+	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportGenerationQueryInputDefinition, inputVals []cbTypes.ReportGenerationQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }

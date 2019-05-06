@@ -1,8 +1,11 @@
 package v1alpha1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+var ReportDataSourceGVK = SchemeGroupVersion.WithKind("ReportDataSource")
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -25,14 +28,22 @@ type ReportDataSource struct {
 
 type ReportDataSourceSpec struct {
 	// Prommsum represents a datasource which holds Prometheus metrics
-	Promsum *PrometheusMetricsDataSource `json:"promsum"`
+	Promsum *PrometheusMetricsDataSource `json:"promsum,omitempty"`
 	// AWSBilling represents a datasource which points to a pre-existing S3
 	// bucket.
-	AWSBilling *AWSBillingDataSource `json:"awsBilling"`
+	AWSBilling *AWSBillingDataSource `json:"awsBilling,omitempty"`
+	// PrestoTable represents a datasource which points to an existing
+	// PrestoTable CR.
+	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
+
+	// GenerationQueryView  represents a datasource which creates a Presto
+	// view from a ReportGenerationQuery
+	GenerationQueryView *GenerationQueryViewDataSource `json:"generationQueryView,omitempty"`
 }
 
 type AWSBillingDataSource struct {
-	Source *S3Bucket `json:"source"`
+	Source       *S3Bucket `json:"source"`
+	DatabaseName string    `json:"databaseName,omitempty"`
 }
 
 type S3Bucket struct {
@@ -58,8 +69,21 @@ type PrometheusMetricsDataSource struct {
 	PrometheusConfig *PrometheusConnectionConfig `json:"prometheusConfig,omitempty"`
 }
 
+type PrestoTableDataSource struct {
+	TableRef v1.LocalObjectReference `json:"tableRef"`
+}
+
+type GenerationQueryViewDataSource struct {
+	// QueryName specifies the ReportGenerationQuery to execute when the report
+	// runs.
+	QueryName string `json:"queryName"`
+	// Inputs are the inputs to the ReportGenerationQuery
+	Inputs  ReportGenerationQueryInputValues `json:"inputs,omitempty"`
+	Storage *StorageLocationRef              `json:"storage,omitempty"`
+}
+
 type ReportDataSourceStatus struct {
-	TableName                    string                        `json:"tableName,omitempty"`
+	TableRef                     v1.LocalObjectReference       `json:"tableRef"`
 	PrometheusMetricImportStatus *PrometheusMetricImportStatus `json:"prometheusMetricImportStatus,omitempty"`
 }
 

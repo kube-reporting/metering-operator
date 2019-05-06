@@ -100,4 +100,4 @@ required = [
 
 [[override]]
   name = "k8s.io/gengo"
-  revision = "0689ccc1d7d65d9dd1bedcc3b0b1ed7df91ba266"
+  revision = "b90029ef6cd877cb3f422d75b3a07707e3aac6b7"
