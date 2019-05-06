@@ -8,6 +8,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// HiveTables returns a HiveTableInformer.
+	HiveTables() HiveTableInformer
 	// PrestoTables returns a PrestoTableInformer.
 	PrestoTables() PrestoTableInformer
 	// Reports returns a ReportInformer.
@@ -31,6 +33,11 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// HiveTables returns a HiveTableInformer.
+func (v *version) HiveTables() HiveTableInformer {
+	return &hiveTableInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // PrestoTables returns a PrestoTableInformer.

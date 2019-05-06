@@ -1,29 +1,27 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "persistentvolumeclaim-request-raw"
+  name: persistentvolumeclaim-request-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "persistentvolumeclaim-request-bytes"
   columns:
   - name: labels
-    type: map<string, string>
     tableHidden: true
+    type: map<varchar, varchar>
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolume
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolume
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: storageclass
-    type: string
+    type: varchar
     unit: kubernetes_storageclass
   - name: volume_request_storage_bytes
     type: double
@@ -38,36 +36,34 @@ spec:
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
+  inputs:
+  - name: PersistentvolumeclaimRequestBytesDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-request-bytes
   query: |
-      SELECT labels,
-      labels['persistentvolumeclaim'] as persistentvolumeclaim,
-      element_at(labels, 'volumename') as persistentvolume,
-          labels['namespace'] as namespace,
-          element_at(labels, 'storageclass') as storageclass,
-          amount as volume_request_storage_bytes,
-          timeprecision,
-          amount * timeprecision as volume_request_storage_byte_seconds,
-          "timestamp",
-          dt
-      FROM {| dataSourceTableName "persistentvolumeclaim-request-bytes" |}
-      WHERE element_at(labels, 'volumename') IS NOT NULL
-
+    SELECT labels,
+    labels['persistentvolumeclaim'] as persistentvolumeclaim,
+    element_at(labels, 'volumename') as persistentvolume,
+        labels['namespace'] as namespace,
+        element_at(labels, 'storageclass') as storageclass,
+        amount as volume_request_storage_bytes,
+        timeprecision,
+        amount * timeprecision as volume_request_storage_byte_seconds,
+        "timestamp",
+        dt
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimRequestBytesDataSourceName |}
+    WHERE element_at(labels, 'volumename') IS NOT NULL
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "persistentvolumeclaim-request"
+  name: persistentvolumeclaim-request
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "persistentvolumeclaim-request-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -76,16 +72,16 @@ spec:
     type: timestamp
     unit: date
   - name: persistentvolumeclaim
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolumeclaim
   - name: persistentvolume
-    type: string
+    type: varchar
     unit: kubernetes_persistentvolume
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: storageclass
-    type: string
+    type: varchar
     unit: kubernetes_storageclass
   - name: data_start
     type: timestamp
@@ -97,9 +93,13 @@ spec:
     type: double
     unit: byte_seconds
   inputs:
-    - name: ReportingStart
-    - name: ReportingEnd
-
+  - name: ReportingStart
+    type: time
+  - name: ReportingEnd
+    type: time
+  - name: PersistentvolumeclaimRequestRawDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-request-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -111,29 +111,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(volume_request_storage_byte_seconds) as volume_request_storage_byte_seconds
-    FROM {| generationQueryViewName "persistentvolumeclaim-request-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimRequestRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY persistentvolumeclaim, namespace, persistentvolume, storageclass
     ORDER BY persistentvolumeclaim, namespace, persistentvolume, storageclass ASC, volume_request_storage_byte_seconds DESC
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "namespace-persistentvolumeclaim-request"
+  name: namespace-persistentvolumeclaim-request
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "persistentvolumeclaim-request-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -142,7 +136,7 @@ spec:
     type: timestamp
     unit: date
   - name: namespace
-    type: string
+    type: varchar
     unit: kubernetes_namespace
   - name: data_start
     type: timestamp
@@ -155,7 +149,12 @@ spec:
     unit: byte_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PersistentvolumeclaimRequestRawDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-request-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -164,29 +163,23 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(volume_request_storage_byte_seconds) as volume_request_storage_byte_seconds
-    FROM {| generationQueryViewName "persistentvolumeclaim-request-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimRequestRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY namespace
     ORDER BY volume_request_storage_byte_seconds DESC
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "cluster-persistentvolumeclaim-request"
+  name: cluster-persistentvolumeclaim-request
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "persistentvolumeclaim-request-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -205,7 +198,12 @@ spec:
     unit: byte_seconds
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: PersistentvolumeclaimRequestRawDataSourceName
+    type: ReportDataSource
+    default: persistentvolumeclaim-request-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -213,7 +211,7 @@ spec:
       min("timestamp") as data_start,
       max("timestamp") as data_end,
       sum(volume_request_storage_byte_seconds) as volume_request_storage_byte_seconds
-    FROM {| generationQueryViewName "persistentvolumeclaim-request-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimRequestRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
     AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'

@@ -2,6 +2,14 @@
 
 package v1alpha1
 
+// HiveTableListerExpansion allows custom methods to be added to
+// HiveTableLister.
+type HiveTableListerExpansion interface{}
+
+// HiveTableNamespaceListerExpansion allows custom methods to be added to
+// HiveTableNamespaceLister.
+type HiveTableNamespaceListerExpansion interface{}
+
 // PrestoTableListerExpansion allows custom methods to be added to
 // PrestoTableLister.
 type PrestoTableListerExpansion interface{}

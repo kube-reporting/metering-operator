@@ -1,26 +1,28 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "cluster-cpu-capacity-raw"
+  name: cluster-cpu-capacity-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "node-cpu-capacity-raw"
   columns:
   - name: timestamp
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   - name: cpu_cores
     type: double
   - name: cpu_core_seconds
     type: double
   - name: node_count
     type: double
+  inputs:
+  - name: NodeCpuCapacityRawDataSourceName
+    type: ReportDataSource
+    default: node-cpu-capacity-raw
   query: |
     SELECT
       "timestamp",
@@ -28,24 +30,18 @@ spec:
       sum(node_capacity_cpu_cores) as cpu_cores,
       sum(node_capacity_cpu_core_seconds) as cpu_core_seconds,
       count(*) AS node_count
-    FROM {| generationQueryViewName "node-cpu-capacity-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.NodeCpuCapacityRawDataSourceName |}
     GROUP BY "timestamp", dt
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "cluster-cpu-capacity"
+  name: cluster-cpu-capacity
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "cluster-cpu-capacity-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -63,8 +59,14 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: ClusterCpuCapacityReportName
+    type: Report
+  - name: ClusterCpuCapacityRawDataSourceName
+    type: ReportDataSource
+    default: cluster-cpu-capacity-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
@@ -80,38 +82,38 @@ spec:
       sum(cpu_core_seconds)  as total_cluster_capacity_cpu_core_seconds,
       avg(cpu_cores) as avg_cluster_capacity_cpu_cores,
       avg(node_count) AS avg_node_count
-      FROM {| generationQueryViewName "cluster-cpu-capacity-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.ClusterCpuCapacityRawDataSourceName |}
       WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'
       AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     {|- end |}
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "cluster-memory-capacity-raw"
+  name: cluster-memory-capacity-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "node-memory-capacity-raw"
   columns:
   - name: timestamp
     type: timestamp
     unit: date
   - name: dt
-    type: string
+    type: varchar
   - name: memory_bytes
     type: double
   - name: memory_byte_seconds
     type: double
   - name: node_count
     type: double
+  inputs:
+  - name: NodeMemoryCapacityRawDataSourceName
+    type: ReportDataSource
+    default: node-memory-capacity-raw
   query: |
     SELECT
       "timestamp",
@@ -119,24 +121,18 @@ spec:
       sum(node_capacity_memory_bytes) as memory_bytes,
       sum(node_capacity_memory_byte_seconds) as memory_byte_seconds,
       count(*) AS node_count
-    FROM {| generationQueryViewName "node-memory-capacity-raw" |}
+    FROM {| dataSourceTableName .Report.Inputs.NodeMemoryCapacityRawDataSourceName |}
     GROUP BY "timestamp", dt
-
 ---
-
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "cluster-memory-capacity"
+  name: cluster-memory-capacity
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "cluster-memory-capacity-raw"
-  view:
-    disabled: true
   columns:
   - name: period_start
     type: timestamp
@@ -154,8 +150,14 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
   - name: ClusterMemoryCapacityReportName
+    type: Report
+  - name: ClusterMemoryCapacityRawDataSourceName
+    type: ReportDataSource
+    default: cluster-memory-capacity-raw
   query: |
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AS period_start,
@@ -171,7 +173,7 @@ spec:
       sum(memory_byte_seconds)  as total_cluster_capacity_memory_byte_seconds,
       avg(memory_bytes) as avg_cluster_capacity_memory_bytes,
       avg(node_count) AS avg_node_count
-      FROM {| generationQueryViewName "cluster-memory-capacity-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.ClusterMemoryCapacityRawDataSourceName |}
       WHERE "timestamp"  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
       AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}'
       AND dt >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prometheusMetricPartitionFormat |}'

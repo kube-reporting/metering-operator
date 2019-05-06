@@ -186,17 +186,16 @@ func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
 	logger := op.logger.WithFields(log.Fields{"reportGenerationQuery": curReportGenerationQuery.Name, "namespace": curReportGenerationQuery.Namespace})
 
 	// Only skip queuing if we're not missing a view
-	if curReportGenerationQuery.Spec.View.Disabled && curReportGenerationQuery.Status.ViewName != "" {
-		if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
-			// Periodic resyncs will send update events for all known ReportGenerationQuerys.
-			// Two different versions of the same reportGenerationQuery will always have
-			// different ResourceVersions.
-			logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
-			return
-		}
-		if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
-			logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
-		}
+	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
+		// Two different versions of the same reportGenerationQuery will always have
+		// different ResourceVersions.
+		logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+		return
+	}
+	if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
+		logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+		return
 	}
 
 	logger.Infof("updating ReportGenerationQuery %s/%s", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
@@ -253,6 +252,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	// exist in our store, so we eagerly drop the table upon seeing the delete
 	// event when ***REMOVED***nalizers are disabled
 	if !op.cfg.EnableFinalizers && prestoTable != nil {
+		// TODO: ***REMOVED***x
 		_ = op.dropPrestoTable(prestoTable)
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(prestoTable)
@@ -270,6 +270,126 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 		return
 	}
 	op.prestoTableQueue.Add(key)
+}
+
+func (op *Reporting) addHiveTable(obj interface{}) {
+	table := obj.(*cbTypes.HiveTable)
+	if table.DeletionTimestamp != nil {
+		op.deleteHiveTable(table)
+		return
+	}
+	logger := op.logger.WithFields(log.Fields{"hiveTable": table.Name, "namespace": table.Namespace})
+	logger.Infof("adding HiveTable %s/%s", table.Namespace, table.Name)
+	op.enqueueHiveTable(table)
+}
+
+func (op *Reporting) updateHiveTable(_, cur interface{}) {
+	curHiveTable := cur.(*cbTypes.HiveTable)
+	if curHiveTable.DeletionTimestamp != nil {
+		op.deleteHiveTable(curHiveTable)
+		return
+	}
+	logger := op.logger.WithFields(log.Fields{"hiveTable": curHiveTable.Name, "namespace": curHiveTable.Namespace})
+	logger.Infof("updating HiveTable %s/%s", curHiveTable.Namespace, curHiveTable.Name)
+	op.enqueueHiveTable(curHiveTable)
+}
+
+func (op *Reporting) deleteHiveTable(obj interface{}) {
+	hiveTable, ok := obj.(*cbTypes.HiveTable)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		hiveTable, ok = tombstone.Obj.(*cbTypes.HiveTable)
+		if !ok {
+			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).Errorf("Tombstone contained object that is not a HiveTable %#v", obj)
+			return
+		}
+	}
+	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// worker get the event from the queue that the resource will no longer
+	// exist in our store, so we eagerly drop the table upon seeing the delete
+	// event when ***REMOVED***nalizers are disabled
+	if !op.cfg.EnableFinalizers && hiveTable != nil {
+		_ = op.dropHiveTable(hiveTable)
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(hiveTable)
+	if err != nil {
+		op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", hiveTable)
+		return
+	}
+	op.hiveTableQueue.Add(key)
+}
+
+func (op *Reporting) enqueueHiveTable(table *cbTypes.HiveTable) {
+	key, err := cache.MetaNamespaceKeyFunc(table)
+	if err != nil {
+		op.logger.WithFields(log.Fields{"hiveTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
+		return
+	}
+	op.hiveTableQueue.Add(key)
+}
+
+func (op *Reporting) addStorageLocation(obj interface{}) {
+	storageLocation := obj.(*cbTypes.StorageLocation)
+	if storageLocation.DeletionTimestamp != nil {
+		op.deleteStorageLocation(storageLocation)
+		return
+	}
+	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
+	logger.Infof("adding StorageLocation %s/%s", storageLocation.Namespace, storageLocation.Name)
+	op.enqueueStorageLocation(storageLocation)
+}
+
+func (op *Reporting) updateStorageLocation(_, cur interface{}) {
+	curStorageLocation := cur.(*cbTypes.StorageLocation)
+	if curStorageLocation.DeletionTimestamp != nil {
+		op.deleteStorageLocation(curStorageLocation)
+		return
+	}
+	logger := op.logger.WithFields(log.Fields{"storageLocation": curStorageLocation.Name, "namespace": curStorageLocation.Namespace})
+	logger.Infof("updating StorageLocation %s/%s", curStorageLocation.Namespace, curStorageLocation.Name)
+	op.enqueueStorageLocation(curStorageLocation)
+}
+
+func (op *Reporting) deleteStorageLocation(obj interface{}) {
+	storageLocation, ok := obj.(*cbTypes.StorageLocation)
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
+			return
+		}
+		storageLocation, ok = tombstone.Obj.(*cbTypes.StorageLocation)
+		if !ok {
+			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).Errorf("Tombstone contained object that is not a StorageLocation %#v", obj)
+			return
+		}
+	}
+	// when ***REMOVED***nalizers aren't enabled, it's pretty likely by the time our
+	// worker get the event from the queue that the resource will no longer
+	// exist in our store, so we eagerly drop the storageLocation upon seeing the delete
+	// event when ***REMOVED***nalizers are disabled
+	if !op.cfg.EnableFinalizers && storageLocation != nil {
+		_ = op.deleteStorage(storageLocation)
+	}
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(storageLocation)
+	if err != nil {
+		op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", storageLocation)
+		return
+	}
+	op.storageLocationQueue.Add(key)
+}
+
+func (op *Reporting) enqueueStorageLocation(storageLocation *cbTypes.StorageLocation) {
+	key, err := cache.MetaNamespaceKeyFunc(storageLocation)
+	if err != nil {
+		op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", storageLocation)
+		return
+	}
+	op.storageLocationQueue.Add(key)
 }
 
 type workerProcessFunc func(logger log.FieldLogger) bool

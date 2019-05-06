@@ -31,10 +31,6 @@ func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name stri
 			}
 			return false, err
 		}
-		if !reportQuery.Spec.View.Disabled && reportQuery.Status.ViewName == "" {
-			t.Logf("ReportGenerationQuery %s view is not created yet", name)
-			return false, nil
-		}
 		return true, nil
 	})
 }
@@ -58,15 +54,6 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 		require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
 
 		depHandler := &reporting.UninitialiedDependendenciesHandler{
-			HandleUninitializedReportGenerationQuery: func(query *metering.ReportGenerationQuery) {
-				if _, exists := readyReportGenQueries[query.Name]; exists {
-					return
-				}
-				t.Logf("%s dependencies: waiting for ReportGenerationQuery %s to exist", queryName, query.Name)
-				_, err := f.WaitForMeteringReportGenerationQuery(t, query.Name, pollInterval, timeout)
-				require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
-				readyReportGenQueries[query.Name] = struct{}{}
-			},
 			HandleUninitializedReportDataSource: func(ds *metering.ReportDataSource) {
 				if _, exists := readyReportDataSources[ds.Name]; exists {
 					return
@@ -81,7 +68,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 		t.Logf("waiting for ReportGenerationQuery %s dependencies to become initialized", queryName)
 		// explicitly ignoring results, since we'll get errors above if any of
 		// the uninitialized dependencies don't become ready in the handler
-		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, reportGenQuery, depHandler)
+		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, reportGenQuery, nil, depHandler)
 		readyReportGenQueries[queryName] = struct{}{}
 	}
 }
@@ -100,7 +87,7 @@ func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queri
 	for _, queryName := range queries {
 		query, err := f.GetMeteringReportGenerationQuery(queryName)
 		require.NoError(t, err, "ReportGenerationQuery should exist")
-		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query)
+		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, nil)
 		require.NoError(t, err, "Getting ReportGenerationQuery dependencies should succeed")
 
 		for _, dataSource := range deps.ReportDataSources {

@@ -57,25 +57,52 @@ Use `kubectl` to obtain a list of available `ReportGenerationQuery` objects:
 
  ```
  kubectl -n $METERING_NAMESPACE get reportgenerationqueries
- NAME                                            AGE
- aws-ec2-billing-data                            11m
- aws-ec2-cluster-cost                            11m
- namespace-cpu-request                           11m
- namespace-memory-request                        11m
- node-cpu-allocatable                            11m
- node-cpu-capacity                               11m
- node-cpu-utilization                            11m
- node-memory-allocatable                         11m
- node-memory-capacity                            11m
- node-memory-utilization                         11m
- pod-cpu-request                                 11m
- pod-cpu-request-aws                             11m
- pod-cpu-request-raw                             11m
- pod-cpu-request-vs-node-cpu-allocatable         11m
- pod-memory-request                              11m
- pod-memory-request-aws                          11m
- pod-memory-request-raw                          11m
- pod-memory-request-vs-node-memory-allocatable   11m
+NAME                                         AGE
+cluster-cpu-capacity                         23m
+cluster-cpu-capacity-raw                     23m
+cluster-cpu-usage                            23m
+cluster-cpu-usage-raw                        23m
+cluster-cpu-utilization                      23m
+cluster-memory-capacity                      23m
+cluster-memory-capacity-raw                  23m
+cluster-memory-usage                         23m
+cluster-memory-usage-raw                     23m
+cluster-memory-utilization                   23m
+cluster-persistentvolumeclaim-request        23m
+namespace-cpu-request                        23m
+namespace-cpu-usage                          23m
+namespace-cpu-utilization                    23m
+namespace-memory-request                     23m
+namespace-memory-usage                       23m
+namespace-memory-utilization                 23m
+namespace-persistentvolumeclaim-request      23m
+namespace-persistentvolumeclaim-usage        23m
+node-cpu-allocatable                         23m
+node-cpu-allocatable-raw                     23m
+node-cpu-capacity                            23m
+node-cpu-capacity-raw                        23m
+node-cpu-utilization                         23m
+node-memory-allocatable                      23m
+node-memory-allocatable-raw                  23m
+node-memory-capacity                         23m
+node-memory-capacity-raw                     23m
+node-memory-utilization                      23m
+persistentvolumeclaim-capacity               23m
+persistentvolumeclaim-capacity-raw           23m
+persistentvolumeclaim-phase-raw              23m
+persistentvolumeclaim-request                23m
+persistentvolumeclaim-request-raw            23m
+persistentvolumeclaim-usage                  23m
+persistentvolumeclaim-usage-raw              23m
+persistentvolumeclaim-usage-with-phase-raw   23m
+pod-cpu-request                              23m
+pod-cpu-request-raw                          23m
+pod-cpu-usage                                23m
+pod-cpu-usage-raw                            23m
+pod-memory-request                           23m
+pod-memory-request-raw                       23m
+pod-memory-usage                             23m
+pod-memory-usage-raw                         23m
 ```
 
 ReportGenerationQueries with the `-raw` suf***REMOVED***x are used by other ReportGenerationQueries to build more complex queries, and should not be used directly for reports.
@@ -106,7 +133,7 @@ kubectl -n $METERING_NAMESPACE get reportgenerationqueries namespace-memory-requ
         "columns": [
             {
                 "name": "namespace",
-                "type": "string"
+                "type": "varchar"
             },
             {
                 "name": "data_start",
@@ -229,15 +256,15 @@ For reports with a schedule set, it will not wait for each period's reportingEnd
 
 ### Inputs
 
-The `inputs` ***REMOVED***eld of a Report `spec` can be used to pass custom values into a `ReportGenerationQuery`.
+The `spec.inputs` ***REMOVED***eld of a Report can be used to override or set values de***REMOVED***ned in a [ReportGenerationQuery's spec.input ***REMOVED***eld][query-inputs].
 
 It is a list of name-value pairs:
 
 ```
 spec:
   inputs:
-  - name: AggregatedReportName
-    value: namespace-cpu-usage-hourly
+  - name: "NamespaceCPUUsageReportName"
+    value: "namespace-cpu-usage-hourly"
 ```
 
 For an example of how this can be used, see it in action [in a roll-up report](rollup-reports.md#3-create-the-aggregator-report).
@@ -246,29 +273,47 @@ For an example of how this can be used, see it in action [in a roll-up report](r
 
 Report data is stored in the database much like metrics themselves, and can thus be used in aggregated or roll-up reports. A simple use case for a roll-up report is to spread the time required to produce a report over a longer period of time: instead of requiring a monthly report to query and add all data over an entire month, the task can be split into daily reports that each run over a thirtieth of the data.
 
-A custom roll-up report requires a custom generation query. The ReportGenerationQuery processor provides a macro that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query):
+A custom roll-up report requires a custom generation query.
+The ReportGenerationQuery template processor provides a function: `reportTableName` that can get the necessary table name [from a report name](rollup-reports.md#2-create-the-aggregation-query).
+
+Below is an snippet taken from a built-in query:
 
 ```
-# namespace-cpu-usage-aggregated-query.yaml
-inputs:
-- name: AggregatedReportName
-  required: true
+# Taken from pod-cpu.yaml
+spec:
 ...
- WHERE {| .Report.Inputs.AggregatedReportName | reportTableName |}.period_start >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
+  inputs:
+  - name: ReportingStart
+    type: time
+  - name: ReportingEnd
+    type: time
+  - name: NamespaceCPUUsageReportName
+    type: Report
+...
+
+  query: |
+...
+    {|- if .Report.Inputs.NamespaceCPUUsageReportName |}
+      namespace,
+      min("period_start") as data_start,
+      max("period_end") as data_end,
+      sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
+    FROM {| .Report.Inputs.NamespaceCPUUsageReportName | reportTableName |}
+...
 ```
 
 ```
 # aggregated-report.yaml
 spec:
-  generationQuery: "namespace-cpu-usage-aggregated"
+  generationQuery: "namespace-cpu-usage"
   inputs:
-  - name: "AggregatedReportName"
+  - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
 ```
 
 For more information on setting up a roll-up report, see the [roll-up report guide](rollup-reports.md).
 
-### Scheduled Report Status
+### Report Status
 
 The execution of a scheduled report can be tracked using its status ***REMOVED***eld. Any errors occurring during the preparation of a report will be recorded here.
 
@@ -278,4 +323,4 @@ The `status` ***REMOVED***eld of a `Report` currently has two ***REMOVED***elds:
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
-
+[query-inputs]: reportgenerationqueries.md#query-inputs

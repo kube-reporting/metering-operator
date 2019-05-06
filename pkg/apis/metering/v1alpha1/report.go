@@ -5,6 +5,8 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var ReportGVK = SchemeGroupVersion.WithKind("Report")
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 type ReportList struct {
@@ -110,10 +112,10 @@ type ReportScheduleMonthly struct {
 }
 
 type ReportStatus struct {
-	Conditions     []ReportCondition `json:"conditions,omitempty"`
-	LastReportTime *meta.Time        `json:"lastReportTime,omitempty"`
-	NextReportTime *meta.Time        `json:"nextReportTime,omitempty"`
-	TableName      string            `json:"tableName"`
+	Conditions     []ReportCondition       `json:"conditions,omitempty"`
+	LastReportTime *meta.Time              `json:"lastReportTime,omitempty"`
+	NextReportTime *meta.Time              `json:"nextReportTime,omitempty"`
+	TableRef       v1.LocalObjectReference `json:"tableRef"`
 }
 
 type ReportCondition struct {

@@ -3,23 +3,24 @@ package operator
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/retry"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
+	cbInterfaces "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
-	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
@@ -31,21 +32,6 @@ const (
 	// data before importing metrics into Presto.
 	allowIncompleteChunks = true
 )
-
-var (
-	awsBillingReportDatasourcePartitionsGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Namespace: "metering",
-			Name:      "aws_billing_reportdatasource_partitions",
-			Help:      "Current number of partitions in a AWSBilling ReportDataSource table.",
-		},
-		[]string{"reportdatasource", "table_name"},
-	)
-)
-
-func init() {
-	prometheus.MustRegister(awsBillingReportDatasourcePartitionsGauge)
-}
 
 func (op *Reporting) runReportDataSourceWorker() {
 	logger := op.logger.WithField("component", "reportDataSourceWorker")
@@ -84,12 +70,24 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 }
 
 func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
+		var err error
+		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
+		if err != nil {
+			return err
+		}
+	}
+
 	var err error
 	switch {
 	case dataSource.Spec.Promsum != nil:
 		err = op.handlePrometheusMetricsDataSource(logger, dataSource)
 	case dataSource.Spec.AWSBilling != nil:
 		err = op.handleAWSBillingDataSource(logger, dataSource)
+	case dataSource.Spec.PrestoTable != nil:
+		err = op.handlePrestoTableDataSource(logger, dataSource)
+	case dataSource.Spec.GenerationQueryView != nil:
+		err = op.handleGenerationQueryViewDataSource(logger, dataSource)
 	default:
 		err = fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
 	}
@@ -102,37 +100,64 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return fmt.Errorf("%s is not a Promsum ReportDataSource", dataSource.Name)
 	}
 
-	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
+	var prestoTable *cbTypes.PrestoTable
+	if dataSource.Status.TableRef.Name != "" {
 		var err error
-		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
+		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-	}
-
-	if dataSource.Status.TableName != "" {
-		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", dataSource.Status.TableName)
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", prestoTable.Status.TableName)
 	} ***REMOVED*** {
-		logger.Infof("new Prometheus ReportDataSource discovered")
-		storage := dataSource.Spec.Promsum.Storage
+		logger.Infof("new Prometheus ReportDataSource %s discovered", dataSource.Name)
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
-		logger.Infof("creating table %s", tableName)
-		err := op.createTableForStorage(logger, dataSource, cbTypes.SchemeGroupVersion.WithKind("ReportDataSource"), storage, tableName, prestostore.PromsumHiveTableColumns, prestostore.PromsumHivePartitionColumns)
+		hiveStorage, err := op.getHiveStorage(dataSource.Spec.Promsum.Storage, dataSource.Namespace)
 		if err != nil {
-			return err
+			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
+		}
+		if hiveStorage.Status.Hive.DatabaseName == "" {
+			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
+		}
+		params := hive.TableParameters{
+			Database:      hiveStorage.Status.Hive.DatabaseName,
+			Name:          tableName,
+			Columns:       prestostore.PromsumHiveTableColumns,
+			PartitionedBy: prestostore.PromsumHivePartitionColumns,
+		}
+		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
+			params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
+			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
+		}
+
+		logger.Infof("creating table %s", tableName)
+		hiveTable, err := op.createHiveTableCR(dataSource, cbTypes.ReportDataSourceGVK, params, false, nil)
+		if err != nil {
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
+		}
+		hiveTable, err = op.waitForHiveTable(hiveTable.Namespace, hiveTable.Name, time.Second, 30*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
+		}
+		prestoTable, err = op.waitForPrestoTable(hiveTable.Namespace, hiveTable.Name, time.Second, 30*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 		}
 		logger.Infof("created table %s", tableName)
 
-		dataSource, err = op.updateDataSourceTableName(logger, dataSource, tableName)
+		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
+		})
 		if err != nil {
 			logger.WithError(err).Errorf("failed to update ReportDataSource TableName ***REMOVED***eld %q", tableName)
 			return err
 		}
 
-		// Queue queries that depend on this when the tables created, as they
-		// may be pending initialization.
-		if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
-			logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
+		if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+		}
+		if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
 		}
 
 		// instead of immediately importing, return early after creating the
@@ -158,10 +183,10 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	dataSourceLogger := logger.WithFields(log.Fields{
 		"queryName":        queryName,
 		"reportDataSource": dataSource.Name,
-		"tableName":        dataSource.Status.TableName,
+		"tableName":        prestoTable.Status.TableName,
 	})
 
-	importerCfg := op.newPromImporterCfg(dataSource, reportPromQuery)
+	importerCfg := op.newPromImporterCfg(dataSource, reportPromQuery, prestoTable)
 
 	// wrap in a closure to handle lock and unlock of the mutex
 	importer, err := func() (*prestostore.PrometheusImporter, error) {
@@ -174,7 +199,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			return importer, nil
 		}
 		// don't already have an importer, so create a new one
-		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery, importerCfg)
+		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery, prestoTable, importerCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -185,12 +210,13 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return err
 	}
 
-	if dataSource.Status.PrometheusMetricImportStatus == nil {
-		dataSource.Status.PrometheusMetricImportStatus = &cbTypes.PrometheusMetricImportStatus{}
+	importStatus := dataSource.Status.PrometheusMetricImportStatus
+	if importStatus == nil {
+		importStatus = &cbTypes.PrometheusMetricImportStatus{}
 	}
 
 	// record the lastImportTime
-	dataSource.Status.PrometheusMetricImportStatus.LastImportTime = &metav1.Time{Time: op.clock.Now().UTC()}
+	importStatus.LastImportTime = &metav1.Time{Time: op.clock.Now().UTC()}
 
 	// run the import
 	results, err := importer.ImportFromLastTimestamp(context.Background(), allowIncompleteChunks)
@@ -212,26 +238,26 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 		// Update the timestamp which records the ***REMOVED***rst timestamp we attempted
 		// to query from.
-		if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || ***REMOVED***rstTimeRange.Start.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
-			dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime = &metav1.Time{Time: ***REMOVED***rstTimeRange.Start}
+		if importStatus.ImportDataStartTime == nil || ***REMOVED***rstTimeRange.Start.Before(importStatus.ImportDataStartTime.Time) {
+			importStatus.ImportDataStartTime = &metav1.Time{Time: ***REMOVED***rstTimeRange.Start}
 		}
 		// Update the timestamp which records the latest we've attempted to query
 		// up until.
-		if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time.Before(lastTimeRange.End) {
-			dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime = &metav1.Time{Time: lastTimeRange.End}
+		if importStatus.ImportDataEndTime == nil || importStatus.ImportDataEndTime.Time.Before(lastTimeRange.End) {
+			importStatus.ImportDataEndTime = &metav1.Time{Time: lastTimeRange.End}
 		}
 
 		// The data we collected is farther back than 1.5 their chunkSize, so requeue sooner
 		// since we're backlogged. We use 1.5 because being behind 1 full chunk
 		// is typical, but we shouldn't be 2 full chunks after catching up.
 		backlogDetectionDuration := time.Duration(1.5*importerCfg.ChunkSize.Seconds()) * time.Second
-		backlogDuration := op.clock.Now().Sub(dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time)
+		backlogDuration := op.clock.Now().Sub(importStatus.ImportDataEndTime.Time)
 		if backlogDuration > backlogDetectionDuration {
 			// import delay has jitter so that processing backlogged
 			// ReportDataSources happens in a more randomized order to allow
 			// all of them to get processed when the queue is blocked.
 			importDelay = wait.Jitter(5*time.Second, 2)
-			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time, backlogDuration, importDelay)
+			logger.Warnf("Prometheus metrics import backlog detected: imported data for Prometheus ReportDataSource %s newest imported metric timestamp %s is %s away, queuing to reprocess in %s", dataSource.Name, importStatus.ImportDataEndTime.Time, backlogDuration, importDelay)
 		}
 
 		if len(results.Metrics) != 0 {
@@ -243,28 +269,31 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 			// if there is no existing timestamp then this must be the ***REMOVED***rst import
 			// and we should set the earliestImportedMetricTime
-			if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime == nil {
-				dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime = &metav1.Time{Time: ***REMOVED***rstMetric.Timestamp}
-			} ***REMOVED*** if dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
+			if importStatus.EarliestImportedMetricTime == nil {
+				importStatus.EarliestImportedMetricTime = &metav1.Time{Time: ***REMOVED***rstMetric.Timestamp}
+			} ***REMOVED*** if importStatus.EarliestImportedMetricTime.After(***REMOVED***rstMetric.Timestamp) {
 				dataSourceLogger.Errorf("detected time new metric import has older data than previously imported, data is likely duplicated.")
 				// TODO(chance): Look at adding an error to the status.
 				return nil // strop processing this ReportDataSource
 			}
 
-			if dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime == nil || lastMetric.Timestamp.After(dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime.Time) {
-				dataSource.Status.PrometheusMetricImportStatus.NewestImportedMetricTime = &metav1.Time{Time: lastMetric.Timestamp}
+			if importStatus.NewestImportedMetricTime == nil || lastMetric.Timestamp.After(importStatus.NewestImportedMetricTime.Time) {
+				importStatus.NewestImportedMetricTime = &metav1.Time{Time: lastMetric.Timestamp}
 			}
 
-			if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
-				logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
-			}
 			if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+				logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+			}
+			if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
 				logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
 			}
 		}
 
 		// Update the status to indicate where we are in the metric import process
-		dataSource, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+			newDS.Status.PrometheusMetricImportStatus = importStatus
+		})
 		if err != nil {
 			return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSource.Name, err)
 		}
@@ -282,14 +311,8 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return fmt.Errorf("ReportDataSource %q: improperly con***REMOVED***gured datasource, source is empty", dataSource.Name)
 	}
 
-	if dataSource.Status.TableName != "" {
-		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", dataSource.Status.TableName)
-	} ***REMOVED*** {
-		logger.Infof("new AWSBilling ReportDataSource discovered")
-	}
-
+	logger.Debugf("querying bucket %#v for AWS Billing manifests for ReportDataSource %s", source, dataSource.Name)
 	manifestRetriever := aws.NewManifestRetriever(source.Region, source.Bucket, source.Pre***REMOVED***x)
-
 	manifests, err := manifestRetriever.RetrieveManifests()
 	if err != nil {
 		return err
@@ -300,37 +323,42 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return nil
 	}
 
-	if dataSource.Status.TableName == "" {
+	var hiveTable *cbTypes.HiveTable
+	if dataSource.Status.TableRef.Name == "" {
+		logger.Infof("new AWSBilling ReportDataSource discovered")
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
 		logger.Debugf("creating AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-		err = op.createAWSUsageTable(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
+		hiveTable, err = op.createAWSUsageHiveTableCR(logger, dataSource, tableName, source.Bucket, source.Pre***REMOVED***x, manifests)
 		if err != nil {
 			return err
 		}
 
 		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-		dataSource, err = op.updateDataSourceTableName(logger, dataSource, tableName)
+		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
+		})
 		if err != nil {
 			return err
 		}
-	}
-
-	gauge := awsBillingReportDatasourcePartitionsGauge.WithLabelValues(dataSource.Name, dataSource.Status.TableName)
-	prestoTableResourceName := reportingutil.PrestoTableResourceNameFromKind("ReportDataSource", dataSource.Namespace, dataSource.Name)
-	prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(prestoTableResourceName)
-	if err != nil {
-		// if not found, try for the uncached copy
-		if apierrors.IsNotFound(err) {
-			prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(dataSource.Namespace).Get(prestoTableResourceName, metav1.GetOptions{})
-			if err != nil {
+	} ***REMOVED*** {
+		hiveTableResourceName := reportingutil.TableResourceNameFromKind("ReportDataSource", dataSource.Namespace, dataSource.Name)
+		hiveTable, err = op.hiveTableLister.HiveTables(dataSource.Namespace).Get(hiveTableResourceName)
+		if err != nil {
+			// if not found, try for the uncached copy
+			if apierrors.IsNotFound(err) {
+				hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(dataSource.Namespace).Get(hiveTableResourceName, metav1.GetOptions{})
+				if err != nil {
+					return err
+				}
+			} ***REMOVED*** {
 				return err
 			}
-		} ***REMOVED*** {
-			return err
 		}
+		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", hiveTable.Status.TableName)
 	}
 
-	err = op.updateAWSBillingPartitions(logger, gauge, source, prestoTable, manifests)
+	err = op.updateAWSBillingPartitions(logger, dataSource, source, hiveTable, manifests)
 	if err != nil {
 		return fmt.Errorf("error updating AWS billing partitions for ReportDataSource %s: %v", dataSource.Name, err)
 	}
@@ -340,183 +368,170 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	logger.Infof("queuing AWSBilling ReportDataSource %s to update partitions again in %s at %s", dataSource.Name, partitionUpdateInterval, nextUpdate)
 	op.enqueueReportDataSourceAfter(dataSource, partitionUpdateInterval)
 
-	if err := op.queueDependentReportGenerationQueriesForDataSource(dataSource); err != nil {
-		logger.WithError(err).Errorf("error queuing ReportGenerationQuery dependents of ReportDataSource %s", dataSource.Name)
-	}
 	if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+	}
+	if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
 		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
 	}
 	return nil
 }
 
-func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, partitionsGauge prometheus.Gauge, source *cbTypes.S3Bucket, prestoTable *cbTypes.PrestoTable, manifests []*aws.Manifest) error {
-	logger.Infof("updating partitions for presto table %s", prestoTable.Name)
-	// Fetch the billing manifests
-	if len(manifests) == 0 {
-		logger.Warnf("PrestoTable %q has no report manifests in its bucket, the ***REMOVED***rst report has likely not been generated yet", prestoTable.Name)
-		return nil
+func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if dataSource.Spec.PrestoTable == nil {
+		return fmt.Errorf("%s is not a PrestoTable ReportDataSource", dataSource.Name)
+	}
+	if dataSource.Spec.PrestoTable.TableRef.Name == "" {
+		return fmt.Errorf("invalid PrestoTable ReportDataSource %s, spec.prestoTable.tableRef.name must be set", dataSource.Name)
 	}
 
-	// Compare the manifests list and existing partitions, deleting stale
-	// partitions and creating missing partitions
-	currentPartitions := prestoTable.Status.Partitions
-	desiredPartitions, err := getDesiredPartitions(source.Bucket, manifests)
-	if err != nil {
-		return err
-	}
-
-	changes := getPartitionChanges(currentPartitions, desiredPartitions)
-
-	currentPartitionsList := make([]string, len(currentPartitions))
-	desiredPartitionsList := make([]string, len(desiredPartitions))
-	toRemovePartitionsList := make([]string, len(changes.toRemovePartitions))
-	toAddPartitionsList := make([]string, len(changes.toAddPartitions))
-	toUpdatePartitionsList := make([]string, len(changes.toUpdatePartitions))
-
-	for i, p := range currentPartitions {
-		currentPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range desiredPartitions {
-		desiredPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toRemovePartitions {
-		toRemovePartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toAddPartitions {
-		toAddPartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-	for i, p := range changes.toUpdatePartitions {
-		toUpdatePartitionsList[i] = fmt.Sprintf("%#v", p)
-	}
-
-	logger.Debugf("current partitions: %s", strings.Join(currentPartitionsList, ", "))
-	logger.Debugf("desired partitions: %s", strings.Join(desiredPartitionsList, ", "))
-	logger.Debugf("partitions to remove: [%s]", strings.Join(toRemovePartitionsList, ", "))
-	logger.Debugf("partitions to add: [%s]", strings.Join(toAddPartitionsList, ", "))
-	logger.Debugf("partitions to update: [%s]", strings.Join(toUpdatePartitionsList, ", "))
-
-	var toRemove = append(changes.toRemovePartitions, changes.toUpdatePartitions...)
-	var toAdd = append(changes.toAddPartitions, changes.toUpdatePartitions...)
-
-	// We do removals then additions so that updates are supported as a combination of remove + add partition
-	tableName := prestoTable.Status.Parameters.Name
-	for _, p := range toRemove {
-		start := p.PartitionSpec["start"]
-		end := p.PartitionSpec["end"]
-
-		logger.Warnf("Deleting partition from presto table %q with range %s-%s", tableName, start, end)
-		err = op.awsTablePartitionManager.DropPartition(tableName, start, end)
+	var prestoTable *cbTypes.PrestoTable
+	if dataSource.Status.TableRef.Name != "" {
+		var err error
+		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to drop partition in table %s for range %s-%s", tableName, start, end)
+			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
+		}
+		logger.Infof("existing PrestoTable ReportDataSource discovered, tableName: %s", prestoTable.Status.TableName)
+	} ***REMOVED*** {
+		logger.Infof("new PrestoTable ReportDataSource discovered, tableName: %s", dataSource.Spec.PrestoTable.TableRef.Name)
+		var err error
+		prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, dataSource.Spec.PrestoTable.TableRef.Name, time.Second, 10*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
+		}
+
+		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
+		})
+		if err != nil {
+			logger.WithError(err).Errorf("failed to update ReportDataSource status.tableRef ***REMOVED***eld %q", prestoTable.Name)
 			return err
 		}
-		logger.Debugf("partition successfully deleted from presto table %q with range %s-%s", tableName, start, end)
 	}
 
-	for _, p := range toAdd {
-		start := p.PartitionSpec["start"]
-		end := p.PartitionSpec["end"]
-
-		// This partition doesn't exist in hive. Create it.
-		logger.Debugf("Adding partition to presto table %q with range %s-%s", tableName, start, end)
-		err = op.awsTablePartitionManager.AddPartition(tableName, start, end, p.Location)
-		if err != nil {
-			logger.WithError(err).Errorf("failed to add partition in table %s for range %s-%s at location %s", prestoTable.Status.Parameters.Name, p.PartitionSpec["start"], p.PartitionSpec["end"], p.Location)
-			return err
-		}
-		logger.Debugf("partition successfully added to presto table %q with range %s-%s", tableName, start, end)
-	}
-
-	prestoTable.Status.Partitions = desiredPartitions
-
-	numPartitions := len(desiredPartitionsList)
-	partitionsGauge.Set(float64(numPartitions))
-
-	_, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
-	if err != nil {
-		logger.WithError(err).Errorf("failed to update PrestoTable CR partitions for %q", prestoTable.Name)
-		return err
-	}
-
-	logger.Infof("***REMOVED***nished updating partitions for prestoTable %q", prestoTable.Name)
 	return nil
 }
 
-func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]cbTypes.TablePartition, error) {
-	desiredPartitions := make([]cbTypes.TablePartition, 0)
-	// Manifests have a one-to-one correlation with hive currentPartitions
-	for _, manifest := range manifests {
-		manifestPath := manifest.DataDirectory()
-		location, err := hive.S3Location(bucket, manifestPath)
-		if err != nil {
-			return nil, err
-		}
-
-		start := reportingutil.BillingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
-		end := reportingutil.BillingPeriodTimestamp(manifest.BillingPeriod.End.Time)
-		p := cbTypes.TablePartition{
-			Location: location,
-			PartitionSpec: presto.PartitionSpec{
-				"start": start,
-				"end":   end,
-			},
-		}
-		desiredPartitions = append(desiredPartitions, p)
+func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if dataSource.Spec.GenerationQueryView == nil {
+		return fmt.Errorf("%s is not a GenerationQueryView ReportDataSource", dataSource.Name)
 	}
-	return desiredPartitions, nil
-}
-
-type partitionChanges struct {
-	toRemovePartitions []cbTypes.TablePartition
-	toAddPartitions    []cbTypes.TablePartition
-	toUpdatePartitions []cbTypes.TablePartition
-}
-
-func getPartitionChanges(currentPartitions, desiredPartitions []cbTypes.TablePartition) partitionChanges {
-	currentPartitionsSet := make(map[string]cbTypes.TablePartition)
-	desiredPartitionsSet := make(map[string]cbTypes.TablePartition)
-
-	for _, p := range currentPartitions {
-		currentPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
-	}
-	for _, p := range desiredPartitions {
-		desiredPartitionsSet[fmt.Sprintf("%s_%s", p.PartitionSpec["start"], p.PartitionSpec["end"])] = p
+	if dataSource.Spec.GenerationQueryView.QueryName == "" {
+		return fmt.Errorf("invalid GenerationQueryView ReportDataSource %s, spec.generationQueryView.queryName must be set", dataSource.Name)
 	}
 
-	var toRemovePartitions, toAddPartitions, toUpdatePartitions []cbTypes.TablePartition
-
-	for key, partition := range currentPartitionsSet {
-		if _, exists := desiredPartitionsSet[key]; !exists {
-			toRemovePartitions = append(toRemovePartitions, partition)
-		}
-	}
-	for key, partition := range desiredPartitionsSet {
-		if _, exists := currentPartitionsSet[key]; !exists {
-			toAddPartitions = append(toAddPartitions, partition)
-		}
-	}
-	for key, existingPartition := range currentPartitionsSet {
-		if newPartition, exists := desiredPartitionsSet[key]; exists && (newPartition.Location != existingPartition.Location) {
-			// use newPartition so toUpdatePartitions contains the desired partition state
-			toUpdatePartitions = append(toUpdatePartitions, newPartition)
-		}
-	}
-
-	return partitionChanges{
-		toRemovePartitions: toRemovePartitions,
-		toAddPartitions:    toAddPartitions,
-		toUpdatePartitions: toUpdatePartitions,
-	}
-}
-
-func (op *Reporting) updateDataSourceTableName(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName string) (*cbTypes.ReportDataSource, error) {
-	dataSource.Status.TableName = tableName
-	ds, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace).Update(dataSource)
+	generationQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(dataSource.Namespace).Get(dataSource.Spec.GenerationQueryView.QueryName)
 	if err != nil {
-		logger.WithError(err).Errorf("failed to update ReportDataSource table name for %q", dataSource.Name)
-		return nil, err
+		return fmt.Errorf("unable to get ReportGenerationQuery %s for GenerationQueryView ReportDataSource %s: %s", dataSource.Spec.GenerationQueryView.QueryName, dataSource.Name, err)
 	}
-	return ds, nil
+
+	var viewName string
+	createView := false
+	if dataSource.Status.TableRef.Name == "" {
+		logger.Infof("new ReportDataSource discovered")
+		viewName = reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
+		createView = true
+	} ***REMOVED*** {
+		prestoTable, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
+		if err != nil {
+			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
+		}
+		logger.Infof("existing ReportDataSource discovered, viewName: %s", prestoTable.Status.TableName)
+		viewName = prestoTable.Status.TableName
+	}
+
+	dependencyResult, err := op.dependencyResolver.ResolveDependencies(generationQuery.Namespace, generationQuery.Spec.Inputs, nil)
+	if err != nil {
+		return err
+	}
+
+	err = reporting.ValidateGenerationQueryDependencies(dependencyResult.Dependencies, op.uninitialiedDependendenciesHandler())
+	if err != nil {
+		if reporting.IsUninitializedDependencyError(err) {
+			logger.Warnf("unable to validate ReportGenerationQuery %s, has uninitialized dependencies: %v", generationQuery.Name, err)
+			// We do not return an error because we do not need to requeue this
+			// query. Instead we can wait until this queries uninitialized
+			// dependencies become initialized. After they're initialized they
+			// will queue anything that depends on them, including this query.
+			return nil
+		} ***REMOVED*** if reporting.IsInvalidDependencyError(err) {
+			logger.WithError(err).Errorf("unable to validate ReportGenerationQuery %s, has invalid dependencies, dropping off queue", generationQuery.Name)
+			// Invalid dependency means it will not resolve itself, so do not
+			// return an error since we do not want to be requeued unless the
+			// resource is modi***REMOVED***ed, or it's dependencies are modi***REMOVED***ed.
+			return nil
+		} ***REMOVED*** {
+			// The error occurred when getting the dependencies or for an
+			// unknown reason so we want to retry up to a limit. This most
+			// commonly occurs when fetching a dependency from the API fails,
+			// or if there is a cyclic dependency.
+			return fmt.Errorf("unable to get or validate ReportGenerationQuery dependencies %s: %v", generationQuery.Name, err)
+		}
+	}
+
+	if createView {
+		hiveStorage, err := op.getHiveStorage(nil, dataSource.Namespace)
+		if err != nil {
+			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
+		}
+		if hiveStorage.Status.Hive.DatabaseName == "" {
+			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
+		}
+		prestoTables, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).List(labels.Everything())
+		if err != nil {
+			return err
+		}
+
+		queryCtx := &reporting.ReportQueryTemplateContext{
+			Namespace:               dataSource.Namespace,
+			ReportQuery:             generationQuery,
+			Reports:                 dependencyResult.Dependencies.Reports,
+			ReportGenerationQueries: dependencyResult.Dependencies.ReportGenerationQueries,
+			ReportDataSources:       dependencyResult.Dependencies.ReportDataSources,
+			PrestoTables:            prestoTables,
+		}
+		renderedQuery, err := reporting.RenderQuery(queryCtx, reporting.TemplateContext{
+			Report: reporting.ReportTemplateInfo{
+				Inputs: dependencyResult.InputValues,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		columns := reportingutil.GeneratePrestoColumns(generationQuery)
+		logger.Infof("creating view %s", viewName)
+		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportGenerationQueryGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
+		if err != nil {
+			return fmt.Errorf("error creating view %s for ReportDataSource %s: %v", viewName, dataSource.Name, err)
+		}
+		prestoTable, err = op.waitForPrestoTable(prestoTable.Namespace, prestoTable.Name, time.Second, 10*time.Second)
+		if err != nil {
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
+		}
+
+		logger.Infof("created view %s", viewName)
+
+		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+			newDS.Status.TableRef.Name = prestoTable.Name
+		})
+		if err != nil {
+			logger.WithError(err).Errorf("failed to update ReportDataSource tableRef ***REMOVED***eld to %q", prestoTable.Name)
+			return err
+		}
+	}
+
+	if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+	}
+	if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
+		logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+	}
+
+	return nil
 }
 
 func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
@@ -550,19 +565,45 @@ func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }
 
-// queueDependentReportGenerationQueriesForDataSource will queue all ReportGenerationQueries in the namespace which have a dependency on the dataSource
-func (op *Reporting) queueDependentReportGenerationQueriesForDataSource(dataSource *cbTypes.ReportDataSource) error {
-	queries, err := op.reportGenerationQueryLister.ReportGenerationQueries(dataSource.Namespace).List(labels.Everything())
+func (op *Reporting) getGenerationQueryDependencies(namespace, name string, inputVals []cbTypes.ReportGenerationQueryInputValue) (*reporting.ReportGenerationQueryDependencies, error) {
+	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
+	genQuery, err := queryGetter.GetReportGenerationQuery(namespace, name)
+	if err != nil {
+		return nil, err
+	}
+	result, err := op.dependencyResolver.ResolveDependencies(genQuery.Namespace, genQuery.Spec.Inputs, inputVals)
+	if err != nil {
+		return nil, err
+	}
+	return result.Dependencies, nil
+}
+
+func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *cbTypes.ReportDataSource) error {
+	// Look at reportDataSources in the namespace of this dataSource
+	reportDataSources, err := op.reportDataSourceLister.ReportDataSources(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
 		return err
 	}
 
-	for _, query := range queries {
-		// look at the list ReportDataSource of dependencies
-		for _, dependency := range query.Spec.DataSources {
-			if dependency == dataSource.Name {
-				// this query depends on the ReportDataSource passed in
-				op.enqueueReportGenerationQuery(query)
+	// For each reportDataSource in the dataSource's namespace, check for
+	// reportDataSources that have a dependency on the provided dataSource
+	for _, ds := range reportDataSources {
+		// Only ReportDataSources that create a view from a
+		// ReportGenerationQuery depend on other ReportDataSources.
+		if ds.Spec.GenerationQueryView == nil {
+			continue
+		}
+
+		deps, err := op.getGenerationQueryDependencies(ds.Namespace, ds.Name, ds.Spec.GenerationQueryView.Inputs)
+		if err != nil {
+			return fmt.Errorf("unable to get dependencies for GenerationQueryView ReportDataSource %s: %s", ds.Name, err)
+		}
+
+		// If this reportDataSource has a dependency on the passed in
+		// dataSource, queue it
+		for _, depDataSource := range deps.ReportDataSources {
+			if depDataSource.Name == dataSource.Name {
+				op.enqueueReportDataSource(ds)
 				break
 			}
 		}
@@ -596,4 +637,20 @@ func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.Repo
 
 	}
 	return nil
+}
+
+func updateReportDataSource(dsClient cbInterfaces.ReportDataSourceInterface, dsName string, updateFunc func(*cbTypes.ReportDataSource)) (*cbTypes.ReportDataSource, error) {
+	var ds *cbTypes.ReportDataSource
+	if err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		newDS, err := dsClient.Get(dsName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		updateFunc(newDS)
+		ds, err = dsClient.Update(newDS)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return ds, nil
 }

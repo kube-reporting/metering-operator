@@ -37,6 +37,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=metering.openshift.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("hivetables"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().HiveTables().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("prestotables"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().PrestoTables().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("reports"):

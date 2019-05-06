@@ -4,18 +4,19 @@ metadata:
   name: "operator-metering"
 spec:
   # If you want to use S3 for storage of reports, and collected metrics, edit
-  # the defaultStorage section below, and set awsAccessKeyID and
+  # the hive metastoreWarehouseDir below, and set awsAccessKeyID and
   # awsSecretAccessKey for reporting-operator and presto
+
   defaultStorage:
-    create: true
-    name: "s3"
-    isDefault: true
     type: "hive"
     hive:
-      tableProperties:
-        # update this with the name of your bucket and the path within
-        # that bucket you wish to use. Do not change the s3a:// protocol.
-        location: "s3a://bucketName/pathInBucket"
+      # unmanagedDatabase false indicates that this should be created by
+      # reporting-operator
+      unmanagedDatabase: false
+      # feel free to adjust the database name  and location
+      databaseName: "metering-s3"
+      # s3a:// must be used
+      location: "s3a://bucketName/pathInBucket"
 
   reporting-operator:
     spec:
@@ -32,7 +33,10 @@ spec:
         awsSecretAccessKey: "REPLACEME"
       hive:
         con***REMOVED***g:
+          # set to false when spec.hdfs.enabled is false
           useHdfsCon***REMOVED***gMap: false
+          # Replace this with your bucket
+          metastoreWarehouseDir: "s3a://bucketName/pathInBucket"
 
   hdfs:
     # disable HDFS components when using S3 to avoid wasting resources.

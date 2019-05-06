@@ -23,6 +23,7 @@ type StorageLocationsGetter interface {
 type StorageLocationInterface interface {
 	Create(*v1alpha1.StorageLocation) (*v1alpha1.StorageLocation, error)
 	Update(*v1alpha1.StorageLocation) (*v1alpha1.StorageLocation, error)
+	UpdateStatus(*v1alpha1.StorageLocation) (*v1alpha1.StorageLocation, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1alpha1.StorageLocation, error)
@@ -110,6 +111,22 @@ func (c *storageLocations) Update(storageLocation *v1alpha1.StorageLocation) (re
 		Namespace(c.ns).
 		Resource("storagelocations").
 		Name(storageLocation.Name).
+		Body(storageLocation).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *storageLocations) UpdateStatus(storageLocation *v1alpha1.StorageLocation) (result *v1alpha1.StorageLocation, err error) {
+	result = &v1alpha1.StorageLocation{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("storagelocations").
+		Name(storageLocation.Name).
+		SubResource("status").
 		Body(storageLocation).
 		Do().
 		Into(result)

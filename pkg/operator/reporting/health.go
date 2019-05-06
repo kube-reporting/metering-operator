@@ -12,22 +12,21 @@ import (
 type PrestoHealthChecker struct {
 	logger       logrus.FieldLogger
 	queryer      db.Queryer
-	tableManager TableManager
+	tableManager HiveTableManager
 
-	tableName       string
-	tableProperties hive.TableProperties
+	databaseName, tableName string
 	// ensures only at most a single testRead query is running against Presto
 	// at one time
 	healthCheckSingleFlight singleflight.Group
 }
 
-func NewPrestoHealthChecker(logger logrus.FieldLogger, queryer db.Queryer, tableManager TableManager, tableName string, tableProperties hive.TableProperties) *PrestoHealthChecker {
+func NewPrestoHealthChecker(logger logrus.FieldLogger, queryer db.Queryer, tableManager HiveTableManager, databaseName, tableName string) *PrestoHealthChecker {
 	return &PrestoHealthChecker{
-		logger:          logger,
-		queryer:         queryer,
-		tableManager:    tableManager,
-		tableName:       tableName,
-		tableProperties: tableProperties,
+		logger:       logger,
+		queryer:      queryer,
+		tableManager: tableManager,
+		databaseName: databaseName,
+		tableName:    tableName,
 	}
 }
 
@@ -67,11 +66,11 @@ func (checker *PrestoHealthChecker) TestWriteToPresto() bool {
 	columns := []hive.Column{{Name: "check_time", Type: "TIMESTAMP"}}
 
 	params := hive.TableParameters{
-		Name:         checker.tableName,
-		Columns:      columns,
-		IgnoreExists: true,
+		Database: checker.databaseName,
+		Name:     checker.tableName,
+		Columns:  columns,
 	}
-	err := checker.tableManager.CreateTable(params, checker.tableProperties)
+	err := checker.tableManager.CreateTable(params, true)
 	if err != nil {
 		logger.WithError(err).Errorf("cannot create Presto table %s", checker.tableName)
 		return false

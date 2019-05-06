@@ -7,31 +7,57 @@ spec:
       spec:
         promsum:
           query: "pod-request-cpu-cores"
+    pod-cpu-request-raw:
+      spec:
+        generationQueryView:
+          queryName: "pod-cpu-request-raw"
+
     pod-limit-cpu-cores:
       spec:
         promsum:
           query: "pod-limit-cpu-cores"
+
     pod-usage-cpu-cores:
       spec:
         promsum:
           query: "pod-usage-cpu-cores"
+    pod-cpu-usage-raw:
+      spec:
+        generationQueryView:
+          queryName: "pod-cpu-usage-raw"
 
     pod-request-memory-bytes:
       spec:
         promsum:
           query: "pod-request-memory-bytes"
+    pod-memory-request-raw:
+      spec:
+        generationQueryView:
+          queryName: "pod-memory-request-raw"
+
     pod-limit-memory-bytes:
       spec:
         promsum:
           query: "pod-limit-memory-bytes"
+
     pod-usage-memory-bytes:
       spec:
         promsum:
           query: "pod-usage-memory-bytes"
+    pod-memory-usage-raw:
+      spec:
+        generationQueryView:
+          queryName: "pod-memory-usage-raw"
+
     persistentvolumeclaim-request-bytes:
       spec:
         promsum:
           query: "persistentvolumeclaim-request-bytes"
+    persistentvolumeclaim-request-raw:
+      spec:
+        generationQueryView:
+          queryName: "persistentvolumeclaim-request-raw"
+
     pod-persistentvolumeclaim-request-info:
       spec:
         promsum:
@@ -41,39 +67,85 @@ spec:
       spec:
         promsum:
           query: "persistentvolumeclaim-capacity-bytes"
+    persistentvolumeclaim-capacity-raw:
+      spec:
+        generationQueryView:
+          queryName: "persistentvolumeclaim-capacity-raw"
+
     persistentvolumeclaim-usage-bytes:
       spec:
         promsum:
           query: "persistentvolumeclaim-usage-bytes"
+    persistentvolumeclaim-usage-raw:
+      spec:
+        generationQueryView:
+          queryName: "persistentvolumeclaim-usage-raw"
+
     persistentvolumeclaim-phase:
       spec:
         promsum:
           query: "persistentvolumeclaim-phase"
+    persistentvolumeclaim-phase-raw:
+      spec:
+        generationQueryView:
+          queryName: "persistentvolumeclaim-phase-raw"
+
+    persistentvolumeclaim-usage-with-phase-raw:
+      spec:
+        generationQueryView:
+          queryName: "persistentvolumeclaim-usage-with-phase-raw"
+
 
     node-allocatable-memory-bytes:
       spec:
         promsum:
           query: "node-allocatable-memory-bytes"
+    node-memory-allocatable-raw:
+      spec:
+        generationQueryView:
+          queryName: "node-memory-allocatable-raw"
+
     node-capacity-memory-bytes:
       spec:
         promsum:
           query: "node-capacity-memory-bytes"
+    node-memory-capacity-raw:
+      spec:
+        generationQueryView:
+          queryName: "node-memory-capacity-raw"
 
     node-allocatable-cpu-cores:
       spec:
         promsum:
           query: "node-allocatable-cpu-cores"
+    node-cpu-allocatable-raw:
+      spec:
+        generationQueryView:
+          queryName: "node-cpu-allocatable-raw"
+
     node-capacity-cpu-cores:
       spec:
         promsum:
           query: "node-capacity-cpu-cores"
+    node-cpu-capacity-raw:
+      spec:
+        generationQueryView:
+          queryName: "node-cpu-capacity-raw"
 
+    cluster-cpu-usage-raw:
+      spec:
+        generationQueryView:
+          queryName: "cluster-cpu-usage-raw"
+    cluster-memory-usage-raw:
+      spec:
+        generationQueryView:
+          queryName: "cluster-memory-usage-raw"
 
-  defaultStorage:
-    create: true
-    name: "hive-hdfs"
-    isDefault: true
-    type: "hive"
-    hive:
-      tableProperties:
-        location: "hdfs://hdfs-namenode-proxy:9820/operator_metering/storage/"
+    cluster-cpu-capacity-raw:
+      spec:
+        generationQueryView:
+          queryName: "cluster-cpu-capacity-raw"
+    cluster-memory-capacity-raw:
+      spec:
+        generationQueryView:
+          queryName: "cluster-memory-capacity-raw"

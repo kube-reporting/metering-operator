@@ -1,12 +1,12 @@
 package operator
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
@@ -241,11 +241,19 @@ func TestValidateReport(t *testing.T) {
 		testReportName           = "test-report"
 		testQueryName            = "test-query"
 		testInvalidQueryName     = "invalid-query"
+		testInvalidQueryName2    = "invalid-query2"
 		testNonExistentQueryName = "does-not-exist"
 	)
 
 	ds1 := testhelpers.NewReportDataSource("datasource1", testNamespace)
-	ds1.Status.TableName = reportingutil.DataSourceTableName("test-ns", "initialized-datasource")
+	ds1.Status.TableRef = v1.LocalObjectReference{Name: "initialized-datasource"}
+	// ds2 is uninitialized
+	ds2 := testhelpers.NewReportDataSource("datasource2", testNamespace)
+
+	newDefault := func(s string) *json.RawMessage {
+		v := json.RawMessage(s)
+		return &v
+	}
 
 	testValidQuery := &metering.ReportGenerationQuery{
 		ObjectMeta: metav1.ObjectMeta{
@@ -253,8 +261,13 @@ func TestValidateReport(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: metering.ReportGenerationQuerySpec{
-			DataSources: []string{
-				ds1.Name,
+			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+				{
+					Name:     "ds",
+					Type:     "ReportDataSource",
+					Required: true,
+					Default:  newDefault((`"` + ds1.Name + `"`)),
+				},
 			},
 		},
 	}
@@ -265,13 +278,38 @@ func TestValidateReport(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: metering.ReportGenerationQuerySpec{
-			DataSources: []string{"this-does-not-exist"},
+			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+				{
+					Name:     "ds",
+					Type:     "ReportDataSource",
+					Required: true,
+					Default:  newDefault(`"this-does-not-exist"`),
+				},
+			},
 		},
 	}
 
-	dataSourceGetter := testhelpers.NewReportDataSourceStore([]*metering.ReportDataSource{ds1})
-	queryGetter := testhelpers.NewReportGenerationQueryStore([]*metering.ReportGenerationQuery{testValidQuery, testInvalidQuery})
+	testInvalidQuery2 := &metering.ReportGenerationQuery{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      testInvalidQueryName2,
+			Namespace: testNamespace,
+		},
+		Spec: metering.ReportGenerationQuerySpec{
+			Inputs: []metering.ReportGenerationQueryInputDe***REMOVED***nition{
+				{
+					Name:     "ds",
+					Type:     "ReportDataSource",
+					Required: true,
+					Default:  newDefault((`"` + ds2.Name + `"`)),
+				},
+			},
+		},
+	}
+
+	dataSourceGetter := testhelpers.NewReportDataSourceStore([]*metering.ReportDataSource{ds1, ds2})
+	queryGetter := testhelpers.NewReportGenerationQueryStore([]*metering.ReportGenerationQuery{testValidQuery, testInvalidQuery, testInvalidQuery2})
 	reportGetter := testhelpers.NewReportStore(nil)
+	dependencyResolver := reporting.NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter)
 
 	reportStart := &time.Time{}
 	reportEndTmp := reportStart.AddDate(0, 1, 0)
@@ -308,10 +346,16 @@ func TestValidateReport(t *testing.T) {
 			expectErrMsg: fmt.Sprintf("ReportGenerationQuery (%s) does not exist", testNonExistentQueryName),
 		},
 		{
-			name:         "valid report with invalid DataSource returns error",
+			name:         "valid report with missing DataSource returns error",
 			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, true),
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("failed to validate ReportGenerationQuery dependencies %s: %s", testInvalidQueryName, "ReportDataSource.metering.openshift.io \"this-does-not-exist\" not found"),
+			expectErrMsg: fmt.Sprintf("failed to resolve ReportGenerationQuery dependencies %s: %s", testInvalidQueryName, "ReportDataSource.metering.openshift.io \"this-does-not-exist\" not found"),
+		},
+		{
+			name:         "valid report with uninitalized DataSource returns error",
+			report:       testhelpers.NewReport(testReportName, testNamespace, testInvalidQueryName2, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, true),
+			expectErr:    true,
+			expectErrMsg: fmt.Sprintf("failed to validate ReportGenerationQuery dependencies %s: ReportGenerationQueryDependencyValidationError: uninitialized ReportDataSource dependencies: %s", testInvalidQueryName2, ds2.Name),
 		},
 		{
 			name:         "valid report with valid DataSource returns nil",
@@ -324,8 +368,9 @@ func TestValidateReport(t *testing.T) {
 	for _, testCase := range testTable {
 		testCase := testCase
 
+		noopHandler := &reporting.UninitialiedDependendenciesHandler{HandleUninitializedReportDataSource: func(ds *metering.ReportDataSource) {}}
 		t.Run(testCase.name, func(t *testing.T) {
-			_, _, err := validateReport(testCase.report, queryGetter, dataSourceGetter, reportGetter, &reporting.UninitialiedDependendenciesHandler{})
+			_, _, err := validateReport(testCase.report, queryGetter, dependencyResolver, noopHandler)
 
 			if testCase.expectErr {
 				assert.EqualErrorf(t, err, testCase.expectErrMsg, "expected that validateReport would return the correct error message")

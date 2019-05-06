@@ -29,34 +29,45 @@ After the above command you should be given a prompt, where you can run queries.
 
 ```
 presto:default> show tables;
-                  Table
-------------------------------------------
- operator_health_check
- datasource_aws_billing
- datasource_node_allocatable_cpu_cores
- datasource_node_allocatable_memory_bytes
- datasource_node_capacity_cpu_cores
- datasource_node_capacity_memory_bytes
- datasource_pod_limit_cpu_cores
- datasource_pod_limit_memory_bytes
- datasource_pod_request_cpu_cores
- datasource_pod_request_memory_bytes
- datasource_pod_usage_cpu_cores
- datasource_pod_usage_memory_bytes
- view_aws_ec2_billing_data
- view_node_cpu_allocatable
- view_node_cpu_capacity
- view_node_memory_allocatable
- view_node_memory_capacity
- view_pod_cpu_request_raw
- view_pod_cpu_usage_raw
- view_pod_memory_request_raw
- view_pod_memory_usage_raw
-(22 rows)
+                                 Table
+------------------------------------------------------------------------
+ datasource_your_namespace_cluster_cpu_capacity_raw
+ datasource_your_namespace_cluster_cpu_usage_raw
+ datasource_your_namespace_cluster_memory_capacity_raw
+ datasource_your_namespace_cluster_memory_usage_raw
+ datasource_your_namespace_node_allocatable_cpu_cores
+ datasource_your_namespace_node_allocatable_memory_bytes
+ datasource_your_namespace_node_capacity_cpu_cores
+ datasource_your_namespace_node_capacity_memory_bytes
+ datasource_your_namespace_node_cpu_allocatable_raw
+ datasource_your_namespace_node_cpu_capacity_raw
+ datasource_your_namespace_node_memory_allocatable_raw
+ datasource_your_namespace_node_memory_capacity_raw
+ datasource_your_namespace_persistentvolumeclaim_capacity_bytes
+ datasource_your_namespace_persistentvolumeclaim_capacity_raw
+ datasource_your_namespace_persistentvolumeclaim_phase
+ datasource_your_namespace_persistentvolumeclaim_phase_raw
+ datasource_your_namespace_persistentvolumeclaim_request_bytes
+ datasource_your_namespace_persistentvolumeclaim_request_raw
+ datasource_your_namespace_persistentvolumeclaim_usage_bytes
+ datasource_your_namespace_persistentvolumeclaim_usage_raw
+ datasource_your_namespace_persistentvolumeclaim_usage_with_phase_raw
+ datasource_your_namespace_pod_cpu_request_raw
+ datasource_your_namespace_pod_cpu_usage_raw
+ datasource_your_namespace_pod_limit_cpu_cores
+ datasource_your_namespace_pod_limit_memory_bytes
+ datasource_your_namespace_pod_memory_request_raw
+ datasource_your_namespace_pod_memory_usage_raw
+ datasource_your_namespace_pod_persistentvolumeclaim_request_info
+ datasource_your_namespace_pod_request_cpu_cores
+ datasource_your_namespace_pod_request_memory_bytes
+ datasource_your_namespace_pod_usage_cpu_cores
+ datasource_your_namespace_pod_usage_memory_bytes
+(32 rows)
 
-Query 20180419_183245_12728_p64yz, FINISHED, 1 node
-Splits: 18 total, 18 done (100.00%)
-0:00 [22 rows, 986B] [110 rows/s, 4.83KB/s]
+Query 20190503_175727_00107_3venm, FINISHED, 1 node
+Splits: 19 total, 19 done (100.00%)
+0:02 [32 rows, 2.23KB] [19 rows/s, 1.37KB/s]
 
 presto:default>
 ```
@@ -73,32 +84,43 @@ After the above command you should be given a prompt, where you can run queries.
 
 ```
 0: jdbc:hive2://127.0.0.1:10000/default> show tables;
-+-------------------------------------------+
-|                 tab_name                  |
-+-------------------------------------------+
-| operator_health_check                     |
-| datasource_aws_billing                    |
-| datasource_node_allocatable_cpu_cores     |
-| datasource_node_allocatable_memory_bytes  |
-| datasource_node_capacity_cpu_cores        |
-| datasource_node_capacity_memory_bytes     |
-| datasource_pod_limit_cpu_cores            |
-| datasource_pod_limit_memory_bytes         |
-| datasource_pod_request_cpu_cores          |
-| datasource_pod_request_memory_bytes       |
-| datasource_pod_usage_cpu_cores            |
-| datasource_pod_usage_memory_bytes         |
-| view_aws_ec2_billing_data                 |
-| view_node_cpu_allocatable                 |
-| view_node_cpu_capacity                    |
-| view_node_memory_allocatable              |
-| view_node_memory_capacity                 |
-| view_pod_cpu_request_raw                  |
-| view_pod_cpu_usage_raw                    |
-| view_pod_memory_request_raw               |
-| view_pod_memory_usage_raw                 |
-+-------------------------------------------+
-22 rows selected (1.725 seconds)
++----------------------------------------------------+
+|                      tab_name                      |
++----------------------------------------------------+
+| datasource_your_namespace_cluster_cpu_capacity_raw |
+| datasource_your_namespace_cluster_cpu_usage_raw  |
+| datasource_your_namespace_cluster_memory_capacity_raw |
+| datasource_your_namespace_cluster_memory_usage_raw |
+| datasource_your_namespace_node_allocatable_cpu_cores |
+| datasource_your_namespace_node_allocatable_memory_bytes |
+| datasource_your_namespace_node_capacity_cpu_cores |
+| datasource_your_namespace_node_capacity_memory_bytes |
+| datasource_your_namespace_node_cpu_allocatable_raw |
+| datasource_your_namespace_node_cpu_capacity_raw  |
+| datasource_your_namespace_node_memory_allocatable_raw |
+| datasource_your_namespace_node_memory_capacity_raw |
+| datasource_your_namespace_persistentvolumeclaim_capacity_bytes |
+| datasource_your_namespace_persistentvolumeclaim_capacity_raw |
+| datasource_your_namespace_persistentvolumeclaim_phase |
+| datasource_your_namespace_persistentvolumeclaim_phase_raw |
+| datasource_your_namespace_persistentvolumeclaim_request_bytes |
+| datasource_your_namespace_persistentvolumeclaim_request_raw |
+| datasource_your_namespace_persistentvolumeclaim_usage_bytes |
+| datasource_your_namespace_persistentvolumeclaim_usage_raw |
+| datasource_your_namespace_persistentvolumeclaim_usage_with_phase_raw |
+| datasource_your_namespace_pod_cpu_request_raw    |
+| datasource_your_namespace_pod_cpu_usage_raw      |
+| datasource_your_namespace_pod_limit_cpu_cores    |
+| datasource_your_namespace_pod_limit_memory_bytes |
+| datasource_your_namespace_pod_memory_request_raw |
+| datasource_your_namespace_pod_memory_usage_raw   |
+| datasource_your_namespace_pod_persistentvolumeclaim_request_info |
+| datasource_your_namespace_pod_request_cpu_cores  |
+| datasource_your_namespace_pod_request_memory_bytes |
+| datasource_your_namespace_pod_usage_cpu_cores    |
+| datasource_your_namespace_pod_usage_memory_bytes |
++----------------------------------------------------+
+32 rows selected (13.101 seconds)
 0: jdbc:hive2://127.0.0.1:10000/default>
 ```
 

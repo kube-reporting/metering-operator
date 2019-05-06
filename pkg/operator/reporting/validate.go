@@ -1,38 +1,22 @@
 package reporting
 
 import (
-	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
-	"time"
 
+	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
-
-const maxDepth = 100
-
-type ReportGenerationQueryDependencies struct {
-	ReportGenerationQueries        []*metering.ReportGenerationQuery
-	DynamicReportGenerationQueries []*metering.ReportGenerationQuery
-	ReportDataSources              []*metering.ReportDataSource
-	Reports                        []*metering.Report
-}
 
 func GetAndValidateGenerationQueryDependencies(
 	queryGetter ReportGenerationQueryGetter,
 	dataSourceGetter ReportDataSourceGetter,
 	reportGetter ReportGetter,
 	generationQuery *metering.ReportGenerationQuery,
+	inputVals []cbTypes.ReportGenerationQueryInputValue,
 	handler *UninitialiedDependendenciesHandler,
 ) (*ReportGenerationQueryDependencies, error) {
-
-	deps, err := GetGenerationQueryDependencies(
-		queryGetter,
-		dataSourceGetter,
-		reportGetter,
-		generationQuery,
-	)
+	deps, err := GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, generationQuery, inputVals)
 	if err != nil {
 		return nil, err
 	}
@@ -43,62 +27,49 @@ func GetAndValidateGenerationQueryDependencies(
 	return deps, nil
 }
 
+func GetGenerationQueryDependencies(
+	queryGetter ReportGenerationQueryGetter,
+	dataSourceGetter ReportDataSourceGetter,
+	reportGetter ReportGetter,
+	generationQuery *metering.ReportGenerationQuery,
+	inputVals []cbTypes.ReportGenerationQueryInputValue,
+) (*ReportGenerationQueryDependencies, error) {
+	result, err := NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter).ResolveDependencies(generationQuery.Namespace, generationQuery.Spec.Inputs, inputVals)
+	if err != nil {
+		return nil, err
+	}
+	return result.Dependencies, nil
+}
+
 type UninitialiedDependendenciesHandler struct {
-	HandleUninitializedReportGenerationQuery func(*metering.ReportGenerationQuery)
-	HandleUninitializedReportDataSource      func(*metering.ReportDataSource)
+	HandleUninitializedReportDataSource func(*metering.ReportDataSource)
 }
 
 func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies, handler *UninitialiedDependendenciesHandler) error {
-	// if the speci***REMOVED***ed ReportGenerationQuery depends on other non-dynamic
-	// ReportGenerationQueries, but they have their view disabled, then it's an
-	// invalid con***REMOVED***guration.
-	var (
-		uninitializedQueries     []*metering.ReportGenerationQuery
-		uninitializedDataSources []*metering.ReportDataSource
-	)
+	// if the speci***REMOVED***ed ReportGenerationQuery depends on datasources without a
+	// table, it's invalid
+	var uninitializedDataSources []*metering.ReportDataSource
 	validationErr := new(reportGenerationQueryDependenciesValidationError)
-	for _, query := range deps.ReportGenerationQueries {
-		// it's invalid for a ReportGenerationQuery with view.disabled set to
-		// true to be a non-dynamic ReportGenerationQuery dependency
-		if query.Spec.View.Disabled {
-			validationErr.disabledViewQueryNames = append(validationErr.disabledViewQueryNames, query.Name)
-			continue
-		}
-		// if a query doesn't disable view creation, than it is
-		// uninitialized if it's view is not created/set yet
-		if !query.Spec.View.Disabled && query.Status.ViewName == "" {
-			uninitializedQueries = append(uninitializedQueries, query)
-			validationErr.uninitializedQueryNames = append(validationErr.uninitializedQueryNames, query.Name)
-		}
-	}
 	// anything below missing tableName in it's status is uninitialized
 	for _, ds := range deps.ReportDataSources {
-		if ds.Status.TableName == "" {
+		if ds.Status.TableRef.Name == "" {
 			uninitializedDataSources = append(uninitializedDataSources, ds)
 			validationErr.uninitializedDataSourceNames = append(validationErr.uninitializedDataSourceNames, ds.Name)
 		}
 	}
 	for _, report := range deps.Reports {
-		if report.Status.TableName == "" {
+		if report.Status.TableRef.Name == "" {
 			validationErr.uninitializedReportNames = append(validationErr.uninitializedReportNames, report.Name)
 		}
 	}
 
 	if handler != nil {
-		for _, query := range uninitializedQueries {
-			handler.HandleUninitializedReportGenerationQuery(query)
-		}
-
 		for _, dataSource := range uninitializedDataSources {
 			handler.HandleUninitializedReportDataSource(dataSource)
 		}
 	}
 
-	if len(validationErr.disabledViewQueryNames) != 0 ||
-		len(validationErr.uninitializedQueryNames) != 0 ||
-		len(validationErr.uninitializedDataSourceNames) != 0 ||
-		len(validationErr.uninitializedReportNames) != 0 ||
-		len(validationErr.uninitializedReportNames) != 0 {
+	if len(validationErr.uninitializedDataSourceNames) != 0 || len(validationErr.uninitializedReportNames) != 0 {
 		return validationErr
 	}
 	return nil
@@ -106,20 +77,16 @@ func ValidateGenerationQueryDependencies(deps *ReportGenerationQueryDependencies
 
 func IsUninitializedDependencyError(err error) bool {
 	validationErr, ok := err.(*reportGenerationQueryDependenciesValidationError)
-	return ok && (len(validationErr.uninitializedQueryNames) != 0 ||
-		len(validationErr.uninitializedDataSourceNames) != 0 ||
-		len(validationErr.uninitializedReportNames) != 0 ||
-		len(validationErr.uninitializedReportNames) != 0)
+	return ok && (len(validationErr.uninitializedDataSourceNames) != 0 || len(validationErr.uninitializedReportNames) != 0)
+
 }
 
 func IsInvalidDependencyError(err error) bool {
-	validationErr, ok := err.(*reportGenerationQueryDependenciesValidationError)
-	return ok && len(validationErr.disabledViewQueryNames) != 0
+	_, ok := err.(*reportGenerationQueryDependenciesValidationError)
+	return ok
 }
 
 type reportGenerationQueryDependenciesValidationError struct {
-	uninitializedQueryNames,
-	disabledViewQueryNames,
 	uninitializedDataSourceNames,
 	uninitializedReportNames []string
 }
@@ -129,254 +96,11 @@ func (e *reportGenerationQueryDependenciesValidationError) Error() string {
 	if len(e.uninitializedDataSourceNames) != 0 {
 		errs = append(errs, fmt.Sprintf("uninitialized ReportDataSource dependencies: %s", strings.Join(e.uninitializedDataSourceNames, ", ")))
 	}
-	if len(e.disabledViewQueryNames) != 0 {
-		errs = append(errs, fmt.Sprintf("invalid ReportGenerationQuery dependencies (disabled view): %s", strings.Join(e.disabledViewQueryNames, ", ")))
-	}
-	if len(e.uninitializedQueryNames) != 0 {
-		errs = append(errs, fmt.Sprintf("uninitialized ReportGenerationQuery dependencies: %s", strings.Join(e.uninitializedQueryNames, ", ")))
-	}
 	if len(e.uninitializedReportNames) != 0 {
 		errs = append(errs, fmt.Sprintf("uninitialized Report dependencies: %s", strings.Join(e.uninitializedReportNames, ", ")))
 	}
-	if len(e.uninitializedReportNames) != 0 {
-		errs = append(errs, fmt.Sprintf("uninitialized Report dependencies: %s", strings.Join(e.uninitializedReportNames, ", ")))
-	}
-
 	if len(errs) != 0 {
 		return fmt.Sprintf("ReportGenerationQueryDependencyValidationError: %s", strings.Join(errs, ", "))
 	}
 	panic("zero uninitialized or invalid dependencies")
-}
-
-func GetGenerationQueryDependencies(
-	queryGetter ReportGenerationQueryGetter,
-	dataSourceGetter ReportDataSourceGetter,
-	reportGetter ReportGetter,
-	generationQuery *metering.ReportGenerationQuery,
-) (*ReportGenerationQueryDependencies, error) {
-	dataSourceDeps, err := GetDependentDataSources(dataSourceGetter, generationQuery)
-	if err != nil {
-		return nil, err
-	}
-	viewQueries, dynamicQueries, queriesDataSources, err := GetDependentGenerationQueries(queryGetter, dataSourceGetter, generationQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	allDataSources := [][]*metering.ReportDataSource{
-		dataSourceDeps,
-		queriesDataSources,
-	}
-
-	// deduplicate the list of ReportDataSources
-	seen := make(map[string]struct{})
-	var dataSources []*metering.ReportDataSource
-	for _, dsList := range allDataSources {
-		for _, ds := range dsList {
-			if _, exists := seen[ds.Name]; exists {
-				continue
-			}
-			dataSources = append(dataSources, ds)
-			seen[ds.Name] = struct{}{}
-		}
-	}
-
-	reports, err := GetDependentReports(reportGetter, generationQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	sort.Slice(viewQueries, func(i, j int) bool {
-		return viewQueries[i].Name < viewQueries[j].Name
-	})
-	sort.Slice(dynamicQueries, func(i, j int) bool {
-		return dynamicQueries[i].Name < dynamicQueries[j].Name
-	})
-	sort.Slice(dataSources, func(i, j int) bool {
-		return dataSources[i].Name < dataSources[j].Name
-	})
-	sort.Slice(reports, func(i, j int) bool {
-		return reports[i].Name < reports[j].Name
-	})
-
-	return &ReportGenerationQueryDependencies{
-		ReportGenerationQueries:        viewQueries,
-		DynamicReportGenerationQueries: dynamicQueries,
-		ReportDataSources:              dataSources,
-		Reports:                        reports,
-	}, nil
-}
-
-func GetDependentGenerationQueries(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportGenerationQuery, []*metering.ReportGenerationQuery, []*metering.ReportDataSource, error) {
-	viewReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
-	dataSourcesAccumulator := make(map[string]*metering.ReportDataSource)
-	dynamicReportQueriesAccumulator := make(map[string]*metering.ReportGenerationQuery)
-
-	err := GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, generationQuery, 0, maxDepth, viewReportQueriesAccumulator, dynamicReportQueriesAccumulator, dataSourcesAccumulator)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	viewQueries := make([]*metering.ReportGenerationQuery, 0, len(viewReportQueriesAccumulator))
-	for _, query := range viewReportQueriesAccumulator {
-		viewQueries = append(viewQueries, query)
-	}
-	dynamicQueries := make([]*metering.ReportGenerationQuery, 0, len(dynamicReportQueriesAccumulator))
-	for _, query := range dynamicReportQueriesAccumulator {
-		dynamicQueries = append(dynamicQueries, query)
-	}
-	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourcesAccumulator))
-	for _, ds := range dataSourcesAccumulator {
-		dataSources = append(dataSources, ds)
-	}
-
-	return viewQueries, dynamicQueries, dataSources, nil
-}
-
-func GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter ReportGenerationQueryGetter, dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, depth, maxDepth int, viewQueriesAccumulator, dynamicQueriesAccumulator map[string]*metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
-	if depth >= maxDepth {
-		return fmt.Errorf("detected a cycle at depth %d for generationQuery %s", depth, generationQuery.Name)
-	}
-	loopInput := []struct {
-		accum      map[string]*metering.ReportGenerationQuery
-		queryNames []string
-	}{
-		{
-			accum:      viewQueriesAccumulator,
-			queryNames: generationQuery.Spec.ReportQueries,
-		},
-		{
-			accum:      dynamicQueriesAccumulator,
-			queryNames: generationQuery.Spec.DynamicReportQueries,
-		},
-	}
-	for _, input := range loopInput {
-		for _, queryName := range input.queryNames {
-			if _, exists := input.accum[queryName]; exists {
-				continue
-			}
-			genQuery, err := queryGetter.GetReportGenerationQuery(generationQuery.Namespace, queryName)
-			if err != nil {
-				return err
-			}
-			// get dependent ReportDataSources
-			err = GetDependentDataSourcesMemoized(dataSourceGetter, genQuery, dataSourceAccumulator)
-			if err != nil {
-				return err
-			}
-			err = GetDependentGenerationQueriesWithDataSourcesMemoized(queryGetter, dataSourceGetter, genQuery, depth+1, maxDepth, viewQueriesAccumulator, dynamicQueriesAccumulator, dataSourceAccumulator)
-			if err != nil {
-				return err
-			}
-			input.accum[genQuery.Name] = genQuery
-		}
-	}
-	return nil
-}
-
-func GetDependentDataSourcesMemoized(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery, dataSourceAccumulator map[string]*metering.ReportDataSource) error {
-	for _, dataSourceName := range generationQuery.Spec.DataSources {
-		if _, exists := dataSourceAccumulator[dataSourceName]; exists {
-			continue
-		}
-		dataSource, err := dataSourceGetter.GetReportDataSource(generationQuery.Namespace, dataSourceName)
-		if err != nil {
-			return err
-		}
-		dataSourceAccumulator[dataSource.Name] = dataSource
-	}
-	return nil
-}
-
-func GetDependentDataSources(dataSourceGetter ReportDataSourceGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.ReportDataSource, error) {
-	dataSourceAccumulator := make(map[string]*metering.ReportDataSource)
-	err := GetDependentDataSourcesMemoized(dataSourceGetter, generationQuery, dataSourceAccumulator)
-	if err != nil {
-		return nil, err
-	}
-	dataSources := make([]*metering.ReportDataSource, 0, len(dataSourceAccumulator))
-	for _, ds := range dataSourceAccumulator {
-		dataSources = append(dataSources, ds)
-	}
-	return dataSources, nil
-}
-
-func GetDependentReports(reportGetter ReportGetter, generationQuery *metering.ReportGenerationQuery) ([]*metering.Report, error) {
-	reports := make([]*metering.Report, len(generationQuery.Spec.Reports))
-	for i, reportName := range generationQuery.Spec.Reports {
-		report, err := reportGetter.GetReport(generationQuery.Namespace, reportName)
-		if err != nil {
-			return nil, err
-		}
-		reports[i] = report
-	}
-	return reports, nil
-}
-
-func ValidateReportGenerationQueryInputs(generationQuery *metering.ReportGenerationQuery, inputs []metering.ReportGenerationQueryInputValue) (map[string]interface{}, error) {
-	var givenInputs, missingInputs, expectedInputs []string
-	reportQueryInputs := make(map[string]interface{})
-	inputDe***REMOVED***nitions := make(map[string]metering.ReportGenerationQueryInputDe***REMOVED***nition)
-
-	for _, inputDef := range generationQuery.Spec.Inputs {
-		inputDe***REMOVED***nitions[inputDef.Name] = inputDef
-	}
-
-	for _, inputVal := range inputs {
-		inputDef := inputDe***REMOVED***nitions[inputVal.Name]
-		val, err := convertQueryInputValueFromDe***REMOVED***nition(inputVal, inputDef)
-		if err != nil {
-			return nil, err
-		}
-		reportQueryInputs[inputVal.Name] = val
-		givenInputs = append(givenInputs, inputVal.Name)
-	}
-
-	// now validate the inputs match what the query is expecting
-	for _, input := range generationQuery.Spec.Inputs {
-		expectedInputs = append(expectedInputs, input.Name)
-		// If the input isn't required than don't include it in the missing
-		if !input.Required {
-			continue
-		}
-		if _, ok := reportQueryInputs[input.Name]; !ok {
-			missingInputs = append(missingInputs, input.Name)
-		}
-	}
-
-	if len(missingInputs) != 0 {
-		sort.Strings(expectedInputs)
-		sort.Strings(givenInputs)
-		return nil, fmt.Errorf("unable to validate ReportGenerationQuery %s inputs: requires %s as inputs, got %s", generationQuery.Name, strings.Join(expectedInputs, ","), strings.Join(givenInputs, ","))
-	}
-
-	return reportQueryInputs, nil
-}
-
-func convertQueryInputValueFromDe***REMOVED***nition(inputVal metering.ReportGenerationQueryInputValue, inputDef metering.ReportGenerationQueryInputDe***REMOVED***nition) (interface{}, error) {
-	if inputVal.Value == nil {
-		return nil, nil
-	}
-
-	inputType := strings.ToLower(inputDef.Type)
-	if inputVal.Name == ReportingStartInputName || inputVal.Name == ReportingEndInputName {
-		inputType = "time"
-	}
-	// unmarshal the data based on the input de***REMOVED***nition type
-	var dst interface{}
-	switch inputType {
-	case "", "string":
-		dst = new(string)
-	case "time":
-		dst = new(time.Time)
-	case "int", "integer":
-		dst = new(int)
-	default:
-		return nil, fmt.Errorf("unsupported input type %s", inputType)
-	}
-	err := json.Unmarshal(*inputVal.Value, dst)
-	if err != nil {
-		return nil, fmt.Errorf("inputs Name: %s is not valid a %s: value: %s, err: %s", inputVal.Name, inputType, string(*inputVal.Value), err)
-	}
-	return dst, nil
 }

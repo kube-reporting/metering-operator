@@ -142,6 +142,11 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 		importer.logger.Infof("no data in table %s: back***REMOVED***lling from %s until %s", cfg.PrestoTableName, startTime, endTime)
 	}
 
+	if startTime.After(endTime) {
+		importer.logger.Infof("import for table %s too early, skipping import", cfg.PrestoTableName)
+		return &PrometheusImportResults{}, nil
+	}
+
 	// If the startTime is too far back, we should limit this run to
 	// cfg.MaxQueryRangeDuration so that if we're stopped for an
 	// extended amount of time, this function won't return a slice with too
@@ -153,7 +158,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 
 	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, cfg, allowIncompleteChunks)
 	if err != nil {
-		importer.logger.WithError(err).Error("error collecting metrics")
+		importer.logger.WithFields(logrus.Fields{"startTime": startTime, "endTime": endTime}).WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what
 		// isn't, so reset our importer.lastTimestamp
 		importer.lastTimestamp = nil

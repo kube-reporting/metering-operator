@@ -202,7 +202,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 
 	// Get the presto table to get actual columns in table
-	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.PrestoTableResourceNameFromKind("report", report.Namespace, report.Name))
+	prestoTable, err := srv.prestoTableLister.PrestoTables(report.Namespace).Get(reportingutil.TableResourceNameFromKind("report", report.Namespace, report.Name))
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			writeErrorResponse(logger, w, r, http.StatusAccepted, "Report is not processed yet")
@@ -213,18 +213,12 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		return
 	}
 
-	tableColumns := prestoTable.Status.Parameters.Columns
-	queryPrestoColumns, err := reportingutil.GeneratePrestoColumns(reportQuery)
-	if err != nil {
-		logger.WithError(err).Errorf("error converting ReportGenerationQuery columns to presto columns: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
-		return
-	}
+	queryPrestoColumns := reportingutil.GeneratePrestoColumns(reportQuery)
+	prestoColumns := prestoTable.Status.Columns
 
-	prestoColumns, err := reportingutil.HiveColumnsToPrestoColumns(tableColumns)
-	if err != nil {
-		logger.WithError(err).Errorf("error converting PrestoTable hive columns to presto columns: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error converting columns: %v", err)
+	if len(prestoColumns) == 0 {
+		logger.WithError(err).Errorf("PrestoTable %s has 0 columns", prestoTable.Name)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "PrestoTable %s has 0 columns", prestoTable.Name)
 		return
 	}
 
@@ -233,7 +227,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportGenerationQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
-	tableName := reportingutil.ReportTableName(namespace, name)
+	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
 	results, err := srv.reportResultsGetter.GetReportResults(tableName, prestoColumns)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to perform presto query")
@@ -241,8 +235,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		return
 	}
 
-	if len(results) > 0 && len(prestoTable.Status.Parameters.Columns) != len(results[0]) {
-		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.Status.Parameters.Columns))
+	if len(results) > 0 && len(prestoTable.Status.Columns) != len(results[0]) {
+		logger.Errorf("report results schema doesn't match expected schema, got %d columns, expected %d", len(results[0]), len(prestoTable.Status.Columns))
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report results schema doesn't match expected schema")
 		return
 	}
@@ -558,6 +552,7 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 
 	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), metrics)
 	if err != nil {
+		logger.WithError(err).Errorf("unable to store promsum metrics: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
 		return
 	}
@@ -596,6 +591,7 @@ func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Reques
 	}
 	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(datasourceTable, startTime, endTime)
 	if err != nil {
+		logger.WithError(err).Errorf("error querying for datasource: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
 		return
 	}

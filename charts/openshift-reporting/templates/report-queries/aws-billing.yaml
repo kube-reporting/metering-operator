@@ -2,19 +2,15 @@
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "aws-ec2-billing-data-raw"
+  name: aws-ec2-billing-data-raw
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportDataSources:
-  - "aws-billing"
-  reportQueries:
-  - "node-memory-allocatable-raw"
   columns:
   - name: resource_id
-    type: string
+    type: varchar
   - name: usage_start_date
     type: timestamp
   - name: usage_end_date
@@ -22,13 +18,17 @@ spec:
   - name: period_cost
     type: double
   - name: partition_start
-    type: string
+    type: varchar
   - name: partition_stop
-    type: string
+    type: varchar
+  inputs:
+  - name: NodeMemoryAllocatableRawDataSourceName
+    type: ReportDataSource
+    default: node-memory-allocatable-raw
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
-      FROM {| generationQueryViewName "node-memory-allocatable-raw" |}
+      FROM {| dataSourceTableName .Report.Inputs.NodeMemoryAllocatableRawDataSourceName |}
       GROUP BY resource_id
     )
     SELECT lineItem_resourceId as resource_id,
@@ -45,24 +45,19 @@ spec:
     AND lineItem_operation LIKE 'RunInstances%'
     AND lineItem_UsageStartDate IS NOT NULL
     AND lineItem_UsageEndDate IS NOT NULL
-
 ---
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "aws-ec2-billing-data"
+  name: aws-ec2-billing-data
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  reportQueries:
-  - "aws-ec2-billing-data-raw"
-  view:
-    disabled: true
   columns:
   - name: resource_id
-    type: string
+    type: varchar
   - name: usage_start_date
     type: timestamp
   - name: usage_end_date
@@ -70,9 +65,9 @@ spec:
   - name: period_cost
     type: double
   - name: partition_start
-    type: string
+    type: varchar
   - name: partition_stop
-    type: string
+    type: varchar
   - name: period_percent
     type: double
   - name: period_start
@@ -83,47 +78,47 @@ spec:
     unit: date
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: AwsEc2BillingDataRawDataSourceName
+    type: ReportDataSource
+    default: aws-ec2-billing-data-raw
   query: |
-        SELECT aws_billing.*,
-               CASE
-                   -- AWS data covers entire reporting period
-                   WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}') AND ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+    SELECT aws_billing.*,
+           CASE
+               -- AWS data covers entire reporting period
+               WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}') AND ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
+                   THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
 
-                   -- AWS data covers start to middle
-                   WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}')
-                       THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', aws_billing.usage_end_date) as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+               -- AWS data covers start to middle
+               WHEN (aws_billing.usage_start_date <= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}')
+                   THEN cast(date_diff('millisecond', timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}', aws_billing.usage_end_date) as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
 
-                   -- AWS data covers middle to end
-                   WHEN ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
-                       THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
-                   ELSE 1
-               END as period_percent,
-               timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
-               timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end
-        FROM {| generationQueryViewName "aws-ec2-billing-data-raw" |} as aws_billing
+               -- AWS data covers middle to end
+               WHEN ( timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' <= aws_billing.usage_end_date)
+                   THEN cast(date_diff('millisecond', aws_billing.usage_start_date, timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}') as double) / cast(date_diff('millisecond', aws_billing.usage_start_date, aws_billing.usage_end_date) as double)
+               ELSE 1
+           END as period_percent,
+           timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
+           timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end
+    FROM {| dataSourceTableName .Report.Inputs.AwsEc2BillingDataRawDataSourceName |} as aws_billing
 
-        -- make sure the partition overlaps with our range
-        WHERE (partition_stop >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | billingPeriodTimestamp |}' AND partition_start <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | billingPeriodTimestamp |}')
+    -- make sure the partition overlaps with our range
+    WHERE (partition_stop >= '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | billingPeriodTimestamp |}' AND partition_start <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | billingPeriodTimestamp |}')
 
-        -- make sure lineItem entries overlap with our range
-        AND (usage_end_date >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AND usage_start_date <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}')
-
+    -- make sure lineItem entries overlap with our range
+    AND (usage_end_date >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AND usage_start_date <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}')
 ---
 apiVersion: metering.openshift.io/v1alpha1
 kind: ReportGenerationQuery
 metadata:
-  name: "aws-ec2-cluster-cost"
+  name: aws-ec2-cluster-cost
   labels:
     operator-metering: "true"
 {{- block "extraMetadata" . }}
 {{- end }}
 spec:
-  dynamicReportQueries:
-  - "aws-ec2-billing-data"
-  view:
-    disabled: true
   columns:
   - name: data_start
     type: timestamp
@@ -133,14 +128,19 @@ spec:
     type: double
   inputs:
   - name: ReportingStart
+    type: time
   - name: ReportingEnd
+    type: time
+  - name: AwsEc2BillingDataQueryName
+    type: ReportGenerationQuery
+    default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery "aws-ec2-billing-data" . |}
+      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     )
     SELECT
         min(usage_start_date) as data_start,
         max(usage_end_date) as data_stop,
         sum(period_cost * period_percent) as cluster_cost
     FROM aws_billing_***REMOVED***ltered
-{{- end -}}
+{{- end }}
