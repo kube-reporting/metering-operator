@@ -11,7 +11,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -22,10 +22,10 @@ type ReportQueryTemplateContext struct {
 	Query          string
 	RequiredInputs []string
 
-	Reports           []*cbTypes.Report
-	ReportQueries     []*cbTypes.ReportQuery
-	ReportDataSources []*cbTypes.ReportDataSource
-	PrestoTables      []*cbTypes.PrestoTable
+	Reports           []*metering.Report
+	ReportQueries     []*metering.ReportQuery
+	ReportDataSources []*metering.ReportDataSource
+	PrestoTables      []*metering.PrestoTable
 }
 
 type TemplateContext struct {
@@ -73,7 +73,7 @@ func (ctx *ReportQueryTemplateContext) reportTableName(name string) (string, err
 }
 
 func (ctx *ReportQueryTemplateContext) renderReportQuery(name string, tmplCtx TemplateContext) (string, error) {
-	var reportQuery *cbTypes.ReportQuery
+	var reportQuery *metering.ReportQuery
 	for _, q := range ctx.ReportQueries {
 		if q.Name == name {
 			reportQuery = q
