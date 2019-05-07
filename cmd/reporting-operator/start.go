@@ -81,14 +81,14 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PrometheusCon***REMOVED***g.BearerTokenFile, "prometheus-bearer-token-***REMOVED***le", "", "File containing bearer token to authenticate against Prometheus. Takes precedence over prometheus-bearer-token.")
 	startCmd.Flags().StringVar(&cfg.PrometheusCon***REMOVED***g.CAFile, "prometheus-ca-***REMOVED***le", "", "The path to the certi***REMOVED***cate authority to use to connect to Prometheus. If empty, defaults to system CAs")
 
-	startCmd.Flags().BoolVar(&cfg.DisablePromsum, "disable-promsum", false, "disables collecting Prometheus metrics periodically")
+	startCmd.Flags().BoolVar(&cfg.DisablePrometheusMetricsImporter, "disable-prometheus-metrics-importer", false, "disables collecting Prometheus metrics periodically")
 	startCmd.Flags().BoolVar(&cfg.LogDMLQueries, "log-dml-queries", false, "logDMLQueries controls if we log data manipulation queries made via Presto (SELECT, INSERT, etc)")
 	startCmd.Flags().BoolVar(&cfg.LogDDLQueries, "log-ddl-queries", false, "logDDLQueries controls if we log data de***REMOVED***nition language queries made via Hive (CREATE TABLE, DROP TABLE, etc)")
 	startCmd.Flags().BoolVar(&cfg.EnableFinalizers, "enable-***REMOVED***nalizers", false, "If enabled, then ***REMOVED***nalizers will be set on some resources to ensure the reporting-operator is able to perform cleanup before the resource is deleted from the API")
 
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration, "promsum-interval", operator.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration, "promsum-step-size", operator.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
-	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration, "promsum-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.QueryInterval.Duration, "prometheus-metrics-importer-interval", operator.DefaultPrometheusQueryInterval, "controls how often the operator polls Prometheus for metrics")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.StepSize.Duration, "prometheus-metrics-importer-step-size", operator.DefaultPrometheusQueryStepSize, "the query step size for Promethus query. This controls resolution of results")
+	startCmd.Flags().DurationVar(&cfg.PrometheusQueryCon***REMOVED***g.ChunkSize.Duration, "prometheus-metrics-importer-chunk-size", operator.DefaultPrometheusQueryChunkSize, "controls how much the range query window sizeby limiting the range query to a range of time no longer than this duration")
 	startCmd.Flags().IntVar(&cfg.PrestoMaxQueryLength, "presto-max-query-length", 0, "If a non-zero positive value, speci***REMOVED***es the max length a Presto query can be. This is used to control buffer sizes used for queries.")
 
 	startCmd.Flags().DurationVar(&cfg.PrometheusDataSourceMaxQueryRangeDuration, "prometheus-datasource-max-query-range-duration", operator.DefaultPrometheusDataSourceMaxQueryRangeDuration, "If non-zero speci***REMOVED***es the maximum duration of time to query from Prometheus. When back***REMOVED***lling, this value is used for the ChunkSize when querying Prometheus.")

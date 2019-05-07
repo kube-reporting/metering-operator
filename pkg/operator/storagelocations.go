@@ -204,8 +204,8 @@ func (op *Reporting) queueDependentsOfStorageLocation(storageLocation *cbTypes.S
 			continue
 		}
 		switch {
-		case datasource.Spec.Promsum != nil:
-			storage, err := op.getStorage(datasource.Spec.Promsum.Storage, datasource.Namespace)
+		case datasource.Spec.PrometheusMetricsImporter != nil:
+			storage, err := op.getStorage(datasource.Spec.PrometheusMetricsImporter.Storage, datasource.Namespace)
 			if err != nil {
 				errs = append(errs, err.Error())
 				continue

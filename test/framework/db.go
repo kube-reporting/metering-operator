@@ -10,7 +10,7 @@ import (
 )
 
 func (f *Framework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {
-	params := operator.StorePromsumDataRequest(metrics)
+	params := operator.StorePrometheusMetricsDataRequest(metrics)
 	body, err := json.Marshal(params)
 	if err != nil {
 		return err

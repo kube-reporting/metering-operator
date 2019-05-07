@@ -11,12 +11,12 @@ spec:
         # This only needs to be adjusted if your cluster is really large, and 5
         # minutes of data is more than a few hundred metrics per time series.
         # This comes up when you have hundreds of namespaces and pods.
-        promsumChunkSize: "5m"
-        promsumPollInterval: "5m"
+        prometheusMetricsImporterChunkSize: "5m"
+        prometheusMetricsImporterPollInterval: "5m"
         # This is the resolution of the metrics. Setting this higher reduces
         # granularity of the data we import, but also reduces the number of
         # metrics returned per query.
-        promsumStepSize: "60s"
+        prometheusMetricsImporterStepSize: "60s"
 
       # Increasing memory to 500Mi allows reporting-operator to keep more
       # metrics in memory at once and helps when the reporting-operator is

@@ -33,7 +33,7 @@ spec:
 
       con***REMOVED***g:
         logLevel: "debug"
-        disablePromsum: {{ .Values.disablePromsum }}
+        disablePrometheusMetricsImporter: {{ .Values.disablePrometheusMetricsImporter }}
         awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
         awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
 
@@ -43,15 +43,15 @@ spec:
 
         # increase the poll interval for tests so that the Reports can run
         # sooner
-        promsumPollInterval: "30s"
+        prometheusMetricsImporterPollInterval: "30s"
 
         # set chunk/query size to a value suitable for the back***REMOVED***ll duration
         prometheusDatasourceMaxQueryRangeDuration: "5m"
-        promsumChunkSize: "5m"
+        prometheusMetricsImporterChunkSize: "5m"
 
         # e2e runs a per-minute report so the metric resolution should be 60s
         # or less
-        promsumStepSize: "60s"
+        prometheusMetricsImporterStepSize: "60s"
 
   presto:
     spec:

@@ -80,7 +80,7 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 
 	var err error
 	switch {
-	case dataSource.Spec.Promsum != nil:
+	case dataSource.Spec.PrometheusMetricsImporter != nil:
 		err = op.handlePrometheusMetricsDataSource(logger, dataSource)
 	case dataSource.Spec.AWSBilling != nil:
 		err = op.handleAWSBillingDataSource(logger, dataSource)
@@ -89,15 +89,15 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 	case dataSource.Spec.GenerationQueryView != nil:
 		err = op.handleGenerationQueryViewDataSource(logger, dataSource)
 	default:
-		err = fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing promsum or awsBilling con***REMOVED***guration", dataSource.Name)
+		err = fmt.Errorf("ReportDataSource %s: improperly con***REMOVED***gured missing prometheusMetricsImporter, awsBilling, generationQueryView or prestoTable con***REMOVED***guration", dataSource.Name)
 	}
 	return err
 
 }
 
 func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	if dataSource.Spec.Promsum == nil {
-		return fmt.Errorf("%s is not a Promsum ReportDataSource", dataSource.Name)
+	if dataSource.Spec.PrometheusMetricsImporter == nil {
+		return fmt.Errorf("%s is not a PrometheusMetricsImporter ReportDataSource", dataSource.Name)
 	}
 
 	var prestoTable *cbTypes.PrestoTable
@@ -111,7 +111,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	} ***REMOVED*** {
 		logger.Infof("new Prometheus ReportDataSource %s discovered", dataSource.Name)
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
-		hiveStorage, err := op.getHiveStorage(dataSource.Spec.Promsum.Storage, dataSource.Namespace)
+		hiveStorage, err := op.getHiveStorage(dataSource.Spec.PrometheusMetricsImporter.Storage, dataSource.Namespace)
 		if err != nil {
 			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
 		}
@@ -121,8 +121,8 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		params := hive.TableParameters{
 			Database:      hiveStorage.Status.Hive.DatabaseName,
 			Name:          tableName,
-			Columns:       prestostore.PromsumHiveTableColumns,
-			PartitionedBy: prestostore.PromsumHivePartitionColumns,
+			Columns:       prestostore.PrometheusMetricHiveTableColumns,
+			PartitionedBy: prestostore.PrometheusMetricHivePartitionColumns,
 		}
 		if hiveStorage.Spec.Hive.DefaultTableProperties != nil {
 			params.RowFormat = hiveStorage.Spec.Hive.DefaultTableProperties.RowFormat
@@ -168,25 +168,19 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return nil
 	}
 
-	if op.cfg.DisablePromsum {
+	if op.cfg.DisablePrometheusMetricsImporter {
 		logger.Infof("Periodic Prometheus ReportDataSource importing disabled")
 		return nil
 	}
 
-	queryName := dataSource.Spec.Promsum.Query
-
-	reportPromQuery, err := op.reportPrometheusQueryLister.ReportPrometheusQueries(dataSource.Namespace).Get(queryName)
-	if err != nil {
-		return fmt.Errorf("unable to get ReportPrometheusQuery %s for ReportDataSource %s, %s", queryName, dataSource.Name, err)
-	}
+	query := dataSource.Spec.PrometheusMetricsImporter.Query
 
 	dataSourceLogger := logger.WithFields(log.Fields{
-		"queryName":        queryName,
 		"reportDataSource": dataSource.Name,
 		"tableName":        prestoTable.Status.TableName,
 	})
 
-	importerCfg := op.newPromImporterCfg(dataSource, reportPromQuery, prestoTable)
+	importerCfg := op.newPromImporterCfg(dataSource, query, prestoTable)
 
 	// wrap in a closure to handle lock and unlock of the mutex
 	importer, err := func() (*prestostore.PrometheusImporter, error) {
@@ -199,7 +193,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			return importer, nil
 		}
 		// don't already have an importer, so create a new one
-		importer, err := op.newPromImporter(dataSourceLogger, dataSource, reportPromQuery, prestoTable, importerCfg)
+		importer, err := op.newPromImporter(dataSourceLogger, dataSource, prestoTable, importerCfg)
 		if err != nil {
 			return nil, err
 		}

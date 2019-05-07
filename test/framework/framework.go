@@ -33,10 +33,10 @@ type Framework struct {
 	ReportingAPIURL             *url.URL
 	HTTPSAPI                    bool
 
-	collectOnce                sync.Once
-	reportStart                time.Time
-	reportEnd                  time.Time
-	collectPromsumDataResponse operator.CollectPromsumDataResponse
+	collectOnce                          sync.Once
+	reportStart                          time.Time
+	reportEnd                            time.Time
+	collectPrometheusMetricsDataResponse operator.CollectPrometheusMetricsDataResponse
 }
 
 // New initializes a test framework and returns it.

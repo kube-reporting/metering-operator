@@ -149,19 +149,9 @@ annotations:
           "name": "unready-deployment-replicas"
         },
         "spec": {
-          "promsum": {
-            "query": "unready-deployment-replicas"
+          "prometheusMetricsImporter": {
+            "query": "sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)\n"
           }
-        }
-      },
-      {
-        "apiVersion": "metering.openshift.io/v1alpha1",
-        "kind": "ReportPrometheusQuery",
-        "metadata": {
-          "name": "unready-deployment-replicas"
-        },
-        "spec": {
-          "query": "sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)\n"
         }
       },
       {

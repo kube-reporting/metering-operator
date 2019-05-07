@@ -121,7 +121,7 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 	// MetricImportStatus is all that changed, we can safely assume that this
 	// update came from the operator updating that ***REMOVED***eld and we can ignore this
 	// update.
-	isProm := curReportDataSource.Spec.Promsum != nil
+	isProm := curReportDataSource.Spec.PrometheusMetricsImporter != nil
 	if isProm {
 		sameSpec := reflect.DeepEqual(curReportDataSource.Spec, prevReportDataSource.Spec)
 		importStatusChanged := !reflect.DeepEqual(curReportDataSource.Status.PrometheusMetricImportStatus, prevReportDataSource.Status.PrometheusMetricImportStatus)
