@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.operator.name }}
+  labels:
+    app: {{ .Values.operator.name }}
+{{- if .Values.operator.labels }}
+{{ toYaml .Values.operator.labels | indent 4 }}
+{{- end }}
+{{- if .Values.operator.annotations }}
+  annotations:
+{{ toYaml .Values.operator.annotations | indent 4 }}
+{{- end }}
+spec:
+{{ include "operator-deployment-spec" . | indent 2 }}

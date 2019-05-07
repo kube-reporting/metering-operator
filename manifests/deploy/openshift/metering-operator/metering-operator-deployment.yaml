@@ -34,8 +34,8 @@ spec:
           value: "false"
         - name: TARGET_NAMESPACES
           valueFrom:
-            ***REMOVED***eldRef:
-              ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
+              ***REMOVED***eldRef:
+                ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
 
         - name: MY_POD_NAME
           valueFrom:

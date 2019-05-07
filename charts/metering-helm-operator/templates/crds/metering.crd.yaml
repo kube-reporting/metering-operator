@@ -11,4 +11,3 @@ spec:
     singular: metering
     kind: Metering
     listKind: MeteringList
-

@@ -1,0 +1,60 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: {{ .Values.olm.csv.name }}
+  namespace: placeholder
+{{- if .Values.olm.csv.annotations }}
+  annotations:
+{{ toYaml .Values.olm.csv.annotations | indent 4 }}
+{{- end }}
+{{- if .Values.olm.labels }}
+  labels:
+{{ toYaml .Values.olm.labels | indent 4 }}
+{{- end }}
+spec:
+  displayName: {{ .Values.olm.csv.displayName }}
+  description: |
+{{ .Values.olm.csv.description | indent 4 }}
+  keywords: {{ .Values.olm.csv.keywords }}
+  version: {{ .Values.olm.csv.version | quote }}
+  maturity: {{ .Values.olm.csv.maturity }}
+  maintainers:
+{{ toYaml .Values.olm.csv.maintainers | indent 4 }}
+  links:
+{{ toYaml .Values.olm.csv.links | indent 4 }}
+  provider:
+{{ toYaml .Values.olm.csv.provider | indent 4 }}
+  icon:
+{{ toYaml .Values.olm.csv.icon | indent 4 }}
+{{- if .Values.olm.csv.labels }}
+  labels:
+{{ toYaml .Values.olm.csv.labels | indent 4 }}
+{{- end }}
+{{- if .Values.olm.csv.matchLabels }}
+  selector:
+    matchLabels:
+{{ toYaml .Values.olm.csv.matchLabels | indent 6 }}
+{{- end }}
+  installModes:
+{{ toYaml .Values.olm.csv.installModes | indent 2 }}
+  install:
+    strategy: deployment
+    spec:
+{{- if .Values.operator.rbac.clusterRoleRules }}
+      clusterPermissions:
+        - serviceAccountName: {{ .Values.operator.serviceAccountName }}
+          rules:
+{{ toYaml .Values.operator.rbac.clusterRoleRules | indent 10 }}
+{{- end }}
+{{- if .Values.operator.rbac.rules }}
+      permissions:
+        - serviceAccountName: {{ .Values.operator.serviceAccountName }}
+          rules:
+{{ toYaml .Values.operator.rbac.rules | indent 10 }}
+{{- end }}
+      deployments:
+        - name: {{ .Values.operator.name }}
+          spec:
+{{ include "operator-deployment-spec" . | indent 12 }}
+  customresourcede***REMOVED***nitions:
+{{ toYaml .Values.olm.csv.customresourcede***REMOVED***nitions | indent 4 }}

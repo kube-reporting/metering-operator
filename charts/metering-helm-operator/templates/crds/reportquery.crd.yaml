@@ -16,4 +16,3 @@ spec:
   - name: Age
     type: date
     JSONPath: .metadata.creationTimestamp
-
