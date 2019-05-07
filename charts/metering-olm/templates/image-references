@@ -1,0 +1,6 @@
+# vi: ft=yaml
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+spec:
+  tags:
+{{ toYaml .Values.imageTags | indent 2 }}

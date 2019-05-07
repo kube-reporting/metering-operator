@@ -271,3 +271,24 @@ catalogSourceCon***REMOVED***gName: metering-operators
 catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
 catalogTargetNamespace: openshift-metering
 
+imageTags:
+- name: metering-helm-operator
+  from:
+    kind: DockerImage
+    name: quay.io/openshift/origin-metering-helm-operator:4.1
+- name: metering-reporting-operator
+  from:
+    kind: DockerImage
+    name: quay.io/openshift/origin-metering-reporting-operator:4.1
+- name: metering-presto
+  from:
+    kind: DockerImage
+    name: quay.io/openshift/origin-metering-presto:4.1
+- name: metering-hive
+  from:
+    kind: DockerImage
+    name: quay.io/openshift/origin-metering-hive:4.1
+- name: metering-hadoop
+  from:
+    kind: DockerImage
+    name: quay.io/openshift/origin-metering-hadoop:4.1
