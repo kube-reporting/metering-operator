@@ -20,7 +20,7 @@ func TestGenerateReport(t *testing.T) {
 		deleteExistingData bool
 		expectedErr        string
 	}{
-		"a table name and a ReportGenerationQuery with a query": {
+		"a table name and a ReportQuery with a query": {
 			tableName: tableName,
 			query:     testSQL,
 		},
@@ -29,7 +29,7 @@ func TestGenerateReport(t *testing.T) {
 			query:       testSQL,
 			expectedErr: errInvalidTableName.Error(),
 		},
-		"a table name and a ReportGenerationQuery with a query field and deleteExistingData=true will succeed": {
+		"a table name and a ReportQuery with a query field and deleteExistingData=true will succeed": {
 			tableName:          tableName,
 			query:              testSQL,
 			deleteExistingData: true,

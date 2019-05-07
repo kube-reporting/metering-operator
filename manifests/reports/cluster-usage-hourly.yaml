@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: cluster-cpu-usage-hourly
 spec:
-  generationQuery: "cluster-cpu-usage"
+  query: "cluster-cpu-usage"
   schedule:
     period: "hourly"
 
@@ -14,7 +14,7 @@ kind: Report
 metadata:
   name: cluster-memory-usage-hourly
 spec:
-  generationQuery: "cluster-memory-usage"
+  query: "cluster-memory-usage"
   schedule:
     period: "hourly"
 

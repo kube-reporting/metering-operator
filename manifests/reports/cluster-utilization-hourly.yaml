@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: cluster-cpu-utilization-hourly
 spec:
-  generationQuery: "cluster-cpu-utilization"
+  query: "cluster-cpu-utilization"
   inputs:
   - name: ClusterCpuCapacityReportName
     value: cluster-cpu-capacity-hourly
@@ -19,7 +19,7 @@ kind: Report
 metadata:
   name: cluster-memory-utilization-hourly
 spec:
-  generationQuery: "cluster-memory-utilization"
+  query: "cluster-memory-utilization"
   inputs:
   - name: ClusterMemoryCapacityReportName
     value: cluster-memory-capacity-hourly

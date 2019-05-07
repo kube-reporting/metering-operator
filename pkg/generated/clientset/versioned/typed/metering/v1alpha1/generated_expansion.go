@@ -10,6 +10,6 @@ type ReportExpansion interface{}
 
 type ReportDataSourceExpansion interface{}
 
-type ReportGenerationQueryExpansion interface{}
+type ReportQueryExpansion interface{}
 
 type StorageLocationExpansion interface{}

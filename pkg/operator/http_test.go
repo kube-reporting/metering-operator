@@ -102,7 +102,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		reportName string
 
 		report      *v1alpha1.Report
-		query       *v1alpha1.ReportGenerationQuery
+		query       *v1alpha1.ReportQuery
 		prestoTable *v1alpha1.PrestoTable
 
 		expectedStatusCode int
@@ -115,7 +115,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		"report-finished-no-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -143,7 +143,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		"report-finished-with-results": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -184,7 +184,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		"report-finished-db-errored": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -229,7 +229,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 		"mismatched-results-schema-to-table-schema": {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name: "timestamp",
 					Type: "timestamp",
@@ -280,11 +280,11 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
-			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
-			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -293,7 +293,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			}
 			// add our test query for the report
 			if tt.query != nil {
-				reportGenerationQueryIndexer.Add(tt.query)
+				reportQueryIndexer.Add(tt.query)
 			}
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
@@ -301,7 +301,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportGenerationQueryLister, prestoTableLister,
+				reportLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -372,7 +372,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		apiPath      string
 
 		report      *v1alpha1.Report
-		query       *v1alpha1.ReportGenerationQuery
+		query       *v1alpha1.ReportQuery
 		prestoTable *v1alpha1.PrestoTable
 
 		expectedStatusCode int
@@ -386,7 +386,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -436,7 +436,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -467,7 +467,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -534,7 +534,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLFull(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -580,11 +580,11 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
-			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
-			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -593,7 +593,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			}
 			// add our test query for the report
 			if tt.query != nil {
-				reportGenerationQueryIndexer.Add(tt.query)
+				reportQueryIndexer.Add(tt.query)
 			}
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
@@ -601,7 +601,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportGenerationQueryLister, prestoTableLister,
+				reportLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -654,7 +654,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		apiPath      string
 
 		report      *v1alpha1.Report
-		query       *v1alpha1.ReportGenerationQuery
+		query       *v1alpha1.ReportQuery
 		prestoTable *v1alpha1.PrestoTable
 
 		expectedStatusCode int
@@ -668,7 +668,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -720,7 +720,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -751,7 +751,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -818,7 +818,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			reportName: testReportName,
 			report:     testhelpers.NewReport(testReportName, namespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{}, nil, false),
 			apiPath:    apiReportV2URLTable(namespace, testReportName) + testFormat,
-			query: testhelpers.NewReportGenerationQuery(testQueryName, namespace, []v1alpha1.ReportGenerationQueryColumn{
+			query: testhelpers.NewReportQuery(testQueryName, namespace, []v1alpha1.ReportQueryColumn{
 				{
 					Name:        "timestamp",
 					Type:        "timestamp",
@@ -864,11 +864,11 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			// cache.Store, it's basically just a key-value store that we can
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
-			reportGenerationQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
-			reportGenerationQueryLister := listers.NewReportGenerationQueryLister(reportGenerationQueryIndexer)
+			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -877,7 +877,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			}
 			// add our test query for the report
 			if tt.query != nil {
-				reportGenerationQueryIndexer.Add(tt.query)
+				reportQueryIndexer.Add(tt.query)
 			}
 			if tt.prestoTable != nil {
 				prestoTableIndexer.Add(tt.prestoTable)
@@ -885,7 +885,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportGenerationQueryLister, prestoTableLister,
+				reportLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()

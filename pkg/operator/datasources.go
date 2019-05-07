@@ -86,10 +86,10 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 		err = op.handleAWSBillingDataSource(logger, dataSource)
 	case dataSource.Spec.PrestoTable != nil:
 		err = op.handlePrestoTableDataSource(logger, dataSource)
-	case dataSource.Spec.GenerationQueryView != nil:
-		err = op.handleGenerationQueryViewDataSource(logger, dataSource)
+	case dataSource.Spec.ReportQueryView != nil:
+		err = op.handleReportQueryViewDataSource(logger, dataSource)
 	default:
-		err = fmt.Errorf("ReportDataSource %s: improperly configured missing prometheusMetricsImporter, awsBilling, generationQueryView or prestoTable configuration", dataSource.Name)
+		err = fmt.Errorf("ReportDataSource %s: improperly configured missing prometheusMetricsImporter, awsBilling, reportQueryView or prestoTable configuration", dataSource.Name)
 	}
 	return err
 
@@ -408,17 +408,17 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 	return nil
 }
 
-func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
-	if dataSource.Spec.GenerationQueryView == nil {
-		return fmt.Errorf("%s is not a GenerationQueryView ReportDataSource", dataSource.Name)
+func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+	if dataSource.Spec.ReportQueryView == nil {
+		return fmt.Errorf("%s is not a ReportQueryView ReportDataSource", dataSource.Name)
 	}
-	if dataSource.Spec.GenerationQueryView.QueryName == "" {
-		return fmt.Errorf("invalid GenerationQueryView ReportDataSource %s, spec.generationQueryView.queryName must be set", dataSource.Name)
+	if dataSource.Spec.ReportQueryView.QueryName == "" {
+		return fmt.Errorf("invalid ReportQueryView ReportDataSource %s, spec.reportQueryView.queryName must be set", dataSource.Name)
 	}
 
-	generationQuery, err := op.reportGenerationQueryLister.ReportGenerationQueries(dataSource.Namespace).Get(dataSource.Spec.GenerationQueryView.QueryName)
+	query, err := op.reportQueryLister.ReportQueries(dataSource.Namespace).Get(dataSource.Spec.ReportQueryView.QueryName)
 	if err != nil {
-		return fmt.Errorf("unable to get ReportGenerationQuery %s for GenerationQueryView ReportDataSource %s: %s", dataSource.Spec.GenerationQueryView.QueryName, dataSource.Name, err)
+		return fmt.Errorf("unable to get ReportQuery %s for ReportQueryView ReportDataSource %s: %s", dataSource.Spec.ReportQueryView.QueryName, dataSource.Name, err)
 	}
 
 	var viewName string
@@ -436,22 +436,22 @@ func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger,
 		viewName = prestoTable.Status.TableName
 	}
 
-	dependencyResult, err := op.dependencyResolver.ResolveDependencies(generationQuery.Namespace, generationQuery.Spec.Inputs, nil)
+	dependencyResult, err := op.dependencyResolver.ResolveDependencies(query.Namespace, query.Spec.Inputs, nil)
 	if err != nil {
 		return err
 	}
 
-	err = reporting.ValidateGenerationQueryDependencies(dependencyResult.Dependencies, op.uninitialiedDependendenciesHandler())
+	err = reporting.ValidateQueryDependencies(dependencyResult.Dependencies, op.uninitialiedDependendenciesHandler())
 	if err != nil {
 		if reporting.IsUninitializedDependencyError(err) {
-			logger.Warnf("unable to validate ReportGenerationQuery %s, has uninitialized dependencies: %v", generationQuery.Name, err)
+			logger.Warnf("unable to validate ReportQuery %s, has uninitialized dependencies: %v", query.Name, err)
 			// We do not return an error because we do not need to requeue this
 			// query. Instead we can wait until this queries uninitialized
 			// dependencies become initialized. After they're initialized they
 			// will queue anything that depends on them, including this query.
 			return nil
 		} else if reporting.IsInvalidDependencyError(err) {
-			logger.WithError(err).Errorf("unable to validate ReportGenerationQuery %s, has invalid dependencies, dropping off queue", generationQuery.Name)
+			logger.WithError(err).Errorf("unable to validate ReportQuery %s, has invalid dependencies, dropping off queue", query.Name)
 			// Invalid dependency means it will not resolve itself, so do not
 			// return an error since we do not want to be requeued unless the
 			// resource is modified, or it's dependencies are modified.
@@ -461,7 +461,7 @@ func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger,
 			// unknown reason so we want to retry up to a limit. This most
 			// commonly occurs when fetching a dependency from the API fails,
 			// or if there is a cyclic dependency.
-			return fmt.Errorf("unable to get or validate ReportGenerationQuery dependencies %s: %v", generationQuery.Name, err)
+			return fmt.Errorf("unable to get or validate ReportQuery dependencies %s: %v", query.Name, err)
 		}
 	}
 
@@ -479,12 +479,12 @@ func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger,
 		}
 
 		queryCtx := &reporting.ReportQueryTemplateContext{
-			Namespace:               dataSource.Namespace,
-			ReportQuery:             generationQuery,
-			Reports:                 dependencyResult.Dependencies.Reports,
-			ReportGenerationQueries: dependencyResult.Dependencies.ReportGenerationQueries,
-			ReportDataSources:       dependencyResult.Dependencies.ReportDataSources,
-			PrestoTables:            prestoTables,
+			Namespace:         dataSource.Namespace,
+			ReportQuery:       query,
+			Reports:           dependencyResult.Dependencies.Reports,
+			ReportQueries:     dependencyResult.Dependencies.ReportQueries,
+			ReportDataSources: dependencyResult.Dependencies.ReportDataSources,
+			PrestoTables:      prestoTables,
 		}
 		renderedQuery, err := reporting.RenderQuery(queryCtx, reporting.TemplateContext{
 			Report: reporting.ReportTemplateInfo{
@@ -495,9 +495,9 @@ func (op *Reporting) handleGenerationQueryViewDataSource(logger log.FieldLogger,
 			return err
 		}
 
-		columns := reportingutil.GeneratePrestoColumns(generationQuery)
+		columns := reportingutil.GeneratePrestoColumns(query)
 		logger.Infof("creating view %s", viewName)
-		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportGenerationQueryGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
+		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportQueryGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
 		if err != nil {
 			return fmt.Errorf("error creating view %s for ReportDataSource %s: %v", viewName, dataSource.Name, err)
 		}
@@ -559,13 +559,13 @@ func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }
 
-func (op *Reporting) getGenerationQueryDependencies(namespace, name string, inputVals []cbTypes.ReportGenerationQueryInputValue) (*reporting.ReportGenerationQueryDependencies, error) {
-	queryGetter := reporting.NewReportGenerationQueryListerGetter(op.reportGenerationQueryLister)
-	genQuery, err := queryGetter.GetReportGenerationQuery(namespace, name)
+func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []cbTypes.ReportQueryInputValue) (*reporting.ReportQueryDependencies, error) {
+	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
+	query, err := queryGetter.GetReportQuery(namespace, name)
 	if err != nil {
 		return nil, err
 	}
-	result, err := op.dependencyResolver.ResolveDependencies(genQuery.Namespace, genQuery.Spec.Inputs, inputVals)
+	result, err := op.dependencyResolver.ResolveDependencies(query.Namespace, query.Spec.Inputs, inputVals)
 	if err != nil {
 		return nil, err
 	}
@@ -583,14 +583,14 @@ func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *cb
 	// reportDataSources that have a dependency on the provided dataSource
 	for _, ds := range reportDataSources {
 		// Only ReportDataSources that create a view from a
-		// ReportGenerationQuery depend on other ReportDataSources.
-		if ds.Spec.GenerationQueryView == nil {
+		// ReportQuery depend on other ReportDataSources.
+		if ds.Spec.ReportQueryView == nil {
 			continue
 		}
 
-		deps, err := op.getGenerationQueryDependencies(ds.Namespace, ds.Name, ds.Spec.GenerationQueryView.Inputs)
+		deps, err := op.getQueryDependencies(ds.Namespace, ds.Name, ds.Spec.ReportQueryView.Inputs)
 		if err != nil {
-			return fmt.Errorf("unable to get dependencies for GenerationQueryView ReportDataSource %s: %s", ds.Name, err)
+			return fmt.Errorf("unable to get dependencies for ReportQueryView ReportDataSource %s: %s", ds.Name, err)
 		}
 
 		// If this reportDataSource has a dependency on the passed in

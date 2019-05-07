@@ -15,7 +15,7 @@ type MeteringV1alpha1Interface interface {
 	PrestoTablesGetter
 	ReportsGetter
 	ReportDataSourcesGetter
-	ReportGenerationQueriesGetter
+	ReportQueriesGetter
 	StorageLocationsGetter
 }
 
@@ -40,8 +40,8 @@ func (c *MeteringV1alpha1Client) ReportDataSources(namespace string) ReportDataS
 	return newReportDataSources(c, namespace)
 }
 
-func (c *MeteringV1alpha1Client) ReportGenerationQueries(namespace string) ReportGenerationQueryInterface {
-	return newReportGenerationQueries(c, namespace)
+func (c *MeteringV1alpha1Client) ReportQueries(namespace string) ReportQueryInterface {
+	return newReportQueries(c, namespace)
 }
 
 func (c *MeteringV1alpha1Client) StorageLocations(namespace string) StorageLocationInterface {

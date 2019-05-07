@@ -3,7 +3,7 @@ kind: Report
 metadata:
   name: cluster-cpu-capacity-daily
 spec:
-  generationQuery: "cluster-cpu-capacity"
+  query: "cluster-cpu-capacity"
   # this configures the this report to aggregate the hourly one
   inputs:
   - name: ClusterCpuCapacityReportName
@@ -18,7 +18,7 @@ kind: Report
 metadata:
   name: cluster-memory-capacity-daily
 spec:
-  generationQuery: "cluster-memory-capacity"
+  query: "cluster-memory-capacity"
   # this configures the this report to aggregate the hourly one
   inputs:
   - name: ClusterMemoryCapacityReportName

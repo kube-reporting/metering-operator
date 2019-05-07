@@ -174,41 +174,41 @@ func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, 
 	op.reportDataSourceQueue.AddAfter(key, duration)
 }
 
-func (op *Reporting) addReportGenerationQuery(obj interface{}) {
-	query := obj.(*cbTypes.ReportGenerationQuery)
-	op.logger.Infof("adding ReportGenerationQuery %s/%s", query.Namespace, query.Name)
-	op.enqueueReportGenerationQuery(query)
+func (op *Reporting) addReportQuery(obj interface{}) {
+	query := obj.(*cbTypes.ReportQuery)
+	op.logger.Infof("adding ReportQuery %s/%s", query.Namespace, query.Name)
+	op.enqueueReportQuery(query)
 }
 
-func (op *Reporting) updateReportGenerationQuery(prev, cur interface{}) {
-	curReportGenerationQuery := cur.(*cbTypes.ReportGenerationQuery)
-	prevReportGenerationQuery := prev.(*cbTypes.ReportGenerationQuery)
-	logger := op.logger.WithFields(log.Fields{"reportGenerationQuery": curReportGenerationQuery.Name, "namespace": curReportGenerationQuery.Namespace})
+func (op *Reporting) updateReportQuery(prev, cur interface{}) {
+	curReportQuery := cur.(*cbTypes.ReportQuery)
+	prevReportQuery := prev.(*cbTypes.ReportQuery)
+	logger := op.logger.WithFields(log.Fields{"reportQuery": curReportQuery.Name, "namespace": curReportQuery.Namespace})
 
 	// Only skip queuing if we're not missing a view
-	if curReportGenerationQuery.ResourceVersion == prevReportGenerationQuery.ResourceVersion {
-		// Periodic resyncs will send update events for all known ReportGenerationQuerys.
-		// Two different versions of the same reportGenerationQuery will always have
+	if curReportQuery.ResourceVersion == prevReportQuery.ResourceVersion {
+		// Periodic resyncs will send update events for all known ReportQuerys.
+		// Two different versions of the same reportQuery will always have
 		// different ResourceVersions.
-		logger.Debugf("ReportGenerationQuery %s/%s resourceVersion is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+		logger.Debugf("ReportQuery %s/%s resourceVersion is unchanged, skipping update", curReportQuery.Namespace, curReportQuery.Name)
 		return
 	}
-	if reflect.DeepEqual(prevReportGenerationQuery.Spec, curReportGenerationQuery.Spec) {
-		logger.Debugf("ReportGenerationQuery %s/%s spec is unchanged, skipping update", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
+	if reflect.DeepEqual(prevReportQuery.Spec, curReportQuery.Spec) {
+		logger.Debugf("ReportQuery %s/%s spec is unchanged, skipping update", curReportQuery.Namespace, curReportQuery.Name)
 		return
 	}
 
-	logger.Infof("updating ReportGenerationQuery %s/%s", curReportGenerationQuery.Namespace, curReportGenerationQuery.Name)
-	op.enqueueReportGenerationQuery(curReportGenerationQuery)
+	logger.Infof("updating ReportQuery %s/%s", curReportQuery.Namespace, curReportQuery.Name)
+	op.enqueueReportQuery(curReportQuery)
 }
 
-func (op *Reporting) enqueueReportGenerationQuery(query *cbTypes.ReportGenerationQuery) {
+func (op *Reporting) enqueueReportQuery(query *cbTypes.ReportQuery) {
 	key, err := cache.MetaNamespaceKeyFunc(query)
 	if err != nil {
-		op.logger.WithFields(log.Fields{"reportGenerationQuery": query.Name, "namespace": query.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", query)
+		op.logger.WithFields(log.Fields{"reportQuery": query.Name, "namespace": query.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", query)
 		return
 	}
-	op.reportGenerationQueryQueue.Add(key)
+	op.reportQueryQueue.Add(key)
 }
 
 func (op *Reporting) addPrestoTable(obj interface{}) {

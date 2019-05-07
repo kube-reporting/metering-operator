@@ -14,19 +14,19 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
-func (f *Framework) GetMeteringReportGenerationQuery(name string) (*metering.ReportGenerationQuery, error) {
-	return f.MeteringClient.ReportGenerationQueries(f.Namespace).Get(name, meta.GetOptions{})
+func (f *Framework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
+	return f.MeteringClient.ReportQueries(f.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportGenerationQuery, error) {
+func (f *Framework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {
 	t.Helper()
-	var reportQuery *metering.ReportGenerationQuery
+	var reportQuery *metering.ReportQuery
 	return reportQuery, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
-		reportQuery, err = f.GetMeteringReportGenerationQuery(name)
+		reportQuery, err = f.GetMeteringReportQuery(name)
 		if err != nil {
 			if errors.IsNotFound(err) {
-				t.Logf("ReportGenerationQuery %s does not exist yet", name)
+				t.Logf("ReportQuery %s does not exist yet", name)
 				return false, nil
 			}
 			return false, err
@@ -35,13 +35,13 @@ func (f *Framework) WaitForMeteringReportGenerationQuery(t *testing.T, name stri
 	})
 }
 
-func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
+func (f *Framework) RequireReportQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
 	t.Helper()
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
 	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
-	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
+	queryGetter := reporting.NewReportQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
 
 	for _, queryName := range queries {
@@ -49,9 +49,9 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 			continue
 		}
 
-		t.Logf("waiting for ReportGenerationQuery %s to exist", queryName)
-		reportGenQuery, err := f.WaitForMeteringReportGenerationQuery(t, queryName, pollInterval, timeout)
-		require.NoError(t, err, "ReportGenerationQuery should exist before creating report using it")
+		t.Logf("waiting for ReportQuery %s to exist", queryName)
+		reportQuery, err := f.WaitForMeteringReportQuery(t, queryName, pollInterval, timeout)
+		require.NoError(t, err, "ReportQuery should exist before creating report using it")
 
 		depHandler := &reporting.UninitialiedDependendenciesHandler{
 			HandleUninitializedReportDataSource: func(ds *metering.ReportDataSource) {
@@ -60,15 +60,15 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 				}
 				t.Logf("%s dependencies: waiting for ReportDataSource %s to exist", queryName, ds.Name)
 				_, err := f.WaitForMeteringReportDataSourceTable(t, ds.Name, pollInterval, timeout)
-				require.NoError(t, err, "ReportDataSource %s table for ReportGenerationQuery %s should exist before running reports against it", ds.Name, queryName)
+				require.NoError(t, err, "ReportDataSource %s table for ReportQuery %s should exist before running reports against it", ds.Name, queryName)
 				readyReportDataSources[ds.Name] = struct{}{}
 			},
 		}
 
-		t.Logf("waiting for ReportGenerationQuery %s dependencies to become initialized", queryName)
+		t.Logf("waiting for ReportQuery %s dependencies to become initialized", queryName)
 		// explicitly ignoring results, since we'll get errors above if any of
 		// the uninitialized dependencies don't become ready in the handler
-		_, _ = reporting.GetAndValidateGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, reportGenQuery, nil, depHandler)
+		_, _ = reporting.GetAndValidateQueryDependencies(queryGetter, dataSourceGetter, reportGetter, reportQuery, nil, depHandler)
 		readyReportGenQueries[queryName] = struct{}{}
 	}
 }
@@ -76,7 +76,7 @@ func (f *Framework) RequireReportGenerationQueriesReady(t *testing.T, queries []
 func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
 	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
-	queryGetter := reporting.NewReportGenerationQueryClientGetter(f.MeteringClient)
+	queryGetter := reporting.NewReportQueryClientGetter(f.MeteringClient)
 	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
 
 	metricsImportedForDS := make(map[string]int)
@@ -85,10 +85,10 @@ func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queri
 	}
 
 	for _, queryName := range queries {
-		query, err := f.GetMeteringReportGenerationQuery(queryName)
-		require.NoError(t, err, "ReportGenerationQuery should exist")
-		deps, err := reporting.GetGenerationQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, nil)
-		require.NoError(t, err, "Getting ReportGenerationQuery dependencies should succeed")
+		query, err := f.GetMeteringReportQuery(queryName)
+		require.NoError(t, err, "ReportQuery should exist")
+		deps, err := reporting.GetQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, nil)
+		require.NoError(t, err, "Getting ReportQuery dependencies should succeed")
 
 		for _, dataSource := range deps.ReportDataSources {
 			metricsImported := metricsImportedForDS[dataSource.Name]

@@ -2,7 +2,7 @@
 
 A `ReportDataSource` is a custom resource that represents how to store data, such as where it should be stored, and in some cases, how the data is to be collected.
 
-There are currently four types of ReportDataSource's: `prometheusMetricsImporter`, `awsBilling`, `generationQueryView` and `prestoTable`.
+There are currently four types of ReportDataSource's: `prometheusMetricsImporter`, `awsBilling`, `reportQueryView` and `prestoTable`.
 Each has a corresponding configuration section within the `spec` of a `ReportDataSource`.
 The main effect that creating a ReportDataSource has is that it causes the metering operator to create a table in Presto or Hive.
 Depending on the type of ReportDataSource it then may do other additional tasks.
@@ -23,9 +23,9 @@ To read more details on how the different ReportDataSources work, read the [mete
     - `bucket`: Bucket name to store data into.
     - `prefix`: Path within the bucket where to store data.
     - `region`: The region where bucket is located.
-- `generationQueryView`: If this section is present, then the `ReportDataSource` will be configured to create a View in Presto using the rendered `spec.query` as the query for the view.
-  - `queryName`: The name of a [ReportGenerationQuery][reportgenerationquery] to create a view from.
-  - `inputs`: A list of inputs this report query accepts to control its behavior. For more in depth details, see the [ReportGenerationQuery query inputs][query-inputs] documentation.
+- `reportQueryView`: If this section is present, then the `ReportDataSource` will be configured to create a View in Presto using the rendered `spec.query` as the query for the view.
+  - `queryName`: The name of a [ReportQuery][reportquery] to create a view from.
+  - `inputs`: A list of inputs this report query accepts to control its behavior. For more in depth details, see the [ReportQuery query inputs][query-inputs] documentation.
   - `storage`: This section controls the `StorageLocation` options, allowing you to control on a per ReportDataSource level, where data is stored.
     - `storageLocationName`: The name of the `StorageLocation` resource to use.
 - `prestoTable`: If present, then the `ReportDataSource` will simply make it possible to reference a database table within Presto as a ReportDataSource.
@@ -75,16 +75,16 @@ spec:
       url: http://custom-prometheus-instance:9090
 ```
 
-## ReportGenerationQuery View Datasource
+## ReportQuery View Datasource
 
-For ReportDataSources with a `spec.generationQueryView` present, a Presto view will be created using the rendered output of a specified [ReportGenerationQuery][reportgenerationquery]'s `spec.query` field.
+For ReportDataSources with a `spec.reportQueryView` present, a Presto view will be created using the rendered output of a specified [ReportQuery][reportquery]'s `spec.query` field.
 This enables abstracting away the details of more complex queries by exposing them as a database table whose content is based on the result of of the query the view is based on.
 It also enables re-use by allowing you to create a view containing the complexities of a query allowing other queries to simply query it as a regular table.
 
-### Example ReportGenerationQuery View Datasource
+### Example ReportQuery View Datasource
 
-This example exposes the `pod-memory-request-raw` ReportGenerationQuery as a view.
-The schema is based on the `spec.columns` of the ReportGenerationQuery.
+This example exposes the `pod-memory-request-raw` ReportQuery as a view.
+The schema is based on the `spec.columns` of the ReportQuery.
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
@@ -94,7 +94,7 @@ metadata:
   labels:
     operator-metering: "true"
 spec:
-  generationQueryView:
+  reportQueryView:
     queryName: pod-memory-request-raw
 ```
 
@@ -145,7 +145,7 @@ spec:
 [default-storage-location]: storagelocations.md#default-storagelocation
 [architecture]: metering-architecture.md
 [presto-types]: https://prestodb.io/docs/current/language/types.html
-[reportgenerationqueries]: reportgenerationqueries.md
-[reportgenerationquery]: reportgenerationqueries.md
 [query-inputs]: reportgenerationqueries.md#query-inputs
+[reportquery]: reportqueries.md
+[query-inputs]: reportqueries.md#query-inputs
 [prestotables]: prestotables.md

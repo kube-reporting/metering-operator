@@ -35,7 +35,7 @@ rules:
   resources:
   - reports
   - reports/export
-  - reportgenerationqueries
+  - reportqueries
   - reportdatasources
   - prestotables
   - storagelocations
@@ -54,7 +54,7 @@ rules:
   resources:
   - reports
   - reports/export
-  - reportgenerationqueries
+  - reportqueries
   - reportdatasources
   - prestotables
   - storagelocations

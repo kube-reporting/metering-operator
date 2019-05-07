@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-cpu-utilization
   labels:
@@ -46,10 +46,10 @@ spec:
   - name: ClusterCpuUsageReportName
     type: Report
   - name: ClusterCpuCapacityQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-cpu-capacity
   - name: ClusterCpuUsageQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-cpu-usage
   query: |
     {|/* Handle aggregating a sub-report */|}
@@ -73,9 +73,9 @@ spec:
     {|- fail "input ClusterCpuCapacityReportName and ClusterCpuUsageReportName must both be set" -|}
     {|- end -|}
     WITH cluster_cpu_capacity AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterCpuCapacityQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterCpuCapacityQueryName . |}
     ), cluster_cpu_usage AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterCpuUsageQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterCpuUsageQueryName . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,
@@ -95,7 +95,7 @@ spec:
     {|- end -|}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: cluster-memory-utilization
   labels:
@@ -142,10 +142,10 @@ spec:
   - name: ClusterMemoryUsageReportName
     type: Report
   - name: ClusterMemoryCapacityQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-memory-capacity
   - name: ClusterMemoryUsageQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: cluster-memory-usage
   query: |
     {|/* Handle aggregating a sub-report */|}
@@ -170,9 +170,9 @@ spec:
     {|- fail "input ClusterMemoryCapacityReportName and ClusterMemoryUsageReportName must both be set" -|}
     {|- end -|}
     WITH cluster_memory_capacity AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterMemoryCapacityQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterMemoryCapacityQueryName . |}
     ), cluster_memory_usage AS (
-      {| renderReportGenerationQuery .Report.Inputs.ClusterMemoryUsageQueryName . |}
+      {| renderReportQuery .Report.Inputs.ClusterMemoryUsageQueryName . |}
     )
     SELECT
       timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart| prestoTimestamp |}' AS period_start,

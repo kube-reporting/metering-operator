@@ -28,8 +28,8 @@ func (c *FakeMeteringV1alpha1) ReportDataSources(namespace string) v1alpha1.Repo
 	return &FakeReportDataSources{c, namespace}
 }
 
-func (c *FakeMeteringV1alpha1) ReportGenerationQueries(namespace string) v1alpha1.ReportGenerationQueryInterface {
-	return &FakeReportGenerationQueries{c, namespace}
+func (c *FakeMeteringV1alpha1) ReportQueries(namespace string) v1alpha1.ReportQueryInterface {
+	return &FakeReportQueries{c, namespace}
 }
 
 func (c *FakeMeteringV1alpha1) StorageLocations(namespace string) v1alpha1.StorageLocationInterface {

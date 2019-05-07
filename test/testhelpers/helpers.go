@@ -26,23 +26,23 @@ func NewReport(name, namespace, testQueryName string, reportStart, reportEnd *ti
 			Namespace: namespace,
 		},
 		Spec: v1alpha1.ReportSpec{
-			GenerationQueryName: testQueryName,
-			ReportingStart:      start,
-			ReportingEnd:        end,
-			Schedule:            schedule,
-			RunImmediately:      runImmediately,
+			QueryName:      testQueryName,
+			ReportingStart: start,
+			ReportingEnd:   end,
+			Schedule:       schedule,
+			RunImmediately: runImmediately,
 		},
 		Status: status,
 	}
 }
 
-func NewReportGenerationQuery(name, namespace string, columns []v1alpha1.ReportGenerationQueryColumn) *v1alpha1.ReportGenerationQuery {
-	return &v1alpha1.ReportGenerationQuery{
+func NewReportQuery(name, namespace string, columns []v1alpha1.ReportQueryColumn) *v1alpha1.ReportQuery {
+	return &v1alpha1.ReportQuery{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
 		},
-		Spec: v1alpha1.ReportGenerationQuerySpec{
+		Spec: v1alpha1.ReportQuerySpec{
 			Columns: columns,
 		},
 	}
@@ -89,24 +89,24 @@ func (store *ReportDataSourceStore) GetReportDataSource(namespace, name string) 
 	return nil, errors.NewNotFound(v1alpha1.Resource("ReportDataSource"), name)
 }
 
-type ReportGenerationQueryStore struct {
-	queries map[string]*v1alpha1.ReportGenerationQuery
+type ReportQueryStore struct {
+	queries map[string]*v1alpha1.ReportQuery
 }
 
-func NewReportGenerationQueryStore(queries []*v1alpha1.ReportGenerationQuery) (store *ReportGenerationQueryStore) {
-	m := make(map[string]*v1alpha1.ReportGenerationQuery)
+func NewReportQueryStore(queries []*v1alpha1.ReportQuery) (store *ReportQueryStore) {
+	m := make(map[string]*v1alpha1.ReportQuery)
 	for _, query := range queries {
 		m[query.Namespace+"/"+query.Name] = query
 	}
-	return &ReportGenerationQueryStore{m}
+	return &ReportQueryStore{m}
 }
 
-func (store *ReportGenerationQueryStore) GetReportGenerationQuery(namespace, name string) (*v1alpha1.ReportGenerationQuery, error) {
+func (store *ReportQueryStore) GetReportQuery(namespace, name string) (*v1alpha1.ReportQuery, error) {
 	query, ok := store.queries[namespace+"/"+name]
 	if ok {
 		return query, nil
 	}
-	return nil, errors.NewNotFound(v1alpha1.Resource("ReportGenerationQuery"), name)
+	return nil, errors.NewNotFound(v1alpha1.Resource("ReportQuery"), name)
 }
 
 type ReportStore struct {
