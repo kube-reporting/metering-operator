@@ -31,8 +31,8 @@ There are 6 custom resources that Operator Metering de***REMOVED***nes that you 
 - `PrestoTables`: De***REMOVED***nes a table in Presto. A PrestoTable can be "unmanaged" to expose a table that already exists, or "managed" to instruct metering to create a table as a result of the resource being created.
 - `HiveTables`: De***REMOVED***nes a table in Hive. When created, it instructs metering to create the table in Hive which causes the table to be available to Presto.
 - `ReportDataSources`: Controls what data is available (Prometheus data, AWS billing data, Presto tables, views into other tables).
-- `ReportGenerationQueries`: Controls how we query the data available within ReportDataSources. If referenced by a `Report` it will manage what it will be reporting on when the report is run. If it's referenced by a `ReportDataSource` it will instruct metering to create a view within Presto based on the rendered query.
-- `Reports`: Causes reports to be generated using the con***REMOVED***gured `ReportGenerationQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be con***REMOVED***gured to run on a schedule.
+- `ReportQueries`: Controls how we query the data available within ReportDataSources. If referenced by a `Report` it will manage what it will be reporting on when the report is run. If it's referenced by a `ReportDataSource` it will instruct metering to create a view within Presto based on the rendered query.
+- `Reports`: Causes reports to be generated using the con***REMOVED***gured `ReportQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be con***REMOVED***gured to run on a schedule.
 
 In the sections below, we will cover the resources described above in more detail.
 
@@ -55,7 +55,7 @@ There are many types of ReportDataSources, with the most common being a "Prometh
 
 A PrometheusMetricsImporter ReportDataSource instructs the reporting-operator to create a database table for storing Prometheus metric data and to being the process of importing Prometheus metrics.
 You can also de***REMOVED***ne a AWSBilling ReportDataSource to create table pointing at an existing S3 bucket containing AWS Cost and Usage reports.
-Additionally, there are GenerationQueryView ReportDataSource's which create views in Presto, and PrestoTable ReportDataSource's which just expose an existing PrestoTable as a ReportDataSource.
+Additionally, there are ReportQueryView ReportDataSource's which create views in Presto, and PrestoTable ReportDataSource's which just expose an existing PrestoTable as a ReportDataSource.
 
 
 #### PrometheusMetricsImporter ReportDataSources
@@ -99,14 +99,14 @@ By default, Operator Metering has an section in the `Metering` resource for con*
 For more details on con***REMOVED***guring this read the [AWS billing correlation section in the Metering Con***REMOVED***guration doc][metering-aws-billing-conf].
 
 
-#### ReportGenerationQueryView View ReportDataSources
+#### ReportReportQueryView View ReportDataSources
 
-A `ReportGenerationQuery` ReportDataSource con***REMOVED***gures the reporting-operator to create a Presto view based on the query speci***REMOVED***ed.
+A `ReportQuery` ReportDataSource con***REMOVED***gures the reporting-operator to create a Presto view based on the query speci***REMOVED***ed.
 
 When the ReportDataSource is created, the reporting-operator:
 
 - Checks if the `ReportDataSource` has a view created for it yet by checking the `status.tableRef` ***REMOVED***eld.
-- If it ***REMOVED***eld is empty, it creates a view by creating a `PrestoTable` resource with `spec.view` set to true, and `spec.query` set the rendered value of the ReportGenerationQuery's spec.query ***REMOVED***eld.
+- If it ***REMOVED***eld is empty, it creates a view by creating a `PrestoTable` resource with `spec.view` set to true, and `spec.query` set the rendered value of the ReportQuery's spec.query ***REMOVED***eld.
 - It then waits for the PrestoTable's `spec.tableName` to be set, and updates the ReportDataSource's `spec.tableRef` to indicate the view was created successfully.
 
 #### PrestoTable ReportDataSources
@@ -118,11 +118,11 @@ When the ReportDataSource is created, the reporting-operator:
 - Lookups the `PrestoTable` resource and veri***REMOVED***es it's `status.tableName` is set.
 - If the `status.tableName` is set then it will update the ReportDataSource's `spec.tableRef` to the tableName.
 
-### ReportGenerationQuery
+### ReportQuery
 
-For user-docs containing a description of the ***REMOVED***elds, and examples, see [ReportGenerationQueries][reportgenerationqueries].
+For user-docs containing a description of the ***REMOVED***elds, and examples, see [ReportQueries][reportqueries].
 
-When the metering operator sees a new `ReportGenerationQuery` in its namespace, it will reprocess anything that depends on it (ReportDataSources or Reports).
+When the metering operator sees a new `ReportQuery` in its namespace, it will reprocess anything that depends on it (ReportDataSources or Reports).
 
 ### Report
 
@@ -130,10 +130,10 @@ For user-docs containing a description of the ***REMOVED***elds, and examples, s
 
 When a `Report` is created, and it sees the creation event, it does the following to generate the results:
 
-- Retrieve the `ReportGenerationQuery` for the Report.
-- For each `ReportGenerationQuery`, `ReportDataSource` and `Report` input in the `spec.inputs`, retrieve and validate them, and any of their dependencies.
+- Retrieve the `ReportQuery` for the Report.
+- For each `ReportQuery`, `ReportDataSource` and `Report` input in the `spec.inputs`, retrieve and validate them, and any of their dependencies.
 - Update the Report status to indicate we're beginning to generate the report.
-- Evaluate the `ReportGenerationQuery` template, passing the StartPeriod & EndPeriod into the template context.
+- Evaluate the `ReportQuery` template, passing the StartPeriod & EndPeriod into the template context.
 - Create a database table using Hive named after the Report. This table is either con***REMOVED***gured to use HDFS or S3 based on the Report's StorageLocation.
 - Execute the query using Presto.
 - Update the Report status that everything succeeded.
@@ -145,5 +145,5 @@ When a `Report` is created, and it sees the creation event, it does the followin
 [metering-aws-billing-conf]: metering-con***REMOVED***g.md#aws-billing-correlation
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
-[reportgenerationqueries]: reportgenerationqueries.md
+[reportqueries]: reportqueries.md
 [reports]: report.md

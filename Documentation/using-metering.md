@@ -9,14 +9,14 @@ If you want a guide on how to extend Metering with custom queries and reports, r
 
 First, read the [Reports][report-md] guide for a list of available options.
 
-Select a `ReportGenerationQuery` and a `reportingStart` and `reportingEnd`.
-Use 'kubectl' to query the Metering namespace for a list of available  `ReportGenerationQueries`:
+Select a `ReportQuery` and a `reportingStart` and `reportingEnd`.
+Use 'kubectl' to query the Metering namespace for a list of available  `ReportQueries`:
 
 ```
-kubectl get reportgenerationqueries -n $METERING_NAMESPACE
+kubectl get reportqueries -n $METERING_NAMESPACE
 ```
 
-Each ReportGenerationQuery is designed to report on a speci***REMOVED***c resource, usually a `pod`, `namespace` or `node`, and on a speci***REMOVED***c metric, like `cpu` or `memory`, on a speci***REMOVED***c resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
+Each ReportQuery is designed to report on a speci***REMOVED***c resource, usually a `pod`, `namespace` or `node`, and on a speci***REMOVED***c metric, like `cpu` or `memory`, on a speci***REMOVED***c resource. Some reports correlate several of these metrics in a single report. See the [Reports][report-md] guide for more information on the returns provided by each report query.
 
 ## Creating a report
 
@@ -33,7 +33,7 @@ metadata:
 spec:
   reportingStart: '2018-01-01T00:00:00Z'
   reportingEnd: '2018-12-30T23:59:59Z'
-  generationQuery: "namespace-cpu-request"
+  query: "namespace-cpu-request"
   runImmediately: true
 ```
 

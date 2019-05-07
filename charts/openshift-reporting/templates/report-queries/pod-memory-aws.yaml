@@ -1,6 +1,6 @@
 {{- if .Values.spec.awsBillingReportDataSource.enabled -}}
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-request-aws
   labels:
@@ -43,11 +43,11 @@ spec:
     type: ReportDataSource
     default: node-memory-allocatable-raw
   - name: AwsEc2BillingDataQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
+      {| renderReportQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost
@@ -93,7 +93,7 @@ spec:
     CROSS JOIN aws_billing_sum
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: pod-memory-usage-aws
   labels:
@@ -136,11 +136,11 @@ spec:
     type: ReportDataSource
     default: node-memory-allocatable-raw
   - name: AwsEc2BillingDataQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
+      {| renderReportQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     ),
     aws_billing_sum AS (
         SELECT sum(aws_billing_***REMOVED***ltered.period_cost * aws_billing_***REMOVED***ltered.period_percent) as cluster_cost

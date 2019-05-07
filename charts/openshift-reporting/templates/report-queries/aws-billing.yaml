@@ -1,6 +1,6 @@
 {{- if .Values.spec.awsBillingReportDataSource.enabled -}}
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: aws-ec2-billing-data-raw
   labels:
@@ -47,7 +47,7 @@ spec:
     AND lineItem_UsageEndDate IS NOT NULL
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: aws-ec2-billing-data
   labels:
@@ -111,7 +111,7 @@ spec:
     AND (usage_end_date >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AND usage_start_date <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}')
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: aws-ec2-cluster-cost
   labels:
@@ -132,11 +132,11 @@ spec:
   - name: ReportingEnd
     type: time
   - name: AwsEc2BillingDataQueryName
-    type: ReportGenerationQuery
+    type: ReportQuery
     default: aws-ec2-billing-data
   query: |
     WITH aws_billing_***REMOVED***ltered AS (
-      {| renderReportGenerationQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
+      {| renderReportQuery .Report.Inputs.AwsEc2BillingDataQueryName . |}
     )
     SELECT
         min(usage_start_date) as data_start,

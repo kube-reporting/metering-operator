@@ -266,10 +266,10 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 		queries = append(queries, test.queryName)
 	}
 
-	// validate all ReportGenerationQueries and ReportDataSources that are
+	// validate all ReportQueries and ReportDataSources that are
 	// used by the test cases are initialized
-	t.Logf("Waiting for ReportGenerationQueries tables to become ready")
-	testFramework.RequireReportGenerationQueriesReady(t, queries, time.Second*5, 2*time.Minute)
+	t.Logf("Waiting for ReportQueries tables to become ready")
+	testFramework.RequireReportQueriesReady(t, queries, time.Second*5, 2*time.Minute)
 
 	var reportStart, reportEnd time.Time
 	dataSourcesSubmitted := make(map[string]struct{})

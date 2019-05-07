@@ -1,13 +1,13 @@
-# Writing Custom Report Prometheus Queries and Report Generation Queries
+# Writing Custom Report Prometheus Queries and Report Queries
 
 One of the main goals of Operator Metering is to be flexible, and extensible.
 The way this has been done is to use Kubernetes Custom Resources as a way of letting users add to, or expand upon the built-in reports and metrics that the operator already has.
 
-The primary Custom Resources that allow this are the [ReportDataSource][reportdatasources], and the [ReportGenerationQuery][reportgenerationqueries].
+The primary Custom Resources that allow this are the [ReportDataSource][reportdatasources], and the [ReportQuery][reportqueries].
 It's highly recommended you read the documentation on each of these resources before continuing.
 
 A ReportDataSource can be con***REMOVED***gured to cause Operator Metering to collect additional Prometheus Metrics by allowing users to write custom Prometheus queries and store the metrics collected.
-Once this is done a ReportGenerationQuery can be used to analyze the metrics.
+Once this is done a ReportQuery can be used to analyze the metrics.
 
 This guide is going to be structured such that you begin by collecting new Prometheus Metrics, and by the end you will be writing custom SQL queries that analyze these metrics.
 
@@ -187,25 +187,25 @@ ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, n
 LIMIT 10;
 ```
 
-## Writing a ReportGenerationQuery
+## Writing a ReportQuery
 
-Now that we have our ***REMOVED***nal query, the time has come to put it into a [ReportGenerationQuery][reportgenerationqueries] resource.
+Now that we have our ***REMOVED***nal query, the time has come to put it into a [ReportQuery][reportqueries] resource.
 
-The basic things you need to know when creating a `ReportGenerationQuery` is the query you're going to use, the schema for that query, and the `ReportDataSources` or `ReportGenerationQueries` your query depends on.
+The basic things you need to know when creating a `ReportQuery` is the query you're going to use, the schema for that query, and the `ReportDataSources` or `ReportQueries` your query depends on.
 
 For our example, we will add the `unready-deployment-replicas` `ReportDataSources` to the `spec.ReportDataSource`, and we'll add the query to `spec.query`.
 The schema, which is de***REMOVED***ned in the `spec.columns` ***REMOVED***eld, is basically a list of the columns from the `SELECT` query and their SQL data types.
 The column information is what the operator uses to create the table when a report is being generated.
 If this doesn't match the query, there will be issues when running the query and trying to store the data into the database.
 
-Below is an example of our ***REMOVED***nal query from the steps above put into a `ReportGenerationQuery`.
+Below is an example of our ***REMOVED***nal query from the steps above put into a `ReportQuery`.
 One thing to note is we replaced `FROM datasource_your_namespace_unready_deployment_replicas` with `{| dataSourceTableName .Report.Inputs.UnreadyDeploymentReplicasDataSourceName |}` and added an `inputs` con***REMOVED***guration to avoid hard coding the table name.
 By using inputs, we can override the default ReportDataSource used and by marking it as `type: ReportDataSource`, it will be considered a dependency and will ensure it exists before running.
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: "unready-deployment-replicas"
 spec:
@@ -240,7 +240,7 @@ However, the above example is missing one crucial bit, and that's the ability to
 To handle this, the `.Report` variable is accessible within templates and contains a `.Report.StartPeriod` and `.Report.EndPeriod` ***REMOVED***eld which will be ***REMOVED***lled in with values corresponding to the Report's reporting period.
 We can use these variables in a `WHERE` clause within our query to ***REMOVED***lter the results to those time ranges.
 
-The `WHERE` clause generally looks the same for all `ReportGenerationQueries` that expect to be used by a Report:
+The `WHERE` clause generally looks the same for all `ReportQueries` that expect to be used by a Report:
 
 ```
 WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
@@ -249,7 +249,7 @@ AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.Repo
 
 Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, we should collect data with timestamps equal to or greater than the start time and less than the end time, as seen in the example above.
 
-In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema de***REMOVED***nition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional ***REMOVED***eld, `spec.input`, to our `ReportGenerationQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
+In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema de***REMOVED***nition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional ***REMOVED***eld, `spec.input`, to our `ReportQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
 Lastly, we need to update the SELECT portion of the `spec.query` ***REMOVED***eld:
 
 ```
@@ -261,12 +261,12 @@ query: |
     ...
 ```
 
-Once we add these columns ***REMOVED***lters to our query we get the ***REMOVED***nal version of our ReportGenerationQuery.
-Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportgenerationquery.yaml`:
+Once we add these columns ***REMOVED***lters to our query we get the ***REMOVED***nal version of our ReportQuery.
+Save the snippet below into a ***REMOVED***le named `unready-deployment-replicas-reportquery.yaml`:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: "unready-deployment-replicas"
 spec:
@@ -306,10 +306,10 @@ spec:
     ORDER BY total_replica_unready_seconds DESC, avg_replica_unready_seconds DESC, namespace ASC, deployment ASC
 ```
 
-Next, let's create the `ReportGenerationQuery` so it can be used by Reports:
+Next, let's create the `ReportQuery` so it can be used by Reports:
 
 ```
-kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportgenerationquery.yaml
+kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportquery.yaml
 ```
 
 ## Creating a Report
@@ -324,7 +324,7 @@ metadata:
 spec:
   reportingStart: '2019-01-01T00:00:00Z'
   reportingEnd: '2019-12-31T23:59:59Z'
-  generationQuery: "unready-deployment-replicas"
+  query: "unready-deployment-replicas"
   runImmediately: true
 ```
 
@@ -378,12 +378,12 @@ Here's a summary of what we did in this guide:
 - We wrote a Prometheus query that collects metrics on unready deployment replicas.
 - We created a `ReportDataSource` that gave us a Presto table containing the metrics from our Prometheus query.
 - We wrote a Presto SQL query that calculates the average and total number of seconds that pods are unready for each deployment.
-- We wrote a `ReportGenerationQuery` that does our calculation, and handles ***REMOVED***ltering the results to a Report's con***REMOVED***gured time range.
-- We created a `Report` that uses our `ReportGenerationQuery`.
+- We wrote a `ReportQuery` that does our calculation, and handles ***REMOVED***ltering the results to a Report's con***REMOVED***gured time range.
+- We created a `Report` that uses our `ReportQuery`.
 - We checked that the Report ***REMOVED***nished, and then fetched the results from the metering operator HTTP API.
 
 [reportdatasources]: reportdatasources.md
-[reportgenerationqueries]: reportgenerationqueries.md
+[reportqueries]: reportqueries.md
 [reports]: report.md
 [install-metering]: install-metering.md
 [presto-cli-exec]:  dev/debugging.md#query-presto-using-presto-cli

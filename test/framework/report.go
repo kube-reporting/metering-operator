@@ -45,10 +45,10 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1
 			Namespace: f.Namespace,
 		},
 		Spec: meteringv1alpha1.ReportSpec{
-			GenerationQueryName: queryName,
-			Schedule:            schedule,
-			ReportingStart:      start,
-			ReportingEnd:        end,
+			QueryName:      queryName,
+			Schedule:       schedule,
+			ReportingStart: start,
+			ReportingEnd:   end,
 		},
 	}
 }

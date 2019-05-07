@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-phase-raw
   labels:
@@ -44,7 +44,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimPhaseDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-usage-raw
   labels:
@@ -91,7 +91,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimUsageBytesDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-usage-with-phase-raw
   labels:
@@ -135,7 +135,7 @@ spec:
     GROUP BY phase.timestamp, phase.dt, phase.namespace, phase.persistentvolumeclaim
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-usage
   labels:
@@ -183,7 +183,7 @@ spec:
 ---
 
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: "namespace-persistentvolumeclaim-usage"
   labels:

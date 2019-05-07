@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-cpu-capacity-raw
   labels:
@@ -46,7 +46,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.NodeCapacityCpuCoresDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-cpu-capacity
   labels:
@@ -92,7 +92,7 @@ spec:
     GROUP BY node, resource_id
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-cpu-allocatable-raw
   labels:
@@ -139,7 +139,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.NodeAllocatableCpuCoresDataSourceName |}
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-cpu-allocatable
   labels:
@@ -185,7 +185,7 @@ spec:
     GROUP BY node, resource_id
 ---
 apiVersion: metering.openshift.io/v1alpha1
-kind: ReportGenerationQuery
+kind: ReportQuery
 metadata:
   name: node-cpu-utilization
   labels:

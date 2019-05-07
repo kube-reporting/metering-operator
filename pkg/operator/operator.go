@@ -128,20 +128,20 @@ type Reporting struct {
 
 	informerFactory factory.SharedInformerFactory
 
-	prestoTableLister           listers.PrestoTableLister
-	hiveTableLister             listers.HiveTableLister
-	reportDataSourceLister      listers.ReportDataSourceLister
-	reportGenerationQueryLister listers.ReportGenerationQueryLister
-	reportLister                listers.ReportLister
-	storageLocationLister       listers.StorageLocationLister
+	prestoTableLister      listers.PrestoTableLister
+	hiveTableLister        listers.HiveTableLister
+	reportDataSourceLister listers.ReportDataSourceLister
+	reportQueryLister      listers.ReportQueryLister
+	reportLister           listers.ReportLister
+	storageLocationLister  listers.StorageLocationLister
 
-	queueList                  []workqueue.RateLimitingInterface
-	reportQueue                workqueue.RateLimitingInterface
-	reportDataSourceQueue      workqueue.RateLimitingInterface
-	reportGenerationQueryQueue workqueue.RateLimitingInterface
-	prestoTableQueue           workqueue.RateLimitingInterface
-	hiveTableQueue             workqueue.RateLimitingInterface
-	storageLocationQueue       workqueue.RateLimitingInterface
+	queueList             []workqueue.RateLimitingInterface
+	reportQueue           workqueue.RateLimitingInterface
+	reportDataSourceQueue workqueue.RateLimitingInterface
+	reportQueryQueue      workqueue.RateLimitingInterface
+	prestoTableQueue      workqueue.RateLimitingInterface
+	hiveTableQueue        workqueue.RateLimitingInterface
+	storageLocationQueue  workqueue.RateLimitingInterface
 
 	reportResultsRepo     prestostore.ReportResultsRepo
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
@@ -251,13 +251,13 @@ func newReportingOperator(
 	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
 	hiveTableInformer := informerFactory.Metering().V1alpha1().HiveTables()
 	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
-	reportGenerationQueryInformer := informerFactory.Metering().V1alpha1().ReportGenerationQueries()
+	reportQueryInformer := informerFactory.Metering().V1alpha1().ReportQueries()
 	reportInformer := informerFactory.Metering().V1alpha1().Reports()
 	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
 
 	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")
-	reportGenerationQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportgenerationqueries")
+	reportQueryQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportqueries")
 	prestoTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "prestotables")
 	hiveTableQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "hivetables")
 	storageLocationQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "storagelocation")
@@ -265,14 +265,14 @@ func newReportingOperator(
 	queueList := []workqueue.RateLimitingInterface{
 		reportQueue,
 		reportDataSourceQueue,
-		reportGenerationQueryQueue,
+		reportQueryQueue,
 		prestoTableQueue,
 		hiveTableQueue,
 		storageLocationQueue,
 	}
 
 	depResolver := reporting.NewDependencyResolver(
-		reporting.NewReportGenerationQueryListerGetter(reportGenerationQueryInformer.Lister()),
+		reporting.NewReportQueryListerGetter(reportQueryInformer.Lister()),
 		reporting.NewReportDataSourceListerGetter(reportDataSourceInformer.Lister()),
 		reporting.NewReportListerGetter(reportInformer.Lister()),
 	)
@@ -286,22 +286,22 @@ func newReportingOperator(
 
 		informerFactory: informerFactory,
 
-		prestoTableLister:           prestoTableInformer.Lister(),
-		hiveTableLister:             hiveTableInformer.Lister(),
-		reportDataSourceLister:      reportDataSourceInformer.Lister(),
-		reportGenerationQueryLister: reportGenerationQueryInformer.Lister(),
-		reportLister:                reportInformer.Lister(),
-		storageLocationLister:       storageLocationInformer.Lister(),
+		prestoTableLister:      prestoTableInformer.Lister(),
+		hiveTableLister:        hiveTableInformer.Lister(),
+		reportDataSourceLister: reportDataSourceInformer.Lister(),
+		reportQueryLister:      reportQueryInformer.Lister(),
+		reportLister:           reportInformer.Lister(),
+		storageLocationLister:  storageLocationInformer.Lister(),
 
 		dependencyResolver: depResolver,
 
-		queueList:                  queueList,
-		reportQueue:                reportQueue,
-		reportDataSourceQueue:      reportDataSourceQueue,
-		reportGenerationQueryQueue: reportGenerationQueryQueue,
-		prestoTableQueue:           prestoTableQueue,
-		hiveTableQueue:             hiveTableQueue,
-		storageLocationQueue:       storageLocationQueue,
+		queueList:             queueList,
+		reportQueue:           reportQueue,
+		reportDataSourceQueue: reportDataSourceQueue,
+		reportQueryQueue:      reportQueryQueue,
+		prestoTableQueue:      prestoTableQueue,
+		hiveTableQueue:        hiveTableQueue,
+		storageLocationQueue:  storageLocationQueue,
 
 		rand:      rand,
 		clock:     clock,
@@ -326,9 +326,9 @@ func newReportingOperator(
 		DeleteFunc: op.deleteReportDataSource,
 	}, op.cfg.TargetNamespaces))
 
-	reportGenerationQueryInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    op.addReportGenerationQuery,
-		UpdateFunc: op.updateReportGenerationQuery,
+	reportQueryInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    op.addReportQuery,
+		UpdateFunc: op.updateReportQuery,
 	}, op.cfg.TargetNamespaces))
 
 	prestoTableInformer.Informer().AddEventHandler(newInTargetNamespaceEventHandler(cache.ResourceEventHandlerFuncs{
@@ -445,7 +445,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
 		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange,
-		op.reportLister, op.reportGenerationQueryLister, op.prestoTableLister,
+		op.reportLister, op.reportQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
 	apiRouter.HandleFunc("/healthy", op.readinessHandler)
@@ -663,9 +663,9 @@ func (op *Reporting) startWorkers(wg *sync.WaitGroup, ctx context.Context) {
 	})
 
 	startWorker(4, func(i int) {
-		op.logger.Infof("starting ReportGenerationQuery worker #%d", i)
-		wait.Until(op.runReportGenerationQueryWorker, time.Second, stopCh)
-		op.logger.Infof("ReportGenerationQuery worker #%d stopped", i)
+		op.logger.Infof("starting ReportQuery worker #%d", i)
+		wait.Until(op.runReportQueryWorker, time.Second, stopCh)
+		op.logger.Infof("ReportQuery worker #%d stopped", i)
 	})
 
 	startWorker(6, func(i int) {
@@ -697,5 +697,5 @@ func (op *Reporting) newPrometheusConn(promCon***REMOVED***g promapi.Con***REMOV
 }
 
 type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportGenerationQueryInputDe***REMOVED***nition, inputVals []cbTypes.ReportGenerationQueryInputValue) (*reporting.DependencyResolutionResult, error)
+	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportQueryInputDe***REMOVED***nition, inputVals []cbTypes.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }

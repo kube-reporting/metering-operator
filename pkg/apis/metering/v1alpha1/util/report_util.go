@@ -31,12 +31,12 @@ const (
 	ReportFinishedReason = "Finished"
 
 	// InvalidReportReason is added to a Report when the
-	// Report is invalid or it's ReportGenerationQuery is invalid.
+	// Report is invalid or it's ReportQuery is invalid.
 	InvalidReportReason = "InvalidReport"
 
 	// ReportingPeriodUnmetDependenciesReason is set when a Report cannot run
-	// because it's dependencies (ReportGenerationQueries dependencies on
-	// ReportDataSources, ReportGenerationQueries, and other Reports) do not
+	// because it's dependencies (ReportQueries dependencies on
+	// ReportDataSources, ReportQueries, and other Reports) do not
 	// have data available for the reporting period currently being processed.
 	ReportingPeriodUnmetDependenciesReason = "ReportingPeriodUnmetDependencies"
 

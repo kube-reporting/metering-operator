@@ -43,7 +43,7 @@ TEST_OUTPUT_DIR=$TEST_OUTPUT_PATH/tests
 REPORT_RESULTS_DIR=$TEST_OUTPUT_PATH/report_results
 REPORTS_DIR=$TEST_OUTPUT_PATH/reports
 DATASOURCES_DIR=$TEST_OUTPUT_PATH/reportdatasources
-REPORTGENERATIONQUERIES_DIR=$TEST_OUTPUT_PATH/reportgenerationqueries
+REPORTQUERIES_DIR=$TEST_OUTPUT_PATH/reportqueries
 HIVETABLES_DIR=$TEST_OUTPUT_PATH/hivetables
 PRESTOTABLES_DIR=$TEST_OUTPUT_PATH/prestotables
 STORAGELOCATIONS_DIR=$TEST_OUTPUT_PATH/storagelocations
@@ -54,7 +54,7 @@ TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TE
 DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
 DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
 
-mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTGENERATIONQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
+mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
 
 export SKIP_DELETE_CRDS=true
 export DELETE_PVCS=true
@@ -138,12 +138,12 @@ function cleanup() {
         ***REMOVED***
     done <<< "$DATASOURCES"
 
-    echo "Capturing Metering ReportGenerationQueries"
-    RGQS="$(kubectl get reportgenerationqueries --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
+    echo "Capturing Metering ReportQueries"
+    RGQS="$(kubectl get reportqueries --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
     while read -r rgq; do
         if [[ -n "$rgq" ]]; then
-            echo "Capturing ReportGenerationQuery $rgq as json"
-            if ! kubectl get reportgenerationquery "$rgq" --namespace "$METERING_NAMESPACE" -o json > "$REPORTGENERATIONQUERIES_DIR/${rgq}.json"; then
+            echo "Capturing ReportQuery $rgq as json"
+            if ! kubectl get reportquery "$rgq" --namespace "$METERING_NAMESPACE" -o json > "$REPORTQUERIES_DIR/${rgq}.json"; then
                 echo "Error getting $rgq as json"
             ***REMOVED***
         ***REMOVED***

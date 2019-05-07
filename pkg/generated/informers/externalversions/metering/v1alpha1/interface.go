@@ -16,8 +16,8 @@ type Interface interface {
 	Reports() ReportInformer
 	// ReportDataSources returns a ReportDataSourceInformer.
 	ReportDataSources() ReportDataSourceInformer
-	// ReportGenerationQueries returns a ReportGenerationQueryInformer.
-	ReportGenerationQueries() ReportGenerationQueryInformer
+	// ReportQueries returns a ReportQueryInformer.
+	ReportQueries() ReportQueryInformer
 	// StorageLocations returns a StorageLocationInformer.
 	StorageLocations() StorageLocationInformer
 }
@@ -53,9 +53,9 @@ func (v *version) ReportDataSources() ReportDataSourceInformer {
 	return &reportDataSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// ReportGenerationQueries returns a ReportGenerationQueryInformer.
-func (v *version) ReportGenerationQueries() ReportGenerationQueryInformer {
-	return &reportGenerationQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// ReportQueries returns a ReportQueryInformer.
+func (v *version) ReportQueries() ReportQueryInformer {
+	return &reportQueryInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // StorageLocations returns a StorageLocationInformer.

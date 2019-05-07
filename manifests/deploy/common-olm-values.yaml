@@ -85,7 +85,7 @@ annotations:
           "name": "unready-deployment-replicas-hourly"
         },
         "spec": {
-          "generationQuery": "unready-deployment-replicas",
+          "query": "unready-deployment-replicas",
           "schedule": {
             "period": "hourly"
           }
@@ -93,7 +93,7 @@ annotations:
       },
       {
         "apiVersion": "metering.openshift.io/v1alpha1",
-        "kind": "ReportGenerationQuery",
+        "kind": "ReportQuery",
         "metadata": {
           "name": "unready-deployment-replicas"
         },
