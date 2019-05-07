@@ -43,7 +43,7 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
 else
     msg "Removing Custom Resource Definitions"
-    kube-remove "$CRD_DIR"
+    find "$CRD_DIR" -type f -name '*.crd.yaml' -exec kubectl delete -f {} \;
 fi
 
 if [ "$DELETE_PVCS" == "true" ]; then

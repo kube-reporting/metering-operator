@@ -1,3 +1,0 @@
-packageName: {{ .Values.packageName }}
-channels:
-{{ toYaml .Values.channels }}

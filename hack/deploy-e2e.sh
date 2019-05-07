@@ -72,6 +72,7 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     HELM_ARGS+=(--set "imagePullSecretName=$METERING_PULL_SECRET_NAME")
 fi
 
+export METERING_CR_FILE=$CUSTOM_METERING_CR_FILE
 helm template \
     "$ROOT_DIR/charts/metering-ci" \
     -x templates/metering.yaml \
@@ -79,18 +80,13 @@ helm template \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$CUSTOM_METERING_CR_FILE"
 
-# use the CUSTOM_METERING_CR_FILE as the CR values for the helm-operator chart values below
-CR_SPEC=$("$FAQ_BIN" -f yaml -o yaml -M -c -r '{ cr: {spec: .spec} }' "$CUSTOM_METERING_CR_FILE" )
-
 cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
-image:
-  repo: ${METERING_OPERATOR_DEPLOY_REPO}
-  tag: ${METERING_OPERATOR_DEPLOY_TAG}
-annotations: { "metering.deploy-custom/deploy-time": "${CUR_DATE}" }
-reconcileIntervalSeconds: 5
-${CR_SPEC}
+operator:
+  image:
+    repo: ${METERING_OPERATOR_DEPLOY_REPO}
+    tag: ${METERING_OPERATOR_DEPLOY_TAG}
+  annotations: { "metering.deploy-custom/deploy-time": "${CUR_DATE}" }
+  reconcileIntervalSeconds: 5
 EOF
-
-touch "$CUSTOM_OLM_OVERRIDE_VALUES"
 
 "$DIR/deploy-custom.sh"

@@ -271,7 +271,8 @@ spec:
     strategy: deployment
     spec:
       clusterPermissions:
-        - rules:
+        - serviceAccountName: metering-operator
+          rules:
           - apiGroups:
             - ""
             resources:
@@ -304,10 +305,10 @@ spec:
             - patch
             - update
             - watch
-          serviceAccountName: metering-operator
 
       permissions:
-        - rules:
+        - serviceAccountName: metering-operator
+          rules:
           - apiGroups:
             - metering.openshift.io
             resources:
@@ -464,38 +465,42 @@ spec:
             - watch
             - update
             - delete
-          serviceAccountName: metering-operator
 
       deployments:
         - name: metering-operator
           spec:
             replicas: 1
+            strategy:
+              type: Recreate
             selector:
               matchLabels:
                 app: metering-operator
-            strategy:
-              type: Recreate
             template:
               metadata:
                 labels:
                   app: metering-operator
               spec:
+                securityContext:
+                  runAsNonRoot: true
                 containers:
-                - args:
-                  - run-operator.sh
+                - name: metering-operator
+                  image: "quay.io/openshift/origin-metering-helm-operator:4.1"
+                  args: ["run-operator.sh"]
+                  imagePullPolicy: Always
                   env:
                   - name: HELM_RELEASE_CRD_NAME
-                    value: Metering
+                    value: "Metering"
                   - name: HELM_RELEASE_CRD_API_GROUP
-                    value: metering.openshift.io
+                    value: "metering.openshift.io"
                   - name: HELM_CHART_PATH
-                    value: /openshift-metering-0.1.0.tgz
+                    value: "/openshift-metering-0.1.0.tgz"
                   - name: ALL_NAMESPACES
                     value: "false"
                   - name: TARGET_NAMESPACES
                     valueFrom:
-                      fieldRef:
-                        fieldPath: metadata.annotations['olm.targetNamespaces']
+                        fieldRef:
+                          fieldPath: metadata.annotations['olm.targetNamespaces']
+
                   - name: MY_POD_NAME
                     valueFrom:
                       fieldRef:
@@ -505,16 +510,13 @@ spec:
                       fieldRef:
                         fieldPath: metadata.namespace
                   - name: HELM_HOST
-                    value: 127.0.0.1:44134
+                    value: "127.0.0.1:44134"
                   - name: HELM_WAIT
                     value: "false"
                   - name: HELM_RECONCILE_INTERVAL_SECONDS
                     value: "30"
                   - name: RELEASE_HISTORY_LIMIT
                     value: "3"
-                  image: quay.io/openshift/origin-metering-helm-operator:4.1
-                  imagePullPolicy: Always
-                  name: metering-operator
                   resources:
                     limits:
                       cpu: 50m
@@ -522,8 +524,11 @@ spec:
                     requests:
                       cpu: 50m
                       memory: 100Mi
-                - args:
-                  - tiller
+
+                - name: tiller
+                  image: "quay.io/openshift/origin-metering-helm-operator:4.1"
+                  args: ["tiller"]
+                  imagePullPolicy: Always
                   env:
                   - name: TILLER_NAMESPACE
                     valueFrom:
@@ -531,8 +536,13 @@ spec:
                         fieldPath: metadata.namespace
                   - name: TILLER_HISTORY_MAX
                     value: "3"
-                  image: quay.io/openshift/origin-metering-helm-operator:4.1
-                  imagePullPolicy: Always
+                  resources:
+                    requests:
+                      memory: "50Mi"
+                      cpu: "50m"
+                    limits:
+                      memory: "100Mi"
+                      cpu: "50m"
                   livenessProbe:
                     failureThreshold: 3
                     httpGet:
@@ -543,7 +553,6 @@ spec:
                     periodSeconds: 10
                     successThreshold: 1
                     timeoutSeconds: 1
-                  name: tiller
                   readinessProbe:
                     failureThreshold: 3
                     httpGet:
@@ -554,18 +563,9 @@ spec:
                     periodSeconds: 10
                     successThreshold: 1
                     timeoutSeconds: 1
-                  resources:
-                    limits:
-                      cpu: 50m
-                      memory: 100Mi
-                    requests:
-                      cpu: 50m
-                      memory: 50Mi
                 restartPolicy: Always
-                securityContext:
-                  runAsNonRoot: true
-                serviceAccount: metering-operator
                 terminationGracePeriodSeconds: 30
+                serviceAccount: metering-operator
 
   customresourcedefinitions:
     owned:

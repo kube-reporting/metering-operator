@@ -9,4 +9,3 @@ spec:
   names:
     plural: storagelocations
     kind: StorageLocation
-

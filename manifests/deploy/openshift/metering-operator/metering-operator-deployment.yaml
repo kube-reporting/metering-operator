@@ -34,8 +34,8 @@ spec:
           value: "false"
         - name: TARGET_NAMESPACES
           valueFrom:
-            fieldRef:
-              fieldPath: metadata.annotations['olm.targetNamespaces']
+              fieldRef:
+                fieldPath: metadata.annotations['olm.targetNamespaces']
 
         - name: MY_POD_NAME
           valueFrom:

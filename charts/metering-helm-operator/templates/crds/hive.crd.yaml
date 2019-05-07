@@ -14,4 +14,3 @@ spec:
   - name: Table Name
     type: string
     JSONPath: .status.tableName
-
