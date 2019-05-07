@@ -31,7 +31,6 @@ There are 6 custom resources that Operator Metering defines that you need to be 
 - `PrestoTables`: Defines a table in Presto. A PrestoTable can be "unmanaged" to expose a table that already exists, or "managed" to instruct metering to create a table as a result of the resource being created.
 - `HiveTables`: Defines a table in Hive. When created, it instructs metering to create the table in Hive which causes the table to be available to Presto.
 - `ReportDataSources`: Controls what data is available (Prometheus data, AWS billing data, Presto tables, views into other tables).
-- `ReportPrometheusQueries`: Controls how Prometheus data is collected.
 - `ReportGenerationQueries`: Controls how we query the data available within ReportDataSources. If referenced by a `Report` it will manage what it will be reporting on when the report is run. If it's referenced by a `ReportDataSource` it will instruct metering to create a view within Presto based on the rendered query.
 - `Reports`: Causes reports to be generated using the configured `ReportGenerationQuery` resource. This is the primary resource an end-user of Operator Metering would interact with. Can be configured to run on a schedule.
 
@@ -52,32 +51,31 @@ In both cases, the data is persisted as ORC files in either S3, HDFS, or a ReadW
 For user-docs containing a description of the fields, and examples, see [ReportDataSources][reportdatasources].
 
 A `ReportDataSource` represents a database table data lives.
-There are many types of ReportDataSources, with the most common being a "Promsum" ReportDataSource.
+There are many types of ReportDataSources, with the most common being a "PrometheusMetricsImporter" ReportDataSource.
 
-A Promsum ReportDataSource instructs the reporting-operator to create a database table for storing Prometheus metric data and to being the process of importing Prometheus metrics.
+A PrometheusMetricsImporter ReportDataSource instructs the reporting-operator to create a database table for storing Prometheus metric data and to being the process of importing Prometheus metrics.
 You can also define a AWSBilling ReportDataSource to create table pointing at an existing S3 bucket containing AWS Cost and Usage reports.
 Additionally, there are GenerationQueryView ReportDataSource's which create views in Presto, and PrestoTable ReportDataSource's which just expose an existing PrestoTable as a ReportDataSource.
 
 
-#### Promsum ReportDataSources
+#### PrometheusMetricsImporter ReportDataSources
 
-A `promsum` ReportDataSource configures the reporting-operator to periodically poll Prometheus for metrics.
+A `PrometheusMetricsImporter` ReportDataSource configures the reporting-operator to periodically poll Prometheus for metrics.
 
 When the ReportDataSource is created, the metering operator does the following:
 
 - Checks if this `ReportDataSource` has a table created for it yet by checking the `status.tableRef` field.
 - If the field is empty it creates the table by creating a `HiveTable` resource, and waiting for it's `status.tableName` to be set, indicating the table has been created, then records the HiveTable name as the `status.tableRef`.
-  - The underlying storage for this table is controlled using the `StorageLocationRef` configuration in `spec.promsum.storage`, which controls what options to use when creating the Presto table, such as what Presto connector is used. Currently only Hive StorageLocation's are supported.
+  - The underlying storage for this table is controlled using the `StorageLocationRef` configuration in `spec.prometheusMetricsImporter.storage`, which controls what options to use when creating the Presto table, such as what Presto connector is used. Currently only Hive StorageLocation's are supported.
 
-Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `promsum` section is specified, does the following to attempt to poll Prometheus metrics for each:
+Additionally, in the background the reporting-operator is periodically listing all `ReportDataSources` and if the `spec.prometheusMetricsImporter` section is specified, does the following to attempt to poll Prometheus metrics for each:
 
 - Checks if the table for this ReportDataSource exists, and if it doesn't, it will skip collecting any data until the next poll for the `ReportDataSource` again.
-- Retrieves the query specified in the `ReportPrometheusQuery` named by the ReportDataSources `spec.promsum.query` field.
-- Executes the Prometheus query against the Prometheus server.
+- Executes the Prometheus query contained in `spec.prometheusMetricsImporter.query` against the Prometheus server.
 - Stores the data received from the metric results into a Presto table.
   - Currently this is done using an `INSERT` query using Presto, but this is subject to change as other `StorageLocations` are added.
 
-Currently, multiple `promsum` ReportDataSources are collected at the same time concurrently.
+Currently, multiple `PrometheusMetricsImporter` ReportDataSources are collected at the same time concurrently.
 Metric resolution, and poll intervals are controlled at a global level on the metering operator via the `Metering` resource's `spec.reporting-operator.config` section.
 
 #### AWSBilling ReportDataSources
@@ -120,12 +118,6 @@ When the ReportDataSource is created, the reporting-operator:
 - Lookups the `PrestoTable` resource and verifies it's `status.tableName` is set.
 - If the `status.tableName` is set then it will update the ReportDataSource's `spec.tableRef` to the tableName.
 
-### ReportPrometheusQuery
-
-For user-docs containing a description of the fields, and examples, see [ReportPrometheusQueries][reportprometheusqueries].
-
-A `ReportPrometheusQuery` is basically just a Prometheus query. All `ReportPrometheusQueries` in the namespace of the operator are available for use in a `ReportDataSource`.
-
 ### ReportGenerationQuery
 
 For user-docs containing a description of the fields, and examples, see [ReportGenerationQueries][reportgenerationqueries].
@@ -153,6 +145,5 @@ When a `Report` is created, and it sees the creation event, it does the followin
 [metering-aws-billing-conf]: metering-config.md#aws-billing-correlation
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
-[reportprometheusqueries]: reportprometheusqueries.md
 [reportgenerationqueries]: reportgenerationqueries.md
 [reports]: report.md

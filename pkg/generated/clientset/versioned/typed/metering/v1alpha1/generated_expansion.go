@@ -12,6 +12,4 @@ type ReportDataSourceExpansion interface{}
 
 type ReportGenerationQueryExpansion interface{}
 
-type ReportPrometheusQueryExpansion interface{}
-
 type StorageLocationExpansion interface{}

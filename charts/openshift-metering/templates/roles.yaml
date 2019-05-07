@@ -37,7 +37,6 @@ rules:
   - reports/export
   - reportgenerationqueries
   - reportdatasources
-  - reportprometheusqueries
   - prestotables
   - storagelocations
   verbs: ["*"]
@@ -57,7 +56,6 @@ rules:
   - reports/export
   - reportgenerationqueries
   - reportdatasources
-  - reportprometheusqueries
   - prestotables
   - storagelocations
   verbs: ["get", "list", "watch"]

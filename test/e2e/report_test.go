@@ -53,7 +53,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 			// for each datasource, wait until it's EarliestImportedMetricTime is set
 			for _, ds := range dependencies.ReportDataSources {
 				_, err := testFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *meteringv1alpha1.ReportDataSource) (bool, error) {
-					if dataSource.Spec.Promsum == nil {
+					if dataSource.Spec.PrometheusMetricsImporter == nil {
 						return true, nil
 					}
 					if dataSource.Status.PrometheusMetricImportStatus != nil && dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime != nil {

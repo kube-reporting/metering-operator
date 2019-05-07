@@ -2,18 +2,18 @@
 
 A `ReportDataSource` is a custom resource that represents how to store data, such as where it should be stored, and in some cases, how the data is to be collected.
 
-There are currently four types of ReportDataSource's: `promsum`, `awsBilling`, `generationQueryView` and `prestoTable`.
+There are currently four types of ReportDataSource's: `prometheusMetricsImporter`, `awsBilling`, `generationQueryView` and `prestoTable`.
 Each has a corresponding configuration section within the `spec` of a `ReportDataSource`.
 The main effect that creating a ReportDataSource has is that it causes the metering operator to create a table in Presto or Hive.
 Depending on the type of ReportDataSource it then may do other additional tasks.
-For `promsum` datasources the operator periodically collects metrics and stores them in the table.
+For `prometheusMetricsImporter` datasources the operator periodically collects metrics and stores them in the table.
 For `awsBilling`, the operator configures the table to point at an S3 bucket containing [AWS Cost and Usage reports][AWS-billing], making these reports exposed as a database table.
 To read more details on how the different ReportDataSources work, read the [metering architecture document][architecture].
 
 ## Fields
 
-- `promsum`: If this section is present, then the `ReportDataSource` will be configured to periodically poll Prometheus for metrics using the specified `ReportPrometheusQuery`.
-  - `query`: The name of the `ReportPrometheusQuery` resource.
+- `prometheusMetricsImporter`: If this section is present, then the `ReportDataSource` will be configured to periodically poll Prometheus for metrics using the specified Prometheus query.
+  - `query`: The PromQL query to use.
   - `storage`: This section controls the `StorageLocation` options, allowing you to control on a per ReportDataSource level, where data is stored.
     - `storageLocationName`: The name of the `StorageLocation` resource to use.
   - `prometheusConfig`:
@@ -31,9 +31,9 @@ To read more details on how the different ReportDataSources work, read the [mete
 - `prestoTable`: If present, then the `ReportDataSource` will simply make it possible to reference a database table within Presto as a ReportDataSource.
   - `tableRef`: The name of the [PrestoTable][prestotable] that this ReportDataSource should refer to.
 
-## Promsum Datasource
+## PrometheusMetricsImporter Datasource
 
-For ReportDataSources with a `spec.promsum` present, their tables have the following database table schema:
+For ReportDataSources with a `spec.prometheusMetricsImporter` present, their tables have the following database table schema:
 
 - `timestamp`: The type of this column is `timestamp`. This is the time which the metric was collected.
    - Note: `timestamp` is also a reserved keyword (for the column type) in Presto, meaning any queries using it must use quotes to refer to the column, like so: `SELECT "timestamp" FROM datasource_unready_deployment_replicas LIMIT 1;`
@@ -41,7 +41,7 @@ For ReportDataSources with a `spec.promsum` present, their tables have the follo
 - `labels`: The type of this column is a `map(varchar, varchar)`. This is the set of Prometheus labels and their values for the metric.
 - `amount`: The type of this column is a `double`. Amount is the value of the metric at that `timestamp`
 
-### Example Promsum Datasource
+### Example PrometheusMetricsImporter Datasource
 
 Below is an example of one of the built-in `ReportDataSource` resources that is installed with Operator Metering by default.
 
@@ -53,8 +53,9 @@ metadata:
   labels:
     operator-metering: "true"
 spec:
-  promsum:
-    query: "pod-request-memory-bytes"
+  prometheusMetricsImporter:
+    query: |
+      sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
 ```
 
 If the data to be scraped is on a non-default Prometheus instance:
@@ -67,8 +68,9 @@ metadata:
   labels:
     operator-metering: "true"
 spec:
-  promsum:
-    query: "pod-request-memory-bytes"
+  prometheusMetricsImporter:
+    query: |
+      sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
     prometheusConfig:
       url: http://custom-prometheus-instance:9090
 ```
@@ -144,5 +146,6 @@ spec:
 [architecture]: metering-architecture.md
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [reportgenerationqueries]: reportgenerationqueries.md
+[reportgenerationquery]: reportgenerationqueries.md
 [query-inputs]: reportgenerationqueries.md#query-inputs
 [prestotables]: prestotables.md

@@ -3,10 +3,11 @@
 One of the main goals of Operator Metering is to be flexible, and extensible.
 The way this has been done is to use Kubernetes Custom Resources as a way of letting users add to, or expand upon the built-in reports and metrics that the operator already has.
 
-The primary Custom Resources that allow this are the [ReportPrometheusQuery][reportprometheusqueries], [ReportDataSource][reportdatasources], and the [ReportGenerationQuery][reportgenerationqueries].
+The primary Custom Resources that allow this are the [ReportDataSource][reportdatasources], and the [ReportGenerationQuery][reportgenerationqueries].
 It's highly recommended you read the documentation on each of these resources before continuing.
 
-A ReportDataSource combined with a ReportPrometheusQueries cause Operator Metering to collect additional Prometheus Metrics by allowing users to write custom Prometheus queries and store the metrics collected for analysis with a ReportGenerationQuery.
+A ReportDataSource can be configured to cause Operator Metering to collect additional Prometheus Metrics by allowing users to write custom Prometheus queries and store the metrics collected.
+Once this is done a ReportGenerationQuery can be used to analyze the metrics.
 
 This guide is going to be structured such that you begin by collecting new Prometheus Metrics, and by the end you will be writing custom SQL queries that analyze these metrics.
 
@@ -56,22 +57,9 @@ sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)
 
 Try the above query in the Prometheus UI to get an idea of what this changes from the original metric and what it's doing.
 
-## Writing a ReportPrometheusQuery and ReportDataSource
+## Writing a PrometheusMetricsImporter ReportDataSource
 
-Now that we have figured out the Prometheus query, we need to create a [ReportPrometheusQuery][reportprometheusqueries] to make this query available to the metering operator.
-Save the snippet below into a file named `unready-deployment-replicas-reportprometheusquery.yaml`:
-
-```
-apiVersion: metering.openshift.io/v1alpha1
-kind: ReportPrometheusQuery
-metadata:
-  name: unready-deployment-replicas
-spec:
-  query: |
-    sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)
-```
-
-Creating the ReportPrometheusQuery only makes the query available for use, but doesn't actually cause the metrics to be collected. To allow a Metric to be collected, you need to create a [ReportDataSource][reportdatasources] with a `spec.promsum` section configured to use the ReportPrometheusQuery of your choice.
+To configure a Metric to be collected, you need to create a [ReportDataSource][reportdatasources] with a `spec.prometheusMetricsImporter` section configured to use the Prometheus query of your choice.
 Save the snippet below into a file named `unready-deployment-replicas-reportdatasource.yaml`:
 
 ```
@@ -80,14 +68,14 @@ kind: ReportDataSource
 metadata:
   name: unready-deployment-replicas
 spec:
-  promsum:
-    query: "unready-deployment-replicas"
+  prometheusMetricsImporter:
+    query: |
+      sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment)
 ```
 
-Creating the ReportDataSource will cause the metering operator to create a table in Presto and begin collecting metrics using the Prometheus query in the ReportPrometheusQuery, so let's create them:
+Creating the ReportDataSource will cause the metering operator to create a table in Presto and begin collecting metrics using the Prometheus query in the `spec.prometheusMetricsImporter.query` field, so let's create it:
 
 ```
-kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportprometheusquery.yaml
 kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportdatasource.yaml
 ```
 
@@ -137,7 +125,7 @@ presto:default> SELECT * FROM datasource_your_namespace_unready_deployment_repli
 Now, it's time to start talking about our data in terms of SQL.
 As you can see, our new table has 4 columns which are documented [in the ReportDataSource Table Schema documentation][datasource-table-schema].
 
-## Writing Presto queries against Promsum ReportDataSource Data
+## Writing Presto queries against PrometheusMetricsImporter ReportDataSource Data
 
 Now that we have a database table that we can experiment with, we can begin to answer the question we started with:
 
@@ -388,7 +376,6 @@ Creating and using reports is covered in more detail in the [Using Metering docu
 Here's a summary of what we did in this guide:
 
 - We wrote a Prometheus query that collects metrics on unready deployment replicas.
-- We created a `ReportPrometheusQuery` containing this query.
 - We created a `ReportDataSource` that gave us a Presto table containing the metrics from our Prometheus query.
 - We wrote a Presto SQL query that calculates the average and total number of seconds that pods are unready for each deployment.
 - We wrote a `ReportGenerationQuery` that does our calculation, and handles filtering the results to a Report's configured time range.
@@ -396,7 +383,6 @@ Here's a summary of what we did in this guide:
 - We checked that the Report finished, and then fetched the results from the metering operator HTTP API.
 
 [reportdatasources]: reportdatasources.md
-[reportprometheusqueries]: reportprometheusqueries.md
 [reportgenerationqueries]: reportgenerationqueries.md
 [reports]: report.md
 [install-metering]: install-metering.md

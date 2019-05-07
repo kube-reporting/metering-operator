@@ -163,6 +163,5 @@ To query report results using the reporting-operator API for tableHidden endpoin
 [view-datasources]: datasources.md#ReportGenerationQuery-View-Datasource
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
-[reportprometheusqueries]: reportprometheusqueries.md
 [reportgenerationqueries]: reportgenerationqueries.md
 [reports]: report.md

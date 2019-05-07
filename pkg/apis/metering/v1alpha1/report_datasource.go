@@ -27,8 +27,8 @@ type ReportDataSource struct {
 }
 
 type ReportDataSourceSpec struct {
-	// Prommsum represents a datasource which holds Prometheus metrics
-	Promsum *PrometheusMetricsDataSource `json:"promsum,omitempty"`
+	// Prometheus represents a datasource which holds Prometheus metrics
+	PrometheusMetricsImporter *PrometheusMetricsImporterDataSource `json:"prometheusMetricsImporter,omitempty"`
 	// AWSBilling represents a datasource which points to a pre-existing S3
 	// bucket.
 	AWSBilling *AWSBillingDataSource `json:"awsBilling,omitempty"`
@@ -62,7 +62,7 @@ type PrometheusConnectionConfig struct {
 	URL string `json:"url,omitempty"`
 }
 
-type PrometheusMetricsDataSource struct {
+type PrometheusMetricsImporterDataSource struct {
 	Query            string                      `json:"query"`
 	QueryConfig      *PrometheusQueryConfig      `json:"queryConfig,omitempty"`
 	Storage          *StorageLocationRef         `json:"storage,omitempty"`

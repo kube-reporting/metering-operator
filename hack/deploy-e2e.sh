@@ -22,7 +22,7 @@ export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
 
 : "${ENABLE_AWS_BILLING:=false}"
-: "${DISABLE_PROMSUM:=false}"
+: "${DISABLE_PROMETHEUS_METRICS_IMPORTER:=false}"
 : "${AWS_ACCESS_KEY_ID:=}"
 : "${AWS_SECRET_ACCESS_KEY:=}"
 : "${AWS_BILLING_BUCKET:=}"
@@ -50,7 +50,7 @@ HELM_ARGS=(\
     --set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_DEPLOY_REPO}" \
     --set "reportingOperatorDeployTag=${REPORTING_OPERATOR_DEPLOY_TAG}" \
     --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
-    --set "disablePromsum=${DISABLE_PROMSUM}" \
+    --set "disablePrometheusMetricsImporter=${DISABLE_PROMETHEUS_METRICS_IMPORTER}" \
     --set "awsAccessKeyId=${AWS_ACCESS_KEY_ID}" \
     --set "awsSecretAccessKey=${AWS_SECRET_ACCESS_KEY}" \
     --set "awsBillingBucket=${AWS_BILLING_BUCKET}" \

@@ -109,29 +109,29 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: prometheus-url
-        - name: REPORTING_OPERATOR_PROMSUM_INTERVAL
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
-              key: promsum-poll-interval
+              key: prometheus-metrics-importer-poll-interval
               optional: true
-        - name: REPORTING_OPERATOR_PROMSUM_CHUNK_SIZE
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
-              key: promsum-chunk-size
+              key: prometheus-metrics-importer-chunk-size
               optional: true
-        - name: REPORTING_OPERATOR_PROMSUM_STEP_SIZE
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
-              key: promsum-step-size
+              key: prometheus-metrics-importer-step-size
               optional: true
-        - name: REPORTING_OPERATOR_DISABLE_PROMSUM
+        - name: REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
-              key: disable-promsum
+              key: disable-prometheus-metrics-importer
         - name: REPORTING_OPERATOR_ENABLE_FINALIZERS
           valueFrom:
             configMapKeyRef:

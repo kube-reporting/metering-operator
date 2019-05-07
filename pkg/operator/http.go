@@ -92,10 +92,10 @@ func newRouter(
 	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
 	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
-	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/store/{namespace}/{datasourceName}", srv.storePromsumDataHandler)
-	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{namespace}/{datasourceName}", srv.fetchPromsumDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPrometheusMetricsDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPrometheusMetricsDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/store/{namespace}/{datasourceName}", srv.storePrometheusMetricsDataHandler)
+	router.HandleFunc("/api/v1/datasources/prometheus/fetch/{namespace}/{datasourceName}", srv.fetchPrometheusMetricsDataHandler)
 
 	return router
 }
@@ -475,23 +475,23 @@ func (srv *server) runReport(logger log.FieldLogger, query, start, end string, w
 	w.Write([]byte("method not yet implemented"))
 }
 
-type CollectPromsumDataRequest struct {
+type CollectPrometheusMetricsDataRequest struct {
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }
 
-type CollectPromsumDataResponse struct {
+type CollectPrometheusMetricsDataResponse struct {
 	Results []*prometheusImportResults `json:"results"`
 }
 
-func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) collectPrometheusMetricsDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	namespace := chi.URLParam(r, "namespace")
 	dsName := chi.URLParam(r, "datasource")
 
 	decoder := json.NewDecoder(r.Body)
-	var req CollectPromsumDataRequest
+	var req CollectPrometheusMetricsDataRequest
 	err := decoder.Decode(&req)
 	if err != nil {
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
@@ -501,7 +501,7 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 	start := req.StartTime.UTC()
 	end := req.EndTime.UTC()
 
-	logger.Debugf("collecting promsum data for ReportDataSources in namespace %s between %s and %s", namespace, start.Format(time.RFC3339), end.Format(time.RFC3339))
+	logger.Debugf("collecting prometheus data for ReportDataSources in namespace %s between %s and %s", namespace, start.Format(time.RFC3339), end.Format(time.RFC3339))
 
 	results, err := srv.collectorFunc(context.Background(), namespace, dsName, start, end)
 	if err != nil {
@@ -509,14 +509,14 @@ func (srv *server) collectPromsumDataHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	writeResponseAsJSON(logger, w, http.StatusOK, CollectPromsumDataResponse{
+	writeResponseAsJSON(logger, w, http.StatusOK, CollectPrometheusMetricsDataResponse{
 		Results: results,
 	})
 }
 
-type StorePromsumDataRequest []*prestostore.PrometheusMetric
+type StorePrometheusMetricsDataRequest []*prestostore.PrometheusMetric
 
-func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	name := chi.URLParam(r, "datasourceName")
@@ -552,15 +552,15 @@ func (srv *server) storePromsumDataHandler(w http.ResponseWriter, r *http.Reques
 
 	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), metrics)
 	if err != nil {
-		logger.WithError(err).Errorf("unable to store promsum metrics: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store promsum metrics: %v", err)
+		logger.WithError(err).Errorf("unable to store prometheus metrics: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store prometheus metrics: %v", err)
 		return
 	}
 
 	writeResponseAsJSON(logger, w, http.StatusOK, struct{}{})
 }
 
-func (srv *server) fetchPromsumDataHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *server) fetchPrometheusMetricsDataHandler(w http.ResponseWriter, r *http.Request) {
 	logger := newRequestLogger(srv.logger, r, srv.rand)
 
 	name := chi.URLParam(r, "datasourceName")

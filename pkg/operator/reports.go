@@ -508,7 +508,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// Validate all ReportDataSources that the Report depends on have indicated
 		// they have data available that covers the current reportPeriod.
 		for _, dataSource := range dependencyResult.Dependencies.ReportDataSources {
-			if dataSource.Spec.Promsum != nil {
+			if dataSource.Spec.PrometheusMetricsImporter != nil {
 				// queue the dataSource and store the list of reports so we can
 				// add information to the Report's status on what's currently
 				// not ready
