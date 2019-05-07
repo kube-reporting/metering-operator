@@ -158,17 +158,23 @@ helm template "$CHART" \
     > "$TMP_CSV"
 
 CSV_VERSION="$("$FAQ_BIN" -M -c -r -o json '.spec.version' "$TMP_CSV" )"
+# shellcheck disable=SC2206
+semver=( ${CSV_VERSION//./ } )
+major="${semver[0]}"
+minor="${semver[1]}"
 
 CSV_BUNDLE_DIR="$OUTPUT_DIR/bundle"
+VERSIONED_BUNDLE_DIR="$CSV_BUNDLE_DIR/${major}.${minor}"
 
-PACKAGE_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/metering.package.yaml"
-CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
+PACKAGE_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/package.yaml"
+CSV_MANIFEST_DESTINATION="$VERSIONED_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
+IMAGE_REFERENCES_MANIFEST_DESTINATION="$VERSIONED_BUNDLE_DIR/image-references"
 
 SUBSCRIPTION_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.subscription.yaml"
 CATALOGSOURCECONFIG_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.catalogsourceconfig.yaml"
 OPERATORGROUP_MANIFEST_DESTINATION="$OUTPUT_DIR/metering.operatorgroup.yaml"
 
-mkdir -p "$CSV_BUNDLE_DIR"
+mkdir -p "$VERSIONED_BUNDLE_DIR"
 
 # Rename the file with it's version in it, and move it to the final destination
 mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
@@ -176,7 +182,7 @@ mv -f "$TMP_CSV" "$CSV_MANIFEST_DESTINATION"
 # copy CRDs to the bundle dir
 find "$CRD_DIR" \
     -type f \
-    -exec cp {} "$CSV_BUNDLE_DIR" \;
+    -exec cp {} "$VERSIONED_BUNDLE_DIR" \;
 
 # render the package file
 helm template "$CHART" \
@@ -185,6 +191,14 @@ helm template "$CHART" \
     -x "templates/package.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
+
+# render the image-references file
+helm template "$CHART" \
+    -f "$TMPDIR/olm-values.yaml" \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/image-references" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$IMAGE_REFERENCES_MANIFEST_DESTINATION"
 
 # render the example subscription file
 helm template "$CHART" \
