@@ -204,9 +204,9 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		return err
 	}
 
-	importStatus := dataSource.Status.PrometheusMetricImportStatus
+	importStatus := dataSource.Status.PrometheusMetricsImportStatus
 	if importStatus == nil {
-		importStatus = &cbTypes.PrometheusMetricImportStatus{}
+		importStatus = &cbTypes.PrometheusMetricsImportStatus{}
 	}
 
 	// record the lastImportTime
@@ -286,10 +286,10 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		// Update the status to indicate where we are in the metric import process
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
-			newDS.Status.PrometheusMetricImportStatus = importStatus
+			newDS.Status.PrometheusMetricsImportStatus = importStatus
 		})
 		if err != nil {
-			return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricImportStatus: %v", dataSource.Name, err)
+			return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricsImportStatus: %v", dataSource.Name, err)
 		}
 	}
 

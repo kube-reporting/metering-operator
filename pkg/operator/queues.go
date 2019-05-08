@@ -124,7 +124,7 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 	isProm := curReportDataSource.Spec.PrometheusMetricsImporter != nil
 	if isProm {
 		sameSpec := reflect.DeepEqual(curReportDataSource.Spec, prevReportDataSource.Spec)
-		importStatusChanged := !reflect.DeepEqual(curReportDataSource.Status.PrometheusMetricImportStatus, prevReportDataSource.Status.PrometheusMetricImportStatus)
+		importStatusChanged := !reflect.DeepEqual(curReportDataSource.Status.PrometheusMetricsImportStatus, prevReportDataSource.Status.PrometheusMetricsImportStatus)
 		if sameSpec && importStatusChanged {
 			return
 		}

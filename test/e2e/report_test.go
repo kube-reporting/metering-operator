@@ -56,12 +56,12 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 					if dataSource.Spec.PrometheusMetricsImporter == nil {
 						return true, nil
 					}
-					if dataSource.Status.PrometheusMetricImportStatus != nil && dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime != nil {
+					if dataSource.Status.PrometheusMetricsImportStatus != nil && dataSource.Status.PrometheusMetricsImportStatus.EarliestImportedMetricTime != nil {
 						// keep the EarliestImportedMetricTime that is the
 						// least far back, so that we ensure the reportStart is
 						// a time that all datasources have metrics for.
-						if reportStart.IsZero() || dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime.Time.After(reportStart) {
-							reportStart = dataSource.Status.PrometheusMetricImportStatus.EarliestImportedMetricTime.Time
+						if reportStart.IsZero() || dataSource.Status.PrometheusMetricsImportStatus.EarliestImportedMetricTime.Time.After(reportStart) {
+							reportStart = dataSource.Status.PrometheusMetricsImportStatus.EarliestImportedMetricTime.Time
 						}
 						return true, nil
 					}
