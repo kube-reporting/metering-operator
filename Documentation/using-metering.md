@@ -97,5 +97,5 @@ $ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting
 
 
 [accessing-services]: https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-services/#manually-constructing-apiserver-proxy-urls
-[report-md]: report.md
+[report-md]: reports.md
 [writing-custom-queries]: writing-custom-queries.md
