@@ -53,6 +53,16 @@ spec:
           value: "30"
         - name: RELEASE_HISTORY_LIMIT
           value: "3"
+        - name: METERING_HELM_OPERATOR
+          value: "quay.io/openshift/origin-metering-helm-operator:4.1"
+        - name: METERING_REPORTING_OPERATOR
+          value: "quay.io/openshift/origin-metering-reporting-operator:4.1"
+        - name: METERING_PRESTO
+          value: "quay.io/openshift/origin-metering-presto:4.1"
+        - name: METERING_HIVE
+          value: "quay.io/openshift/origin-metering-hive:4.1"
+        - name: METERING_HADOOP
+          value: "quay.io/openshift/origin-metering-hadoop:4.1"
         resources:
           limits:
             cpu: 50m

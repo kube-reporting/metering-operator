@@ -60,6 +60,10 @@ template:
         value: {{ .Values.operator.reconcileIntervalSeconds | quote }}
       - name: RELEASE_HISTORY_LIMIT
         value: "3"
+{{- range $index, $item := .Values.olm.imageTags }}
+      - name: {{ $item.name | replace "-" "_" | upper }}
+        value: "{{ $item.from.name }}"
+{{- end }}
       resources:
 {{ toYaml .Values.operator.resources | indent 8 }}
     - name: tiller
