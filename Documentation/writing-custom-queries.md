@@ -249,7 +249,7 @@ AND "timestamp" < timestamp '{| default .Report.ReportingEnd .Report.Inputs.Repo
 
 Queries should be [left-closed and right-open](https://en.wikipedia.org/wiki/Interval_(mathematics)#Classi***REMOVED***cation_of_intervals); that is, we should collect data with timestamps equal to or greater than the start time and less than the end time, as seen in the example above.
 
-In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema de***REMOVED***nition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional ***REMOVED***eld, `spec.input`, to our `ReportQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/report.md#reportingstart)
+In addition to the query time constraints, we often want to be able to track the time period for each row of data. In order to do this, we can append two columns to the above schema de***REMOVED***nition: `period_start` and `period_end` and remove "timestamp", since we're looking at a range of time rather than an instant in time. Both of these columns will be of type `timestamp`, which requires us to add an additional ***REMOVED***eld, `spec.input`, to our `ReportQuery` as this is a custom input. To see more about `spec.inputs`, `ReportingStart`, and `ReportingEnd` see [reports.md.](https://github.com/operator-framework/operator-metering/blob/master/Documentation/reports.md#reportingstart)
 Lastly, we need to update the SELECT portion of the `spec.query` ***REMOVED***eld:
 
 ```
@@ -384,7 +384,7 @@ Here's a summary of what we did in this guide:
 
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md
-[reports]: report.md
+[reports]: reports.md
 [install-metering]: install-metering.md
 [presto-cli-exec]:  dev/debugging.md#query-presto-using-presto-cli
 [reporting-operator-logs]:  dev/debugging.md#get-reporting-operator-logs
