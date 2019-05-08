@@ -3,7 +3,7 @@
 Customizing how Operator Metering generates reports is done using a custom resource called a `ReportQuery`.
 
 These `ReportQuery` resources control the SQL queries that can be used to produce a report.
-When writing a [report](report.md) you can specify the query it will use by setting the `spec.query` ***REMOVED***eld to `metadata.name` of any `ReportQuery` in the reporting-operator's namespace.
+When writing a [report](reports.md) you can specify the query it will use by setting the `spec.query` ***REMOVED***eld to `metadata.name` of any `ReportQuery` in the reporting-operator's namespace.
 
 ## Fields
 
@@ -52,10 +52,10 @@ For each of these types, the behavior varies:
 
 - `string`: Strings are passed through directly.
 - `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
-- `int`: An int value is passed through as a Go [int][https://golang.org/pkg/builtin/#int].
-- `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasource] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources speci***REMOVED***ed exist.
-- `ReportQuery`: A string value referencing the name of a [ReportQuery][reportquery] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportQuery` inputs are validated by checking that all the ReportQueries speci***REMOVED***ed exist.
-- `Report`: A string value referencing the name of a [Report][report] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `Report` inputs are validated by checking that all the Reports speci***REMOVED***ed exist.
+- `int`: An int value is passed through as a Go [int](https://golang.org/pkg/builtin/#int).
+- `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasources] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources speci***REMOVED***ed exist.
+- `ReportQuery`: A string value referencing the name of a [ReportQuery][reportqueries] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportQuery` inputs are validated by checking that all the ReportQueries speci***REMOVED***ed exist.
+- `Report`: A string value referencing the name of a [Report][reports] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `Report` inputs are validated by checking that all the Reports speci***REMOVED***ed exist.
 
 ### Template functions
 
@@ -164,4 +164,4 @@ To query report results using the reporting-operator API for tableHidden endpoin
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md
-[reports]: report.md
+[reports]: reports.md

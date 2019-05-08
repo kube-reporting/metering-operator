@@ -146,4 +146,4 @@ When a `Report` is created, and it sees the creation event, it does the followin
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md
-[reports]: report.md
+[reports]: reports.md
