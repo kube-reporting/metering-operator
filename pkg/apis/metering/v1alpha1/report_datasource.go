@@ -83,11 +83,11 @@ type ReportQueryViewDataSource struct {
 }
 
 type ReportDataSourceStatus struct {
-	TableRef                     v1.LocalObjectReference       `json:"tableRef"`
-	PrometheusMetricImportStatus *PrometheusMetricImportStatus `json:"prometheusMetricImportStatus,omitempty"`
+	TableRef                      v1.LocalObjectReference        `json:"tableRef"`
+	PrometheusMetricsImportStatus *PrometheusMetricsImportStatus `json:"prometheusMetricImportStatus,omitempty"`
 }
 
-type PrometheusMetricImportStatus struct {
+type PrometheusMetricsImportStatus struct {
 	// LastImportTime is the time the import last import was ran.
 	LastImportTime *meta.Time `json:"lastImportTime,omitempty"`
 

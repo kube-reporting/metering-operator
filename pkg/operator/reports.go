@@ -513,17 +513,17 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 				// add information to the Report's status on what's currently
 				// not ready
 				queue := false
-				if dataSource.Status.PrometheusMetricImportStatus == nil {
+				if dataSource.Status.PrometheusMetricsImportStatus == nil {
 					unstartedDataSourceDependencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
 					queue = true
 				} ***REMOVED*** {
 					// reportPeriod lower bound not covered
-					if dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricImportStatus.ImportDataStartTime.Time) {
+					if dataSource.Status.PrometheusMetricsImportStatus.ImportDataStartTime == nil || reportPeriod.periodStart.Before(dataSource.Status.PrometheusMetricsImportStatus.ImportDataStartTime.Time) {
 						queue = true
 						unmetDataStartDataSourceDependendencies = append(unmetDataStartDataSourceDependendencies, dataSource.Name)
 					}
 					// reportPeriod upper bound is not covered
-					if dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime == nil || reportPeriod.periodEnd.After(dataSource.Status.PrometheusMetricImportStatus.ImportDataEndTime.Time) {
+					if dataSource.Status.PrometheusMetricsImportStatus.ImportDataEndTime == nil || reportPeriod.periodEnd.After(dataSource.Status.PrometheusMetricsImportStatus.ImportDataEndTime.Time) {
 						queue = true
 						unmetDataEndDataSourceDependendencies = append(unmetDataEndDataSourceDependendencies, dataSource.Name)
 					}
