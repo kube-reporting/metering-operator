@@ -27,7 +27,7 @@
 
 Custom Resources:
 
-- [Reports](report.md)
+- [Reports](reports.md)
   - [Roll-up Reports](rollup-reports.md)
 - [ReportQueries](reportqueries.md)
 - [ReportDataSources](reportdatasources.md)
