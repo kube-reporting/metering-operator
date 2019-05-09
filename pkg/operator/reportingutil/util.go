@@ -105,8 +105,7 @@ func PrestoColumnsToHiveColumns(columns []presto.Column) ([]hive.Column, error) 
 }
 
 func SimpleHiveColumnTypeToPrestoColumnType(colType string) string {
-	colType = strings.ToUpper(colType)
-	switch colType {
+	switch strings.ToUpper(colType) {
 	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT",
 		"FLOAT", "DOUBLE", "BOOLEAN",
 		"VARCHAR", "CHAR",
