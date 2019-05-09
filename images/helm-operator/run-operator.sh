@@ -8,22 +8,17 @@ fi
 : "${HELM_RELEASE_CRD_NAME:?}"
 : "${HELM_RELEASE_CRD_API_GROUP:?}"
 
-: "${HELM_WAIT:=false}"
-: "${HELM_WAIT_TIMEOUT:=120}"
 : "${EXTRA_VALUES_FILE:=}"
 
 : "${MY_POD_NAMESPACE:?}"
 
 : "${HELM_RECONCILE_INTERVAL_SECONDS:=120}"
-: "${HELM_HOST:="127.0.0.1:44134"}"
-: "${TILLER_READY_ENDPOINT:="127.0.0.1:44135/readiness"}"
 
 : "${ALL_NAMESPACES:=false}"
 : "${TARGET_NAMESPACES:=$MY_POD_NAMESPACE}"
 
 
 export HELM_HOST
-export RELEASE_HISTORY_LIMIT
 
 NEEDS_EXIT=false
 
@@ -32,9 +27,6 @@ trap setNeedsExit SIGINT SIGTERM
 CRD="${HELM_RELEASE_CRD_NAME}.${HELM_RELEASE_CRD_API_GROUP}"
 CR_DIRECTORY=/tmp/custom-resources
 UPGRADE_RESULT_DIRECTORY=/tmp/helm-upgrade-result
-OWNER_PATCH_FILE=/tmp/owner-patch.json
-OWNER_VALUES_FILE=/tmp/owner-values.yaml
-RELEASE_CONFIGMAPS_FILE=/tmp/release-configmaps.json
 
 setNeedsExit() {
     echo "Got shutdown signal"
@@ -48,116 +40,37 @@ checkExit() {
     fi
 }
 
-writeReleaseConfigmapsFile() {
-    HELM_RELEASE_NAME=$1
-    kubectl \
-        --namespace "$MY_POD_NAMESPACE" \
-        get configmap \
-        -l "OWNER=TILLER,NAME=$HELM_RELEASE_NAME" \
-        -o json | jq '.' -r > "$RELEASE_CONFIGMAPS_FILE"
-}
-
-setOwnerOnReleaseConfigmaps(){
-    if [ "$SET_OWNER_REFERENCE_VALUE" == "true" ]; then
-        echo "Setting ownerReferences for Helm release configmaps"
-
-        RELEASE_CM_NAMES="$(jq '.items[] | select(.metadata.ownerReferences | length == 0) | .metadata.name' -r "$RELEASE_CONFIGMAPS_FILE")"
-        if [ -z "$RELEASE_CM_NAMES" ]; then
-            echo "No release configmaps to patch ownership of yet"
-        else
-            echo "$RELEASE_CM_NAMES" | while read -r cm; do
-                echo "Setting owner of $cm"
-                kubectl \
-                    --namespace "$MY_POD_NAMESPACE" \
-                    patch configmap "$cm" \
-                    -p "$(cat $OWNER_PATCH_FILE)"
-            done
-        fi
-    fi
-}
-
-cleanupOldReleaseConfigmaps() {
-    if [ -n "$RELEASE_HISTORY_LIMIT" ]; then
-        echo "Getting list of helm release configmaps to delete"
-        DELETE_RELEASE_CM_NAMES="$(jq '.items | length as $listLength | ($listLength - (env.RELEASE_HISTORY_LIMIT | tonumber)) as $limitSize | (if $limitSize <= 0 then empty else $limitSize end) as $limitSize | sort_by(.metadata.labels.VERSION | tonumber) | limit($limitSize; .[]) | .metadata.name' -rc "$RELEASE_CONFIGMAPS_FILE")"
-        if [ -z "$DELETE_RELEASE_CM_NAMES" ]; then
-            echo "No release configmaps to delete yet"
-        else
-            echo "$DELETE_RELEASE_CM_NAMES" | while read -r cm; do
-                echo "Deleting helm release configmap $cm"
-                kubectl \
-                    --namespace "$MY_POD_NAMESPACE" \
-                    delete configmap "$cm"
-            done
-        fi
-    fi
-}
-
-writeReleaseConfigMapOwnerPatchFile() {
-    OWNER_API_VERSION=$1
-    OWNER_KIND=$2
-    OWNER_NAME=$3
-    OWNER_UID=$4
-    cat <<EOF > "$OWNER_PATCH_FILE"
-{
-  "metadata": {
-    "ownerReferences": [{
-      "apiVersion": "$OWNER_API_VERSION",
-      "blockOwnerDeletion": true,
-      "controller": true,
-      "kind": "$OWNER_KIND",
-      "name": "$OWNER_NAME",
-      "uid": "$OWNER_UID"
-    }]
-  }
-}
-EOF
-}
-
-
-writeReleaseOwnerValuesFile() {
-    OWNER_API_VERSION=$1
-    OWNER_KIND=$2
-    OWNER_NAME=$3
-    OWNER_UID=$4
-    cat <<EOF > "$OWNER_VALUES_FILE"
-global:
-  ownerReferences:
-  - apiVersion: "$OWNER_API_VERSION"
-    blockOwnerDeletion: false
-    controller: true
-    kind: "$OWNER_KIND"
-    name: "$OWNER_NAME"
-    uid: "$OWNER_UID"
-EOF
-}
-
-helmUpgrade() {
+deployResources() {
     RELEASE_NAME=$1
     CHART_LOCATION=$2
     NAMESPACE=$3
-    if helm upgrade \
-        --install \
-        --namespace "$NAMESPACE" \
-        --force \
-        --wait="$HELM_WAIT" \
-        --timeout="$HELM_WAIT_TIMEOUT" \
+    OWNER_API_VERSION=${4:?}
+    OWNER_KIND=${5:?}
+    OWNER_NAME=${6:?}
+    OWNER_UID=${7:?}
+    FLAGS=("${@:8}")
+
+    PRUNE_LABEL_KEY='metering.openshift.io/prune'
+
+    if deploy-resources.sh \
+        "${FLAGS[@]}" \
         "$RELEASE_NAME"\
         "$CHART_LOCATION" \
-        "${@:4}";
+        "$NAMESPACE" \
+        "$OWNER_API_VERSION" \
+        "$OWNER_KIND" \
+        "$OWNER_NAME" \
+        "$OWNER_UID" \
+        "$PRUNE_LABEL_KEY" \
+        false;
     then
-        echo "Helm upgrade succeeded"
+        echo "Deploy resources succeeded"
         return 0
     else
-        echo "Helm upgrade failed"
+        echo "Deploy resources failed"
         return 1
     fi
 }
-
-until curl -s $TILLER_READY_ENDPOINT; do
-    echo "Waiting for Tiller to become ready"
-    sleep 1
-done
 
 checkExit
 
@@ -235,6 +148,7 @@ while true; do
         RESOURCE_UID="$(jq -Mcr '.metadata.uid' "$CR_FILE")"
         RESOURCE_API_VERSION="$(jq -Mcr '.apiVersion' "$CR_FILE")"
         RESOURCE_RESOURCE_VERSION="$(jq -Mcr '.metadata.resourceVersion' "$CR_FILE")"
+        RESOURCE_OBSERVED_VERSION="$(jq -Mcr '.status.observedVersion' "$CR_FILE")"
         RESOURCE_VALUES="$(jq -Mcr '.spec // {}' "$CR_FILE")"
         CHART_LOCATION="$(jq -Mcr '.metadata.annotations["helm-operator.coreos.com/chart-location"] // empty' "$CR_FILE")"
         # use the chart location in annotations if specified, otherwise use HELM_CHART_PATH
@@ -256,9 +170,9 @@ while true; do
         fi
         echo "Processing $CRD $FULL_RESOURCE_NAME at resourceVersion: $RESOURCE_RESOURCE_VERSION using $CHART as chart and $RELEASE_NAME as release name"
 
-        HELM_ARGS=()
+        DEPLOY_RESOURCES_FLAGS=()
         if [ -s "$EXTRA_VALUES_FILE" ]; then
-            HELM_ARGS+=("-f" "$EXTRA_VALUES_FILE")
+            DEPLOY_RESOURCES_FLAGS+=("-f" "$EXTRA_VALUES_FILE")
         fi
 
         VALUES_FILE="/tmp/$RESOURCE_NAMESPACE-$RESOURCE_NAME-values.yaml"
@@ -266,7 +180,7 @@ while true; do
 
         echo -E "$RESOURCE_VALUES" > "$NEW_VALUES_FILE"
 
-        # If the spec for this CR hasn't changed, we can skip running helm upgrade.
+        # If the spec for this CR hasn't changed, we can skip redeploying
         if [[ -a "$VALUES_FILE" && "$(cat "$VALUES_FILE")" == "$(cat "$NEW_VALUES_FILE")" ]]; then
             echo "Nothing has changed for $FULL_RESOURCE_NAME"
         else
@@ -275,15 +189,17 @@ while true; do
             else
                 echo "New $CRD $FULL_RESOURCE_NAME"
             fi
-            HELM_ARGS+=("-f" "$NEW_VALUES_FILE")
+            DEPLOY_RESOURCES_FLAGS+=("-f" "$NEW_VALUES_FILE")
 
-            writeReleaseOwnerValuesFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
-            writeReleaseConfigMapOwnerPatchFile "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID"
-            HELM_ARGS+=("-f" "$OWNER_VALUES_FILE")
+            if [ "$RESOURCE_OBSERVED_VERSION" != "null" ]; then
+                DEPLOY_RESOURCES_FLAGS+=(--is-upgrade)
+            fi
 
             mkdir -p "$UPGRADE_RESULT_DIRECTORY"
-            echo "Running helm upgrade for release $RELEASE_NAME"
-            if helmUpgrade "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" "${HELM_ARGS[@]}"; then
+            echo "Deploying resources for release $RELEASE_NAME"
+            if deployResources \
+                "$RELEASE_NAME" "$CHART" "$RESOURCE_NAMESPACE" \
+                "$RESOURCE_API_VERSION" "$RESOURCE_KIND" "$RESOURCE_NAME" "$RESOURCE_UID" "${DEPLOY_RESOURCES_FLAGS[@]}"; then
                 # store the last version that we were able to process so we can
                 # compare new specs against it later
                 mv -f "$NEW_VALUES_FILE" "$VALUES_FILE"
@@ -293,10 +209,6 @@ while true; do
                     patch "$RESOURCE_KIND" "$RESOURCE_NAME" \
                     --type json \
                     -p '[{"op": "add", "path": "/status", "value":{}},{"op": "add", "path": "/status/observedVersion", "value":"'"$RESOURCE_RESOURCE_VERSION"'"}]'
-
-                writeReleaseConfigmapsFile "$RELEASE_NAME"
-                setOwnerOnReleaseConfigmaps
-                cleanupOldReleaseConfigmaps
             else
                 echo "Error occurred when processing $FULL_RESOURCE_NAME"
             fi

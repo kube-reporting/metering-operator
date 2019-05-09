@@ -22,6 +22,10 @@ ENV HELM_HOST 127.0.0.1:44134
 
 ENV HOME /tmp
 
+COPY images/helm-operator/add-label.sh /usr/local/bin/add-label.sh
+COPY images/helm-operator/add-owner-ref.sh /usr/local/bin/add-owner-ref.sh
+COPY images/helm-operator/helm-template.sh /usr/local/bin/helm-template.sh
+COPY images/helm-operator/deploy-resources.sh /usr/local/bin/deploy-resources.sh
 COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
 
 COPY charts/openshift-metering /openshift-metering
