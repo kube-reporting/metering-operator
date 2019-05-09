@@ -1,8 +1,0 @@
-apiVersion: operators.coreos.com/v1
-kind: CatalogSourceConfig
-metadata:
- name: {{ .Values.catalogSourceConfigName }}
- namespace: {{ .Values.catalogSourceConfigNamespace }}
-spec:
-  targetNamespace: {{ .Values.catalogTargetNamespace }}
-  packages: {{ .Values.packageName }}
