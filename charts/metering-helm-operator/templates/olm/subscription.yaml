@@ -1,0 +1,9 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.olm.subscriptionName }}
+spec:
+  channel: {{ .Values.olm.subscriptionChannel }}
+  name: {{ .Values.olm.packageName }}
+  source: {{ .Values.olm.subscriptionCatalogSource }}
+  sourceNamespace: {{ .Values.olm.subscriptionCatalogSourceNamespace  }}
