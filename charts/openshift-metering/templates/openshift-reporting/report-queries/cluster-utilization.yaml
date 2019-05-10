@@ -5,8 +5,6 @@ metadata:
   name: cluster-cpu-utilization
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -101,8 +99,6 @@ metadata:
   name: cluster-memory-utilization
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start

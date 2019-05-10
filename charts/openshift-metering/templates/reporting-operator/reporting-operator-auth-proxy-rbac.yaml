@@ -6,8 +6,6 @@ metadata:
   name: {{ .Release.Namespace }}-reporting-operator-auth-proxy
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 rules:
 {{- if $operatorValues.spec.authProxy.subjectAccessReviewEnabled }}
 - apiGroups:
@@ -32,8 +30,6 @@ metadata:
   name: {{ .Release.Namespace }}-reporting-operator-auth-proxy
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

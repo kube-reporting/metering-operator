@@ -8,8 +8,6 @@ metadata:
   name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 rules:
 # grants access to metrics data
 - apiGroups:
@@ -29,8 +27,6 @@ metadata:
   name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

@@ -6,8 +6,6 @@ metadata:
   labels:
     app: hdfs-namenode
     hdfs: namenode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - port: 9820
@@ -26,8 +24,6 @@ metadata:
   labels:
     app: hdfs-namenode
     hdfs: namenode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - port: 9820
@@ -45,8 +41,6 @@ metadata:
   labels:
     app: hdfs-namenode
     hdfs: namenode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - port: 9870
@@ -63,8 +57,6 @@ metadata:
   labels:
     app: hdfs-namenode
     hdfs: namenode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   serviceName: "hdfs-namenode"
   replicas: 1

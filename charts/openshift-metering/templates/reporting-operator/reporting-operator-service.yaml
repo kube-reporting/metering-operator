@@ -9,8 +9,6 @@ metadata:
   annotations:
 {{ toYaml $operatorValues.spec.service.annotations | indent 4 }}
 {{- end }}
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   type: "{{ $operatorValues.spec.service.type }}"
   selector:
@@ -39,8 +37,6 @@ metadata:
 {{- if $operatorValues.spec.metricsService.annotations }}
   annotations:
 {{ toYaml $operatorValues.spec.metricsService.annotations | indent 4 }}
-{{- end }}
-{{- block "extraMetadata" . }}
 {{- end }}
 spec:
   selector:

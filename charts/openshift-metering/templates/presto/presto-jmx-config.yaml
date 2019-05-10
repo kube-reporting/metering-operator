@@ -4,8 +4,6 @@ metadata:
   name: presto-jmx-con***REMOVED***g
   labels:
     app: presto
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   con***REMOVED***g.yml: |
     ---

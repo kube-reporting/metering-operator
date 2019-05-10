@@ -6,8 +6,6 @@ metadata:
   name: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.value }}
 {{- end }}

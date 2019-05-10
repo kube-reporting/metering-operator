@@ -3,8 +3,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: hive-warehouse-data
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   accessModes:
   - ReadWriteMany

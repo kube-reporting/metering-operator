@@ -5,8 +5,6 @@ metadata:
   name: persistentvolumeclaim-phase-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: namespace
@@ -50,8 +48,6 @@ metadata:
   name: persistentvolumeclaim-usage-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: namespace
@@ -97,8 +93,6 @@ metadata:
   name: persistentvolumeclaim-usage-with-phase-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: namespace
@@ -141,8 +135,6 @@ metadata:
   name: persistentvolumeclaim-usage
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -189,8 +181,6 @@ metadata:
   name: "namespace-persistentvolumeclaim-usage"
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start

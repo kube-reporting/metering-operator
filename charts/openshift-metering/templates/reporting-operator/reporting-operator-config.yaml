@@ -5,8 +5,6 @@ metadata:
   name: reporting-operator-con***REMOVED***g
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   log-level: {{ $operatorValues.spec.con***REMOVED***g.logLevel | quote}}
   log-reports: {{ $operatorValues.spec.con***REMOVED***g.logReports | quote}}
