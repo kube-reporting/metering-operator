@@ -84,7 +84,7 @@ type ReportQueryViewDataSource struct {
 
 type ReportDataSourceStatus struct {
 	TableRef                      v1.LocalObjectReference        `json:"tableRef"`
-	PrometheusMetricsImportStatus *PrometheusMetricsImportStatus `json:"prometheusMetricImportStatus,omitempty"`
+	PrometheusMetricsImportStatus *PrometheusMetricsImportStatus `json:"prometheusMetricsImportStatus,omitempty"`
 }
 
 type PrometheusMetricsImportStatus struct {

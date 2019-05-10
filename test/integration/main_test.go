@@ -320,7 +320,7 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 				reportStartStr := reportStart.UTC().Format(time.RFC3339)
 				nowStr := time.Now().UTC().Format(time.RFC3339)
 				jsonPatch := []byte(fmt.Sprintf(
-					`[{ "op": "add", "path": "/status/prometheusMetricImportStatus", "value": { "importDataStartTime": "%s", "importDataEndTime": "%s", "earliestImportedMetricTime": "%s", "newestImportedMetricTime": "%s", "lastImportTime": "%s" } } ]`,
+					`[{ "op": "add", "path": "/status/prometheusMetricsImportStatus", "value": { "importDataStartTime": "%s", "importDataEndTime": "%s", "earliestImportedMetricTime": "%s", "newestImportedMetricTime": "%s", "lastImportTime": "%s" } } ]`,
 					reportStartStr, reportEndStr, reportStartStr, reportEndStr, nowStr))
 				_, err = testFramework.MeteringClient.ReportDataSources(testFramework.Namespace).Patch(dataSource.DatasourceName, types.JSONPatchType, jsonPatch)
 				require.NoError(t, err)
