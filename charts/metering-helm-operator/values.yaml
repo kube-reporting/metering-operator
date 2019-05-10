@@ -22,11 +22,11 @@ operator:
   serviceAccountName: metering-operator
   resources:
     requests:
-      memory: "100Mi"
-      cpu: "50m"
+      memory: "200Mi"
+      cpu: "200m"
     limits:
-      memory: "100Mi"
-      cpu: "50m"
+      memory: "300Mi"
+      cpu: "500m"
 
   rbac:
     clusterRoleName: metering-operator
