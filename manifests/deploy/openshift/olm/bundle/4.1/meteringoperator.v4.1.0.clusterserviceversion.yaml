@@ -297,14 +297,7 @@ spec:
             - clusterrolebindings
             - clusterroles
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
 
       permissions:
         - serviceAccountName: metering-operator
@@ -318,7 +311,7 @@ spec:
           - apiGroups:
             - monitoring.coreos.com
             resources:
-            - '*'
+            - servicemonitors
             verbs:
             - '*'
           - apiGroups:
@@ -330,47 +323,26 @@ spec:
             - pods/portforward
             - pods/proxy
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - ""
             resources:
             - configmaps
             - endpoints
             - persistentvolumeclaims
-            - replicationcontrollers
-            - replicationcontrollers/scale
             - secrets
             - serviceaccounts
             - services
             - services/proxy
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - ""
             resources:
-            - bindings
             - events
-            - limitranges
             - namespaces/status
             - pods/log
             - pods/status
-            - replicationcontrollers/status
-            - resourcequotas
-            - resourcequotas/status
             verbs:
             - get
             - list
@@ -394,33 +366,22 @@ spec:
           - apiGroups:
             - apps
             resources:
+            - daemonsets
             - deployments
             - deployments/rollback
             - deployments/scale
+            - replicasets
+            - replicasets/scale
             - statefulsets
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - batch
             resources:
             - cronjobs
             - jobs
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - extensions
             resources:
@@ -430,43 +391,21 @@ spec:
             - deployments/scale
             - replicasets
             - replicasets/scale
-            - replicationcontrollers/scale
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - rbac.authorization.k8s.io
             resources:
             - rolebindings
             - roles
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - route.openshift.io
             resources:
             - routes
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
 
       deployments:
         - name: metering-operator

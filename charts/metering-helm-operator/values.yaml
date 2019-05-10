@@ -59,15 +59,7 @@ operator:
       resources:
       - clusterrolebindings
       - clusterroles
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
 
     roleName: metering-operator
     rules:
@@ -77,7 +69,8 @@ operator:
       verbs: ["*"]
     # grant access to monitoring resources for optional monitoring integration
     - apiGroups: ["monitoring.coreos.com"]
-      resources: ["*"]
+      resources:
+      - servicemonitors
       verbs: ["*"]
     # access to most core resources that can be created by metering
     - apiGroups:
@@ -88,48 +81,25 @@ operator:
       - pods/exec
       - pods/portforward
       - pods/proxy
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - ""
       resources:
       - configmaps
       - endpoints
       - persistentvolumeclaims
-      - replicationcontrollers
-      - replicationcontrollers/scale
       - secrets
       - serviceaccounts
       - services
       - services/proxy
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - ""
       resources:
-      - bindings
       - events
-      - limitranges
       - namespaces/status
       - pods/log
       - pods/status
-      - replicationcontrollers/status
-      - resourcequotas
-      - resourcequotas/status
       verbs:
       - get
       - list
@@ -153,33 +123,20 @@ operator:
     - apiGroups:
       - apps
       resources:
+      - daemonsets
       - deployments
       - deployments/rollback
       - deployments/scale
+      - replicasets
+      - replicasets/scale
       - statefulsets
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - batch
       resources:
       - cronjobs
       - jobs
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - extensions
       resources:
@@ -189,43 +146,18 @@ operator:
       - deployments/scale
       - replicasets
       - replicasets/scale
-      - replicationcontrollers/scale
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - rbac.authorization.k8s.io
       resources:
       - rolebindings
       - roles
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
     - apiGroups:
       - route.openshift.io
       resources:
       - routes
-      verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      verbs: ["*"]
 
 olm:
   packageName: metering
