@@ -1,0 +1,377 @@
+{{- $operatorValues :=  index .Values "reporting-operator" -}}
+{{/* When using TLS but set probes to use https */}}
+{{- if $operatorValues.spec.con***REMOVED***g.tls.enabled -}}
+{{- $_ := set $operatorValues.spec.readinessProbe.httpGet "scheme" "HTTPS" -}}
+{{- $_ := set $operatorValues.spec.livenessProbe.httpGet "scheme" "HTTPS" -}}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reporting-operator
+  labels:
+    app: reporting-operator
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  replicas: {{ $operatorValues.spec.replicas }}
+  strategy:
+{{ toYaml $operatorValues.spec.updateStrategy | indent 4 }}
+  selector:
+    matchLabels:
+      app: reporting-operator
+{{- if $operatorValues.spec.labels }}
+{{ toYaml $operatorValues.spec.labels | indent 6 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: reporting-operator
+{{- if $operatorValues.spec.labels }}
+{{ toYaml $operatorValues.spec.labels | indent 8 }}
+{{- end }}
+      annotations:
+        reporting-operator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-con***REMOVED***g.yaml") . | sha256sum }}
+{{- if $operatorValues.spec.con***REMOVED***g.createAwsCredentialsSecret }}
+        reporting-operator-aws-credentials-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-aws-credentials-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.con***REMOVED***g.tls.enabled $operatorValues.spec.con***REMOVED***g.tls.createSecret }}
+        reporting-operator-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.createCookieSecret }}
+        reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.createHtpasswdSecret }}
+        reporting-operator-auth-proxy-htpasswd-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-htpasswd-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.createAuthenticatedEmailsSecret }}
+        reporting-operator-auth-proxy-authenticated-emails-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-authenticated-emails-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if $operatorValues.spec.annotations }}
+{{ toYaml $operatorValues.spec.annotations | indent 8 }}
+{{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+{{- if $operatorValues.spec.nodeSelector }}
+      nodeSelector:
+{{ toYaml $operatorValues.spec.nodeSelector | indent 8 }}
+{{- end }}
+{{- if $operatorValues.spec.tolerations }}
+      tolerations:
+{{ toYaml $operatorValues.spec.tolerations | indent 8 }}
+{{- end }}
+{{- if $operatorValues.spec.af***REMOVED***nity }}
+      af***REMOVED***nity:
+{{ toYaml $operatorValues.spec.af***REMOVED***nity | indent 8 }}
+{{- end }}
+      containers:
+      - name: reporting-operator
+        image: "{{ $operatorValues.spec.image.repository }}:{{ $operatorValues.spec.image.tag }}"
+        imagePullPolicy: {{ $operatorValues.spec.image.pullPolicy }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName }}"
+              key: aws-access-key-id
+              optional: true
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName }}"
+              key: aws-secret-access-key
+              optional: true
+        - name: REPORTING_OPERATOR_LOG_LEVEL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: log-level
+        - name: REPORTING_OPERATOR_LOG_DML_QUERIES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: log-dml-queries
+        - name: REPORTING_OPERATOR_LOG_DDL_QUERIES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: log-ddl-queries
+        - name: REPORTING_OPERATOR_LOG_REPORT
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: log-reports
+        - name: REPORTING_OPERATOR_PROMETHEUS_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-url
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-metrics-importer-poll-interval
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-metrics-importer-chunk-size
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-metrics-importer-step-size
+              optional: true
+        - name: REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: disable-prometheus-metrics-importer
+        - name: REPORTING_OPERATOR_ENABLE_FINALIZERS
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: enable-***REMOVED***nalizers
+        - name: REPORTING_OPERATOR_PRESTO_MAX_QUERY_LENGTH
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: presto-max-query-length
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_QUERY_RANGE_DURATION
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-datasource-max-query-range-duration
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-datasource-max-import-back***REMOVED***ll-duration
+              optional: true
+        - name: REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_IMPORT_FROM
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-datasource-import-from
+              optional: true
+{{- /* neither speci***REMOVED***ed = no auth used; both speci***REMOVED***ed = error; either = correct & authenticated */ -}}
+{{- if and $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.useServiceAccountToken  }}
+  {{ fail "cannot use both token from secret and token from service account" }}
+{{- end }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_BEARER_TOKEN_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: prometheus-bearer-token-***REMOVED***le
+              optional: true
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.useServiceAccountCA }}
+  {{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+    {{ fail "Cannot both use serviceAccount CA and CA from con***REMOVED***gMap" }}
+  {{- end }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
+          value: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+        - name: REPORTING_OPERATOR_PROMETHEUS_CA_FILE
+          value: "/var/run/reporting-operator/ca/{{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}"
+{{- end }}
+        - name: REPORTING_OPERATOR_PRESTO_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: presto-host
+        - name: REPORTING_OPERATOR_HIVE_HOST
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: hive-host
+        - name: REPORTING_OPERATOR_LEASE_DURATION
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: leader-lease-duration
+{{- if $operatorValues.spec.con***REMOVED***g.tls.enabled }}
+        - name: REPORTING_OPERATOR_TLS_KEY
+          value: "/tls/tls.key"
+        - name: REPORTING_OPERATOR_TLS_CERT
+          value: "/tls/tls.crt"
+{{/* If authProxy is enabled we do not enable TLS on the reporting-operator operator since the proxy will do TLS */}}
+{{- if $operatorValues.spec.authProxy.enabled }}
+        - name: REPORTING_OPERATOR_USE_TLS
+          value: "false"
+{{- ***REMOVED*** }}
+        - name: REPORTING_OPERATOR_USE_TLS
+          value: "true"
+{{- end }}
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.metricsTLS.enabled }}
+        - name: REPORTING_OPERATOR_METRICS_TLS_KEY
+          value: "/metrics-tls/tls.key"
+        - name: REPORTING_OPERATOR_METRICS_TLS_CERT
+          value: "/metrics-tls/tls.crt"
+        - name: REPORTING_OPERATOR_METRICS_USE_TLS
+          value: "true"
+{{- end }}
+        - name: REPORTING_OPERATOR_ALL_NAMESPACES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: all-namespaces
+              optional: true
+        - name: REPORTING_OPERATOR_TARGET_NAMESPACES
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: target-namespaces
+              optional: true
+        - name: REPORTING_OPERATOR_API_LISTEN
+{{- if $operatorValues.spec.authProxy.enabled }}
+          value: 127.0.0.1:8080
+{{- ***REMOVED*** }}
+          value: 0.0.0.0:8080
+{{- end }}
+        - name: REPORTING_OPERATOR_METRICS_LISTEN
+          value: 0.0.0.0:8082
+        - name: REPORTING_OPERATOR_PPROF_LISTEN
+          value: 127.0.0.1:6060
+        resources:
+{{ toYaml $operatorValues.spec.resources | indent 10 }}
+        ports:
+        - name: "http"
+          containerPort: 8080
+        - name: "pprof"
+          containerPort: 6060
+        - name: "metrics"
+          containerPort: 8082
+{{/* When using auth-proxy, disable probes against the reporting-operator pod since we'll listen on localhost, and we'll con***REMOVED***gure to probe the auth proxy pod instead */}}
+{{- if not $operatorValues.spec.authProxy.enabled }}
+        readinessProbe:
+{{ toYaml $operatorValues.spec.readinessProbe | indent 10 }}
+        livenessProbe:
+{{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
+{{- end }}
+        volumeMounts:
+{{- if $operatorValues.spec.con***REMOVED***g.tls.enabled }}
+        - name: api-tls
+          mountPath: /tls
+        - name: metrics-tls
+          mountPath: /metrics-tls
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+        - name: prometheus-certi***REMOVED***cate-authority
+          mountPath: /var/run/reporting-operator/ca/
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
+        - mountPath: /var/run/reporting-operator/token
+          name: prometheus-bearer-token
+          subPath: token
+{{- end }}
+{{- if $operatorValues.spec.authProxy.enabled }}
+      - name: reporting-operator-auth-proxy
+        image: "{{ $operatorValues.spec.authProxy.image.repository }}:{{ $operatorValues.spec.authProxy.image.tag }}"
+        imagePullPolicy: {{ $operatorValues.spec.authProxy.image.pullPolicy }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.namespace
+        args:
+        - -provider=openshift
+        - -https-address=:8081
+        - -http-address=
+        - -upstream=http://127.0.0.1:8080
+        - -htpasswd-***REMOVED***le=/etc/proxy/htpasswd/auth
+        - -tls-cert=/etc/tls/tls.crt
+        - -tls-key=/etc/tls/tls.key
+        - -client-secret-***REMOVED***le=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-***REMOVED***le=/etc/proxy/cookie-secret/cookie-secret-seed
+        - -request-logging=true
+        - -skip-auth-regex=^/healthy$
+        - -skip-auth-regex=^/ready$
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-service-account=reporting-operator
+{{- if $operatorValues.spec.authProxy.authenticatedEmailsEnabled }}
+        - -authenticated-emails-***REMOVED***le=/etc/proxy/authenticated-emails/emails
+{{- ***REMOVED*** }}
+        - -email-domain=*
+{{- end }}
+{{- if $operatorValues.spec.authProxy.subjectAccessReviewEnabled }}
+        - '-openshift-sar={{- $operatorValues.spec.authProxy.subjectAccessReviewPolicy | trim -}}'
+{{- end }}
+{{- if $operatorValues.spec.authProxy.delegateURLsEnabled }}
+        - '-openshift-delegate-urls={{- $operatorValues.spec.authProxy.delegateURLsPolicy | trim -}}'
+{{- end }}
+{{/* When using the auth-proxy, con***REMOVED***gure liveness probes correctly to communicate with the proxy using the auth-proxy port */}}
+{{- $_ := set $operatorValues.spec.readinessProbe.httpGet "port" 8081 }}
+{{- $_ := set $operatorValues.spec.livenessProbe.httpGet "port" 8081 }}
+        readinessProbe:
+{{ toYaml $operatorValues.spec.readinessProbe | indent 10 }}
+        livenessProbe:
+{{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
+        ports:
+        - name: auth-proxy
+          containerPort: 8081
+        resources:
+{{ toYaml $operatorValues.spec.authProxy.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: /etc/tls
+          name: api-tls
+        - mountPath: /etc/proxy/cookie-secret
+          name: cookie-secret
+        - mountPath: /etc/proxy/htpasswd
+          name: htpasswd-secret
+{{- if $operatorValues.spec.authProxy.authenticatedEmailsEnabled  }}
+        - mountPath: /etc/proxy/authenticated-emails
+          name: authenticated-emails-secret
+{{- end }}
+{{- end }}
+      volumes:
+{{- if $operatorValues.spec.con***REMOVED***g.tls.enabled }}
+      - name: api-tls
+        secret:
+          secretName: {{ $operatorValues.spec.con***REMOVED***g.tls.secretName }}
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.enabled }}
+      - name: prometheus-certi***REMOVED***cate-authority
+        con***REMOVED***gMap:
+          name: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.metricsTLS.enabled }}
+      - name: metrics-tls
+        secret:
+          secretName: {{ $operatorValues.spec.con***REMOVED***g.metricsTLS.secretName }}
+{{- end }}
+{{- if $operatorValues.spec.authProxy.enabled }}
+      - name: cookie-secret
+        secret:
+          secretName: {{ $operatorValues.spec.authProxy.cookieSecretName }}
+      - name: htpasswd-secret
+        secret:
+          secretName: {{ $operatorValues.spec.authProxy.htpasswdSecretName }}
+{{- if $operatorValues.spec.authProxy.authenticatedEmailsEnabled  }}
+      - name: authenticated-emails-secret
+        secret:
+          secretName: {{ $operatorValues.spec.authProxy.authenticatedEmailsSecretName }}
+{{- end }}
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.enabled }}
+      - name: prometheus-bearer-token
+        secret:
+          secretName: {{ $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.name }}
+{{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: reporting-operator
+{{- if $operatorValues.spec.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml $operatorValues.spec.imagePullSecrets | indent 8 }}
+{{- end }}

@@ -1,0 +1,18 @@
+{{- $operatorValues :=  index .Values "reporting-operator" -}}
+{{- if $operatorValues.spec.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ $operatorValues.spec.route.name }}
+{{- block "extraMetadata" . }}
+{{- end }}
+spec:
+  port:
+    targetPort: http
+  tls:
+    termination: Reencrypt
+    insecureEdgeTerminationPolicy: Allow
+  to:
+    kind: Service
+    name: reporting-operator
+{{- end }}

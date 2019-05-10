@@ -1,7 +1,7 @@
 operator:
   name: metering-operator
 
-  chartPath: "/openshift-metering-0.1.0.tgz"
+  chartPath: "/openshift-metering"
   reconcileIntervalSeconds: 30
   allNamespaces: false
   targetNamespaces: []

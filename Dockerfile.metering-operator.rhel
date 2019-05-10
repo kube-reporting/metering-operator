@@ -4,28 +4,6 @@ FROM openshift/ose-metering-helm:v4.0 as helm
 # ***REMOVED***nal image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/ose-cli as cli
 
-# build image builds our charts
-FROM openshift/golang-builder:1.10 AS build
-
-RUN INSTALL_PKGS="faq jq-1.6-2.el7" \
-    && yum -y remove jq \
-    && yum install --setopt=skip_missing_names_on_install=False -y \
-        $INSTALL_PKGS \
-    && yum clean all \
-    && rm -rf /var/cache/yum
-
-# we need the helm CLI to build the charts
-COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
-
-COPY . /go/src/github.com/operator-framework/operator-metering
-WORKDIR /go/src/github.com/operator-framework/operator-metering
-
-RUN make \
-    RUN_UPDATE_CODEGEN=false \
-    CHECK_GO_FILES=false \
-    OCP_BUILD=true \
-    bin/openshift-metering-0.1.0.tgz
-
 # metering-helm-operator is below
 FROM openshift/ose-metering-helm:v4.0
 
@@ -47,7 +25,7 @@ ENV HOME /tmp
 COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
 COPY images/helm-operator/get_owner.sh /usr/local/bin/get_owner.sh
 
-COPY --from=build /go/src/github.com/operator-framework/operator-metering/bin/openshift-metering-0.1.0.tgz /
+COPY charts/openshift-metering /openshift-metering
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
 CMD ["run-operator.sh"]
