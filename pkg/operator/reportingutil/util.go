@@ -125,11 +125,12 @@ func HiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 			Type: colType,
 		}, nil
 	} else {
-		colType = strings.ToUpper(column.Type)
+		colType = column.Type
+		upperColType := strings.ToUpper(colType)
 		switch {
-		case strings.Contains(colType, "MAP"):
+		case strings.Contains(upperColType, "MAP"):
 			// does not support maps with arrays inside them
-			if strings.Contains(colType, "ARRAY") {
+			if strings.Contains(upperColType, "ARRAY") {
 				return presto.Column{}, fmt.Errorf("cannot convert map containing array into map for Presto, column: %q, type: %q", column.Name, column.Type)
 			}
 			beginMapIndex := strings.Index(colType, "<")
@@ -171,8 +172,7 @@ func HiveColumnToPrestoColumn(column hive.Column) (presto.Column, error) {
 }
 
 func SimplePrestoColumnTypeToHiveColumnType(colType string) string {
-	colType = strings.ToUpper(colType)
-	switch colType {
+	switch strings.ToUpper(colType) {
 	case "TINYINT", "SMALLINT", "INT", "INTEGER", "BIGINT",
 		"FLOAT", "DOUBLE", "BOOLEAN",
 		"CHAR",
@@ -194,11 +194,12 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 			Type: colType,
 		}, nil
 	} else {
-		colType = strings.ToUpper(column.Type)
+		colType = column.Type
+		upperColType := strings.ToUpper(colType)
 		switch {
-		case strings.Contains(colType, "MAP"):
+		case strings.Contains(upperColType, "MAP"):
 			// does not support maps with arrays inside them
-			if strings.Contains(colType, "ARRAY") {
+			if strings.Contains(upperColType, "ARRAY") {
 				return hive.Column{}, fmt.Errorf("cannot convert map containing array into map for Presto, column: %q, type: %q", column.Name, column.Type)
 			}
 			beginMapIndex := strings.Index(colType, "(")
