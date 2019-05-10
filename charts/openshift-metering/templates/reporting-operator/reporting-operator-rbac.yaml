@@ -15,8 +15,6 @@ metadata:
 {{- end }}
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 rules:
 # grants access to all core metering types which the reporting-operator uses
 - apiGroups: ["metering.openshift.io"]
@@ -61,8 +59,6 @@ metadata:
 {{- end }}
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
 {{- if $operatorValues.spec.config.allNamespaces }}

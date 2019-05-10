@@ -5,8 +5,6 @@ metadata:
   name: node-cpu-capacity-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: node
@@ -52,8 +50,6 @@ metadata:
   name: node-cpu-capacity
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -98,8 +94,6 @@ metadata:
   name: node-cpu-allocatable-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: node
@@ -145,8 +139,6 @@ metadata:
   name: node-cpu-allocatable
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -191,8 +183,6 @@ metadata:
   name: node-cpu-utilization
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start

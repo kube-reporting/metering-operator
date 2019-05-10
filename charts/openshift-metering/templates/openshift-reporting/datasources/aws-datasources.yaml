@@ -7,8 +7,6 @@ metadata:
   name: "aws-billing"
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   awsBilling:
     source:
@@ -24,8 +22,6 @@ metadata:
   name: "aws-ec2-billing-data-raw-raw"
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   reportQueryView:
     queryName: "aws-ec2-billing-data-raw-raw"

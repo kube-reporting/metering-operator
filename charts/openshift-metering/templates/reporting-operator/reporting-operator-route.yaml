@@ -4,8 +4,6 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ $operatorValues.spec.route.name }}
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   port:
     targetPort: http

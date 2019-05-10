@@ -10,8 +10,6 @@ metadata:
   name: reporting-operator
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   replicas: {{ $operatorValues.spec.replicas }}
   strategy:

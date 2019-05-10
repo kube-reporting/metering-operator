@@ -3,8 +3,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: metering-presto
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   jobLabel: app
   endpoints:

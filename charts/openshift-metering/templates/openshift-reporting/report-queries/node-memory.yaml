@@ -5,8 +5,6 @@ metadata:
   name: node-memory-capacity-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: node
@@ -53,8 +51,6 @@ metadata:
   name: node-memory-capacity
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -99,8 +95,6 @@ metadata:
   name: node-memory-allocatable-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: node
@@ -147,8 +141,6 @@ metadata:
   name: node-memory-allocatable
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -193,8 +185,6 @@ metadata:
   name: node-memory-utilization
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
