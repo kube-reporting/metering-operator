@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: presto-coordinator-config
+  labels:
+    app: presto
+{{- block "extraMetadata" . }}
+{{- end }}
+data:
+  log.properties: |
+    com.facebook.presto={{ upper .Values.presto.spec.presto.coordinator.config.logLevel }}
+
+  node.properties: |
+    node.data-dir=/var/presto/data
+    node.environment=production
+
+  config.properties: |
+    http-server.http.port=8080
+    jmx.rmiserver.port=8081
+    jmx.rmiregistry.port=8081
+    coordinator=true
+    discovery-server.enabled=true
+    discovery.uri={{ .Values.presto.spec.presto.config.discoveryURI }}
+    node-scheduler.include-coordinator={{ .Values.presto.spec.presto.config.nodeSchedulerIncludeCoordinator }}
+{{- if .Values.presto.spec.presto.config.maxQueryLength }}
+    query.max-length={{ .Values.presto.spec.presto.config.maxQueryLength }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.taskConcurrency }}
+    task.concurrency={{ .Values.presto.spec.presto.coordinator.config.taskConcurrency }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.taskMaxWorkerThreads }}
+    task.max-worker-threads: {{ .Values.presto.spec.presto.coordinator.config.taskMaxWorkerThreads }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.taskMinDrivers }}
+    task.min-drivers: {{ .Values.presto.spec.presto.coordinator.config.taskMinDrivers }}
+{{- end }}
+
+  jvm.config: |
+    -server
+    -XX:+UseG1GC
+    -XX:+UseGCOverheadLimit
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.G1HeapRegionSize }}
+    -XX:G1HeapRegionSize={{ .Values.presto.spec.presto.coordinator.config.jvm.G1HeapRegionSize }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.parallelGCThreads }}
+    -XX:ParallelGCThreads={{ .Values.presto.spec.presto.coordinator.config.jvm.parallelGCThreads }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.concGCThreads }}
+    -XX:ConcGCThreads={{ .Values.presto.spec.presto.coordinator.config.jvm.concGCThreads }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.permSize }}
+    -XX:PermSize={{ .Values.presto.spec.presto.coordinator.config.jvm.permSize }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.maxGcPauseMillis }}
+    -XX:MaxGCPauseMillis={{ .Values.presto.spec.presto.coordinator.config.jvm.maxGcPauseMillis }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.config.jvm.initiatingHeapOccupancyPercent }}
+    -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.presto.coordinator.config.jvm.initiatingHeapOccupancyPercent }}
+{{- end }}
+{{- range .Values.presto.spec.presto.coordinator.config.jvm.extraFlags }}
+    {{ . }}
+{{- end }}
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:+ExitOnOutOfMemoryError
+    -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/config/config.yml
+    -Dcom.sun.management.jmxremote
+    -Dcom.sun.management.jmxremote.local.only=false
+    -Dcom.sun.management.jmxremote.ssl=false
+    -Dcom.sun.management.jmxremote.authenticate=false
+    -Dcom.sun.management.jmxremote.port=8081
+    -Dcom.sun.management.jmxremote.rmi.port=8081
+    -Djava.rmi.server.hostname=127.0.0.1
+    -verbose:gc
+    -XX:+PrintGCDetails
+    -XX:+PrintGCTimeStamps
+    -XX:+PrintGCDateStamps
+    -Xloggc:/var/presto/logs/gc.log
