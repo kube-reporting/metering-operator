@@ -212,8 +212,7 @@ reporting-operator:
       awsCredentialsSecretName: reporting-operator-aws-credentials-secrets
       awsSecretAccessKey: ""
       createAwsCredentialsSecret: true
-      createClusterMonitoringViewClusterRole: true
-      createClusterMonitoringViewClusterRoleBinding: true
+      createClusterMonitoringViewRBAC: true
       disablePrometheusMetricsImporter: "false"
       enableFinalizers: "false"
       hiveHost: hive-server:10000
