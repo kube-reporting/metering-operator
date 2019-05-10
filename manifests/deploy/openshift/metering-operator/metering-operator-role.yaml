@@ -154,9 +154,11 @@ rules:
     - routes
     verbs:
     - create
+    - delete
+    - deletecollection
     - get
     - list
-    - watch
+    - patch
     - update
-    - delete
+    - watch
 
