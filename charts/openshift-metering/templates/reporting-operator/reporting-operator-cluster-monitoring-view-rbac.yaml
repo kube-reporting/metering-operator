@@ -1,0 +1,38 @@
+{{- $operatorValues :=  index .Values "reporting-operator" -}}
+{{- if $operatorValues.spec.con***REMOVED***g.createClusterMonitoringViewRBAC }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+{{- /* Pre***REMOVED***x the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
+  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+  labels:
+    app: reporting-operator
+rules:
+# grants access to metrics data
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+{{- end }}
+
+{{- if $operatorValues.spec.con***REMOVED***g.createClusterMonitoringViewRBAC }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+{{- /* Pre***REMOVED***x the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
+  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+  labels:
+    app: reporting-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+subjects:
+- kind: ServiceAccount
+  name: reporting-operator
+  namespace: {{ .Release.Namespace }}
+{{- end }}

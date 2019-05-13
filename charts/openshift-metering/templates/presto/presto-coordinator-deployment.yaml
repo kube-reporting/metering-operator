@@ -5,8 +5,6 @@ metadata:
   labels:
     app: presto
     presto: coordinator
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   replicas: 1
   selector:

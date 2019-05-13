@@ -5,8 +5,6 @@ metadata:
   labels:
     app: hive
     hive: metastore
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   serviceName: hive-metastore
   replicas: 1

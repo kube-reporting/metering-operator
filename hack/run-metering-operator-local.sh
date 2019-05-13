@@ -9,6 +9,8 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
 : "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
+: "${ENABLE_DEBUG:=false-operator}"
+: "${HELM_RECONCILE_INTERVAL_SECONDS:=30}"
 
 set -ex
 
@@ -28,21 +30,7 @@ docker run \
     -e HELM_CHART_PATH="$METERING_CHART" \
     -e MY_POD_NAME="local-pod" \
     -e MY_POD_NAMESPACE="$METERING_NAMESPACE" \
-    -e HELM_HOST="127.0.0.1:44134" \
-    -e HELM_WAIT="false" \
-    -e HELM_RECONCILE_INTERVAL_SECONDS="5" \
-    -e RELEASE_HISTORY_LIMIT="3" \
-    -e TILLER_NAMESPACE="$METERING_NAMESPACE" \
-    -e TILLER_HISTORY_MAX="3" \
+    -e HELM_RECONCILE_INTERVAL_SECONDS="$HELM_RECONCILE_INTERVAL_SECONDS" \
+    -e ENABLE_DEBUG="$ENABLE_DEBUG" \
     "${METERING_OPERATOR_IMAGE}" \
-    bash -c '
-    cleanup() {
-        echo "Got signal!"
-        trap - SIGINT SIGTERM # clear the trap
-        kill -- -$$ # Sends SIGTERM to child/sub processes
-    }
-    trap cleanup SIGINT SIGTERM
-    tiller &
-    run-operator.sh &
-    wait
-    '
+    run-operator.sh

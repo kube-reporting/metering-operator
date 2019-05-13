@@ -4,8 +4,6 @@ metadata:
   name: presto-worker-con***REMOVED***g
   labels:
     app: presto
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   log.properties: |
     com.facebook.presto={{ upper .Values.presto.spec.presto.worker.con***REMOVED***g.logLevel }}

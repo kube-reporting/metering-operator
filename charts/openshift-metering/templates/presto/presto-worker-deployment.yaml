@@ -5,8 +5,6 @@ metadata:
   labels:
     app: presto
     presto: worker
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   replicas: {{ .Values.presto.spec.presto.worker.replicas }}
   selector:

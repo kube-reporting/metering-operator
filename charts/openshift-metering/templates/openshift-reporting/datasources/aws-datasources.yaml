@@ -1,0 +1,28 @@
+{{- $reportingValues :=  index .Values "openshift-reporting" -}}
+{{- if $reportingValues.spec.awsBillingReportDataSource.enabled }}
+---
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "aws-billing"
+  labels:
+    operator-metering: "true"
+spec:
+  awsBilling:
+    source:
+      bucket: "{{ $reportingValues.spec.awsBillingReportDataSource.bucket }}"
+      pre***REMOVED***x: "{{ $reportingValues.spec.awsBillingReportDataSource.pre***REMOVED***x }}"
+      region: "{{ $reportingValues.spec.awsBillingReportDataSource.region }}"
+
+---
+
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportDataSource
+metadata:
+  name: "aws-ec2-billing-data-raw-raw"
+  labels:
+    operator-metering: "true"
+spec:
+  reportQueryView:
+    queryName: "aws-ec2-billing-data-raw-raw"
+{{- end }}
