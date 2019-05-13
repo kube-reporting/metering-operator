@@ -7,5 +7,5 @@ metadata:
   labels:
     app: reporting-operator
 data:
-  {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.filename }}: {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.value }}
+  {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.filename | quote }}: {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.value | quote }}
 {{- end }}
