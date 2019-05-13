@@ -3,9 +3,7 @@
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
-if command -v oc; then
-    oc new-project "${METERING_NAMESPACE}" || oc project "${METERING_NAMESPACE}"
-***REMOVED***
+kubectl create namespace "${METERING_NAMESPACE}" || true
 
 echo "Labeling namespace ${METERING_NAMESPACE} with 'openshift.io/cluster-monitoring=true'"
 kubectl label \
