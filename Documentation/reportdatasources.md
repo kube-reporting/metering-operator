@@ -145,7 +145,7 @@ spec:
 [default-storage-location]: storagelocations.md#default-storagelocation
 [architecture]: metering-architecture.md
 [presto-types]: https://prestodb.io/docs/current/language/types.html
-[query-inputs]: reportgenerationqueries.md#query-inputs
+[query-inputs]: reportqueries.md#query-inputs
 [reportquery]: reportqueries.md
 [query-inputs]: reportqueries.md#query-inputs
 [prestotables]: prestotables.md
