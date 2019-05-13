@@ -5,8 +5,6 @@ metadata:
   name: persistentvolumeclaim-request-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: labels
@@ -62,8 +60,6 @@ metadata:
   name: persistentvolumeclaim-request
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -126,8 +122,6 @@ metadata:
   name: namespace-persistentvolumeclaim-request
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -178,8 +172,6 @@ metadata:
   name: cluster-persistentvolumeclaim-request
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start

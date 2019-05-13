@@ -15,8 +15,6 @@ metadata:
 {{- end }}
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 rules:
 # grants access to all core metering types which the reporting-operator uses
 - apiGroups: ["metering.openshift.io"]
@@ -61,8 +59,6 @@ metadata:
 {{- end }}
   labels:
     app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
 {{- if $operatorValues.spec.config.allNamespaces }}
@@ -76,51 +72,3 @@ subjects:
 - kind: ServiceAccount
   name: reporting-operator
   namespace: {{ .Release.Namespace }}
-
----
-
-{{- if $operatorValues.spec.config.createClusterMonitoringViewClusterRoleBinding }}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-{{- /* Prefix the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
-  labels:
-    app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-{{- if $operatorValues.spec.config.createClusterMonitoringViewClusterRole }}
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
-{{- else }}
-  name: cluster-monitoring-view
-{{- end }}
-subjects:
-- kind: ServiceAccount
-  name: reporting-operator
-  namespace: {{ .Release.Namespace }}
-{{- end }}
-
----
-
-{{- if $operatorValues.spec.config.createClusterMonitoringViewClusterRole }}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-{{- /* Prefix the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
-  labels:
-    app: reporting-operator
-{{- block "extraMetadata" . }}
-{{- end }}
-rules:
-# grants access to metrics data
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-{{- end }}

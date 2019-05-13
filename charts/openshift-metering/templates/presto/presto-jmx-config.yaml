@@ -4,8 +4,6 @@ metadata:
   name: presto-jmx-config
   labels:
     app: presto
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   config.yml: |
     ---

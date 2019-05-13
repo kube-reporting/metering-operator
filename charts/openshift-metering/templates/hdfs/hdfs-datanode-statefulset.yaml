@@ -6,8 +6,6 @@ metadata:
   labels:
     app: hdfs-datanode
     hdfs: datanode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - port: 9866
@@ -24,8 +22,6 @@ metadata:
   labels:
     app: hdfs-datanode
     hdfs: datanode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - port: 9864
@@ -42,8 +38,6 @@ metadata:
   labels:
     app: hdfs-datanode
     hdfs: datanode
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   serviceName: "hdfs-datanode"
   replicas: {{ .Values.hdfs.spec.datanode.replicas }}

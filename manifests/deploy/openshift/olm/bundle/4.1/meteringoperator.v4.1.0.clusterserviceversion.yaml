@@ -297,14 +297,7 @@ spec:
             - clusterrolebindings
             - clusterroles
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
 
       permissions:
         - serviceAccountName: metering-operator
@@ -318,7 +311,7 @@ spec:
           - apiGroups:
             - monitoring.coreos.com
             resources:
-            - '*'
+            - servicemonitors
             verbs:
             - '*'
           - apiGroups:
@@ -330,47 +323,26 @@ spec:
             - pods/portforward
             - pods/proxy
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - ""
             resources:
             - configmaps
             - endpoints
             - persistentvolumeclaims
-            - replicationcontrollers
-            - replicationcontrollers/scale
             - secrets
             - serviceaccounts
             - services
             - services/proxy
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - ""
             resources:
-            - bindings
             - events
-            - limitranges
             - namespaces/status
             - pods/log
             - pods/status
-            - replicationcontrollers/status
-            - resourcequotas
-            - resourcequotas/status
             verbs:
             - get
             - list
@@ -394,33 +366,22 @@ spec:
           - apiGroups:
             - apps
             resources:
+            - daemonsets
             - deployments
             - deployments/rollback
             - deployments/scale
+            - replicasets
+            - replicasets/scale
             - statefulsets
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - batch
             resources:
             - cronjobs
             - jobs
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - extensions
             resources:
@@ -430,41 +391,21 @@ spec:
             - deployments/scale
             - replicasets
             - replicasets/scale
-            - replicationcontrollers/scale
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - rbac.authorization.k8s.io
             resources:
             - rolebindings
             - roles
             verbs:
-            - create
-            - delete
-            - deletecollection
-            - get
-            - list
-            - patch
-            - update
-            - watch
+            - '*'
           - apiGroups:
             - route.openshift.io
             resources:
             - routes
             verbs:
-            - create
-            - get
-            - list
-            - watch
-            - update
-            - delete
+            - '*'
 
       deployments:
         - name: metering-operator
@@ -509,14 +450,8 @@ spec:
                     valueFrom:
                       fieldRef:
                         fieldPath: metadata.namespace
-                  - name: HELM_HOST
-                    value: "127.0.0.1:44134"
-                  - name: HELM_WAIT
-                    value: "false"
                   - name: HELM_RECONCILE_INTERVAL_SECONDS
                     value: "30"
-                  - name: RELEASE_HISTORY_LIMIT
-                    value: "3"
                   - name: METERING_HELM_OPERATOR
                     value: "quay.io/openshift/origin-metering-helm-operator:4.1"
                   - name: METERING_REPORTING_OPERATOR
@@ -529,50 +464,12 @@ spec:
                     value: "quay.io/openshift/origin-metering-hadoop:4.1"
                   resources:
                     limits:
-                      cpu: 50m
-                      memory: 100Mi
+                      cpu: 500m
+                      memory: 300Mi
                     requests:
-                      cpu: 50m
-                      memory: 100Mi
+                      cpu: 200m
+                      memory: 200Mi
 
-                - name: tiller
-                  image: "quay.io/openshift/origin-metering-helm-operator:4.1"
-                  args: ["tiller"]
-                  imagePullPolicy: Always
-                  env:
-                  - name: TILLER_NAMESPACE
-                    valueFrom:
-                      fieldRef:
-                        fieldPath: metadata.namespace
-                  - name: TILLER_HISTORY_MAX
-                    value: "3"
-                  resources:
-                    requests:
-                      memory: "50Mi"
-                      cpu: "50m"
-                    limits:
-                      memory: "100Mi"
-                      cpu: "50m"
-                  livenessProbe:
-                    failureThreshold: 3
-                    httpGet:
-                      path: /liveness
-                      port: 44135
-                      scheme: HTTP
-                    initialDelaySeconds: 1
-                    periodSeconds: 10
-                    successThreshold: 1
-                    timeoutSeconds: 1
-                  readinessProbe:
-                    failureThreshold: 3
-                    httpGet:
-                      path: /readiness
-                      port: 44135
-                      scheme: HTTP
-                    initialDelaySeconds: 1
-                    periodSeconds: 10
-                    successThreshold: 1
-                    timeoutSeconds: 1
                 restartPolicy: Always
                 terminationGracePeriodSeconds: 30
                 serviceAccount: metering-operator

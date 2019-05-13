@@ -1,11 +1,9 @@
 # build image needs the helm-cli from the helm image
 FROM openshift/ose-metering-helm:v4.0 as helm
-
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/ose-cli as cli
-
-# metering-helm-operator is below
-FROM openshift/ose-metering-helm:v4.0
+# real base
+FROM openshift/ose-base:v4.0.0
 
 USER root
 RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certificates socat" \
@@ -14,16 +12,17 @@ RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certificates socat" \
     && yum clean all \
     && rm -rf /var/cache/yum
 
+COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
 RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
-EXPOSE 44134
-ENV HELM_HOST 127.0.0.1:44134
-
 ENV HOME /tmp
 
+COPY images/helm-operator/add-label.sh /usr/local/bin/add-label.sh
+COPY images/helm-operator/add-owner-ref.sh /usr/local/bin/add-owner-ref.sh
+COPY images/helm-operator/helm-template.sh /usr/local/bin/helm-template.sh
+COPY images/helm-operator/deploy-resources.sh /usr/local/bin/deploy-resources.sh
 COPY images/helm-operator/run-operator.sh /usr/local/bin/run-operator.sh
-COPY images/helm-operator/get_owner.sh /usr/local/bin/get_owner.sh
 
 COPY charts/openshift-metering /openshift-metering
 COPY manifests/deploy/openshift/olm/bundle /manifests

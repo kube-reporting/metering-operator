@@ -5,8 +5,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: metering-prometheus-k8s
-{{- block "extraMetadata" . }}
-{{- end }}
 rules:
 - apiGroups:
   - ""
@@ -25,8 +23,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: metering-prometheus-k8s
-{{- block "extraMetadata" . }}
-{{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

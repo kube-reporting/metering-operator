@@ -5,8 +5,6 @@ metadata:
   labels:
     app: presto
     presto: coordinator
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - name: http
@@ -26,8 +24,6 @@ metadata:
   labels:
     app: presto
     metrics: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   ports:
   - name: metrics

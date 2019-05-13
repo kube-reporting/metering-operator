@@ -9,8 +9,6 @@ metadata:
   annotations:
     storagelocation.metering.openshift.io/is-default: "true"
 {{- end }}
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
 {{- if eq .Values.defaultStorage.type "hive" }}
   hive:

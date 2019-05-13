@@ -4,8 +4,6 @@ metadata:
   name: presto-worker-config
   labels:
     app: presto
-{{- block "extraMetadata" . }}
-{{- end }}
 data:
   log.properties: |
     com.facebook.presto={{ upper .Values.presto.spec.presto.worker.config.logLevel }}

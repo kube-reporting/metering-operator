@@ -6,8 +6,6 @@ metadata:
   name: aws-ec2-billing-data-raw
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: resource_id
@@ -53,8 +51,6 @@ metadata:
   name: aws-ec2-billing-data
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: resource_id
@@ -117,8 +113,6 @@ metadata:
   name: aws-ec2-cluster-cost
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: data_start

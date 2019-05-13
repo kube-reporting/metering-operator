@@ -6,8 +6,6 @@ metadata:
   name: pod-cpu-request-aws
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
@@ -99,8 +97,6 @@ metadata:
   name: pod-cpu-usage-aws
   labels:
     operator-metering: "true"
-{{- block "extraMetadata" . }}
-{{- end }}
 spec:
   columns:
   - name: period_start
