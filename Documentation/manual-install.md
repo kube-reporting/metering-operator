@@ -161,20 +161,6 @@ This will just build and run the metering-operator docker image, which will watc
 make run-metering-operator-local
 ```
 
-If you want to also create the namespace using the install scripts you can do that manually and set `$SKIP_METERING_OPERATOR_DEPLOYMENT` to `true`:
-
-```
-export SKIP_METERING_OPERATOR_DEPLOYMENT=true
-./hack/openshift-install.sh
-```
-
-Or you can set `$LOCAL_METERING_OPERATOR_RUN_INSTALL` to `true` and run the same make command as above:
-
-```
-export LOCAL_METERING_OPERATOR_RUN_INSTALL=true
-make run-metering-operator-local
-```
-
 ## Install the most recent version available in OLM
 
 There is set of scripts for install/uninstall that automate using the latest version of the `metering` package in OLM: `hack/olm-install.sh` and `hack/olm-uninstall.sh`.
