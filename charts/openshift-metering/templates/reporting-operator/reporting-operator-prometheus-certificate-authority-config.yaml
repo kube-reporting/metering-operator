@@ -7,5 +7,5 @@ metadata:
   labels:
     app: reporting-operator
 data:
-  {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename }}: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.value }}
+  {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename | quote }}: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.value | quote }}
 {{- end }}
