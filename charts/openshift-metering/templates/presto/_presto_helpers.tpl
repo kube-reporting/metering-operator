@@ -16,6 +16,23 @@ hive.metastore-timeout={{ .Values.presto.spec.presto.config.metastoreTimeout }}
 connector.name=jmx
 {{ end }}
 
+{{- define "presto-blackhole-catalog-properties" -}}
+connector.name=blackhole
+{{ end }}
+
+{{- define "presto-memory-catalog-properties" -}}
+connector.name=memory
+{{ end }}
+
+{{- define "presto-tpcds-catalog-properties" -}}
+connector.name=tpcds
+{{ end }}
+
+{{- define "presto-tpch-catalog-properties" -}}
+connector.name=tpch
+{{ end }}
+
+
 {{- define "presto-common-env" }}
 - name: MY_NODE_ID
   valueFrom:
