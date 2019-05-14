@@ -45,12 +45,12 @@ The value of an input depends on a if the user speci***REMOVED***ed a value in t
 
 Each input can have a different `type`, which determines how the input should be processed.
 
-Available options are `string`, `time`, and `int`, `ReportDataSource`, `ReportQuery`, and `Report`.
-If left empty, it defaults to `string`.
+Available options are `varchar`, `time`, and `int`, `ReportDataSource`, `ReportQuery`, and `Report`.
+If left empty, it defaults to `varchar`.
 
 For each of these types, the behavior varies:
 
-- `string`: Strings are passed through directly.
+- `varchar`: Varchars are passed through directly.
 - `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
 - `int`: An int value is passed through as a Go [int](https://golang.org/pkg/builtin/#int).
 - `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasources] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources speci***REMOVED***ed exist.
@@ -160,7 +160,7 @@ To query report results using the reporting-operator API for tableHidden endpoin
 [go-templates]: https://golang.org/pkg/text/template/
 [go-time]: https://golang.org/pkg/time/#Time
 [sprig]: https://masterminds.github.io/sprig/
-[view-datasources]: datasources.md#ReportQuery-View-Datasource
+[view-datasources]: reportdatasources.md#ReportQuery-View-Datasource
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md
