@@ -149,6 +149,7 @@ operator:
       verbs: ["*"]
     - apiGroups:
       - rbac.authorization.k8s.io
+      - authorization.openshift.io
       resources:
       - rolebindings
       - roles
