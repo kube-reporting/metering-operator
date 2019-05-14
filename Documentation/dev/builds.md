@@ -10,11 +10,11 @@ Each of them is built slightly differently.
     - source is https://github.com/operator-framework/operator-metering
     - Dockerfile is `Dockerfile.reporting-operator`
     - Docker image is [quay.io/openshift/origin-metering-reporting-operator](https://quay.io/repository/openshift/origin-metering-reporting-operator)
-    - Built by this repos Jenkins CI.
+    - Built by origin CI using prow/ci-operator
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-reporting-operator/
     - OCP Dockerfile is `Dockerfile.reporting-operator.rhel`
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-metering-reporting-operator](https://registry.access.redhat.com/openshift4/ose-metering-reporting-operator)
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-reporting-operator-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70735
@@ -26,67 +26,67 @@ Each of them is built slightly differently.
     - Source: https://github.com/operator-framework/operator-metering
     - Dockerfile is `Dockerfile.metering-operator`
     - Docker image is [quay.io/openshift/origin-metering-helm-operator](https://quay.io/repository/openshift/origin-metering-helm-operator)
-    - Built by this repos Jenkins CI.
+    - Built by origin CI using prow/ci-operator
   - OCP
     - Source: http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm-operator/
     - OCP Dockerfile is `Dockerfile.metering-operator.rhel`
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-metering-helm-operator](https://registry.access.redhat.com/openshift4/ose-metering-helm-operator)
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-helm-operator-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70824
 - helm
   - Written in Go
   - origin
-    - Source is https://github.com/operator-framework/helm/blob/metering-v2.8.2
-    - Dockerfile is https://github.com/operator-framework/helm/blob/metering-v2.8.2/Dockerfile
+    - Source is https://github.com/operator-framework/helm/blob/master
+    - Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-helm](https://quay.io/repository/openshift/origin-metering-helm)
-    - Built by quay.io
+    - Build by origin CI using prow/ci-operator
   - OCP
     - Source is  http://pkgs.devel.redhat.com/cgit/containers/ose-metering-helm/
-    - OCP Dockerfile is https://github.com/operator-framework/helm/blob/release-4.0/Dockerfile.rhel
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-metering-helm](https://registry.access.redhat.com/openshift4/ose-metering-helm)
+    - OCP Dockerfile is https://github.com/operator-framework/helm/blob/master/Dockerfile.rhel
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `ose-metering-helm-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70736
 - presto
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/presto/tree/metering-0.212
-    - Dockerfile is https://github.com/operator-framework/presto/blob/metering-0.212/Dockerfile
+    - Source is https://github.com/operator-framework/presto/tree/master
+    - Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-presto](https://quay.io/repository/openshift/origin-metering-presto)
-    - Built by quay.io
+    - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/presto/
-    - OCP Dockerfile is https://github.com/operator-framework/presto/blob/release-4.0/Dockerfile.rhel
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-presto](https://registry.access.redhat.com/openshift4/ose-presto)
+    - OCP Dockerfile is https://github.com/operator-framework/presto/blob/master/Dockerfile.rhel
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `presto-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70772
 - hive
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/hive/tree/metering-2.3.3
-    - Dockerfile is https://github.com/operator-framework/hive/tree/metering-2.3.3/Dockerfile
+    - Source is https://github.com/operator-framework/hive/tree/master
+    - Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hive](https://quay.io/repository/openshift/origin-metering-hive)
-    - Built by quay.io
+    - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hive/
-    - OCP Dockerfile is https://github.com/operator-framework/hive/tree/release-4.0/Dockerfile.rhel
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-hive](https://registry.access.redhat.com/openshift4/ose-hive)
+    - OCP Dockerfile is https://github.com/operator-framework/hive/tree/master/Dockerfile.rhel
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hive-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70894
 - hadoop
   - Written in Java, uses [maven][maven] as a project build tool.
   - origin
-    - Source is https://github.com/operator-framework/hadoop/tree/metering-3.1.1
-    - Dockerfile is https://github.com/operator-framework/hadoop/tree/metering-3.1.1/Dockerfile
+    - Source is https://github.com/operator-framework/hadoop/tree/master
+    - Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile
     - Docker image is [quay.io/openshift/origin-metering-hadoop](https://quay.io/repository/openshift/origin-metering-hadoop)
-    - Built by quay.io
+    - Build by origin CI using prow/ci-operator
   - OCP
     - Source is http://pkgs.devel.redhat.com/cgit/containers/hadoop/
-    - OCP Dockerfile is https://github.com/operator-framework/hadoop/tree/release-4.0/Dockerfile.rhel
-    - OCP Docker image is [registry.access.redhat.com/openshift4/ose-hadoop](https://registry.access.redhat.com/openshift4/ose-hadoop)
+    - OCP Dockerfile is https://github.com/operator-framework/hadoop/tree/master/Dockerfile.rhel
+    - OCP Docker image is TBD
     - Built in brew by OSBS
     - brew package name: `hadoop-container`
     - url: https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=70822
@@ -122,7 +122,7 @@ Project New Castle (PNC) is basically an isolated build environment that proxies
 It also proxies from maven central anything that isn't available yet, and uses persistent caching to ensure that once something is downloaded it doesn't change.
 Once it's done the builds, we do a push to brew.
 
-The Openshift Metering "product" is found at: http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/product/50
+The Openshift Metering "product" is found at: http://orch.psi.redhat.com/pnc-web/#/product/50
 
 Current product versions:
 
@@ -132,21 +132,22 @@ Current product versions:
 We currently have 4 projects in PNC:
 
 - presto
-  - http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/207
+  - http://orch.psi.redhat.com/pnc-web/#/projects/207
   - build configs:
-    - presto-0.212: http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/build-configs/571
+    - presto-0.212: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-configs/571
+    - presto-310: http://orch.psi.redhat.com/pnc-web/#/projects/207/build-configs/1470
 - hive
-  - http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/220
+  - http://orch.psi.redhat.com/pnc-web/#/projects/220
   - build configs:
-    - hive-2.3.3: http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/220/build-configs/636
+    - hive-2.3.3: http://orch.psi.redhat.com/pnc-web/#/projects/220/build-configs/636
 - hadoop
-  - http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/219
+  - http://orch.psi.redhat.com/pnc-web/#/projects/219
   - build configs:
-    - hadoop-3.1.1: http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/219/build-configs/633
+    - hadoop-3.1.1: http://orch.psi.redhat.com/pnc-web/#/projects/219/build-configs/633
 - prometheus-jmx-exporter
-  - http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/208
+  - http://orch.psi.redhat.com/pnc-web/#/projects/208
   - build configs:
-    - prometheus-jmx-exporter-0.3.1: http://orch.cloud.pnc.engineering.redhat.com/pnc-web/#/projects/208/build-configs/578
+    - prometheus-jmx-exporter-0.3.1: http://orch.psi.redhat.com/pnc-web/#/projects/208/build-configs/578
 
 ### PNC Brew Push
 
