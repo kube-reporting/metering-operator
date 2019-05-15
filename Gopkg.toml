@@ -62,6 +62,7 @@ required = [
 [[override]]
   name = "github.com/taozle/go-hive-driver"
   branch = "custom_dialer"
+  source = "github.com/chancez/go-hive-driver"
 
 [[override]]
   name = "git.apache.org/thrift.git"
