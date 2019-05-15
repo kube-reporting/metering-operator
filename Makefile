@@ -21,6 +21,9 @@ REPORTING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-reporting-opera
 REPORTING_OPERATOR_IMAGE_TAG=4.1
 METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-helm-operator
 METERING_OPERATOR_IMAGE_TAG=4.1
+METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator
+METERING_ANSIBLE_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
+METERING_ANSIBLE_OPERATOR_IMAGE_TAG=4.1
 
 REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
 METERING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-operator
@@ -67,6 +70,9 @@ metering-src-docker-build: Docker***REMOVED***le.src
 
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 	docker build -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+
+metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
+	docker build -f $< -t $(METERING_ANSIBLE_OPERATOR_IMAGE_REPO):$(METERING_ANSIBLE_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
