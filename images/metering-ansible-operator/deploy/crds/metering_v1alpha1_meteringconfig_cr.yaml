@@ -1,0 +1,5 @@
+apiVersion: metering.openshift.io/v1alpha1
+kind: MeteringConfig
+metadata:
+  name: example-meteringconfig
+spec: {}
