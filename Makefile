@@ -54,10 +54,6 @@ ifeq ($(RUN_UPDATE_CODEGEN), true)
 	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_***REMOVED***les.sh)
 endif
 
-# Hive Git repository for Thrift de***REMOVED***nitions
-HIVE_REPO := "git://git.apache.org/hive.git"
-HIVE_SHA := "1fe8db618a7bbc09e041844021a2711c89355995"
-
 all: fmt unit metering-manifests docker-build-all
 
 docker-build-all: reporting-operator-docker-build metering-operator-docker-build
@@ -74,9 +70,9 @@ metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
 	docker build -f $< -t $(METERING_ANSIBLE_OPERATOR_IMAGE_REPO):$(METERING_ANSIBLE_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
-# Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
+# Runs gofmt on all ***REMOVED***les in project except vendored source
 fmt:
-	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" -not -path "./pkg/hive/hive_thrift/*" | xargs gofmt -w
+	***REMOVED***nd . -name '*.go' -not -path "./vendor/*" | xargs gofmt -w
 
 # Update dependencies
 vendor: Gopkg.toml
@@ -198,7 +194,6 @@ bin/test2json: gotools/test2json/main.go
 
 .PHONY: \
 	test vendor fmt verify \
-	regenerate-hive-thrift thrift-gen \
 	update-codegen verify-codegen \
 	docker-build docker-tag docker-push \
 	docker-build-all docker-tag-all docker-push-all \
@@ -215,25 +210,3 @@ $(CODEGEN_OUTPUT_GO_FILES): $(CODEGEN_SOURCE_GO_FILES)
 
 verify-codegen:
 	./hack/verify-codegen.sh
-
-# The results of these targets get vendored, but the targets exist for
-# regenerating if needed.
-regenerate-hive-thrift: pkg/hive/hive_thrift
-
-# Download Hive git repo.
-out/thrift.git:
-	mkdir -p out
-	git clone --single-branch --bare ${HIVE_REPO} $@
-
-# Retrieve Hive thrift de***REMOVED***nition from git repo.
-thrift/TCLIService.thrift: out/thrift.git
-	mkdir -p $(dir $@)
-	git -C $< show ${HIVE_SHA}:service-rpc/if/$(notdir $@) > $@
-
-# Generate source from Hive thrift de***REMOVED***ntions and remove executable packages.
-pkg/hive/hive_thrift: thrift/TCLIService.thrift thrift-gen
-
-thrift-gen:
-	thrift -gen go:package_pre***REMOVED***x=${GO_PKG}/pkg/hive,package=hive_thrift -out pkg/hive thrift/TCLIService.thrift
-	for i in `go list -f '{{if eq .Name "main"}}{{ .Dir }}{{end}}' ./pkg/hive/hive_thrift/...`; do rm -rf $$i; done
-
