@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -222,9 +223,20 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 		return
 	}
 
+	// prepare both lists of columns for comparison
+	for _, colList := range [][]presto.Column{queryPrestoColumns, prestoColumns} {
+		// lowercase the type to make comparing types case insensitive
+		for _, col := range colList {
+			col.Type = strings.ToLower(col.Type)
+		}
+		// Sort the columns by name
+		sort.Slice(colList, func(i, j int) bool {
+			return colList[i].Name < colList[j].Name
+		})
+	}
+
 	if !reflect.DeepEqual(queryPrestoColumns, prestoColumns) {
-		logger.Warnf("report columns and table columns don't match, ReportQuery was likely updated after the report ran")
-		logger.Debugf("mismatched columns, PrestoTable columns: %v, ReportQuery columns: %v", prestoColumns, queryPrestoColumns)
+		logger.Warnf("mismatched columns, PrestoTable columns: %v, ReportQuery columns: %v", prestoColumns, queryPrestoColumns)
 	}
 
 	tableName := reportingutil.FullyQualifiedTableName(prestoTable)
