@@ -16,6 +16,7 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	_ "github.com/taozle/go-hive-driver"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -37,7 +38,6 @@ import (
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
@@ -393,11 +393,13 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Infof("setting up DB clients")
-	hiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+	hiveQueryer, err := sql.Open("hive", fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
+	if err != nil {
+		return err
+	}
 	defer hiveQueryer.Close()
 
-	connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
-	prestoQueryer, err := sql.Open("presto", connStr)
+	prestoQueryer, err := sql.Open("presto", fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost))
 	if err != nil {
 		return err
 	}
