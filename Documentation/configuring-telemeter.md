@@ -27,7 +27,7 @@ A complete Metering configuration resource with options set for connecting to a 
 ```yaml
 # metering-telemeter.yaml
 apiVersion: metering.openshift.io/v1alpha1
-kind: Metering
+kind: MeteringConfig
 metadata:
   name: operator-metering
 spec:

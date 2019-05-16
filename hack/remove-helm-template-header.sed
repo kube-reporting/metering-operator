@@ -3,7 +3,7 @@
 # Removes headers of the following form
 # Example helm template header:
 # ---
-# # Source: helm-operator/templates/deployment.yaml
+# # Source: foo-chart/templates/deployment.yaml
 s/^---$//g
 s/# Source.*$//g
 # Delete trailing whitespace (spaces, tabs) from end of each line

@@ -69,6 +69,7 @@ rules:
     resources:
     - daemonsets
     - deployments
+    - deployments/finalizers
     - deployments/rollback
     - deployments/scale
     - replicasets

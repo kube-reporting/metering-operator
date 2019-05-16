@@ -5,8 +5,8 @@ spec:
   tags:
   - from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-helm-operator:4.2
-    name: metering-helm-operator
+      name: quay.io/openshift/origin-metering-ansible-operator:4.2
+    name: metering-ansible-operator
   - from:
       kind: DockerImage
       name: quay.io/openshift/origin-metering-reporting-operator:4.2
