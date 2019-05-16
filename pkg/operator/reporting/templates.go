@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 	"text/template"
 	"time"
 
 	"github.com/Masterminds/sprig"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
@@ -16,9 +18,11 @@ import (
 )
 
 type ReportQueryTemplateContext struct {
-	Namespace         string
+	Namespace      string
+	Query          string
+	RequiredInputs []string
+
 	Reports           []*cbTypes.Report
-	ReportQuery       *cbTypes.ReportQuery
 	ReportQueries     []*cbTypes.ReportQuery
 	ReportDataSources []*cbTypes.ReportDataSource
 	PrestoTables      []*cbTypes.PrestoTable
@@ -82,7 +86,8 @@ func (ctx *ReportQueryTemplateContext) renderReportQuery(name string, tmplCtx Te
 
 	// copy context and replace the query we're rendering
 	newCtx := *ctx
-	newCtx.ReportQuery = reportQuery
+	newCtx.RequiredInputs = reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
+	newCtx.Query = reportQuery.Spec.Query
 
 	renderedQuery, err := RenderQuery(&newCtx, tmplCtx)
 	if err != nil {
@@ -101,7 +106,7 @@ func (ctx *ReportQueryTemplateContext) newQueryTemplate() (*template.Template, e
 		"renderReportQuery":               ctx.renderReportQuery,
 	}
 
-	tmpl, err := template.New("reportQueryTemplate").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(ctx.ReportQuery.Spec.Query)
+	tmpl, err := template.New("reportQueryTemplate").Delims("{|", "|}").Funcs(templateFuncMap).Funcs(sprig.TxtFuncMap()).Parse(ctx.Query)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing query: %v", err)
 	}
@@ -109,6 +114,18 @@ func (ctx *ReportQueryTemplateContext) newQueryTemplate() (*template.Template, e
 }
 
 func RenderQuery(ctx *ReportQueryTemplateContext, tmplCtx TemplateContext) (string, error) {
+	requiredInputs := sets.NewString(ctx.RequiredInputs...)
+	givenInputs := sets.NewString()
+	for inputName := range tmplCtx.Report.Inputs {
+		givenInputs.Insert(inputName)
+	}
+
+	missingInputs := requiredInputs.Difference(givenInputs)
+
+	if missingInputs.Len() != 0 {
+		return "", fmt.Errorf("missing inputs: %s", strings.Join(missingInputs.List(), ", "))
+	}
+
 	tmpl, err := ctx.newQueryTemplate()
 	if err != nil {
 		return "", err

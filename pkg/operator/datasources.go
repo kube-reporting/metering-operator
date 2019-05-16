@@ -478,9 +478,11 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 			return err
 		}
 
+		requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(query.Spec.Inputs)
 		queryCtx := &reporting.ReportQueryTemplateContext{
 			Namespace:         dataSource.Namespace,
-			ReportQuery:       query,
+			Query:             query.Spec.Query,
+			RequiredInputs:    requiredInputs,
 			Reports:           dependencyResult.Dependencies.Reports,
 			ReportQueries:     dependencyResult.Dependencies.ReportQueries,
 			ReportDataSources: dependencyResult.Dependencies.ReportDataSources,
