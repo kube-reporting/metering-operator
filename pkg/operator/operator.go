@@ -455,7 +455,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	loggingDMLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDMLQueries)
 	loggingDDLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDDLQueries)
-	loggingDDLHiveQueryer := db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+	loggingDDLHiveQueryer := db.NewLoggingExecer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
 
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(loggingDMLPrestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)

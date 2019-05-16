@@ -40,15 +40,15 @@ type TablePartition struct {
 
 type PartitionSpec map[string]string
 
-func ExecuteCreateTable(queryer db.Queryer, params TableParameters, ignoreExists bool) error {
+func ExecuteCreateTable(execer db.Execer, params TableParameters, ignoreExists bool) error {
 	query := generateCreateTableSQL(params, ignoreExists)
-	_, err := queryer.Query(query)
+	_, err := execer.Exec(query)
 	return err
 }
 
-func ExecuteDropTable(queryer db.Queryer, dbName, tableName string, ignoreNotExists bool) error {
+func ExecuteDropTable(execer db.Execer, dbName, tableName string, ignoreNotExists bool) error {
 	query := generateDropTableSQL(dbName, tableName, ignoreNotExists, false)
-	_, err := queryer.Query(query)
+	_, err := execer.Exec(query)
 	return err
 }
 

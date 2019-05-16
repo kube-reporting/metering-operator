@@ -7,14 +7,14 @@ type DatabaseParameters struct {
 	Location string `json:"location"`
 }
 
-func ExecuteCreateDatabase(queryer db.Queryer, params DatabaseParameters) error {
+func ExecuteCreateDatabase(execer db.Execer, params DatabaseParameters) error {
 	query := generateCreateDatabaseSQL(params, false)
-	_, err := queryer.Query(query)
+	_, err := execer.Exec(query)
 	return err
 }
 
-func ExecuteDropDatabase(queryer db.Queryer, dbName string, ignoreNotExists, cascade bool) error {
+func ExecuteDropDatabase(execer db.Execer, dbName string, ignoreNotExists, cascade bool) error {
 	query := generateDropDatabaseSQL(dbName, ignoreNotExists, cascade)
-	_, err := queryer.Query(query)
+	_, err := execer.Exec(query)
 	return err
 }
