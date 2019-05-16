@@ -8,7 +8,7 @@ metadata:
       [
         {
           "apiVersion": "metering.openshift.io/v1alpha1",
-          "kind": "Metering",
+          "kind": "MeteringCon***REMOVED***g",
           "metadata": {
             "name": "operator-metering"
           },
@@ -192,7 +192,7 @@ metadata:
     capabilities: Basic Install
     categories: OpenShift Optional, Monitoring
     certi***REMOVED***ed: "false"
-    containerImage: quay.io/openshift/origin-metering-helm-operator:latest
+    containerImage: quay.io/openshift/origin-metering-ansible-operator:latest
     createdAt: 2019-01-01T11:59:59Z
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
@@ -279,6 +279,7 @@ spec:
             - namespaces
             verbs:
             - get
+            - list
           - apiGroups:
             - authorization.k8s.io
             resources:
@@ -368,6 +369,7 @@ spec:
             resources:
             - daemonsets
             - deployments
+            - deployments/***REMOVED***nalizers
             - deployments/rollback
             - deployments/scale
             - replicasets
@@ -425,36 +427,35 @@ spec:
                 securityContext:
                   runAsNonRoot: true
                 containers:
-                - name: metering-operator
-                  image: "quay.io/openshift/origin-metering-helm-operator:4.2"
-                  args: ["run-operator.sh"]
+                - name: ansible
+                  command:
+                  - /usr/local/bin/ao-logs
+                  - /tmp/ansible-operator/runner
+                  - stdout
+                  image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+                  imagePullPolicy: Always
+                  volumeMounts:
+                  - mountPath: /tmp/ansible-operator/runner
+                    name: runner
+                    readOnly: true
+                - name: operator
+                  image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
                   imagePullPolicy: Always
                   env:
-                  - name: HELM_RELEASE_CRD_NAME
-                    value: "Metering"
-                  - name: HELM_RELEASE_CRD_API_GROUP
-                    value: "metering.openshift.io"
+                  - name: OPERATOR_NAME
+                    value: "metering-ansible-operator"
                   - name: HELM_CHART_PATH
                     value: "/openshift-metering"
-                  - name: ALL_NAMESPACES
-                    value: "false"
-                  - name: TARGET_NAMESPACES
+                  - name: WATCH_NAMESPACE
                     valueFrom:
-                        ***REMOVED***eldRef:
-                          ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
-
-                  - name: MY_POD_NAME
+                      ***REMOVED***eldRef:
+                        ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
+                  - name: POD_NAME
                     valueFrom:
                       ***REMOVED***eldRef:
                         ***REMOVED***eldPath: metadata.name
-                  - name: MY_POD_NAMESPACE
-                    valueFrom:
-                      ***REMOVED***eldRef:
-                        ***REMOVED***eldPath: metadata.namespace
-                  - name: HELM_RECONCILE_INTERVAL_SECONDS
-                    value: "30"
-                  - name: METERING_HELM_OPERATOR
-                    value: "quay.io/openshift/origin-metering-helm-operator:4.2"
+                  - name: METERING_ANSIBLE_OPERATOR
+                    value: "quay.io/openshift/origin-metering-ansible-operator:4.2"
                   - name: METERING_REPORTING_OPERATOR
                     value: "quay.io/openshift/origin-metering-reporting-operator:4.2"
                   - name: METERING_PRESTO
@@ -463,14 +464,20 @@ spec:
                     value: "quay.io/openshift/origin-metering-hive:4.2"
                   - name: METERING_HADOOP
                     value: "quay.io/openshift/origin-metering-hadoop:4.2"
+                  volumeMounts:
+                  - mountPath: /tmp/ansible-operator/runner
+                    name: runner
                   resources:
                     limits:
-                      cpu: 500m
-                      memory: 300Mi
+                      cpu: 1500m
+                      memory: 500Mi
                     requests:
-                      cpu: 200m
-                      memory: 200Mi
+                      cpu: 750m
+                      memory: 400Mi
 
+                volumes:
+                  - name: runner
+                    emptyDir: {}
                 restartPolicy: Always
                 terminationGracePeriodSeconds: 30
                 serviceAccount: metering-operator
@@ -478,9 +485,9 @@ spec:
   customresourcede***REMOVED***nitions:
     owned:
     - description: An instance of Metering with high-level con***REMOVED***guration
-      displayName: Metering
-      kind: Metering
-      name: meterings.metering.openshift.io
+      displayName: Metering Con***REMOVED***guration
+      kind: MeteringCon***REMOVED***g
+      name: meteringcon***REMOVED***gs.metering.openshift.io
       version: v1alpha1
     - description: A scheduled or on-off Metering Report summarizes data based on the
         query speci***REMOVED***ed.

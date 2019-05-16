@@ -9,7 +9,7 @@ USER root
 # our copy of faq and jq
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
 # oniguruma-devel comes from epel-release
-RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates" \
+RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certi***REMOVED***cates less which" \
     && yum -y install epel-release \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
@@ -24,7 +24,7 @@ USER 1001
 
 COPY images/metering-ansible-operator/roles/ /opt/ansible/roles/
 COPY images/metering-ansible-operator/watches.yaml /opt/ansible/watches.yaml
-COPY images/helm-operator/* /opt/ansible/scripts/
+COPY images/metering-ansible-operator/scripts /opt/ansible/scripts
 
 COPY charts/openshift-metering /openshift-metering
 COPY manifests/deploy/openshift/olm/bundle /manifests

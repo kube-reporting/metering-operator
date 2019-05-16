@@ -23,43 +23,53 @@ template:
     securityContext:
       runAsNonRoot: true
     containers:
-    - name: {{ .Values.operator.name }}
+    - name: ansible
+      command:
+      - /usr/local/bin/ao-logs
+      - /tmp/ansible-operator/runner
+      - stdout
       image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
-      args: ["run-operator.sh"]
+      imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+      volumeMounts:
+      - mountPath: /tmp/ansible-operator/runner
+        name: runner
+        readOnly: true
+    - name: operator
+      image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
       imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
       env:
-      - name: HELM_RELEASE_CRD_NAME
-        value: "Metering"
-      - name: HELM_RELEASE_CRD_API_GROUP
-        value: "metering.openshift.io"
+      - name: OPERATOR_NAME
+        value: "metering-ansible-operator"
       - name: HELM_CHART_PATH
         value: "{{ required "chartPath is required" .Values.operator.chartPath }}"
-      - name: ALL_NAMESPACES
-        value: "{{ .Values.operator.allNamespaces }}"
-{{- if .Values.operator.targetNamespaces }}
-      - name: TARGET_NAMESPACES
-        value: "{{ .Values.operator.targetNamespaces | join "," }}"
-{{- ***REMOVED*** if .Values.operator.targetNamespacesDownwardAPIValueFrom }}
-      - name: TARGET_NAMESPACES
-        valueFrom:
-{{ toYaml .Values.operator.targetNamespacesDownwardAPIValueFrom | indent 12 }}
-{{- end }}
-      - name: MY_POD_NAME
+      - name: WATCH_NAMESPACE
+{{- if .Values.operator.targetNamespace }}
+        value: "{{ .Values.operator.targetNamespace }}"
+{{- ***REMOVED*** if .Values.operator.useTargetNamespacesDownwardAPIValueFrom }}
         valueFrom:
           ***REMOVED***eldRef:
-            ***REMOVED***eldPath: metadata.name
-      - name: MY_POD_NAMESPACE
+            ***REMOVED***eldPath: metadata.annotations['olm.targetNamespaces']
+{{- ***REMOVED*** }}
         valueFrom:
           ***REMOVED***eldRef:
             ***REMOVED***eldPath: metadata.namespace
-      - name: HELM_RECONCILE_INTERVAL_SECONDS
-        value: {{ .Values.operator.reconcileIntervalSeconds | quote }}
+{{- end }}
+      - name: POD_NAME
+        valueFrom:
+          ***REMOVED***eldRef:
+            ***REMOVED***eldPath: metadata.name
 {{- range $index, $item := .Values.olm.imageTags }}
       - name: {{ $item.name | replace "-" "_" | upper }}
         value: "{{ $item.from.name }}"
 {{- end }}
+      volumeMounts:
+      - mountPath: /tmp/ansible-operator/runner
+        name: runner
       resources:
 {{ toYaml .Values.operator.resources | indent 8 }}
+    volumes:
+      - name: runner
+        emptyDir: {}
     restartPolicy: Always
     terminationGracePeriodSeconds: 30
 {{- if .Values.operator.serviceAccountName}}
@@ -69,4 +79,10 @@ template:
     imagePullSecrets:
 {{ toYaml .Values.operator.imagePullSecrets | indent 4 }}
 {{- end }}
+{{ end }}
+
+
+{{- de***REMOVED***ne "cluster-service-version-deployment-spec" -}}
+{{- $ctxCopy := merge (dict "Values" (dict "operator" (dict "useTargetNamespacesDownwardAPIValueFrom" true))) . -}}
+{{ include "operator-deployment-spec" $ctxCopy }}
 {{ end }}

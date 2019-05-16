@@ -36,7 +36,7 @@ if [[ $# -ge 3 ]] ; then
 
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf $TMPDIR' EXIT SIGINT
-CHART="$ROOT_DIR/charts/metering-helm-operator"
+CHART="$ROOT_DIR/charts/metering-ansible-operator"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
@@ -76,9 +76,9 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
-    -x "templates/operator/metering.yaml" \
+    -x "templates/operator/meteringcon***REMOVED***g.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$METERING_OPERATOR_OUTPUT_DIR/metering.yaml"
+    > "$METERING_OPERATOR_OUTPUT_DIR/meteringcon***REMOVED***g.yaml"
 
 # Render the CSV to a temporary location, so we can add the version into it's
 # ***REMOVED***lename after it's been rendered
@@ -148,9 +148,9 @@ helm template "$CHART" \
 for CRD_DIR in "$METERING_OPERATOR_OUTPUT_DIR" "$CSV_BUNDLE_DIR"; do
     helm template "$CHART" \
         "${VALUES_ARGS[@]}" \
-        -x "templates/crds/metering.crd.yaml" \
+        -x "templates/crds/meteringcon***REMOVED***g.crd.yaml" \
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-        > "$CRD_DIR/metering.crd.yaml"
+        > "$CRD_DIR/meteringcon***REMOVED***g.crd.yaml"
 
     helm template "$CHART" \
         "${VALUES_ARGS[@]}" \
