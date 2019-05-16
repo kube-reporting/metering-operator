@@ -1,9 +1,9 @@
 # build image needs the helm-cli from the helm image
-FROM openshift/ose-metering-helm:v4.0 as helm
+FROM openshift/ose-metering-helm:latest as helm
 # final image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/ose-cli as cli
 # real base
-FROM openshift/ose-base:v4.0.0
+FROM openshift/ose-base:latest
 
 USER root
 RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certificates socat" \

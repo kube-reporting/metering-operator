@@ -1,4 +1,4 @@
-FROM quay.io/operator-framework/ansible-operator:v0.6.0
+FROM openshift/ose-ansible-operator:latest
 
 COPY images/metering-ansible-operator/roles/ /opt/ansible/roles/
 COPY images/metering-ansible-operator/watches.yaml /opt/ansible/watches.yaml
