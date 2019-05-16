@@ -1,6 +1,7 @@
 #!/bin/bash
 
 : "${PULL_OSE_METERING_HELM:=true}"
+: "${PULL_OSE_ANSIBLE_OPERATOR:=true}"
 
 set -x
 
@@ -15,11 +16,17 @@ docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/gola
 docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golang-builder:1.10' openshift/golang-builder:1.10
 
 # openshift base
-docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:v4.0.0'
-docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:v4.0.0' openshift/ose-base:v4.0.0
+docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:latest'
+docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:latest' openshift/ose-base:latest
 
 # helm is pulled for building metering-operator
 if [ "$PULL_OSE_METERING_HELM" == "true" ]; then
-    docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:v4.0'
-    docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:v4.0' openshift/ose-metering-helm:v4.0
+    docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:latest'
+    docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:latest' openshift/ose-metering-helm:latest
+***REMOVED***
+
+# ansible-operator is pulled for building metering-ansible-operator
+if [ "$PULL_OSE_ANSIBLE_OPERATOR" == "true" ]; then
+    docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-ansible-operator:latest'
+    docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-ansible-operator:latest' openshift/ose-ansible-operator:latest
 ***REMOVED***
