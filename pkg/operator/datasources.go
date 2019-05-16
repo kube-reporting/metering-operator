@@ -180,7 +180,10 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		"tableName":        prestoTable.Status.TableName,
 	})
 
-	importerCfg := op.newPromImporterCfg(dataSource, query, prestoTable)
+	importerCfg, err := op.newPromImporterCfg(dataSource, query, prestoTable)
+	if err != nil {
+		return err
+	}
 
 	// wrap in a closure to handle lock and unlock of the mutex
 	importer, err := func() (*prestostore.PrometheusImporter, error) {

@@ -648,7 +648,10 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	tableName := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	if err != nil {
+		return err
+	}
 	err = op.reportGenerator.GenerateReport(tableName, query, report.Spec.OverwriteExistingData)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))

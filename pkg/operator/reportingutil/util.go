@@ -35,8 +35,23 @@ func AWSBillingPeriodTimestamp(date time.Time) string {
 	return date.Format(AWSUsagePartitionDateStringLayout)
 }
 
-func FullyQuali***REMOVED***edTableName(prestoTable *cbTypes.PrestoTable) string {
-	return presto.FullyQuai***REMOVED***edTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName)
+func FullyQuali***REMOVED***edTableName(prestoTable *cbTypes.PrestoTable) (string, error) {
+	var errs []string
+	if len(prestoTable.Status.Catalog) == 0 {
+		errs = append(errs, "prestoTable.Status.Catalog is unset")
+	}
+	if len(prestoTable.Status.Schema) == 0 {
+		errs = append(errs, "prestoTable.Status.Schema is unset")
+	}
+	if len(prestoTable.Status.TableName) == 0 {
+		errs = append(errs, "prestoTable.Status.TableName is unset")
+	}
+
+	if len(errs) != 0 {
+		return "", fmt.Errorf("PrestoTable status is invalid: %s", strings.Join(errs, ", "))
+	}
+
+	return presto.FullyQuai***REMOVED***edTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
 }
 
 func IsValidSQLIdenti***REMOVED***er(id string) bool {
