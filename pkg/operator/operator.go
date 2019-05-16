@@ -424,6 +424,9 @@ func (op *Reporting) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	hiveQueryer.SetConnMaxLifetime(time.Minute)
+	hiveQueryer.SetMaxOpenConns(2)
+	hiveQueryer.SetMaxIdleConns(2)
 	defer hiveQueryer.Close()
 
 	prestoQueryer, err := sql.Open("presto", fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost))
