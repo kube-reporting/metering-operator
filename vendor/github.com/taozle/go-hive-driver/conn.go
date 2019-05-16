@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+
 	"github.com/taozle/go-hive-driver/thriftlib"
 )
 
@@ -13,9 +14,9 @@ var (
 )
 
 type Connection struct {
-	client  *thriftlib.TCLIServiceClient
-	session *thriftlib.TSessionHandle
-	config  *config
+	client    *thriftlib.TCLIServiceClient
+	session   *thriftlib.TSessionHandle
+	batchSize int64
 }
 
 func (*Connection) Prepare(query string) (driver.Stmt, error) {
@@ -79,7 +80,7 @@ func (c *Connection) QueryContext(ctx context.Context, query string, args []driv
 		return nil, err
 	}
 
-	rs := newRowSet(c.client, ret.GetOperationHandle(), c.config)
+	rs := newRowSet(c.client, ret.GetOperationHandle(), c.batchSize)
 	if err := rs.Bootstrap(); err != nil {
 		return nil, err
 	}

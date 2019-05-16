@@ -4,27 +4,28 @@ import (
 	"context"
 	"database/sql/driver"
 	"errors"
-	"github.com/taozle/go-hive-driver/thriftlib"
 	"io"
 	"reflect"
 	"sync"
+
+	"github.com/taozle/go-hive-driver/thriftlib"
 )
 
 type rowSet struct {
-	client   *thriftlib.TCLIServiceClient
-	opHandle *thriftlib.TOperationHandle
-	config   *config
+	client    *thriftlib.TCLIServiceClient
+	opHandle  *thriftlib.TOperationHandle
+	batchSize int64
 
 	columns    []*thriftlib.TColumnDesc
 	columnOnce sync.Once
 	values     [][]interface{}
 }
 
-func newRowSet(client *thriftlib.TCLIServiceClient, opHandle *thriftlib.TOperationHandle, config *config) *rowSet {
+func newRowSet(client *thriftlib.TCLIServiceClient, opHandle *thriftlib.TOperationHandle, batchSize int64) *rowSet {
 	return &rowSet{
-		client:   client,
-		opHandle: opHandle,
-		config:   config,
+		client:    client,
+		opHandle:  opHandle,
+		batchSize: batchSize,
 	}
 }
 
@@ -82,7 +83,7 @@ func (r *rowSet) fetchNext() error {
 	req := thriftlib.NewTFetchResultsReq()
 	req.OperationHandle = r.opHandle
 	req.Orientation = thriftlib.TFetchOrientation_FETCH_NEXT
-	req.MaxRows = r.config.batchSize
+	req.MaxRows = r.batchSize
 
 	resp, err := r.client.FetchResults(context.Background(), req)
 	if err != nil {

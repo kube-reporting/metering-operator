@@ -410,15 +410,16 @@
   version = "v1.2.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6b6465b76d296047f8d2ee183cdd18ec1ebae6fff466150892465f568c20362f"
+  branch = "custom_dialer"
+  digest = "1:ca27008dc1f7a01c905dfb0a490fd162aa133ac4ad746e4bcc30b8f34698fc66"
   name = "github.com/taozle/go-hive-driver"
   packages = [
     ".",
     "thriftlib",
   ]
   pruneopts = "NUT"
-  revision = "79951111cb07cb79a9f8bb4b37d8a9a26c018301"
+  revision = "b3c680b33c4fb2fa11c32f8642978d07a5379a9c"
+  source = "github.com/chancez/go-hive-driver"
 
 [[projects]]
   branch = "master"
