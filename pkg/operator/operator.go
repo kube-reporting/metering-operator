@@ -2,8 +2,11 @@ package operator
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -16,7 +19,7 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	_ "github.com/taozle/go-hive-driver"
+	hive "github.com/taozle/go-hive-driver"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -97,6 +100,9 @@ type Con***REMOVED***g struct {
 	PprofListen   string
 
 	HiveHost   string
+	HiveUseTLS bool
+	HiveCAFile string
+
 	PrestoHost string
 
 	PrestoMaxQueryLength int
@@ -393,7 +399,28 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Infof("setting up DB clients")
-	hiveQueryer, err := sql.Open("hive", fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
+	var dialer hive.Dialer
+	if op.cfg.HiveUseTLS {
+		cert, err := ioutil.ReadFile(op.cfg.HiveCAFile)
+		if err != nil {
+			return err
+		}
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(cert)
+		dialer = hive.TLSDialer{
+			Con***REMOVED***g: &tls.Con***REMOVED***g{
+				RootCAs: certPool,
+			},
+		}
+	} ***REMOVED*** {
+		dialer = hive.DialWrapper{}
+	}
+	hiveDB, err := hive.NewConnectorWithDialer(dialer, fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
+	if err != nil {
+		return err
+	}
+
+	hiveQueryer := sql.OpenDB(hiveDB)
 	if err != nil {
 		return err
 	}
