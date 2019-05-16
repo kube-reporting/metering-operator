@@ -229,6 +229,9 @@ reporting-operator:
         secretName: reporting-operator-metrics-tls-secrets
       prestoHost: presto:8080
       prestoMaxQueryLength: null
+      prestoTLS:
+        enabled: false
+        secretName: ""
       prometheusCertificateAuthority:
         configMap:
           create: false
@@ -418,9 +421,11 @@ presto:
     presto:
       annotations: {}
       config:
+        tls:
+          enabled: false
+          secretName: ""
         connectors:
           extraConnectorFiles: []
-        discoveryURI: http://presto:8080
         environment: production
         hiveMetastoreURI: thrift://hive-metastore:9083
         maxQueryLength: "10000000"

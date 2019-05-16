@@ -15,6 +15,9 @@ data:
   prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" $operatorValues.spec.config.prometheusURL | quote}}
   disable-prometheus-metrics-importer: {{ $operatorValues.spec.config.disablePrometheusMetricsImporter | quote}}
   enable-finalizers: {{ $operatorValues.spec.config.enableFinalizers | quote}}
+{{- if $operatorValues.spec.config.prestoTLS.enabled }}
+  presto-ca-file: "/var/run/secrets/presto-tls/tls.crt"
+{{- end }}
 {{- if $operatorValues.spec.config.prometheusMetricsImporterPollInterval }}
   prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.config.prometheusMetricsImporterPollInterval | quote}}
 {{- end }}
