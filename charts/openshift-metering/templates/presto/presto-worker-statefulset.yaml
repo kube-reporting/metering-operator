@@ -52,10 +52,21 @@ spec:
       - name: copy-presto-con***REMOVED***g
         image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
         imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
-        command: ['bash', '-c']
+        command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted con***REMOVED***guration data into the presto-etc emptyDir volume so we can write to the con***REMOVED***g ***REMOVED***les
-        args: ['cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/']
         env:
+{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+        - name: PRESTO_KEYFILE
+          value: /presto/tls.key
+        - name: PRESTO_CRTFILE
+          value: /presto/tls.crt
+        - name: PRESTO_KEYSTORE_PKCS12
+          value: /opt/presto/tls/keystore.pkcs12
+        - name: PRESTO_KEYSTORE_JKS
+          value: /opt/presto/tls/keystore.jks
+        - name: PRESTO_KEYSTORE_PASSWORD
+          value: password
+{{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc
@@ -66,6 +77,14 @@ spec:
           mountPath: /presto-etc/catalog
         - name: presto-data
           mountPath: /var/presto/data
+        - name: presto-common-con***REMOVED***g
+          mountPath: /presto-common
+{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+        - name: presto-tls
+          mountPath: /opt/presto/tls
+        - name: presto-pem-***REMOVED***les
+          mountPath: /presto
+{{- end }}
         resources:
 {{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
       containers:
@@ -96,6 +115,10 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
+{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+        - name: presto-tls
+          mountPath: /opt/presto/tls
+{{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.mountPath }}
@@ -122,6 +145,13 @@ spec:
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
+{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+      - name: presto-tls
+        emptyDir: {}
+      - name: presto-pem-***REMOVED***les
+        secret:
+          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.tls.secretName }}
+{{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
