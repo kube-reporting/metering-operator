@@ -238,3 +238,12 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 	}
 	return hive.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
 }
+
+func ConvertInputDe***REMOVED***nitionsIntoInputList(defs []cbTypes.ReportQueryInputDe***REMOVED***nition) (required []string) {
+	for _, def := range defs {
+		if def.Required {
+			required = append(required, def.Name)
+		}
+	}
+	return required
+}

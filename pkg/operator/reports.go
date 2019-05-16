@@ -609,9 +609,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		return err
 	}
 
+	requiredInputs := reportingutil.ConvertInputDe***REMOVED***nitionsIntoInputList(reportQuery.Spec.Inputs)
 	queryCtx := &reporting.ReportQueryTemplateContext{
 		Namespace:         report.Namespace,
-		ReportQuery:       reportQuery,
+		Query:             reportQuery.Spec.Query,
+		RequiredInputs:    requiredInputs,
 		Reports:           reports,
 		ReportQueries:     queries,
 		ReportDataSources: datasources,
