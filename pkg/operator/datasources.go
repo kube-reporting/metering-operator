@@ -499,7 +499,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 		columns := reportingutil.GeneratePrestoColumns(query)
 		logger.Infof("creating view %s", viewName)
-		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportQueryGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
+		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportDataSourceGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
 		if err != nil {
 			return fmt.Errorf("error creating view %s for ReportDataSource %s: %v", viewName, dataSource.Name, err)
 		}
