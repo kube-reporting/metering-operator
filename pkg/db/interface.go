@@ -13,6 +13,11 @@ type Queryer interface {
 	Close() error
 }
 
+type Execer interface {
+	Exec(query string, args ...interface{}) (sql.Result, error)
+	Close() error
+}
+
 type loggingQueryer struct {
 	queryer    Queryer
 	logger     log.FieldLogger
@@ -37,6 +42,32 @@ func (loggingQueryer *loggingQueryer) Query(query string, args ...interface{}) (
 
 func (loggingQueryer *loggingQueryer) Close() error {
 	return loggingQueryer.queryer.Close()
+}
+
+type loggingExecer struct {
+	execer     Execer
+	logger     log.FieldLogger
+	logQueries bool
+}
+
+func NewLoggingExecer(execer Execer, logger log.FieldLogger, logQueries bool) *loggingExecer {
+	return &loggingExecer{
+		execer:     execer,
+		logger:     logger,
+		logQueries: logQueries,
+	}
+}
+
+func (loggingExecer *loggingExecer) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if loggingExecer.logQueries {
+		margs := argsString(args...)
+		loggingExecer.logger.Debugf("EXEC: %s [%s]", query, margs)
+	}
+	return loggingExecer.execer.Exec(query, args...)
+}
+
+func (loggingExecer *loggingExecer) Close() error {
+	return loggingExecer.execer.Close()
 }
 
 // argsString pretty prints arguments passed into it for logging query
