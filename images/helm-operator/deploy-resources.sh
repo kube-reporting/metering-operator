@@ -7,7 +7,6 @@ set -u
 
 shopt -s extglob
 
-
 : "${ENABLE_DEBUG:=false}"
 
 if [ "$ENABLE_DEBUG" == "true" ]; then
@@ -404,10 +403,15 @@ installReportingOperatorResources() {
     helmTemplateAndApply templates/reporting-operator/reporting-operator-deployment.yaml reporting-operator-deployment true false
 }
 
+echo "Deploying metering resources"
 installMeteringResources
+echo "Deploying reporting resources"
 installReportingResources
+echo "Deploying HDFS resources"
 installHdfsResources
+echo "Deploying Presto resources"
 installPrestoResources
+echo "Deploying reporting-operator resources"
 installReportingOperatorResources
 
 wait
