@@ -18,15 +18,18 @@ RUN INSTALL_PKGS="curl bash jq-1.6-2.el7 faq ca-certificates less which inotify-
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
-RUN ln -s /usr/bin/oc /usr/bin/kubectl
+RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
 USER 1001
+ENV HOME /opt/ansible
+ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
 
-COPY images/metering-ansible-operator/roles/ /opt/ansible/roles/
-COPY images/metering-ansible-operator/watches.yaml /opt/ansible/watches.yaml
-COPY images/metering-ansible-operator/scripts /opt/ansible/scripts
+COPY images/metering-ansible-operator/roles/ ${HOME}/roles/
+COPY images/metering-ansible-operator/watches.yaml ${HOME}/watches.yaml
+COPY images/metering-ansible-operator/scripts ${HOME}/scripts
+COPY images/metering-ansible-operator/ansible.cfg /etc/ansible/ansible.cfg
+COPY charts/openshift-metering ${HELM_CHART_PATH}
 
-COPY charts/openshift-metering /openshift-metering
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \

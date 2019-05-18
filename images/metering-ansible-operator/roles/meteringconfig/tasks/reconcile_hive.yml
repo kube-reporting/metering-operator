@@ -1,0 +1,38 @@
+---
+
+- name: Deploy hive resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_file: /tmp/metering-values.yaml
+    resources:
+      - template_file: templates/presto/hive-metastore-pvc.yaml
+        apis: [ {kind: persistentvolumeclaim} ]
+        prune_label_value: hive-metastore-pvc
+        create: "{{ meteringconfig_create_hive_metastore_pvc }}"
+      - template_file: templates/presto/hive-shared-volume-pvc.yaml
+        apis: [ {kind: persistentvolumeclaim} ]
+        prune_label_value: hive-shared-volume-pvc
+        create: "{{ meteringconfig_create_presto_shared_volume_pvc }}"
+      - template_file: templates/presto/hive-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-configmap
+      - template_file: templates/presto/hive-scripts-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-scripts-configmap
+      - template_file: templates/presto/hive-metastore-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: hive-metastore-service
+      - template_file: templates/presto/hive-metastore-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hive-metastore-statefulset
+      - template_file: templates/presto/hive-server-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: hive-server-service
+      - template_file: templates/presto/hive-serviceaccount.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: hive-serviceaccount
+      - template_file: templates/presto/hive-server-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hive-server-statefulset
+

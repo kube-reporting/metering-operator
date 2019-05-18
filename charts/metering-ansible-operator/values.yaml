@@ -1,7 +1,6 @@
 operator:
   name: metering-operator
 
-  chartPath: "/openshift-metering"
   reconcileIntervalSeconds: 30
   targetNamespace: ""
   useTargetNamespacesDownwardAPIValueFrom: false
