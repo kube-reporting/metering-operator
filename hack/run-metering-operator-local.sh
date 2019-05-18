@@ -5,7 +5,6 @@ source "${ROOT_DIR}/hack/common.sh"
 
 
 : "${METERING_OPERATOR_IMAGE:=${METERING_OPERATOR_IMAGE_REPO}:${METERING_OPERATOR_IMAGE_TAG}}"
-: "${METERING_CHART:=/openshift-metering}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
 : "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
@@ -25,7 +24,6 @@ docker run \
     -v "$KUBECONFIG:/kubecon***REMOVED***g" \
     -v /tmp/ansible-operator/runner \
     -e KUBECONFIG=/kubecon***REMOVED***g \
-    -e HELM_CHART_PATH="$METERING_CHART" \
     -e OPERATOR_NAME="metering-ansible-operator" \
     -e POD_NAME="metering-ansible-operator" \
     -e WATCH_NAMESPACE="$METERING_NAMESPACE" \

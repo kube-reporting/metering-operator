@@ -1,0 +1,38 @@
+---
+
+- name: Deploy hive resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_***REMOVED***le: /tmp/metering-values.yaml
+    resources:
+      - template_***REMOVED***le: templates/presto/hive-metastore-pvc.yaml
+        apis: [ {kind: persistentvolumeclaim} ]
+        prune_label_value: hive-metastore-pvc
+        create: "{{ meteringcon***REMOVED***g_create_hive_metastore_pvc }}"
+      - template_***REMOVED***le: templates/presto/hive-shared-volume-pvc.yaml
+        apis: [ {kind: persistentvolumeclaim} ]
+        prune_label_value: hive-shared-volume-pvc
+        create: "{{ meteringcon***REMOVED***g_create_presto_shared_volume_pvc }}"
+      - template_***REMOVED***le: templates/presto/hive-con***REMOVED***gmap.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hive-con***REMOVED***gmap
+      - template_***REMOVED***le: templates/presto/hive-scripts-con***REMOVED***gmap.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hive-scripts-con***REMOVED***gmap
+      - template_***REMOVED***le: templates/presto/hive-metastore-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: hive-metastore-service
+      - template_***REMOVED***le: templates/presto/hive-metastore-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hive-metastore-statefulset
+      - template_***REMOVED***le: templates/presto/hive-server-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: hive-server-service
+      - template_***REMOVED***le: templates/presto/hive-serviceaccount.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: hive-serviceaccount
+      - template_***REMOVED***le: templates/presto/hive-server-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hive-server-statefulset
+

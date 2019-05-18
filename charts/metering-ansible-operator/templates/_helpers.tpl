@@ -40,8 +40,6 @@ template:
       env:
       - name: OPERATOR_NAME
         value: "metering-ansible-operator"
-      - name: HELM_CHART_PATH
-        value: "{{ required "chartPath is required" .Values.operator.chartPath }}"
       - name: WATCH_NAMESPACE
 {{- if .Values.operator.targetNamespace }}
         value: "{{ .Values.operator.targetNamespace }}"
@@ -59,7 +57,7 @@ template:
           ***REMOVED***eldRef:
             ***REMOVED***eldPath: metadata.name
 {{- range $index, $item := .Values.olm.imageTags }}
-      - name: {{ $item.name | replace "-" "_" | upper }}
+      - name: {{ $item.name | replace "-" "_" | upper | printf "%s_IMAGE" }}
         value: "{{ $item.from.name }}"
 {{- end }}
       volumeMounts:

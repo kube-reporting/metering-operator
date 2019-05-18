@@ -1,0 +1,61 @@
+---
+
+- name: Deploy reporting resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_***REMOVED***le: /tmp/metering-values.yaml
+    resources:
+      - template_***REMOVED***le: templates/metering/default-storage-location.yaml
+        apis: [ {kind: storagelocation} ]
+        prune_label_value: openshift-metering-default-storage-location
+        create: "{{ meteringcon***REMOVED***g_create_metering_default_storage }}"
+      - template_***REMOVED***le: templates/openshift-reporting/datasources/default-datasources.yaml
+        apis: [ {kind: datasource} ]
+        prune_label_value: default-datasources
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/cluster-capacity.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-cluster-capacity
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/cluster-usage.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-cluster-usage
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/cluster-utilization.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-cluster-utilization
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/node-cpu.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-node-cpu
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/node-memory.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-node-memory
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/persistentvolumeclaim-capacity.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-persistentvolumeclaim-capacity
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/persistentvolumeclaim-request.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-persistentvolumeclaim-request
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/persistentvolumeclaim-usage.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-persistentvolumeclaim-usage
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/pod-cpu.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-pod-cpu
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/pod-memory.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-pod-memory
+      - template_***REMOVED***le: templates/openshift-reporting/datasources/aws-datasources.yaml
+        apis: [ {kind: datasources} ]
+        prune_label_value: aws-datasources
+        create: "{{ meteringcon***REMOVED***g_enable_reporting_aws_billing }}"
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/aws-billing.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-aws-billing
+        create: "{{ meteringcon***REMOVED***g_enable_reporting_aws_billing }}"
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/pod-cpu-aws.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-pod-cpu-aws
+        create: "{{ meteringcon***REMOVED***g_enable_reporting_aws_billing }}"
+      - template_***REMOVED***le: templates/openshift-reporting/report-queries/pod-memory-aws.yaml
+        apis: [ {kind: reportqueries} ]
+        prune_label_value: report-queries-pod-memory-aws
+        create: "{{ meteringcon***REMOVED***g_enable_reporting_aws_billing }}"

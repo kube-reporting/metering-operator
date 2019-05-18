@@ -1,0 +1,39 @@
+---
+
+- name: Deploy presto resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_***REMOVED***le: /tmp/metering-values.yaml
+    resources:
+      - template_***REMOVED***le: templates/presto/presto-aws-credentials-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-aws-credentials-secret
+        create: "{{ meteringcon***REMOVED***g_create_presto_aws_credentials }}"
+      - template_***REMOVED***le: templates/presto/presto-catalog-con***REMOVED***g-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-catalog-con***REMOVED***g-secret
+      - template_***REMOVED***le: templates/presto/presto-common-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: presto-common-con***REMOVED***g
+      - template_***REMOVED***le: templates/presto/presto-coordinator-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: presto-coordinator-con***REMOVED***g
+      - template_***REMOVED***le: templates/presto/presto-serviceaccount.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: presto-serviceaccount
+      - template_***REMOVED***le: templates/presto/presto-jmx-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: presto-jmx-con***REMOVED***g
+      - template_***REMOVED***le: templates/presto/presto-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: presto-service
+      - template_***REMOVED***le: templates/presto/presto-worker-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: presto-worker-con***REMOVED***g
+      - template_***REMOVED***le: templates/presto/presto-coordinator-statefulset.yaml
+        apis: [ {kind: statefulset} ]
+        prune_label_value: presto-coordinator-statefulset
+      - template_***REMOVED***le: templates/presto/presto-worker-statefulset.yaml
+        apis: [ {kind: statefulset} ]
+        prune_label_value: presto-worker-statefulset

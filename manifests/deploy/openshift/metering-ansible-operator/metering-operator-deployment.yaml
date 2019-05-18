@@ -36,8 +36,6 @@ spec:
         env:
         - name: OPERATOR_NAME
           value: "metering-ansible-operator"
-        - name: HELM_CHART_PATH
-          value: "/openshift-metering"
         - name: WATCH_NAMESPACE
           valueFrom:
             ***REMOVED***eldRef:
@@ -46,15 +44,15 @@ spec:
           valueFrom:
             ***REMOVED***eldRef:
               ***REMOVED***eldPath: metadata.name
-        - name: METERING_ANSIBLE_OPERATOR
+        - name: METERING_ANSIBLE_OPERATOR_IMAGE
           value: "quay.io/openshift/origin-metering-ansible-operator:4.2"
-        - name: METERING_REPORTING_OPERATOR
+        - name: METERING_REPORTING_OPERATOR_IMAGE
           value: "quay.io/openshift/origin-metering-reporting-operator:4.2"
-        - name: METERING_PRESTO
+        - name: METERING_PRESTO_IMAGE
           value: "quay.io/openshift/origin-metering-presto:4.2"
-        - name: METERING_HIVE
+        - name: METERING_HIVE_IMAGE
           value: "quay.io/openshift/origin-metering-hive:4.2"
-        - name: METERING_HADOOP
+        - name: METERING_HADOOP_IMAGE
           value: "quay.io/openshift/origin-metering-hadoop:4.2"
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
