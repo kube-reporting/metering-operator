@@ -10,6 +10,11 @@ REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
 
+DOCKER_BUILD_CMD = docker build
+OCP_BUILD = false
+REPO_FILE = $(ROOT_DIR)/hack/ocp-util/redhat.repo
+SUB_MGR_FILE = $(ROOT_DIR)/hack/ocp-util/subscription-manager.conf
+
 IMAGE_REPOSITORY = quay.io
 IMAGE_ORG = openshift
 DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
@@ -27,6 +32,14 @@ METERING_ANSIBLE_OPERATOR_IMAGE_TAG=4.1
 REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
 METERING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-operator
 METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator
+
+
+ifeq ($(OCP_BUILD), true)
+	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_FILE):/etc/yum.repos.d/redhat.repo -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
+	REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator.rhel
+	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator.rhel
+endif
+
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
@@ -63,16 +76,16 @@ all: fmt unit metering-manifests docker-build-all
 docker-build-all: reporting-operator-docker-build metering-operator-docker-build
 
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
-	docker build -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+	$(DOCKER_BUILD_CMD) -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 metering-src-docker-build: Docker***REMOVED***le.src
-	docker build -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
+	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
 
 metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
 	docker build -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
-	docker build -f $< -t $(METERING_ANSIBLE_OPERATOR_IMAGE_REPO):$(METERING_ANSIBLE_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_ANSIBLE_OPERATOR_IMAGE_REPO):$(METERING_ANSIBLE_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source and Hive Thrift de***REMOVED***nitions
 fmt:
