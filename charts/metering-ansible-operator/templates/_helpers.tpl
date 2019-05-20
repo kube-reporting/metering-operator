@@ -25,7 +25,7 @@ template:
     containers:
     - name: ansible
       command:
-      - /usr/local/bin/ao-logs
+      - /opt/ansible/scripts/ansible-logs.sh
       - /tmp/ansible-operator/runner
       - stdout
       image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
