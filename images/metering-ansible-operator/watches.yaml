@@ -3,3 +3,5 @@
   group: metering.openshift.io
   kind: MeteringCon***REMOVED***g
   role: /opt/ansible/roles/meteringcon***REMOVED***g
+  watchDependentResources: false
+  reconcilePeriod: 1m
