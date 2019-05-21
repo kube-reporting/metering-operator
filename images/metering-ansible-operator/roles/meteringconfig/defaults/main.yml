@@ -1,29 +1,75 @@
 ---
 
 meteringconfig_chart_path: "{{ lookup('env','HELM_CHART_PATH') }}"
+meteringconfig_prune_label_key: 'metering.openshift.io/prune'
+
 meteringconfig_default_values_file: "{{ meteringconfig_chart_path + '/values.yaml' }}"
 meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_file) | from_yaml }}"
-meteringconfig_spec: "{{ _metering_openshift_io_meteringconfig.spec }}"
+
+# The default specs for each component
+_presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
+_reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
+_hdfs_default_spec: "{{ meteringconfig_default_values.hdfs.spec }}"
+
+# Default image repository and tag from the defaults
+meteringconfig_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
+meteringconfig_reporting_operator_default_image_tag: "{{ _reporting_op_default_spec.image.tag }}"
+meteringconfig_presto_default_image_repo: "{{ _presto_default_spec.presto.image.repository }}"
+meteringconfig_presto_default_image_tag: "{{ _presto_default_spec.presto.image.tag }}"
+meteringconfig_hive_default_image_repo: "{{ _presto_default_spec.hive.image.repository }}"
+meteringconfig_hive_default_image_tag: "{{ _presto_default_spec.hive.image.tag }}"
+meteringconfig_hdfs_default_image_repo: "{{ _hdfs_default_spec.image.repository }}"
+meteringconfig_hdfs_default_image_tag: "{{ _hdfs_default_spec.image.tag }}"
+
+# Override the default images we use with env vars if set, falling back to the values.yaml configured default if not set.
+meteringconfig_default_image_overrides:
+  reporting-operator:
+    spec:
+      image:
+        repository: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[0] | default(meteringconfig_reporting_operator_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[1] | default(meteringconfig_reporting_operator_default_image_tag, true) }}"
+  presto:
+    spec:
+      presto:
+        image:
+          repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringconfig_presto_default_image_repo, true) }}"
+          tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringconfig_presto_default_image_tag, true) }}"
+      hive:
+        image:
+          repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringconfig_hive_default_image_repo, true) }}"
+          tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringconfig_hive_default_image_tag, true) }}"
+  hdfs:
+    spec:
+      image:
+        repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hdfs_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hdfs_default_image_tag, true) }}"
+
+# meteringconfig_spec_with_defaults comes first so that user's meteringconfig spec overrides defaults if the user specifies any image overrides.
+meteringconfig_spec: "{{ meteringconfig_default_image_overrides | combine(_metering_openshift_io_meteringconfig.spec , recursive=True) }}"
+
+# We need the combined user input + defaults so we can determine what resources/components are enabled/disabled after merging
 meteringconfig_spec_with_defaults: "{{ meteringconfig_default_values | combine(meteringconfig_spec, recursive=True) }}"
-meteringconfig_prune_label_key: 'metering.openshift.io/prune'
+
+# Private variables to reduce boilerplate
+_monitoring_conf: "{{ meteringconfig_spec_with_defaults.monitoring }}"
+_openshift_reporting_spec: "{{ meteringconfig_spec_with_defaults['openshift-reporting'].spec }}"
+_presto_spec: "{{ meteringconfig_spec_with_defaults.presto.spec }}"
+_reporting_op_spec: "{{ meteringconfig_spec_with_defaults['reporting-operator'].spec }}"
+_hdfs_spec: "{{ meteringconfig_spec_with_defaults.hdfs.spec }}"
 
 meteringconfig_create_metering_default_storage: "{{ meteringconfig_spec_with_defaults.defaultStorage.create | default(true) }}"
 
-_monitoring_conf: "{{ meteringconfig_spec_with_defaults.monitoring }}"
 meteringconfig_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
 meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"
 
-_openshift_reporting_spec: "{{ meteringconfig_spec_with_defaults['openshift-reporting'].spec }}"
 meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
 meteringconfig_enable_hdfs: "{{ meteringconfig_spec_with_defaults.hdfs.enabled | default(false) }}"
 
-_presto_spec: "{{ meteringconfig_spec_with_defaults.presto.spec }}"
 meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
 meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
 
-_reporting_op_spec: "{{ meteringconfig_spec_with_defaults['reporting-operator'].spec }}"
 meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
 meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
 meteringconfig_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createAuthenticatedEmailsSecret | default(true) }}"
