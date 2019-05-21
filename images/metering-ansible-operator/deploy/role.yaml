@@ -4,51 +4,99 @@ metadata:
   creationTimestamp: null
   name: metering-ansible-operator
 rules:
+# grant access to metering resources
+- apiGroups: ["metering.openshift.io"]
+  resources: ["*"]
+  verbs: ["*"]
+# grant access to monitoring resources for optional monitoring integration
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  verbs: ["*"]
+# access to most core resources that can be created by metering
 - apiGroups:
   - ""
   resources:
   - pods
-  - services
+  - pods/attach
+  - pods/exec
+  - pods/portforward
+  - pods/proxy
+  verbs: ["*"]
+- apiGroups:
+  - ""
+  resources:
+  - con***REMOVED***gmaps
   - endpoints
   - persistentvolumeclaims
-  - events
-  - con***REMOVED***gmaps
   - secrets
+  - serviceaccounts
+  - services
+  - services/proxy
+  verbs: ["*"]
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces/status
+  - pods/log
+  - pods/status
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - patch
 - apiGroups:
   - ""
   resources:
   - namespaces
   verbs:
   - get
+  - list
+  - watch
 - apiGroups:
   - apps
   resources:
-  - deployments
   - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
   - replicasets
+  - replicasets/scale
   - statefulsets
-  verbs:
-  - '*'
+  verbs: ["*"]
 - apiGroups:
-  - monitoring.coreos.com
+  - batch
   resources:
-  - servicemonitors
-  verbs:
-  - get
-  - create
+  - cronjobs
+  - jobs
+  verbs: ["*"]
 - apiGroups:
-  - apps
-  resourceNames:
-  - metering-ansible-operator
+  - extensions
   resources:
-  - deployments/***REMOVED***nalizers
-  verbs:
-  - update
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  verbs: ["*"]
 - apiGroups:
-  - metering.openshift.io
+  - rbac.authorization.k8s.io
+  - authorization.openshift.io
   resources:
-  - '*'
-  verbs:
-  - '*'
+  - rolebindings
+  - roles
+  verbs: ["*"]
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs: ["*"]
