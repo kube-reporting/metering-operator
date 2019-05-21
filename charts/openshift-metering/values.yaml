@@ -262,7 +262,7 @@ reporting-operator:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-reporting-operator
-      tag: 4.1
+      tag: 4.2
     labels: {}
     livenessProbe:
       failureThreshold: 5
@@ -343,7 +343,7 @@ presto:
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-metering-hive
-        tag: 4.1
+        tag: 4.2
       labels: {}
       metastore:
         af***REMOVED***nity: {}
@@ -463,7 +463,7 @@ presto:
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-metering-presto
-        tag: 4.1
+        tag: 4.2
       labels: {}
       securityContext:
         fsGroup: null
@@ -544,7 +544,7 @@ hdfs:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hadoop
-      tag: 4.1
+      tag: 4.2
     namenode:
       af***REMOVED***nity:
         podAntiAf***REMOVED***nity:
