@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metering-ansible-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: metering-ansible-operator
+subjects:
+- kind: ServiceAccount
+  name: metering-ansible-operator
+  namespace: placeholder
+
