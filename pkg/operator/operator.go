@@ -36,7 +36,7 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
@@ -113,7 +113,7 @@ type Config struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PrometheusQueryConfig                         cbTypes.PrometheusQueryConfig
+	PrometheusQueryConfig                         metering.PrometheusQueryConfig
 	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
 	PrometheusDataSourceMaxBackfillImportDuration time.Duration
 	PrometheusDataSourceGlobalImportFromTime      *time.Time
@@ -729,5 +729,5 @@ func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 }
 
 type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportQueryInputDefinition, inputVals []cbTypes.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
+	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }
