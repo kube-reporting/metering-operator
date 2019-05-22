@@ -19,6 +19,10 @@ docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golan
 docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:latest'
 docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:latest' openshift/ose-base:latest
 
+# openshift cli
+docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-cli:latest'
+docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-cli:latest' openshift/ose-cli:latest
+
 # helm is pulled for building metering-operator
 if [ "$PULL_OSE_METERING_HELM" == "true" ]; then
     docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-metering-helm:latest'
