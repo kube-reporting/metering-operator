@@ -2,8 +2,11 @@ package operator
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -16,6 +19,7 @@ import (
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	hive "github.com/taozle/go-hive-driver"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -37,7 +41,6 @@ import (
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
@@ -97,6 +100,9 @@ type Con***REMOVED***g struct {
 	PprofListen   string
 
 	HiveHost   string
+	HiveUseTLS bool
+	HiveCAFile string
+
 	PrestoHost string
 
 	PrestoMaxQueryLength int
@@ -393,11 +399,37 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Infof("setting up DB clients")
-	hiveQueryer := hive.NewReconnectingQueryer(ctx, op.logger, op.cfg.HiveHost, connBackoff, maxConnRetries)
+	var dialer hive.Dialer
+	if op.cfg.HiveUseTLS {
+		cert, err := ioutil.ReadFile(op.cfg.HiveCAFile)
+		if err != nil {
+			return err
+		}
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(cert)
+		dialer = hive.TLSDialer{
+			Con***REMOVED***g: &tls.Con***REMOVED***g{
+				RootCAs: certPool,
+			},
+		}
+	} ***REMOVED*** {
+		dialer = hive.DialWrapper{}
+	}
+	hiveDB, err := hive.NewConnectorWithDialer(dialer, fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
+	if err != nil {
+		return err
+	}
+
+	hiveQueryer := sql.OpenDB(hiveDB)
+	if err != nil {
+		return err
+	}
+	hiveQueryer.SetConnMaxLifetime(time.Minute)
+	hiveQueryer.SetMaxOpenConns(2)
+	hiveQueryer.SetMaxIdleConns(2)
 	defer hiveQueryer.Close()
 
-	connStr := fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost)
-	prestoQueryer, err := sql.Open("presto", connStr)
+	prestoQueryer, err := sql.Open("presto", fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost))
 	if err != nil {
 		return err
 	}
@@ -423,7 +455,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	loggingDMLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDMLQueries)
 	loggingDDLPrestoQueryer := db.NewLoggingQueryer(prestoQueryer, op.logger, op.cfg.LogDDLQueries)
-	loggingDDLHiveQueryer := db.NewLoggingQueryer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
+	loggingDDLHiveQueryer := db.NewLoggingExecer(hiveQueryer, op.logger, op.cfg.LogDDLQueries)
 
 	op.reportResultsRepo = prestostore.NewReportResultsRepo(loggingDMLPrestoQueryer)
 	op.reportGenerator = reporting.NewReportGenerator(op.logger, op.reportResultsRepo)

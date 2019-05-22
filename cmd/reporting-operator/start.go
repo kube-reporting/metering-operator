@@ -74,6 +74,9 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the pprof debug info")
 
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
+	startCmd.Flags().BoolVar(&cfg.HiveUseTLS, "hive-use-tls", false, "If true, enables TLS when connecting to Hive")
+	startCmd.Flags().StringVar(&cfg.HiveCAFile, "hive-ca-***REMOVED***le", "", "The path to the certi***REMOVED***cate authority to use to connect to Hive. If empty, defaults to system CAs")
+
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto")
 	startCmd.Flags().StringVar(&cfg.PrometheusCon***REMOVED***g.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
 	startCmd.Flags().BoolVar(&cfg.PrometheusCon***REMOVED***g.SkipTLSVerify, "prometheus-skip-tls-verify", false, "Skip TLS veri***REMOVED***cation")
