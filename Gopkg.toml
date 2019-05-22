@@ -59,14 +59,19 @@ required = [
   branch = "master"
   name = "github.com/prestodb/presto-go-client"
 
-[[constraint]]
-  name = "github.com/go-chi/chi"
-  version = "3.3.2"
+[[override]]
+  name = "github.com/taozle/go-hive-driver"
+  branch = "custom_dialer"
+  source = "github.com/chancez/go-hive-driver"
 
-[[constraint]]
+[[override]]
   name = "git.apache.org/thrift.git"
   source = "github.com/apache/thrift"
   version = "0.11.0"
+
+[[constraint]]
+  name = "github.com/go-chi/chi"
+  version = "3.3.2"
 
 [[constraint]]
   name = "github.com/spf13/pflag"

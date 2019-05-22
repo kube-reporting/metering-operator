@@ -25,27 +25,27 @@ type HivePartitionManager interface {
 }
 
 type HiveManager struct {
-	queryer db.Queryer
+	execer db.Execer
 }
 
-func NewHiveManager(queryer db.Queryer) *HiveManager {
-	return &HiveManager{queryer: queryer}
+func NewHiveManager(execer db.Execer) *HiveManager {
+	return &HiveManager{execer: execer}
 }
 
 func (m *HiveManager) CreateTable(params hive.TableParameters, ignoreExists bool) error {
-	return hive.ExecuteCreateTable(m.queryer, params, ignoreExists)
+	return hive.ExecuteCreateTable(m.execer, params, ignoreExists)
 }
 
 func (m *HiveManager) DropTable(dbName, tableName string, ignoreNotExists bool) error {
-	return hive.ExecuteDropTable(m.queryer, dbName, tableName, ignoreNotExists)
+	return hive.ExecuteDropTable(m.execer, dbName, tableName, ignoreNotExists)
 }
 
 func (m *HiveManager) CreateDatabase(params hive.DatabaseParameters) error {
-	return hive.ExecuteCreateDatabase(m.queryer, params)
+	return hive.ExecuteCreateDatabase(m.execer, params)
 }
 
 func (m *HiveManager) DropDatabase(dbName string, ignoreNotExists, cascade bool) error {
-	return hive.ExecuteDropDatabase(m.queryer, dbName, ignoreNotExists, cascade)
+	return hive.ExecuteDropDatabase(m.execer, dbName, ignoreNotExists, cascade)
 }
 
 func (m *HiveManager) AddPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
@@ -54,13 +54,13 @@ func (m *HiveManager) AddPartition(tableName string, partitionColumns []hive.Col
 	if partition.Location != "" {
 		locationStr = "LOCATION " + partition.Location
 	}
-	_, err := m.queryer.Query(fmt.Sprintf("ALTER TABLE %s ADD IF NOT EXISTS PARTITION (%s) %s", tableName, partitionSpecStr, locationStr))
+	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s ADD IF NOT EXISTS PARTITION (%s) %s", tableName, partitionSpecStr, locationStr))
 	return err
 }
 
 func (m *HiveManager) DropPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
 	partitionSpecStr := FmtPartitionSpec(partitionColumns, partition.PartitionSpec)
-	_, err := m.queryer.Query(fmt.Sprintf("ALTER TABLE %s DROP IF EXISTS PARTITION (%s)", tableName, partitionSpecStr))
+	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s DROP IF EXISTS PARTITION (%s)", tableName, partitionSpecStr))
 	return err
 }
 

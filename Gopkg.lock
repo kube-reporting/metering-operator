@@ -88,6 +88,14 @@
   version = "v1.1.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:a957ea8aac9dca83f9b2f4a0dc7d84ad373a5e481e7684df0d5c31c5a3b3b99b"
+  name = "github.com/emersion/go-sasl"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "7e096a0a6197b89989e8cc31016daa67c8c62051"
+
+[[projects]]
   digest = "1:32598368f409bbee79deb9d43569fcd92b9fb27f39155f5e166b3371217f051f"
   name = "github.com/evanphx/json-patch"
   packages = ["."]
@@ -400,6 +408,18 @@
   pruneopts = "NUT"
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
+
+[[projects]]
+  branch = "custom_dialer"
+  digest = "1:ca27008dc1f7a01c905dfb0a490fd162aa133ac4ad746e4bcc30b8f34698fc66"
+  name = "github.com/taozle/go-hive-driver"
+  packages = [
+    ".",
+    "thriftlib",
+  ]
+  pruneopts = "NUT"
+  revision = "b3c680b33c4fb2fa11c32f8642978d07a5379a9c"
+  source = "github.com/chancez/go-hive-driver"
 
 [[projects]]
   branch = "master"
@@ -779,7 +799,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "git.apache.org/thrift.git/lib/go/thrift",
     "github.com/Masterminds/sprig",
     "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/session",
@@ -803,6 +822,7 @@
     "github.com/spf13/pflag",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
+    "github.com/taozle/go-hive-driver",
     "golang.org/x/sync/errgroup",
     "golang.org/x/sync/singleflight",
     "k8s.io/api/core/v1",
@@ -817,6 +837,7 @@
     "k8s.io/apimachinery/pkg/util/clock",
     "k8s.io/apimachinery/pkg/util/net",
     "k8s.io/apimachinery/pkg/util/runtime",
+    "k8s.io/apimachinery/pkg/util/sets",
     "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/discovery",
@@ -834,6 +855,7 @@
     "k8s.io/client-go/tools/record",
     "k8s.io/client-go/transport",
     "k8s.io/client-go/util/flowcontrol",
+    "k8s.io/client-go/util/retry",
     "k8s.io/client-go/util/workqueue",
     "k8s.io/code-generator/cmd/client-gen",
     "k8s.io/code-generator/cmd/conversion-gen",
