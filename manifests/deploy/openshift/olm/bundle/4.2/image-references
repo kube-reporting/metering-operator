@@ -1,0 +1,26 @@
+# vi: ft=yaml
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+spec:
+  tags:
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-metering-helm-operator:4.2
+    name: metering-helm-operator
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-metering-reporting-operator:4.2
+    name: metering-reporting-operator
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-metering-presto:4.2
+    name: metering-presto
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-metering-hive:4.2
+    name: metering-hive
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-metering-hadoop:4.2
+    name: metering-hadoop
+
