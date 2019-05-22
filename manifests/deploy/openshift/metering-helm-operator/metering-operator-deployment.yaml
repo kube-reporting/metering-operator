@@ -20,7 +20,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: metering-operator
-        image: "quay.io/openshift/origin-metering-helm-operator:4.1"
+        image: "quay.io/openshift/origin-metering-helm-operator:4.2"
         args: ["run-operator.sh"]
         imagePullPolicy: Always
         env:
@@ -48,15 +48,15 @@ spec:
         - name: HELM_RECONCILE_INTERVAL_SECONDS
           value: "30"
         - name: METERING_HELM_OPERATOR
-          value: "quay.io/openshift/origin-metering-helm-operator:4.1"
+          value: "quay.io/openshift/origin-metering-helm-operator:4.2"
         - name: METERING_REPORTING_OPERATOR
-          value: "quay.io/openshift/origin-metering-reporting-operator:4.1"
+          value: "quay.io/openshift/origin-metering-reporting-operator:4.2"
         - name: METERING_PRESTO
-          value: "quay.io/openshift/origin-metering-presto:4.1"
+          value: "quay.io/openshift/origin-metering-presto:4.2"
         - name: METERING_HIVE
-          value: "quay.io/openshift/origin-metering-hive:4.1"
+          value: "quay.io/openshift/origin-metering-hive:4.2"
         - name: METERING_HADOOP
-          value: "quay.io/openshift/origin-metering-hadoop:4.1"
+          value: "quay.io/openshift/origin-metering-hadoop:4.2"
         resources:
           limits:
             cpu: 500m
