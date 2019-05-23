@@ -32,7 +32,7 @@ The `/api/v2/reports/{namespace}/{name}/full` endpoint returns reports in either
 This URL `/api/v2/reports/openshift-metering/namespace-cpu-request/full?format=json` returns
 
 ```
- {"results":[{"values":[{"name":"data_start","value":"2019-08-13T20:35:00Z","tableHidden":false,"unit":"date"},{"name":"data_end","value":"2019-08-13T23:58:00Z","tableHidden":false,"unit":"date"},{"name":"pod_request_cpu_core_seconds","value":2412,"tableHidden":false,"unit":"cpu_core_seconds"},{"name":"period_start","value":"2019-01-01T00:00:00Z","tableHidden":false,"unit":"date"},{"name":"period_end","value":"2019-12-30T23:59:59Z","tableHidden":false,"unit":"date"},{"name":"namespace","value":"default","tableHidden":false,"unit":"kubernetes_namespace"}]},
+ {"results":[{"values":[{"name":"pod_request_cpu_core_seconds","value":2412,"tableHidden":false,"unit":"cpu_core_seconds"},{"name":"period_start","value":"2019-01-01T00:00:00Z","tableHidden":false,"unit":"date"},{"name":"period_end","value":"2019-12-30T23:59:59Z","tableHidden":false,"unit":"date"},{"name":"namespace","value":"default","tableHidden":false,"unit":"kubernetes_namespace"}]},
  ```
 
 ### V2 Reports Table
@@ -42,5 +42,5 @@ This URL `/api/v2/reports/openshift-metering/namespace-cpu-request/full?format=j
  This URL  `/api/v2/reports/openshift-metering/namespace-cpu-request/table?format=json` returns
 
 ```
- {"results":[{"values":[{"name":"period_start","value":"2019-01-01T00:00:00Z","tableHidden":false,"unit":"date"},{"name":"period_end","value":"2019-12-30T23:59:59Z","tableHidden":false,"unit":"date"},{"name":"namespace","value":"default","tableHidden":false,"unit":"kubernetes_namespace"},{"name":"data_start","value":"2019-08-13T20:35:00Z","tableHidden":false,"unit":"date"},{"name":"data_end","value":"2019-08-13T23:58:00Z","tableHidden":false,"unit":"date"},{"name":"pod_request_cpu_core_seconds","value":2412,"tableHidden":false,"unit":"cpu_core_seconds"}]},
+ {"results":[{"values":[{"name":"period_start","value":"2019-01-01T00:00:00Z","tableHidden":false,"unit":"date"},{"name":"period_end","value":"2019-12-30T23:59:59Z","tableHidden":false,"unit":"date"},{"name":"namespace","value":"default","tableHidden":false,"unit":"kubernetes_namespace"},{"name":"pod_request_cpu_core_seconds","value":2412,"tableHidden":false,"unit":"cpu_core_seconds"}]},
  ```
