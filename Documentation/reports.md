@@ -117,39 +117,31 @@ ReportQueries with the `-raw` suffix are used by other ReportQueries to build mo
 
 The `aws-ec2-billing-data` report is used by other queries, and should not be used as a standalone report. The `aws-ec2-cluster-cost` report provides a total cost based on the nodes included in the cluster, and the sum of their costs for the time period being reported on.
 
-For a complete list of fields each report query produces, use `kubectl` to get the object as JSON, and check the `columns` field:
+For a complete list of fields each report query produces, use `kubectl` to get the object as YAML, and check the `columns` field:
 
 ```
-kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o json
+kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o yaml
 
-{
-    "apiVersion": "metering.openshift.io/v1alpha1",
-    "kind": "ReportQuery",
-    "metadata": {
-        "name": "namespace-memory-request",
-        "namespace": "metering"
-    },
-    "spec": {
-        "columns": [
-            {
-                "name": "namespace",
-                "type": "varchar"
-            },
-            {
-                "name": "data_start",
-                "type": "timestamp"
-            },
-            {
-                "name": "data_end",
-                "type": "timestamp"
-            },
-            {
-                "name": "pod_request_memory_byte_seconds",
-                "type": "double"
-            }
-        ]
-    }
-}
+apiVersion: metering.openshift.io/v1alpha1
+kind: ReportQuery
+metadata:
+  name: namespace-memory-request
+  labels:
+    operator-metering: "true"
+spec:
+  columns:
+  - name: period_start
+    type: timestamp
+    unit: date
+  - name: period_end
+    type: timestamp
+    unit: date
+  - name: namespace
+    type: varchar
+    unit: kubernetes_namespace
+  - name: pod_request_memory_byte_seconds
+    type: double
+    unit: byte_seconds
 ```
 
 ## schedule
@@ -289,14 +281,15 @@ spec:
     type: time
   - name: NamespaceCPUUsageReportName
     type: Report
+  - name: PodCpuUsageRawDataSourceName
+    type: ReportDataSource
+    default: pod-cpu-usage-raw
 ...
 
   query: |
 ...
     {|- if .Report.Inputs.NamespaceCPUUsageReportName |}
       namespace,
-      min("period_start") as data_start,
-      max("period_end") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| .Report.Inputs.NamespaceCPUUsageReportName | reportTableName |}
 ...
