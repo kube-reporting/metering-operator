@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: presto-worker
   labels:
@@ -7,6 +7,7 @@ metadata:
     presto: worker
 spec:
   replicas: {{ .Values.presto.spec.presto.worker.replicas }}
+  serviceName: presto-nodes
   selector:
     matchLabels:
       app: presto
