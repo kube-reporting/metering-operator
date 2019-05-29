@@ -32,3 +32,21 @@ spec:
     targetPort: metrics
   selector:
     app: presto
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: presto-nodes
+  labels:
+    app: presto
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  clusterIP: None
+  selector:
+    app: presto
