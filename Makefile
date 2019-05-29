@@ -19,6 +19,14 @@ IMAGE_REPOSITORY = quay.io
 IMAGE_ORG = openshift
 DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
+GIT_REVISION = $(shell git rev-list --count HEAD)
+OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION = 4.2.0
+OLM_PACKAGE_PRE_RELEASE_VERSION = $(GIT_REVISION)
+OLM_PACKAGE_BUILD_META = $(shell hack/date.sh +%s)
+
+OLM_PACKAGE_VERSION=$(OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION)-$(OLM_PACKAGE_PRE_RELEASE_VERSION)+$(OLM_PACKAGE_BUILD_META)
+OLM_PACKAGE_ORG = coreos
+
 METERING_SRC_IMAGE_REPO=$(DOCKER_BASE_URL)/metering-src
 METERING_SRC_IMAGE_TAG=latest
 
@@ -151,12 +159,15 @@ e2e-docker: metering-src-docker-build
 vet:
 	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
 
+push-olm-manifests: verify-olm-manifests
+	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering $(OLM_PACKAGE_VERSION)
+
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen verify-manifests fmt vet
+verify: verify-codegen verify-olm-manifests fmt vet
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
-verify-manifests: metering-manifests
+verify-olm-manifests: metering-manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
 
 verify-docker: metering-src-docker-build
