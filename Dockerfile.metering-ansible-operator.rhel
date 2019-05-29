@@ -16,6 +16,8 @@ COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=cli /usr/bin/oc /usr/bin/oc
 RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
+RUN yum -y update python-openshift
+
 USER 1001
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
