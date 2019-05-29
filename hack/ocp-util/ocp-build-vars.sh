@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DIR=$(dirname "${BASH_SOURCE}")/
-
+DIR="$(dirname "$0")"
 
 _readlink() {
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
