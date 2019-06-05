@@ -329,8 +329,8 @@ installPrestoResources() {
     helmTemplateAndApply templates/presto/presto-service.yaml presto-service true false
     helmTemplateAndApply templates/presto/presto-worker-config.yaml presto-worker-config true false
 
-    helmTemplateAndApply templates/presto/presto-coordinator-deployment.yaml presto-coordinator-deployment true false
-    helmTemplateAndApply templates/presto/presto-worker-deployment.yaml presto-worker-deployment true false
+    helmTemplateAndApply templates/presto/presto-coordinator-statefulset.yaml presto-coordinator-statefulset true false
+    helmTemplateAndApply templates/presto/presto-worker-statefulset.yaml presto-worker-statefulset true false
 }
 
 installReportingOperatorResources() {

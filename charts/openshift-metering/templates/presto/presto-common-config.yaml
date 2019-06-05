@@ -3,6 +3,17 @@ kind: ConfigMap
 metadata:
   name: presto-common-config
 data:
+  initialize_presto.sh: |
+    #!/bin/bash
+    set -e
+
+{{- if .Values.presto.spec.presto.config.tls.enabled }}
+    openssl pkcs12 -export -inkey $PRESTO_KEYFILE -in $PRESTO_CRTFILE -out $PRESTO_KEYSTORE_PKCS12 -password pass:$PRESTO_KEYSTORE_PASSWORD
+    keytool -importkeystore -noprompt -srckeystore $PRESTO_KEYSTORE_PKCS12 -srcstoretype pkcs12 -destkeystore $PRESTO_KEYSTORE_JKS -storepass $PRESTO_KEYSTORE_PASSWORD -srcstorepass $PRESTO_KEYSTORE_PASSWORD
+{{- end }}
+
+    cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
+
   entrypoint.sh: |
     #!/bin/bash
     set -e

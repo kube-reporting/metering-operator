@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: presto-coordinator
+  name: presto-worker
   labels:
     app: presto
-    presto: coordinator
+    presto: worker
 spec:
-  replicas: 1
+  replicas: {{ .Values.presto.spec.presto.worker.replicas }}
   serviceName: presto-nodes
   selector:
     matchLabels:
       app: presto
-      presto: coordinator
+      presto: worker
 {{- if .Values.presto.spec.presto.labels }}
 {{ toYaml .Values.presto.spec.presto.labels | indent 6 }}
 {{- end }}
@@ -19,12 +19,12 @@ spec:
     metadata:
       labels:
         app: presto
-        presto: coordinator
+        presto: worker
 {{- if .Values.presto.spec.presto.labels }}
 {{ toYaml .Values.presto.spec.presto.labels | indent 8 }}
 {{- end }}
       annotations:
-        presto-coordinator-config-hash: {{ include (print $.Template.BasePath "/presto/presto-coordinator-config.yaml") . | sha256sum }}
+        presto-worker-config-hash: {{ include (print $.Template.BasePath "/presto/presto-worker-config.yaml") . | sha256sum }}
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
         presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
         presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
@@ -36,38 +36,57 @@ spec:
       securityContext:
 {{ toYaml .Values.presto.spec.presto.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.affinity }}
+{{- if .Values.presto.spec.presto.worker.affinity }}
       affinity:
-{{ toYaml .Values.presto.spec.presto.coordinator.affinity | indent 8 }}
+{{ toYaml .Values.presto.spec.presto.worker.affinity | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.nodeSelector }}
+{{- if .Values.presto.spec.presto.worker.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.presto.spec.presto.coordinator.nodeSelector | indent 8 }}
+{{ toYaml .Values.presto.spec.presto.worker.nodeSelector | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.tolerations }}
+{{- if .Values.presto.spec.presto.worker.tolerations }}
       tolerations:
-{{ toYaml .Values.presto.spec.presto.coordinator.tolerations | indent 8 }}
+{{ toYaml .Values.presto.spec.presto.worker.tolerations | indent 8 }}
 {{- end }}
       initContainers:
       - name: copy-presto-config
         image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
         imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
-        command: ['bash', '-c']
+        command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted configuration data into the presto-etc emptyDir volume so we can write to the config files
-        args: ['cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/']
         env:
+{{- if .Values.presto.spec.presto.config.tls.enabled }}
+        - name: PRESTO_KEYFILE
+          value: /presto/tls.key
+        - name: PRESTO_CRTFILE
+          value: /presto/tls.crt
+        - name: PRESTO_KEYSTORE_PKCS12
+          value: /opt/presto/tls/keystore.pkcs12
+        - name: PRESTO_KEYSTORE_JKS
+          value: /opt/presto/tls/keystore.jks
+        - name: PRESTO_KEYSTORE_PASSWORD
+          value: password
+{{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
-        - name: presto-coordinator-config
+        - name: presto-worker-config
           mountPath: /presto-etc
         - name: presto-catalog-config
           mountPath: /presto-etc/catalog
         - name: presto-data
           mountPath: /var/presto/data
+        - name: presto-common-config
+          mountPath: /presto-common
+{{- if .Values.presto.spec.presto.config.tls.enabled }}
+        - name: presto-tls
+          mountPath: /opt/presto/tls
+        - name: presto-pem-files
+          mountPath: /presto
+{{- end }}
         resources:
-{{ toYaml .Values.presto.spec.presto.coordinator.resources | indent 10 }}
+{{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
       containers:
       - name: presto
         image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
@@ -76,7 +95,7 @@ spec:
         args: ['/opt/presto/presto-server/bin/launcher', 'run']
         env:
         - name: JAVA_MAX_MEM_RATIO
-          value: "{{ .Values.presto.spec.presto.coordinator.config.jvm.percentMemoryLimitAsHeap }}"
+          value: "{{ .Values.presto.spec.presto.worker.config.jvm.percentMemoryLimitAsHeap }}"
 {{- include "presto-common-env" . | indent 8 }}
         ports:
         - name: http
@@ -96,16 +115,20 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
+{{- if .Values.presto.spec.presto.config.tls.enabled }}
+        - name: presto-tls
+          mountPath: /opt/presto/tls
+{{- end }}
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.presto.spec.config.sharedVolume.mountPath }}
 {{- end }}
         resources:
-{{ toYaml .Values.presto.spec.presto.coordinator.resources | indent 10 }}
+{{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
       volumes:
-      - name: presto-coordinator-config
+      - name: presto-worker-config
         configMap:
-          name: presto-coordinator-config
+          name: presto-worker-config
       - name: presto-common-config
         configMap:
           name: presto-common-config
@@ -122,6 +145,13 @@ spec:
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
+{{- if .Values.presto.spec.presto.config.tls.enabled }}
+      - name: presto-tls
+        emptyDir: {}
+      - name: presto-pem-files
+        secret:
+          secretName: {{ .Values.presto.spec.presto.config.tls.secretName }}
+{{- end }}
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
@@ -134,4 +164,4 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.presto.spec.imagePullSecrets | indent 8 }}
 {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.presto.spec.presto.coordinator.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.presto.spec.presto.worker.terminationGracePeriodSeconds }}

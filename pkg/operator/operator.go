@@ -9,11 +9,13 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/prestodb/presto-go-client/presto"
 	_ "github.com/prestodb/presto-go-client/presto"
 	promapi "github.com/prometheus/client_golang/api"
 	prom "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -36,7 +38,7 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
@@ -103,7 +105,9 @@ type Config struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost string
+	PrestoHost   string
+	PrestoUseTLS bool
+	PrestoCAFile string
 
 	PrestoMaxQueryLength int
 
@@ -113,7 +117,7 @@ type Config struct {
 	LogDMLQueries bool
 	LogDDLQueries bool
 
-	PrometheusQueryConfig                         cbTypes.PrometheusQueryConfig
+	PrometheusQueryConfig                         metering.PrometheusQueryConfig
 	PrometheusDataSourceMaxQueryRangeDuration     time.Duration
 	PrometheusDataSourceMaxBackfillImportDuration time.Duration
 	PrometheusDataSourceGlobalImportFromTime      *time.Time
@@ -429,7 +433,41 @@ func (op *Reporting) Run(ctx context.Context) error {
 	hiveQueryer.SetMaxIdleConns(2)
 	defer hiveQueryer.Close()
 
-	prestoQueryer, err := sql.Open("presto", fmt.Sprintf("http://%s@%s?catalog=hive&schema=default", prestoUsername, op.cfg.PrestoHost))
+	// start building up the presto query endpoint, default value is http
+	prestoURL, err := url.Parse(fmt.Sprintf("http://%s@%s?", prestoUsername, op.cfg.PrestoHost))
+	if err != nil {
+		return err
+	}
+
+	val := prestoURL.Query()
+	val.Set("catalog", "hive")
+	val.Set("schema", "default")
+
+	// check if the PrestoUseTLS flag is set to true
+	if op.cfg.PrestoUseTLS {
+		cert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
+		if err != nil {
+			return fmt.Errorf("presto: Error loading SSL Cert File: %v", err)
+		}
+		certPool := x509.NewCertPool()
+		certPool.AppendCertsFromPEM(cert)
+
+		// build up the http client structure to use the provided CA cert
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: certPool,
+				},
+			},
+		}
+
+		prestoURL.Scheme = "https"
+		val.Set("custom_client", "httpClient")
+		presto.RegisterCustomClient("httpClient", httpClient)
+	}
+
+	prestoURL.RawQuery = val.Encode()
+	prestoQueryer, err := sql.Open("presto", prestoURL.String())
 	if err != nil {
 		return err
 	}
@@ -729,5 +767,5 @@ func (op *Reporting) newPrometheusConn(promConfig promapi.Config) (prom.API, err
 }
 
 type DependencyResolver interface {
-	ResolveDependencies(namespace string, inputDefs []cbTypes.ReportQueryInputDefinition, inputVals []cbTypes.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
+	ResolveDependencies(namespace string, inputDefs []metering.ReportQueryInputDefinition, inputVals []metering.ReportQueryInputValue) (*reporting.DependencyResolutionResult, error)
 }
