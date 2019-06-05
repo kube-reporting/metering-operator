@@ -39,7 +39,7 @@
         prune_label_value: reporting-operator-rbac
       - template_***REMOVED***le: templates/reporting-operator/reporting-operator-cluster-monitoring-view-rbac.yaml
         apis: [ {kind: clusterrole, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: clusterrolebinding, api_version: 'rbac.authorization.k8s.io/v1'} ]
-        prune_label_value: "{{ meta.namespace }}-reporting-operator-cluster-monitoring-view-rbac"
+        prune_label_value: "{{ meta.namespace }}-cluster-monitoring-view-rbac"
         create: "{{ meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac }}"
       - template_***REMOVED***le: templates/reporting-operator/reporting-operator-con***REMOVED***g.yaml
         apis: [ {kind: con***REMOVED***g} ]
