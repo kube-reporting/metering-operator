@@ -142,7 +142,7 @@ When a `Report` is created, and it sees the creation event, it does the followin
 [hive-overview]: https://cwiki.apache.org/confluence/display/Hive/Home#Home-ApacheHive
 [presto-connector]: https://prestosql.io/docs/current/overview/concepts.html#connector
 [AWS-billing]: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html
-[metering-aws-billing-conf]: metering-con***REMOVED***g.md#aws-billing-correlation
+[metering-aws-billing-conf]: con***REMOVED***guring-aws-billing.md
 [storagelocations]: storagelocations.md
 [reportdatasources]: reportdatasources.md
 [reportqueries]: reportqueries.md
