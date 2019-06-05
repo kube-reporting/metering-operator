@@ -5,7 +5,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
 {{- /* Prefix the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+  name: {{ .Release.Namespace }}-cluster-monitoring-view
   labels:
     app: reporting-operator
 rules:
@@ -24,13 +24,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
 {{- /* Prefix the namespace to the name of the ClusterRole since there could be multiple copies of this being installed */}}
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+  name: {{ .Release.Namespace }}-cluster-monitoring-view
   labels:
     app: reporting-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ .Release.Namespace }}-reporting-operator-cluster-monitoring-view
+  name: {{ .Release.Namespace }}-cluster-monitoring-view
 subjects:
 - kind: ServiceAccount
   name: reporting-operator
