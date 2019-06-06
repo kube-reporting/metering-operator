@@ -31,8 +31,8 @@ kind: Report
 metadata:
   name: namespace-cpu-request
 spec:
-  reportingStart: '2018-01-01T00:00:00Z'
-  reportingEnd: '2018-12-30T23:59:59Z'
+  reportingStart: '2019-01-01T00:00:00Z'
+  reportingEnd: '2019-12-30T23:59:59Z'
   query: "namespace-cpu-request"
   runImmediately: true
 ```

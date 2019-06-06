@@ -67,7 +67,7 @@ Querying for Deployment metering-operator
 No values, using default values
 Running helm upgrade for release operator-metering
 Release "operator-metering" has been upgraded. Happy Helming!
-LAST DEPLOYED: Fri Jan 26 19:18:34 2018
+LAST DEPLOYED: Fri Jan 26 19:18:34 2019
 NAMESPACE: metering
 STATUS: DEPLOYED
 
