@@ -22,7 +22,7 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   query: "pod-cpu-request"
-  reportingStart: "2018-07-01T00:00:00Z"
+  reportingStart: "2019-07-01T00:00:00Z"
   schedule:
     period: "hourly"
     hourly:
@@ -42,8 +42,8 @@ metadata:
   name: pod-cpu-request-hourly
 spec:
   query: "pod-cpu-request"
-  reportingStart: "2018-07-01T00:00:00Z"
-  reportingEnd: "2018-07-31T00:00:00Z"
+  reportingStart: "2019-07-01T00:00:00Z"
+  reportingEnd: "2019-07-31T00:00:00Z"
 ```
 
 ### query
@@ -212,7 +212,7 @@ One important thing to understand is that this will result in the reporting-oper
 This could be thousands of queries if the period is less than daily and the `reportingStart` is more than a few months back.
 If `reportingStart` is left unset, the Report will run at the next full reportingPeriod after the time the report is created.
 
-As an example of how to use this ***REMOVED***eld, if you had data already collected dating back to January 1st, 2018 which you wanted to be included in your Report, you could create a report with the following values:
+As an example of how to use this ***REMOVED***eld, if you had data already collected dating back to January 1st, 2019 which you wanted to be included in your Report, you could create a report with the following values:
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
@@ -223,7 +223,7 @@ spec:
   query: "pod-cpu-request"
   schedule:
     period: "hourly"
-  reportingStart: "2018-01-01T00:00:00Z"
+  reportingStart: "2019-01-01T00:00:00Z"
 ```
 
 
@@ -245,8 +245,8 @@ spec:
   query: "pod-cpu-request"
   schedule:
     period: "weekly"
-  reportingStart: "2018-07-01T00:00:00Z"
-  reportingEnd: "2018-07-31T00:00:00Z"
+  reportingStart: "2019-07-01T00:00:00Z"
+  reportingEnd: "2019-07-31T00:00:00Z"
 ```
 
 ### runImmediately

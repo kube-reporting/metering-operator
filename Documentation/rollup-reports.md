@@ -16,7 +16,7 @@ metadata:
   name: namespace-cpu-usage-hourly
 spec:
   query: "namespace-cpu-usage"
-  reportingStart: '2018-10-09T00:00:00Z'
+  reportingStart: '2019-10-09T00:00:00Z'
   schedule:
     period: "hourly"
 ```
@@ -108,7 +108,7 @@ spec:
   inputs:
   - name: "NamespaceCPUUsageReportName"
     value: "namespace-cpu-usage-hourly"
-  reportingStart: '2018-10-09T00:00:00Z'
+  reportingStart: '2019-10-09T00:00:00Z'
   schedule:
     period: "daily"
 ```
