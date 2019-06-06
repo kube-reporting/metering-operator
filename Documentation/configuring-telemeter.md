@@ -27,7 +27,7 @@ A complete Metering con***REMOVED***guration resource with options set for conne
 ```yaml
 # metering-telemeter.yaml
 apiVersion: metering.openshift.io/v1alpha1
-kind: Metering
+kind: MeteringCon***REMOVED***g
 metadata:
   name: operator-metering
 spec:

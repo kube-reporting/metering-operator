@@ -1,13 +1,14 @@
 ---
 
-- name: Extract MeteringCon***REMOVED***g spec
-  copy: content="{{ _metering_openshift_io_meteringcon***REMOVED***g.spec }}" dest=/tmp/metering-values.yaml
+- name: Print meteringcon***REMOVED***g values
+  debug:
+    msg: "{{ item }}: {{ lookup('vars', item) }}"
+  loop: "{{ vars | dict2items | to_json | from_json | json_query(query) | difference(***REMOVED***ltered_vars) }}"
+  vars:
+    ***REMOVED***ltered_vars:
+      - meteringcon***REMOVED***g_default_values
+      - meteringcon***REMOVED***g_spec
+      - meteringcon***REMOVED***g_spec_with_defaults
+    query: "[?starts_with(@.key, `meteringcon***REMOVED***g_`)].key"
 
-- name: Install Metering
-  shell: |
-    /opt/ansible/scripts/deploy-resources.sh -f /tmp/metering-values.yaml {{ meta.name }} {{ lookup('env','HELM_CHART_PATH') }} {{ meta.namespace }} metering.openshift.io meteringcon***REMOVED***g {{ meta.name }} {{ _metering_openshift_io_meteringcon***REMOVED***g.metadata.uid }} metering.openshift.io/prune false 2>&1 | tee /tmp/deploy-resources.txt
-  register: install_result
-
-- debug: msg="{{item}}"
-  with_items: "{{install_result.stdout_lines}}"
-  when: install_result.stdout_lines
+- include_tasks: reconcile.yml

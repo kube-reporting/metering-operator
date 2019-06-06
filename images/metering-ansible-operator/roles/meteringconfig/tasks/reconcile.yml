@@ -1,0 +1,13 @@
+---
+
+- name: Store MeteringCon***REMOVED***g spec into values ***REMOVED***le
+  copy: content="{{ meteringcon***REMOVED***g_spec }}" dest=/tmp/metering-values.yaml
+
+- include_tasks: "{{ item }}"
+  loop:
+    - reconcile_monitoring.yml
+    - reconcile_hdfs.yml
+    - reconcile_hive.yml
+    - reconcile_presto.yml
+    - reconcile_reporting_operator.yml
+    - reconcile_reporting.yml

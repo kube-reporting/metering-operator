@@ -10,8 +10,8 @@ trap "rm -rf $TMPDIR" EXIT
 export METERING_OPERATOR_IMAGE_REPO="${METERING_OPERATOR_IMAGE_REPO:?}"
 export METERING_OPERATOR_IMAGE_TAG="${METERING_OPERATOR_IMAGE_TAG:?}"
 
-export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-helm-operator-values.yaml"
-"$ROOT_DIR/hack/render-helm-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
+export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES="$TMPDIR/override-ansible-operator-values.yaml"
+"$ROOT_DIR/hack/render-ansible-operator-override-values.sh" > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
 
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$INSTALLER_MANIFESTS_DIR" \

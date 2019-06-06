@@ -1,19 +1,14 @@
 operator:
   name: metering-operator
 
-  chartPath: "/openshift-metering"
   reconcileIntervalSeconds: 30
-  allNamespaces: false
-  targetNamespaces: []
+  targetNamespace: ""
+  useTargetNamespacesDownwardAPIValueFrom: false
   labels: {}
   annotations: {}
 
-  targetNamespacesDownwardAPIValueFrom:
-    ***REMOVED***eldRef:
-      ***REMOVED***eldPath: "metadata.annotations['olm.targetNamespaces']"
-
   image:
-    repository: quay.io/openshift/origin-metering-helm-operator
+    repository: quay.io/openshift/origin-metering-ansible-operator
     tag: 4.2
     pullPolicy: Always
 
@@ -22,11 +17,11 @@ operator:
   serviceAccountName: metering-operator
   resources:
     requests:
-      memory: "200Mi"
-      cpu: "200m"
+      memory: "400Mi"
+      cpu: "750m"
     limits:
-      memory: "300Mi"
-      cpu: "500m"
+      memory: "500Mi"
+      cpu: "1500m"
 
   rbac:
     clusterRoleName: metering-operator
@@ -38,6 +33,7 @@ operator:
       - namespaces
       verbs:
       - get
+      - list
     # used by openshift auth-proxy
     - apiGroups:
       - authorization.k8s.io
@@ -125,6 +121,7 @@ operator:
       resources:
       - daemonsets
       - deployments
+      - deployments/***REMOVED***nalizers
       - deployments/rollback
       - deployments/scale
       - replicasets
@@ -167,10 +164,10 @@ olm:
     currentCSV: metering-operator.v4.2.0
 
   imageTags:
-  - name: metering-helm-operator
+  - name: metering-ansible-operator
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-helm-operator:4.2
+      name: quay.io/openshift/origin-metering-ansible-operator:4.2
   - name: metering-reporting-operator
     from:
       kind: DockerImage
@@ -253,9 +250,9 @@ olm:
     customresourcede***REMOVED***nitions:
       owned:
       - description: An instance of Metering with high-level con***REMOVED***guration
-        displayName: Metering
-        kind: Metering
-        name: meterings.metering.openshift.io
+        displayName: Metering Con***REMOVED***guration
+        kind: MeteringCon***REMOVED***g
+        name: meteringcon***REMOVED***gs.metering.openshift.io
         version: v1alpha1
       - description: A scheduled or on-off Metering Report summarizes data based on the
           query speci***REMOVED***ed.
@@ -299,14 +296,14 @@ olm:
       capabilities: Basic Install
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
-      containerImage: "quay.io/openshift/origin-metering-helm-operator:latest"
+      containerImage: "quay.io/openshift/origin-metering-ansible-operator:latest"
       description: 'Chargeback and reporting tool to provide accountability for how resources are used across a cluster'
       repository: https://github.com/operator-framework/operator-metering
       alm-examples: |-
         [
           {
             "apiVersion": "metering.openshift.io/v1alpha1",
-            "kind": "Metering",
+            "kind": "MeteringCon***REMOVED***g",
             "metadata": {
               "name": "operator-metering"
             },

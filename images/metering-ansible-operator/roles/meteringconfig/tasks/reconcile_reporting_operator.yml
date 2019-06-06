@@ -1,0 +1,63 @@
+---
+
+- name: Deploy reporting-operator resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_***REMOVED***le: /tmp/metering-values.yaml
+    resources:
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-auth-proxy-authenticated-emails-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: reporting-operator-auth-proxy-authenticated-emails-secret
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_authenticated_emails_secret }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-auth-proxy-cookie-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: reporting-operator-auth-proxy-cookie-secret
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_cookie_secret }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-auth-proxy-htpasswd-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: reporting-operator-auth-proxy-htpasswd-secret
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_htpasswd_secret }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-auth-proxy-rbac.yaml
+        apis: [ {kind: clusterrole, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: clusterrolebinding, api_version: 'rbac.authorization.k8s.io/v1'} ]
+        prune_label_value: "{{ meta.namespace }}-reporting-operator-auth-proxy-rbac"
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_rbac }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-prometheus-bearer-token-secrets.yaml
+        apis: [ {kind: secrets} ]
+        prune_label_value: reporting-operator-prometheus-bearer-token-secrets
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_prometheus_bearer_token }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-prometheus-certi***REMOVED***cate-authority-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***g} ]
+        prune_label_value: reporting-operator-prometheus-certi***REMOVED***cate-authority-con***REMOVED***g
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_prometheus_certi***REMOVED***cate_authority }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-aws-credentials-secrets.yaml
+        apis: [ {kind: secrets} ]
+        prune_label_value: reporting-operator-aws-credentials-secrets
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_aws_credentials }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-rbac.yaml
+        apis: [ {kind: role}, {kind: rolebinding} ]
+        prune_label_value: reporting-operator-rbac
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-cluster-monitoring-view-rbac.yaml
+        apis: [ {kind: clusterrole, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: clusterrolebinding, api_version: 'rbac.authorization.k8s.io/v1'} ]
+        prune_label_value: "{{ meta.namespace }}-cluster-monitoring-view-rbac"
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***g} ]
+        prune_label_value: reporting-operator-con***REMOVED***g
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-service.yaml
+        apis: [ {kind: service} ]
+        prune_label_value: reporting-operator-service
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-serviceaccount.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: reporting-operator-serviceaccount
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-tls-secrets.yaml
+        apis: [ {kind: secrets} ]
+        prune_label_value: reporting-operator-tls-secrets
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_tls_secrets }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-route.yaml
+        apis: [ {kind: route, api_version: 'route.openshift.io/v1'} ]
+        prune_label_value: reporting-operator-route
+        create: "{{ meteringcon***REMOVED***g_create_reporting_operator_route }}"
+      - template_***REMOVED***le: templates/reporting-operator/reporting-operator-deployment.yaml
+        apis: [ {kind: deployment} ]
+        prune_label_value: reporting-operator-deployment

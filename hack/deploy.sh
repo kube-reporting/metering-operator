@@ -83,7 +83,7 @@ elif [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
         echo 'waiting for metering-operator pods to be ready'
         sleep 5
     done
-    echo "metering helm-operator is ready"
+    echo "metering ansible-operator is ready"
 ***REMOVED***
 
 if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then

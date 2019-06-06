@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metering-operator
+  labels:
+    app: metering-operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: metering-operator
+  template:
+    metadata:
+      labels:
+        app: metering-operator
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: ansible
+        command:
+        - /opt/ansible/scripts/ansible-logs.sh
+        - /tmp/ansible-operator/runner
+        - stdout
+        image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /tmp/ansible-operator/runner
+          name: runner
+          readOnly: true
+      - name: operator
+        image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+        imagePullPolicy: Always
+        env:
+        - name: OPERATOR_NAME
+          value: "metering-ansible-operator"
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            ***REMOVED***eldRef:
+              ***REMOVED***eldPath: metadata.name
+        - name: METERING_ANSIBLE_OPERATOR_IMAGE
+          value: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+        - name: METERING_REPORTING_OPERATOR_IMAGE
+          value: "quay.io/openshift/origin-metering-reporting-operator:4.2"
+        - name: METERING_PRESTO_IMAGE
+          value: "quay.io/openshift/origin-metering-presto:4.2"
+        - name: METERING_HIVE_IMAGE
+          value: "quay.io/openshift/origin-metering-hive:4.2"
+        - name: METERING_HADOOP_IMAGE
+          value: "quay.io/openshift/origin-metering-hadoop:4.2"
+        volumeMounts:
+        - mountPath: /tmp/ansible-operator/runner
+          name: runner
+        resources:
+          limits:
+            cpu: 1500m
+            memory: 500Mi
+          requests:
+            cpu: 750m
+            memory: 400Mi
+
+      volumes:
+        - name: runner
+          emptyDir: {}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: metering-operator
+

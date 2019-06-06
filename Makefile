@@ -19,20 +19,24 @@ IMAGE_REPOSITORY = quay.io
 IMAGE_ORG = openshift
 DOCKER_BASE_URL = $(IMAGE_REPOSITORY)/$(IMAGE_ORG)
 
+GIT_REVISION = $(shell git rev-list --count HEAD)
+OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION = 4.2.0
+OLM_PACKAGE_PRE_RELEASE_VERSION = $(GIT_REVISION)
+OLM_PACKAGE_BUILD_META = $(shell hack/date.sh +%s)
+
+OLM_PACKAGE_VERSION=$(OLM_PACKAGE_MAJOR_MINOR_PATCH_VERSION)-$(OLM_PACKAGE_PRE_RELEASE_VERSION)+$(OLM_PACKAGE_BUILD_META)
+OLM_PACKAGE_ORG = coreos
+
 METERING_SRC_IMAGE_REPO=$(DOCKER_BASE_URL)/metering-src
 METERING_SRC_IMAGE_TAG=latest
 
 REPORTING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-reporting-operator
 REPORTING_OPERATOR_IMAGE_TAG=4.2
-METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-helm-operator
+METERING_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
 METERING_OPERATOR_IMAGE_TAG=4.2
-METERING_ANSIBLE_OPERATOR_IMAGE_REPO=$(DOCKER_BASE_URL)/origin-metering-ansible-operator
-METERING_ANSIBLE_OPERATOR_IMAGE_TAG=4.2
 
 REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
-METERING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-operator
 METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator
-
 
 ifeq ($(OCP_BUILD), true)
 	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_FILE):/etc/yum.repos.d/redhat.repo -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
@@ -69,7 +73,7 @@ endif
 
 all: fmt unit metering-manifests docker-build-all
 
-docker-build-all: reporting-operator-docker-build metering-operator-docker-build
+docker-build-all: reporting-operator-docker-build metering-ansible-operator-docker-build
 
 reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
 	$(DOCKER_BUILD_CMD) -f $< -t $(REPORTING_OPERATOR_IMAGE_REPO):$(REPORTING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
@@ -77,11 +81,8 @@ reporting-operator-docker-build: $(REPORTING_OPERATOR_DOCKERFILE)
 metering-src-docker-build: Docker***REMOVED***le.src
 	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) $(ROOT_DIR)
 
-metering-operator-docker-build: $(METERING_OPERATOR_DOCKERFILE)
-	docker build -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
-
 metering-ansible-operator-docker-build: $(METERING_ANSIBLE_OPERATOR_DOCKERFILE)
-	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_ANSIBLE_OPERATOR_IMAGE_REPO):$(METERING_ANSIBLE_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
+	$(DOCKER_BUILD_CMD) -f $< -t $(METERING_OPERATOR_IMAGE_REPO):$(METERING_OPERATOR_IMAGE_TAG) $(ROOT_DIR)
 
 # Runs gofmt on all ***REMOVED***les in project except vendored source
 fmt:
@@ -108,7 +109,7 @@ unit-docker: metering-src-docker-build
 integration:
 	hack/integration.sh
 
-integration-local: reporting-operator-local metering-operator-docker-build
+integration-local: reporting-operator-local metering-ansible-operator-docker-build
 	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
 
 integration-docker: metering-src-docker-build
@@ -133,7 +134,7 @@ integration-docker: metering-src-docker-build
 e2e:
 	hack/e2e.sh
 
-e2e-local: reporting-operator-local metering-operator-docker-build
+e2e-local: reporting-operator-local metering-ansible-operator-docker-build
 	$(MAKE) e2e DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
 
 e2e-docker: metering-src-docker-build
@@ -158,12 +159,15 @@ e2e-docker: metering-src-docker-build
 vet:
 	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
 
+push-olm-manifests: verify-olm-manifests
+	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering $(OLM_PACKAGE_VERSION)
+
 # validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen verify-manifests fmt vet
+verify: verify-codegen verify-olm-manifests fmt vet
 	@echo Checking for unstaged changes
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
 
-verify-manifests: metering-manifests
+verify-olm-manifests: metering-manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
 
 verify-docker: metering-src-docker-build
@@ -176,7 +180,7 @@ verify-docker: metering-src-docker-build
 		make verify
 
 .PHONY: run-metering-operator-local
-run-metering-operator-local: metering-operator-docker-build
+run-metering-operator-local: metering-ansible-operator-docker-build
 	./hack/run-metering-operator-local.sh
 
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
