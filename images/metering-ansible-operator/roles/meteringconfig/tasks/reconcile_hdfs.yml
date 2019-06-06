@@ -1,0 +1,24 @@
+---
+
+- name: Deploy hdfs resources
+  include_tasks: deploy_resources.yml
+  vars:
+    async_seconds: 120
+    values_file: /tmp/metering-values.yaml
+    resources:
+      - template_file: templates/hdfs/hdfs-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hdfs-configmap
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hdfs/hdfs-serviceaccount.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: hdfs-service-account
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hdfs/hdfs-datanode-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hdfs-datanode-statefulset
+        create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hdfs/hdfs-namenode-statefulset.yaml
+        apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
+        prune_label_value: hdfs-namenode-statefulset
+        create: "{{ meteringconfig_enable_hdfs }}"

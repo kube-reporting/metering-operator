@@ -55,6 +55,6 @@ spec:
       deployments:
         - name: {{ .Values.operator.name }}
           spec:
-{{ include "operator-deployment-spec" . | indent 12 }}
+{{ include "cluster-service-version-deployment-spec" . | indent 12 }}
   customresourcedefinitions:
 {{ toYaml .Values.olm.csv.customresourcedefinitions | indent 4 }}

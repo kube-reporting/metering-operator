@@ -16,15 +16,9 @@ else
     .
 end
 
-| if notEmpty($ENV.METERING_OPERATOR_ALL_NAMESPACES) then
-    # Update the env var ALL_NAMESPACES
-     updateDeploymentEnv(.; "ALL_NAMESPACES"; $ENV.METERING_OPERATOR_ALL_NAMESPACES)
-else
-    .
-end
 | if notEmpty($ENV.METERING_OPERATOR_TARGET_NAMESPACES) then
-    # Update the env var TARGET_NAMESPACES
-    updateDeploymentEnv(.; "TARGET_NAMESPACES"; $ENV.METERING_OPERATOR_TARGET_NAMESPACES)
+    # Update the env var WATCH_NAMESPACE
+    updateDeploymentEnv(.; "WATCH_NAMESPACE"; $ENV.METERING_OPERATOR_TARGET_NAMESPACES)
 else
     .
 end

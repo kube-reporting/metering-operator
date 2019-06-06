@@ -86,7 +86,12 @@ spec:
           mountPath: /presto
 {{- end }}
         resources:
-{{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
       containers:
       - name: presto
         image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"

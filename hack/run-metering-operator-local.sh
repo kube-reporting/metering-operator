@@ -5,12 +5,10 @@ source "${ROOT_DIR}/hack/common.sh"
 
 
 : "${METERING_OPERATOR_IMAGE:=${METERING_OPERATOR_IMAGE_REPO}:${METERING_OPERATOR_IMAGE_TAG}}"
-: "${METERING_CHART:=/openshift-metering}"
 : "${LOCAL_METERING_OPERATOR_RUN_INSTALL:=true}"
 : "${METERING_INSTALL_SCRIPT:=./hack/openshift-install.sh}"
 : "${METERING_OPERATOR_CONTAINER_NAME:=metering-operator}"
-: "${ENABLE_DEBUG:=false-operator}"
-: "${HELM_RECONCILE_INTERVAL_SECONDS:=30}"
+: "${ENABLE_DEBUG:=false}"
 
 set -ex
 
@@ -24,13 +22,10 @@ docker run \
     --rm \
     -u 0:0 \
     -v "$KUBECONFIG:/kubeconfig" \
+    -v /tmp/ansible-operator/runner \
     -e KUBECONFIG=/kubeconfig \
-    -e HELM_RELEASE_CRD_NAME="Metering" \
-    -e HELM_RELEASE_CRD_API_GROUP="metering.openshift.io" \
-    -e HELM_CHART_PATH="$METERING_CHART" \
-    -e MY_POD_NAME="local-pod" \
-    -e MY_POD_NAMESPACE="$METERING_NAMESPACE" \
-    -e HELM_RECONCILE_INTERVAL_SECONDS="$HELM_RECONCILE_INTERVAL_SECONDS" \
+    -e OPERATOR_NAME="metering-ansible-operator" \
+    -e POD_NAME="metering-ansible-operator" \
+    -e WATCH_NAMESPACE="$METERING_NAMESPACE" \
     -e ENABLE_DEBUG="$ENABLE_DEBUG" \
-    "${METERING_OPERATOR_IMAGE}" \
-    run-operator.sh
+    "${METERING_OPERATOR_IMAGE}"

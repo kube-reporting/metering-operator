@@ -1,0 +1,73 @@
+---
+
+- name: Helm template
+  shell: helm template {{ meteringconfig_chart_path }} --name {{ meta.name }} --namespace {{ meta.namespace}} -x {{ resource.template_file }} -f {{ values_file }}
+  loop: "{{ resources }}"
+  loop_control:
+    loop_var: resource
+    label: "{{ resource.template_file }}"
+  when: resource.create | default(true)
+  no_log: true
+  register: template_results
+
+- name: Add prune label to resources
+  vars:
+    # Index into the template_results.results array to get the result of
+    # the shell task above that corresponds to this resource
+    template_result: "{{ template_results.results[index] }}"
+    # Next we take the stdout returned by the shell command executing helm
+    # template, which contains the list of resources produced by the given
+    # template file.
+    # After that, use `from_yaml_all` to parse the yaml, and use `list` to
+    # put it into a list in case we got a single resource returned by helm
+    # template.
+    # We use difference to filter out null items in the list, since
+    # sometimes there are empty resources templated.
+    # Finally, once we have a list of resources, use map to run
+    # the combine function on each resource, which adds the prune label to
+    # each item in the list, storing the result in new_resources
+    new_resources: "{{ template_result.stdout | from_yaml_all | list | difference([None]) | map('combine', {'metadata':{'labels':{meteringconfig_prune_label_key: resource.prune_label_value}}}, recursive=True) | list }}"
+  set_fact:
+    # Create a new variable to contain the updated resources with prune
+    # labels, and append the updated resources to it each iteration of this
+    # loop.
+    updated_template_results: "{{ (updated_template_results | default([])) + [ new_resources ] }}"
+  loop: "{{ resources }}"
+  loop_control:
+    index_var: index
+    loop_var: resource
+    label: "{{ resource.template_file }}"
+  when: template_result.changed and resource is not none
+  no_log: true
+
+- name: Create resources
+  k8s:
+    state: present
+    namespace: "{{ meta.namespace }}"
+    definition: "{{ updated_template_results | flatten }}"
+    merge_type: ['merge', 'strategic-merge']
+  async: "{{ async_seconds | default(0) }}"
+  poll: 0
+  when: template_results.changed and resource is not none
+  register: create_resources_async_result
+
+- name: Wait for resources to finish deploying when deployed asynchronously
+  async_status:
+    jid: "{{ create_resources_async_result.ansible_job_id }}"
+  when: async_seconds != 0 and create_resources_async_result.changed
+  until: create_resources_job_result.finished
+  # delay is 1 second, so retry up to async_seconds, meaning, wait for all
+  # async tasks to complete within the time given to each
+  retries: "{{ async_seconds }}"
+  delay: 1
+  register: create_resources_job_result
+
+- name: Prune resources
+  include_tasks: prune_resources.yml
+  vars:
+    namespace: "{{ meta.namespace }}"
+  loop: "{{ resources }}"
+  loop_control:
+    loop_var: resource
+    label: "{{ resource.template_file }}"
+  when: not (resource.create | default(true))

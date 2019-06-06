@@ -1,5 +1,5 @@
 apiVersion: metering.openshift.io/v1alpha1
-kind: Metering
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:

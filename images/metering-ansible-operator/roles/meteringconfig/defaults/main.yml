@@ -1,2 +1,36 @@
 ---
-# defaults file for meteringconfig
+
+meteringconfig_chart_path: "{{ lookup('env','HELM_CHART_PATH') }}"
+meteringconfig_default_values_file: "{{ meteringconfig_chart_path + '/values.yaml' }}"
+meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_file) | from_yaml }}"
+meteringconfig_spec: "{{ _metering_openshift_io_meteringconfig.spec }}"
+meteringconfig_spec_with_defaults: "{{ meteringconfig_default_values | combine(meteringconfig_spec, recursive=True) }}"
+meteringconfig_prune_label_key: 'metering.openshift.io/prune'
+
+meteringconfig_create_metering_default_storage: "{{ meteringconfig_spec_with_defaults.defaultStorage.create | default(true) }}"
+
+_monitoring_conf: "{{ meteringconfig_spec_with_defaults.monitoring }}"
+meteringconfig_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
+meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"
+
+_openshift_reporting_spec: "{{ meteringconfig_spec_with_defaults['openshift-reporting'].spec }}"
+meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
+
+meteringconfig_enable_hdfs: "{{ meteringconfig_spec_with_defaults.hdfs.enabled | default(false) }}"
+
+_presto_spec: "{{ meteringconfig_spec_with_defaults.presto.spec }}"
+meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
+meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
+meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
+
+_reporting_op_spec: "{{ meteringconfig_spec_with_defaults['reporting-operator'].spec }}"
+meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createAuthenticatedEmailsSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec.authProxy.enabled and (_reporting_op_spec.authProxy.subjectAccessReviewEnabled and _reporting_op_spec.authProxy.delegateURLsEnabled) | default(false) }}"
+meteringconfig_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.config.prometheusImporter.auth.tokenSecret.create | default(false) }}"
+meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _reporting_op_spec.config.prometheusCertificateAuthority.configMap.create | default(false) }}"
+meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.createAwsCredentialsSecret | default(false) }}"
+meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.createSecret or _reporting_op_spec.config.metricsTLS.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
+meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.config.createClusterMonitoringViewRBAC | default(true) }}"

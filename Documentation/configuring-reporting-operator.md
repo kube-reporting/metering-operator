@@ -117,7 +117,7 @@ Exposing the reporting API is as simple as changing the type of `Service` used f
 
 ```
 apiVersion: metering.openshift.io/v1alpha1
-kind: Metering
+kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
