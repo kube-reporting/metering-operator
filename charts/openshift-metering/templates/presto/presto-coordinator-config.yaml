@@ -77,6 +77,8 @@ data:
     -XX:+ExplicitGCInvokesConcurrent
     -XX:+HeapDumpOnOutOfMemoryError
     -XX:+ExitOnOutOfMemoryError
+    -XX:ReservedCodeCacheSize=512M
+    -Djdk.nio.maxCachedBufferSize=2000000
     -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml
     -Dcom.sun.management.jmxremote
     -Dcom.sun.management.jmxremote.local.only=false
