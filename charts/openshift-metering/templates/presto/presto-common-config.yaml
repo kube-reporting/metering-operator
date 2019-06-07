@@ -44,6 +44,8 @@ data:
     export MIN_HEAPSIZE="$MAX_HEAPSIZE"
 
     JVM_CONFIG="${PRESTO_HOME}/etc/jvm.con***REMOVED***g"
+    # ensure there's a newline between the last item in the con***REMOVED***g and what we add
+    echo "" >> $JVM_CONFIG
     if [ -n "$MAX_HEAPSIZE" ]; then
       # add heapsize to jvm con***REMOVED***g if not already
       if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
@@ -62,6 +64,8 @@ data:
 
     # add node id to node con***REMOVED***g
     NODE_CONFIG="${PRESTO_HOME}/etc/node.properties"
+    # ensure there's a newline between the last item in the con***REMOVED***g and what we add
+    echo "" >> $NODE_CONFIG
     if ! grep -q -F 'node.id' "$NODE_CONFIG"; then
       NODE_ID="node.id=$MY_NODE_ID"
       echo "Adding $NODE_ID to $NODE_CONFIG"
@@ -70,6 +74,8 @@ data:
 
     # add AWS creds to hive catalog properties
     HIVE_CATALOG_CONFIG="${PRESTO_HOME}/etc/catalog/hive.properties"
+    # ensure there's a newline between the last item in the con***REMOVED***g and what we add
+    echo "" >> $HIVE_CATALOG_CONFIG
     if ! grep -q -F 'hive.s3.aws-access-key' "$HIVE_CATALOG_CONFIG"; then
       echo "Adding hive.s3.aws-access-key and hive.s3.aws-secret-key to $HIVE_CATALOG_CONFIG"
       echo "hive.s3.aws-access-key=$AWS_ACCESS_KEY_ID" >> "$HIVE_CATALOG_CONFIG"
