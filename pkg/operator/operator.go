@@ -105,9 +105,11 @@ type Config struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost   string
-	PrestoUseTLS bool
-	PrestoCAFile string
+	PrestoHost       string
+	PrestoUseTLS     bool
+	PrestoUseAuth    bool
+	PrestoCAFile     string
+	PrestoServerFile string
 
 	PrestoMaxQueryLength int
 
@@ -445,19 +447,39 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// check if the PrestoUseTLS flag is set to true
 	if op.cfg.PrestoUseTLS {
-		cert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
+		customClientConfig := &tls.Config{}
+
+		rootCert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
 		if err != nil {
 			return fmt.Errorf("presto: Error loading SSL Cert File: %v", err)
 		}
-		certPool := x509.NewCertPool()
-		certPool.AppendCertsFromPEM(cert)
 
-		// build up the http client structure to use the provided CA cert
+		rootCertPool := x509.NewCertPool()
+		rootCertPool.AppendCertsFromPEM(rootCert)
+
+		// if we are using only TLS and auth is disabled, then we only need the root CA cert pool
+		customClientConfig = &tls.Config{
+			RootCAs: rootCertPool,
+		}
+
+		if op.cfg.PrestoUseAuth {
+			serverCert, err := tls.LoadX509KeyPair(op.cfg.PrestoServerFile+"tls.crt", op.cfg.PrestoServerFile+"tls.key")
+			if err != nil {
+				return fmt.Errorf("presto: Error loading SSL Server cert/key file: %v", err)
+			}
+			// override the default customClientConfig with server/client certificates
+			customClientConfig = &tls.Config{
+				RootCAs:      rootCertPool,
+				Certificates: []tls.Certificate{serverCert},
+				ClientCAs:    rootCertPool,
+				ClientAuth:   tls.RequireAndVerifyClientCert,
+			}
+		}
+
+		// build up the http client structure to use the correct certificates when TLS/auth is enabled/disabled
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					RootCAs: certPool,
-				},
+				TLSClientConfig: customClientConfig,
 			},
 		}
 
