@@ -105,9 +105,11 @@ type Con***REMOVED***g struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost   string
-	PrestoUseTLS bool
-	PrestoCAFile string
+	PrestoHost       string
+	PrestoUseTLS     bool
+	PrestoUseAuth    bool
+	PrestoCAFile     string
+	PrestoServerFile string
 
 	PrestoMaxQueryLength int
 
@@ -445,19 +447,39 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// check if the PrestoUseTLS flag is set to true
 	if op.cfg.PrestoUseTLS {
-		cert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
+		customClientCon***REMOVED***g := &tls.Con***REMOVED***g{}
+
+		rootCert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
 		if err != nil {
 			return fmt.Errorf("presto: Error loading SSL Cert File: %v", err)
 		}
-		certPool := x509.NewCertPool()
-		certPool.AppendCertsFromPEM(cert)
 
-		// build up the http client structure to use the provided CA cert
+		rootCertPool := x509.NewCertPool()
+		rootCertPool.AppendCertsFromPEM(rootCert)
+
+		// if we are using only TLS and auth is disabled, then we only need the root CA cert pool
+		customClientCon***REMOVED***g = &tls.Con***REMOVED***g{
+			RootCAs: rootCertPool,
+		}
+
+		if op.cfg.PrestoUseAuth {
+			serverCert, err := tls.LoadX509KeyPair(op.cfg.PrestoServerFile+"tls.crt", op.cfg.PrestoServerFile+"tls.key")
+			if err != nil {
+				return fmt.Errorf("presto: Error loading SSL Server cert/key ***REMOVED***le: %v", err)
+			}
+			// override the default customClientCon***REMOVED***g with server/client certi***REMOVED***cates
+			customClientCon***REMOVED***g = &tls.Con***REMOVED***g{
+				RootCAs:      rootCertPool,
+				Certi***REMOVED***cates: []tls.Certi***REMOVED***cate{serverCert},
+				ClientCAs:    rootCertPool,
+				ClientAuth:   tls.RequireAndVerifyClientCert,
+			}
+		}
+
+		// build up the http client structure to use the correct certi***REMOVED***cates when TLS/auth is enabled/disabled
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				TLSClientCon***REMOVED***g: &tls.Con***REMOVED***g{
-					RootCAs: certPool,
-				},
+				TLSClientCon***REMOVED***g: customClientCon***REMOVED***g,
 			},
 		}
 
