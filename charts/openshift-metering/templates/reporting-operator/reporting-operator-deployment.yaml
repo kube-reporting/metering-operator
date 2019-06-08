@@ -186,7 +186,7 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: presto-host
-{{- if $operatorValues.spec.config.prestoTLS.enabled}}
+{{- if $operatorValues.spec.config.prestoTLS.enabled }}
         - name: REPORTING_OPERATOR_PRESTO_USE_TLS
           value: "true"
         - name: REPORTING_OPERATOR_PRESTO_CA_FILE
@@ -196,6 +196,18 @@ spec:
               key: presto-ca-file
 {{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_TLS
+          value: "false"
+{{- end }}
+{{- if $operatorValues.spec.config.prestoAuth.enabled }}
+        - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
+          value: "true"
+        - name: REPORTING_OPERATOR_PRESTO_SERVER_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-server-file
+{{- else }}
+        - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
 {{- end }}
         - name: REPORTING_OPERATOR_HIVE_HOST
@@ -271,7 +283,11 @@ spec:
         volumeMounts:
 {{- if $operatorValues.spec.config.prestoTLS.enabled }}
         - name: presto-tls
-          mountPath: /var/run/secrets/presto-tls/
+          mountPath: /var/run/secrets/presto-tls
+{{- if $operatorValues.spec.config.prestoAuth.enabled }}
+        - name: presto-auth
+          mountPath: /var/run/secrets/presto-auth
+{{- end }}
 {{- end }}
 {{- if $operatorValues.spec.config.tls.enabled }}
         - name: api-tls
@@ -353,6 +369,11 @@ spec:
       - name: presto-tls
         secret:
           secretName: {{ $operatorValues.spec.config.prestoTLS.secretName }}
+{{- if $operatorValues.spec.config.prestoAuth.enabled }}
+      - name: presto-auth
+        secret:
+          secretName: {{ $operatorValues.spec.config.prestoAuth.secretName }}
+{{- end }}
 {{- end }}
 {{- if $operatorValues.spec.config.tls.enabled }}
       - name: api-tls
