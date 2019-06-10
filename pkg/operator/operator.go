@@ -110,6 +110,7 @@ type Config struct {
 	PrestoUseClientCertAuth bool
 	PrestoCAFile            string
 	PrestoClientCertFile    string
+	PrestoClientKeyFile     string
 
 	PrestoMaxQueryLength int
 
@@ -462,7 +463,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		}
 
 		if op.cfg.PrestoUseClientCertAuth {
-			clientCert, err := tls.LoadX509KeyPair(op.cfg.PrestoClientCertFile+"tls.crt", op.cfg.PrestoClientCertFile+"tls.key")
+			clientCert, err := tls.LoadX509KeyPair(op.cfg.PrestoClientCertFile, op.cfg.PrestoClientKeyFile)
 			if err != nil {
 				return fmt.Errorf("presto: Error loading SSL Client cert/key file: %v", err)
 			}

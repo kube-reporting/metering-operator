@@ -18,7 +18,8 @@ data:
 {{- if $operatorValues.spec.config.prestoTLS.enabled }}
   presto-ca-file: "/var/run/secrets/presto-tls/tls.crt"
 {{- if $operatorValues.spec.config.prestoAuth.enabled }}
-  presto-client-cert-file: "/var/run/secrets/presto-auth/"
+  presto-client-cert-file: "/var/run/secrets/presto-auth/tls.crt"
+  presto-client-key-file: "/var/run/secrets/presto-auth/tls.key"
 {{- end }}
 {{- end }}
 {{- if $operatorValues.spec.config.prometheusMetricsImporterPollInterval }}

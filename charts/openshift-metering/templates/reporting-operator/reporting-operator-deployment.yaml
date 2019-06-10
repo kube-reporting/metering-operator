@@ -206,6 +206,11 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: presto-client-cert-file
+        - name: REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: presto-client-key-file
 {{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
