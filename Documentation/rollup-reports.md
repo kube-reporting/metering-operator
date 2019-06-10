@@ -45,12 +45,6 @@ spec:
   - name: namespace
     type: varchar
     unit: kubernetes_namespace
-  - name: data_start
-    type: timestamp
-    unit: date
-  - name: data_end
-    type: timestamp
-    unit: date
   - name: pod_usage_cpu_core_seconds
     type: double
     unit: core_seconds
@@ -70,8 +64,6 @@ spec:
       timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}' AS period_end,
     {|- if .Report.Inputs.NamespaceCPUUsageReportName |}
       namespace,
-      min("period_start") as data_start,
-      max("period_end") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| .Report.Inputs.NamespaceCPUUsageReportName | reportTableName |}
     WHERE period_start  >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
@@ -79,8 +71,6 @@ spec:
     GROUP BY namespace
     {|- ***REMOVED*** |}
       namespace,
-      min("timestamp") as data_start,
-      max("timestamp") as data_end,
       sum(pod_usage_cpu_core_seconds) as pod_usage_cpu_core_seconds
     FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}
     WHERE "timestamp" >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}'
