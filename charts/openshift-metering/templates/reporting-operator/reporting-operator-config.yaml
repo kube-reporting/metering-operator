@@ -18,7 +18,8 @@ data:
 {{- if $operatorValues.spec.con***REMOVED***g.prestoTLS.enabled }}
   presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/tls.crt"
 {{- if $operatorValues.spec.con***REMOVED***g.prestoAuth.enabled }}
-  presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/"
+  presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/tls.crt"
+  presto-client-key-***REMOVED***le: "/var/run/secrets/presto-auth/tls.key"
 {{- end }}
 {{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterPollInterval }}

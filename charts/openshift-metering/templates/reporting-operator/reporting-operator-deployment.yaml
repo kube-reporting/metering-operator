@@ -206,6 +206,11 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: presto-client-cert-***REMOVED***le
+        - name: REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: presto-client-key-***REMOVED***le
 {{- ***REMOVED*** }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
