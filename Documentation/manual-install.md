@@ -7,7 +7,7 @@ By default, if it's unset, it will use the `metering` namespace.
 ## Versioning
 
 By default, a manual install will deploy the latest build of master.
-If you want to use a speci***REMOVED***c version, checkout a git tag for the version you want to use before installing, or follow the instructions for [installing with a custom metering operator image][#install-with-a-custom-metering-operator-image].
+If you want to use a speci***REMOVED***c version, checkout a git tag for the version you want to use before installing, or follow the instructions for [installing with a custom metering operator image](#install-with-a-custom-metering-operator-image).
 
 ## Requirements
 
