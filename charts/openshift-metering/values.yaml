@@ -426,11 +426,10 @@ presto:
       con***REMOVED***g:
         tls:
           enabled: false
-          serverSecretName: ""
-          rootCASecretName: ""
+          serverCerti***REMOVED***cateSecretName: ""
         auth:
           enabled: false
-          clientSecretName: ""
+          clientCerti***REMOVED***cateSecretName: ""
         connectors:
           extraConnectorFiles: []
         environment: production
