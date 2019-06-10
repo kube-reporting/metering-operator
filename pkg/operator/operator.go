@@ -448,8 +448,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// check if the PrestoUseTLS flag is set to true
 	if op.cfg.PrestoUseTLS {
-		prestoTLSConfig := &tls.Config{}
-
 		rootCert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
 		if err != nil {
 			return fmt.Errorf("presto: Error loading SSL Cert File: %v", err)
@@ -458,7 +456,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		rootCertPool := x509.NewCertPool()
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
-		prestoTLSConfig = &tls.Config{
+		prestoTLSConfig := &tls.Config{
 			RootCAs: rootCertPool,
 		}
 
