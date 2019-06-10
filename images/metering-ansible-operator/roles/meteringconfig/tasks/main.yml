@@ -6,9 +6,9 @@
   loop: "{{ vars | dict2items | to_json | from_json | json_query(query) | difference(***REMOVED***ltered_vars) }}"
   vars:
     ***REMOVED***ltered_vars:
-      - meteringcon***REMOVED***g_default_values
       - meteringcon***REMOVED***g_spec
-      - meteringcon***REMOVED***g_spec_with_defaults
+      - meteringcon***REMOVED***g_spec_overrides
+      - meteringcon***REMOVED***g_default_values
     query: "[?starts_with(@.key, `meteringcon***REMOVED***g_`)].key"
 
 - include_tasks: reconcile.yml

@@ -103,8 +103,8 @@ spec:
           mountPath: /hive-con***REMOVED***g
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHdfsCon***REMOVED***gMap }}
-        - name: hdfs-con***REMOVED***g
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***gMap }}
+        - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
 {{- end}}
         - name: hive-jmx-con***REMOVED***g
@@ -121,10 +121,6 @@ spec:
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.mountPath }}
-{{- end }}
-{{- if or (not .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled) (and .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled (ne .Values.presto.spec.con***REMOVED***g.sharedVolume.mountPath "/user/hive/warehouse") ) }}
-        - name: hive-warehouse-empty
-          mountPath: /user/hive/warehouse
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.hive.server.resources | indent 10 }}
@@ -144,18 +140,16 @@ spec:
         con***REMOVED***gMap:
           name: hive-scripts
           defaultMode: 0555
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHdfsCon***REMOVED***gMap }}
-      - name: hdfs-con***REMOVED***g
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***gMap }}
+      - name: hadoop-con***REMOVED***g
         con***REMOVED***gMap:
-          name: {{ .Values.presto.spec.hive.con***REMOVED***g.hdfsCon***REMOVED***gMapName }}
+          name: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopCon***REMOVED***gMapName }}
 {{- end }}
       - name: hive-jmx-con***REMOVED***g
         con***REMOVED***gMap:
           name: hive-jmx-con***REMOVED***g
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Docker***REMOVED***le have a corresponding volumeMount
-      - name: hive-warehouse-empty
-        emptyDir: {}
       - name: namenode-empty
         emptyDir: {}
       - name: datanode-empty
@@ -167,5 +161,5 @@ spec:
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.persistentVolumeClaimName }}
+          claimName: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.claimName }}
 {{- end}}

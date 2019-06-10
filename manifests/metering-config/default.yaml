@@ -2,4 +2,11 @@ apiVersion: metering.openshift.io/v1alpha1
 kind: MeteringCon***REMOVED***g
 metadata:
   name: "operator-metering"
-spec: {}
+spec:
+  storage:
+    type: hive
+    # hive:
+    #   type: "s3"
+    #   s3:
+    #     bucket: "bucketname/path/"
+    #     awsCredentialsSecretName: "my-aws-secret"

@@ -1,19 +1,20 @@
-{{- if .Values.defaultStorage.create -}}
+{{- $reportingValues :=  index .Values "openshift-reporting" -}}
+{{- if $reportingValues.spec.defaultStorageLocation.create -}}
 apiVersion: metering.openshift.io/v1alpha1
 kind: StorageLocation
 metadata:
-  name: {{ .Values.defaultStorage.name }}
+  name: {{ $reportingValues.spec.defaultStorageLocation.name }}
   labels:
     operator-metering: "true"
-{{- if .Values.defaultStorage.isDefault }}
+{{- if $reportingValues.spec.defaultStorageLocation.isDefault }}
   annotations:
     storagelocation.metering.openshift.io/is-default: "true"
 {{- end }}
 spec:
-{{- if eq .Values.defaultStorage.type "hive" }}
+{{- if eq $reportingValues.spec.defaultStorageLocation.type "hive" }}
   hive:
-{{ toYaml .Values.defaultStorage.hive | indent 4 }}
+{{ toYaml $reportingValues.spec.defaultStorageLocation.hive | indent 4 }}
 {{- ***REMOVED*** }}
-{{ printf "Unsupported defaultStorage.type: '%s'" .Values.defaultStorage.type | fail }}
+{{ printf "Unsupported defaultStorageLocation.type: '%s'" $reportingValues.spec.defaultStorageLocation.type | fail }}
 {{- end -}}
 {{- end -}}

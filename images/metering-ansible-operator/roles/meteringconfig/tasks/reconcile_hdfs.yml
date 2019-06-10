@@ -5,6 +5,11 @@
   vars:
     values_***REMOVED***le: /tmp/metering-values.yaml
     resources:
+      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***gmap.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hadoop-con***REMOVED***gmap
+        # always create the hadoop-con***REMOVED***gmap
+        create: true
       - template_***REMOVED***le: templates/hadoop/hadoop-aws-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-aws-credentials
@@ -16,10 +21,6 @@
       - template_***REMOVED***le: templates/hadoop/hdfs-jmx-con***REMOVED***g.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hdfs-jmx-con***REMOVED***g
-        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***gmap.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hadoop-con***REMOVED***gmap
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
       - template_***REMOVED***le: templates/hadoop/hdfs-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
