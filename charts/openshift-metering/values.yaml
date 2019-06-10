@@ -232,6 +232,9 @@ reporting-operator:
       prestoTLS:
         enabled: false
         secretName: ""
+      prestoAuth:
+        enabled: false
+        secretName: ""
       prometheusCerti***REMOVED***cateAuthority:
         con***REMOVED***gMap:
           create: false
@@ -423,7 +426,10 @@ presto:
       con***REMOVED***g:
         tls:
           enabled: false
-          secretName: ""
+          serverCerti***REMOVED***cateSecretName: ""
+        auth:
+          enabled: false
+          clientCerti***REMOVED***cateSecretName: ""
         connectors:
           extraConnectorFiles: []
         environment: production

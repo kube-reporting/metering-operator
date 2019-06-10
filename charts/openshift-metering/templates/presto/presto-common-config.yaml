@@ -7,9 +7,14 @@ data:
     #!/bin/bash
     set -e
 
+{{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
+    cat $PRESTO_CLIENT_KEYFILE $PRESTO_CLIENT_CRTFILE > $PRESTO_TRUSTSTORE_PEM
+
 {{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
-    openssl pkcs12 -export -inkey $PRESTO_KEYFILE -in $PRESTO_CRTFILE -out $PRESTO_KEYSTORE_PKCS12 -password pass:$PRESTO_KEYSTORE_PASSWORD
-    keytool -importkeystore -noprompt -srckeystore $PRESTO_KEYSTORE_PKCS12 -srcstoretype pkcs12 -destkeystore $PRESTO_KEYSTORE_JKS -storepass $PRESTO_KEYSTORE_PASSWORD -srcstorepass $PRESTO_KEYSTORE_PASSWORD
+    # copy all necessary tls.crt/tls.key from read-only secret volumes - append server bundle and CA cert to truststore
+    cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE > $PRESTO_KEYSTORE_PEM
+    cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE >> $PRESTO_TRUSTSTORE_PEM
+{{- end }}
 {{- end }}
 
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/

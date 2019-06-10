@@ -105,9 +105,12 @@ type Con***REMOVED***g struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost   string
-	PrestoUseTLS bool
-	PrestoCAFile string
+	PrestoHost              string
+	PrestoUseTLS            bool
+	PrestoUseClientCertAuth bool
+	PrestoCAFile            string
+	PrestoClientCertFile    string
+	PrestoClientKeyFile     string
 
 	PrestoMaxQueryLength int
 
@@ -445,19 +448,34 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// check if the PrestoUseTLS flag is set to true
 	if op.cfg.PrestoUseTLS {
-		cert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
+		rootCert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
 		if err != nil {
 			return fmt.Errorf("presto: Error loading SSL Cert File: %v", err)
 		}
-		certPool := x509.NewCertPool()
-		certPool.AppendCertsFromPEM(cert)
 
-		// build up the http client structure to use the provided CA cert
+		rootCertPool := x509.NewCertPool()
+		rootCertPool.AppendCertsFromPEM(rootCert)
+
+		prestoTLSCon***REMOVED***g := &tls.Con***REMOVED***g{
+			RootCAs: rootCertPool,
+		}
+
+		if op.cfg.PrestoUseClientCertAuth {
+			clientCert, err := tls.LoadX509KeyPair(op.cfg.PrestoClientCertFile, op.cfg.PrestoClientKeyFile)
+			if err != nil {
+				return fmt.Errorf("presto: Error loading SSL Client cert/key ***REMOVED***le: %v", err)
+			}
+
+			// mutate the necessary structure ***REMOVED***elds in prestoTLSCon***REMOVED***g to work with client certi***REMOVED***cates
+			prestoTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
+			prestoTLSCon***REMOVED***g.ClientCAs = rootCertPool
+			prestoTLSCon***REMOVED***g.ClientAuth = tls.RequireAndVerifyClientCert
+		}
+
+		// build up the http client structure to use the correct certi***REMOVED***cates when TLS/auth is enabled/disabled
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				TLSClientCon***REMOVED***g: &tls.Con***REMOVED***g{
-					RootCAs: certPool,
-				},
+				TLSClientCon***REMOVED***g: prestoTLSCon***REMOVED***g,
 			},
 		}
 
