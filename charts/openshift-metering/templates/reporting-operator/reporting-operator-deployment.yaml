@@ -201,11 +201,11 @@ spec:
 {{- if $operatorValues.spec.config.prestoAuth.enabled }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "true"
-        - name: REPORTING_OPERATOR_PRESTO_SERVER_FILE
+        - name: REPORTING_OPERATOR_PRESTO_CLIENT_CERT_FILE
           valueFrom:
             configMapKeyRef:
               name: reporting-operator-config
-              key: presto-server-file
+              key: presto-client-cert-file
 {{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"

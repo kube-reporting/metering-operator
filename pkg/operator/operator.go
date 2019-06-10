@@ -105,11 +105,11 @@ type Config struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost       string
-	PrestoUseTLS     bool
-	PrestoUseAuth    bool
-	PrestoCAFile     string
-	PrestoServerFile string
+	PrestoHost              string
+	PrestoUseTLS            bool
+	PrestoUseClientCertAuth bool
+	PrestoCAFile            string
+	PrestoClientCertFile    string
 
 	PrestoMaxQueryLength int
 
@@ -447,7 +447,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	// check if the PrestoUseTLS flag is set to true
 	if op.cfg.PrestoUseTLS {
-		customClientConfig := &tls.Config{}
+		prestoTLSConfig := &tls.Config{}
 
 		rootCert, err := ioutil.ReadFile(op.cfg.PrestoCAFile)
 		if err != nil {
@@ -457,29 +457,26 @@ func (op *Reporting) Run(ctx context.Context) error {
 		rootCertPool := x509.NewCertPool()
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
-		// if we are using only TLS and auth is disabled, then we only need the root CA cert pool
-		customClientConfig = &tls.Config{
+		prestoTLSConfig = &tls.Config{
 			RootCAs: rootCertPool,
 		}
 
-		if op.cfg.PrestoUseAuth {
-			serverCert, err := tls.LoadX509KeyPair(op.cfg.PrestoServerFile+"tls.crt", op.cfg.PrestoServerFile+"tls.key")
+		if op.cfg.PrestoUseClientCertAuth {
+			clientCert, err := tls.LoadX509KeyPair(op.cfg.PrestoClientCertFile+"tls.crt", op.cfg.PrestoClientCertFile+"tls.key")
 			if err != nil {
-				return fmt.Errorf("presto: Error loading SSL Server cert/key file: %v", err)
+				return fmt.Errorf("presto: Error loading SSL Client cert/key file: %v", err)
 			}
-			// override the default customClientConfig with server/client certificates
-			customClientConfig = &tls.Config{
-				RootCAs:      rootCertPool,
-				Certificates: []tls.Certificate{serverCert},
-				ClientCAs:    rootCertPool,
-				ClientAuth:   tls.RequireAndVerifyClientCert,
-			}
+
+			// mutate the necessary structure fields in prestoTLSConfig to work with client certificates
+			prestoTLSConfig.Certificates = []tls.Certificate{clientCert}
+			prestoTLSConfig.ClientCAs = rootCertPool
+			prestoTLSConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		}
 
 		// build up the http client structure to use the correct certificates when TLS/auth is enabled/disabled
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: customClientConfig,
+				TLSClientConfig: prestoTLSConfig,
 			},
 		}
 

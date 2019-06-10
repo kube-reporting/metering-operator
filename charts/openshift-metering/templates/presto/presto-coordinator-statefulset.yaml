@@ -60,14 +60,12 @@ spec:
           value: /presto-server/tls.key
         - name: PRESTO_SERVER_CRTFILE
           value: /presto-server/tls.crt
-        - name: PRESTO_SERVER_PEM
-          value: /opt/presto/tls/server.pem
+        - name: PRESTO_CA_CRTFILE
+          value: /presto-server/ca.crt
         - name: PRESTO_KEYSTORE_PEM
           value: /opt/presto/tls/keystore.pem
         - name: PRESTO_TRUSTSTORE_PEM
           value: /opt/presto/tls/truststore.pem
-        - name: PRESTO_CA_CRTFILE
-          value: /presto-ca/tls.crt
 {{- if .Values.presto.spec.presto.config.auth.enabled }}
         - name: PRESTO_CLIENT_KEYFILE
           value: /presto-client/tls.key
@@ -92,8 +90,6 @@ spec:
           mountPath: /opt/presto/tls
         - name: presto-server-pem
           mountPath: /presto-server
-        - name: presto-ca-pem
-          mountPath: /presto-ca
 {{- if .Values.presto.spec.presto.config.auth.enabled }}
         - name: presto-client-pem
           mountPath: /presto-client
@@ -169,16 +165,11 @@ spec:
         emptyDir: {}
       - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.config.tls.serverSecretName }}
-      - name: presto-ca
-        emptyDir: {}
-      - name: presto-ca-pem
-        secret:
-          secretName: {{ .Values.presto.spec.presto.config.tls.rootCASecretName }}
+          secretName: {{ .Values.presto.spec.presto.config.tls.serverCertificateSecretName }}
 {{- if .Values.presto.spec.presto.config.auth.enabled }}
       - name: presto-client-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.config.auth.clientSecretName }}
+          secretName: {{ .Values.presto.spec.presto.config.auth.clientCertificateSecretName }}
 {{- end }}
 {{- end }}
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}

@@ -426,11 +426,10 @@ presto:
       config:
         tls:
           enabled: false
-          serverSecretName: ""
-          rootCASecretName: ""
+          serverCertificateSecretName: ""
         auth:
           enabled: false
-          clientSecretName: ""
+          clientCertificateSecretName: ""
         connectors:
           extraConnectorFiles: []
         environment: production
