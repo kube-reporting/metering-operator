@@ -20,16 +20,19 @@ data:
     http-server.http.enabled=false
     http-server.https.enabled=true
     http-server.https.port=8080
-    http-server.https.keystore.path=/opt/presto/tls/keystore.jks
-    http-server.https.keystore.key=password
+    http-server.https.keystore.path=/opt/presto/tls/keystore.pem
+    http-server.https.truststore.path=/opt/presto/tls/truststore.pem
     node.internal-address-source=FQDN
     discovery.uri=https://presto:8080
     internal-communication.https.required=true
-    internal-communication.https.keystore.path=/opt/presto/tls/keystore.jks
-    internal-communication.https.keystore.key=password
+    internal-communication.https.keystore.path=/opt/presto/tls/keystore.pem
+    internal-communication.https.truststore.path=/opt/presto/tls/truststore.pem
 {{- else }}
     http-server.http.port=8080
     discovery.uri=http://presto:8080
+{{- end }}
+{{- if .Values.presto.spec.presto.config.auth.enabled }}
+    http-server.authentication.type=CERTIFICATE
 {{- end }}
 
     jmx.rmiserver.port=8081

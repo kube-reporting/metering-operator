@@ -56,16 +56,22 @@ spec:
         # Copy the mounted configuration data into the presto-etc emptyDir volume so we can write to the config files
         env:
 {{- if .Values.presto.spec.presto.config.tls.enabled }}
-        - name: PRESTO_KEYFILE
-          value: /presto/tls.key
-        - name: PRESTO_CRTFILE
-          value: /presto/tls.crt
-        - name: PRESTO_KEYSTORE_PKCS12
-          value: /opt/presto/tls/keystore.pkcs12
-        - name: PRESTO_KEYSTORE_JKS
-          value: /opt/presto/tls/keystore.jks
-        - name: PRESTO_KEYSTORE_PASSWORD
-          value: password
+        - name: PRESTO_SERVER_KEYFILE
+          value: /presto-server/tls.key
+        - name: PRESTO_SERVER_CRTFILE
+          value: /presto-server/tls.crt
+        - name: PRESTO_CA_CRTFILE
+          value: /presto-server/ca.crt
+        - name: PRESTO_KEYSTORE_PEM
+          value: /opt/presto/tls/keystore.pem
+        - name: PRESTO_TRUSTSTORE_PEM
+          value: /opt/presto/tls/truststore.pem
+{{- if .Values.presto.spec.presto.config.auth.enabled }}
+        - name: PRESTO_CLIENT_KEYFILE
+          value: /presto-client/tls.key
+        - name: PRESTO_CLIENT_CRTFILE
+          value: /presto-client/tls.crt
+{{- end }}
 {{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
@@ -82,8 +88,12 @@ spec:
 {{- if .Values.presto.spec.presto.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
-        - name: presto-pem-files
-          mountPath: /presto
+        - name: presto-server-pem
+          mountPath: /presto-server
+{{- if .Values.presto.spec.presto.config.auth.enabled }}
+        - name: presto-client-pem
+          mountPath: /presto-client
+{{- end }}
 {{- end }}
         resources:
           limits:
@@ -153,9 +163,14 @@ spec:
 {{- if .Values.presto.spec.presto.config.tls.enabled }}
       - name: presto-tls
         emptyDir: {}
-      - name: presto-pem-files
+      - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.config.tls.secretName }}
+          secretName: {{ .Values.presto.spec.presto.config.tls.serverCertificateSecretName }}
+{{- if .Values.presto.spec.presto.config.auth.enabled }}
+      - name: presto-client-pem
+        secret:
+          secretName: {{ .Values.presto.spec.presto.config.auth.clientCertificateSecretName }}
+{{- end }}
 {{- end }}
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
