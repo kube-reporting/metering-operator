@@ -3,34 +3,13 @@ kind: MeteringConfig
 metadata:
   name: "operator-metering"
 spec:
-  defaultStorage:
-    type: "hive"
+  storage:
     hive:
-      # instructs reporting-operator to create a new database in Hive
-      unmanagedDatabase: false
-      # feel free to adjust the database name  and location
-      databaseName: "metering-nfs"
-      location: "/user/hive/warehouse"
-
-  presto:
-    spec:
-      config:
-        sharedVolume:
-          enabled: true
-          storage:
-            # change REPLACEME to the name of your PVC
-            persistentVolumeClaimStorageClass: REPLACEME
-            # mountPath must match the value of the location specified above.
-            mountPath: "/user/hive/warehouse"
-      hive:
-        config:
-          # set to false when spec.hadoop.spec.hdfs.enabled is false
-          useHdfsConfigMap: false
-          # Replace this with your path
-          metastoreWarehouseDir: "/user/hive/warehouse"
-
-  hadoop:
-    spec:
-      hdfs:
-        # disable HDFS components when using S3 to avoid wasting resources.
-        enabled: false
+      type: "sharedPVC"
+      sharedPVC:
+        claimName: "metering-nfs"
+        # uncomment the lines below to provision a new PVC using the specified
+        # storageClass.
+        # createPVC: true
+        # storageClass: "my-nfs-storage-class"
+        # size: 5Gi

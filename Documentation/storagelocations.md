@@ -1,7 +1,10 @@
 # Storage Locations
 
-A `StorageLocation` is a custom resource that configures where data will be stored.
+A `StorageLocation` is a custom resource that configures where data will be stored by the reporting-operator.
 This includes the data collected from Prometheus, and the results produced by generating a `Report`.
+
+Normally, users shouldn't need to configure StorageLocation's unless they want to store data in multiple locations, like multiple S3 buckets or both S3 and HDFS, or if they wish to access a database in Hive/Presto that was not created by metering.
+Instead, users should use the [configuring storage](configuring-storage.md) documentation to manage configuration of all components in the metering stack.
 
 The Operator Metering default installation provides a few ways of configuring the [Default StorageLocation](#default-storagelocation), and normally it shouldn't be necessary to create these directly.
 Refer to the [Metering Configuration doc](metering-config.md#storing-data-in-s3) for details on using the `Metering` resource to set your default StorageLocation.
@@ -19,7 +22,7 @@ Refer to the [Metering Configuration doc](metering-config.md#storing-data-in-s3)
 ## Example StorageLocation
 
 This first example is what the built-in local storage option looks like.
-As you can see, it's configured to use HDFS and supplies no additional options.
+As you can see, it's configured to use Hive, and by default data is stored wherever Hive is configured to use storage by default (HDFS, S3, or a ReadWriteMany PVC) since the location isn't set.
 
 ```yaml
 apiVersion: metering.openshift.io/v1alpha1
@@ -30,9 +33,9 @@ metadata:
     operator-metering: "true"
   spec:
     hive:
-      databaseName: default
-      unmanagedDatabase: true
-      location: "hdfs://hdfs-namenode-proxy:8020"
+      databaseName: metering
+      unmanagedDatabase: false
+      location: ""
 ```
 
 The example below uses an AWS S3 bucket for storage.

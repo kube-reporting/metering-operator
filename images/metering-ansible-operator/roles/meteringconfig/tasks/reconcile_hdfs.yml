@@ -5,6 +5,11 @@
   vars:
     values_file: /tmp/metering-values.yaml
     resources:
+      - template_file: templates/hadoop/hadoop-configmap.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hadoop-configmap
+        # always create the hadoop-configmap
+        create: true
       - template_file: templates/hadoop/hadoop-aws-credentials.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-aws-credentials
@@ -16,10 +21,6 @@
       - template_file: templates/hadoop/hdfs-jmx-config.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hdfs-jmx-config
-        create: "{{ meteringconfig_enable_hdfs }}"
-      - template_file: templates/hadoop/hadoop-configmap.yaml
-        apis: [ {kind: configmap} ]
-        prune_label_value: hadoop-configmap
         create: "{{ meteringconfig_enable_hdfs }}"
       - template_file: templates/hadoop/hdfs-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]

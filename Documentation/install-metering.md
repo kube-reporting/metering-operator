@@ -2,10 +2,8 @@
 
 Operator Metering is a collection of a few components:
 
-- A Metering Operator Pod which aggregates Prometheus data and generates reports based
-  on the collected usage information.
-- Hive and Presto clusters, used by the Operator Metering Pod to perform queries on the
-  collected usage data.
+- A Metering Operator Pod which aggregates Prometheus data and generates reports based on the collected usage information.
+- Presto and Hive, used by the Operator Metering Pod to perform queries on the collected usage data.
 
 ## Prerequisites
 
@@ -21,33 +19,37 @@ Operator Metering requires the following components:
     - Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 - A properly configured kubectl to access the Kubernetes cluster.
 
+In addition, Metering **storage must be configured before proceeding**.
+Available storage options are listed in the [configuring storage documentation][configuring-storage].
+
 ## Configuration
 
 Before continuing with the installation, please read [Configuring Operator Metering][configuring-metering].
-Some options may not be changed post-install. Be certain to configure these options, if desired, before installation.
-
-If you do not wish to modify the Operator Metering configuration, a minimal configuration example that doesn't override anything can be found in [default.yaml][default-config].
+Some options may not be changed post-install, such as storage.
+Be certain to configure these options, if desired, before installation.
 
 ### Prometheus Monitoring Configuration
 
-For Openshift 3.11 or later, Prometheus is installed by default through cluster monitoring in the openshift-monitoring namespace.
+For Openshift 3.11, 4.x and later, Prometheus is installed by default through cluster monitoring in the openshift-monitoring namespace, and the default configuration is already setup to use Openshift cluster monitoring.
 
-If you're not using Openshift, then you will need to use the manual install method.
-In this case you must customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
+If you're not using Openshift, then you will need to use the manual install method and customize the [prometheus URL config option][configure-prometheus-url] before proceeding.
 
 ## Install Methods
 
 There are multiple installation methods depending on your Kubernetes platform and the version of Operator Metering you want.
 
-### Manual install scripts
-
-Manual installation is generally the recommended install method unless OLM can be used, or if you need to run a custom version of metering rather than what OLM has available.
-For instructions on installing using our manual install scripts follow the [manual installation guide][manual-install].
-
 ### Operator Lifecycle Manager
 
-OLM is currently only supported on Openshift 4.0.
+Using OLM is the recommended option as it ensures you are getting a stable release that we have tested.
+
+OLM is currently only supported on Openshift 4.x.
 For instructions on installing using OLM follow the [OLM install guide][olm-install].
+
+### Manual install scripts
+
+Manual installation is generally not recommended unless OLM is unavailable, or if you need to run a custom version of metering rather than what OLM has available.
+Please remember that the manual installation method does not guarantee any consistent version or upgrade experience.
+For instructions on installing using our manual install scripts follow the [manual installation guide][manual-install].
 
 ## Verifying operation
 
@@ -57,23 +59,10 @@ First, wait until the Metering Helm operator deploys all of the Metering compone
 kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-operator
 ```
 
-When output similar to the following appears, the rest of the Pods should be initializing:
+It will potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
 
 ```
-Waiting for Tiller to become ready
-Waiting for Tiller to become ready
-Getting pod metering-operator-b5f86788c-ks4zq owner information
-Querying for Deployment metering-operator
-No values, using default values
-Running helm upgrade for release operator-metering
-Release "operator-metering" has been upgraded. Happy Helming!
-LAST DEPLOYED: Fri Jan 26 19:18:34 2019
-NAMESPACE: metering
-STATUS: DEPLOYED
-
-RESOURCES:
-
-... the rest is omitted for brevity ...
+{"level":"info","ts":1560984641.7900484,"logger":"runner","msg":"Ansible-runner exited successfully","job":"7911455193145848968","name":"operator-metering","namespace":"metering"}
 ```
 
 Next, get the list of pods:
@@ -82,20 +71,17 @@ Next, get the list of pods:
 kubectl -n $METERING_NAMESPACE get pods
 ```
 
-It may take a 2-3 minutes, but eventually all pods should have a status of `Running`:
+It may take a couple of minutes, but eventually all pods should have a status of `Running`:
 
 ```
-NAME                                  READY     STATUS    RESTARTS   AGE
-hdfs-datanode-0                       1/1       Running   0          9m
-hdfs-namenode-0                       1/1       Running   0          9m
-hive-metastore-0                      1/1       Running   0          9m
-hive-server-0                         1/1       Running   0          9m
-metering-operator-df67bb6cb-6d7vh     2/2       Running   1          11m
-presto-coordinator-7b7b87ff49-bhzgg   1/1       Running   0          9m
-reporting-operator-7cf77b68f9-l6jrd   1/1       Running   1          9m
+NAME                                  READY   STATUS    RESTARTS   AGE
+hive-metastore-0                      1/1     Running   0          3m
+hive-server-0                         1/1     Running   0          3m
+metering-operator-df67bb6cb-6d7vh     2/2     Running   0          4m
+presto-coordinator-0                  1/1     Running   0          3m
 ```
 
-Check the logs of the `reporting-operator` pod for errors:
+Check the logs of the `reporting-operator` pod for signs of any persistent errors:
 
 ```
 $ kubectl get pods -n $METERING_NAMESPACE -l app=reporting-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs {} -f
@@ -108,7 +94,9 @@ For instructions on using Operator Metering, please see [using Operator Metering
 [default-config]: ../manifests/metering-config/default.yaml
 [using-metering]: using-metering.md
 [configuring-metering]: metering-config.md
-[configure-prometheus-url]: metering-config.md#prometheus-url
+[configuring-storage]: configuring-storage.md
+[configure-prometheus-url]: metering-config.md#prometheus-connection
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 [olm-install]: olm-install.md
 [manual-install]: manual-install.md
+[storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/

@@ -2,6 +2,10 @@
 
 This document contains example configurations for configuration that spans one or more components.
 
+## Storage
+
+Storage has it's own documentation page at [configuring storage](configuring-storage.md).
+
 ## Resource requests and limits
 
 You can adjust the cpu, memory, or storage resource requests and/or limits for pods and volumes.

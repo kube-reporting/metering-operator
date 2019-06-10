@@ -1,5 +1,17 @@
 ---
 
+- name: Validate storage configuration
+  fail:
+    msg: "Unsupported spec.storage.type, only 'hive' is  a supported option"
+  when: meteringconfig_spec | json_query('storage.type') != "hive"
+
+- name: Validate Hive storage configuration
+  fail:
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', or 'sharedPVC'"
+  vars:
+    hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
+  when: hiveStorageType is undefined or hiveStorageType not in ['s3', 'sharedPVC', 'hdfs']
+
 - name: Store MeteringConfig spec into values file
   copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
 

@@ -7,6 +7,9 @@ meteringconfig_prune_namespace_label_key: 'metering.openshift.io/ns-prune'
 meteringconfig_default_values_file: "{{ meteringconfig_chart_path + '/values.yaml' }}"
 meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_file) | from_yaml }}"
 
+# contains the users overrides
+meteringconfig_spec_overrides: "{{ _metering_openshift_io_meteringconfig.spec }}"
+
 # The default specs for each component
 _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
@@ -45,20 +48,75 @@ meteringconfig_default_image_overrides:
         repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hadoop_default_image_repo, true) }}"
         tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hadoop_default_image_tag, true) }}"
 
-# meteringconfig_spec_with_defaults comes first so that user's meteringconfig spec overrides defaults if the user specifies any image overrides.
-meteringconfig_spec: "{{ meteringconfig_default_image_overrides | combine(_metering_openshift_io_meteringconfig.spec , recursive=True) }}"
+_storage_overrides:
+  s3:
+    reporting-operator:
+      spec:
+        config:
+          awsCredentialsSecretName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          createAwsCredentialsSecret: false
+    presto:
+      spec:
+        config:
+          awsCredentialsSecretName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          createAwsCredentialsSecret: false
+        hive:
+          config:
+            metastoreWarehouseDir: "s3a://{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+    hadoop:
+      spec:
+        config:
+          defaultFS: "s3a://{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+        hdfs:
+          enabled: false
 
-# We need the combined user input + defaults so we can determine what resources/components are enabled/disabled after merging
-meteringconfig_spec_with_defaults: "{{ meteringconfig_default_values | combine(meteringconfig_spec, recursive=True) }}"
+  hdfs:
+    hadoop:
+      spec:
+        config:
+          defaultFS: "hdfs://{{ meteringconfig_spec_overrides | json_query('storage.hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
+        hdfs:
+          enabled: "{{ meteringconfig_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
+
+  sharedPVC:
+    presto:
+      spec:
+        config:
+          sharedVolume:
+            enabled: true
+            createPVC: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.createPVC') | default(false, true) }}"
+            mountPath: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
+            size: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
+            storageClass: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
+        hive:
+          config:
+            metastoreWarehouseDir: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+
+    hadoop:
+      spec:
+        config:
+          defaultFS: "file://{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+        hdfs:
+          enabled: false
+
+
+meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_default_values | combine(meteringconfig_spec_overrides) | json_query('storage.hive.type')] | default({}, true) }}"
+
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, recursive=True) }}"
+
+########################
+# All Variables below are setup to consume the result of merging the defaults, internal overrides, and user overrides.
+########################
 
 # Private variables to reduce boilerplate
-_monitoring_conf: "{{ meteringconfig_spec_with_defaults.monitoring }}"
-_openshift_reporting_spec: "{{ meteringconfig_spec_with_defaults['openshift-reporting'].spec }}"
-_presto_spec: "{{ meteringconfig_spec_with_defaults.presto.spec }}"
-_reporting_op_spec: "{{ meteringconfig_spec_with_defaults['reporting-operator'].spec }}"
-_hadoop_spec: "{{ meteringconfig_spec_with_defaults.hadoop.spec }}"
+_monitoring_conf: "{{ meteringconfig_spec.monitoring }}"
+_openshift_reporting_spec: "{{ meteringconfig_spec['openshift-reporting'].spec }}"
+_presto_spec: "{{ meteringconfig_spec.presto.spec }}"
+_reporting_op_spec: "{{ meteringconfig_spec['reporting-operator'].spec }}"
+_hadoop_spec: "{{ meteringconfig_spec.hadoop.spec }}"
 
-meteringconfig_create_metering_default_storage: "{{ meteringconfig_spec_with_defaults.defaultStorage.create | default(true) }}"
+meteringconfig_create_metering_default_storage: "{{ _openshift_reporting_spec.defaultStorageLocation.create | default(true) }}"
 
 meteringconfig_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
 meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"
