@@ -23,7 +23,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	api "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -187,7 +187,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 
 	if r.FormValue("ignore_failed") != "true" {
-		if cond := cbutil.GetReportCondition(report.Status, api.ReportRunning); cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == cbutil.GenerateReportFailedReason {
+		if cond := meteringUtil.GetReportCondition(report.Status, api.ReportRunning); cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringUtil.GenerateReportFailedReason {
 			logger.Errorf("report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			return

@@ -17,7 +17,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -212,11 +212,11 @@ type reportPeriod struct {
 // isReportFinished checks the running condition of the report parameter and returns true if the report has previously run
 func isReportFinished(logger log.FieldLogger, report *metering.Report) bool {
 	// check if this report was previously finished
-	runningCond := cbutil.GetReportCondition(report.Status, metering.ReportRunning)
+	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 
 	if runningCond == nil {
 		logger.Infof("new report, validating report")
-	} else if runningCond.Reason == cbutil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
+	} else if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
 		// Found an already finished runOnce report. Log that we're not
 		// re-processing runOnce reports after they're previously finished
 		if report.Spec.Schedule == nil {
@@ -349,7 +349,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		return nil
 	}
 
-	runningCond := cbutil.GetReportCondition(report.Status, metering.ReportRunning)
+	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 
 	// validate that Report contains valid Spec fields
@@ -475,7 +475,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 
 	var runningMsg, runningReason string
 	if report.Spec.RunImmediately {
-		runningReason = cbutil.RunImmediatelyReason
+		runningReason = meteringUtil.RunImmediatelyReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 	} else {
 		// Check if it's time to generate the report
@@ -484,13 +484,13 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, reportPeriod.periodEnd)
 			logger.Infof(waitMsg+". waiting %s", waitTime)
 
-			if runningCond := cbutil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
+			if runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == meteringUtil.ReportingPeriodWaitingReason {
 				op.enqueueReportAfter(report, waitTime)
 				return nil
 			}
 
 			var err error
-			report, err = op.updateReportStatus(report, cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg))
+			report, err = op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodWaitingReason, waitMsg))
 			if err != nil {
 				return err
 			}
@@ -501,7 +501,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			return nil
 		}
 
-		runningReason = cbutil.ScheduledReason
+		runningReason = meteringUtil.ScheduledReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 
 		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
@@ -573,18 +573,18 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 
 			// If the previous condition is unmet dependencies, check if the
 			// message changes, and only update if it does
-			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
-				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, cbutil.ReportingPeriodUnmetDependenciesReason)
+			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == meteringUtil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
+				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, meteringUtil.ReportingPeriodUnmetDependenciesReason)
 				return nil
 			}
 			logger.Warnf(unmetMsg)
-			_, err := op.updateReportStatus(report, cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
+			_, err := op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
 			return err
 		}
 	}
 	logger.Infof(runningMsg + " Running now.")
 
-	report, err = op.updateReportStatus(report, cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
+	report, err = op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
 	if err != nil {
 		return err
 	}
@@ -660,7 +660,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		// update the status to Failed with message containing the
 		// error
 		errMsg := fmt.Sprintf("error occurred while generating report: %s", err)
-		_, updateErr := op.updateReportStatus(report, cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.GenerateReportFailedReason, errMsg))
+		_, updateErr := op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.GenerateReportFailedReason, errMsg))
 		if updateErr != nil {
 			logger.WithError(updateErr).Errorf("unable to update Report status")
 			return updateErr
@@ -677,8 +677,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	// the status to indicate the report has finished
 	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
 		msg := fmt.Sprintf("Report has finished reporting. Report has reached the configured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
-		runningCond := cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.ReportFinishedReason, msg)
-		cbutil.SetReportCondition(&report.Status, *runningCond)
+		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, msg)
+		meteringUtil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(msg)
 	} else if report.Spec.Schedule != nil {
 		// determine the next reportTime, if it's not a run-once report and then
@@ -699,8 +699,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		waitTime := nextRunTime.Sub(now)
 
 		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, nextRunTime)
-		runningCond := cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg)
-		cbutil.SetReportCondition(&report.Status, *runningCond)
+		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodWaitingReason, waitMsg)
+		meteringUtil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(waitMsg+". waiting %s", waitTime)
 		op.enqueueReportAfter(report, waitTime)
 	}
@@ -793,20 +793,20 @@ func reportNeedsFinalizer(report *metering.Report) bool {
 }
 
 func (op *Reporting) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
-	cbutil.SetReportCondition(&report.Status, *cond)
+	meteringUtil.SetReportCondition(&report.Status, *cond)
 	return op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 }
 
 func (op *Reporting) setReportStatusInvalidReport(report *metering.Report, msg string) error {
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	// don't update unless the validation error changes
-	if runningCond := cbutil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.InvalidReportReason && runningCond.Message == msg {
+	if runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == meteringUtil.InvalidReportReason && runningCond.Message == msg {
 		logger.Debugf("Report %s failed validation last reconcile, skipping updating status", report.Name)
 		return nil
 	}
 
 	logger.Warnf("Report %s failed validation: %s", report.Name, msg)
-	cond := cbutil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, cbutil.InvalidReportReason, msg)
+	cond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.InvalidReportReason, msg)
 	_, err := op.updateReportStatus(report, cond)
 	return err
 }
