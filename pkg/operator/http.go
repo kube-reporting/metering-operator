@@ -22,7 +22,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	api "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
@@ -187,7 +187,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 
 	if r.FormValue("ignore_failed") != "true" {
-		if cond := meteringUtil.GetReportCondition(report.Status, api.ReportRunning); cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringUtil.GenerateReportFailedReason {
+		if cond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringUtil.GenerateReportFailedReason {
 			logger.Errorf("report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "report is is failed state, reason: %s, message: %s", cond.Reason, cond.Message)
 			return
@@ -253,7 +253,7 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 	}
 }
 
-func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.csv", name))
 	err := writeResultsAsCSV(columns, results, w, ',')
@@ -264,7 +264,7 @@ func writeResultsResponseAsCSV(logger log.FieldLogger, name string, columns []ap
 	w.WriteHeader(http.StatusOK)
 }
 
-func writeResultsAsCSV(columns []api.ReportQueryColumn, results []presto.Row, w io.Writer, delimiter rune) error {
+func writeResultsAsCSV(columns []metering.ReportQueryColumn, results []presto.Row, w io.Writer, delimiter rune) error {
 	csvWriter := csv.NewWriter(w)
 	csvWriter.Comma = delimiter
 
@@ -317,7 +317,7 @@ func writeResultsAsCSV(columns []api.ReportQueryColumn, results []presto.Row, w 
 	return csvWriter.Error()
 }
 
-func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/tab-separated-values")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.tsv", name))
 	padding := 2
@@ -344,7 +344,7 @@ func writeResultsResponseAsTabular(logger log.FieldLogger, name string, columns 
 	w.WriteHeader(http.StatusOK)
 }
 
-func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;***REMOVED***lename=%s.json", name))
 	newResults := make([]*orderedmap.OrderedMap, len(results))
 	for i, item := range results {
@@ -358,7 +358,7 @@ func writeResultsResponseAsJSON(logger log.FieldLogger, name string, columns []a
 	writeResponseAsJSON(logger, w, http.StatusOK, newResults)
 }
 
-func writeResultsResponse(logger log.FieldLogger, format, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponse(logger log.FieldLogger, format, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "json":
 		writeResultsResponseAsJSON(logger, name, columns, results, w, r)
@@ -385,9 +385,9 @@ type ReportResultValues struct {
 }
 
 // convertsToGetReportResults converts Rows returned from `presto.ExecuteSelect` into a GetReportResults
-func convertsToGetReportResults(input []presto.Row, columns []api.ReportQueryColumn) GetReportResults {
+func convertsToGetReportResults(input []presto.Row, columns []metering.ReportQueryColumn) GetReportResults {
 	results := GetReportResults{}
-	columnsMap := make(map[string]api.ReportQueryColumn)
+	columnsMap := make(map[string]metering.ReportQueryColumn)
 	for _, column := range columns {
 		columnsMap[column.Name] = column
 	}
@@ -407,9 +407,9 @@ func convertsToGetReportResults(input []presto.Row, columns []api.ReportQueryCol
 	return results
 }
 
-func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
-	columnsMap := make(map[string]api.ReportQueryColumn)
-	var ***REMOVED***lteredColumns []api.ReportQueryColumn
+func writeResultsResponseV1(logger log.FieldLogger, format string, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+	columnsMap := make(map[string]metering.ReportQueryColumn)
+	var ***REMOVED***lteredColumns []metering.ReportQueryColumn
 
 	// remove tableHidden columns and their values if the format is tabular or CSV
 
@@ -434,11 +434,11 @@ func writeResultsResponseV1(logger log.FieldLogger, format string, name string, 
 	writeResultsResponse(logger, format, name, ***REMOVED***lteredColumns, results, w, r)
 }
 
-func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []api.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
+func writeResultsResponseV2(logger log.FieldLogger, full bool, format string, name string, columns []metering.ReportQueryColumn, results []presto.Row, w http.ResponseWriter, r *http.Request) {
 	format = strings.ToLower(format)
 	isTableFormat := format == "csv" || format == "tab" || format == "tabular"
-	columnsMap := make(map[string]api.ReportQueryColumn)
-	var ***REMOVED***lteredColumns []api.ReportQueryColumn
+	columnsMap := make(map[string]metering.ReportQueryColumn)
+	var ***REMOVED***lteredColumns []metering.ReportQueryColumn
 
 	// Remove columns and their values from `results` if full is false and the
 	// column's TableHidden is true or if TableHidden is true and we're
