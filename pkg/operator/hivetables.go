@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	hiveTableFinalizer = cbTypes.GroupName + "/hivetable"
+	hiveTableFinalizer = metering.GroupName + "/hivetable"
 )
 
 var (
@@ -89,7 +89,7 @@ func (op *Reporting) syncHiveTable(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.HiveTable) error {
+func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering.HiveTable) error {
 	if op.cfg.EnableFinalizers && hiveTableNeedsFinalizer(hiveTable) {
 		var err error
 		hiveTable, err = op.addHiveTableFinalizer(hiveTable)
@@ -159,11 +159,11 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.
 			return fmt.Errorf("unable to create PrestoTable %s, error converting Hive columns to Presto columns: %s", hiveTable.Name, err)
 		}
 
-		ownerRef := metav1.NewControllerRef(hiveTable, cbTypes.HiveTableGVK)
-		prestoTable := &cbTypes.PrestoTable{
+		ownerRef := metav1.NewControllerRef(hiveTable, metering.HiveTableGVK)
+		prestoTable := &metering.PrestoTable{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "PrestoTable",
-				APIVersion: cbTypes.PrestoTableGVK.GroupVersion().String(),
+				APIVersion: metering.PrestoTableGVK.GroupVersion().String(),
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      hiveTable.Name,
@@ -173,7 +173,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.
 					*ownerRef,
 				},
 			},
-			Spec: cbTypes.PrestoTableSpec{
+			Spec: metering.PrestoTableSpec{
 				// this is managed via the HiveTable, do not manage it directly
 				// as a Presto table
 				Unmanaged: true,
@@ -274,7 +274,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *cbTypes.
 	return nil
 }
 
-func (op *Reporting) addHiveTableFinalizer(hiveTable *cbTypes.HiveTable) (*cbTypes.HiveTable, error) {
+func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	hiveTable.Finalizers = append(hiveTable.Finalizers, hiveTableFinalizer)
 	newHiveTable, err := op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
@@ -286,7 +286,7 @@ func (op *Reporting) addHiveTableFinalizer(hiveTable *cbTypes.HiveTable) (*cbTyp
 	return newHiveTable, nil
 }
 
-func (op *Reporting) removeHiveTableFinalizer(hiveTable *cbTypes.HiveTable) (*cbTypes.HiveTable, error) {
+func (op *Reporting) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	if !slice.ContainsString(hiveTable.ObjectMeta.Finalizers, hiveTableFinalizer, nil) {
 		return hiveTable, nil
 	}
@@ -301,11 +301,11 @@ func (op *Reporting) removeHiveTableFinalizer(hiveTable *cbTypes.HiveTable) (*cb
 	return newHiveTable, nil
 }
 
-func hiveTableNeedsFinalizer(hiveTable *cbTypes.HiveTable) bool {
+func hiveTableNeedsFinalizer(hiveTable *metering.HiveTable) bool {
 	return hiveTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(hiveTable.ObjectMeta.Finalizers, hiveTableFinalizer, nil)
 }
 
-func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, managePartitions bool, partitions []hive.TablePartition) (*cbTypes.HiveTable, error) {
+func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersionKind, params hive.TableParameters, managePartitions bool, partitions []hive.TablePartition) (*metering.HiveTable, error) {
 	apiVersion := gvk.GroupVersion().String()
 	kind := gvk.Kind
 	name := obj.GetName()
@@ -318,20 +318,20 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 		finalizers = []string{hiveTableFinalizer}
 	}
 
-	var newPartitions []cbTypes.HiveTablePartition
+	var newPartitions []metering.HiveTablePartition
 	for _, p := range partitions {
-		newPartitions = append(newPartitions, cbTypes.HiveTablePartition(p))
+		newPartitions = append(newPartitions, metering.HiveTablePartition(p))
 	}
-	var newSortedBy []cbTypes.SortColumn
+	var newSortedBy []metering.SortColumn
 	for _, c := range params.SortedBy {
-		newSortedBy = append(newSortedBy, cbTypes.SortColumn{
+		newSortedBy = append(newSortedBy, metering.SortColumn{
 			Name:      c.Name,
 			Decending: c.Decending,
 		})
 	}
 
 	resourceName := reportingutil.TableResourceNameFromKind(kind, namespace, name)
-	newHiveTable := &cbTypes.HiveTable{
+	newHiveTable := &metering.HiveTable{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "HiveTable",
 			APIVersion: apiVersion,
@@ -345,7 +345,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 			},
 			Finalizers: finalizers,
 		},
-		Spec: cbTypes.HiveTableSpec{
+		Spec: metering.HiveTableSpec{
 			DatabaseName:     params.Database,
 			TableName:        params.Name,
 			Columns:          params.Columns,
@@ -376,8 +376,8 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 	return hiveTable, nil
 }
 
-func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, timeout time.Duration) (*cbTypes.HiveTable, error) {
-	var hiveTable *cbTypes.HiveTable
+func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.HiveTable, error) {
+	var hiveTable *metering.HiveTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
 		hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(namespace).Get(name, metav1.GetOptions{})
@@ -401,7 +401,7 @@ func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, time
 	return hiveTable, nil
 }
 
-func (op *Reporting) dropHiveTable(hiveTable *cbTypes.HiveTable) error {
+func (op *Reporting) dropHiveTable(hiveTable *metering.HiveTable) error {
 	tableName := hiveTable.Status.TableName
 	databaseName := hiveTable.Status.DatabaseName
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace, "tableName": tableName})
@@ -416,16 +416,16 @@ func (op *Reporting) dropHiveTable(hiveTable *cbTypes.HiveTable) error {
 }
 
 type partitionChanges struct {
-	toRemovePartitions []cbTypes.HiveTablePartition
-	toAddPartitions    []cbTypes.HiveTablePartition
-	toUpdatePartitions []cbTypes.HiveTablePartition
+	toRemovePartitions []metering.HiveTablePartition
+	toAddPartitions    []metering.HiveTablePartition
+	toUpdatePartitions []metering.HiveTablePartition
 }
 
-func getPartitionChanges(partitionColumns []hive.Column, current []cbTypes.HiveTablePartition, desired []cbTypes.HiveTablePartition) partitionChanges {
+func getPartitionChanges(partitionColumns []hive.Column, current []metering.HiveTablePartition, desired []metering.HiveTablePartition) partitionChanges {
 	currSet := sets.NewString()
 	desiredSet := sets.NewString()
 	// lookup a map used to go back from setID to Partition
-	lookup := make(map[string]cbTypes.HiveTablePartition)
+	lookup := make(map[string]metering.HiveTablePartition)
 
 	for _, p := range current {
 		var vals []string

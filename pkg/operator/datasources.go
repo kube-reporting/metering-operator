@@ -14,7 +14,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	cbInterfaces "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	reportDataSourceFinalizer = cbTypes.GroupName + "/reportdatasource"
+	reportDataSourceFinalizer = metering.GroupName + "/reportdatasource"
 	partitionUpdateInterval   = 30 * time.Minute
 	// allowIncompleteChunks must be true generally if we have a large
 	// chunkSize because otherwise we will wait for an entire chunks worth of
@@ -69,7 +69,7 @@ func (op *Reporting) syncReportDataSource(logger log.FieldLogger, key string) er
 	return op.handleReportDataSource(logger, ds)
 }
 
-func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if op.cfg.EnableFinalizers && reportDataSourceNeedsFinalizer(dataSource) {
 		var err error
 		dataSource, err = op.addReportDataSourceFinalizer(dataSource)
@@ -95,12 +95,12 @@ func (op *Reporting) handleReportDataSource(logger log.FieldLogger, dataSource *
 
 }
 
-func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.PrometheusMetricsImporter == nil {
 		return fmt.Errorf("%s is not a PrometheusMetricsImporter ReportDataSource", dataSource.Name)
 	}
 
-	var prestoTable *cbTypes.PrestoTable
+	var prestoTable *metering.PrestoTable
 	if dataSource.Status.TableRef.Name != "" {
 		var err error
 		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
@@ -130,7 +130,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 
 		logger.Infof("creating table %s", tableName)
-		hiveTable, err := op.createHiveTableCR(dataSource, cbTypes.ReportDataSourceGVK, params, false, nil)
+		hiveTable, err := op.createHiveTableCR(dataSource, metering.ReportDataSourceGVK, params, false, nil)
 		if err != nil {
 			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 		}
@@ -145,7 +145,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		logger.Infof("created table %s", tableName)
 
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		})
 		if err != nil {
@@ -209,7 +209,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 	importStatus := dataSource.Status.PrometheusMetricsImportStatus
 	if importStatus == nil {
-		importStatus = &cbTypes.PrometheusMetricsImportStatus{}
+		importStatus = &metering.PrometheusMetricsImportStatus{}
 	}
 
 	// record the lastImportTime
@@ -288,7 +288,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 
 		// Update the status to indicate where we are in the metric import process
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.PrometheusMetricsImportStatus = importStatus
 		})
 		if err != nil {
@@ -302,7 +302,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	return nil
 }
 
-func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	source := dataSource.Spec.AWSBilling.Source
 	if source == nil {
 		return fmt.Errorf("ReportDataSource %q: improperly configured datasource, source is empty", dataSource.Name)
@@ -320,7 +320,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		return nil
 	}
 
-	var hiveTable *cbTypes.HiveTable
+	var hiveTable *metering.HiveTable
 	if dataSource.Status.TableRef.Name == "" {
 		logger.Infof("new AWSBilling ReportDataSource discovered")
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
@@ -332,7 +332,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 
 		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		})
 		if err != nil {
@@ -374,7 +374,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 	return nil
 }
 
-func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.PrestoTable == nil {
 		return fmt.Errorf("%s is not a PrestoTable ReportDataSource", dataSource.Name)
 	}
@@ -382,7 +382,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		return fmt.Errorf("invalid PrestoTable ReportDataSource %s, spec.prestoTable.tableRef.name must be set", dataSource.Name)
 	}
 
-	var prestoTable *cbTypes.PrestoTable
+	var prestoTable *metering.PrestoTable
 	if dataSource.Status.TableRef.Name != "" {
 		var err error
 		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
@@ -399,7 +399,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		}
 
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		})
 		if err != nil {
@@ -411,7 +411,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 	return nil
 }
 
-func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
 	if dataSource.Spec.ReportQueryView == nil {
 		return fmt.Errorf("%s is not a ReportQueryView ReportDataSource", dataSource.Name)
 	}
@@ -502,7 +502,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 		columns := reportingutil.GeneratePrestoColumns(query)
 		logger.Infof("creating view %s", viewName)
-		prestoTable, err := op.createPrestoTableCR(dataSource, cbTypes.ReportDataSourceGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
+		prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, "hive", hiveStorage.Status.Hive.DatabaseName, viewName, columns, false, true, renderedQuery)
 		if err != nil {
 			return fmt.Errorf("error creating view %s for ReportDataSource %s: %v", viewName, dataSource.Name, err)
 		}
@@ -514,7 +514,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 		logger.Infof("created view %s", viewName)
 
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *cbTypes.ReportDataSource) {
+		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef.Name = prestoTable.Name
 		})
 		if err != nil {
@@ -533,7 +533,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 	return nil
 }
 
-func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
 	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
@@ -545,7 +545,7 @@ func (op *Reporting) addReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) 
 	return newReportDataSource, nil
 }
 
-func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSource) (*cbTypes.ReportDataSource, error) {
+func (op *Reporting) removeReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	if !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil) {
 		return ds, nil
 	}
@@ -560,11 +560,11 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *cbTypes.ReportDataSourc
 	return newReportDataSource, nil
 }
 
-func reportDataSourceNeedsFinalizer(ds *cbTypes.ReportDataSource) bool {
+func reportDataSourceNeedsFinalizer(ds *metering.ReportDataSource) bool {
 	return ds.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(ds.ObjectMeta.Finalizers, reportDataSourceFinalizer, nil)
 }
 
-func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []cbTypes.ReportQueryInputValue) (*reporting.ReportQueryDependencies, error) {
+func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []metering.ReportQueryInputValue) (*reporting.ReportQueryDependencies, error) {
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 	query, err := queryGetter.GetReportQuery(namespace, name)
 	if err != nil {
@@ -577,7 +577,7 @@ func (op *Reporting) getQueryDependencies(namespace, name string, inputVals []cb
 	return result.Dependencies, nil
 }
 
-func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *metering.ReportDataSource) error {
 	// Look at reportDataSources in the namespace of this dataSource
 	reportDataSources, err := op.reportDataSourceLister.ReportDataSources(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
@@ -610,7 +610,7 @@ func (op *Reporting) queueDependentReportDataSourcesForDataSource(dataSource *cb
 	return nil
 }
 
-func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.ReportDataSource) error {
+func (op *Reporting) queueDependentReportsForDataSource(dataSource *metering.ReportDataSource) error {
 	// Look at reports in the namespace of this dataSource
 	reports, err := op.reportLister.Reports(dataSource.Namespace).List(labels.Everything())
 	if err != nil {
@@ -638,8 +638,8 @@ func (op *Reporting) queueDependentReportsForDataSource(dataSource *cbTypes.Repo
 	return nil
 }
 
-func updateReportDataSource(dsClient cbInterfaces.ReportDataSourceInterface, dsName string, updateFunc func(*cbTypes.ReportDataSource)) (*cbTypes.ReportDataSource, error) {
-	var ds *cbTypes.ReportDataSource
+func updateReportDataSource(dsClient cbInterfaces.ReportDataSourceInterface, dsName string, updateFunc func(*metering.ReportDataSource)) (*metering.ReportDataSource, error) {
+	var ds *metering.ReportDataSource
 	if err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
 		newDS, err := dsClient.Get(dsName, metav1.GetOptions{})
 		if err != nil {
