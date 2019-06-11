@@ -18,20 +18,20 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 )
 
-func (f *Framework) CreateMeteringReport(report *meteringv1alpha1.Report) error {
+func (f *Framework) CreateMeteringReport(report *metering.Report) error {
 	_, err := f.MeteringClient.Reports(f.Namespace).Create(report)
 	return err
 }
 
-func (f *Framework) GetMeteringReport(name string) (*meteringv1alpha1.Report, error) {
+func (f *Framework) GetMeteringReport(name string) (*metering.Report, error) {
 	return f.MeteringClient.Reports(f.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1alpha1.ReportSchedule, reportingStart, reportingEnd *time.Time) *meteringv1alpha1.Report {
+func (f *Framework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
 	var start, end *meta.Time
 	if reportingStart != nil {
 		start = &meta.Time{*reportingStart}
@@ -39,12 +39,12 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1
 	if reportingEnd != nil {
 		end = &meta.Time{*reportingEnd}
 	}
-	return &meteringv1alpha1.Report{
+	return &metering.Report{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
 			Namespace: f.Namespace,
 		},
-		Spec: meteringv1alpha1.ReportSpec{
+		Spec: metering.ReportSpec{
 			QueryName:      queryName,
 			Schedule:       schedule,
 			ReportingStart: start,
@@ -53,7 +53,7 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *meteringv1
 	}
 }
 
-func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) {
+func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering.Report, waitTimeout time.Duration) {
 	t.Helper()
 	err := f.MeteringClient.Reports(f.Namespace).Delete(report.Name, nil)
 	assert.Condition(t, func() bool {
@@ -71,8 +71,8 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 		if err != nil {
 			return false, err
 		}
-		cond := meteringutil.GetReportCondition(report.Status, meteringv1alpha1.ReportRunning)
-		if cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringutil.ReportFinishedReason {
+		cond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
+		if cond != nil && cond.Status == v1.ConditionFalse && cond.Reason == meteringUtil.ReportFinishedReason {
 			return true, nil
 		}
 
@@ -86,7 +86,7 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 	require.NoErrorf(t, err, "expected Report to ***REMOVED***nished within %s timeout", waitTimeout)
 }
 
-func (f *Framework) GetReportResults(t *testing.T, report *meteringv1alpha1.Report, waitTimeout time.Duration) []map[string]interface{} {
+func (f *Framework) GetReportResults(t *testing.T, report *metering.Report, waitTimeout time.Duration) []map[string]interface{} {
 	t.Helper()
 	var reportResults []map[string]interface{}
 	var reportData []byte

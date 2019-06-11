@@ -9,17 +9,17 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/stretchr/testify/require"
 )
 
-func (f *Framework) GetMeteringReportDataSource(name string) (*meteringv1alpha1.ReportDataSource, error) {
+func (f *Framework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
 	return f.MeteringClient.ReportDataSources(f.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*meteringv1alpha1.ReportDataSource, error) {
+func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
 	t.Helper()
-	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *meteringv1alpha1.ReportDataSource) (bool, error) {
+	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *metering.ReportDataSource) (bool, error) {
 		if ds.Status.TableRef.Name == "" {
 			t.Logf("ReportDataSource %s table is not created yet", name)
 			return false, nil
@@ -35,9 +35,9 @@ func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name stri
 	return ds, nil
 }
 
-func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*meteringv1alpha1.ReportDataSource, error) {
+func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*metering.ReportDataSource, error) {
 	t.Helper()
-	var reportDataSources []*meteringv1alpha1.ReportDataSource
+	var reportDataSources []*metering.ReportDataSource
 	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		reportDataSourcesList, err := f.MeteringClient.ReportDataSources(f.Namespace).List(meta.ListOptions{})
 		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
@@ -53,9 +53,9 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 	})
 }
 
-func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *meteringv1alpha1.ReportDataSource) (bool, error)) (*meteringv1alpha1.ReportDataSource, error) {
+func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *metering.ReportDataSource) (bool, error)) (*metering.ReportDataSource, error) {
 	t.Helper()
-	var ds *meteringv1alpha1.ReportDataSource
+	var ds *metering.ReportDataSource
 	return ds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
 		ds, err = f.GetMeteringReportDataSource(name)
