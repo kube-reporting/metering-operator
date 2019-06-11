@@ -39,6 +39,8 @@ export METERING_CREATE_PULL_SECRET
 : "${HIVE_METASTORE_STORAGE_SIZE:=}"
 : "${HIVE_METASTORE_MEMORY:=}"
 : "${HIVE_METASTORE_CPU:=}"
+: "${PRESTO_MEMORY:=1Gi}"
+: "${PRESTO_CPU:=1}"
 : "${CUR_DATE:=$(date +%s)}"
 
 if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
@@ -65,6 +67,8 @@ HELM_ARGS=(\
     --set "hiveMetastoreStorageSize=${HIVE_METASTORE_STORAGE_SIZE}" \
     --set "hiveMetastoreMemory=${HIVE_METASTORE_MEMORY}" \
     --set "hiveMetastoreCpu=${HIVE_METASTORE_CPU}" \
+    --set "prestoMemory=${PRESTO_MEMORY}" \
+    --set "prestoCpu=${PRESTO_CPU}" \
     --set "dateAnnotationValue=currdate-${CUR_DATE}" \
 )
 
