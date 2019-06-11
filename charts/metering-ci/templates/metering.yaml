@@ -68,6 +68,18 @@ spec:
   {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
   {{- end }}
+        {{- if or .Values.prestoMemory .Values.prestoCpu }}
+        coordinator:
+          {{- if or .Values.prestoMemory .Values.prestoCpu }}
+          resources:
+            requests:
+              memory: "{{ .Values.prestoMemory }}"
+              cpu: "{{ .Values.prestoCpu }}"
+            limits:
+              memory: null
+              cpu: null
+          {{- end }}
+        {{- end }}
       hive:
   {{- if .Values.dateAnnotationValue }}
         annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
