@@ -10,7 +10,7 @@ import (
 
 	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/test/testhelpers"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -134,7 +134,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "***REMOVED***nished status on run-once report returns true",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.ReportFinishedReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 			}, nil, false),
 			expectFinished: true,
@@ -143,7 +143,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "unset reportingEnd returns false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, nil, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.ReportFinishedReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -152,7 +152,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "reportingEnd > lastReportTime returns false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.ReportFinishedReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 				LastReportTime: &metav1.Time{Time: reportStart.AddDate(0, 0, 0)},
 			}, schedule, false),
@@ -162,7 +162,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "reportingEnd < lastReportTime returns true",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.ReportFinishedReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, testReportMessage),
 				},
 				LastReportTime: &metav1.Time{Time: reportStart.AddDate(0, 2, 0)},
 			}, schedule, false),
@@ -172,7 +172,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is false and reason is Scheduled return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.ScheduledReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ScheduledReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -181,7 +181,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is true and reason is Scheduled return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, util.ScheduledReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.ScheduledReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -190,7 +190,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is false and reason is InvalidReport return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.InvalidReportReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.InvalidReportReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -199,7 +199,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is true and reason is InvalidReport return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, util.InvalidReportReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.InvalidReportReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -208,7 +208,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is false and reason is RunImmediately return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, util.RunImmediatelyReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.RunImmediatelyReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
@@ -217,7 +217,7 @@ func TestIsReportFinished(t *testing.T) {
 			name: "when status running is true and reason is RunImmediately return false",
 			report: testhelpers.NewReport(testReportName, testNamespace, testQueryName, reportStart, reportEnd, v1alpha1.ReportStatus{
 				Conditions: []metering.ReportCondition{
-					*util.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, util.RunImmediatelyReason, testReportMessage),
+					*meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, meteringUtil.RunImmediatelyReason, testReportMessage),
 				},
 			}, schedule, false),
 			expectFinished: false,
