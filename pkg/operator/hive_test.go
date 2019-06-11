@@ -5,22 +5,22 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 )
 
 func TestGetPartitionChanges(t *testing.T) {
 	tests := []struct {
 		name             string
-		current          []cbTypes.HiveTablePartition
-		desired          []cbTypes.HiveTablePartition
-		expectedToRemove []cbTypes.HiveTablePartition
-		expectedToAdd    []cbTypes.HiveTablePartition
-		expectedToUpdate []cbTypes.HiveTablePartition
+		current          []metering.HiveTablePartition
+		desired          []metering.HiveTablePartition
+		expectedToRemove []metering.HiveTablePartition
+		expectedToAdd    []metering.HiveTablePartition
+		expectedToUpdate []metering.HiveTablePartition
 	}{
 		{
 			name: "current and desired are same",
-			current: []cbTypes.HiveTablePartition{
+			current: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -29,7 +29,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.HiveTablePartition{
+			desired: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -41,7 +41,7 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "empty current should have desired in to add list",
-			desired: []cbTypes.HiveTablePartition{
+			desired: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -50,7 +50,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "foobar",
 				},
 			},
-			expectedToAdd: []cbTypes.HiveTablePartition{
+			expectedToAdd: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -62,7 +62,7 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "desired is empty and current should be removed",
-			current: []cbTypes.HiveTablePartition{
+			current: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -71,7 +71,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "foobar",
 				},
 			},
-			expectedToRemove: []cbTypes.HiveTablePartition{
+			expectedToRemove: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -83,7 +83,7 @@ func TestGetPartitionChanges(t *testing.T) {
 		},
 		{
 			name: "desired matches and replaces current",
-			current: []cbTypes.HiveTablePartition{
+			current: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -92,7 +92,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "foobar",
 				},
 			},
-			desired: []cbTypes.HiveTablePartition{
+			desired: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",
@@ -101,7 +101,7 @@ func TestGetPartitionChanges(t *testing.T) {
 					Location: "fizbuzz",
 				},
 			},
-			expectedToUpdate: []cbTypes.HiveTablePartition{
+			expectedToUpdate: []metering.HiveTablePartition{
 				{
 					PartitionSpec: hive.PartitionSpec{
 						"start": "20170101",

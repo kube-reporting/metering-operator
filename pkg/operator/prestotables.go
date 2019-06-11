@@ -15,14 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
 const (
-	prestoTableFinalizer = cbTypes.GroupName + "/prestotable"
+	prestoTableFinalizer = metering.GroupName + "/prestotable"
 )
 
 func (op *Reporting) runPrestoTableWorker() {
@@ -92,7 +92,7 @@ func (op *Reporting) syncPrestoTable(logger log.FieldLogger, key string) error {
 	return nil
 }
 
-func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTypes.PrestoTable) error {
+func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *metering.PrestoTable) error {
 	if op.cfg.EnableFinalizers && prestoTableNeedsFinalizer(prestoTable) {
 		var err error
 		prestoTable, err = op.addPrestoTableFinalizer(prestoTable)
@@ -165,7 +165,7 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *cbTy
 	return nil
 }
 
-func copyPrestoTableSpecToStatus(prestoTable *cbTypes.PrestoTable) bool {
+func copyPrestoTableSpecToStatus(prestoTable *metering.PrestoTable) bool {
 	var needsUpdate bool
 	if prestoTable.Status.Catalog != prestoTable.Spec.Catalog {
 		prestoTable.Status.Catalog = prestoTable.Spec.Catalog
@@ -217,7 +217,7 @@ func copyPrestoTableSpecToStatus(prestoTable *cbTypes.PrestoTable) bool {
 	return needsUpdate
 }
 
-func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
+func (op *Reporting) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
 	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
 	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
@@ -229,7 +229,7 @@ func (op *Reporting) addPrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (
 	return newPrestoTable, nil
 }
 
-func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable) (*cbTypes.PrestoTable, error) {
+func (op *Reporting) removePrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
 	if !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil) {
 		return prestoTable, nil
 	}
@@ -244,11 +244,11 @@ func (op *Reporting) removePrestoTableFinalizer(prestoTable *cbTypes.PrestoTable
 	return newPrestoTable, nil
 }
 
-func prestoTableNeedsFinalizer(prestoTable *cbTypes.PrestoTable) bool {
+func prestoTableNeedsFinalizer(prestoTable *metering.PrestoTable) bool {
 	return prestoTable.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(prestoTable.ObjectMeta.Finalizers, prestoTableFinalizer, nil)
 }
 
-func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
+func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 	if !prestoTable.Spec.Unmanaged {
 		if prestoTable.Status.View {
 			return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
@@ -262,7 +262,7 @@ func (op *Reporting) dropPrestoTable(prestoTable *cbTypes.PrestoTable) error {
 	return errors.New("dropping PrestoTables is currently unsupported")
 }
 
-func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*cbTypes.PrestoTable, error) {
+func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVersionKind, catalog, schema, tableName string, columns []presto.Column, unmanaged, view bool, query string) (*metering.PrestoTable, error) {
 	apiVersion := gvk.GroupVersion().String()
 	kind := gvk.Kind
 	name := obj.GetName()
@@ -276,7 +276,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 	}
 
 	resourceName := reportingutil.TableResourceNameFromKind(kind, namespace, name)
-	newPrestoTable := &cbTypes.PrestoTable{
+	newPrestoTable := &metering.PrestoTable{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PrestoTable",
 			APIVersion: apiVersion,
@@ -290,7 +290,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 			},
 			Finalizers: finalizers,
 		},
-		Spec: cbTypes.PrestoTableSpec{
+		Spec: metering.PrestoTableSpec{
 			Unmanaged: unmanaged,
 			Catalog:   catalog,
 			Schema:    schema,
@@ -315,8 +315,8 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 	return prestoTable, nil
 }
 
-func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, timeout time.Duration) (*cbTypes.PrestoTable, error) {
-	var prestoTable *cbTypes.PrestoTable
+func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, timeout time.Duration) (*metering.PrestoTable, error) {
+	var prestoTable *metering.PrestoTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
 		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Get(name, metav1.GetOptions{})
@@ -340,7 +340,7 @@ func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, ti
 	return prestoTable, nil
 }
 
-func (op *Reporting) queueDependentsOfPrestoTable(prestoTable *cbTypes.PrestoTable) error {
+func (op *Reporting) queueDependentsOfPrestoTable(prestoTable *metering.PrestoTable) error {
 	reports, err := op.reportLister.Reports(prestoTable.Namespace).List(labels.Everything())
 	if err != nil {
 		return err

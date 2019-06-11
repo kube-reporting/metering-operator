@@ -9,14 +9,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
 )
 
 const (
-	storageLocationFinalizer = cbTypes.GroupName + "/storagelocation"
+	storageLocationFinalizer = metering.GroupName + "/storagelocation"
 )
 
 func (op *Reporting) runStorageLocationWorker() {
@@ -85,7 +85,7 @@ func (op *Reporting) syncStorageLocation(logger log.FieldLogger, key string) err
 	return nil
 }
 
-func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocation *cbTypes.StorageLocation) error {
+func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocation *metering.StorageLocation) error {
 	if op.cfg.EnableFinalizers && storageLocationNeedsFinalizer(storageLocation) {
 		var err error
 		storageLocation, err = op.addStorageLocationFinalizer(storageLocation)
@@ -149,7 +149,7 @@ func (op *Reporting) handleStorageLocation(logger log.FieldLogger, storageLocati
 	return nil
 }
 
-func (op *Reporting) addStorageLocationFinalizer(storageLocation *cbTypes.StorageLocation) (*cbTypes.StorageLocation, error) {
+func (op *Reporting) addStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
 	storageLocation.Finalizers = append(storageLocation.Finalizers, storageLocationFinalizer)
 	newStorageLocation, err := op.meteringClient.MeteringV1alpha1().StorageLocations(storageLocation.Namespace).Update(storageLocation)
 	logger := op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace})
@@ -161,7 +161,7 @@ func (op *Reporting) addStorageLocationFinalizer(storageLocation *cbTypes.Storag
 	return newStorageLocation, nil
 }
 
-func (op *Reporting) removeStorageLocationFinalizer(storageLocation *cbTypes.StorageLocation) (*cbTypes.StorageLocation, error) {
+func (op *Reporting) removeStorageLocationFinalizer(storageLocation *metering.StorageLocation) (*metering.StorageLocation, error) {
 	if !slice.ContainsString(storageLocation.ObjectMeta.Finalizers, storageLocationFinalizer, nil) {
 		return storageLocation, nil
 	}
@@ -176,11 +176,11 @@ func (op *Reporting) removeStorageLocationFinalizer(storageLocation *cbTypes.Sto
 	return newStorageLocation, nil
 }
 
-func storageLocationNeedsFinalizer(storageLocation *cbTypes.StorageLocation) bool {
+func storageLocationNeedsFinalizer(storageLocation *metering.StorageLocation) bool {
 	return storageLocation.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(storageLocation.ObjectMeta.Finalizers, storageLocationFinalizer, nil)
 }
 
-func (op *Reporting) deleteStorage(storageLocation *cbTypes.StorageLocation) error {
+func (op *Reporting) deleteStorage(storageLocation *metering.StorageLocation) error {
 	if storageLocation.Spec.Hive != nil {
 		if !storageLocation.Spec.Hive.UnmanagedDatabase {
 			return op.hiveDatabaseManager.DropDatabase(storageLocation.Status.Hive.DatabaseName, true, false)
@@ -189,7 +189,7 @@ func (op *Reporting) deleteStorage(storageLocation *cbTypes.StorageLocation) err
 	return nil
 }
 
-func (op *Reporting) queueDependentsOfStorageLocation(storageLocation *cbTypes.StorageLocation) error {
+func (op *Reporting) queueDependentsOfStorageLocation(storageLocation *metering.StorageLocation) error {
 	reports, err := op.reportLister.Reports(storageLocation.Namespace).List(labels.Everything())
 	if err != nil {
 		return err

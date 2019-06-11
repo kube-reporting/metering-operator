@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
 	_ "github.com/operator-framework/operator-metering/pkg/util/workqueue/prometheus" // for prometheus metric registration
 )
@@ -23,7 +23,7 @@ func (op *Reporting) shutdownQueues() {
 }
 
 func (op *Reporting) addReport(obj interface{}) {
-	report := obj.(*cbTypes.Report)
+	report := obj.(*metering.Report)
 	if report.DeletionTimestamp != nil {
 		op.deleteReport(report)
 		return
@@ -33,8 +33,8 @@ func (op *Reporting) addReport(obj interface{}) {
 }
 
 func (op *Reporting) updateReport(prev, cur interface{}) {
-	prevReport := prev.(*cbTypes.Report)
-	curReport := cur.(*cbTypes.Report)
+	prevReport := prev.(*metering.Report)
+	curReport := cur.(*metering.Report)
 	if curReport.DeletionTimestamp != nil {
 		op.deleteReport(curReport)
 		return
@@ -58,14 +58,14 @@ func (op *Reporting) updateReport(prev, cur interface{}) {
 }
 
 func (op *Reporting) deleteReport(obj interface{}) {
-	report, ok := obj.(*cbTypes.Report)
+	report, ok := obj.(*metering.Report)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
-		report, ok = tombstone.Obj.(*cbTypes.Report)
+		report, ok = tombstone.Obj.(*metering.Report)
 		if !ok {
 			op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace}).Errorf("Tombstone contained object that is not a Report %#v", obj)
 			return
@@ -79,7 +79,7 @@ func (op *Reporting) deleteReport(obj interface{}) {
 	op.reportQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReport(report *cbTypes.Report) {
+func (op *Reporting) enqueueReport(report *metering.Report) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
@@ -88,7 +88,7 @@ func (op *Reporting) enqueueReport(report *cbTypes.Report) {
 	op.reportQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Duration) {
+func (op *Reporting) enqueueReportAfter(report *metering.Report, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(report)
 	if err != nil {
 		op.logger.WithError(err).Errorf("Couldn't get key for object %#v: %v", report, err)
@@ -98,7 +98,7 @@ func (op *Reporting) enqueueReportAfter(report *cbTypes.Report, duration time.Du
 }
 
 func (op *Reporting) addReportDataSource(obj interface{}) {
-	ds := obj.(*cbTypes.ReportDataSource)
+	ds := obj.(*metering.ReportDataSource)
 	if ds.DeletionTimestamp != nil {
 		op.deleteReportDataSource(ds)
 		return
@@ -108,8 +108,8 @@ func (op *Reporting) addReportDataSource(obj interface{}) {
 }
 
 func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
-	curReportDataSource := cur.(*cbTypes.ReportDataSource)
-	prevReportDataSource := prev.(*cbTypes.ReportDataSource)
+	curReportDataSource := cur.(*metering.ReportDataSource)
+	prevReportDataSource := prev.(*metering.ReportDataSource)
 	if curReportDataSource.DeletionTimestamp != nil {
 		op.deleteReportDataSource(curReportDataSource)
 		return
@@ -135,14 +135,14 @@ func (op *Reporting) updateReportDataSource(prev, cur interface{}) {
 }
 
 func (op *Reporting) deleteReportDataSource(obj interface{}) {
-	dataSource, ok := obj.(*cbTypes.ReportDataSource)
+	dataSource, ok := obj.(*metering.ReportDataSource)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			op.logger.WithFields(log.Fields{"reportDataSsource": dataSource.Name, "namespace": dataSource.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
-		dataSource, ok = tombstone.Obj.(*cbTypes.ReportDataSource)
+		dataSource, ok = tombstone.Obj.(*metering.ReportDataSource)
 		if !ok {
 			op.logger.WithFields(log.Fields{"reportDataSsource": dataSource.Name, "namespace": dataSource.Namespace}).Errorf("Tombstone contained object that is not a ReportDataSource %#v", obj)
 			return
@@ -156,7 +156,7 @@ func (op *Reporting) deleteReportDataSource(obj interface{}) {
 	op.reportDataSourceQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
+func (op *Reporting) enqueueReportDataSource(ds *metering.ReportDataSource) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
@@ -165,7 +165,7 @@ func (op *Reporting) enqueueReportDataSource(ds *cbTypes.ReportDataSource) {
 	op.reportDataSourceQueue.Add(key)
 }
 
-func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, duration time.Duration) {
+func (op *Reporting) enqueueReportDataSourceAfter(ds *metering.ReportDataSource, duration time.Duration) {
 	key, err := cache.MetaNamespaceKeyFunc(ds)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", ds)
@@ -175,14 +175,14 @@ func (op *Reporting) enqueueReportDataSourceAfter(ds *cbTypes.ReportDataSource, 
 }
 
 func (op *Reporting) addReportQuery(obj interface{}) {
-	query := obj.(*cbTypes.ReportQuery)
+	query := obj.(*metering.ReportQuery)
 	op.logger.Infof("adding ReportQuery %s/%s", query.Namespace, query.Name)
 	op.enqueueReportQuery(query)
 }
 
 func (op *Reporting) updateReportQuery(prev, cur interface{}) {
-	curReportQuery := cur.(*cbTypes.ReportQuery)
-	prevReportQuery := prev.(*cbTypes.ReportQuery)
+	curReportQuery := cur.(*metering.ReportQuery)
+	prevReportQuery := prev.(*metering.ReportQuery)
 	logger := op.logger.WithFields(log.Fields{"reportQuery": curReportQuery.Name, "namespace": curReportQuery.Namespace})
 
 	// Only skip queuing if we're not missing a view
@@ -202,7 +202,7 @@ func (op *Reporting) updateReportQuery(prev, cur interface{}) {
 	op.enqueueReportQuery(curReportQuery)
 }
 
-func (op *Reporting) enqueueReportQuery(query *cbTypes.ReportQuery) {
+func (op *Reporting) enqueueReportQuery(query *metering.ReportQuery) {
 	key, err := cache.MetaNamespaceKeyFunc(query)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"reportQuery": query.Name, "namespace": query.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", query)
@@ -212,7 +212,7 @@ func (op *Reporting) enqueueReportQuery(query *cbTypes.ReportQuery) {
 }
 
 func (op *Reporting) addPrestoTable(obj interface{}) {
-	table := obj.(*cbTypes.PrestoTable)
+	table := obj.(*metering.PrestoTable)
 	if table.DeletionTimestamp != nil {
 		op.deletePrestoTable(table)
 		return
@@ -223,7 +223,7 @@ func (op *Reporting) addPrestoTable(obj interface{}) {
 }
 
 func (op *Reporting) updatePrestoTable(_, cur interface{}) {
-	curPrestoTable := cur.(*cbTypes.PrestoTable)
+	curPrestoTable := cur.(*metering.PrestoTable)
 	if curPrestoTable.DeletionTimestamp != nil {
 		op.deletePrestoTable(curPrestoTable)
 		return
@@ -234,14 +234,14 @@ func (op *Reporting) updatePrestoTable(_, cur interface{}) {
 }
 
 func (op *Reporting) deletePrestoTable(obj interface{}) {
-	prestoTable, ok := obj.(*cbTypes.PrestoTable)
+	prestoTable, ok := obj.(*metering.PrestoTable)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
-		prestoTable, ok = tombstone.Obj.(*cbTypes.PrestoTable)
+		prestoTable, ok = tombstone.Obj.(*metering.PrestoTable)
 		if !ok {
 			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).Errorf("Tombstone contained object that is not a PrestoTable %#v", obj)
 			return
@@ -263,7 +263,7 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	op.prestoTableQueue.Add(key)
 }
 
-func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
+func (op *Reporting) enqueuePrestoTable(table *metering.PrestoTable) {
 	key, err := cache.MetaNamespaceKeyFunc(table)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"prestoTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
@@ -273,7 +273,7 @@ func (op *Reporting) enqueuePrestoTable(table *cbTypes.PrestoTable) {
 }
 
 func (op *Reporting) addHiveTable(obj interface{}) {
-	table := obj.(*cbTypes.HiveTable)
+	table := obj.(*metering.HiveTable)
 	if table.DeletionTimestamp != nil {
 		op.deleteHiveTable(table)
 		return
@@ -284,7 +284,7 @@ func (op *Reporting) addHiveTable(obj interface{}) {
 }
 
 func (op *Reporting) updateHiveTable(_, cur interface{}) {
-	curHiveTable := cur.(*cbTypes.HiveTable)
+	curHiveTable := cur.(*metering.HiveTable)
 	if curHiveTable.DeletionTimestamp != nil {
 		op.deleteHiveTable(curHiveTable)
 		return
@@ -295,14 +295,14 @@ func (op *Reporting) updateHiveTable(_, cur interface{}) {
 }
 
 func (op *Reporting) deleteHiveTable(obj interface{}) {
-	hiveTable, ok := obj.(*cbTypes.HiveTable)
+	hiveTable, ok := obj.(*metering.HiveTable)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
-		hiveTable, ok = tombstone.Obj.(*cbTypes.HiveTable)
+		hiveTable, ok = tombstone.Obj.(*metering.HiveTable)
 		if !ok {
 			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).Errorf("Tombstone contained object that is not a HiveTable %#v", obj)
 			return
@@ -323,7 +323,7 @@ func (op *Reporting) deleteHiveTable(obj interface{}) {
 	op.hiveTableQueue.Add(key)
 }
 
-func (op *Reporting) enqueueHiveTable(table *cbTypes.HiveTable) {
+func (op *Reporting) enqueueHiveTable(table *metering.HiveTable) {
 	key, err := cache.MetaNamespaceKeyFunc(table)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"hiveTable": table.Name, "namespace": table.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", table)
@@ -333,7 +333,7 @@ func (op *Reporting) enqueueHiveTable(table *cbTypes.HiveTable) {
 }
 
 func (op *Reporting) addStorageLocation(obj interface{}) {
-	storageLocation := obj.(*cbTypes.StorageLocation)
+	storageLocation := obj.(*metering.StorageLocation)
 	if storageLocation.DeletionTimestamp != nil {
 		op.deleteStorageLocation(storageLocation)
 		return
@@ -344,7 +344,7 @@ func (op *Reporting) addStorageLocation(obj interface{}) {
 }
 
 func (op *Reporting) updateStorageLocation(_, cur interface{}) {
-	curStorageLocation := cur.(*cbTypes.StorageLocation)
+	curStorageLocation := cur.(*metering.StorageLocation)
 	if curStorageLocation.DeletionTimestamp != nil {
 		op.deleteStorageLocation(curStorageLocation)
 		return
@@ -355,14 +355,14 @@ func (op *Reporting) updateStorageLocation(_, cur interface{}) {
 }
 
 func (op *Reporting) deleteStorageLocation(obj interface{}) {
-	storageLocation, ok := obj.(*cbTypes.StorageLocation)
+	storageLocation, ok := obj.(*metering.StorageLocation)
 	if !ok {
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).Errorf("Couldn't get object from tombstone %#v", obj)
 			return
 		}
-		storageLocation, ok = tombstone.Obj.(*cbTypes.StorageLocation)
+		storageLocation, ok = tombstone.Obj.(*metering.StorageLocation)
 		if !ok {
 			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).Errorf("Tombstone contained object that is not a StorageLocation %#v", obj)
 			return
@@ -383,7 +383,7 @@ func (op *Reporting) deleteStorageLocation(obj interface{}) {
 	op.storageLocationQueue.Add(key)
 }
 
-func (op *Reporting) enqueueStorageLocation(storageLocation *cbTypes.StorageLocation) {
+func (op *Reporting) enqueueStorageLocation(storageLocation *metering.StorageLocation) {
 	key, err := cache.MetaNamespaceKeyFunc(storageLocation)
 	if err != nil {
 		op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("couldn't get key for object: %#v", storageLocation)
