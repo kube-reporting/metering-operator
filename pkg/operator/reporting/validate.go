@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 )
 
@@ -13,7 +12,7 @@ func GetAndValidateQueryDependencies(
 	dataSourceGetter ReportDataSourceGetter,
 	reportGetter ReportGetter,
 	query *metering.ReportQuery,
-	inputVals []cbTypes.ReportQueryInputValue,
+	inputVals []metering.ReportQueryInputValue,
 	handler *UninitialiedDependendenciesHandler,
 ) (*ReportQueryDependencies, error) {
 	deps, err := GetQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, inputVals)
@@ -32,7 +31,7 @@ func GetQueryDependencies(
 	dataSourceGetter ReportDataSourceGetter,
 	reportGetter ReportGetter,
 	query *metering.ReportQuery,
-	inputVals []cbTypes.ReportQueryInputValue,
+	inputVals []metering.ReportQueryInputValue,
 ) (*ReportQueryDependencies, error) {
 	result, err := NewDependencyResolver(queryGetter, dataSourceGetter, reportGetter).ResolveDependencies(query.Namespace, query.Spec.Inputs, inputVals)
 	if err != nil {

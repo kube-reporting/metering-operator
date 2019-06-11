@@ -6,7 +6,7 @@ import (
 	"time"
 	"unicode"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )
@@ -35,7 +35,7 @@ func AWSBillingPeriodTimestamp(date time.Time) string {
 	return date.Format(AWSUsagePartitionDateStringLayout)
 }
 
-func FullyQuali***REMOVED***edTableName(prestoTable *cbTypes.PrestoTable) (string, error) {
+func FullyQuali***REMOVED***edTableName(prestoTable *metering.PrestoTable) (string, error) {
 	var errs []string
 	if len(prestoTable.Status.Catalog) == 0 {
 		errs = append(errs, "prestoTable.Status.Catalog is unset")
@@ -79,7 +79,7 @@ func TruncateToMinute(t time.Time) time.Time {
 	return t.Truncate(time.Minute)
 }
 
-func GenerateHiveColumns(query *cbTypes.ReportQuery) []hive.Column {
+func GenerateHiveColumns(query *metering.ReportQuery) []hive.Column {
 	var columns []hive.Column
 	for _, col := range query.Spec.Columns {
 		columns = append(columns, hive.Column{Name: col.Name, Type: col.Type})
@@ -87,7 +87,7 @@ func GenerateHiveColumns(query *cbTypes.ReportQuery) []hive.Column {
 	return columns
 }
 
-func GeneratePrestoColumns(query *cbTypes.ReportQuery) []presto.Column {
+func GeneratePrestoColumns(query *metering.ReportQuery) []presto.Column {
 	var columns []presto.Column
 	for _, col := range query.Spec.Columns {
 		columns = append(columns, presto.Column{Name: col.Name, Type: col.Type})
@@ -254,7 +254,7 @@ func PrestoColumnToHiveColumn(column presto.Column) (hive.Column, error) {
 	return hive.Column{}, fmt.Errorf("unsupported hive type: %q", column.Type)
 }
 
-func ConvertInputDe***REMOVED***nitionsIntoInputList(defs []cbTypes.ReportQueryInputDe***REMOVED***nition) (required []string) {
+func ConvertInputDe***REMOVED***nitionsIntoInputList(defs []metering.ReportQueryInputDe***REMOVED***nition) (required []string) {
 	for _, def := range defs {
 		if def.Required {
 			required = append(required, def.Name)

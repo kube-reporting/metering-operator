@@ -3,21 +3,21 @@ package operator
 import (
 	"fmt"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	cbListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*cbTypes.StorageLocation, error) {
+func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationLister, namespace string) (*metering.StorageLocation, error) {
 	storageLocations, err := lister.StorageLocations(namespace).List(labels.Everything())
 	if err != nil {
 		return nil, err
 	}
 
-	var defaultStorageLocations []*cbTypes.StorageLocation
+	var defaultStorageLocations []*metering.StorageLocation
 
 	for _, storageLocation := range storageLocations {
-		if storageLocation.Annotations[cbTypes.IsDefaultStorageLocationAnnotation] == "true" {
+		if storageLocation.Annotations[metering.IsDefaultStorageLocationAnnotation] == "true" {
 			defaultStorageLocations = append(defaultStorageLocations, storageLocation)
 		}
 	}
@@ -35,7 +35,7 @@ func (op *Reporting) getDefaultStorageLocation(lister cbListers.StorageLocationL
 
 }
 
-func (op *Reporting) getStorage(storage *cbTypes.StorageLocationRef, namespace string) (*cbTypes.StorageLocation, error) {
+func (op *Reporting) getStorage(storage *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
 	// Nothing speci***REMOVED***ed, try to use default storage location
 	if storage == nil || storage.StorageLocationName == "" {
 		storageLocation, err := op.getDefaultStorageLocation(op.storageLocationLister, namespace)
@@ -52,7 +52,7 @@ func (op *Reporting) getStorage(storage *cbTypes.StorageLocationRef, namespace s
 	return nil, fmt.Errorf("no default storageLocation and storageLocationName is empty")
 }
 
-func (op *Reporting) getHiveStorage(storageRef *cbTypes.StorageLocationRef, namespace string) (*cbTypes.StorageLocation, error) {
+func (op *Reporting) getHiveStorage(storageRef *metering.StorageLocationRef, namespace string) (*metering.StorageLocation, error) {
 	storageLocation, err := op.getStorage(storageRef, namespace)
 	if err != nil {
 		return nil, err
