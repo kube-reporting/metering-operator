@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -36,7 +36,7 @@ var (
 )
 
 // CreateAWSUsageTable instantiates a new external HiveTable CR for AWS Billing/Usage reports stored in S3.
-func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *cbTypes.ReportDataSource, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) (*cbTypes.HiveTable, error) {
+func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSource *metering.ReportDataSource, tableName, bucket, pre***REMOVED***x string, manifests []*aws.Manifest) (*metering.HiveTable, error) {
 	location, err := hive.S3Location(bucket, pre***REMOVED***x)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	}
 
 	logger.Infof("creating Hive table %s", tableName)
-	hiveTable, err := op.createHiveTableCR(dataSource, cbTypes.ReportDataSourceGVK, params, true, nil)
+	hiveTable, err := op.createHiveTableCR(dataSource, metering.ReportDataSourceGVK, params, true, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Hive table for ReportDataSource %s: %s", dataSource.Name, err)
 	}
@@ -112,7 +112,7 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 	return hiveTable, nil
 }
 
-func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSource *cbTypes.ReportDataSource, source *cbTypes.S3Bucket, hiveTable *cbTypes.HiveTable, manifests []*aws.Manifest) error {
+func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSource *metering.ReportDataSource, source *metering.S3Bucket, hiveTable *metering.HiveTable, manifests []*aws.Manifest) error {
 	logger.Infof("updating partitions for Hive table %s", hiveTable.Name)
 	// Fetch the billing manifests
 	if len(manifests) == 0 {
@@ -135,8 +135,8 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSour
 	return nil
 }
 
-func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]cbTypes.HiveTablePartition, error) {
-	desiredPartitions := make([]cbTypes.HiveTablePartition, 0)
+func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]metering.HiveTablePartition, error) {
+	desiredPartitions := make([]metering.HiveTablePartition, 0)
 	// Manifests have a one-to-one correlation with hive currentPartitions
 	for _, manifest := range manifests {
 		manifestPath := manifest.DataDirectory()
@@ -147,7 +147,7 @@ func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]cbTypes.H
 
 		start := reportingutil.AWSBillingPeriodTimestamp(manifest.BillingPeriod.Start.Time)
 		end := reportingutil.AWSBillingPeriodTimestamp(manifest.BillingPeriod.End.Time)
-		p := cbTypes.HiveTablePartition{
+		p := metering.HiveTablePartition{
 			Location: location,
 			PartitionSpec: hive.PartitionSpec{
 				"start": start,

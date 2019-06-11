@@ -6,7 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
@@ -43,7 +43,7 @@ func (op *Reporting) syncReportQuery(logger log.FieldLogger, key string) error {
 	return op.handleReportQuery(logger, q)
 }
 
-func (op *Reporting) handleReportQuery(logger log.FieldLogger, query *cbTypes.ReportQuery) error {
+func (op *Reporting) handleReportQuery(logger log.FieldLogger, query *metering.ReportQuery) error {
 	// queue any reportDataSources using this query to create views
 	return op.queueDependentReportDataSourcesForQuery(query)
 }
@@ -54,7 +54,7 @@ func (op *Reporting) uninitialiedDependendenciesHandler() *reporting.Uninitialie
 	}
 }
 
-func (op *Reporting) queueDependentReportDataSourcesForQuery(query *cbTypes.ReportQuery) error {
+func (op *Reporting) queueDependentReportDataSourcesForQuery(query *metering.ReportQuery) error {
 	reportDataSourceLister := op.meteringClient.MeteringV1alpha1().ReportDataSources(query.Namespace)
 	reportDataSources, err := reportDataSourceLister.List(metav1.ListOptions{})
 	if err != nil {

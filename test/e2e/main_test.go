@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/test/framework"
 )
 
@@ -53,9 +53,9 @@ func TestMain(m *testing.M) {
 
 func TestReportingProducesData(t *testing.T) {
 	// cron schedule to run every minute
-	cronSchedule := &meteringv1alpha1.ReportSchedule{
-		Period: meteringv1alpha1.ReportPeriodCron,
-		Cron: &meteringv1alpha1.ReportScheduleCron{
+	cronSchedule := &metering.ReportSchedule{
+		Period: metering.ReportPeriodCron,
+		Cron: &metering.ReportScheduleCron{
 			Expression: fmt.Sprintf("*/1 * * * *"),
 		},
 	}

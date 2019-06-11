@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/test/framework"
 )
@@ -15,8 +15,8 @@ import (
 type reportProducesDataTestCase struct {
 	name          string
 	queryName     string
-	schedule      *meteringv1alpha1.ReportSchedule
-	newReportFunc func(name, queryName string, schedule *meteringv1alpha1.ReportSchedule, start, end *time.Time) *meteringv1alpha1.Report
+	schedule      *metering.ReportSchedule
+	newReportFunc func(name, queryName string, schedule *metering.ReportSchedule, start, end *time.Time) *metering.Report
 	skip          bool
 	parallel      bool
 }
@@ -52,7 +52,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 
 			// for each datasource, wait until it's EarliestImportedMetricTime is set
 			for _, ds := range dependencies.ReportDataSources {
-				_, err := testFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *meteringv1alpha1.ReportDataSource) (bool, error) {
+				_, err := testFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *metering.ReportDataSource) (bool, error) {
 					if dataSource.Spec.PrometheusMetricsImporter == nil {
 						return true, nil
 					}

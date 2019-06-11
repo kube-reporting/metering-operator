@@ -16,8 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	cbTypes "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	cbutil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	reportFinalizer = cbTypes.GroupName + "/report"
+	reportFinalizer = metering.GroupName + "/report"
 )
 
 var (
@@ -106,18 +106,18 @@ type reportSchedule interface {
 	Next(time.Time) time.Time
 }
 
-func getSchedule(reportSched *cbTypes.ReportSchedule) (reportSchedule, error) {
+func getSchedule(reportSched *metering.ReportSchedule) (reportSchedule, error) {
 	var cronSpec string
 	switch reportSched.Period {
-	case cbTypes.ReportPeriodCron:
+	case metering.ReportPeriodCron:
 		if reportSched.Cron == nil || reportSched.Cron.Expression == "" {
 			return nil, fmt.Errorf("spec.schedule.cron.expression must be speci***REMOVED***ed")
 		}
 		return cron.ParseStandard(reportSched.Cron.Expression)
-	case cbTypes.ReportPeriodHourly:
+	case metering.ReportPeriodHourly:
 		sched := reportSched.Hourly
 		if sched == nil {
-			sched = &cbTypes.ReportScheduleHourly{}
+			sched = &metering.ReportScheduleHourly{}
 		}
 		if err := validateMinute(sched.Minute); err != nil {
 			return nil, err
@@ -126,10 +126,10 @@ func getSchedule(reportSched *cbTypes.ReportSchedule) (reportSchedule, error) {
 			return nil, err
 		}
 		cronSpec = fmt.Sprintf("%d %d * * * *", sched.Second, sched.Minute)
-	case cbTypes.ReportPeriodDaily:
+	case metering.ReportPeriodDaily:
 		sched := reportSched.Daily
 		if sched == nil {
-			sched = &cbTypes.ReportScheduleDaily{}
+			sched = &metering.ReportScheduleDaily{}
 		}
 		if err := validateHour(sched.Hour); err != nil {
 			return nil, err
@@ -141,10 +141,10 @@ func getSchedule(reportSched *cbTypes.ReportSchedule) (reportSchedule, error) {
 			return nil, err
 		}
 		cronSpec = fmt.Sprintf("%d %d %d * * *", sched.Second, sched.Minute, sched.Hour)
-	case cbTypes.ReportPeriodWeekly:
+	case metering.ReportPeriodWeekly:
 		sched := reportSched.Weekly
 		if sched == nil {
-			sched = &cbTypes.ReportScheduleWeekly{}
+			sched = &metering.ReportScheduleWeekly{}
 		}
 		dow := 0
 		if sched.DayOfWeek != nil {
@@ -164,10 +164,10 @@ func getSchedule(reportSched *cbTypes.ReportSchedule) (reportSchedule, error) {
 			return nil, err
 		}
 		cronSpec = fmt.Sprintf("%d %d %d * * %d", sched.Second, sched.Minute, sched.Hour, dow)
-	case cbTypes.ReportPeriodMonthly:
+	case metering.ReportPeriodMonthly:
 		sched := reportSched.Monthly
 		if sched == nil {
-			sched = &cbTypes.ReportScheduleMonthly{}
+			sched = &metering.ReportScheduleMonthly{}
 		}
 		dom := int64(1)
 		if sched.DayOfMonth != nil {
@@ -192,7 +192,7 @@ func getSchedule(reportSched *cbTypes.ReportSchedule) (reportSchedule, error) {
 	return cron.Parse(cronSpec)
 }
 
-func (op *Reporting) handleReport(logger log.FieldLogger, report *cbTypes.Report) error {
+func (op *Reporting) handleReport(logger log.FieldLogger, report *metering.Report) error {
 	if op.cfg.EnableFinalizers && reportNeedsFinalizer(report) {
 		var err error
 		report, err = op.addReportFinalizer(report)
@@ -210,13 +210,13 @@ type reportPeriod struct {
 }
 
 // isReportFinished checks the running condition of the report parameter and returns true if the report has previously run
-func isReportFinished(logger log.FieldLogger, report *cbTypes.Report) bool {
+func isReportFinished(logger log.FieldLogger, report *metering.Report) bool {
 	// check if this report was previously ***REMOVED***nished
-	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
+	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 
 	if runningCond == nil {
 		logger.Infof("new report, validating report")
-	} ***REMOVED*** if runningCond.Reason == cbutil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
+	} ***REMOVED*** if runningCond.Reason == meteringUtil.ReportFinishedReason && runningCond.Status != v1.ConditionTrue {
 		// Found an already ***REMOVED***nished runOnce report. Log that we're not
 		// re-processing runOnce reports after they're previously ***REMOVED***nished
 		if report.Spec.Schedule == nil {
@@ -244,11 +244,11 @@ func isReportFinished(logger log.FieldLogger, report *cbTypes.Report) bool {
 
 // validateReport takes a Report structure and checks if it contains valid ***REMOVED***elds
 func validateReport(
-	report *cbTypes.Report,
+	report *metering.Report,
 	queryGetter reporting.ReportQueryGetter,
 	depResolver DependencyResolver,
 	handler *reporting.UninitialiedDependendenciesHandler,
-) (*cbTypes.ReportQuery, *reporting.DependencyResolutionResult, error) {
+) (*metering.ReportQuery, *reporting.DependencyResolutionResult, error) {
 	// Validate the ReportQuery is set
 	if report.Spec.QueryName == "" {
 		return nil, nil, errors.New("must set spec.query")
@@ -290,7 +290,7 @@ func validateReport(
 
 // getReportPeriod determines a Report's reporting period based off the report parameter's ***REMOVED***elds.
 // Returns a pointer to a reportPeriod structure if no error was encountered, ***REMOVED*** panic or return an error.
-func getReportPeriod(now time.Time, logger log.FieldLogger, report *cbTypes.Report) (*reportPeriod, error) {
+func getReportPeriod(now time.Time, logger log.FieldLogger, report *metering.Report) (*reportPeriod, error) {
 	var reportPeriod *reportPeriod
 
 	// check if the report's schedule spec is set
@@ -343,13 +343,13 @@ func getReportPeriod(now time.Time, logger log.FieldLogger, report *cbTypes.Repo
 // according the report's schedule. If the next scheduled reporting period
 // hasn't elapsed, runReport will requeue the resource for a time when
 // the period has elapsed.
-func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) error {
+func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) error {
 	// check if the report was previously ***REMOVED***nished; store result in bool
 	if reportFinished := isReportFinished(logger, report); reportFinished {
 		return nil
 	}
 
-	runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning)
+	runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning)
 	queryGetter := reporting.NewReportQueryListerGetter(op.reportQueryLister)
 
 	// validate that Report contains valid Spec ***REMOVED***elds
@@ -374,7 +374,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	// create the table before we check to see if the report has dependencies
 	// that are missing data
-	var prestoTable *cbTypes.PrestoTable
+	var prestoTable *metering.PrestoTable
 	// if tableName isn't set, this report is still new and we should make sure
 	// no tables exist already in case of a previously failed cleanup.
 	if report.Status.TableRef.Name != "" {
@@ -409,7 +409,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		}
 
 		logger.Infof("creating table %s", tableName)
-		hiveTable, err := op.createHiveTableCR(report, cbTypes.ReportGVK, params, false, nil)
+		hiveTable, err := op.createHiveTableCR(report, metering.ReportGVK, params, false, nil)
 		if err != nil {
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
 		}
@@ -425,11 +425,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		logger.Infof("created table %s", tableName)
 		dataSourceName := fmt.Sprintf("report-%s", report.Name)
 		logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, prestoTable.Status.TableName)
-		ownerRef := metav1.NewControllerRef(prestoTable, cbTypes.PrestoTableGVK)
-		newReportDataSource := &cbTypes.ReportDataSource{
+		ownerRef := metav1.NewControllerRef(prestoTable, metering.PrestoTableGVK)
+		newReportDataSource := &metering.ReportDataSource{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "ReportDataSource",
-				APIVersion: cbTypes.ReportDataSourceGVK.GroupVersion().String(),
+				APIVersion: metering.ReportDataSourceGVK.GroupVersion().String(),
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      dataSourceName,
@@ -439,8 +439,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 					*ownerRef,
 				},
 			},
-			Spec: cbTypes.ReportDataSourceSpec{
-				PrestoTable: &cbTypes.PrestoTableDataSource{
+			Spec: metering.ReportDataSourceSpec{
+				PrestoTable: &metering.PrestoTableDataSource{
 					TableRef: v1.LocalObjectReference{
 						Name: prestoTable.Name,
 					},
@@ -475,7 +475,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 	var runningMsg, runningReason string
 	if report.Spec.RunImmediately {
-		runningReason = cbutil.RunImmediatelyReason
+		runningReason = meteringUtil.RunImmediatelyReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 	} ***REMOVED*** {
 		// Check if it's time to generate the report
@@ -484,13 +484,13 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, reportPeriod.periodEnd)
 			logger.Infof(waitMsg+". waiting %s", waitTime)
 
-			if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == cbutil.ReportingPeriodWaitingReason {
+			if runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionTrue && runningCond.Reason == meteringUtil.ReportingPeriodWaitingReason {
 				op.enqueueReportAfter(report, waitTime)
 				return nil
 			}
 
 			var err error
-			report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg))
+			report, err = op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodWaitingReason, waitMsg))
 			if err != nil {
 				return err
 			}
@@ -501,7 +501,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 			return nil
 		}
 
-		runningReason = cbutil.ScheduledReason
+		runningReason = meteringUtil.ScheduledReason
 		runningMsg = fmt.Sprintf("Report %s scheduled: reached end of reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 
 		var unmetDataStartDataSourceDependendencies, unmetDataEndDataSourceDependendencies, unstartedDataSourceDependencies []string
@@ -573,18 +573,18 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 
 			// If the previous condition is unmet dependencies, check if the
 			// message changes, and only update if it does
-			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
-				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, cbutil.ReportingPeriodUnmetDependenciesReason)
+			if runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == meteringUtil.ReportingPeriodUnmetDependenciesReason && runningCond.Message == unmetMsg {
+				logger.Debugf("Report %s already has Running condition=false with reason=%s and unchanged message, skipping update", report.Name, meteringUtil.ReportingPeriodUnmetDependenciesReason)
 				return nil
 			}
 			logger.Warnf(unmetMsg)
-			_, err := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
+			_, err := op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodUnmetDependenciesReason, unmetMsg))
 			return err
 		}
 	}
 	logger.Infof(runningMsg + " Running now.")
 
-	report, err = op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
+	report, err = op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionTrue, runningReason, runningMsg))
 	if err != nil {
 		return err
 	}
@@ -660,7 +660,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		// update the status to Failed with message containing the
 		// error
 		errMsg := fmt.Sprintf("error occurred while generating report: %s", err)
-		_, updateErr := op.updateReportStatus(report, cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.GenerateReportFailedReason, errMsg))
+		_, updateErr := op.updateReportStatus(report, meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.GenerateReportFailedReason, errMsg))
 		if updateErr != nil {
 			logger.WithError(updateErr).Errorf("unable to update Report status")
 			return updateErr
@@ -677,8 +677,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	// the status to indicate the report has ***REMOVED***nished
 	if report.Spec.ReportingEnd != nil && report.Status.LastReportTime.Time.Equal(report.Spec.ReportingEnd.Time) {
 		msg := fmt.Sprintf("Report has ***REMOVED***nished reporting. Report has reached the con***REMOVED***gured spec.reportingEnd: %s", report.Spec.ReportingEnd.Time)
-		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportFinishedReason, msg)
-		cbutil.SetReportCondition(&report.Status, *runningCond)
+		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportFinishedReason, msg)
+		meteringUtil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(msg)
 	} ***REMOVED*** if report.Spec.Schedule != nil {
 		// determine the next reportTime, if it's not a run-once report and then
@@ -699,8 +699,8 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 		waitTime := nextRunTime.Sub(now)
 
 		waitMsg := fmt.Sprintf("Next scheduled report period is [%s to %s]. next run time is %s.", reportPeriod.periodStart, reportPeriod.periodEnd, nextRunTime)
-		runningCond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.ReportingPeriodWaitingReason, waitMsg)
-		cbutil.SetReportCondition(&report.Status, *runningCond)
+		runningCond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.ReportingPeriodWaitingReason, waitMsg)
+		meteringUtil.SetReportCondition(&report.Status, *runningCond)
 		logger.Infof(waitMsg+". waiting %s", waitTime)
 		op.enqueueReportAfter(report, waitTime)
 	}
@@ -721,7 +721,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *cbTypes.Report) e
 	return nil
 }
 
-func getRunOnceReportPeriod(report *cbTypes.Report) (*reportPeriod, error) {
+func getRunOnceReportPeriod(report *metering.Report) (*reportPeriod, error) {
 	if report.Spec.ReportingEnd == nil || report.Spec.ReportingStart == nil {
 		return nil, fmt.Errorf("run-once reports must have both ReportingEnd and ReportingStart")
 	}
@@ -732,7 +732,7 @@ func getRunOnceReportPeriod(report *cbTypes.Report) (*reportPeriod, error) {
 	return reportPeriod, nil
 }
 
-func getNextReportPeriod(schedule reportSchedule, period cbTypes.ReportPeriod, lastScheduled time.Time) *reportPeriod {
+func getNextReportPeriod(schedule reportSchedule, period metering.ReportPeriod, lastScheduled time.Time) *reportPeriod {
 	periodStart := lastScheduled.UTC()
 	periodEnd := schedule.Next(periodStart)
 	return &reportPeriod{
@@ -761,7 +761,7 @@ func convertDayOfWeek(dow string) (int, error) {
 	return 0, fmt.Errorf("invalid day of week: %s", dow)
 }
 
-func (op *Reporting) addReportFinalizer(report *cbTypes.Report) (*cbTypes.Report, error) {
+func (op *Reporting) addReportFinalizer(report *metering.Report) (*metering.Report, error) {
 	report.Finalizers = append(report.Finalizers, reportFinalizer)
 	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
@@ -773,7 +773,7 @@ func (op *Reporting) addReportFinalizer(report *cbTypes.Report) (*cbTypes.Report
 	return newReport, nil
 }
 
-func (op *Reporting) removeReportFinalizer(report *cbTypes.Report) (*cbTypes.Report, error) {
+func (op *Reporting) removeReportFinalizer(report *metering.Report) (*metering.Report, error) {
 	if !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil) {
 		return report, nil
 	}
@@ -788,39 +788,39 @@ func (op *Reporting) removeReportFinalizer(report *cbTypes.Report) (*cbTypes.Rep
 	return newReport, nil
 }
 
-func reportNeedsFinalizer(report *cbTypes.Report) bool {
+func reportNeedsFinalizer(report *metering.Report) bool {
 	return report.ObjectMeta.DeletionTimestamp == nil && !slice.ContainsString(report.ObjectMeta.Finalizers, reportFinalizer, nil)
 }
 
-func (op *Reporting) updateReportStatus(report *cbTypes.Report, cond *cbTypes.ReportCondition) (*cbTypes.Report, error) {
-	cbutil.SetReportCondition(&report.Status, *cond)
+func (op *Reporting) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
+	meteringUtil.SetReportCondition(&report.Status, *cond)
 	return op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
 }
 
-func (op *Reporting) setReportStatusInvalidReport(report *cbTypes.Report, msg string) error {
+func (op *Reporting) setReportStatusInvalidReport(report *metering.Report, msg string) error {
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	// don't update unless the validation error changes
-	if runningCond := cbutil.GetReportCondition(report.Status, cbTypes.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == cbutil.InvalidReportReason && runningCond.Message == msg {
+	if runningCond := meteringUtil.GetReportCondition(report.Status, metering.ReportRunning); runningCond != nil && runningCond.Status == v1.ConditionFalse && runningCond.Reason == meteringUtil.InvalidReportReason && runningCond.Message == msg {
 		logger.Debugf("Report %s failed validation last reconcile, skipping updating status", report.Name)
 		return nil
 	}
 
 	logger.Warnf("Report %s failed validation: %s", report.Name, msg)
-	cond := cbutil.NewReportCondition(cbTypes.ReportRunning, v1.ConditionFalse, cbutil.InvalidReportReason, msg)
+	cond := meteringUtil.NewReportCondition(metering.ReportRunning, v1.ConditionFalse, meteringUtil.InvalidReportReason, msg)
 	_, err := op.updateReportStatus(report, cond)
 	return err
 }
 
 // GetReportQueryForReport returns the ReportQuery that was used in the Report parameter
-func GetReportQueryForReport(report *cbTypes.Report, queryGetter reporting.ReportQueryGetter) (*cbTypes.ReportQuery, error) {
+func GetReportQueryForReport(report *metering.Report, queryGetter reporting.ReportQueryGetter) (*metering.ReportQuery, error) {
 	return queryGetter.GetReportQuery(report.Namespace, report.Spec.QueryName)
 }
 
-func (op *Reporting) getReportDependencies(report *cbTypes.Report) (*reporting.ReportQueryDependencies, error) {
+func (op *Reporting) getReportDependencies(report *metering.Report) (*reporting.ReportQueryDependencies, error) {
 	return op.getQueryDependencies(report.Namespace, report.Spec.QueryName, report.Spec.Inputs)
 }
 
-func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) error {
+func (op *Reporting) queueDependentReportsForReport(report *metering.Report) error {
 	// Look for all reports in the namespace
 	reports, err := op.reportLister.Reports(report.Namespace).List(labels.Everything())
 	if err != nil {
@@ -849,7 +849,7 @@ func (op *Reporting) queueDependentReportsForReport(report *cbTypes.Report) erro
 // queueDependentReportQueriesForReport will queue all
 // ReportQueries in the namespace which have a dependency on the
 // report
-func (op *Reporting) queueDependentReportQueriesForReport(report *cbTypes.Report) error {
+func (op *Reporting) queueDependentReportQueriesForReport(report *metering.Report) error {
 	queryLister := op.meteringClient.MeteringV1alpha1().ReportQueries(report.Namespace)
 	queries, err := queryLister.List(metav1.ListOptions{})
 	if err != nil {

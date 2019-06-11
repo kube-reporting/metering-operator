@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
@@ -579,19 +578,19 @@ func TestRenderQuery(t *testing.T) {
 }
 
 // newPrestoTableCustom allows us to insert a custom name, as opposed to testhelpers.NewPrestoTable
-func newTestPrestoTable(name, namespace, schema, catalog string, columns []presto.Column) *v1alpha1.PrestoTable {
-	return &v1alpha1.PrestoTable{
+func newTestPrestoTable(name, namespace, schema, catalog string, columns []presto.Column) *metering.PrestoTable {
+	return &metering.PrestoTable{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
 		},
-		Status: v1alpha1.PrestoTableStatus{
+		Status: metering.PrestoTableStatus{
 			Catalog:   catalog,
 			Schema:    schema,
 			TableName: name,
 			Columns:   columns,
 		},
-		Spec: v1alpha1.PrestoTableSpec{
+		Spec: metering.PrestoTableSpec{
 			Catalog:   catalog,
 			Schema:    schema,
 			TableName: name,
