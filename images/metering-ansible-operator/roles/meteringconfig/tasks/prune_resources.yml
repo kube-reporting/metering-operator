@@ -16,18 +16,4 @@
     de***REMOVED***nition: "{{ to_delete.results | map(attribute='resources') | flatten }}"
   vars:
     label_selector: "{{ meteringcon***REMOVED***g_prune_label_key }}={{ resource.prune_label_value }}"
-  async: "{{ async_seconds | default(0) }}"
-  poll: 0
   when: to_delete.changed
-  register: delete_resources_async_result
-
-- name: Wait for resources to being deleted when deleted asynchronously
-  async_status:
-    jid: "{{ delete_resources_async_result.ansible_job_id }}"
-  when: delete_resources_async_result.results is de***REMOVED***ned and async_seconds is de***REMOVED***ned and async_seconds != 0
-  until: delete_resources_job_result.***REMOVED***nished
-  # delay is 1 second, so retry up to async_seconds, meaning, wait for all
-  # async tasks to complete within the time given to each
-  retries: "{{ async_seconds }}"
-  delay: 1
-  register: delete_resources_job_result
