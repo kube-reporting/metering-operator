@@ -23,3 +23,9 @@ name=Red Hat OCP 4.2
 enabled=1
 gpgcheck=0
 baseurl=http://download.lab.eng.bos.redhat.com/rcm-guest/puddles/RHAOS/AtomicOpenShift/4.2/building/x86_64/os/
+
+[hel-7-server-ansible-runner-1.1-rpms]
+name=ansible runner 1.1
+enabled=1
+gpgcheck=0
+baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/7/7Server/x86_64/ansible-runner/1.1/os/
