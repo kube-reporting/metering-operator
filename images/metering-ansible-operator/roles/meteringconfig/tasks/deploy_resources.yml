@@ -54,7 +54,7 @@
 - name: Wait for resources to ***REMOVED***nish deploying when deployed asynchronously
   async_status:
     jid: "{{ create_resources_async_result.ansible_job_id }}"
-  when: async_seconds != 0 and create_resources_async_result.changed
+  when: create_resources_async_result.changed and async_seconds is de***REMOVED***ned and async_seconds != 0
   until: create_resources_job_result.***REMOVED***nished
   # delay is 1 second, so retry up to async_seconds, meaning, wait for all
   # async tasks to complete within the time given to each
