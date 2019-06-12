@@ -24,7 +24,7 @@
 - name: Wait for resources to being deleted when deleted asynchronously
   async_status:
     jid: "{{ delete_resources_async_result.ansible_job_id }}"
-  when: async_seconds != 0 and delete_resources_async_result.results is defined
+  when: delete_resources_async_result.results is defined and async_seconds is defined and async_seconds != 0
   until: delete_resources_job_result.finished
   # delay is 1 second, so retry up to async_seconds, meaning, wait for all
   # async tasks to complete within the time given to each
