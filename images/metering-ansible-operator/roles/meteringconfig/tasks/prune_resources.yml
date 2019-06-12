@@ -1,11 +1,13 @@
 - name: Query for {{ resource.apis | map(attribute='kind') | join(', ') }} resources with selector {{ label_selector }} to delete
   k8s_facts:
-    api_version: "{{ item.api_version | default(omit) }}"
-    kind: "{{ item.kind }}"
+    api_version: "{{ to_delete_item.api_version | default(omit) }}"
+    kind: "{{ to_delete_item.kind }}"
     namespace: "{{ namespace }}"
     label_selectors:
       - "{{ label_selector }}"
   loop: "{{ resource.apis }}"
+  loop_control:
+    loop_var: to_delete_item
   vars:
     label_selector: "{{ meteringcon***REMOVED***g_prune_label_key }}={{ resource.prune_label_value }}"
   register: to_delete
