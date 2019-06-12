@@ -9,12 +9,11 @@ data:
 
 {{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
     cat $PRESTO_CLIENT_KEYFILE $PRESTO_CLIENT_CRTFILE > $PRESTO_TRUSTSTORE_PEM
-
+{{- end }}
 {{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
     # copy all necessary tls.crt/tls.key from read-only secret volumes - append server bundle and CA cert to truststore
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE > $PRESTO_KEYSTORE_PEM
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE >> $PRESTO_TRUSTSTORE_PEM
-{{- end }}
 {{- end }}
 
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
