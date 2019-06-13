@@ -3,7 +3,6 @@
 - name: Deploy presto resources
   include_tasks: deploy_resources.yml
   vars:
-    async_seconds: 120
     values_***REMOVED***le: /tmp/metering-values.yaml
     resources:
       - template_***REMOVED***le: templates/presto/presto-aws-credentials-secret.yaml
