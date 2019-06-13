@@ -101,6 +101,8 @@ spec:
           mountPath: /hadoop/dfs/name
         - name: datanode-empty
           mountPath: /hadoop/dfs/data
+        - name: hadoop-logs
+          mountPath: /opt/hadoop/logs
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.mountPath }}

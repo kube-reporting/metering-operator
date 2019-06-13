@@ -170,6 +170,8 @@ spec:
         # required for openshift
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
+        - name: hadoop-logs
+          mountPath: /opt/hadoop/logs
         livenessProbe:
           exec:
             command: ["/hadoop-con***REMOVED***g/check-datanode-healthy.sh" ]
