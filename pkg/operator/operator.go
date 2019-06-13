@@ -111,6 +111,7 @@ type Config struct {
 	PrestoCAFile            string
 	PrestoClientCertFile    string
 	PrestoClientKeyFile     string
+	PrestoClientCACertFile  string
 
 	PrestoMaxQueryLength int
 
@@ -466,9 +467,17 @@ func (op *Reporting) Run(ctx context.Context) error {
 				return fmt.Errorf("presto: Error loading SSL Client cert/key file: %v", err)
 			}
 
+			clientCACert, err := ioutil.ReadFile(op.cfg.PrestoClientCACertFile)
+			if err != nil {
+				return fmt.Errorf("presto: Error loading SSL Client CA Cert File: %v", err)
+			}
+
+			clientCAPool := x509.NewCertPool()
+			clientCAPool.AppendCertsFromPEM(clientCACert)
+
 			// mutate the necessary structure fields in prestoTLSConfig to work with client certificates
 			prestoTLSConfig.Certificates = []tls.Certificate{clientCert}
-			prestoTLSConfig.ClientCAs = rootCertPool
+			prestoTLSConfig.ClientCAs = clientCAPool
 			prestoTLSConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		}
 

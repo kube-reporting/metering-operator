@@ -83,6 +83,7 @@ func init() {
 	startCmd.Flags().StringVar(&cfg.PrestoCAFile, "presto-ca-file", "", "The path to the certificate authority to use to connect to Presto.")
 	startCmd.Flags().StringVar(&cfg.PrestoClientCertFile, "presto-client-cert-file", "", "The path to the client certificate to use to connect to Presto.")
 	startCmd.Flags().StringVar(&cfg.PrestoClientKeyFile, "presto-client-key-file", "", "The path to the client private key to use to connect to Presto.")
+	startCmd.Flags().StringVar(&cfg.PrestoClientCACertFile, "presto-client-ca-cert-file", "", "The path to the client certificate authority to use to connect to Presto.")
 
 	startCmd.Flags().StringVar(&cfg.PrometheusConfig.Address, "prometheus-host", defaultPromHost, "the URL string for connecting to Prometheus")
 	startCmd.Flags().BoolVar(&cfg.PrometheusConfig.SkipTLSVerify, "prometheus-skip-tls-verify", false, "Skip TLS verification")
