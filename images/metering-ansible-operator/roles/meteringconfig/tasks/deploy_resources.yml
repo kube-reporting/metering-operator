@@ -46,21 +46,7 @@
     namespace: "{{ meta.namespace }}"
     definition: "{{ updated_template_results | flatten }}"
     merge_type: ['merge', 'strategic-merge']
-  async: "{{ async_seconds | default(0) }}"
-  poll: 0
   when: template_results.changed and resource is not none
-  register: create_resources_async_result
-
-- name: Wait for resources to finish deploying when deployed asynchronously
-  async_status:
-    jid: "{{ create_resources_async_result.ansible_job_id }}"
-  when: async_seconds != 0 and create_resources_async_result.changed
-  until: create_resources_job_result.finished
-  # delay is 1 second, so retry up to async_seconds, meaning, wait for all
-  # async tasks to complete within the time given to each
-  retries: "{{ async_seconds }}"
-  delay: 1
-  register: create_resources_job_result
 
 - name: Prune resources
   include_tasks: prune_resources.yml

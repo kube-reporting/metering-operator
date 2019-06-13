@@ -3,7 +3,6 @@
 - name: Deploy reporting-operator resources
   include_tasks: deploy_resources.yml
   vars:
-    async_seconds: 120
     values_file: /tmp/metering-values.yaml
     resources:
       - template_file: templates/reporting-operator/reporting-operator-auth-proxy-authenticated-emails-secret.yaml

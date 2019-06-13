@@ -3,7 +3,6 @@
 - name: Deploy metering resources
   include_tasks: deploy_resources.yml
   vars:
-    async_seconds: 120
     values_file: /tmp/metering-values.yaml
     resources:
       - template_file: templates/metering/metering-roles.yaml
