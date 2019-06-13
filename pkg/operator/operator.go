@@ -111,6 +111,7 @@ type Con***REMOVED***g struct {
 	PrestoCAFile            string
 	PrestoClientCertFile    string
 	PrestoClientKeyFile     string
+	PrestoClientCACertFile  string
 
 	PrestoMaxQueryLength int
 
@@ -466,9 +467,17 @@ func (op *Reporting) Run(ctx context.Context) error {
 				return fmt.Errorf("presto: Error loading SSL Client cert/key ***REMOVED***le: %v", err)
 			}
 
+			clientCACert, err := ioutil.ReadFile(op.cfg.PrestoClientCACertFile)
+			if err != nil {
+				return fmt.Errorf("presto: Error loading SSL Client CA Cert File: %v", err)
+			}
+
+			clientCAPool := x509.NewCertPool()
+			clientCAPool.AppendCertsFromPEM(clientCACert)
+
 			// mutate the necessary structure ***REMOVED***elds in prestoTLSCon***REMOVED***g to work with client certi***REMOVED***cates
 			prestoTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
-			prestoTLSCon***REMOVED***g.ClientCAs = rootCertPool
+			prestoTLSCon***REMOVED***g.ClientCAs = clientCAPool
 			prestoTLSCon***REMOVED***g.ClientAuth = tls.RequireAndVerifyClientCert
 		}
 

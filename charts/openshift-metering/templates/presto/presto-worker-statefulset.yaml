@@ -71,6 +71,8 @@ spec:
           value: /presto-client/tls.key
         - name: PRESTO_CLIENT_CRTFILE
           value: /presto-client/tls.crt
+        - name: PRESTO_CLIENT_CA_CRTFILE
+          value: /presto-client/ca.crt
 {{- end }}
 {{- end }}
 {{- include "presto-common-env" . | indent 8 }}
