@@ -104,44 +104,45 @@ spec:
           {{- end }}
 {{- end }}
 
-  hdfs:
+  hadoop:
     spec:
 {{- if .Values.imagePullSecretName }}
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
 {{- end }}
-      datanode:
-  {{- if .Values.dateAnnotationValue }}
-        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-  {{- end }}
-  {{- if .Values.terminationGracePeriodSeconds  }}
-        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-  {{- end }}
-  {{- if .Values.hdfsDatanodeMemory }}
-        resources:
-          requests:
-            memory: "{{ .Values.hdfsDatanodeMemory }}"
-          limits:
-            memory: "{{ .Values.hdfsDatanodeMemory }}"
-  {{- end }}
-  {{- if .Values.hdfsDatanodeStorageSize }}
-        storage:
-          size: {{ .Values.hdfsDatanodeStorageSize }}
-  {{- end }}
-      namenode:
-  {{- if .Values.dateAnnotationValue }}
-        annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-  {{- end }}
-  {{- if .Values.terminationGracePeriodSeconds  }}
-        terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-  {{- end }}
-  {{- if .Values.hdfsNamenodeMemory }}
-        resources:
-          requests:
-            memory: "{{ .Values.hdfsNamenodeMemory }}"
-          limits:
-            memory: "{{ .Values.hdfsNamenodeMemory }}"
-  {{- end }}
-  {{- if .Values.hdfsNamenodeStorageSize   }}
-        storage:
-          size: {{ .Values.hdfsNamenodeStorageSize }}
-  {{- end }}
+      hdfs:
+        datanode:
+{{- if .Values.dateAnnotationValue }}
+          annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+{{- end }}
+{{- if .Values.terminationGracePeriodSeconds  }}
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- end }}
+{{- if .Values.hdfsDatanodeMemory }}
+          resources:
+            requests:
+              memory: "{{ .Values.hdfsDatanodeMemory }}"
+            limits:
+              memory: "{{ .Values.hdfsDatanodeMemory }}"
+{{- end }}
+{{- if .Values.hdfsDatanodeStorageSize }}
+          storage:
+            size: {{ .Values.hdfsDatanodeStorageSize }}
+{{- end }}
+        namenode:
+{{- if .Values.dateAnnotationValue }}
+          annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
+{{- end }}
+{{- if .Values.terminationGracePeriodSeconds  }}
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- end }}
+{{- if .Values.hdfsNamenodeMemory }}
+          resources:
+            requests:
+              memory: "{{ .Values.hdfsNamenodeMemory }}"
+            limits:
+              memory: "{{ .Values.hdfsNamenodeMemory }}"
+{{- end }}
+{{- if .Values.hdfsNamenodeStorageSize   }}
+          storage:
+            size: {{ .Values.hdfsNamenodeStorageSize }}
+{{- end }}
