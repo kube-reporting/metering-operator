@@ -9,6 +9,14 @@
         apis: [ {kind: secret} ]
         prune_label_value: presto-aws-credentials-secret
         create: "{{ meteringconfig_create_presto_aws_credentials }}"
+      - template_file: templates/presto/presto-tls-secrets.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-tls-secrets
+        create: "{{ meteringconfig_create_presto_tls_secrets }}"
+      - template_file: templates/presto/presto-auth-secrets.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-auth-secrets
+        create: "{{ meteringconfig_create_presto_auth_secrets }}"
       - template_file: templates/presto/presto-catalog-config-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-catalog-config-secret

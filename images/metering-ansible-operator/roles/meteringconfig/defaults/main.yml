@@ -70,6 +70,8 @@ meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.create
 meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
 meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
+meteringconfig_create_presto_tls_secrets: "{{ _presto_spec.presto.config.tls.enabled and _presto_spec.presto.config.tls.createSecret | default(false) }}"
+meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.presto.config.auth.enabled and _presto_spec.presto.config.auth.createSecret | default(false) }}"
 
 meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
 meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
@@ -78,6 +80,8 @@ meteringconfig_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec
 meteringconfig_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.config.prometheusImporter.auth.tokenSecret.create | default(false) }}"
 meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _reporting_op_spec.config.prometheusCertificateAuthority.configMap.create | default(false) }}"
 meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.createAwsCredentialsSecret | default(false) }}"
+meteringconfig_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.config.prestoTLS.enabled and _reporting_op_spec.config.prestoTLS.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.config.prestoAuth.enabled and _reporting_op_spec.config.prestoAuth.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.createSecret or _reporting_op_spec.config.metricsTLS.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.config.createClusterMonitoringViewRBAC | default(true) }}"

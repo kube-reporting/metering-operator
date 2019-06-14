@@ -53,6 +53,14 @@
         apis: [ {kind: secrets} ]
         prune_label_value: reporting-operator-tls-secrets
         create: "{{ meteringconfig_create_reporting_operator_tls_secrets }}"
+      - template_file: templates/reporting-operator/reporting-operator-presto-tls-secrets.yaml
+        apis: [ {kind: secrets} ]
+        prune_label_value: reporting-operator-presto-tls-secrets
+        create: "{{ meteringconfig_create_reporting_operator_presto_tls_secrets }}"
+      - template_file: templates/reporting-operator/reporting-operator-presto-auth-secrets.yaml
+        apis: [ {kind: secrets} ]
+        prune_label_value: reporting-operator-presto-auth-secrets
+        create: "{{ meteringconfig_create_reporting_operator_presto_auth_secrets }}"
       - template_file: templates/reporting-operator/reporting-operator-route.yaml
         apis: [ {kind: route, api_version: 'route.openshift.io/v1'} ]
         prune_label_value: reporting-operator-route
