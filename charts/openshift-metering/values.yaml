@@ -230,9 +230,21 @@ reporting-operator:
       prestoHost: presto:8080
       prestoMaxQueryLength: null
       prestoTLS:
+        # CA for the server cert
+        caCerti***REMOVED***cate: ""
+
+        createSecret: false
         enabled: false
         secretName: ""
       prestoAuth:
+        # client cert
+        certi***REMOVED***cate: ""
+        # client private key
+        key: ""
+        # CA for the client cert
+        caCerti***REMOVED***cate: ""
+
+        createSecret: false
         enabled: false
         secretName: ""
       prometheusCerti***REMOVED***cateAuthority:
@@ -425,11 +437,28 @@ presto:
       annotations: {}
       con***REMOVED***g:
         tls:
+          # server cert
+          certi***REMOVED***cate: ""
+          # server private key
+          key: ""
+          # CA for the server cert
+          caCerti***REMOVED***cate: ""
+
+          createSecret: false
           enabled: false
-          serverCerti***REMOVED***cateSecretName: ""
+          secretName: ""
+
         auth:
+          # client cert
+          certi***REMOVED***cate: ""
+          # client private key
+          key: ""
+          # CA for the client cert
+          caCerti***REMOVED***cate: ""
+
+          createSecret: false
           enabled: false
-          clientCerti***REMOVED***cateSecretName: ""
+          secretName: ""
         connectors:
           extraConnectorFiles: []
         environment: production
