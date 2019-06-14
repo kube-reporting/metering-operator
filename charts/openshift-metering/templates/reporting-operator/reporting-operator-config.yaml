@@ -16,7 +16,7 @@ data:
   disable-prometheus-metrics-importer: {{ $operatorValues.spec.con***REMOVED***g.disablePrometheusMetricsImporter | quote}}
   enable-***REMOVED***nalizers: {{ $operatorValues.spec.con***REMOVED***g.enableFinalizers | quote}}
 {{- if $operatorValues.spec.con***REMOVED***g.prestoTLS.enabled }}
-  presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/tls.crt"
+  presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/ca.crt"
 {{- if $operatorValues.spec.con***REMOVED***g.prestoAuth.enabled }}
   presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/tls.crt"
   presto-client-key-***REMOVED***le: "/var/run/secrets/presto-auth/tls.key"

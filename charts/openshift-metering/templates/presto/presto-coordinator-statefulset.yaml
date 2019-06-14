@@ -167,11 +167,11 @@ spec:
         emptyDir: {}
       - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.tls.serverCerti***REMOVED***cateSecretName }}
+          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.tls.secretName }}
 {{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
       - name: presto-client-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.auth.clientCerti***REMOVED***cateSecretName }}
+          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.auth.secretName }}
 {{- end }}
 {{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
