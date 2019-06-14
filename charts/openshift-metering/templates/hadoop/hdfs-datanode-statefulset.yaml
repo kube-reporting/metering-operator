@@ -40,46 +40,50 @@ metadata:
     hdfs: datanode
 spec:
   serviceName: "hdfs-datanode"
-  replicas: {{ .Values.hdfs.spec.datanode.replicas }}
+  replicas: {{ .Values.hadoop.spec.hdfs.datanode.replicas }}
   updateStrategy:
     type: RollingUpdate
   selector:
     matchLabels:
       app: hdfs-datanode
       hdfs: datanode
-{{- if .Values.hdfs.spec.datanode.labels }}
-{{ toYaml .Values.hdfs.spec.datanode.labels | indent 6 }}
+{{- if .Values.hadoop.spec.hdfs.datanode.labels }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: hdfs-datanode
         hdfs: datanode
-{{- if .Values.hdfs.spec.datanode.labels }}
-{{ toYaml .Values.hdfs.spec.datanode.labels | indent 8 }}
+{{- if .Values.hadoop.spec.hdfs.datanode.labels }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.labels | indent 8 }}
 {{- end }}
       annotations:
-        hdfs-configmap-hash: {{ include (print $.Template.BasePath "/hdfs/hdfs-configmap.yaml") . | sha256sum }}
-{{- if .Values.hdfs.spec.datanode.annotations }}
-{{ toYaml .Values.hdfs.spec.datanode.annotations | indent 8 }}
+        hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-configmap.yaml") . | sha256sum }}
+        hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
+{{- if .Values.hadoop.spec.config.aws.createCredentialsSecret }}
+        hadoop-aws-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-aws-credentials.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hadoop.spec.hdfs.datanode.annotations }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.annotations | indent 8 }}
 {{- end }}
     spec:
-      terminationGracePeriodSeconds: {{ .Values.hdfs.spec.datanode.terminationGracePeriodSeconds }}
-{{- if .Values.hdfs.spec.securityContext }}
+      terminationGracePeriodSeconds: {{ .Values.hadoop.spec.hdfs.datanode.terminationGracePeriodSeconds }}
+{{- if .Values.hadoop.spec.hdfs.securityContext }}
       securityContext:
-{{ toYaml .Values.hdfs.spec.securityContext | indent 8 }}
+{{ toYaml .Values.hadoop.spec.hdfs.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.hdfs.spec.datanode.affinity }}
+{{- if .Values.hadoop.spec.hdfs.datanode.affinity }}
       affinity:
-{{ toYaml .Values.hdfs.spec.datanode.affinity | indent 8 }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.affinity | indent 8 }}
 {{- end }}
-{{- if .Values.hdfs.spec.datanode.nodeSelector }}
+{{- if .Values.hadoop.spec.hdfs.datanode.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.hdfs.spec.datanode.nodeSelector | indent 8 }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.nodeSelector | indent 8 }}
 {{- end }}
-{{- if .Values.hdfs.spec.datanode.tolerations }}
+{{- if .Values.hadoop.spec.hdfs.datanode.tolerations }}
       tolerations:
-{{ toYaml .Values.hdfs.spec.datanode.tolerations | indent 8 }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.tolerations | indent 8 }}
 {{- end }}
       initContainers:
       # wait-for-namenode exists because for some reason the datanode is unable
@@ -88,12 +92,15 @@ spec:
       # would always be resolvable, because on Openshift, clusterIP services
       # NAT loses sourceIPs, breaking HDFS clustering.
       - name: wait-for-namenode
-        image: "{{ .Values.hdfs.spec.image.repository }}:{{ .Values.hdfs.spec.image.tag }}"
-        imagePullPolicy: {{ .Values.hdfs.spec.image.pullPolicy }}
+        image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command:
         - '/bin/bash'
         - '-c'
         - 'until host $NAMENODE_HOST; do echo waiting for $NAMENODE_HOST; sleep 2; done;'
+        env:
+        - name: NAMENODE_HOST
+          value: hdfs-namenode-0.hdfs-namenode
         resources:
           requests:
             memory: "5Mi"
@@ -110,24 +117,27 @@ spec:
         # required for openshift
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
-        env:
-        - name: NAMENODE_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: hdfs-config
-              key: namenode-host
       containers:
       - name: hdfs-datanode
-        image: "{{ .Values.hdfs.spec.image.repository }}:{{ .Values.hdfs.spec.image.tag }}"
-        imagePullPolicy: {{ .Values.hdfs.spec.image.pullPolicy }}
-        command: ["/hadoop-config/entrypoint.sh"]
-        args: ["/hadoop-config/datanode-entrypoint.sh"]
+        image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
+        command: ["/hadoop-scripts/entrypoint.sh"]
+        args: ["/hadoop-scripts/datanode-entrypoint.sh"]
         env:
         - name: HADOOP_LOGLEVEL
+          value: "{{ upper .Values.hadoop.spec.hdfs.config.logLevel }}"
+        - name: AWS_ACCESS_KEY_ID
           valueFrom:
-            configMapKeyRef:
-              name: hdfs-config
-              key: log-level
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.aws.credentialsSecretName }}"
+              key: aws-access-key-id
+              optional: true
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.aws.credentialsSecretName }}"
+              key: aws-secret-access-key
+              optional: true
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
@@ -160,8 +170,10 @@ spec:
         - containerPort: 9867
           name: ipc
         volumeMounts:
-        - name: hdfs-config
+        - name: hadoop-config
           mountPath: /hadoop-config
+        - name: hadoop-scripts
+          mountPath: /hadoop-scripts
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data
           # we use a subPath to avoid the lost+found directory at the root of
@@ -174,22 +186,26 @@ spec:
           mountPath: /opt/hadoop/logs
         livenessProbe:
           exec:
-            command: ["/hadoop-config/check-datanode-healthy.sh" ]
+            command: ["/hadoop-scripts/check-datanode-healthy.sh" ]
           initialDelaySeconds: 90
           periodSeconds: 30
           failureThreshold: 2
           successThreshold: 1
         resources:
-{{ toYaml .Values.hdfs.spec.datanode.resources | indent 10 }}
+{{ toYaml .Values.hadoop.spec.hdfs.datanode.resources | indent 10 }}
       serviceAccount: hdfs
-{{- if .Values.hdfs.spec.imagePullSecrets }}
+{{- if .Values.hadoop.spec.image.pullSecrets }}
       imagePullSecrets:
-{{ toYaml .Values.hdfs.spec.imagePullSecrets | indent 8 }}
+{{ toYaml .Values.hadoop.spec.image.pullSecrets | indent 8 }}
 {{- end }}
       volumes:
-      - name: hdfs-config
+      - name: hadoop-config
         configMap:
-          name: hdfs-config
+          name: "{{ .Values.hadoop.spec.configMapName }}"
+          defaultMode: 0555
+      - name: hadoop-scripts
+        configMap:
+          name: hadoop-scripts
           defaultMode: 0555
       - name: namenode-empty
         emptyDir: {}
@@ -203,7 +219,7 @@ spec:
         hdfs: datanode
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ .Values.hdfs.spec.datanode.storage.class }}
+      storageClassName: {{ .Values.hadoop.spec.hdfs.datanode.storage.class }}
       resources:
         requests:
-          storage: {{ .Values.hdfs.spec.datanode.storage.size }}
+          storage: {{ .Values.hadoop.spec.hdfs.datanode.storage.size }}

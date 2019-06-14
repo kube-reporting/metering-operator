@@ -341,10 +341,10 @@ presto:
         defaultFileFormat: orc
         defaultfs: null
         enableMetastoreSchemaVerification: false
-        hdfsConfigMapName: hdfs-config
         metastoreClientSocketTimeout: null
         metastoreURIs: thrift://hive-metastore:9083
         metastoreWarehouseDir: hdfs://hdfs-namenode-proxy:9820/operator_metering/default_hive_warehouse/
+        hdfsConfigMapName: hadoop-config
         useHdfsConfigMap: true
       image:
         pullPolicy: Always
@@ -515,73 +515,92 @@ presto:
         terminationGracePeriodSeconds: 30
         tolerations: []
 
-hdfs:
-  enabled: true
+hadoop:
   spec:
+    configMapName: hadoop-config
+
     config:
-      datanodeDataDirPerms: "775"
       defaultFS: hdfs://hdfs-namenode-0.hdfs-namenode:9820
-      logLevel: info
-      namenodeHost: hdfs-namenode-0.hdfs-namenode
-      namenodePort: 9820
-      replicationFactor: 3
-    datanode:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - hdfs-datanode
-            topologyKey: kubernetes.io/hostname
-      annotations: {}
-      labels: {}
-      nodeSelector: {}
-      replicas: 1
-      resources:
-        limits:
-          cpu: 250m
-          memory: 250Mi
-        requests:
-          cpu: 250m
-          memory: 250Mi
-      storage:
-        class: null
-        size: 5Gi
-      terminationGracePeriodSeconds: 30
-      tolerations: []
+
+      aws:
+        accessKeyID: ""
+        secretAccessKey: ""
+        createCredentialsSecret: false
+        credentialsSecretName: hadoop-aws-credentials
+
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hadoop
       tag: 4.2
-    namenode:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - hdfs-namenode
-            topologyKey: kubernetes.io/hostname
-      annotations: {}
-      labels: {}
-      nodeSelector: {}
-      resources:
-        limits:
-          cpu: 250m
-          memory: 350Mi
-        requests:
-          cpu: 250m
-          memory: 350Mi
-      storage:
-        class: null
-        size: 5Gi
-      terminationGracePeriodSeconds: 30
-      tolerations: []
-    securityContext:
-      fsGroup: null
-      runAsNonRoot: true
+      pullSecrets: null
+
+    hdfs:
+      enabled: true
+      config:
+        datanodeDataDirPerms: "775"
+        replicationFactor: 3
+        logLevel: info
+
+      datanode:
+        annotations: {}
+        labels: {}
+        nodeSelector: {}
+        tolerations: []
+        terminationGracePeriodSeconds: 30
+        replicas: 1
+
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        storage:
+          class: null
+          size: 5Gi
+
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - hdfs-datanode
+              topologyKey: kubernetes.io/hostname
+
+      namenode:
+        annotations: {}
+        labels: {}
+        nodeSelector: {}
+        terminationGracePeriodSeconds: 30
+        tolerations: []
+
+        resources:
+          limits:
+            cpu: 250m
+            memory: 350Mi
+          requests:
+            cpu: 250m
+            memory: 350Mi
+
+        storage:
+          class: null
+          size: 5Gi
+
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - hdfs-namenode
+              topologyKey: kubernetes.io/hostname
+
+      securityContext:
+        fsGroup: null
+        runAsNonRoot: true
