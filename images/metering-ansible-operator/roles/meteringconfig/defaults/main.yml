@@ -9,7 +9,7 @@ meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_
 # The default specs for each component
 _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
-_hdfs_default_spec: "{{ meteringconfig_default_values.hdfs.spec }}"
+_hadoop_default_spec: "{{ meteringconfig_default_values.hadoop.spec }}"
 
 # Default image repository and tag from the defaults
 meteringconfig_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
@@ -18,8 +18,8 @@ meteringconfig_presto_default_image_repo: "{{ _presto_default_spec.presto.image.
 meteringconfig_presto_default_image_tag: "{{ _presto_default_spec.presto.image.tag }}"
 meteringconfig_hive_default_image_repo: "{{ _presto_default_spec.hive.image.repository }}"
 meteringconfig_hive_default_image_tag: "{{ _presto_default_spec.hive.image.tag }}"
-meteringconfig_hdfs_default_image_repo: "{{ _hdfs_default_spec.image.repository }}"
-meteringconfig_hdfs_default_image_tag: "{{ _hdfs_default_spec.image.tag }}"
+meteringconfig_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
+meteringconfig_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
 
 # Override the default images we use with env vars if set, falling back to the values.yaml configured default if not set.
 meteringconfig_default_image_overrides:
@@ -38,11 +38,11 @@ meteringconfig_default_image_overrides:
         image:
           repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringconfig_hive_default_image_repo, true) }}"
           tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringconfig_hive_default_image_tag, true) }}"
-  hdfs:
+  hadoop:
     spec:
       image:
-        repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hdfs_default_image_repo, true) }}"
-        tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hdfs_default_image_tag, true) }}"
+        repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hadoop_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hadoop_default_image_tag, true) }}"
 
 # meteringconfig_spec_with_defaults comes first so that user's meteringconfig spec overrides defaults if the user specifies any image overrides.
 meteringconfig_spec: "{{ meteringconfig_default_image_overrides | combine(_metering_openshift_io_meteringconfig.spec , recursive=True) }}"
@@ -55,7 +55,7 @@ _monitoring_conf: "{{ meteringconfig_spec_with_defaults.monitoring }}"
 _openshift_reporting_spec: "{{ meteringconfig_spec_with_defaults['openshift-reporting'].spec }}"
 _presto_spec: "{{ meteringconfig_spec_with_defaults.presto.spec }}"
 _reporting_op_spec: "{{ meteringconfig_spec_with_defaults['reporting-operator'].spec }}"
-_hdfs_spec: "{{ meteringconfig_spec_with_defaults.hdfs.spec }}"
+_hadoop_spec: "{{ meteringconfig_spec_with_defaults.hadoop.spec }}"
 
 meteringconfig_create_metering_default_storage: "{{ meteringconfig_spec_with_defaults.defaultStorage.create | default(true) }}"
 
@@ -64,7 +64,8 @@ meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and
 
 meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
-meteringconfig_enable_hdfs: "{{ meteringconfig_spec_with_defaults.hdfs.enabled | default(false) }}"
+meteringconfig_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
+meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createCredentialsSecret | default(false) }}"
 
 meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
 meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
