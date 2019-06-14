@@ -35,6 +35,9 @@ spec:
 {{- if and $operatorValues.spec.config.tls.enabled $operatorValues.spec.config.tls.createSecret }}
         reporting-operator-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
+{{- if and $operatorValues.spec.config.prestoTLS.enabled $operatorValues.spec.config.prestoTLS.createSecret }}
+        reporting-operator-presto-tls-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.createCookieSecret }}
         reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
 {{- end }}

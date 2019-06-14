@@ -230,9 +230,21 @@ reporting-operator:
       prestoHost: presto:8080
       prestoMaxQueryLength: null
       prestoTLS:
+        # CA for the server cert
+        caCertificate: ""
+
+        createSecret: false
         enabled: false
         secretName: ""
       prestoAuth:
+        # client cert
+        certificate: ""
+        # client private key
+        key: ""
+        # CA for the client cert
+        caCertificate: ""
+
+        createSecret: false
         enabled: false
         secretName: ""
       prometheusCertificateAuthority:
@@ -425,11 +437,28 @@ presto:
       annotations: {}
       config:
         tls:
+          # server cert
+          certificate: ""
+          # server private key
+          key: ""
+          # CA for the server cert
+          caCertificate: ""
+
+          createSecret: false
           enabled: false
-          serverCertificateSecretName: ""
+          secretName: ""
+
         auth:
+          # client cert
+          certificate: ""
+          # client private key
+          key: ""
+          # CA for the client cert
+          caCertificate: ""
+
+          createSecret: false
           enabled: false
-          clientCertificateSecretName: ""
+          secretName: ""
         connectors:
           extraConnectorFiles: []
         environment: production
