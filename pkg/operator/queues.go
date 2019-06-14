@@ -446,7 +446,7 @@ func (op *Reporting) handleErr(logger log.FieldLogger, err error, objType string
 
 	// This controller retries up to maxRequeues times if something goes wrong.
 	// After that, it stops trying.
-	if queue.NumRequeues(obj) < maxRequeues {
+	if maxRequeues == -1 || queue.NumRequeues(obj) < maxRequeues {
 		logger.WithError(err).Errorf("error syncing %s %q, adding back to queue", objType, obj)
 		queue.AddRateLimited(obj)
 		return
