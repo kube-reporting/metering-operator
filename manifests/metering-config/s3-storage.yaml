@@ -38,6 +38,8 @@ spec:
           # Replace this with your bucket
           metastoreWarehouseDir: "s3a://bucketName/pathInBucket"
 
-  hdfs:
-    # disable HDFS components when using S3 to avoid wasting resources.
-    enabled: false
+  hadoop:
+    spec:
+      hdfs:
+        # disable HDFS components when using S3 to avoid wasting resources.
+        enabled: false
