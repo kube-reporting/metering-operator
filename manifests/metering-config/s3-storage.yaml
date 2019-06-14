@@ -33,7 +33,7 @@ spec:
         awsSecretAccessKey: "REPLACEME"
       hive:
         con***REMOVED***g:
-          # set to false when spec.hdfs.enabled is false
+          # set to false when spec.hadoop.spec.hdfs.enabled is false
           useHdfsCon***REMOVED***gMap: false
           # Replace this with your bucket
           metastoreWarehouseDir: "s3a://bucketName/pathInBucket"
