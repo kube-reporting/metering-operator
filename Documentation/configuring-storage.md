@@ -43,16 +43,16 @@ To configure and specify a `StorageClass` for use in Metering, specify the `Stor
 Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Metering to use the default StorageClass for the cluster.
 
 - `spec.presto.spec.hive.metastore.storage.class`
-- `spec.hdfs.spec.datanode.storage.class`
-- `spec.hdfs.spec.namenode.storage.class`
+- `spec.hadoop.spec.hdfs.datanode.storage.class`
+- `spec.hadoop.spec.hdfs.namenode.storage.class`
 
 ### Configuring the volume sizes for Metering
 
 Use [custom-storage.yaml][custom-storage-config] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
 
-- `presto.spec.hive.metastore.storage.size`
-- `hdfs.spec.datanode.storage.size`
-- `hdfs.spec.namenode.storage.size`
+- `spec.presto.spec.hive.metastore.storage.size`
+- `spec.hadoop.spec.hdfs.datanode.storage.size`
+- `spec.hadoop.spec.hdfs.namenode.storage.size`
 
 ### Manually creating Persistent Volumes
 
@@ -75,7 +75,7 @@ Replace `operator-metering-data` with the name of your bucket.
 Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
 
 Because the deployed HDFS cluster will not be used to store data, it may also be disabled.
-In `s3-storage.yaml`, this has already been done by setting `hdfs.enabled` to `false` and setting `presto.spec.hive.config.useHdfsConfigMap` to `false`.
+In `s3-storage.yaml`, this has already been done by setting `spec.hadoop.spec.hdfs.enabled` to `false` and setting `presto.spec.hive.config.useHdfsConfigMap` to `false`.
 
 ## Using shared volumes for storage
 
@@ -85,7 +85,7 @@ To use a ReadWriteMany for storage, modify the [shared-storage.yaml][shared-stor
 
 Configure the `presto.spec.config.sharedVolume.storage.persistentVolumeClaimStorageClass` to a StorageClass with ReadWriteMany access mode.
 
-Note that our example [shared-storage.yaml][shared-storage-config] disables HDFS by setting `hdfs.enabled` to false since it will not be used.
+Note that our example [shared-storage.yaml][shared-storage-config] disables HDFS by setting `spec.hadoop.spec.hdfs.enabled` to false since it will not be used.
 
 > Note: NFS is not recommended to use with Metering.
 
