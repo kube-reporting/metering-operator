@@ -28,5 +28,9 @@ spec:
           useHdfsCon***REMOVED***gMap: false
           # Replace this with your path
           metastoreWarehouseDir: "/user/hive/warehouse"
-  hdfs:
-    enabled: false
+
+  hadoop:
+    spec:
+      hdfs:
+        # disable HDFS components when using S3 to avoid wasting resources.
+        enabled: false

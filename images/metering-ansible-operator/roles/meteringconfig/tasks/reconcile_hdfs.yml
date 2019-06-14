@@ -5,19 +5,27 @@
   vars:
     values_***REMOVED***le: /tmp/metering-values.yaml
     resources:
-      - template_***REMOVED***le: templates/hdfs/hdfs-con***REMOVED***gmap.yaml
+      - template_***REMOVED***le: templates/hadoop/hadoop-aws-credentials.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-aws-credentials
+        create: "{{ meteringcon***REMOVED***g_create_hadoop_aws_credentials }}"
+      - template_***REMOVED***le: templates/hadoop/hadoop-scripts.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hdfs-con***REMOVED***gmap
+        prune_label_value: hadoop-scripts
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hdfs/hdfs-serviceaccount.yaml
+      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***gmap.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hadoop-con***REMOVED***gmap
+        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
+      - template_***REMOVED***le: templates/hadoop/hdfs-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: hdfs-service-account
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hdfs/hdfs-datanode-statefulset.yaml
+      - template_***REMOVED***le: templates/hadoop/hdfs-datanode-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hdfs-datanode-statefulset
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
-      - template_***REMOVED***le: templates/hdfs/hdfs-namenode-statefulset.yaml
+      - template_***REMOVED***le: templates/hadoop/hdfs-namenode-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hdfs-namenode-statefulset
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
