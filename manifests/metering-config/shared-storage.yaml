@@ -24,7 +24,7 @@ spec:
             mountPath: "/user/hive/warehouse"
       hive:
         con***REMOVED***g:
-          # set to false when spec.hdfs.enabled is false
+          # set to false when spec.hadoop.spec.hdfs.enabled is false
           useHdfsCon***REMOVED***gMap: false
           # Replace this with your path
           metastoreWarehouseDir: "/user/hive/warehouse"
