@@ -111,8 +111,6 @@ spec:
         command: ['/presto-common/entrypoint.sh']
         args: ['/opt/presto/presto-server/bin/launcher', 'run']
         env:
-        - name: JAVA_MAX_MEM_RATIO
-          value: "{{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.percentMemoryLimitAsHeap }}"
 {{- include "presto-common-env" . | indent 8 }}
         ports:
         - name: http

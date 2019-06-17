@@ -367,7 +367,9 @@ presto:
         af***REMOVED***nity: {}
         con***REMOVED***g:
           jvm:
-            percentMemoryLimitAsHeap: "50"
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
           logLevel: info
         livenessProbe:
           failureThreshold: 3
@@ -405,7 +407,9 @@ presto:
         af***REMOVED***nity: {}
         con***REMOVED***g:
           jvm:
-            percentMemoryLimitAsHeap: "50"
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
           logLevel: info
         livenessProbe:
           failureThreshold: 3
@@ -483,10 +487,18 @@ presto:
             concGCThreads: null
             extraFlags: []
             initiatingHeapOccupancyPercent: null
-            maxGcPauseMillis: 200
+            maxGcPauseMillis: null
             parallelGCThreads: null
-            percentMemoryLimitAsHeap: "50"
+            initialRAMPercentage: "50.0"
+            maxRAMPercentage: "50.0"
+            minRAMPercentage: null
             permSize: null
+            reservedCodeCacheSize: null
+            maxCachedBufferSize: null
+            maxDirectMemorySize: null
+          logLevel: info
+          taskMaxWorkerThreads: null
+          taskMinDrivers: null
           logLevel: info
           taskMaxWorkerThreads: null
           taskMinDrivers: null
@@ -509,6 +521,7 @@ presto:
         fsGroup: null
         runAsNonRoot: true
       worker:
+        replicas: 0
         af***REMOVED***nity:
           podAntiAf***REMOVED***nity:
             requiredDuringSchedulingIgnoredDuringExecution:
@@ -527,13 +540,17 @@ presto:
             initiatingHeapOccupancyPercent: null
             maxGcPauseMillis: null
             parallelGCThreads: null
-            percentMemoryLimitAsHeap: "50"
+            initialRAMPercentage: "50.0"
+            maxRAMPercentage: "50.0"
+            minRAMPercentage: null
             permSize: null
+            reservedCodeCacheSize: null
+            maxCachedBufferSize: null
+            maxDirectMemorySize: null
           logLevel: info
           taskMaxWorkerThreads: null
           taskMinDrivers: null
         nodeSelector: {}
-        replicas: 0
         resources:
           limits:
             cpu: "2"
@@ -578,6 +595,12 @@ hadoop:
         terminationGracePeriodSeconds: 30
         replicas: 1
 
+        con***REMOVED***g:
+          jvm:
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
+
         resources:
           limits:
             cpu: 250m
@@ -606,6 +629,12 @@ hadoop:
         nodeSelector: {}
         terminationGracePeriodSeconds: 30
         tolerations: []
+
+        con***REMOVED***g:
+          jvm:
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
 
         resources:
           limits:
