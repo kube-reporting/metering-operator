@@ -68,8 +68,18 @@ spec:
         env:
         - name: HIVE_LOGLEVEL
           value: {{ upper .Values.presto.spec.hive.metastore.con***REMOVED***g.logLevel | quote}}
-        - name: JAVA_MAX_MEM_RATIO
-          value: "{{ .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.percentMemoryLimitAsHeap }}"
+{{- if .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.initialRAMPercentage }}
+        - name: JVM_INITIAL_RAM_PERCENTAGE
+          value: {{ .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.initialRAMPercentage }}"
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}
+        - name: JVM_MAX_RAM_PERCENTAGE
+          value: {{ .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}"
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.maxRAMPercentage }}
+        - name: JVM_MIN_RAM_PERCENTAGE
+          value: {{ .Values.presto.spec.hive.metastore.con***REMOVED***g.jvm.minRAMPercentage }}"
+{{- end }}
 {{ include "hive-env" . | indent 8 }}
         - name: MY_MEM_REQUEST
           valueFrom:

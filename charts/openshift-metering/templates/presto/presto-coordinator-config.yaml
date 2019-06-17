@@ -54,6 +54,7 @@ data:
 
   jvm.con***REMOVED***g: |
     -server
+    -XX:+UseContainerSupport
     -XX:+UseG1GC
     -XX:+UseGCOverheadLimit
 {{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.G1HeapRegionSize }}
@@ -74,6 +75,24 @@ data:
 {{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
     -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.initiatingHeapOccupancyPercent }}
 {{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.initialRAMPercentage }}
+    -XX:InitialRAMPercentage={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.initialRAMPercentage }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxRAMPercentage }}
+    -XX:MaxRAMPercentage={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxRAMPercentage }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.minRAMPercentage }}
+    -XX:MinRAMPercentage={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.minRAMPercentage }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.reservedCodeCacheSize }}
+    -XX:ReservedCodeCacheSize={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.reservedCodeCacheSize }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxCachedBufferSize }}
+    -Djdk.nio.maxCachedBufferSize={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxCachedBufferSize }}
+{{- end }}
+{{- if .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxDirectMemorySize }}
+    -XX:MaxDirectMemorySize={{ .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.maxDirectMemorySize  }}
+{{- end }}
 {{- range .Values.presto.spec.presto.coordinator.con***REMOVED***g.jvm.extraFlags }}
     {{ . }}
 {{- end }}
@@ -82,8 +101,11 @@ data:
     -XX:HeapDumpPath=/var/presto/logs/heap_dump.bin
     -XX:+ExitOnOutOfMemoryError
     -XX:ErrorFile=/var/presto/logs/java_error%p.log
-    -XX:ReservedCodeCacheSize=512M
-    -Djdk.nio.maxCachedBufferSize=2000000
+    -verbose:gc
+    -XX:+PrintGCDetails
+    -XX:+PrintGCTimeStamps
+    -XX:+PrintGCDateStamps
+    -Xloggc:/var/presto/logs/gc.log
     -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/con***REMOVED***g/con***REMOVED***g.yml
     -Dcom.sun.management.jmxremote
     -Dcom.sun.management.jmxremote.local.only=false
@@ -92,8 +114,3 @@ data:
     -Dcom.sun.management.jmxremote.port=8081
     -Dcom.sun.management.jmxremote.rmi.port=8081
     -Djava.rmi.server.hostname=127.0.0.1
-    -verbose:gc
-    -XX:+PrintGCDetails
-    -XX:+PrintGCTimeStamps
-    -XX:+PrintGCDateStamps
-    -Xloggc:/var/presto/logs/gc.log
