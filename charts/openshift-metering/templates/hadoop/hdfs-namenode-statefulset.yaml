@@ -149,8 +149,18 @@ spec:
             resourceFieldRef:
               containerName: hdfs-namenode
               resource: limits.memory
-        - name: JAVA_MAX_MEM_RATIO
-          value: "50"
+{{- if .Values.hadoop.spec.hdfs.namenode.config.jvm.initialRAMPercentage }}
+        - name: JVM_INITIAL_RAM_PERCENTAGE
+          value: {{ .Values.hadoop.spec.hdfs.namenode.config.jvm.initialRAMPercentage }}"
+{{- end }}
+{{- if .Values.hadoop.spec.hdfs.namenode.config.jvm.maxRAMPercentage }}
+        - name: JVM_MAX_RAM_PERCENTAGE
+          value: {{ .Values.hadoop.spec.hdfs.namenode.config.jvm.maxRAMPercentage }}"
+{{- end }}
+{{- if .Values.hadoop.spec.hdfs.namenode.config.jvm.maxRAMPercentage }}
+        - name: JVM_MIN_RAM_PERCENTAGE
+          value: {{ .Values.hadoop.spec.hdfs.namenode.config.jvm.minRAMPercentage }}"
+{{- end }}
         ports:
         - containerPort: 9820
           name: fs
