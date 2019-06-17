@@ -103,7 +103,7 @@ spec:
           value: hdfs-namenode-0.hdfs-namenode
         resources:
           requests:
-            memory: "5Mi"
+            memory: "10Mi"
             cpu: "10m"
           limits:
             memory: "50Mi"
