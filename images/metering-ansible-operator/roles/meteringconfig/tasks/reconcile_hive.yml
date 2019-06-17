@@ -19,6 +19,9 @@
       - template_file: templates/presto/hive-scripts-configmap.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hive-scripts-configmap
+      - template_file: templates/presto/hive-jmx-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hive-jmx-config
       - template_file: templates/presto/hive-metastore-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-metastore-service

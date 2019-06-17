@@ -221,12 +221,6 @@ reporting-operator:
       logDMLQueries: "false"
       logLevel: info
       logReports: "false"
-      metricsTLS:
-        certificateData: null
-        createSecret: false
-        enabled: true
-        privateKeyData: null
-        secretName: reporting-operator-metrics-tls-secrets
       prestoHost: presto:8080
       prestoMaxQueryLength: null
       prestoTLS:
@@ -292,9 +286,6 @@ reporting-operator:
       periodSeconds: 60
       successThreshold: 1
       timeoutSeconds: 60
-    metricsService:
-      annotations:
-        service.alpha.openshift.io/serving-cert-secret-name: reporting-operator-metrics-tls-secrets
     nodeSelector: {}
     readinessProbe:
       failureThreshold: 3
@@ -355,7 +346,7 @@ presto:
         enableMetastoreSchemaVerification: false
         metastoreClientSocketTimeout: null
         metastoreURIs: thrift://hive-metastore:9083
-        metastoreWarehouseDir: hdfs://hdfs-namenode-proxy:9820/operator_metering/default_hive_warehouse/
+        metastoreWarehouseDir: hdfs://hdfs-namenode-0.hdfs-namenode:9820/operator_metering/default_hive_warehouse/
         hdfsConfigMapName: hadoop-config
         useHdfsConfigMap: true
       image:

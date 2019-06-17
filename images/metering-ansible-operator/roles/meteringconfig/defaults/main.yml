@@ -82,6 +82,6 @@ meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _
 meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.createAwsCredentialsSecret | default(false) }}"
 meteringconfig_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.config.prestoTLS.enabled and _reporting_op_spec.config.prestoTLS.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.config.prestoAuth.enabled and _reporting_op_spec.config.prestoAuth.createSecret | default(false) }}"
-meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.createSecret or _reporting_op_spec.config.metricsTLS.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.config.createClusterMonitoringViewRBAC | default(true) }}"

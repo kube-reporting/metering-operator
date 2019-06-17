@@ -28,6 +28,7 @@ spec:
       annotations:
         hive-configmap-hash: {{ include (print $.Template.BasePath "/presto/hive-configmap.yaml") . | sha256sum }}
         hive-scripts-hash: {{ include (print $.Template.BasePath "/presto/hive-scripts-configmap.yaml") . | sha256sum }}
+        hive-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/hive-jmx-config.yaml") . | sha256sum }}
         presto-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- if .Values.presto.spec.hive.annotations }}
 {{ toYaml .Values.presto.spec.hive.annotations | indent 8 }}
@@ -57,6 +58,8 @@ spec:
         - name: meta
           containerPort: 9083
           protocol: TCP
+        - containerPort: 8082
+          name: metrics
 {{- if .Values.presto.spec.hive.metastore.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.presto.spec.hive.metastore.readinessProbe | indent 10 }}
@@ -100,6 +103,8 @@ spec:
         - name: hdfs-config
           mountPath: /hadoop-config
 {{- end }}
+        - name: hive-jmx-config
+          mountPath: /opt/jmx_exporter/config
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
         # openshift requires volumeMounts for VOLUMEs in a Dockerfile
@@ -140,6 +145,9 @@ spec:
         configMap:
           name: {{ .Values.presto.spec.hive.config.hdfsConfigMapName }}
 {{- end }}
+      - name: hive-jmx-config
+        configMap:
+          name: hive-jmx-config
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Dockerfile have a corresponding volumeMount
       - name: hive-warehouse-empty

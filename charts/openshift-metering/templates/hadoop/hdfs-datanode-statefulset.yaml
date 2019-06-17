@@ -4,31 +4,43 @@ kind: Service
 metadata:
   name: hdfs-datanode
   labels:
-    app: hdfs-datanode
+    app: hdfs
     hdfs: datanode
+    component: hdfs-datanode
 spec:
   ports:
   - port: 9866
     name: fs
+  - port: 9864
+    name: web
+  - port: 9867
+    name: ipc
+  - port: 8082
+    name: metrics
   clusterIP: None
   selector:
-    app: hdfs-datanode
+    app: hdfs
+    hdfs: datanode
+
 ---
-# A headless service for the web interface.
+
+# A clusterIP service for the web interface.
 apiVersion: v1
 kind: Service
 metadata:
   name: hdfs-datanode-web
   labels:
-    app: hdfs-datanode
+    app: hdfs
     hdfs: datanode
+    component: hdfs-datanode
 spec:
   ports:
   - port: 9864
     name: web
   selector:
-    app: hdfs-datanode
+    app: hdfs
     hdfs: datanode
+
 ---
 
 apiVersion: apps/v1
@@ -36,7 +48,7 @@ kind: StatefulSet
 metadata:
   name: hdfs-datanode
   labels:
-    app: hdfs-datanode
+    app: hdfs
     hdfs: datanode
 spec:
   serviceName: "hdfs-datanode"
@@ -45,7 +57,7 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: hdfs-datanode
+      app: hdfs
       hdfs: datanode
 {{- if .Values.hadoop.spec.hdfs.datanode.labels }}
 {{ toYaml .Values.hadoop.spec.hdfs.datanode.labels | indent 6 }}
@@ -53,7 +65,7 @@ spec:
   template:
     metadata:
       labels:
-        app: hdfs-datanode
+        app: hdfs
         hdfs: datanode
 {{- if .Values.hadoop.spec.hdfs.datanode.labels }}
 {{ toYaml .Values.hadoop.spec.hdfs.datanode.labels | indent 8 }}
@@ -61,6 +73,7 @@ spec:
       annotations:
         hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-configmap.yaml") . | sha256sum }}
         hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
+        hdfs-jmx-config-hash: {{ include (print $.Template.BasePath "/hadoop/hdfs-jmx-config.yaml") . | sha256sum }}
 {{- if .Values.hadoop.spec.config.aws.createCredentialsSecret }}
         hadoop-aws-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-aws-credentials.yaml") . | sha256sum }}
 {{- end }}
@@ -179,11 +192,15 @@ spec:
           name: fs
         - containerPort: 9867
           name: ipc
+        - containerPort: 8082
+          name: metrics
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
+        - name: hdfs-jmx-config
+          mountPath: /opt/jmx_exporter/config
         - name: hdfs-datanode-data
           mountPath: /hadoop/dfs/data
           # we use a subPath to avoid the lost+found directory at the root of
@@ -217,6 +234,9 @@ spec:
         configMap:
           name: hadoop-scripts
           defaultMode: 0555
+      - name: hdfs-jmx-config
+        configMap:
+          name: hdfs-jmx-config
       - name: namenode-empty
         emptyDir: {}
       - name: hadoop-logs
@@ -225,7 +245,7 @@ spec:
   - metadata:
       name: "hdfs-datanode-data"
       labels:
-        app: hdfs-datanode
+        app: hdfs
         hdfs: datanode
     spec:
       accessModes: ["ReadWriteOnce"]
