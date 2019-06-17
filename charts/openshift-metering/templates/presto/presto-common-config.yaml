@@ -22,50 +22,6 @@ data:
     #!/bin/bash
     set -e
 
-    max_memory() {
-        local memory_limit=$1
-        local ratio=${JAVA_MAX_MEM_RATIO:-50}
-        echo "${memory_limit} ${ratio} 1048576" | awk '{printf "%d\n" , ($1*$2)/(100*$3) + 0.5}'
-    }
-
-    # Check for container memory limits/request and use it to set JVM Heap size.
-    # Defaults to 50% of the limit/request value.
-    if [ -n "$MY_MEM_LIMIT" ]; then
-        export MAX_HEAPSIZE="$( max_memory $MY_MEM_LIMIT )"
-    elif [ -n "$MY_MEM_REQUEST" ]; then
-        export MAX_HEAPSIZE="$( max_memory $MY_MEM_REQUEST )"
-    fi
-
-    if [ -z "$MAX_HEAPSIZE" ]; then
-        echo "Unable to automatically set Presto JVM Max Heap Size based on pod request/limits"
-        export MAX_HEAPSIZE=1024
-        echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
-    else
-        echo "Setting Presto JVM Max Heap Size to ${MAX_HEAPSIZE}M"
-    fi
-
-    # set min to max to avoid pauses caused by heap expansion
-    export MIN_HEAPSIZE="$MAX_HEAPSIZE"
-
-    JVM_CONFIG="${PRESTO_HOME}/etc/jvm.config"
-    # ensure there's a newline between the last item in the config and what we add
-    echo "" >> $JVM_CONFIG
-    if [ -n "$MAX_HEAPSIZE" ]; then
-      # add heapsize to jvm config if not already
-      if ! grep -q -F 'Xmx' "$JVM_CONFIG"; then
-        FLAG="-Xmx${MAX_HEAPSIZE}M"
-        echo "Adding $FLAG to $JVM_CONFIG"
-        echo "$FLAG" >> "$JVM_CONFIG"
-      fi
-    fi
-    if [ -n "$MIN_HEAPSIZE" ]; then
-      if ! grep -q -F 'Xms' "$JVM_CONFIG"; then
-        FLAG="-Xms${MIN_HEAPSIZE}M"
-        echo "Adding $FLAG to $JVM_CONFIG"
-        echo "$FLAG" >> "$JVM_CONFIG"
-      fi
-    fi
-
     # add node id to node config
     NODE_CONFIG="${PRESTO_HOME}/etc/node.properties"
     # ensure there's a newline between the last item in the config and what we add
