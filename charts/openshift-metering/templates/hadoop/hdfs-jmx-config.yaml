@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Con***REMOVED***gMap
+metadata:
+  name: hdfs-jmx-con***REMOVED***g
+  labels:
+    app: hdfs
+data:
+  con***REMOVED***g.yml: |
+    ---
+    startDelaySeconds: 0
+    ssl: false
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    whitelistObjectNames:
+      - 'Hadoop:service=DataNode,name=*'
+      - 'Hadoop:service=NameNode,name=*'
+      - 'Hadoop:service=NameNode,name=MetricsSystem,sub=*'
+      - 'Hadoop:service=DataNode,name=MetricsSystem,sub=*'
+    blacklistObjectNames:
+      - 'Hadoop:service=DataNode,name=RpcActivity*'
+      - 'Hadoop:service=DataNode,name=RpcDetailedActivity*'
+      - 'Hadoop:service=DataNode,name=UgiMetrics'
+      - 'Hadoop:service=NameNode,name=RetryCache.NameNodeRetryCache'
+      - 'Hadoop:service=NameNode,name=RpcActivity*'
+      - 'Hadoop:service=NameNode,name=RpcDetailedActivity*'
+      - 'Hadoop:service=NameNode,name=UgiMetrics'
+    rules:
+      # MetricsSystem
+      - pattern: 'Hadoop<service=(.*), name=MetricsSystem, sub=(.*)><>(.*): (\d+)'
+        attrNameSnakeCase: true
+        name: hadoop_$1_$3
+        value: $4
+        labels:
+          role: $1
+          kind: 'MetricsSystem'
+          sub: $2
+        type: GAUGE
+      # FSDatasetState (also extracts the FSDataset ID)
+      - pattern: 'Hadoop<service=(.*), name=FSDatasetState-(.*)><>(.*): (\d+)'
+        attrNameSnakeCase: true
+        name: hadoop_$1_$3
+        value: $4
+        labels:
+          role: $1
+          fsdatasetid: $2
+          kind: 'FSDatasetState'
+        type: GAUGE
+      # DataNodeActivity (also extracts hostname and port)
+      - pattern: 'Hadoop<service=(.*), name=DataNodeActivity-(.*)-(\d+)><>(.*): (\d+)'
+        attrNameSnakeCase: true
+        name: hadoop_$1_$4
+        value: $5
+        labels:
+          role: $1
+          datanode: $2
+          port: $3
+          kind: 'DataNodeActivity'
+        type: GAUGE
+      # All other services can be handled generically
+      - pattern: 'Hadoop<service=(.*), name=(.*)><>(.*): (\d+)'
+        attrNameSnakeCase: true
+        name: hadoop_$1_$3
+        value: $4
+        labels:
+          role: $1
+          kind: $2
+        type: GAUGE

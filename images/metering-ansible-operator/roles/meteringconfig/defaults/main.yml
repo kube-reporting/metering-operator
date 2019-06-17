@@ -82,6 +82,6 @@ meteringcon***REMOVED***g_create_reporting_operator_prometheus_certi***REMOVED**
 meteringcon***REMOVED***g_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.con***REMOVED***g.createAwsCredentialsSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.prestoTLS.enabled and _reporting_op_spec.con***REMOVED***g.prestoTLS.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.con***REMOVED***g.prestoAuth.enabled and _reporting_op_spec.con***REMOVED***g.prestoAuth.createSecret | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.createSecret or _reporting_op_spec.con***REMOVED***g.metricsTLS.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.con***REMOVED***g.createClusterMonitoringViewRBAC | default(true) }}"

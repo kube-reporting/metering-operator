@@ -18,6 +18,18 @@ data:
         <value>NOSASL</value>
       </property>
       <property>
+        <name>hive.metastore.metrics.enabled</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>hive.server2.metrics.enabled</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>hive.service.metrics.reporter</name>
+        <value>JMX</value>
+      </property>
+      <property>
         <name>hive.metastore.uris</name>
         <value>{{ .Values.presto.spec.hive.con***REMOVED***g.metastoreURIs }}</value>
       </property>

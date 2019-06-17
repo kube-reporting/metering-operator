@@ -9,12 +9,10 @@ spec:
   ports:
   - name: thrift
     port: 10000
-    protocol: TCP
-    targetPort: 10000
   - name: ui
     port: 10002
-    protocol: TCP
-    targetPort: 10002
+  - name: metrics
+    port: 8082
   selector:
     app: hive
     hive: server
