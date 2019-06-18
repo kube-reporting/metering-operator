@@ -246,12 +246,10 @@ spec:
         - name: REPORTING_OPERATOR_USE_TLS
           value: "true"
 {{- end }}
-{{- end }}
-{{- if $operatorValues.spec.config.metricsTLS.enabled }}
         - name: REPORTING_OPERATOR_METRICS_TLS_KEY
-          value: "/metrics-tls/tls.key"
+          value: "/tls/tls.key"
         - name: REPORTING_OPERATOR_METRICS_TLS_CERT
-          value: "/metrics-tls/tls.crt"
+          value: "/tls/tls.crt"
         - name: REPORTING_OPERATOR_METRICS_USE_TLS
           value: "true"
 {{- end }}
@@ -305,8 +303,6 @@ spec:
 {{- if $operatorValues.spec.config.tls.enabled }}
         - name: api-tls
           mountPath: /tls
-        - name: metrics-tls
-          mountPath: /metrics-tls
 {{- end }}
 {{- if $operatorValues.spec.config.prometheusCertificateAuthority.configMap.enabled }}
         - name: prometheus-certificate-authority
@@ -397,11 +393,6 @@ spec:
       - name: prometheus-certificate-authority
         configMap:
           name: {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.name }}
-{{- end }}
-{{- if $operatorValues.spec.config.metricsTLS.enabled }}
-      - name: metrics-tls
-        secret:
-          secretName: {{ $operatorValues.spec.config.metricsTLS.secretName }}
 {{- end }}
 {{- if $operatorValues.spec.authProxy.enabled }}
       - name: cookie-secret

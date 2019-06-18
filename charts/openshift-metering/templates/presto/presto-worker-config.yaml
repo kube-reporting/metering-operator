@@ -101,10 +101,13 @@ data:
     -XX:+ExitOnOutOfMemoryError
     -XX:ErrorFile=/var/presto/logs/java_error%p.log
     -verbose:gc
+    -Xloggc:/var/presto/logs/gc.log
     -XX:+PrintGCDetails
     -XX:+PrintGCTimeStamps
     -XX:+PrintGCDateStamps
-    -Xloggc:/var/presto/logs/gc.log
+    -XX:+UseGCLogFileRotation
+    -XX:NumberOfGCLogFiles=5
+    -XX:GCLogFileSize=3M
     -javaagent:/opt/jmx_exporter/jmx_exporter.jar=8082:/opt/jmx_exporter/config/config.yml
     -Dcom.sun.management.jmxremote
     -Dcom.sun.management.jmxremote.local.only=false

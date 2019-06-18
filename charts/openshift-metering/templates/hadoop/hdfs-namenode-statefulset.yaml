@@ -4,50 +4,41 @@ kind: Service
 metadata:
   name: hdfs-namenode
   labels:
-    app: hdfs-namenode
+    app: hdfs
     hdfs: namenode
+    component: hdfs-namenode
 spec:
   ports:
   - port: 9820
     name: fs
+  - port: 9870
+    name: web
+  - port: 8082
+    name: metrics
   clusterIP: None
   selector:
-    app: hdfs-namenode
+    app: hdfs
     hdfs: namenode
 
 ---
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: hdfs-namenode-proxy
-  labels:
-    app: hdfs-namenode
-    hdfs: namenode
-spec:
-  ports:
-  - port: 9820
-    name: fs
-  selector:
-    app: hdfs-namenode
-    hdfs: namenode
-
----
-# A headless service for the web interface.
+# A clusterIP service for the web interface.
 apiVersion: v1
 kind: Service
 metadata:
   name: hdfs-namenode-web
   labels:
-    app: hdfs-namenode
+    app: hdfs
     hdfs: namenode
+    component: hdfs-namenode
 spec:
   ports:
   - port: 9870
     name: web
   selector:
-    app: hdfs-namenode
+    app: hdfs
     hdfs: namenode
+
 ---
 
 apiVersion: apps/v1
@@ -55,7 +46,7 @@ kind: StatefulSet
 metadata:
   name: hdfs-namenode
   labels:
-    app: hdfs-namenode
+    app: hdfs
     hdfs: namenode
 spec:
   serviceName: "hdfs-namenode"
@@ -64,7 +55,7 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: hdfs-namenode
+      app: hdfs
       hdfs: namenode
 {{- if .Values.hadoop.spec.hdfs.namenode.labels }}
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.labels | indent 6 }}
@@ -72,7 +63,7 @@ spec:
   template:
     metadata:
       labels:
-        app: hdfs-namenode
+        app: hdfs
         hdfs: namenode
 {{- if .Values.hadoop.spec.hdfs.namenode.labels }}
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.labels | indent 8 }}
@@ -80,6 +71,7 @@ spec:
       annotations:
         hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-configmap.yaml") . | sha256sum }}
         hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
+        hdfs-jmx-config-hash: {{ include (print $.Template.BasePath "/hadoop/hdfs-jmx-config.yaml") . | sha256sum }}
 {{- if .Values.hadoop.spec.config.aws.createCredentialsSecret }}
         hadoop-aws-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-aws-credentials.yaml") . | sha256sum }}
 {{- end }}
@@ -166,11 +158,15 @@ spec:
           name: fs
         - containerPort: 9870
           name: web
+        - containerPort: 8082
+          name: metrics
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
+        - name: hdfs-jmx-config
+          mountPath: /opt/jmx_exporter/config
         - name: hdfs-namenode-data
           mountPath: /hadoop/dfs/name
           # we use a subPath to avoid the lost+found directory at the root of
@@ -197,6 +193,9 @@ spec:
         configMap:
           name: hadoop-scripts
           defaultMode: 0555
+      - name: hdfs-jmx-config
+        configMap:
+          name: hdfs-jmx-config
       - name: datanode-empty
         emptyDir: {}
       - name: hadoop-logs
@@ -205,7 +204,7 @@ spec:
   - metadata:
       name: "hdfs-namenode-data"
       labels:
-        app: hdfs-namenode
+        app: hdfs
         hdfs: namenode
     spec:
       accessModes: ["ReadWriteOnce"]

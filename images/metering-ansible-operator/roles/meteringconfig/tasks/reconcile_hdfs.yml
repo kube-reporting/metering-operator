@@ -13,6 +13,10 @@
         apis: [ {kind: configmap} ]
         prune_label_value: hadoop-scripts
         create: "{{ meteringconfig_enable_hdfs }}"
+      - template_file: templates/hadoop/hdfs-jmx-config.yaml
+        apis: [ {kind: configmap} ]
+        prune_label_value: hdfs-jmx-config
+        create: "{{ meteringconfig_enable_hdfs }}"
       - template_file: templates/hadoop/hadoop-configmap.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hadoop-configmap

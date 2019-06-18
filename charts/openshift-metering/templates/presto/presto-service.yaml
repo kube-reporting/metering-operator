@@ -5,12 +5,13 @@ metadata:
   labels:
     app: presto
     presto: coordinator
+    component: presto-coordinator
 spec:
   ports:
   - name: http
     port: 8080
-    protocol: TCP
-    targetPort: 8080
+  - name: metrics
+    port: 8082
   selector:
     app: presto
     presto: coordinator
@@ -20,18 +21,20 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: presto-metrics
+  name: presto-worker
   labels:
     app: presto
-    metrics: "true"
+    presto: worker
+    component: presto-coordinator
 spec:
   ports:
+  - name: http
+    port: 8080
   - name: metrics
     port: 8082
-    protocol: TCP
-    targetPort: metrics
   selector:
     app: presto
+    presto: worker
 
 ---
 
@@ -45,8 +48,6 @@ spec:
   ports:
   - name: http
     port: 8080
-    protocol: TCP
-    targetPort: 8080
   clusterIP: None
   selector:
     app: presto
