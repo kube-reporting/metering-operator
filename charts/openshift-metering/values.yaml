@@ -229,10 +229,10 @@ reporting-operator:
         tag: v1.1.0
       resources:
         limits:
-          cpu: 50m
-          memory: 50Mi
+          cpu: 500m
+          memory: 100Mi
         requests:
-          cpu: 50m
+          cpu: 100m
           memory: 50Mi
       subjectAccessReviewEnabled: false
       subjectAccessReviewPolicy: '{"group": "metering.openshift.io", "resource": "reports",
@@ -331,11 +331,11 @@ reporting-operator:
     replicas: 1
     resources:
       limits:
-        cpu: 100m
-        memory: 150Mi
+        cpu: 1
+        memory: 500Mi
       requests:
-        cpu: 50m
-        memory: 50Mi
+        cpu: 500m
+        memory: 100Mi
     route:
       enabled: false
       name: metering
@@ -413,8 +413,8 @@ presto:
           timeoutSeconds: 15
         resources:
           limits:
-            cpu: 500m
-            memory: 650Mi
+            cpu: 4
+            memory: 2Gi
           requests:
             cpu: 500m
             memory: 650Mi
@@ -453,10 +453,10 @@ presto:
           timeoutSeconds: 15
         resources:
           limits:
-            cpu: 100m
-            memory: 500Mi
+            cpu: 1
+            memory: 1Gi
           requests:
-            cpu: 100m
+            cpu: 500m
             memory: 500Mi
         tolerations: []
       terminationGracePeriodSeconds: 30
@@ -528,10 +528,10 @@ presto:
         nodeSelector: {}
         resources:
           limits:
-            cpu: "2"
-            memory: 2Gi
+            cpu: 4
+            memory: 4Gi
           requests:
-            cpu: "2"
+            cpu: 2
             memory: 2Gi
         terminationGracePeriodSeconds: 30
         tolerations: []
@@ -576,10 +576,10 @@ presto:
         nodeSelector: {}
         resources:
           limits:
-            cpu: "2"
-            memory: 2Gi
+            cpu: 8
+            memory: 8Gi
           requests:
-            cpu: "2"
+            cpu: 4
             memory: 2Gi
         terminationGracePeriodSeconds: 30
         tolerations: []
@@ -626,11 +626,12 @@ hadoop:
 
         resources:
           limits:
-            cpu: 250m
-            memory: 250Mi
+            cpu: 1
+            memory: 1Gi
           requests:
             cpu: 250m
-            memory: 250Mi
+            memory: 500Mi
+
         storage:
           class: null
           size: 5Gi
@@ -661,11 +662,11 @@ hadoop:
 
         resources:
           limits:
-            cpu: 250m
-            memory: 350Mi
+            cpu: 2
+            memory: 2Gi
           requests:
-            cpu: 250m
-            memory: 350Mi
+            cpu: 500m
+            memory: 500Mi
 
         storage:
           class: null
