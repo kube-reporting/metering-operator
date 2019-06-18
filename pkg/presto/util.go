@@ -48,7 +48,7 @@ func DropTable(queryer db.Queryer, catalog, schema, tableName string, ignoreNotE
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
 	}
-	table := FullyQuai***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
 	query := fmt.Sprintf("DROP TABLE %s %s", ifExists, table)
 	_, err := queryer.Query(query)
 	return err
@@ -60,7 +60,7 @@ func CreateView(queryer db.Queryer, catalog, schema, viewName string, query stri
 		fullQuery += " OR REPLACE"
 	}
 	fullQuery += " VIEW %s AS %s"
-	view := FullyQuai***REMOVED***edTableName(catalog, schema, viewName)
+	view := FullyQuali***REMOVED***edTableName(catalog, schema, viewName)
 	***REMOVED***nalQuery := fmt.Sprintf(fullQuery, view, query)
 	_, err := queryer.Query(***REMOVED***nalQuery)
 	return err
@@ -71,7 +71,7 @@ func DropView(queryer db.Queryer, catalog, schema, viewName string, ignoreNotExi
 	if ignoreNotExists {
 		ifExists = "IF EXISTS"
 	}
-	view := FullyQuai***REMOVED***edTableName(catalog, schema, viewName)
+	view := FullyQuali***REMOVED***edTableName(catalog, schema, viewName)
 	query := fmt.Sprintf("DROP VIEW %s %s", ifExists, view)
 	_, err := queryer.Query(query)
 	return err
@@ -124,7 +124,7 @@ func GenerateOrderBySQL(columns []Column) string {
 	return fmt.Sprintf("%s ASC", strings.Join(quotedColumns, ", "))
 }
 
-func FullyQuai***REMOVED***edTableName(catalog, schema, tableName string) string {
+func FullyQuali***REMOVED***edTableName(catalog, schema, tableName string) string {
 	return fmt.Sprintf("%s.%s.%s", catalog, schema, tableName)
 }
 
@@ -141,7 +141,7 @@ func generateCreateTableSQL(catalog, schema, tableName string, columns []Column,
 		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
 	}
 
-	table := FullyQuai***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
 
 	sqlStr := `CREATE TABLE %s
 %s (
@@ -168,7 +168,7 @@ func generateCreateTableAsSQL(catalog, schema, tableName string, columns []Colum
 		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
 	}
 
-	table := FullyQuai***REMOVED***edTableName(catalog, schema, tableName)
+	table := FullyQuali***REMOVED***edTableName(catalog, schema, tableName)
 
 	sqlStr := `CREATE TABLE %s
 %s (

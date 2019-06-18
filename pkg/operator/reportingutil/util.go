@@ -51,7 +51,7 @@ func FullyQuali***REMOVED***edTableName(prestoTable *metering.PrestoTable) (stri
 		return "", fmt.Errorf("PrestoTable status is invalid: %s", strings.Join(errs, ", "))
 	}
 
-	return presto.FullyQuai***REMOVED***edTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
+	return presto.FullyQuali***REMOVED***edTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
 }
 
 func IsValidSQLIdenti***REMOVED***er(id string) bool {
