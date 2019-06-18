@@ -19,7 +19,7 @@
         create: "{{ meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret }}"
       - template_file: templates/reporting-operator/reporting-operator-auth-proxy-rbac.yaml
         apis: [ {kind: clusterrole, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: clusterrolebinding, api_version: 'rbac.authorization.k8s.io/v1'} ]
-        prune_label_value: "{{ meta.namespace }}-reporting-operator-auth-proxy-rbac"
+        prune_label_value: "reporting-operator-auth-proxy-rbac"
         create: "{{ meteringconfig_create_reporting_operator_auth_proxy_rbac }}"
       - template_file: templates/reporting-operator/reporting-operator-prometheus-bearer-token-secrets.yaml
         apis: [ {kind: secrets} ]
@@ -38,7 +38,7 @@
         prune_label_value: reporting-operator-rbac
       - template_file: templates/reporting-operator/reporting-operator-cluster-monitoring-view-rbac.yaml
         apis: [ {kind: clusterrole, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: clusterrolebinding, api_version: 'rbac.authorization.k8s.io/v1'} ]
-        prune_label_value: "{{ meta.namespace }}-cluster-monitoring-view-rbac"
+        prune_label_value: "cluster-monitoring-view-rbac"
         create: "{{ meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac }}"
       - template_file: templates/reporting-operator/reporting-operator-config.yaml
         apis: [ {kind: config} ]
