@@ -41,6 +41,7 @@ echo "\$TEST_OUTPUT_PATH=$TEST_OUTPUT_PATH"
 LOG_DIR=$TEST_OUTPUT_PATH/logs
 TEST_OUTPUT_DIR=$TEST_OUTPUT_PATH/tests
 REPORT_RESULTS_DIR=$TEST_OUTPUT_PATH/report_results
+METERINGCONFIGS_DIR=$TEST_OUTPUT_PATH/meteringconfigs
 REPORTS_DIR=$TEST_OUTPUT_PATH/reports
 DATASOURCES_DIR=$TEST_OUTPUT_PATH/reportdatasources
 REPORTQUERIES_DIR=$TEST_OUTPUT_PATH/reportqueries
@@ -54,7 +55,7 @@ TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TE
 DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
 DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
 
-mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
+mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$METERINGCONFIGS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
 
 export SKIP_DELETE_CRDS=true
 export DELETE_PVCS=true
@@ -93,6 +94,16 @@ function cleanup() {
         done
     done <<< "$PODS"
 
+    echo "Capturing MeteringConfigs"
+    METERINGCONFIGS="$(kubectl get meteringconfigs --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
+    while read -r meteringconfig; do
+        if [[ -n "$meteringconfig" ]]; then
+            echo "Capturing MeteringConfig $meteringconfig as json"
+            if ! kubectl get meteringconfig "$meteringconfig" --namespace "$METERING_NAMESPACE" -o json > "$METERINGCONFIGS_DIR/${meteringconfig}.json"; then
+                echo "Error getting $meteringconfig as json"
+            fi
+        fi
+    done <<< "$METERINGCONFIGS"
 
     echo "Capturing Metering StorageLocations"
     STORAGELOCATIONS="$(kubectl get storagelocations --no-headers --namespace "$METERING_NAMESPACE" -o name | cut -d/ -f2)"
