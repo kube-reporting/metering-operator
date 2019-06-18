@@ -63,6 +63,13 @@ spec:
         # or less
         prometheusMetricsImporterStepSize: "60s"
 
+      {{- if or .Values.reportingOperatorMemory .Values.reportingOperatorCpu }}
+      resources:
+        requests:
+          memory: "{{ .Values.reportingOperatorMemory }}"
+          cpu: "{{ .Values.reportingOperatorCpu }}"
+      {{- end }}
+
   presto:
     spec:
 {{- if .Values.imagePullSecretName }}
@@ -85,9 +92,6 @@ spec:
             requests:
               memory: "{{ .Values.prestoMemory }}"
               cpu: "{{ .Values.prestoCpu }}"
-            limits:
-              memory: null
-              cpu: null
           {{- end }}
         {{- end }}
       hive:
@@ -104,13 +108,19 @@ spec:
             requests:
               memory: "{{ .Values.hiveMetastoreMemory }}"
               cpu: "{{ .Values.hiveMetastoreCpu }}"
-            limits:
-              memory: "{{ .Values.hiveMetastoreMemory }}"
-              cpu: "{{ .Values.hiveMetastoreCpu }}"
           {{- end }}
           {{- if .Values.hiveMetastoreStorageSize }}
           storage:
             size: "{{ .Values.hiveMetastoreStorageSize }}"
+          {{- end }}
+{{- end }}
+{{- if or .Values.hiveServerMemory .Values.hiveServerCpu .Values.hiveServerStorageSize }}
+        server:
+          {{- if or .Values.hiveServerMemory .Values.hiveServerCpu }}
+          resources:
+            requests:
+              memory: "{{ .Values.hiveServerMemory }}"
+              cpu: "{{ .Values.hiveServerCpu }}"
           {{- end }}
 {{- end }}
 
@@ -132,8 +142,6 @@ spec:
           resources:
             requests:
               memory: "{{ .Values.hdfsDatanodeMemory }}"
-            limits:
-              memory: "{{ .Values.hdfsDatanodeMemory }}"
 {{- end }}
 {{- if .Values.hdfsDatanodeStorageSize }}
           storage:
@@ -149,8 +157,6 @@ spec:
 {{- if .Values.hdfsNamenodeMemory }}
           resources:
             requests:
-              memory: "{{ .Values.hdfsNamenodeMemory }}"
-            limits:
               memory: "{{ .Values.hdfsNamenodeMemory }}"
 {{- end }}
 {{- if .Values.hdfsNamenodeStorageSize   }}
