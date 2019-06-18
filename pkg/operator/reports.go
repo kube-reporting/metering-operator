@@ -382,7 +382,11 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for Report %s, %s", report.Status.TableRef, report.Name, err)
 		}
-		logger.Infof("Report %s table already exists, tableName: %s", report.Name, prestoTable.Status.TableName)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("Report %s table already exists, tableName: %s", report.Name, tableName)
 	} else {
 		tableName := reportingutil.ReportTableName(report.Namespace, report.Name)
 		hiveStorage, err := op.getHiveStorage(report.Spec.Output, report.Namespace)
@@ -408,7 +412,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
 		}
 
-		logger.Infof("creating table %s", tableName)
+		logger.Infof("creating Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
 		hiveTable, err := op.createHiveTableCR(report, metering.ReportGVK, params, false, nil)
 		if err != nil {
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
@@ -422,9 +426,15 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			return fmt.Errorf("error creating table for Report %s: %s", report.Name, err)
 		}
 
-		logger.Infof("created table %s", tableName)
+		logger.Infof("created Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
+
+		tableName, err = reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
 		dataSourceName := fmt.Sprintf("report-%s", report.Name)
-		logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, prestoTable.Status.TableName)
+
+		logger.Infof("creating PrestoTable ReportDataSource %s pointing at report table %s", dataSourceName, tableName)
 		ownerRef := metav1.NewControllerRef(prestoTable, metering.PrestoTableGVK)
 		newReportDataSource := &metering.ReportDataSource{
 			TypeMeta: metav1.TypeMeta{
@@ -633,11 +643,16 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		return err
 	}
 
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+	if err != nil {
+		return err
+	}
+
 	metricLabels := prometheus.Labels{
 		"report":      report.Name,
 		"namespace":   report.Namespace,
 		"reportquery": report.Spec.QueryName,
-		"table_name":  prestoTable.Status.TableName,
+		"table_name":  tableName,
 	}
 
 	genReportTotalCounter := generateReportTotalCounter.With(metricLabels)
@@ -648,10 +663,6 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 
 	genReportTotalCounter.Inc()
 	generateReportStart := op.clock.Now()
-	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
-	if err != nil {
-		return err
-	}
 	err = op.reportGenerator.GenerateReport(tableName, query, report.Spec.OverwriteExistingData)
 	generateReportDuration := op.clock.Since(generateReportStart)
 	genReportDurationObserver.Observe(float64(generateReportDuration.Seconds()))

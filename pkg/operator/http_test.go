@@ -285,10 +285,12 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportDataSourceIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
 			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
+			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -305,7 +307,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportQueryLister, prestoTableLister,
+				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -589,10 +591,12 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportDataSourceIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
 			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
+			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -609,7 +613,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportQueryLister, prestoTableLister,
+				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
@@ -877,10 +881,12 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			// use to mock the lister returns.
 			reportIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			reportQueryIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
+			reportDataSourceIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 			prestoTableIndexer := cache.NewIndexer(cache.DeletionHandlingMetaNamespaceKeyFunc, cache.Indexers{})
 
 			reportLister := listers.NewReportLister(reportIndexer)
 			reportQueryLister := listers.NewReportQueryLister(reportQueryIndexer)
+			reportDataSourceLister := listers.NewReportDataSourceLister(reportDataSourceIndexer)
 			prestoTableLister := listers.NewPrestoTableLister(prestoTableIndexer)
 
 			// add our test report if one is specified
@@ -897,7 +903,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 
 			// setup a test server suitable for making API calls against
 			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
-				reportLister, reportQueryLister, prestoTableLister,
+				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
 			defer server.Close()
