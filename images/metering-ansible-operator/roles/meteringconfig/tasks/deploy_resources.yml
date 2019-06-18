@@ -26,7 +26,7 @@
     # Finally, once we have a list of resources, use map to run
     # the combine function on each resource, which adds the prune label to
     # each item in the list, storing the result in new_resources
-    new_resources: "{{ template_result.stdout | from_yaml_all | list | difference([None]) | map('combine', {'metadata':{'labels':{meteringcon***REMOVED***g_prune_label_key: resource.prune_label_value}}}, recursive=True) | list }}"
+    new_resources: "{{ template_result.stdout | from_yaml_all | list | difference([None]) | map('combine', {'metadata':{'labels':{meteringcon***REMOVED***g_prune_label_key: resource.prune_label_value, meteringcon***REMOVED***g_prune_namespace_label_key: meta.namespace}}}, recursive=True) | list }}"
   set_fact:
     # Create a new variable to contain the updated resources with prune
     # labels, and append the updated resources to it each iteration of this

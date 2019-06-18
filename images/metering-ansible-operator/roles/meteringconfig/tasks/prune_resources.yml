@@ -9,7 +9,7 @@
   loop_control:
     loop_var: to_delete_item
   vars:
-    label_selector: "{{ meteringcon***REMOVED***g_prune_label_key }}={{ resource.prune_label_value }}"
+    label_selector: "{{ meteringcon***REMOVED***g_prune_label_key }}={{ resource.prune_label_value }},{{ meteringcon***REMOVED***g_prune_namespace_label_key }}={{ namespace }}"
   register: to_delete
 
 - name: Delete {{ resource.apis | map(attribute='kind') | join(', ') }} resources with selector {{ label_selector}}
