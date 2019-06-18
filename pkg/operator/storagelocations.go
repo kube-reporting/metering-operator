@@ -22,26 +22,9 @@ const (
 func (op *Reporting) runStorageLocationWorker() {
 	logger := op.logger.WithField("component", "storageLocationWorker")
 	logger.Infof("StorageLocation worker started")
-	const maxRequeues = 10
+	const maxRequeues = -1
 	for op.processResource(logger, op.syncStorageLocation, "StorageLocation", op.storageLocationQueue, maxRequeues) {
 	}
-}
-
-func (op *Reporting) processStorageLocation(logger log.FieldLogger) bool {
-	obj, quit := op.storageLocationQueue.Get()
-	if quit {
-		logger.Infof("queue is shutting down, exiting StorageLocation worker")
-		return false
-	}
-	defer op.storageLocationQueue.Done(obj)
-
-	logger = logger.WithFields(newLogIdenti***REMOVED***er(op.rand))
-	if key, ok := op.getKeyFromQueueObj(logger, "StorageLocation", obj, op.storageLocationQueue); ok {
-		err := op.syncStorageLocation(logger, key)
-		const maxRequeues = 10
-		op.handleErr(logger, err, "StorageLocation", key, op.storageLocationQueue, maxRequeues)
-	}
-	return true
 }
 
 func (op *Reporting) syncStorageLocation(logger log.FieldLogger, key string) error {
