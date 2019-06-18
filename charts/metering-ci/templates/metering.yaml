@@ -4,7 +4,7 @@ metadata:
   name: "{{ .Values.deployPlatform }}-metering"
 spec:
   monitoring:
-    enabled: false
+    enabled: true
 
   openshift-reporting:
     spec:

@@ -19,6 +19,9 @@
       - template_***REMOVED***le: templates/presto/hive-scripts-con***REMOVED***gmap.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hive-scripts-con***REMOVED***gmap
+      - template_***REMOVED***le: templates/presto/hive-jmx-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hive-jmx-con***REMOVED***g
       - template_***REMOVED***le: templates/presto/hive-metastore-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-metastore-service

@@ -28,6 +28,7 @@ spec:
       annotations:
         hive-con***REMOVED***gmap-hash: {{ include (print $.Template.BasePath "/presto/hive-con***REMOVED***gmap.yaml") . | sha256sum }}
         hive-scripts-hash: {{ include (print $.Template.BasePath "/presto/hive-scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
+        hive-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/hive-jmx-con***REMOVED***g.yaml") . | sha256sum }}
         presto-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- if .Values.presto.spec.hive.annotations }}
 {{ toYaml .Values.presto.spec.hive.annotations | indent 8 }}
@@ -60,6 +61,8 @@ spec:
         - name: ui
           containerPort: 10002
           protocol: TCP
+        - containerPort: 8082
+          name: metrics
 {{- if .Values.presto.spec.hive.server.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.presto.spec.hive.server.readinessProbe | indent 10 }}
@@ -104,6 +107,8 @@ spec:
         - name: hdfs-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
 {{- end}}
+        - name: hive-jmx-con***REMOVED***g
+          mountPath: /opt/jmx_exporter/con***REMOVED***g
         # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
         - name: hive-metastore-db-data
           mountPath: /var/lib/hive
@@ -144,6 +149,9 @@ spec:
         con***REMOVED***gMap:
           name: {{ .Values.presto.spec.hive.con***REMOVED***g.hdfsCon***REMOVED***gMapName }}
 {{- end }}
+      - name: hive-jmx-con***REMOVED***g
+        con***REMOVED***gMap:
+          name: hive-jmx-con***REMOVED***g
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Docker***REMOVED***le have a corresponding volumeMount
       - name: hive-warehouse-empty

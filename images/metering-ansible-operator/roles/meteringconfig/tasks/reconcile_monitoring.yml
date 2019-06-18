@@ -7,14 +7,22 @@
     resources:
       - template_***REMOVED***le: templates/monitoring/monitoring-rbac.yaml
         apis: [ {kind: role, api_version: 'rbac.authorization.k8s.io/v1'}, {kind: rolebindings, api_version: 'rbac.authorization.k8s.io/v1'} ]
-        prune_label_value: openshift-metering-monitoring-rbac
+        prune_label_value: metering-monitoring-rbac
         create: "{{ meteringcon***REMOVED***g_create_metering_monitoring_rbac }}"
+      - template_***REMOVED***le: templates/monitoring/hdfs-service-monitor.yaml
+        apis: [ {kind: serviceMonitor, api_version: 'monitoring.coreos.com/v1'} ]
+        prune_label_value: metering-hdfs-service-monitor
+        create: "{{ meteringcon***REMOVED***g_create_metering_monitoring_resources }}"
+      - template_***REMOVED***le: templates/monitoring/hive-service-monitor.yaml
+        apis: [ {kind: serviceMonitor, api_version: 'monitoring.coreos.com/v1'} ]
+        prune_label_value: metering-hive-service-monitor
+        create: "{{ meteringcon***REMOVED***g_create_metering_monitoring_resources }}"
       - template_***REMOVED***le: templates/monitoring/presto-service-monitor.yaml
         apis: [ {kind: serviceMonitor, api_version: 'monitoring.coreos.com/v1'} ]
-        prune_label_value: openshift-metering-presto-service-monitor
+        prune_label_value: metering-presto-service-monitor
         create: "{{ meteringcon***REMOVED***g_create_metering_monitoring_resources }}"
       - template_***REMOVED***le: templates/monitoring/reporting-operator-service-monitor.yaml
         apis: [ {kind: serviceMonitor, api_version: 'monitoring.coreos.com/v1'} ]
-        prune_label_value: openshift-metering-reporting-operator-service-monitor
+        prune_label_value: metering-reporting-operator-service-monitor
         create: "{{ meteringcon***REMOVED***g_create_metering_monitoring_resources }}"
 

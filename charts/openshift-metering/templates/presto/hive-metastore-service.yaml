@@ -9,8 +9,8 @@ spec:
   ports:
   - name: meta
     port: 9083
-    protocol: TCP
-    targetPort: 9083
+  - name: metrics
+    port: 8082
   selector:
     app: hive
     hive: metastore

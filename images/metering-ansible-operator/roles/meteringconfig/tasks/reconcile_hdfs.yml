@@ -13,6 +13,10 @@
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hadoop-scripts
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
+      - template_***REMOVED***le: templates/hadoop/hdfs-jmx-con***REMOVED***g.yaml
+        apis: [ {kind: con***REMOVED***gmap} ]
+        prune_label_value: hdfs-jmx-con***REMOVED***g
+        create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
       - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***gmap.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hadoop-con***REMOVED***gmap

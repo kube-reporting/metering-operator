@@ -2,9 +2,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: metering-presto
+  name: metering-hdfs
   labels:
-    k8s-app: metering-presto
+    k8s-app: metering-hdfs
 spec:
   jobLabel: component
   endpoints:
@@ -13,7 +13,7 @@ spec:
     scheme: "http"
   selector:
     matchLabels:
-      app: presto
+      app: hdfs
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}

@@ -7,43 +7,75 @@ metadata:
 data:
   con***REMOVED***g.yml: |
     ---
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    attrNameSnakeCase: false
     rules:
-      - pattern: "com.facebook.presto.hive<type=(.+), name=hive><>(.+AllTime.+): (.*)"
-        name: "presto_hive_$1_$2"
+      # capture percentile and set quantile label
+      - pattern: 'presto.plugin.hive<type=(.+), name=hive><>(.+AllTime).P(\d+): (.*)'
+        name: 'presto_hive_$1_$2_seconds'
         type: GAUGE
-      - pattern: "com.facebook.presto.hive<type=(.+), name=hive><>(.+TotalCount.*): (.*)"
-        name: "presto_hive_$1_$2_total"
+        valueFactor: 0.001
+        labels:
+          quantile: '0.$3'
+      # match non-percentiles
+      - pattern: 'presto.plugin.hive<type=(.+), name=hive><>(.+AllTime.+): (.*)'
+        name: 'presto_hive_$1_$2_seconds'
+        type: GAUGE
+        valueFactor: 0.001
+        # counts
+      - pattern: 'presto.plugin.hive<type=(.+), name=hive><>(.+TotalCount.*): (.*)'
+        name: 'presto_hive_$1_$2_total'
         type: COUNTER
-      - pattern: "com.facebook.presto.hive.s3<type=(.+), name=hive><>(.+AllTime.+): (.*)"
-        name: "presto_hive_s3_$1_$2"
+      # capture percentile and set quantile label
+      - pattern: 'presto.plugin.hive.s3<type=(.+), name=hive><>(.+AllTime).P(\d+): (.*)'
+        name: 'presto_hive_s3_$1_$2_seconds'
         type: GAUGE
-      - pattern: "com.facebook.presto.hive.s3<type=(.+), name=hive><>(.+TotalCount.*): (.*)"
-        name: "presto_hive_s3_$1_$2_total"
+        valueFactor: 0.001
+        labels:
+          quantile: '0.$3'
+      # match non-percentiles
+      - pattern: 'presto.plugin.hive.s3<type=(.+), name=hive><>(.+AllTime.+): (.*)'
+        name: 'presto_hive_s3_$1_$2_seconds'
+        type: GAUGE
+        valueFactor: 0.001
+        # counts
+      - pattern: 'presto.plugin.hive.s3<type=(.+), name=hive><>(.+TotalCount.*): (.*)'
+        name: 'presto_hive_s3_$1_$2_total'
         type: COUNTER
-      - pattern: "com.facebook.presto.hive.metastore.thrift<type=(.+), name=hive><>(.+AllTime.+): (.*)"
-        name: "presto_hive_metastore_thrift_$1_$2"
+      # capture percentile and set quantile label
+      - pattern: 'presto.plugin.hive.metastore.thrift<type=(.+), name=hive><>(.+AllTime).P(\d+): (.*)'
+        name: 'presto_hive_metastore_thrift_$1_$2_seconds'
         type: GAUGE
-      - pattern: "com.facebook.presto.hive.metastore.thrift<type=(.+), name=hive><>(.+TotalCount.*): (.*)"
-        name: "presto_hive_metastore_thrift_$1_$2_total"
+        valueFactor: 0.001
+        labels:
+          quantile: '0.$3'
+      # match non-percentiles
+      - pattern: 'presto.plugin.hive.metastore.thrift<type=(.+), name=hive><>(.+AllTime.+): (.*)'
+        name: 'presto_hive_metastore_thrift_$1_$2_count_seconds'
+        type: GAUGE
+        valueFactor: 0.001
+      # counts
+      - pattern: 'presto.plugin.hive.metastore.thrift<type=(.+), name=hive><>(.+TotalCount.*): (.*)'
+        name: 'presto_hive_metastore_thrift_$1_$2_total'
         type: COUNTER
-      - pattern: "com.facebook.presto.execution<name=(.+)><>(.+AllTime.+): (.*)"
-        name: "presto_execution_$1_$2"
+      - pattern: 'presto.execution<name=(.+)><>(.+AllTime).P(\d+): (.*)'
+        name: 'presto_execution_$1_$2_seconds'
         type: GAUGE
-      - pattern: "com.facebook.presto.execution<name=(.+)><>(.+TotalCount.*): (.*)"
-        name: "presto_execution_$1_$2_total"
+        valueFactor: 0.001
+        labels:
+          quantile: '0.$3'
+      - pattern: 'presto.execution<name=(.+)><>(.+AllTime.+): (.*)'
+        name: 'presto_execution_$1_$2_seconds'
+        type: GAUGE
+        valueFactor: 0.001
+      # counts
+      - pattern: 'presto.execution<name=(.+)><>(.+TotalCount.*): (.*)'
+        name: 'presto_execution_$1_$2_total'
         type: COUNTER
-      - pattern: "com.facebook.presto.execution.executor<name=(.+)><>(.+AllTime.*): (.*)"
-        name: "presto_executor_$1_$2"
+      - pattern: 'presto.memory<type=(.*), name=(.*)><>(.+): (.*)'
+        name: 'presto_memory_$1_$2_$3'
         type: GAUGE
-      - pattern: "com.facebook.presto.execution.executor<name=(.+)><>(.+TotalCount.*): (.*)"
-        name: "presto_executor_$1_$2_total"
-        type: COUNTER
-      - pattern: "com.facebook.presto.memory<name=ClusterMemoryManager><>(.+): (.*)"
-        name: "presto_clustermemorymanager_$1"
-        type: GAUGE
-      - pattern: "com.facebook.presto.memory<type=ClusterMemoryPool, name=(.*)><>(.+): (.*)"
-        name: "presto_clustermemorypool_$1_$2"
-        type: GAUGE
-      - pattern: "com.facebook.presto.failureDetector<name=HeartbeatFailureDetector><>ActiveCount: (.*)"
-        name: "presto_heartbeatdetector_activecount"
+      - pattern: 'presto.failuredetector<name=HeartbeatFailureDetector><>ActiveCount: (.*)'
+        name: 'presto_heartbeatdetector_activecount'
         type: GAUGE
