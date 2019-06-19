@@ -56,7 +56,7 @@ data:
       </property>
       <property>
         <name>net.topology.script.***REMOVED***le.name</name>
-        <value>/hadoop-con***REMOVED***g/topology-con***REMOVED***guration.sh</value>
+        <value>/hadoop-scripts/topology-con***REMOVED***guration.sh</value>
       </property>
     </con***REMOVED***guration>
 {{- end }}
