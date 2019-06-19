@@ -51,7 +51,7 @@ func FullyQualifiedTableName(prestoTable *metering.PrestoTable) (string, error) 
 		return "", fmt.Errorf("PrestoTable status is invalid: %s", strings.Join(errs, ", "))
 	}
 
-	return presto.FullyQuaifiedTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
+	return presto.FullyQualifiedTableName(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName), nil
 }
 
 func IsValidSQLIdentifier(id string) bool {

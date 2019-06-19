@@ -203,18 +203,19 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 				return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", reportDataSource.Status.TableRef, reportDataSource.Name, err)
 			}
 
-			dataSourceLogger := logger.WithFields(logrus.Fields{
-				"reportDataSource": reportDataSource.Name,
-				"tableName":        prestoTable.Status.TableName,
-			})
 			importCfg, err := op.newPromImporterCfg(reportDataSource, reportDataSource.Spec.PrometheusMetricsImporter.Query, prestoTable)
 			if err != nil {
 				return err
 			}
+			dataSourceLogger := logger.WithFields(logrus.Fields{
+				"reportDataSource": reportDataSource.Name,
+				"tableName":        importCfg.PrestoTableName,
+			})
+
 			// ignore any global ImportFrom configuration since this is an
 			// on-demand import
 			importCfg.ImportFromTime = nil
-			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable)
+			metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable, importCfg)
 
 			select {
 			case semaphore <- struct{}{}:
@@ -322,7 +323,7 @@ func (op *Reporting) newPromImporterCfg(reportDataSource *metering.ReportDataSou
 }
 
 func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) (*prestostore.PrometheusImporter, error) {
-	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable)
+	metricsCollectors := op.newPromImporterMetricsCollectors(reportDataSource, prestoTable, cfg)
 	var promConn prom.API
 	var err error
 	if (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig != nil) && (reportDataSource.Spec.PrometheusMetricsImporter.PrometheusConfig.URL != "") {
@@ -337,11 +338,11 @@ func (op *Reporting) newPromImporter(logger logrus.FieldLogger, reportDataSource
 	return prestostore.NewPrometheusImporter(logger, promConn, op.prometheusMetricsRepo, op.clock, cfg, metricsCollectors), nil
 }
 
-func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable) prestostore.ImporterMetricsCollectors {
+func (op *Reporting) newPromImporterMetricsCollectors(reportDataSource *metering.ReportDataSource, prestoTable *metering.PrestoTable, cfg prestostore.Config) prestostore.ImporterMetricsCollectors {
 	promLabels := prometheus.Labels{
 		"reportdatasource": reportDataSource.Name,
 		"namespace":        reportDataSource.Namespace,
-		"table_name":       prestoTable.Status.TableName,
+		"table_name":       cfg.PrestoTableName,
 	}
 
 	totalImportsCounter := prometheusReportDatasourceTotalImportsCounter.With(promLabels)

@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	"github.com/stretchr/testify/require"
 )
 
 func (f *Framework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
@@ -20,8 +20,11 @@ func (f *Framework) GetMeteringReportDataSource(name string) (*metering.ReportDa
 func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
 	t.Helper()
 	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *metering.ReportDataSource) (bool, error) {
-		if ds.Status.TableRef.Name == "" {
-			t.Logf("ReportDataSource %s table is not created yet", name)
+		exists, err := f.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
+		if err != nil {
+			return false, err
+		}
+		if !exists {
 			return false, nil
 		}
 		return true, nil
@@ -44,8 +47,11 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 		reportDataSources = reportDataSourcesList.Items
 
 		for _, ds := range reportDataSources {
-			if ds.Status.TableRef.Name == "" {
-				t.Logf("ReportDataSource %s table is not created yet", ds.Name)
+			exists, err := f.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
+			if err != nil {
+				return false, err
+			}
+			if !exists {
 				return false, nil
 			}
 		}
@@ -68,4 +74,25 @@ func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, p
 		}
 		return dsFunc(ds)
 	})
+}
+
+func (f *Framework) WaitForReportDataSourcePrestoTable(t *testing.T, ds *metering.ReportDataSource, pollInterval, timeout time.Duration) (bool, error) {
+	if ds.Status.TableRef.Name == "" {
+		t.Logf("ReportDataSource %s PrestoTable resource is not created yet", ds.Name)
+		return false, nil
+	}
+
+	table, err := f.WaitForPrestoTable(t, ds.Status.TableRef.Name, pollInterval, timeout, func(table *metering.PrestoTable) (bool, error) {
+		if table.Status.TableName == "" {
+			t.Logf("ReportDataSource %s PrestoTable %s status.tableName not set yet", ds.Name, table.Name)
+			return false, nil
+		}
+		return true, nil
+	})
+	if err != nil {
+		return false, err
+	}
+
+	t.Logf("ReportDataSource %s PrestoTable %s has a table: %s", ds.Name, table.Name, table.Status.TableName)
+	return true, nil
 }

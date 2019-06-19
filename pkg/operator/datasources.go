@@ -107,7 +107,11 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", prestoTable.Status.TableName)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("existing Prometheus ReportDataSource discovered, tableName: %s", tableName)
 	} else {
 		logger.Infof("new Prometheus ReportDataSource %s discovered", dataSource.Name)
 		tableName := reportingutil.DataSourceTableName(dataSource.Namespace, dataSource.Name)
@@ -129,7 +133,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			params.FileFormat = hiveStorage.Spec.Hive.DefaultTableProperties.FileFormat
 		}
 
-		logger.Infof("creating table %s", tableName)
+		logger.Infof("creating Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
 		hiveTable, err := op.createHiveTableCR(dataSource, metering.ReportDataSourceGVK, params, false, nil)
 		if err != nil {
 			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
@@ -142,14 +146,14 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if err != nil {
 			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 		}
-		logger.Infof("created table %s", tableName)
+		logger.Infof("created Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
 
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		})
 		if err != nil {
-			logger.WithError(err).Errorf("failed to update ReportDataSource TableName field %q", tableName)
+			logger.WithError(err).Errorf("failed to update ReportDataSource tableRef to %s", hiveTable.Name)
 			return err
 		}
 
@@ -174,10 +178,14 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	}
 
 	query := dataSource.Spec.PrometheusMetricsImporter.Query
+	tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+	if err != nil {
+		return err
+	}
 
 	dataSourceLogger := logger.WithFields(log.Fields{
 		"reportDataSource": dataSource.Name,
-		"tableName":        prestoTable.Status.TableName,
+		"tableName":        tableName,
 	})
 
 	importerCfg, err := op.newPromImporterCfg(dataSource, query, prestoTable)
@@ -330,6 +338,15 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 			return err
 		}
 
+		prestoTable, err := op.prestoTableLister.PrestoTables(hiveTable.Namespace).Get(hiveTable.Name)
+		if err != nil {
+			return fmt.Errorf("unable to get PrestoTable %s for HiveTable %s, %s", hiveTable.Name, hiveTable.Name, err)
+		}
+		tableName, err = reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+
 		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at prefix %s", tableName, source.Bucket, source.Prefix)
 		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
@@ -352,7 +369,15 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 				return err
 			}
 		}
-		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", hiveTable.Status.TableName)
+		prestoTable, err := op.prestoTableLister.PrestoTables(hiveTable.Namespace).Get(hiveTable.Name)
+		if err != nil {
+			return fmt.Errorf("unable to get PrestoTable %s for HiveTable %s, %s", hiveTable.Name, hiveTable.Name, err)
+		}
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("existing AWSBilling ReportDataSource discovered, tableName: %s", tableName)
 	}
 
 	err = op.updateAWSBillingPartitions(logger, dataSource, source, hiveTable, manifests)
@@ -389,7 +414,11 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		logger.Infof("existing PrestoTable ReportDataSource discovered, tableName: %s", prestoTable.Status.TableName)
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("existing PrestoTable ReportDataSource discovered, tableName: %s", tableName)
 	} else {
 		logger.Infof("new PrestoTable ReportDataSource discovered, tableName: %s", dataSource.Spec.PrestoTable.TableRef.Name)
 		var err error
@@ -435,8 +464,12 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
 		}
-		logger.Infof("existing ReportDataSource discovered, viewName: %s", prestoTable.Status.TableName)
-		viewName = prestoTable.Status.TableName
+		tableName, err := reportingutil.FullyQualifiedTableName(prestoTable)
+		if err != nil {
+			return err
+		}
+		logger.Infof("existing ReportQuery ReportDataSource discovered, viewName: %s", tableName)
+		viewName = tableName
 	}
 
 	dependencyResult, err := op.dependencyResolver.ResolveDependencies(query.Namespace, query.Spec.Inputs, nil)
