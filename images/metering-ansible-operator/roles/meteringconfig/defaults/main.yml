@@ -2,6 +2,7 @@
 
 meteringconfig_chart_path: "{{ lookup('env','HELM_CHART_PATH') }}"
 meteringconfig_prune_label_key: 'metering.openshift.io/prune'
+meteringconfig_prune_namespace_label_key: 'metering.openshift.io/ns-prune'
 
 meteringconfig_default_values_file: "{{ meteringconfig_chart_path + '/values.yaml' }}"
 meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_file) | from_yaml }}"
