@@ -56,7 +56,7 @@ data:
       </property>
       <property>
         <name>net.topology.script.file.name</name>
-        <value>/hadoop-config/topology-configuration.sh</value>
+        <value>/hadoop-scripts/topology-configuration.sh</value>
       </property>
     </configuration>
 {{- end }}
