@@ -49,9 +49,10 @@ type server struct {
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportResultsGetter   prestostore.ReportResultsGetter
 
-	reportLister      listers.ReportLister
-	reportQueryLister listers.ReportQueryLister
-	prestoTableLister listers.PrestoTableLister
+	reportLister           listers.ReportLister
+	reportDataSourceLister listers.ReportDataSourceLister
+	reportQueryLister      listers.ReportQueryLister
+	prestoTableLister      listers.PrestoTableLister
 }
 
 type requestLogger struct {
@@ -69,6 +70,7 @@ func newRouter(
 	reportResultsGetter prestostore.ReportResultsGetter,
 	collectorFunc prometheusImporterFunc,
 	reportLister listers.ReportLister,
+	reportDataSourceLister listers.ReportDataSourceLister,
 	reportQueryLister listers.ReportQueryLister,
 	prestoTableLister listers.PrestoTableLister,
 ) chi.Router {
@@ -79,14 +81,15 @@ func newRouter(
 	router.Use(prometheusMiddleware)
 
 	srv := &server{
-		logger:                logger,
-		rand:                  rand,
-		collectorFunc:         collectorFunc,
-		prometheusMetricsRepo: prometheusMetricsRepo,
-		reportResultsGetter:   reportResultsGetter,
-		reportLister:          reportLister,
-		reportQueryLister:     reportQueryLister,
-		prestoTableLister:     prestoTableLister,
+		logger:                 logger,
+		rand:                   rand,
+		collectorFunc:          collectorFunc,
+		prometheusMetricsRepo:  prometheusMetricsRepo,
+		reportResultsGetter:    reportResultsGetter,
+		reportLister:           reportLister,
+		reportDataSourceLister: reportDataSourceLister,
+		reportQueryLister:      reportQueryLister,
+		prestoTableLister:      prestoTableLister,
 	}
 
 	router.HandleFunc(APIV2ReportsEndpointPre***REMOVED***x+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
@@ -555,7 +558,38 @@ func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), reportingutil.DataSourceTableName(namespace, name), metrics)
+	dataSource, err := srv.reportDataSourceLister.ReportDataSources(namespace).Get(name)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to get ReportDataSource %s: %v", name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to get ReportDataSource %s: %v", name, err)
+		return
+	}
+	if dataSource.Status.TableRef.Name == "" {
+		logger.WithError(err).Errorf("ReportDataSource %s table not created yet", name)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "ReportDataSource %s table not created yet", name)
+		return
+	}
+
+	prestoTable, err := srv.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to get PrestoTable %s: %v", dataSource.Status.TableRef.Name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to get PrestoTable %s: %v", dataSource.Status.TableRef.Name, err)
+		return
+	}
+	if prestoTable.Status.TableName == "" {
+		logger.WithError(err).Errorf("PrestoTable %s table %s not created yet", prestoTable.Name, prestoTable.Spec.TableName)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "PrestoTable %s table %s not created yet", prestoTable.Name, prestoTable.Spec.TableName)
+		return
+	}
+
+	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	if err != nil {
+		logger.WithError(err).Errorf("invalid PrestoTable %s: %v", prestoTable.Name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid PrestoTable %s: %v", prestoTable.Name, err)
+		return
+	}
+
+	err = srv.prometheusMetricsRepo.StorePrometheusMetrics(context.Background(), tableName, metrics)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to store prometheus metrics: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to store prometheus metrics: %v", err)
@@ -576,7 +610,6 @@ func (srv *server) fetchPrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 		return
 	}
 
-	datasourceTable := reportingutil.DataSourceTableName(namespace, name)
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 	var startTime, endTime time.Time
@@ -594,7 +627,38 @@ func (srv *server) fetchPrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 			return
 		}
 	}
-	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(datasourceTable, startTime, endTime)
+
+	dataSource, err := srv.reportDataSourceLister.ReportDataSources(namespace).Get(name)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to get ReportDataSource %s: %v", name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to get ReportDataSource %s: %v", name, err)
+		return
+	}
+	if dataSource.Status.TableRef.Name == "" {
+		logger.WithError(err).Errorf("ReportDataSource %s table not created yet", name)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "ReportDataSource %s table not created yet", name)
+		return
+	}
+
+	prestoTable, err := srv.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
+	if err != nil {
+		logger.WithError(err).Errorf("unable to get PrestoTable %s: %v", dataSource.Status.TableRef.Name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to get PrestoTable %s: %v", dataSource.Status.TableRef.Name, err)
+		return
+	}
+	if prestoTable.Status.TableName == "" {
+		logger.WithError(err).Errorf("PrestoTable %s table %s not created yet", prestoTable.Name, prestoTable.Spec.TableName)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "PrestoTable %s table %s not created yet", prestoTable.Name, prestoTable.Spec.TableName)
+		return
+	}
+	tableName, err := reportingutil.FullyQuali***REMOVED***edTableName(prestoTable)
+	if err != nil {
+		logger.WithError(err).Errorf("invalid PrestoTable %s: %v", prestoTable.Name, err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "invalid PrestoTable %s: %v", prestoTable.Name, err)
+		return
+	}
+
+	results, err := srv.prometheusMetricsRepo.GetPrometheusMetrics(tableName, startTime, endTime)
 	if err != nil {
 		logger.WithError(err).Errorf("error querying for datasource: %v", err)
 		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error querying for datasource: %v", err)
