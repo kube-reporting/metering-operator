@@ -259,7 +259,7 @@ func TestMain(m *testing.M) {
 func TestReportingProducesCorrectDataForInput(t *testing.T) {
 	var queries []string
 	t.Logf("Waiting for ReportDataSources tables to be created")
-	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 2*time.Minute)
+	_, err := testFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 5*time.Minute)
 	require.NoError(t, err, "should not error when waiting for all ReportDataSource tables to be created")
 
 	for _, test := range testReportsProduceCorrectDataForInputTestCases {
@@ -269,7 +269,7 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 	// validate all ReportQueries and ReportDataSources that are
 	// used by the test cases are initialized
 	t.Logf("Waiting for ReportQueries tables to become ready")
-	testFramework.RequireReportQueriesReady(t, queries, time.Second*5, 2*time.Minute)
+	testFramework.RequireReportQueriesReady(t, queries, time.Second*5, 5*time.Minute)
 
 	var reportStart, reportEnd time.Time
 	dataSourcesSubmitted := make(map[string]struct{})
@@ -280,7 +280,7 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 		for _, dataSource := range test.dataSources {
 			if _, alreadySubmitted := dataSourcesSubmitted[dataSource.DatasourceName]; !alreadySubmitted {
 				// wait for the datasource table to exist
-				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, time.Minute)
+				_, err := testFramework.WaitForMeteringReportDataSourceTable(t, dataSource.DatasourceName, time.Second*5, 2*time.Minute)
 				require.NoError(t, err, "ReportDataSource table should exist before storing data into it")
 
 				metricsFile, err := os.Open(dataSource.FileName)
