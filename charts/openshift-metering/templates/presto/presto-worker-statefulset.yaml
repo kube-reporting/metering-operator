@@ -28,6 +28,12 @@ spec:
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
         presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
         presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
+{{- if and .Values.presto.spec.presto.config.tls.enabled .Values.presto.spec.presto.config.tls.createSecret }}
+        presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
+{{- if and .Values.presto.spec.presto.config.auth.enabled .Values.presto.spec.presto.config.auth.createSecret}}
+        presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- end }}
 {{- if .Values.presto.spec.presto.annotations }}
 {{ toYaml .Values.presto.spec.presto.annotations | indent 8 }}
 {{- end }}
