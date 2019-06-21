@@ -1,0 +1,33 @@
+---
+
+- name: Configure S3 Storage
+  block:
+    - name: Validate Metering S3 bucket name
+      fail:
+        msg: "storage.hive.s3.bucket and storage.hive.s3.region cannot be empty, got bucket: '{{ meteringconfig_storage_s3_bucket_name }}', and region: '{{ meteringconfig_storage_s3_bucket_region }}'"
+      when: meteringconfig_storage_s3_bucket_name == "" or meteringconfig_storage_s3_bucket_region == ""
+
+    - name: Validate Metering S3 credentials
+      fail:
+        msg: "storage.hive.s3.awsCredentialsSecretName cannot be empty"
+      when: meteringconfig_storage_s3_aws_credentials_secret_name == ""
+
+    - name: Obtaining AWS credentials to configure S3 bucket
+      k8s_facts:
+        api_version: v1
+        kind: Secret
+        name: "{{ meteringconfig_storage_s3_aws_credentials_secret_name }}"
+        namespace: "{{ meta.namespace }}"
+      no_log: true
+      register: operator_s3_credentials_secret
+
+    - name: Create Metering S3 bucket
+      s3_bucket:
+        state: present
+        name: "{{ meteringconfig_storage_s3_bucket_name }}"
+        region: "{{ meteringconfig_storage_s3_bucket_region }}"
+        aws_access_key: "{{ operator_s3_credentials_secret.resources[0].data['aws-access-key-id'] | b64decode | default(omit) }}"
+        aws_secret_key: "{{ operator_s3_credentials_secret.resources[0].data['aws-secret-access-key'] | b64decode | default(omit) }}"
+      when: operator_s3_credentials_secret.resources | length > 0
+
+  when: meteringconfig_storage_hive_store_type == 's3' and meteringconfig_storage_s3_create_bucket
