@@ -99,8 +99,8 @@ spec:
           mountPath: /hive-config
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if .Values.presto.spec.hive.config.useHdfsConfigMap }}
-        - name: hdfs-config
+{{- if .Values.presto.spec.hive.config.useHadoopConfigMap }}
+        - name: hadoop-config
           mountPath: /hadoop-config
 {{- end }}
         - name: hive-jmx-config
@@ -117,10 +117,6 @@ spec:
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: {{ .Values.presto.spec.config.sharedVolume.mountPath }}
-{{- end }}
-{{- if or (not .Values.presto.spec.config.sharedVolume.enabled) (and .Values.presto.spec.config.sharedVolume.enabled (ne .Values.presto.spec.config.sharedVolume.mountPath "/user/hive/warehouse") ) }}
-        - name: hive-warehouse-empty
-          mountPath: /user/hive/warehouse
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.hive.metastore.resources | indent 10 }}
@@ -140,18 +136,16 @@ spec:
         configMap:
           name: hive-scripts
           defaultMode: 0555
-{{- if .Values.presto.spec.hive.config.useHdfsConfigMap }}
-      - name: hdfs-config
+{{- if .Values.presto.spec.hive.config.useHadoopConfigMap }}
+      - name: hadoop-config
         configMap:
-          name: {{ .Values.presto.spec.hive.config.hdfsConfigMapName }}
+          name: {{ .Values.presto.spec.hive.config.hadoopConfigMapName }}
 {{- end }}
       - name: hive-jmx-config
         configMap:
           name: hive-jmx-config
       # these emptyDir volumes are necessary because Openshift requires VOLUMEs
       # in a Dockerfile have a corresponding volumeMount
-      - name: hive-warehouse-empty
-        emptyDir: {}
       - name: namenode-empty
         emptyDir: {}
       - name: datanode-empty
@@ -168,5 +162,5 @@ spec:
 {{- if .Values.presto.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.presto.spec.config.sharedVolume.persistentVolumeClaimName }}
+          claimName: {{ .Values.presto.spec.config.sharedVolume.claimName }}
 {{- end}}

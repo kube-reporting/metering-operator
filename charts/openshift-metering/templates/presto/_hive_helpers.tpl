@@ -11,16 +11,16 @@
   valueFrom:
     fieldRef:
       fieldPath: metadata.namespace
+{{- if or .Values.presto.spec.config.awsCredentialsSecretName .Values.presto.spec.config.createAwsCredentialsSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName }}"
+      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName | default "presto-aws-credentials" }}"
       key: aws-access-key-id
-      optional: true
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName }}"
+      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName | default "presto-aws-credentials" }}"
       key: aws-secret-access-key
-      optional: true
+{{- end }}
 {{- end }}

@@ -1,14 +1,34 @@
 global:
   ownerReferences: []
 
-defaultStorage:
-  create: true
-  hive:
-    databaseName: default
-    unmanagedDatabase: true
-  isDefault: true
-  name: hive
-  type: hive
+unsupportedFeatures:
+  enableHDFS: false
+
+storage:
+  type: "hive"
+  hive: {}
+
+  # Below is an example of what configuring storage could look like:
+  #
+  # hive:
+  #   type: "hdfs"
+  #   hdfs:
+  #     namenode: "hdfs-namenode-0.hdfs-namenode:9820"
+
+  # hive:
+  #   type: "s3"
+  #   s3:
+  #     bucket: "bucketname/path/"
+  #     awsCredentialsSecretName: "my-aws-secret"
+
+  # hive:
+  #   type: "sharedPVC"
+  #   sharedPVC:
+  #     claimName: "metering-nfs"
+  #     createPVC: true
+  #     storageClass: null
+  #     size: 5Gi
+  #     mountPath: "/"
 
 permissions:
   meteringAdmins: []
@@ -25,8 +45,19 @@ monitoring:
 openshift-reporting:
   enabled: true
   spec:
+    defaultStorageLocation:
+      create: true
+      isDefault: true
+      name: hive
+      type: hive
+      hive:
+        databaseName: metering
+        unmanagedDatabase: false
+        location: ""
+
     awsBillingReportDataSource:
       enabled: false
+
     defaultReportDataSources:
       cluster-cpu-capacity-raw:
         spec:
@@ -209,9 +240,9 @@ reporting-operator:
     config:
       allNamespaces: false
       awsAccessKeyID: ""
-      awsCredentialsSecretName: reporting-operator-aws-credentials-secrets
+      awsCredentialsSecretName: ""
       awsSecretAccessKey: ""
-      createAwsCredentialsSecret: true
+      createAwsCredentialsSecret: false
       createClusterMonitoringViewRBAC: true
       disablePrometheusMetricsImporter: "false"
       enableFinalizers: "false"
@@ -321,17 +352,19 @@ presto:
   spec:
     config:
       awsAccessKeyID: ""
-      awsCredentialsSecretName: presto-aws-credentials
+      awsCredentialsSecretName: ""
       awsSecretAccessKey: ""
-      createAwsCredentialsSecret: true
+      createAwsCredentialsSecret: false
+
       sharedVolume:
-        createPVC: true
         enabled: false
         mountPath: /user/hive/warehouse
-        persistentVolumeClaimName: hive-warehouse-data
-        storage:
-          persistentVolumeClaimSize: 5Gi
-          persistentVolumeClaimStorageClass: null
+
+        createPVC: false
+        claimName: hive-warehouse-data
+        size: 5Gi
+        storageClass: null
+
     hive:
       annotations: {}
       config:
@@ -342,13 +375,12 @@ presto:
         dbConnectionUsername: null
         defaultCompression: zlib
         defaultFileFormat: orc
-        defaultfs: null
         enableMetastoreSchemaVerification: false
         metastoreClientSocketTimeout: null
         metastoreURIs: thrift://hive-metastore:9083
-        metastoreWarehouseDir: hdfs://hdfs-namenode-0.hdfs-namenode:9820/operator_metering/default_hive_warehouse/
-        hdfsConfigMapName: hadoop-config
-        useHdfsConfigMap: true
+        metastoreWarehouseDir: null
+        hadoopConfigMapName: hadoop-config
+        useHadoopConfigMap: true
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-metering-hive
@@ -572,7 +604,7 @@ hadoop:
       pullSecrets: null
 
     hdfs:
-      enabled: true
+      enabled: false
       config:
         datanodeDataDirPerms: "775"
         replicationFactor: 3

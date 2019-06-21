@@ -6,9 +6,9 @@
   loop: "{{ vars | dict2items | to_json | from_json | json_query(query) | difference(filtered_vars) }}"
   vars:
     filtered_vars:
-      - meteringconfig_default_values
       - meteringconfig_spec
-      - meteringconfig_spec_with_defaults
+      - meteringconfig_spec_overrides
+      - meteringconfig_default_values
     query: "[?starts_with(@.key, `meteringconfig_`)].key"
 
 - include_tasks: reconcile.yml
