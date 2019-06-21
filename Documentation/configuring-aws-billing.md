@@ -8,10 +8,22 @@ For more information, see [Turning on the AWS Cost and Usage report][enable-aws-
 
 Next, update update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report in the `openshift-reporting.spec.awsBillingReportDataSource` in the [aws-billing.yaml][example-config] example configuration manifest.
 
-Then, set the `awsAccessKeyID` and `awsSecretAccessKey` in the `spec.reporting-operator.spec.config` and `spec.presto.spec.config` sections.
+The `spec.reporting-operator.spec.config.aws.secretName` and `spec.presto.spec.config.awsCredentialsSecretName` fields should be set to the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
 
-To retrieve data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read access to the bucket.
-For an example of an IAM policy granting the required permissions see the [aws/read-only.json](aws/read-only.json) file.
+For example:
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: your-aws-secret
+data:
+  aws-access-key-id: "dGVzdAo="
+  aws-secret-access-key: "c2VjcmV0Cg=="
+```
+
+To store data in S3, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
+For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) file.
 Replace `operator-metering-data` with the name of your bucket.
 
 This can be done either pre-install or post-install. Note that disabling it post-install can cause errors in the reporting-operator.

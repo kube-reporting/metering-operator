@@ -65,8 +65,9 @@ _storage_overrides:
     reporting-operator:
       spec:
         config:
-          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
-          createAwsCredentialsSecret: false
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+            createSecret: false
     presto:
       spec:
         config:
@@ -142,19 +143,22 @@ _tls_overrides:
   reporting-operator:
     spec:
       config:
-        prestoTLS:
-          enabled: true
-          createSecret: true
-          secretName: "{{ meteringconfig_reporting_operator_presto_server_secret_name }}"
-          caCertificate: "{{ meteringconfig_reporting_operator_presto_server_ca_certificate }}"
+        presto:
+          tls:
+            caCertificate: "{{ meteringconfig_reporting_operator_presto_server_ca_certificate }}"
 
-        prestoAuth:
-          enabled: true
-          createSecret: true
-          secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
-          certificate: "{{ meteringconfig_reporting_operator_client_cert }}"
-          key: "{{ meteringconfig_reporting_operator_client_key }}"
-          caCertificate: "{{ meteringconfig_reporting_operator_presto_client_ca_certificate }}"
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringconfig_reporting_operator_presto_server_secret_name }}"
+
+          auth:
+            certificate: "{{ meteringconfig_reporting_operator_client_cert }}"
+            key: "{{ meteringconfig_reporting_operator_client_key }}"
+            caCertificate: "{{ meteringconfig_reporting_operator_presto_client_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
   presto:
     spec:
       presto:
@@ -223,15 +227,15 @@ meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.presto.config.auth.e
 #
 # Reporting Operator
 #
-meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
-meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
-meteringconfig_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createAuthenticatedEmailsSecret | default(true) }}"
-meteringconfig_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec.authProxy.enabled and (_reporting_op_spec.authProxy.subjectAccessReviewEnabled and _reporting_op_spec.authProxy.delegateURLsEnabled) | default(false) }}"
-meteringconfig_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.config.prometheusImporter.auth.tokenSecret.create | default(false) }}"
-meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _reporting_op_spec.config.prometheusCertificateAuthority.configMap.create | default(false) }}"
-meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.createAwsCredentialsSecret | default(false) }}"
-meteringconfig_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.config.prestoTLS.enabled and _reporting_op_spec.config.prestoTLS.createSecret | default(false) }}"
-meteringconfig_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.config.prestoAuth.enabled and _reporting_op_spec.config.prestoAuth.createSecret | default(false) }}"
-meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.cookie.createSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.htpasswd.createSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.authenticatedEmails.createSecret | default(true) }}"
+meteringconfig_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.rbac.createAuthProxyClusterRole and (_reporting_op_spec.authProxy.subjectAccessReview.enabled and _reporting_op_spec.authProxy.delegateURLs.enabled) | default(false) }}"
+meteringconfig_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.config.prometheus.metricsImporter.auth.tokenSecret.create | default(false) }}"
+meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _reporting_op_spec.config.prometheus.certificateAuthority.configMap.create | default(false) }}"
+meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.config.presto.tls.enabled and _reporting_op_spec.config.presto.tls.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.config.presto.auth.enabled and _reporting_op_spec.config.presto.auth.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.api.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
-meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.config.createClusterMonitoringViewRBAC | default(true) }}"
+meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"

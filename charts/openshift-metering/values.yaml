@@ -212,128 +212,20 @@ reporting-operator:
   spec:
     affinity: {}
     annotations: {}
-    authProxy:
-      authenticatedEmailsData: ""
-      authenticatedEmailsEnabled: false
-      authenticatedEmailsSecretName: reporting-operator-auth-proxy-authenticated-emails
-      cookieSecretName: reporting-operator-auth-proxy-cookie-seed
-      cookieSeed: ""
-      createAuthProxyClusterRole: true
-      createAuthenticatedEmailsSecret: true
-      createCookieSecret: true
-      createHtpasswdSecret: true
-      delegateURLsEnabled: false
-      delegateURLsPolicy: '{"/": {"group": "metering.openshift.io", "resource": "reports",
-        "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}}'
-      enabled: false
-      htpasswdData: ""
-      htpasswdSecretName: reporting-operator-auth-proxy-htpasswd
-      image:
-        pullPolicy: Always
-        repository: openshift/oauth-proxy
-        tag: v1.1.0
-      resources:
-        limits:
-          cpu: 500m
-          memory: 100Mi
-        requests:
-          cpu: 100m
-          memory: 50Mi
-      subjectAccessReviewEnabled: false
-      subjectAccessReviewPolicy: '{"group": "metering.openshift.io", "resource": "reports",
-        "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}'
-    config:
-      allNamespaces: false
-      awsAccessKeyID: ""
-      awsCredentialsSecretName: ""
-      awsSecretAccessKey: ""
-      createAwsCredentialsSecret: false
-      createClusterMonitoringViewRBAC: true
-      disablePrometheusMetricsImporter: "false"
-      enableFinalizers: "false"
-      hiveHost: hive-server:10000
-      leaderLeaseDuration: 60s
-      logDDLQueries: "false"
-      logDMLQueries: "false"
-      logLevel: info
-      logReports: "false"
-      prestoHost: presto:8080
-      prestoMaxQueryLength: null
-      prestoTLS:
-        # CA for the server cert
-        caCertificate: ""
+    labels: {}
+    nodeSelector: {}
+    tolerations: []
+    replicas: 1
 
-        createSecret: false
-        enabled: false
-        secretName: ""
-      prestoAuth:
-        # client cert
-        certificate: ""
-        # client private key
-        key: ""
-        # CA for the client cert
-        caCertificate: ""
-
-        createSecret: false
-        enabled: false
-        secretName: ""
-      prometheusCertificateAuthority:
-        configMap:
-          create: false
-          enabled: false
-          filename: ""
-          name: reporting-operator-certificate-authority-config
-          value: ""
-        useServiceAccountCA: true
-      prometheusDatasourceImportFrom: null
-      prometheusDatasourceMaxImportBackfillDuration: null
-      prometheusDatasourceMaxQueryRangeDuration: null
-      prometheusImporter:
-        auth:
-          tokenSecret:
-            create: false
-            enabled: false
-            name: reporting-operator-prometheus-bearer-secrets
-            value: ""
-          useServiceAccountToken: true
-      prometheusMetricsImporterChunkSize: 5m
-      prometheusMetricsImporterPollInterval: 5m
-      prometheusMetricsImporterStepSize: 60s
-      prometheusURL: https://prometheus-k8s.openshift-monitoring.svc:9091/
-      targetNamespaces: []
-      tls:
-        certificateData: null
-        createSecret: false
-        enabled: true
-        privateKeyData: null
-        secretName: reporting-operator-api-tls-secrets
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-reporting-operator
       tag: 4.2
-    labels: {}
-    livenessProbe:
-      failureThreshold: 5
-      httpGet:
-        path: /healthy
-        port: 8080
-        scheme: HTTP
-      initialDelaySeconds: 120
-      periodSeconds: 60
-      successThreshold: 1
-      timeoutSeconds: 60
-    nodeSelector: {}
-    readinessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /ready
-        port: 8080
-        scheme: HTTP
-      initialDelaySeconds: 60
-      periodSeconds: 60
-      successThreshold: 1
-      timeoutSeconds: 60
-    replicas: 1
+      pullSecrets: []
+
+    updateStrategy:
+      type: RollingUpdate
+
     resources:
       limits:
         cpu: 1
@@ -341,17 +233,185 @@ reporting-operator:
       requests:
         cpu: 500m
         memory: 100Mi
-    route:
-      enabled: false
-      name: metering
-    service:
+
+    config:
+      allNamespaces: false
+      enableFinalizers: false
+      leaderLeaseDuration: "60s"
+
+      logDDLQueries: false
+      logDMLQueries: false
+      logReports: false
+      logLevel: info
+
+      aws:
+        accessKeyID: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
+      hive:
+        # note this will contain more information once TLS/Auth is enabled w/ Hive
+        host: hive-server:10000
+        # tls:
+        #   # client cert
+        #   certificate: ""
+        #   # client private key
+        #   key: ""
+        #   # CA for the client cert
+        #   caCertificate: ""
+
+        #   createSecret: false
+        #   enabled: false
+        #   secretName: ""
+
+      presto:
+        host: presto:8080
+        maxQueryLength: null
+
+        tls:
+          # CA for the server cert
+          caCertificate: ""
+
+          createSecret: false
+          enabled: false
+          secretName: ""
+        auth:
+          # client cert
+          certificate: ""
+          # client private key
+          key: ""
+          # CA for the client cert
+          caCertificate: ""
+
+          createSecret: false
+          enabled: false
+          secretName: ""
+
+      prometheus:
+        url: https://prometheus-k8s.openshift-monitoring.svc:9091/
+
+        certificateAuthority:
+          useServiceAccountCA: true
+          configMap:
+            create: false
+            enabled: false
+            filename: ""
+            name: reporting-operator-certificate-authority-config
+            value: ""
+
+        metricsImporter:
+          enabled: true
+          auth:
+            useServiceAccountToken: true
+            tokenSecret:
+              create: false
+              enabled: false
+              name: reporting-operator-prometheus-bearer-secrets
+              value: ""
+          config:
+            chunkSize: 5m
+            pollInterval: 5m
+            stepSize: 60s
+            importFrom: null
+            maxImportBackfillDuration: null
+            maxQueryRangeDuration: null
+
+      tls:
+        api:
+          # server cert
+          certificate: ""
+          # server private key
+          key: ""
+          # CA for the server cert
+          caCertificate: ""
+
+          createSecret: false
+          # default enabled because we expect the cert to be created by the
+          # service serving cert controller.
+          enabled: true
+          secretName: reporting-operator-api-tls-secrets
+
+    rbac:
+      createClusterMonitoringViewRBAC: true
+
+    livenessProbe:
+      failureThreshold: 5
+      initialDelaySeconds: 120
+      periodSeconds: 60
+      successThreshold: 1
+      timeoutSeconds: 60
+
+      httpGet:
+        path: /healthy
+        port: 8080
+        scheme: HTTP
+
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 60
+      periodSeconds: 60
+      successThreshold: 1
+      timeoutSeconds: 60
+
+      httpGet:
+        path: /ready
+        port: 8080
+        scheme: HTTP
+
+    apiService:
       annotations:
         service.alpha.openshift.io/serving-cert-secret-name: reporting-operator-api-tls-secrets
       nodePort: null
       type: ClusterIP
-    tolerations: []
-    updateStrategy:
-      type: RollingUpdate
+
+    route:
+      enabled: false
+      name: metering
+
+    authProxy:
+      enabled: false
+
+      image:
+        pullPolicy: Always
+        repository: openshift/oauth-proxy
+        tag: v1.1.0
+        pullSecrets: []
+
+      authenticatedEmails:
+        enabled: false
+        data: ""
+        createSecret: true
+        secretName: reporting-operator-auth-proxy-authenticated-emails
+
+      cookie:
+        seed: ""
+        createSecret: true
+        secretName: reporting-operator-auth-proxy-cookie-seed
+
+      delegateURLs:
+        enabled: true
+        policy: '{"/": {"group": "metering.openshift.io", "resource": "reports", "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}}'
+
+      subjectAccessReview:
+        enabled: true
+        policy: '{"group": "metering.openshift.io", "resource": "reports", "namespace": "$(NAMESPACE)", "subresource": "export", "verb": "get"}'
+
+      htpasswd:
+        data: ""
+        createSecret: true
+        secretName: reporting-operator-auth-proxy-htpasswd
+
+      rbac:
+        createAuthProxyClusterRole: true
+
+      resources:
+        limits:
+          cpu: 500m
+          memory: 100Mi
+        requests:
+          cpu: 100m
+          memory: 50Mi
 
 presto:
   spec:

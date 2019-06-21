@@ -10,50 +10,50 @@ data:
   log-reports: {{ $operatorValues.spec.config.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.config.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.config.logDMLQueries | quote}}
-  presto-host: {{ $operatorValues.spec.config.prestoHost | quote }}
-  hive-host: {{ $operatorValues.spec.config.hiveHost | quote }}
-  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" $operatorValues.spec.config.prometheusURL | quote}}
-  disable-prometheus-metrics-importer: {{ $operatorValues.spec.config.disablePrometheusMetricsImporter | quote}}
+  presto-host: {{ $operatorValues.spec.config.presto.host | quote }}
+  hive-host: {{ $operatorValues.spec.config.hive.host | quote }}
+  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" $operatorValues.spec.config.prometheus.url | quote}}
+  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.config.prometheus.metricsImporter.enabled | quote}}
   enable-finalizers: {{ $operatorValues.spec.config.enableFinalizers | quote}}
-{{- if $operatorValues.spec.config.prestoTLS.enabled }}
+{{- if $operatorValues.spec.config.presto.tls.enabled }}
   presto-ca-file: "/var/run/secrets/presto-tls/ca.crt"
-{{- if $operatorValues.spec.config.prestoAuth.enabled }}
+{{- if $operatorValues.spec.config.presto.auth.enabled }}
   presto-client-cert-file: "/var/run/secrets/presto-auth/tls.crt"
   presto-client-key-file: "/var/run/secrets/presto-auth/tls.key"
   presto-client-ca-cert-file: "/var/run/secrets/presto-auth/ca.crt"
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusMetricsImporterPollInterval }}
-  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.config.prometheusMetricsImporterPollInterval | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval }}
+  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval | quote}}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusMetricsImporterChunkSize }}
-  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.config.prometheusMetricsImporterChunkSize | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.chunkSize }}
+  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.chunkSize | quote}}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusMetricsImporterStepSize }}
-  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.config.prometheusMetricsImporterStepSize | quote}}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.stepSize }}
+  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.stepSize | quote}}
 {{- end }}
 {{- if $operatorValues.spec.config.leaderLeaseDuration }}
   leader-lease-duration: {{ $operatorValues.spec.config.leaderLeaseDuration | quote }}
 {{- end }}
 {{- if $operatorValues.spec.config.prestoMaxQueryLength }}
-  presto-max-query-length: {{ $operatorValues.spec.config.prestoMaxQueryLength | quote }}
+  presto-max-query-length: {{ $operatorValues.spec.config.presto.maxQueryLength | quote }}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusDatasourceMaxQueryRangeDuration }}
-  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.config.prometheusDatasourceMaxQueryRangeDuration | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.maxQueryRangeDuration }}
+  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.maxQueryRangeDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusDatasourceMaxImportBackfillDuration }}
-  prometheus-datasource-max-import-backfill-duration: {{ $operatorValues.spec.config.prometheusDatasourceMaxImportBackfillDuration | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.maxImportBackfillDuration }}
+  prometheus-datasource-max-import-backfill-duration: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.maxImportBackfillDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusDatasourceImportFrom }}
-  prometheus-datasource-import-from: {{ $operatorValues.spec.config.prometheusDatasourceImportFrom | quote }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.config.importFrom }}
+  prometheus-datasource-import-from: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.importFrom | quote }}
 {{- end }}
-{{- if $operatorValues.spec.config.prometheusImporter.auth.useServiceAccountToken }}
+{{- if $operatorValues.spec.config.prometheus.metricsImporter.auth.useServiceAccountToken }}
   prometheus-bearer-token-file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 {{- else }}
   prometheus-bearer-token-file: "/var/run/reporting-operator/token"
 {{- end }}
 {{- if $operatorValues.spec.config.allNamespaces }}
-  all-namespaces: {{ $operatorValues.spec.config.allNamespaces | quote }}
+  all-namespaces: "true"
 {{- end }}
 {{- if $operatorValues.spec.config.targetNamespaces }}
   target-namespaces: {{ $operatorValues.spec.config.targetNamespaces | join "," | quote }}

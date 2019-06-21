@@ -1,11 +1,11 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
-{{- if $operatorValues.spec.config.prometheusCertificateAuthority.configMap.create }}
+{{- if $operatorValues.spec.config.prometheus.certificateAuthority.configMap.create }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.name }}
+  name: {{ $operatorValues.spec.config.prometheus.certificateAuthority.configMap.name }}
   labels:
     app: reporting-operator
 data:
-  {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.filename | quote }}: {{ $operatorValues.spec.config.prometheusCertificateAuthority.configMap.value | quote }}
+  {{ $operatorValues.spec.config.prometheus.certificateAuthority.configMap.filename | quote }}: {{ $operatorValues.spec.config.prometheus.certificateAuthority.configMap.value | quote }}
 {{- end }}

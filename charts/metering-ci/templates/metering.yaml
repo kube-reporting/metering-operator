@@ -33,38 +33,39 @@ spec:
       image:
         repository: "{{ .Values.reportingOperatorDeployRepo }}"
         tag: "{{ .Values.reportingOperatorDeployTag }}"
-
-      {{- if .Values.imagePullSecretName }}
-      imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
-      {{- end }}
+        {{- if .Values.imagePullSecretName }}
+        pullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
+        {{- end }}
       {{- if .Values.dateAnnotationValue }}
       annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-      {{- end }}
-      {{- if .Values.terminationGracePeriodSeconds  }}
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- end }}
 
       config:
         logLevel: "debug"
-        disablePrometheusMetricsImporter: {{ .Values.disablePrometheusMetricsImporter }}
-        awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
-        awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
+        aws:
+          accessKeyID: "{{ .Values.awsAccessKeyId }}"
+          secretAccessKey: "{{ .Values.awsSecretAccessKey }}"
 
-        # decrease backfill for e2e since we run for a short period of time
-        # and run reports against the last 10 minutes of data
-        prometheusDatasourceMaxImportBackfillDuration: "15m"
+        prometheus:
+          metricsImporter:
+            enabled: {{ not .Values.disablePrometheusMetricsImporter }}
+            config:
+              # decrease backfill for e2e since we run for a short period of
+              # time and run reports against the last ~15 minutes of data
+              maxImportBackfillDuration: "15m"
 
-        # increase the poll interval for tests so that the Reports can run
-        # sooner
-        prometheusMetricsImporterPollInterval: "30s"
+              # increase the poll interval for tests so that the Reports can
+              # run sooner
+              pollInterval: "30s"
 
-        # set chunk/query size to a value suitable for the backfill duration
-        prometheusDatasourceMaxQueryRangeDuration: "5m"
-        prometheusMetricsImporterChunkSize: "5m"
+              # set chunk/query size to a value suitable for the backfill
+              # duration
+              maxQueryRangeDuration: "5m"
+              chunkSize: "5m"
 
-        # e2e runs a per-minute report so the metric resolution should be 60s
-        # or less
-        prometheusMetricsImporterStepSize: "60s"
+              # e2e runs a per-minute report so the metric resolution should be
+              # 60s or less
+              stepSize: "60s"
 
       {{- if or .Values.reportingOperatorMemory .Values.reportingOperatorCpu }}
       resources:

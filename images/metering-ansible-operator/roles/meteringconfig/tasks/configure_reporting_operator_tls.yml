@@ -3,21 +3,21 @@
 #
 # Presto and reporting-operator TLS
 #
-- name: Check for the existence of the reporting-operator prestoTLS.secretName
+- name: Check for the existence of the reporting-operator presto server TLS secret
   k8s_facts:
     api_version: v1
     kind: Secret
-    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.prestoTLS.secretName }}"
+    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.tls.secretName }}"
     namespace: "{{ meta.namespace }}"
   no_log: true
   register: reporting_operator_tls_secret_buf
   when: meteringconfig_tls_enabled
 
-- name: Check for the existence of the reporting-operator prestoAuth.secretName
+- name: Check for the existence of the reporting-operator presto client auth TLS secret
   k8s_facts:
     api_version: v1
     kind: Secret
-    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.prestoAuth.secretName }}"
+    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
     namespace: "{{ meta.namespace }}"
   no_log: true
   register: reporting_operator_auth_secret_buf
