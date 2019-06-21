@@ -14,6 +14,7 @@
     - [con***REMOVED***guring Authentication on Openshift](con***REMOVED***guring-reporting-operator.md#openshift-authentication)
   - [con***REMOVED***guring storage](con***REMOVED***guring-storage.md)
     - [storing data in s3](con***REMOVED***guring-storage.md#storing-data-in-s3)
+    - [storing data in a ReadWriteMany PVC](con***REMOVED***guring-storage.md#using-shared-volumes-for-storage)
   - [con***REMOVED***guring the Hive metastore](con***REMOVED***guring-hive-metastore.md)
   - [con***REMOVED***guring aws billing correlation for cost correlation](con***REMOVED***guring-aws-billing.md)
   - [con***REMOVED***guring for use with Telemeter](con***REMOVED***guring-telemeter.md)

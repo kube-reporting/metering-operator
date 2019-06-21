@@ -2,6 +2,10 @@
 
 This document contains example con***REMOVED***gurations for con***REMOVED***guration that spans one or more components.
 
+## Storage
+
+Storage has it's own documentation page at [con***REMOVED***guring storage](con***REMOVED***guring-storage.md).
+
 ## Resource requests and limits
 
 You can adjust the cpu, memory, or storage resource requests and/or limits for pods and volumes.

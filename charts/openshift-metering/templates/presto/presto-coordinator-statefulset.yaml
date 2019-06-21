@@ -181,7 +181,7 @@ spec:
 {{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.persistentVolumeClaimName }}
+          claimName: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.claimName }}
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always

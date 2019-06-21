@@ -1,96 +1,64 @@
 # Con***REMOVED***guring Storage
 
-Metering by default requires persistent storage in a few areas, but can be con***REMOVED***gured so it doesn't require any real persistent storage within the cluster.
-The primary purpose of the storage requirements are to persist data collected by the reporting-operator and store the results of reports.
+By Default, Metering requires persistent storage in two main ways.
+The primary storage requirement is to persist data collected by the reporting-operator and store the results of reports. This is usually some form of object storage or distributed ***REMOVED***le system.
 
-## Persistent Volumes
-
-Metering by default requires at least 3 Persistent Volume to operate. The Persistent Volume Claims (PVCs) are listed below:
-
-- `hive-metastore-db-data` is generally the only _required_ volume.
-  It is used by hive metastore to retain information about the location of where data is stored, which Presto and Hive server use.
-  In practice, it is possible to remove this requirement by using [MySQL or Postgresql for the Hive metastore database][con***REMOVED***guring-hive-metastore].
-- `hdfs-namenode-data-hdfs-namenode-0`
-  Used by the hdfs-namenode pod to store metadata about the ***REMOVED***les and blocks stored in the hdfs-datanodes.
-  This PVCs are not required to [store data in AWS S3](#storing-data-in-s3).
-- One `hdfs-datanode-data-hdfs-datanode-$i` PV per hdfs-datanode replica.
-  Used by each hdfs-datanode pod to store blocks for ***REMOVED***les in the HDFS cluster.
-  These PVCs are not required to [store data in AWS S3](#storing-data-in-s3).
-
-Each of these Persistent Volume Claims is created dynamically by a Stateful Set.
-Enabling this requires that dynamic volume provisioning be enabled via a Storage Class, or persistent volumes of the correct size must be manually pre-created.
-
-## Dynamically provisioning Persistent Volumes using Storage Classes
-
-Storage Classes may be used when dynamically provisioning Persistent Volume Claims using a Stateful Set.
-Use `kubectl get` to determine if Storage Classes have been created in your cluster.
-
-```
-$ kubectl get storageclasses
-```
-
-If the output includes `(default)` next to the `name` of any `StorageClass`, then that `StorageClass` is the default for the cluster.
-The default is used when `StorageClass` is unspeci***REMOVED***ed or set to `null` in a `PersistentVolumeClaim` spec.
-
-If no `StorageClass` is listed, or if you wish to use a non-default `StorageClass`, see [Con***REMOVED***guring the StorageClass for Metering](#con***REMOVED***guring-the-storage-class-for-metering) below.
-
-For more information, see [Storage Classes][storage-classes] in the Kubernetes documentation.
-
-### Con***REMOVED***guring the Storage Class for Metering
-
-To con***REMOVED***gure and specify a `StorageClass` for use in Metering, specify the `StorageClass` in `custom-values.yaml`. A example `StorageClass` section is included in [custom-storage.yaml][custom-storage-con***REMOVED***g].
-
-Uncomment the following sections and replace the `null` in `class: null` value with the name of the `StorageClass` to use. Leaving the value `null` will cause Metering to use the default StorageClass for the cluster.
-
-- `spec.presto.spec.hive.metastore.storage.class`
-- `spec.hadoop.spec.hdfs.datanode.storage.class`
-- `spec.hadoop.spec.hdfs.namenode.storage.class`
-
-### Con***REMOVED***guring the volume sizes for Metering
-
-Use [custom-storage.yaml][custom-storage-con***REMOVED***g] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
-
-- `spec.presto.spec.hive.metastore.storage.size`
-- `spec.hadoop.spec.hdfs.datanode.storage.size`
-- `spec.hadoop.spec.hdfs.namenode.storage.size`
-
-### Manually creating Persistent Volumes
-
-If a Storage Class that supports dynamic volume provisioning does not exist in the cluster, it is possible to manually create a Persistent Volume with the correct capacity.
-By default, the PVCs listed above each request 5Gi of storage.
-This can be adjusted in the same section as adjusting the Storage Class as documented in [Con***REMOVED***guring the volume sizes for Metering](#con***REMOVED***guring-the-volume-sizes-for-metering).
+Additionally, Hive metastore requires storage for it's database containing metadata about database tables managed by Presto or Hive. By default, this information is stored in an embedded database called Derby, which keeps it's data on disk in a PersistentVolume, but metastore can also be con***REMOVED***gured to use an existing Mysql or Postgresql database, instead of Derby. Read the [con***REMOVED***guring the Hive metastore documentation][con***REMOVED***guring-hive-metastore] for more details.
 
 ## Storing data in S3
 
-By default, the data that Metering collects and generates is stored in a single node HDFS cluster which is backed by a Persistent Volume.
-To store the data in a location outside of the cluster, con***REMOVED***gure Metering to store data in S3.
+By default, metering has no stored con***REMOVED***gured but can be con***REMOVED***gured to store data in S3.
 
-To use S3 for storage, edit the `spec.defaultStorage` section in the example [s3-storage.yaml][s3-storage-con***REMOVED***g] con***REMOVED***guration.
-Set `awsAccessKeyID` and `awsSecretAccessKey` in the `reporting-operator.con***REMOVED***g` and `presto.con***REMOVED***g` sections.
+To use S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-con***REMOVED***g] con***REMOVED***guration.
+Set the `spec.storage.hive.s3.bucket` and `spec.storage.hive.s3.awsCredentialsSecretName`.
+The `bucket` should be the name and optionally the path within the bucket you wish to store metering data at.
+The `awsCredentialsSecretName` should be the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` ***REMOVED***elds.
 
-To store data in S3, the `awsAccessKeyID` and `awsSecretAccessKey` credentials must have read and write access to the bucket.
+For example:
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-aws-secret
+data:
+  aws-access-key-id: "dGVzdAo="
+  aws-secret-access-key: "c2VjcmV0Cg=="
+```
+
+To store data in S3, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) ***REMOVED***le.
-Replace `operator-metering-data` with the name of your bucket.
+Replace `bucketname/path` with the name of the bucket and the path in the bucket you want to store metering data within.
 
-Please note that this must be done before installation. Changing these settings after installation may result in unexpected behavior.
-
-Because the deployed HDFS cluster will not be used to store data, it may also be disabled.
-In `s3-storage.yaml`, this has already been done by setting `spec.hadoop.spec.hdfs.enabled` to `false` and setting `presto.spec.hive.con***REMOVED***g.useHdfsCon***REMOVED***gMap` to `false`.
+Please note that this must be done before installation.
+Changing these settings after installation will result in broken and unexpected behavior.
 
 ## Using shared volumes for storage
 
-Metering uses HDFS for storage by default, but can use any ReadWriteMany PersistentVolume or StorageClass.
+Metering has no storage by default, but can use any ReadWriteMany PersistentVolume or [StorageClass][storage-classes] that provisions a ReadWriteMany PersistentVolume.
 
-To use a ReadWriteMany for storage, modify the [shared-storage.yaml][shared-storage-con***REMOVED***g] con***REMOVED***guration.
+To use a ReadWriteMany PersistentVolume for storage, modify the [shared-storage.yaml][shared-storage-con***REMOVED***g] con***REMOVED***guration.
 
-Con***REMOVED***gure the `presto.spec.con***REMOVED***g.sharedVolume.storage.persistentVolumeClaimStorageClass` to a StorageClass with ReadWriteMany access mode.
+You have two options:
 
-Note that our example [shared-storage.yaml][shared-storage-con***REMOVED***g] disables HDFS by setting `spec.hadoop.spec.hdfs.enabled` to false since it will not be used.
+1) Set `storage.hive.sharedPVC.createPVC` to true and set the `storage.hive.sharedPVC.storageClass` to the name of a StorageClass with ReadWriteMany access mode. This will use dynamic volume provisioning to have a volume created automatically.
+2) Set `storage.hive.sharedPVC.claimName` to the name of an existing ReadWriteMany PVC. This is necessary if you don't have dynamic volume provisioning, or wish to have more control over how the PersistentVolume is created.
 
 > Note: NFS is not recommended to use with Metering.
 
+## Using HDFS for storage (unsupported)
+
+If you do not have access to S3, or storage provisioner that supports ReadWriteMany PVCs, you may also test using HDFS.
+
+HDFS is currently unsupported.
+We do not support running HDFS on Kubernetes as it's not very ef***REMOVED***cient, and has an increased complexity over using object storage.
+However, because we historically have used HDFS for development, there are options available within Metering to deploy and use HDFS if you're willing to enable unsupported features.
+
+For more details read [con***REMOVED***guring HDFS][con***REMOVED***guring-hdfs].
+
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
-[custom-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/custom-storage.yaml
 [s3-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/s3-storage.yaml
 [shared-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/shared-storage.yaml
+[hdfs-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/hdfs-storage.yaml
 [con***REMOVED***guring-hive-metastore]: con***REMOVED***guring-hive-metastore.md
+[con***REMOVED***guring-hdfs]: con***REMOVED***guring-hdfs.md

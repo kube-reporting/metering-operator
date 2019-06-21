@@ -77,18 +77,18 @@ spec:
           valueFrom:
             ***REMOVED***eldRef:
               ***REMOVED***eldPath: metadata.name
+{{- if or $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName $operatorValues.spec.con***REMOVED***g.createAwsCredentialsSecret }}
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName }}"
+              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName | default "reporting-operator-aws-credentials" }}"
               key: aws-access-key-id
-              optional: true
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName }}"
+              name: "{{ $operatorValues.spec.con***REMOVED***g.awsCredentialsSecretName | default "reporting-operator-aws-credentials" }}"
               key: aws-secret-access-key
-              optional: true
+{{- end }}
         - name: REPORTING_OPERATOR_LOG_LEVEL
           valueFrom:
             con***REMOVED***gMapKeyRef:

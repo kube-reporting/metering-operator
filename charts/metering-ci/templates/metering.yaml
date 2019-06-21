@@ -6,6 +6,16 @@ spec:
   monitoring:
     enabled: true
 
+  unsupportedFeatures:
+    enableHDFS: true
+
+  storage:
+    type: "hive"
+    hive:
+      type: "hdfs"
+      hdfs:
+        namenode: "hdfs-namenode-0.hdfs-namenode:9820"
+
   openshift-reporting:
     spec:
       awsBillingReportDataSource:
@@ -110,6 +120,7 @@ spec:
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
 {{- end }}
       hdfs:
+        enabled: true
         datanode:
 {{- if .Values.dateAnnotationValue }}
           annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }

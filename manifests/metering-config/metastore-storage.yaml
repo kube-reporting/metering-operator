@@ -13,17 +13,3 @@ spec:
             class: null
             # class: "fast-ssd"
             size: "5Gi"
-  hdfs:
-    spec:
-      datanode:
-        storage:
-          # Default is null, which means using the default storage class if it exists.
-          # If you wish to use a different storage class, specify it here
-          class: null
-          # class: "fast-ssd"
-          size: "5Gi"
-      namenode:
-        storage:
-          class: null
-          # class: "fast-ssd"
-          size: "5Gi"
