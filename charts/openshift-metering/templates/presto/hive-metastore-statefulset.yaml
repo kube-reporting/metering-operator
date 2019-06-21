@@ -120,6 +120,39 @@ spec:
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.hive.metastore.resources | indent 10 }}
+{{- if .Values.presto.spec.hive.metastore.config.tls.enabled }}
+      - name: ghostunnel-server
+        image: {{ .Values.presto.spec.ghostunnel.image.repository }}:{{ .Values.presto.spec.ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.presto.spec.ghostunnel.image.pullPolicy }}
+        env:
+        - name: HIVE_METASTORE_CA_CRTFILE
+          value: /opt/hive/tls/ca.crt
+        - name: HIVE_METASTORE_KEYFILE
+          value: /opt/hive/tls/tls.key
+        - name: HIVE_METASTORE_CRTFILE
+          value: /opt/hive/tls/tls.crt
+        command: ["ghostunnel"]
+        args:
+        - server
+        - --listen
+        - localhost:8443
+        - --target
+        - localhost:9083
+        - --key
+        -  $(HIVE_METASTORE_KEYFILE)
+        - --cert
+        - $(HIVE_METASTORE_CRTFILE)
+        - --cacert
+        -  $(HIVE_METASTORE_CA_CRTFILE)
+        - --allow-cn
+        - Any
+        ports:
+        - name: ghostunnel
+          containerPort: 8443
+        volumeMounts:
+        - name: hive-metastore-tls-secret
+          mountPath: /opt/hive/tls
+{{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.presto.spec.hive.terminationGracePeriodSeconds }}
@@ -164,3 +197,8 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Values.presto.spec.config.sharedVolume.claimName }}
 {{- end}}
+{{- if .Values.presto.spec.hive.metastore.config.tls.enabled }}
+      - name: hive-metastore-tls-secret
+        secret:
+          secretName: {{ .Values.presto.spec.hive.metastore.config.tls.secretName }}
+{{- end }}

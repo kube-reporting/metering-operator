@@ -434,6 +434,11 @@ presto:
         size: 5Gi
         storageClass: null
 
+    ghostunnel:
+      image:
+        pullPolicy: Always
+        repository: quay.io/openshift/origin-ghostunnel
+        tag: 4.2
     hive:
       annotations: {}
       config:
@@ -458,6 +463,10 @@ presto:
       metastore:
         affinity: {}
         config:
+          tls:
+            enabled: false
+            createSecret: false
+            secretName: ""
           jvm:
             initialRAMPercentage: null
             maxRAMPercentage: null
