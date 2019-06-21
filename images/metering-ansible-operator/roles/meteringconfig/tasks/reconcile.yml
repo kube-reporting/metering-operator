@@ -12,6 +12,9 @@
     hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
   when: hiveStorageType is undefined or hiveStorageType not in ['s3', 'sharedPVC', 'hdfs']
 
+- name: Configure TLS
+  include_tasks: configure_tls.yml
+
 - name: Store MeteringConfig spec into values file
   copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
 
