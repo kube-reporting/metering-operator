@@ -11,6 +11,7 @@ meteringcon***REMOVED***g_default_values: "{{ lookup('***REMOVED***le', metering
 meteringcon***REMOVED***g_spec_overrides: "{{ _metering_openshift_io_meteringcon***REMOVED***g.spec }}"
 
 # The default specs for each component
+_storage_defaults: "{{ meteringcon***REMOVED***g_default_values.storage }}"
 _presto_default_spec: "{{ meteringcon***REMOVED***g_default_values.presto.spec }}"
 _reporting_op_default_spec: "{{ meteringcon***REMOVED***g_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringcon***REMOVED***g_default_values.hadoop.spec }}"
@@ -53,20 +54,20 @@ _storage_overrides:
     reporting-operator:
       spec:
         con***REMOVED***g:
-          awsCredentialsSecretName: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
     presto:
       spec:
         con***REMOVED***g:
-          awsCredentialsSecretName: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
         hive:
           con***REMOVED***g:
-            metastoreWarehouseDir: "s3a://{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+            metastoreWarehouseDir: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
     hadoop:
       spec:
         con***REMOVED***g:
-          defaultFS: "s3a://{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+          defaultFS: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
         hdfs:
           enabled: false
 
@@ -74,7 +75,7 @@ _storage_overrides:
     hadoop:
       spec:
         con***REMOVED***g:
-          defaultFS: "hdfs://{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
+          defaultFS: "hdfs://{{ _storage_defaults | json_query('hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
         hdfs:
           enabled: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
 
@@ -84,26 +85,33 @@ _storage_overrides:
         con***REMOVED***g:
           sharedVolume:
             enabled: true
-            createPVC: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.createPVC') | default(false, true) }}"
-            mountPath: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
-            claimName: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.claimName') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.claimName, true) }}"
-            size: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.size') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.size, true) }}"
-            storageClass: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.storageClass') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.storageClass, true) }}"
+            createPVC: "{{ _storage_defaults | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
+            mountPath: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ _storage_defaults | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.claimName, true) }}"
+            size: "{{ _storage_defaults | json_query('hive.sharedPVC.size') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.size, true) }}"
+            storageClass: "{{ _storage_defaults | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.storageClass, true) }}"
         hive:
           con***REMOVED***g:
-            metastoreWarehouseDir: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            metastoreWarehouseDir: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
 
     hadoop:
       spec:
         con***REMOVED***g:
-          defaultFS: "***REMOVED***le://{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+          defaultFS: "***REMOVED***le://{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
         hdfs:
           enabled: false
 
-
-meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides) | json_query('storage.hive.type')] | default({}, true) }}"
+meteringcon***REMOVED***g_storage_hive_store_type: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides) | json_query('storage.hive.type') }}"
+meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon***REMOVED***g_storage_hive_store_type] | default({}, true) }}"
 
 meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, recursive=True) }}"
+
+meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') | default(true, true) }}"
+# Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
+_default_metering_bucket_name: "-uncon***REMOVED***gured-metering-bucket-name-"
+meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default(_default_metering_bucket_name, true)).split('/')[0] }}"
+meteringcon***REMOVED***g_storage_s3_bucket_region: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.region') | default(omit, true) }}"
+meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.awsCredentialsSecretName') | default(omit, true) }}"
 
 ########################
 # All Variables below are setup to consume the result of merging the defaults, internal overrides, and user overrides.

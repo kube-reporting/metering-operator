@@ -10,8 +10,9 @@ Additionally, Hive metastore requires storage for it's database containing metad
 By default, metering has no stored con***REMOVED***gured but can be con***REMOVED***gured to store data in S3.
 
 To use S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-con***REMOVED***g] con***REMOVED***guration.
-Set the `spec.storage.hive.s3.bucket` and `spec.storage.hive.s3.awsCredentialsSecretName`.
-The `bucket` should be the name and optionally the path within the bucket you wish to store metering data at.
+Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.awsCredentialsSecretName` values.
+The `bucket` should be the name and optionally the path within the bucket you wish to store metering data at, and the `region` should be the region to create your bucket in.
+If you wish to provide an existing bucket, or do not want to provide IAM credentials that have CreateBucket permissions, set `spec.storage.hive.s3.createBucket` to `false` and provide the name of a pre-existing bucket for `spec.storage.hive.s3.bucket`.
 The `awsCredentialsSecretName` should be the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` ***REMOVED***elds.
 
 For example:
@@ -28,7 +29,7 @@ data:
 
 To store data in S3, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
 For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) ***REMOVED***le.
-Replace `bucketname/path` with the name of the bucket and the path in the bucket you want to store metering data within.
+If you left `spec.storage.hive.s3.createBucket` set to true, or unset, then you should use [aws/read-write-create.json](aws/read-write-create.json) which contains permissions for creating and deleting buckets.
 
 Please note that this must be done before installation.
 Changing these settings after installation will result in broken and unexpected behavior.
