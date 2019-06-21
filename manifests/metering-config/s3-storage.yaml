@@ -9,4 +9,8 @@ spec:
       type: "s3"
       s3:
         bucket: "bucketname/path/"
+        region: "us-west-1"
         awsCredentialsSecretName: "my-aws-secret"
+        # Set to false if you want to provide an existing bucket, instead of
+        # having Metering create the bucket on your behalf.
+        createBucket: true

@@ -15,6 +15,9 @@
 - name: Store MeteringConfig spec into values file
   copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
 
+- name: Configure Storage
+  include_tasks: configure_storage.yml
+
 - include_tasks: "{{ item }}"
   loop:
     - reconcile_monitoring.yml

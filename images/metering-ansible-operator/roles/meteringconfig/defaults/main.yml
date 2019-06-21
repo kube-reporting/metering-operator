@@ -11,6 +11,7 @@ meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_
 meteringconfig_spec_overrides: "{{ _metering_openshift_io_meteringconfig.spec }}"
 
 # The default specs for each component
+_storage_defaults: "{{ meteringconfig_default_values.storage }}"
 _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringconfig_default_values.hadoop.spec }}"
@@ -53,20 +54,20 @@ _storage_overrides:
     reporting-operator:
       spec:
         config:
-          awsCredentialsSecretName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
     presto:
       spec:
         config:
-          awsCredentialsSecretName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
         hive:
           config:
-            metastoreWarehouseDir: "s3a://{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+            metastoreWarehouseDir: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
     hadoop:
       spec:
         config:
-          defaultFS: "s3a://{{ meteringconfig_spec_overrides | json_query('storage.hive.s3.bucket') }}"
+          defaultFS: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
         hdfs:
           enabled: false
 
@@ -74,7 +75,7 @@ _storage_overrides:
     hadoop:
       spec:
         config:
-          defaultFS: "hdfs://{{ meteringconfig_spec_overrides | json_query('storage.hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
+          defaultFS: "hdfs://{{ _storage_defaults | json_query('hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
         hdfs:
           enabled: "{{ meteringconfig_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
 
@@ -84,26 +85,33 @@ _storage_overrides:
         config:
           sharedVolume:
             enabled: true
-            createPVC: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.createPVC') | default(false, true) }}"
-            mountPath: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
-            claimName: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
-            size: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
-            storageClass: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
+            createPVC: "{{ _storage_defaults | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
+            mountPath: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ _storage_defaults | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
+            size: "{{ _storage_defaults | json_query('hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
+            storageClass: "{{ _storage_defaults | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
         hive:
           config:
-            metastoreWarehouseDir: "{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            metastoreWarehouseDir: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
 
     hadoop:
       spec:
         config:
-          defaultFS: "file://{{ meteringconfig_spec_overrides | json_query('storage.hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+          defaultFS: "file://{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
         hdfs:
           enabled: false
 
-
-meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_default_values | combine(meteringconfig_spec_overrides) | json_query('storage.hive.type')] | default({}, true) }}"
+meteringconfig_storage_hive_store_type: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides) | json_query('storage.hive.type') }}"
+meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_hive_store_type] | default({}, true) }}"
 
 meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, recursive=True) }}"
+
+meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') | default(true, true) }}"
+# Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
+_default_metering_bucket_name: "-unconfigured-metering-bucket-name-"
+meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default(_default_metering_bucket_name, true)).split('/')[0] }}"
+meteringconfig_storage_s3_bucket_region: "{{ meteringconfig_spec | json_query('storage.hive.s3.region') | default(omit, true) }}"
+meteringconfig_storage_s3_aws_credentials_secret_name: "{{ meteringconfig_spec | json_query('storage.hive.s3.awsCredentialsSecretName') | default(omit, true) }}"
 
 ########################
 # All Variables below are setup to consume the result of merging the defaults, internal overrides, and user overrides.

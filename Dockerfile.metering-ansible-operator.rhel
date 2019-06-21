@@ -6,7 +6,7 @@ FROM openshift/ose-cli:latest as cli
 FROM openshift/ose-ansible-operator:latest
 
 USER root
-RUN INSTALL_PKGS="curl bash ca-certificates less which inotify-tools tini" \
+RUN INSTALL_PKGS="curl bash ca-certificates less which inotify-tools tini python-boto3" \
     && yum install --setopt=skip_missing_names_on_install=False -y \
         $INSTALL_PKGS  \
     && yum clean all \
