@@ -21,7 +21,7 @@ For example:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: my-aws-secret
+  name: your-aws-secret
 data:
   aws-access-key-id: "dGVzdAo="
   aws-secret-access-key: "c2VjcmV0Cg=="

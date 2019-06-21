@@ -6,17 +6,21 @@ spec:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        # reporting-operator does the work of importing Metrics in chunks of 5
-        # minutes (by default), every 5 minutes.
-        # This only needs to be adjusted if your cluster is really large, and 5
-        # minutes of data is more than a few hundred metrics per time series.
-        # This comes up when you have hundreds of namespaces and pods.
-        prometheusMetricsImporterChunkSize: "5m"
-        prometheusMetricsImporterPollInterval: "5m"
-        # This is the resolution of the metrics. Setting this higher reduces
-        # granularity of the data we import, but also reduces the number of
-        # metrics returned per query.
-        prometheusMetricsImporterStepSize: "60s"
+        prometheus:
+          metricsImporter:
+            con***REMOVED***g:
+              # reporting-operator does the work of importing Metrics in chunks
+              # of 5 minutes (by default), every 5 minutes.
+              # This only needs to be adjusted if your cluster is really large,
+              # and 5 minutes of data is more than a few hundred metrics per
+              # time series.  This comes up when you have hundreds of
+              # namespaces and pods.
+              chunkSize: "5m"
+              pollInterval: "5m"
+              # This is the resolution of the metrics. Setting this higher
+              # reduces granularity of the data we import, but also reduces the
+              # number of metrics returned per query.
+              stepSize: "60s"
 
       # Increasing memory to 500Mi allows reporting-operator to keep more
       # metrics in memory at once and helps when the reporting-operator is
@@ -95,55 +99,56 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "250m"
-  hdfs:
+  hadoop:
     spec:
-      datanode:
-        # 3 replicas is recommended to ensure data is replicated.
-        replicas: 3
-        # Since HDFS stores all of the data, and its frequently being accessed,
-        # it requires an increased amount of memory as metrics grow or when
-        # there's a large cluster.
-        resources:
-          requests:
-            memory: "750Mi"
-            cpu: "250m"
-          limits:
-            memory: "750Mi"
-            cpu: "250m"
-        storage:
-          # class defaults to null, which means using the default storage
-          # class.
-          # If you have a storageClass which provides SSDs, uncomment and
-          # specify it here:
-          # class: "fast-ssd"
-          class: null
-          # The default size of 5Gi is fairly small. With 1000 namespaces and
-          # at least 5 pods per namespace you could expect a few hundred Mb of
-          # storage per week.
-          # With multiple replicas, storage capacity is also increased.
-          # Additionally, on many clouds, IOPS are provisioned based on disk
-          # size, meaning a larger PVC can be faster.
-          size: "20Gi"
-      namenode:
-        # The HDFS Namenode stores metadata, and requires more resources as the
-        # amount of storage increases.
-        resources:
-          requests:
-            memory: "750Mi"
-            cpu: "250m"
-          limits:
-            memory: "750Mi"
-            cpu: "250m"
-        storage:
-          # class defaults to null, which means using the default storage
-          # class.
-          # If you have a storageClass which provides SSDs, uncomment and
-          # specify it here:
-          # class: "fast-ssd"
-          class: null
-          # Namenodes mostly need larger disks because they consume more
-          # inodes, and the amount of storage needed grows over time as more
-          # blocks are created on HDFS datanodes.
-          # Additionally, on many clouds, IOPS are provisioned based on disk
-          # size, meaning a larger PVC can be faster.
-          size: "20Gi"
+      hdfs:
+        datanode:
+          # 3 replicas is recommended to ensure data is replicated.
+          replicas: 3
+          # Since HDFS stores all of the data, and its frequently being accessed,
+          # it requires an increased amount of memory as metrics grow or when
+          # there's a large cluster.
+          resources:
+            requests:
+              memory: "750Mi"
+              cpu: "250m"
+            limits:
+              memory: "750Mi"
+              cpu: "250m"
+          storage:
+            # class defaults to null, which means using the default storage
+            # class.
+            # If you have a storageClass which provides SSDs, uncomment and
+            # specify it here:
+            # class: "fast-ssd"
+            class: null
+            # The default size of 5Gi is fairly small. With 1000 namespaces and
+            # at least 5 pods per namespace you could expect a few hundred Mb of
+            # storage per week.
+            # With multiple replicas, storage capacity is also increased.
+            # Additionally, on many clouds, IOPS are provisioned based on disk
+            # size, meaning a larger PVC can be faster.
+            size: "20Gi"
+        namenode:
+          # The HDFS Namenode stores metadata, and requires more resources as the
+          # amount of storage increases.
+          resources:
+            requests:
+              memory: "750Mi"
+              cpu: "250m"
+            limits:
+              memory: "750Mi"
+              cpu: "250m"
+          storage:
+            # class defaults to null, which means using the default storage
+            # class.
+            # If you have a storageClass which provides SSDs, uncomment and
+            # specify it here:
+            # class: "fast-ssd"
+            class: null
+            # Namenodes mostly need larger disks because they consume more
+            # inodes, and the amount of storage needed grows over time as more
+            # blocks are created on HDFS datanodes.
+            # Additionally, on many clouds, IOPS are provisioned based on disk
+            # size, meaning a larger PVC can be faster.
+            size: "20Gi"

@@ -25,11 +25,12 @@ spec:
           nodeSelector:
             "node-role.kubernetes.io/infra": "true"
 
-  hdfs:
+  hadoop:
     spec:
-      namenode:
-        nodeSelector:
-          "node-role.kubernetes.io/infra": "true"
-      datanode:
-        nodeSelector:
-          "node-role.kubernetes.io/infra": "true"
+      hdfs:
+        namenode:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"
+        datanode:
+          nodeSelector:
+            "node-role.kubernetes.io/infra": "true"

@@ -12,16 +12,15 @@ spec:
         bucket: "your-aws-cost-report-bucket"
         pre***REMOVED***x: "path/to/report"
         region: "your-buckets-region"
+
   reporting-operator:
     spec:
       con***REMOVED***g:
-        # Replace these with your own AWS credentials
-        awsAccessKeyID: "REPLACEME"
-        awsSecretAccessKey: "REPLACEME"
+        aws:
+          secretName: "your-aws-secret"
 
   presto:
     spec:
       con***REMOVED***g:
-        # Replace these with your own AWS credentials
-        awsAccessKeyID: "REPLACEME"
-        awsSecretAccessKey: "REPLACEME"
+        awsCredentialsSecretName: "your-aws-secret"
+

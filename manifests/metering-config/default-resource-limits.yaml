@@ -54,30 +54,31 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "100m"
-  hdfs:
+  hadoop:
     spec:
-      datanode:
-        replicas: 1
-        resources:
-          requests:
-            memory: "250Mi"
-            cpu: "250m"
-          limits:
-            memory: "250Mi"
-            cpu: "250m"
-        storage:
-          # Default to null, which means using the default storage class
-          class: null
-          size: "5Gi"
-      namenode:
-        resources:
-          requests:
-            memory: "350Mi"
-            cpu: "250m"
-          limits:
-            memory: "350Mi"
-            cpu: "250m"
-        storage:
-          # Default to null, which means using the default storage class
-          class: null
-          size: "5Gi"
+      hdfs:
+        datanode:
+          replicas: 1
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "250m"
+            limits:
+              memory: "250Mi"
+              cpu: "250m"
+          storage:
+            # Default to null, which means using the default storage class
+            class: null
+            size: "5Gi"
+        namenode:
+          resources:
+            requests:
+              memory: "350Mi"
+              cpu: "250m"
+            limits:
+              memory: "350Mi"
+              cpu: "250m"
+          storage:
+            # Default to null, which means using the default storage class
+            class: null
+            size: "5Gi"

@@ -1,5 +1,5 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
-{{- if and $operatorValues.spec.authProxy.enabled (or $operatorValues.spec.authProxy.subjectAccessReviewEnabled $operatorValues.spec.authProxy.delegateURLsEnabled) $operatorValues.spec.authProxy.createAuthProxyClusterRole }}
+{{- if and $operatorValues.spec.authProxy.enabled (or $operatorValues.spec.authProxy.subjectAccessReview.enabled $operatorValues.spec.authProxy.delegateURLs.enabled) $operatorValues.spec.authProxy.rbac.createAuthProxyClusterRole }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ metadata:
   labels:
     app: reporting-operator
 rules:
-{{- if $operatorValues.spec.authProxy.subjectAccessReviewEnabled }}
+{{- if $operatorValues.spec.authProxy.subjectAccessReview.enabled }}
 - apiGroups:
   - authorization.k8s.io
   resources:
@@ -15,7 +15,7 @@ rules:
   verbs:
   - create
 {{- end }}
-{{- if $operatorValues.spec.authProxy.delegateURLsEnabled }}
+{{- if $operatorValues.spec.authProxy.delegateURLs.enabled }}
 - apiGroups:
   - authentication.k8s.io
   resources:

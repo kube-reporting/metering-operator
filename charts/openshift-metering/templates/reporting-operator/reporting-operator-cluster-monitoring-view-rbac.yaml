@@ -1,5 +1,5 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
-{{- if $operatorValues.spec.con***REMOVED***g.createClusterMonitoringViewRBAC }}
+{{- if $operatorValues.spec.rbac.createClusterMonitoringViewRBAC }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -18,7 +18,7 @@ rules:
   - get
 {{- end }}
 
-{{- if $operatorValues.spec.con***REMOVED***g.createClusterMonitoringViewRBAC }}
+{{- if $operatorValues.spec.rbac.createClusterMonitoringViewRBAC }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

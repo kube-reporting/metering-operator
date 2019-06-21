@@ -65,8 +65,9 @@ _storage_overrides:
     reporting-operator:
       spec:
         con***REMOVED***g:
-          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
-          createAwsCredentialsSecret: false
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+            createSecret: false
     presto:
       spec:
         con***REMOVED***g:
@@ -142,19 +143,22 @@ _tls_overrides:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        prestoTLS:
-          enabled: true
-          createSecret: true
-          secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name }}"
-          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate }}"
+        presto:
+          tls:
+            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate }}"
 
-        prestoAuth:
-          enabled: true
-          createSecret: true
-          secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
-          certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_client_cert }}"
-          key: "{{ meteringcon***REMOVED***g_reporting_operator_client_key }}"
-          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate }}"
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name }}"
+
+          auth:
+            certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_client_cert }}"
+            key: "{{ meteringcon***REMOVED***g_reporting_operator_client_key }}"
+            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
   presto:
     spec:
       presto:
@@ -223,15 +227,15 @@ meteringcon***REMOVED***g_create_presto_auth_secrets: "{{ _presto_spec.presto.co
 #
 # Reporting Operator
 #
-meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
-meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
-meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createAuthenticatedEmailsSecret | default(true) }}"
-meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec.authProxy.enabled and (_reporting_op_spec.authProxy.subjectAccessReviewEnabled and _reporting_op_spec.authProxy.delegateURLsEnabled) | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.con***REMOVED***g.prometheusImporter.auth.tokenSecret.create | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_prometheus_certi***REMOVED***cate_authority: "{{ _reporting_op_spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.create | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.con***REMOVED***g.createAwsCredentialsSecret | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.prestoTLS.enabled and _reporting_op_spec.con***REMOVED***g.prestoTLS.createSecret | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.con***REMOVED***g.prestoAuth.enabled and _reporting_op_spec.con***REMOVED***g.prestoAuth.createSecret | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.cookie.createSecret | default(true) }}"
+meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.htpasswd.createSecret | default(true) }}"
+meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.authenticatedEmails.createSecret | default(true) }}"
+meteringcon***REMOVED***g_create_reporting_operator_auth_proxy_rbac: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.rbac.createAuthProxyClusterRole and (_reporting_op_spec.authProxy.subjectAccessReview.enabled and _reporting_op_spec.authProxy.delegateURLs.enabled) | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_prometheus_bearer_token: "{{ _reporting_op_spec.con***REMOVED***g.prometheus.metricsImporter.auth.tokenSecret.create | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_prometheus_certi***REMOVED***cate_authority: "{{ _reporting_op_spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.create | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.presto.tls.enabled and _reporting_op_spec.con***REMOVED***g.presto.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.con***REMOVED***g.presto.auth.enabled and _reporting_op_spec.con***REMOVED***g.presto.auth.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.api.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
-meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.con***REMOVED***g.createClusterMonitoringViewRBAC | default(true) }}"
+meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"

@@ -1,11 +1,11 @@
 {{- $operatorValues :=  index .Values "reporting-operator" -}}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.create }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.create }}
 apiVersion: v1
 kind: Con***REMOVED***gMap
 metadata:
-  name: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
+  name: {{ $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.name }}
   labels:
     app: reporting-operator
 data:
-  {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename | quote }}: {{ $operatorValues.spec.con***REMOVED***g.prometheusCerti***REMOVED***cateAuthority.con***REMOVED***gMap.value | quote }}
+  {{ $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.***REMOVED***lename | quote }}: {{ $operatorValues.spec.con***REMOVED***g.prometheus.certi***REMOVED***cateAuthority.con***REMOVED***gMap.value | quote }}
 {{- end }}
