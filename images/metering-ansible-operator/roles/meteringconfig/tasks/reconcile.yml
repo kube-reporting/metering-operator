@@ -12,6 +12,9 @@
     hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
   when: hiveStorageType is unde***REMOVED***ned or hiveStorageType not in ['s3', 'sharedPVC', 'hdfs']
 
+- name: Con***REMOVED***gure TLS
+  include_tasks: con***REMOVED***gure_tls.yml
+
 - name: Store MeteringCon***REMOVED***g spec into values ***REMOVED***le
   copy: content="{{ meteringcon***REMOVED***g_spec }}" dest=/tmp/metering-values.yaml
 
