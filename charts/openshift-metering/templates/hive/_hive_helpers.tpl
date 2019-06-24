@@ -11,16 +11,16 @@
   valueFrom:
     ***REMOVED***eldRef:
       ***REMOVED***eldPath: metadata.namespace
-{{- if or .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName .Values.presto.spec.con***REMOVED***g.createAwsCredentialsSecret }}
+{{- if or .Values.hive.spec.con***REMOVED***g.awsCredentialsSecretName .Values.hive.spec.con***REMOVED***g.createAwsCredentialsSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.hive.spec.con***REMOVED***g.awsCredentialsSecretName | default "hive-aws-credentials" }}"
       key: aws-access-key-id
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.hive.spec.con***REMOVED***g.awsCredentialsSecretName | default "hive-aws-credentials" }}"
       key: aws-secret-access-key
 {{- end }}
 {{- end }}

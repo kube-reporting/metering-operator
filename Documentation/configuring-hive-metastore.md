@@ -21,14 +21,14 @@ To install, Hive metastore requires that dynamic volume provisioning be enabled 
 To con***REMOVED***gure and specify a `StorageClass` for the hive-metastore-db-data PVC, specify the `StorageClass` in your MeteringCon***REMOVED***g.
 A example `StorageClass` section is included in [metastore-storage.yaml][metastore-storage-con***REMOVED***g].
 
-Uncomment the `spec.presto.spec.hive.metastore.storage.class` sections and replace the `null` in `class: null` value with the name of the StorageClass to use.
+Uncomment the `spec.hive.spec.metastore.storage.class` sections and replace the `null` in `class: null` value with the name of the StorageClass to use.
 Leaving the value `null` will cause Metering to use the default StorageClass for the cluster.
 
 ### Con***REMOVED***guring the volume sizes for Hive Metastore
 
 Use [metastore-storage.yaml][metastore-storage-con***REMOVED***g] as a template and adjust the `size: "5Gi"` value to the desired capacity for the following sections:
 
-- `spec.presto.spec.hive.metastore.storage.size`
+- `spec.hive.spec.metastore.storage.size`
 
 ## Use MySQL for the Hive Metastore database
 

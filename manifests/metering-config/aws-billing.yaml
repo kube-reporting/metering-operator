@@ -24,3 +24,8 @@ spec:
       con***REMOVED***g:
         awsCredentialsSecretName: "your-aws-secret"
 
+  hive:
+    spec:
+      con***REMOVED***g:
+        awsCredentialsSecretName: "your-aws-secret"
+

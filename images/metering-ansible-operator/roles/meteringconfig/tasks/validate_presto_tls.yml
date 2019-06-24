@@ -7,39 +7,39 @@
   block:
   - name: Validate that the user provided a non-empty TLS certi***REMOVED***cate value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.tls.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.tls.certi***REMOVED***cate == ""
+      msg: "presto.spec.con***REMOVED***g.tls.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.certi***REMOVED***cate == ""
 
   - name: Validate that the user provided a non-empty TLS CA certi***REMOVED***cate value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.tls.caCerti***REMOVED***cate == ""
+      msg: "presto.spec.con***REMOVED***g.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.caCerti***REMOVED***cate == ""
 
   - name: Validate that the user provided a non-empty TLS key value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.tls.key == ""
+      msg: "presto.spec.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.key == ""
   when: meteringcon***REMOVED***g_template_presto_tls_secret
 
 - name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
   block:
   - name: Validate that the user provided a non-empty auth certi***REMOVED***cate value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.auth.certi***REMOVED***cate == ""
+      msg: "presto.spec.con***REMOVED***g.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.certi***REMOVED***cate == ""
 
   - name: Validate that the user provided a non-empty auth CA certi***REMOVED***cate value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.auth.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.auth.caCerti***REMOVED***cate == ""
+      msg: "presto.spec.con***REMOVED***g.auth.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.caCerti***REMOVED***cate == ""
 
   - name: Validate that the user provided a non-empty auth key value
     fail:
-      msg: "presto.spec.presto.con***REMOVED***g.auth.key cannot be empty if createSecret: true and secretName != ''"
-    when: meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.auth.key == ""
+      msg: "presto.spec.con***REMOVED***g.auth.key cannot be empty if createSecret: true and secretName != ''"
+    when: meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.key == ""
 
   - name: Validate that TLS is enabled when auth is enabled
     fail:
       msg: "Invalid con***REMOVED***guration passed: you cannot enable auth but disable TLS."
-    when: not meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.auth.enabled
+    when: not meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.enabled
   when: meteringcon***REMOVED***g_template_presto_auth_secret

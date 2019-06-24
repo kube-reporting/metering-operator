@@ -31,46 +31,46 @@ data:
       </property>
       <property>
         <name>hive.metastore.uris</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.metastoreURIs }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreURIs }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.dbConnectionURL }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionURL }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionDriverName</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.dbConnectionDriver }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionDriver }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.dbConnectionUsername }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionUsername }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.dbConnectionPassword }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionPassword }}</value>
       </property>
       <property>
         <name>datanucleus.schema.autoCreateAll</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.autoCreateMetastoreSchema }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.autoCreateMetastoreSchema }}</value>
       </property>
       <property>
         <name>hive.metastore.schema.veri***REMOVED***cation</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
       </property>
       <property>
         <name>hive.default.***REMOVED***leformat</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.defaultFileFormat }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}</value>
       </property>
-{{- if .Values.presto.spec.hive.con***REMOVED***g.metastoreWarehouseDir }}
+{{- if .Values.hive.spec.con***REMOVED***g.metastoreWarehouseDir }}
       <property>
         <name>hive.metastore.warehouse.dir</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.metastoreWarehouseDir }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreWarehouseDir }}</value>
       </property>
 {{- end }}
-{{- if .Values.presto.spec.hive.con***REMOVED***g.metastoreClientSocketTimeout }}
+{{- if .Values.hive.spec.con***REMOVED***g.metastoreClientSocketTimeout }}
       <property>
         <name>hive.metastore.client.socket.timeout</name>
-        <value>{{ .Values.presto.spec.hive.con***REMOVED***g.metastoreClientSocketTimeout }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreClientSocketTimeout }}</value>
       </property>
 {{- end }}
     </con***REMOVED***guration>

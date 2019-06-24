@@ -12,56 +12,56 @@ spec:
     matchLabels:
       app: presto
       presto: coordinator
-{{- if .Values.presto.spec.presto.labels }}
-{{ toYaml .Values.presto.spec.presto.labels | indent 6 }}
+{{- if .Values.presto.spec.labels }}
+{{ toYaml .Values.presto.spec.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: presto
         presto: coordinator
-{{- if .Values.presto.spec.presto.labels }}
-{{ toYaml .Values.presto.spec.presto.labels | indent 8 }}
+{{- if .Values.presto.spec.labels }}
+{{ toYaml .Values.presto.spec.labels | indent 8 }}
 {{- end }}
       annotations:
         presto-coordinator-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-coordinator-con***REMOVED***g.yaml") . | sha256sum }}
         presto-common-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-common-con***REMOVED***g.yaml") . | sha256sum }}
         presto-catalog-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-con***REMOVED***g-secret.yaml") . | sha256sum }}
         presto-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-con***REMOVED***g.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.presto.con***REMOVED***g.tls.enabled .Values.presto.spec.presto.con***REMOVED***g.tls.createSecret }}
+{{- if and .Values.presto.spec.con***REMOVED***g.tls.enabled .Values.presto.spec.con***REMOVED***g.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.presto.con***REMOVED***g.auth.enabled .Values.presto.spec.presto.con***REMOVED***g.auth.createSecret}}
+{{- if and .Values.presto.spec.con***REMOVED***g.auth.enabled .Values.presto.spec.con***REMOVED***g.auth.createSecret}}
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- end }}
-{{- if .Values.presto.spec.presto.annotations }}
-{{ toYaml .Values.presto.spec.presto.annotations | indent 8 }}
+{{- if .Values.presto.spec.annotations }}
+{{ toYaml .Values.presto.spec.annotations | indent 8 }}
 {{- end }}
     spec:
-{{- if .Values.presto.spec.presto.securityContext }}
+{{- if .Values.presto.spec.securityContext }}
       securityContext:
-{{ toYaml .Values.presto.spec.presto.securityContext | indent 8 }}
+{{ toYaml .Values.presto.spec.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.af***REMOVED***nity }}
+{{- if .Values.presto.spec.coordinator.af***REMOVED***nity }}
       af***REMOVED***nity:
-{{ toYaml .Values.presto.spec.presto.coordinator.af***REMOVED***nity | indent 8 }}
+{{ toYaml .Values.presto.spec.coordinator.af***REMOVED***nity | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.nodeSelector }}
+{{- if .Values.presto.spec.coordinator.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.presto.spec.presto.coordinator.nodeSelector | indent 8 }}
+{{ toYaml .Values.presto.spec.coordinator.nodeSelector | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.coordinator.tolerations }}
+{{- if .Values.presto.spec.coordinator.tolerations }}
       tolerations:
-{{ toYaml .Values.presto.spec.presto.coordinator.tolerations | indent 8 }}
+{{ toYaml .Values.presto.spec.coordinator.tolerations | indent 8 }}
 {{- end }}
       initContainers:
       - name: copy-presto-con***REMOVED***g
-        image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
-        imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
+        image: "{{ .Values.presto.spec.image.repository }}:{{ .Values.presto.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted con***REMOVED***guration data into the presto-etc emptyDir volume so we can write to the con***REMOVED***g ***REMOVED***les
         env:
-{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
         - name: PRESTO_SERVER_KEYFILE
           value: /presto-server/tls.key
         - name: PRESTO_SERVER_CRTFILE
@@ -72,7 +72,7 @@ spec:
           value: /opt/presto/tls/keystore.pem
         - name: PRESTO_TRUSTSTORE_PEM
           value: /opt/presto/tls/truststore.pem
-{{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
         - name: PRESTO_CLIENT_KEYFILE
           value: /presto-client/tls.key
         - name: PRESTO_CLIENT_CRTFILE
@@ -93,19 +93,15 @@ spec:
           mountPath: /var/presto/data
         - name: presto-common-con***REMOVED***g
           mountPath: /presto-common
-{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
         - name: presto-server-pem
           mountPath: /presto-server
-{{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
         - name: presto-client-pem
           mountPath: /presto-client
 {{- end }}
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
-        - name: hadoop-con***REMOVED***g
-          mountPath: /hadoop-con***REMOVED***g
-{{- end }}        
 {{- end }}
         resources:
           limits:
@@ -116,8 +112,8 @@ spec:
             memory: 100Mi
       containers:
       - name: presto
-        image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
-        imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
+        image: "{{ .Values.presto.spec.image.repository }}:{{ .Values.presto.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/entrypoint.sh']
         args: ['/opt/presto/presto-server/bin/launcher', 'run']
         env:
@@ -140,21 +136,20 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+{{- if .Values.presto.spec.con***REMOVED***g.useHadoopCon***REMOVED***g}}
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
 {{- end }}
-
-{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
-          mountPath: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.mountPath }}
+          mountPath: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.mountPath }}
 {{- end }}
         resources:
-{{ toYaml .Values.presto.spec.presto.coordinator.resources | indent 10 }}
+{{ toYaml .Values.presto.spec.coordinator.resources | indent 10 }}
       volumes:
       - name: presto-coordinator-con***REMOVED***g
         con***REMOVED***gMap:
@@ -169,33 +164,33 @@ spec:
       - name: presto-jmx-con***REMOVED***g
         con***REMOVED***gMap:
           name: presto-jmx-con***REMOVED***g
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
-      - name: hadoop-con***REMOVED***g
-        secret:
-          secretName: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopSecretName }}
-{{- end }}
       - name: presto-etc
         emptyDir: {}
       - name: presto-data
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
-{{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
+{{- if .Values.presto.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
+      - name: hadoop-con***REMOVED***g
+        secret:
+          secretName: {{ .Values.presto.spec.con***REMOVED***g.hadoopCon***REMOVED***gSecretName }}
+{{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
       - name: presto-tls
         emptyDir: {}
       - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.tls.secretName }}
-{{- if .Values.presto.spec.presto.con***REMOVED***g.auth.enabled }}
+          secretName: {{ .Values.presto.spec.con***REMOVED***g.tls.secretName }}
+{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
       - name: presto-client-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.con***REMOVED***g.auth.secretName }}
+          secretName: {{ .Values.presto.spec.con***REMOVED***g.auth.secretName }}
 {{- end }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.sharedVolume.enabled }}
+{{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.presto.spec.con***REMOVED***g.sharedVolume.claimName }}
+          claimName: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.claimName }}
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -204,4 +199,4 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.presto.spec.imagePullSecrets | indent 8 }}
 {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.presto.spec.presto.coordinator.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.presto.spec.coordinator.terminationGracePeriodSeconds }}
