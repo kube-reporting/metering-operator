@@ -78,10 +78,11 @@ _storage_overrides:
     hive:
       spec:
         con***REMOVED***g:
-          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
-          createAwsCredentialsSecret: false
           # regex_replace to append a trailing slash if missing
           metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+            createSecret: false
     hadoop:
       spec:
         con***REMOVED***g:

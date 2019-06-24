@@ -99,6 +99,10 @@ spec:
       {{- end }}
 hive:
   spec:
+    con***REMOVED***g:
+      aws:
+        accessKeyID: "{{ .Values.awsAccessKeyId }}"
+        secretAccessKey: "{{ .Values.awsSecretAccessKey }}"
     {{- if .Values.imagePullSecretName }}
     image:
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]

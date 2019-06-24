@@ -35,32 +35,38 @@ data:
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionURL }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.url }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionDriverName</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionDriver }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.driver }}</value>
       </property>
+{{- if .Values.hive.spec.con***REMOVED***g.db.username }}
       <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionUsername }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.username }}</value>
       </property>
+{{- end }}
+{{- if .Values.hive.spec.con***REMOVED***g.db.password }}
       <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.dbConnectionPassword }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.password }}</value>
       </property>
+{{- end }}
       <property>
         <name>datanucleus.schema.autoCreateAll</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.autoCreateMetastoreSchema }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.autoCreateMetastoreSchema }}</value>
       </property>
       <property>
         <name>hive.metastore.schema.veri***REMOVED***cation</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
+        <value>{{ .Values.hive.spec.con***REMOVED***g.db.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
       </property>
+{{- if .Values.hive.spec.con***REMOVED***g.db.defaultFileFormat }}
       <property>
         <name>hive.default.***REMOVED***leformat</name>
         <value>{{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}</value>
       </property>
+{{- end }}
 {{- if .Values.hive.spec.con***REMOVED***g.metastoreWarehouseDir }}
       <property>
         <name>hive.metastore.warehouse.dir</name>
