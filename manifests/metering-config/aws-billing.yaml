@@ -24,3 +24,8 @@ spec:
       config:
         awsCredentialsSecretName: "your-aws-secret"
 
+  hive:
+    spec:
+      config:
+        awsCredentialsSecretName: "your-aws-secret"
+

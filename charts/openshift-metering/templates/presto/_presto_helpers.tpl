@@ -2,15 +2,15 @@
 connector.name=hive-hadoop2
 hive.allow-drop-table=true
 hive.allow-rename-table=true
-hive.storage-format={{ .Values.presto.spec.hive.config.defaultFileFormat | upper }}
+hive.storage-format={{ .Values.hive.spec.config.defaultFileFormat | upper }}
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
-hive.metastore.uri={{ .Values.presto.spec.hive.config.metastoreURIs }}
-{{- if .Values.presto.spec.presto.config.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.presto.spec.presto.config.metastoreTimeout }}
+hive.metastore.uri={{ .Values.presto.spec.config.hiveMetastoreURI }}
+{{- if .Values.presto.spec.config.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.presto.spec.config.metastoreTimeout }}
 {{- end }}
-{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
+{{- if .Values.presto.spec.config.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
 {{- end }}
 

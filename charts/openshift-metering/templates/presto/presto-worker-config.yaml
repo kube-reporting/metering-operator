@@ -6,7 +6,7 @@ metadata:
     app: presto
 data:
   log.properties: |
-    com.facebook.presto={{ upper .Values.presto.spec.presto.worker.config.logLevel }}
+    com.facebook.presto={{ upper .Values.presto.spec.worker.config.logLevel }}
 
   node.properties: |
     node.data-dir=/var/presto/data
@@ -14,9 +14,9 @@ data:
 
   config.properties: |
     coordinator=false
-    node-scheduler.include-coordinator={{ .Values.presto.spec.presto.config.nodeSchedulerIncludeCoordinator }}
+    node-scheduler.include-coordinator={{ .Values.presto.spec.config.nodeSchedulerIncludeCoordinator }}
 
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
     http-server.http.enabled=false
     http-server.https.enabled=true
     http-server.https.port=8080
@@ -31,24 +31,24 @@ data:
     http-server.http.port=8080
     discovery.uri=http://presto:8080
 {{- end }}
-{{- if .Values.presto.spec.presto.config.auth.enabled }}
+{{- if .Values.presto.spec.config.auth.enabled }}
     http-server.authentication.type=CERTIFICATE
 {{- end }}
 
     jmx.rmiserver.port=8081
     jmx.rmiregistry.port=8081
 
-{{- if .Values.presto.spec.presto.config.maxQueryLength }}
-    query.max-length={{ .Values.presto.spec.presto.config.maxQueryLength }}
+{{- if .Values.presto.spec.config.maxQueryLength }}
+    query.max-length={{ .Values.presto.spec.config.maxQueryLength }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.taskConcurrency }}
-    task.concurrency={{ .Values.presto.spec.presto.worker.config.taskConcurrency }}
+{{- if .Values.presto.spec.worker.config.taskConcurrency }}
+    task.concurrency={{ .Values.presto.spec.worker.config.taskConcurrency }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.taskMaxWorkerThreads }}
-    task.max-worker-threads: {{ .Values.presto.spec.presto.worker.config.taskMaxWorkerThreads }}
+{{- if .Values.presto.spec.worker.config.taskMaxWorkerThreads }}
+    task.max-worker-threads: {{ .Values.presto.spec.worker.config.taskMaxWorkerThreads }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.taskMinDrivers }}
-    task.min-drivers: {{ .Values.presto.spec.presto.worker.config.taskMinDrivers }}
+{{- if .Values.presto.spec.worker.config.taskMinDrivers }}
+    task.min-drivers: {{ .Values.presto.spec.worker.config.taskMinDrivers }}
 {{- end }}
 
   jvm.config: |
@@ -56,43 +56,43 @@ data:
     -XX:+UseContainerSupport
     -XX:+UseG1GC
     -XX:+UseGCOverheadLimit
-{{- if .Values.presto.spec.presto.worker.config.jvm.G1HeapRegionSize }}
-    -XX:G1HeapRegionSize={{ .Values.presto.spec.presto.worker.config.jvm.G1HeapRegionSize }}
+{{- if .Values.presto.spec.worker.config.jvm.G1HeapRegionSize }}
+    -XX:G1HeapRegionSize={{ .Values.presto.spec.worker.config.jvm.G1HeapRegionSize }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.parallelGCThreads }}
-    -XX:ParallelGCThreads={{ .Values.presto.spec.presto.worker.config.jvm.parallelGCThreads }}
+{{- if .Values.presto.spec.worker.config.jvm.parallelGCThreads }}
+    -XX:ParallelGCThreads={{ .Values.presto.spec.worker.config.jvm.parallelGCThreads }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.concGCThreads }}
-    -XX:ConcGCThreads={{ .Values.presto.spec.presto.worker.config.jvm.concGCThreads }}
+{{- if .Values.presto.spec.worker.config.jvm.concGCThreads }}
+    -XX:ConcGCThreads={{ .Values.presto.spec.worker.config.jvm.concGCThreads }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.permSize }}
-    -XX:PermSize={{ .Values.presto.spec.presto.worker.config.jvm.permSize }}
+{{- if .Values.presto.spec.worker.config.jvm.permSize }}
+    -XX:PermSize={{ .Values.presto.spec.worker.config.jvm.permSize }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.maxGcPauseMillis }}
-    -XX:MaxGCPauseMillis={{ .Values.presto.spec.presto.worker.config.jvm.maxGcPauseMillis }}
+{{- if .Values.presto.spec.worker.config.jvm.maxGcPauseMillis }}
+    -XX:MaxGCPauseMillis={{ .Values.presto.spec.worker.config.jvm.maxGcPauseMillis }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.initiatingHeapOccupancyPercent }}
-    -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.presto.worker.config.jvm.initiatingHeapOccupancyPercent }}
+{{- if .Values.presto.spec.worker.config.jvm.initiatingHeapOccupancyPercent }}
+    -XX:InitiatingHeapOccupancyPercent={{ .Values.presto.spec.worker.config.jvm.initiatingHeapOccupancyPercent }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.initialRAMPercentage }}
-    -XX:InitialRAMPercentage={{ .Values.presto.spec.presto.worker.config.jvm.initialRAMPercentage }}
+{{- if .Values.presto.spec.worker.config.jvm.initialRAMPercentage }}
+    -XX:InitialRAMPercentage={{ .Values.presto.spec.worker.config.jvm.initialRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.maxRAMPercentage }}
-    -XX:MaxRAMPercentage={{ .Values.presto.spec.presto.worker.config.jvm.maxRAMPercentage }}
+{{- if .Values.presto.spec.worker.config.jvm.maxRAMPercentage }}
+    -XX:MaxRAMPercentage={{ .Values.presto.spec.worker.config.jvm.maxRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.minRAMPercentage }}
-    -XX:MinRAMPercentage={{ .Values.presto.spec.presto.worker.config.jvm.minRAMPercentage }}
+{{- if .Values.presto.spec.worker.config.jvm.minRAMPercentage }}
+    -XX:MinRAMPercentage={{ .Values.presto.spec.worker.config.jvm.minRAMPercentage }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.reservedCodeCacheSize }}
-    -XX:ReservedCodeCacheSize={{ .Values.presto.spec.presto.worker.config.jvm.reservedCodeCacheSize }}
+{{- if .Values.presto.spec.worker.config.jvm.reservedCodeCacheSize }}
+    -XX:ReservedCodeCacheSize={{ .Values.presto.spec.worker.config.jvm.reservedCodeCacheSize }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.maxCachedBufferSize }}
-    -Djdk.nio.maxCachedBufferSize={{ .Values.presto.spec.presto.worker.config.jvm.maxCachedBufferSize }}
+{{- if .Values.presto.spec.worker.config.jvm.maxCachedBufferSize }}
+    -Djdk.nio.maxCachedBufferSize={{ .Values.presto.spec.worker.config.jvm.maxCachedBufferSize }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.config.jvm.maxDirectMemorySize }}
-    -XX:MaxDirectMemorySize={{ .Values.presto.spec.presto.worker.config.jvm.maxDirectMemorySize  }}
+{{- if .Values.presto.spec.worker.config.jvm.maxDirectMemorySize }}
+    -XX:MaxDirectMemorySize={{ .Values.presto.spec.worker.config.jvm.maxDirectMemorySize  }}
 {{- end }}
-{{- range .Values.presto.spec.presto.worker.config.jvm.extraFlags }}
+{{- range .Values.presto.spec.worker.config.jvm.extraFlags }}
     {{ . }}
 {{- end }}
     -XX:+ExplicitGCInvokesConcurrent

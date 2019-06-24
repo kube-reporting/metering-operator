@@ -12,16 +12,17 @@ meteringconfig_spec_overrides: "{{ _metering_openshift_io_meteringconfig.spec }}
 
 # The default specs for each component
 _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
+_hive_default_spec: "{{ meteringconfig_default_values.hive.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringconfig_default_values.hadoop.spec }}"
 
 # Default image repository and tag from the defaults
 meteringconfig_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
 meteringconfig_reporting_operator_default_image_tag: "{{ _reporting_op_default_spec.image.tag }}"
-meteringconfig_presto_default_image_repo: "{{ _presto_default_spec.presto.image.repository }}"
-meteringconfig_presto_default_image_tag: "{{ _presto_default_spec.presto.image.tag }}"
-meteringconfig_hive_default_image_repo: "{{ _presto_default_spec.hive.image.repository }}"
-meteringconfig_hive_default_image_tag: "{{ _presto_default_spec.hive.image.tag }}"
+meteringconfig_presto_default_image_repo: "{{ _presto_default_spec.image.repository }}"
+meteringconfig_presto_default_image_tag: "{{ _presto_default_spec.image.tag }}"
+meteringconfig_hive_default_image_repo: "{{ _hive_default_spec.image.repository }}"
+meteringconfig_hive_default_image_tag: "{{ _hive_default_spec.image.tag }}"
 meteringconfig_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
 meteringconfig_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
 
@@ -40,10 +41,11 @@ meteringconfig_default_image_overrides:
         image:
           repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringconfig_presto_default_image_repo, true) }}"
           tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringconfig_presto_default_image_tag, true) }}"
-      hive:
-        image:
-          repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringconfig_hive_default_image_repo, true) }}"
-          tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringconfig_hive_default_image_tag, true) }}"
+  hive:
+    spec:
+      image:
+        repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringconfig_hive_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringconfig_hive_default_image_tag, true) }}"
   hadoop:
     spec:
       image:
@@ -73,10 +75,13 @@ _storage_overrides:
         config:
           awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
-        hive:
-          config:
-            # regex_replace to append a trailing slash if missing
-            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
+    hive:
+      spec:
+        config:
+          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+          createAwsCredentialsSecret: false
+          # regex_replace to append a trailing slash if missing
+          metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
     hadoop:
       spec:
         config:
@@ -94,19 +99,17 @@ _storage_overrides:
           enabled: "{{ meteringconfig_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
 
   sharedPVC:
-    presto:
+    hive:
       spec:
         config:
+          metastoreWarehouseDir: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
           sharedVolume:
             enabled: true
             createPVC: "{{ _storage_spec | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
             mountPath: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
-            claimName: "{{ _storage_spec | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
-            size: "{{ _storage_spec | json_query('hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
-            storageClass: "{{ _storage_spec | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
-        hive:
-          config:
-            metastoreWarehouseDir: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ _storage_spec | json_query('hive.sharedPVC.claimName') | default(_hive_default_spec.config.sharedVolume.claimName, true) }}"
+            size: "{{ _storage_spec | json_query('hive.sharedPVC.size') | default(_hive_default_spec.config.sharedVolume.size, true) }}"
+            storageClass: "{{ _storage_spec | json_query('hive.sharedPVC.storageClass') | default(_hive_default_spec.config.sharedVolume.storageClass, true) }}"
 
     hadoop:
       spec:
@@ -169,24 +172,23 @@ _tls_overrides:
             secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
   presto:
     spec:
-      presto:
-        config:
-          tls:
-            certificate: "{{  meteringconfig_presto_server_certificate }}"
-            key: "{{ meteringconfig_presto_server_key }}"
-            caCertificate: "{{ meteringconfig_presto_server_ca_certificate }}"
+      config:
+        tls:
+          certificate: "{{  meteringconfig_presto_server_certificate }}"
+          key: "{{ meteringconfig_presto_server_key }}"
+          caCertificate: "{{ meteringconfig_presto_server_ca_certificate }}"
 
-            enabled: true
-            createSecret: true
-            secretName: "{{ meteringconfig_presto_server_secret_name }}"
-          auth:
-            certificate: "{{  meteringconfig_presto_client_certificate }}"
-            key: "{{ meteringconfig_presto_client_key }}"
-            caCertificate: "{{ meteringconfig_presto_client_ca_certificate }}"
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringconfig_presto_server_secret_name }}"
+        auth:
+          certificate: "{{  meteringconfig_presto_client_certificate }}"
+          key: "{{ meteringconfig_presto_client_key }}"
+          caCertificate: "{{ meteringconfig_presto_client_ca_certificate }}"
 
-            enabled: true
-            createSecret: true
-            secretName: "{{ meteringconfig_presto_client_secret_name }}"
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringconfig_presto_client_secret_name }}"
 
 # check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
@@ -207,6 +209,7 @@ meteringconfig_storage_s3_aws_credentials_secret_name: "{{ meteringconfig_spec |
 _monitoring_conf: "{{ meteringconfig_spec.monitoring }}"
 _openshift_reporting_spec: "{{ meteringconfig_spec['openshift-reporting'].spec }}"
 _presto_spec: "{{ meteringconfig_spec.presto.spec }}"
+_hive_spec: "{{ meteringconfig_spec.hive.spec }}"
 _reporting_op_spec: "{{ meteringconfig_spec['reporting-operator'].spec }}"
 _hadoop_spec: "{{ meteringconfig_spec.hadoop.spec }}"
 
@@ -221,17 +224,19 @@ meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBi
 meteringconfig_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
 meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createCredentialsSecret | default(false) }}"
 
-meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
-meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
+meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
+meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
+meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.createAwsCredentialsSecret | default(false) }}"
+
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
 
 #
 # Enabling Presto TLS/Auth by Default
 #
-meteringconfig_template_presto_tls_secret: "{{ _presto_spec.presto.config.tls.enabled and _presto_spec.presto.config.tls.createSecret and _presto_spec.presto.config.tls.secretName != 'presto-server-tls' }}"
-meteringconfig_template_presto_auth_secret: "{{ _presto_spec.presto.config.auth.enabled and _presto_spec.presto.config.auth.createSecret and _presto_spec.presto.config.auth.secretName != 'presto-client-tls' }}"
-meteringconfig_create_presto_tls_secrets: "{{ _presto_spec.presto.config.tls.enabled and _presto_spec.presto.config.tls.createSecret | default(false) }}"
-meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.presto.config.auth.enabled and _presto_spec.presto.config.auth.createSecret | default(false) }}"
+meteringconfig_template_presto_tls_secret: "{{ _presto_spec.config.tls.enabled and _presto_spec.config.tls.createSecret and _presto_spec.config.tls.secretName != 'presto-server-tls' }}"
+meteringconfig_template_presto_auth_secret: "{{ _presto_spec.config.auth.enabled and _presto_spec.config.auth.createSecret and _presto_spec.config.auth.secretName != 'presto-client-tls' }}"
+meteringconfig_create_presto_tls_secrets: "{{ _presto_spec.config.tls.enabled and _presto_spec.config.tls.createSecret | default(false) }}"
+meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.config.auth.enabled and _presto_spec.config.auth.createSecret | default(false) }}"
 
 #
 # Reporting Operator

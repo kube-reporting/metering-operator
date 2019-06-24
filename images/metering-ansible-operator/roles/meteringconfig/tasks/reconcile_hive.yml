@@ -5,36 +5,40 @@
   vars:
     values_file: /tmp/metering-values.yaml
     resources:
-      - template_file: templates/presto/hive-metastore-pvc.yaml
+      - template_file: templates/hive/hive-metastore-pvc.yaml
         apis: [ {kind: persistentvolumeclaim} ]
         prune_label_value: hive-metastore-pvc
         create: "{{ meteringconfig_create_hive_metastore_pvc }}"
-      - template_file: templates/presto/hive-shared-volume-pvc.yaml
+      - template_file: templates/hive/hive-shared-volume-pvc.yaml
         apis: [ {kind: persistentvolumeclaim} ]
         prune_label_value: hive-shared-volume-pvc
-        create: "{{ meteringconfig_create_presto_shared_volume_pvc }}"
-      - template_file: templates/presto/hive-configmap.yaml
+        create: "{{ meteringconfig_create_hive_shared_volume_pvc }}"
+      - template_file: templates/hive/hive-aws-credentials-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hive-aws-credentials-secret
+        create: "{{ meteringconfig_create_hive_aws_credentials }}"
+      - template_file: templates/hive/hive-configmap.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hive-configmap
-      - template_file: templates/presto/hive-scripts-configmap.yaml
+      - template_file: templates/hive/hive-scripts-configmap.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hive-scripts-configmap
-      - template_file: templates/presto/hive-jmx-config.yaml
+      - template_file: templates/hive/hive-jmx-config.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hive-jmx-config
-      - template_file: templates/presto/hive-metastore-service.yaml
+      - template_file: templates/hive/hive-metastore-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-metastore-service
-      - template_file: templates/presto/hive-metastore-statefulset.yaml
+      - template_file: templates/hive/hive-metastore-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-metastore-statefulset
-      - template_file: templates/presto/hive-server-service.yaml
+      - template_file: templates/hive/hive-server-service.yaml
         apis: [ {kind: service} ]
         prune_label_value: hive-server-service
-      - template_file: templates/presto/hive-serviceaccount.yaml
+      - template_file: templates/hive/hive-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: hive-serviceaccount
-      - template_file: templates/presto/hive-server-statefulset.yaml
+      - template_file: templates/hive/hive-server-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-server-statefulset
 

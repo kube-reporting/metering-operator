@@ -7,10 +7,10 @@ data:
     #!/bin/bash
     set -e
 
-{{- if .Values.presto.spec.presto.config.auth.enabled }}
+{{- if .Values.presto.spec.config.auth.enabled }}
     cat $PRESTO_CLIENT_KEYFILE $PRESTO_CLIENT_CRTFILE $PRESTO_CLIENT_CA_CRTFILE > $PRESTO_TRUSTSTORE_PEM
 {{- end }}
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
     # copy all necessary tls.crt/tls.key from read-only secret volumes - append server bundle and CA cert to truststore
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE > $PRESTO_KEYSTORE_PEM
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE >> $PRESTO_TRUSTSTORE_PEM

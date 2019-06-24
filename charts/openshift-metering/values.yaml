@@ -419,7 +419,169 @@ reporting-operator:
 
 presto:
   spec:
+    labels: {}
+
+    image:
+      pullPolicy: Always
+      repository: quay.io/openshift/origin-metering-presto
+      tag: 4.2
+
     config:
+      awsAccessKeyID: ""
+      awsCredentialsSecretName: ""
+      awsSecretAccessKey: ""
+      createAwsCredentialsSecret: false
+
+      hadoopConfigSecretName: hadoop-config
+      useHadoopConfig: true
+
+      environment: production
+      hiveMetastoreURI: thrift://hive-metastore:9083
+      metastoreTimeout: null
+      nodeSchedulerIncludeCoordinator: true
+      maxQueryLength: "10000000"
+
+      tls:
+        # server cert
+        certificate: ""
+        # server private key
+        key: ""
+        # CA for the server cert
+        caCertificate: ""
+
+        createSecret: false
+        enabled: false
+        secretName: ""
+
+      auth:
+        # client cert
+        certificate: ""
+        # client private key
+        key: ""
+        # CA for the client cert
+        caCertificate: ""
+
+        createSecret: false
+        enabled: false
+        secretName: ""
+
+      connectors:
+        extraConnectorFiles: []
+
+    coordinator:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - presto
+            topologyKey: kubernetes.io/hostname
+      nodeSelector: {}
+      tolerations: []
+      terminationGracePeriodSeconds: 30
+
+      config:
+        jvm:
+          G1HeapRegionSize: null
+          concGCThreads: null
+          extraFlags: []
+          initiatingHeapOccupancyPercent: null
+          maxGcPauseMillis: null
+          parallelGCThreads: null
+          initialRAMPercentage: "50.0"
+          maxRAMPercentage: "50.0"
+          minRAMPercentage: null
+          permSize: null
+          reservedCodeCacheSize: null
+          maxCachedBufferSize: null
+          maxDirectMemorySize: null
+        logLevel: info
+        taskMaxWorkerThreads: null
+        taskMinDrivers: null
+        logLevel: info
+        taskMaxWorkerThreads: null
+        taskMinDrivers: null
+
+      resources:
+        limits:
+          cpu: 4
+          memory: 4Gi
+        requests:
+          cpu: 2
+          memory: 2Gi
+
+    securityContext:
+      fsGroup: null
+      runAsNonRoot: true
+
+    worker:
+      replicas: 0
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - presto
+            topologyKey: kubernetes.io/hostname
+      nodeSelector: {}
+      terminationGracePeriodSeconds: 30
+      tolerations: []
+
+      config:
+        jvm:
+          G1HeapRegionSize: null
+          concGCThreads: null
+          extraFlags: []
+          initiatingHeapOccupancyPercent: null
+          maxGcPauseMillis: null
+          parallelGCThreads: null
+          initialRAMPercentage: "50.0"
+          maxRAMPercentage: "50.0"
+          minRAMPercentage: null
+          permSize: null
+          reservedCodeCacheSize: null
+          maxCachedBufferSize: null
+          maxDirectMemorySize: null
+        logLevel: info
+        taskMaxWorkerThreads: null
+        taskMinDrivers: null
+
+      resources:
+        limits:
+          cpu: 8
+          memory: 8Gi
+        requests:
+          cpu: 4
+          memory: 2Gi
+
+hive:
+  spec:
+    labels: {}
+    annotations: {}
+    terminationGracePeriodSeconds: 30
+
+    config:
+      autoCreateMetastoreSchema: true
+      dbConnectionDriver: org.apache.derby.jdbc.EmbeddedDriver
+      dbConnectionPassword: null
+      dbConnectionURL: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
+      dbConnectionUsername: null
+      defaultCompression: zlib
+      defaultFileFormat: orc
+      enableMetastoreSchemaVerification: false
+      metastoreClientSocketTimeout: null
+      metastoreURIs: thrift://hive-metastore:9083
+      metastoreWarehouseDir: null
+
+      hadoopConfigSecretName: hadoop-config
+      useHadoopConfig: true
+
       awsAccessKeyID: ""
       awsCredentialsSecretName: ""
       awsSecretAccessKey: ""
@@ -434,233 +596,103 @@ presto:
         size: 5Gi
         storageClass: null
 
-    ghostunnel:
-      image:
-        pullPolicy: Always
-        repository: quay.io/openshift/origin-ghostunnel
-        tag: 4.2
-    hive:
-      annotations: {}
+    image:
+      pullPolicy: Always
+      repository: quay.io/openshift/origin-metering-hive
+      tag: 4.2
+
+    metastore:
+      affinity: {}
+      nodeSelector: {}
+      tolerations: []
+
       config:
-        autoCreateMetastoreSchema: true
-        dbConnectionDriver: org.apache.derby.jdbc.EmbeddedDriver
-        dbConnectionPassword: null
-        dbConnectionURL: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
-        dbConnectionUsername: null
-        defaultCompression: zlib
-        defaultFileFormat: orc
-        enableMetastoreSchemaVerification: false
-        metastoreClientSocketTimeout: null
-        metastoreURIs: thrift://hive-metastore:9083
-        metastoreWarehouseDir: null
-        hadoopSecretName: hadoop-config
-        useHadoopConfig: true
-      image:
-        pullPolicy: Always
-        repository: quay.io/openshift/origin-metering-hive
-        tag: 4.2
-      labels: {}
-      metastore:
-        affinity: {}
-        config:
-          tls:
-            enabled: false
-            createSecret: false
-            secretName: ""
-          jvm:
-            initialRAMPercentage: null
-            maxRAMPercentage: null
-            minRAMPercentage: null
-          logLevel: info
-        livenessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 90
-          periodSeconds: 30
-          successThreshold: 1
-          tcpSocket:
-            port: 9083
-          timeoutSeconds: 15
-        nodeSelector: {}
-        readinessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 60
-          periodSeconds: 20
-          successThreshold: 1
-          tcpSocket:
-            port: 9083
-          timeoutSeconds: 15
-        resources:
-          limits:
-            cpu: 4
-            memory: 2Gi
-          requests:
-            cpu: 500m
-            memory: 650Mi
-        storage:
-          class: null
-          create: true
-          size: 5Gi
-        tolerations: []
-      securityContext:
-        fsGroup: null
-        runAsNonRoot: true
-      server:
-        affinity: {}
-        config:
-          jvm:
-            initialRAMPercentage: null
-            maxRAMPercentage: null
-            minRAMPercentage: null
-          logLevel: info
-        livenessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 300
-          periodSeconds: 30
-          successThreshold: 1
-          tcpSocket:
-            port: 10000
-          timeoutSeconds: 15
-        nodeSelector: {}
-        readinessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 60
-          periodSeconds: 20
-          successThreshold: 1
-          tcpSocket:
-            port: 10000
-          timeoutSeconds: 15
-        resources:
-          limits:
-            cpu: 1
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 500Mi
-        tolerations: []
-      terminationGracePeriodSeconds: 30
-    presto:
-      annotations: {}
-      config:
+        logLevel: info
+        jvm:
+          initialRAMPercentage: null
+          maxRAMPercentage: null
+          minRAMPercentage: null
+
         tls:
-          # server cert
-          certificate: ""
-          # server private key
-          key: ""
-          # CA for the server cert
-          caCertificate: ""
-
-          createSecret: false
           enabled: false
+          createSecret: false
           secretName: ""
 
-        auth:
-          # client cert
-          certificate: ""
-          # client private key
-          key: ""
-          # CA for the client cert
-          caCertificate: ""
+      resources:
+        limits:
+          cpu: 4
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 650Mi
+      storage:
+        class: null
+        create: true
+        size: 5Gi
 
-          createSecret: false
-          enabled: false
-          secretName: ""
-        connectors:
-          extraConnectorFiles: []
-        environment: production
-        hiveMetastoreURI: thrift://hive-metastore:9083
-        maxQueryLength: "10000000"
-        metastoreTimeout: null
-        nodeSchedulerIncludeCoordinator: true
-      coordinator:
-        affinity:
-          podAntiAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - presto
-              topologyKey: kubernetes.io/hostname
-        config:
-          jvm:
-            G1HeapRegionSize: null
-            concGCThreads: null
-            extraFlags: []
-            initiatingHeapOccupancyPercent: null
-            maxGcPauseMillis: null
-            parallelGCThreads: null
-            initialRAMPercentage: "50.0"
-            maxRAMPercentage: "50.0"
-            minRAMPercentage: null
-            permSize: null
-            reservedCodeCacheSize: null
-            maxCachedBufferSize: null
-            maxDirectMemorySize: null
-          logLevel: info
-          taskMaxWorkerThreads: null
-          taskMinDrivers: null
-          logLevel: info
-          taskMaxWorkerThreads: null
-          taskMinDrivers: null
-        nodeSelector: {}
-        resources:
-          limits:
-            cpu: 4
-            memory: 4Gi
-          requests:
-            cpu: 2
-            memory: 2Gi
-        terminationGracePeriodSeconds: 30
-        tolerations: []
-      image:
-        pullPolicy: Always
-        repository: quay.io/openshift/origin-metering-presto
-        tag: 4.2
-      labels: {}
-      securityContext:
-        fsGroup: null
-        runAsNonRoot: true
-      worker:
-        replicas: 0
-        affinity:
-          podAntiAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - presto
-              topologyKey: kubernetes.io/hostname
-        config:
-          jvm:
-            G1HeapRegionSize: null
-            concGCThreads: null
-            extraFlags: []
-            initiatingHeapOccupancyPercent: null
-            maxGcPauseMillis: null
-            parallelGCThreads: null
-            initialRAMPercentage: "50.0"
-            maxRAMPercentage: "50.0"
-            minRAMPercentage: null
-            permSize: null
-            reservedCodeCacheSize: null
-            maxCachedBufferSize: null
-            maxDirectMemorySize: null
-          logLevel: info
-          taskMaxWorkerThreads: null
-          taskMinDrivers: null
-        nodeSelector: {}
-        resources:
-          limits:
-            cpu: 8
-            memory: 8Gi
-          requests:
-            cpu: 4
-            memory: 2Gi
-        terminationGracePeriodSeconds: 30
-        tolerations: []
+      livenessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 90
+        periodSeconds: 30
+        successThreshold: 1
+        tcpSocket:
+          port: 9083
+        timeoutSeconds: 15
+      readinessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 60
+        periodSeconds: 20
+        successThreshold: 1
+        tcpSocket:
+          port: 9083
+        timeoutSeconds: 15
+
+    server:
+      affinity: {}
+      nodeSelector: {}
+      tolerations: []
+
+      config:
+        logLevel: info
+        jvm:
+          initialRAMPercentage: null
+          maxRAMPercentage: null
+          minRAMPercentage: null
+
+      resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 500m
+          memory: 500Mi
+
+      livenessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 300
+        periodSeconds: 30
+        successThreshold: 1
+        tcpSocket:
+          port: 10000
+        timeoutSeconds: 15
+      readinessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 60
+        periodSeconds: 20
+        successThreshold: 1
+        tcpSocket:
+          port: 10000
+        timeoutSeconds: 15
+
+    securityContext:
+      fsGroup: null
+      runAsNonRoot: true
+
+__ghostunnel:
+  image:
+    pullPolicy: Always
+    repository: quay.io/openshift/origin-ghostunnel
+    tag: 4.2
 
 hadoop:
   spec:

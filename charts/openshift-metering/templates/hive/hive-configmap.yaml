@@ -31,46 +31,46 @@ data:
       </property>
       <property>
         <name>hive.metastore.uris</name>
-        <value>{{ .Values.presto.spec.hive.config.metastoreURIs }}</value>
+        <value>{{ .Values.hive.spec.config.metastoreURIs }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>{{ .Values.presto.spec.hive.config.dbConnectionURL }}</value>
+        <value>{{ .Values.hive.spec.config.dbConnectionURL }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionDriverName</name>
-        <value>{{ .Values.presto.spec.hive.config.dbConnectionDriver }}</value>
+        <value>{{ .Values.hive.spec.config.dbConnectionDriver }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>{{ .Values.presto.spec.hive.config.dbConnectionUsername }}</value>
+        <value>{{ .Values.hive.spec.config.dbConnectionUsername }}</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>{{ .Values.presto.spec.hive.config.dbConnectionPassword }}</value>
+        <value>{{ .Values.hive.spec.config.dbConnectionPassword }}</value>
       </property>
       <property>
         <name>datanucleus.schema.autoCreateAll</name>
-        <value>{{ .Values.presto.spec.hive.config.autoCreateMetastoreSchema }}</value>
+        <value>{{ .Values.hive.spec.config.autoCreateMetastoreSchema }}</value>
       </property>
       <property>
         <name>hive.metastore.schema.verification</name>
-        <value>{{ .Values.presto.spec.hive.config.enableMetastoreSchemaVerification }}</value>
+        <value>{{ .Values.hive.spec.config.enableMetastoreSchemaVerification }}</value>
       </property>
       <property>
         <name>hive.default.fileformat</name>
-        <value>{{ .Values.presto.spec.hive.config.defaultFileFormat }}</value>
+        <value>{{ .Values.hive.spec.config.defaultFileFormat }}</value>
       </property>
-{{- if .Values.presto.spec.hive.config.metastoreWarehouseDir }}
+{{- if .Values.hive.spec.config.metastoreWarehouseDir }}
       <property>
         <name>hive.metastore.warehouse.dir</name>
-        <value>{{ .Values.presto.spec.hive.config.metastoreWarehouseDir }}</value>
+        <value>{{ .Values.hive.spec.config.metastoreWarehouseDir }}</value>
       </property>
 {{- end }}
-{{- if .Values.presto.spec.hive.config.metastoreClientSocketTimeout }}
+{{- if .Values.hive.spec.config.metastoreClientSocketTimeout }}
       <property>
         <name>hive.metastore.client.socket.timeout</name>
-        <value>{{ .Values.presto.spec.hive.config.metastoreClientSocketTimeout }}</value>
+        <value>{{ .Values.hive.spec.config.metastoreClientSocketTimeout }}</value>
       </property>
 {{- end }}
     </configuration>
