@@ -567,25 +567,30 @@ hive:
     terminationGracePeriodSeconds: 30
 
     config:
-      autoCreateMetastoreSchema: true
-      dbConnectionDriver: org.apache.derby.jdbc.EmbeddedDriver
-      dbConnectionPassword: null
-      dbConnectionURL: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
-      dbConnectionUsername: null
-      defaultCompression: zlib
-      defaultFileFormat: orc
-      enableMetastoreSchemaVerification: false
       metastoreClientSocketTimeout: null
       metastoreURIs: thrift://hive-metastore:9083
       metastoreWarehouseDir: null
 
+      defaultCompression: zlib
+      defaultFileFormat: orc
+
       hadoopConfigSecretName: hadoop-config
       useHadoopConfig: true
 
-      awsAccessKeyID: ""
-      awsCredentialsSecretName: ""
-      awsSecretAccessKey: ""
-      createAwsCredentialsSecret: false
+      db:
+        driver: org.apache.derby.jdbc.EmbeddedDriver
+        password: null
+        url: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
+        username: null
+
+        autoCreateMetastoreSchema: true
+        enableMetastoreSchemaVerification: false
+
+      aws:
+        accessKeyID: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
 
       sharedVolume:
         enabled: false
@@ -600,6 +605,7 @@ hive:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hive
       tag: 4.2
+      pullSecrets: []
 
     metastore:
       affinity: {}
