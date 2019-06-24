@@ -31,15 +31,15 @@ spec:
         repository: "{{ .Values.reportingOperatorDeployRepo }}"
         tag: "{{ .Values.reportingOperatorDeployTag }}"
 
-{{- if .Values.imagePullSecretName }}
+      {{- if .Values.imagePullSecretName }}
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
-{{- end }}
-{{- if .Values.dateAnnotationValue }}
+      {{- end }}
+      {{- if .Values.dateAnnotationValue }}
       annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-{{- end }}
-{{- if .Values.terminationGracePeriodSeconds  }}
+      {{- end }}
+      {{- if .Values.terminationGracePeriodSeconds  }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-{{- end }}
+      {{- end }}
 
       config:
         logLevel: "debug"
@@ -63,21 +63,28 @@ spec:
         # or less
         prometheusMetricsImporterStepSize: "60s"
 
+      {{- if or .Values.reportingOperatorMemory .Values.reportingOperatorCpu }}
+      resources:
+        requests:
+          memory: "{{ .Values.reportingOperatorMemory }}"
+          cpu: "{{ .Values.reportingOperatorCpu }}"
+      {{- end }}
+
   presto:
     spec:
-{{- if .Values.imagePullSecretName }}
+      {{- if .Values.imagePullSecretName }}
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
-{{- end }}
+      {{- end }}
       config:
         awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
         awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
       presto:
-  {{- if .Values.dateAnnotationValue }}
+        {{- if .Values.dateAnnotationValue }}
         annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-  {{- end }}
-  {{- if .Values.terminationGracePeriodSeconds  }}
+        {{- end }}
+        {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-  {{- end }}
+        {{- end }}
         {{- if or .Values.prestoMemory .Values.prestoCpu }}
         coordinator:
           {{- if or .Values.prestoMemory .Values.prestoCpu }}
@@ -85,26 +92,20 @@ spec:
             requests:
               memory: "{{ .Values.prestoMemory }}"
               cpu: "{{ .Values.prestoCpu }}"
-            limits:
-              memory: null
-              cpu: null
           {{- end }}
         {{- end }}
       hive:
-  {{- if .Values.dateAnnotationValue }}
+        {{- if .Values.dateAnnotationValue }}
         annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-  {{- end }}
-  {{- if .Values.terminationGracePeriodSeconds  }}
+        {{- end }}
+        {{- if .Values.terminationGracePeriodSeconds  }}
         terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-  {{- end }}
-{{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreCpu .Values.hiveMetastoreStorageSize }}
+        {{- end }}
+        {{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreCpu .Values.hiveMetastoreStorageSize }}
         metastore:
           {{- if or .Values.hiveMetastoreMemory .Values.hiveMetastoreCpu }}
           resources:
             requests:
-              memory: "{{ .Values.hiveMetastoreMemory }}"
-              cpu: "{{ .Values.hiveMetastoreCpu }}"
-            limits:
               memory: "{{ .Values.hiveMetastoreMemory }}"
               cpu: "{{ .Values.hiveMetastoreCpu }}"
           {{- end }}
@@ -112,48 +113,53 @@ spec:
           storage:
             size: "{{ .Values.hiveMetastoreStorageSize }}"
           {{- end }}
-{{- end }}
+        {{- end }}
+        {{- if or .Values.hiveServerMemory .Values.hiveServerCpu .Values.hiveServerStorageSize }}
+        server:
+          {{- if or .Values.hiveServerMemory .Values.hiveServerCpu }}
+          resources:
+            requests:
+              memory: "{{ .Values.hiveServerMemory }}"
+              cpu: "{{ .Values.hiveServerCpu }}"
+          {{- end }}
+        {{- end }}
 
   hadoop:
     spec:
-{{- if .Values.imagePullSecretName }}
+      {{- if .Values.imagePullSecretName }}
       imagePullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
-{{- end }}
+      {{- end }}
       hdfs:
         enabled: true
         datanode:
-{{- if .Values.dateAnnotationValue }}
+          {{- if .Values.dateAnnotationValue }}
           annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-{{- end }}
-{{- if .Values.terminationGracePeriodSeconds  }}
+          {{- end }}
+          {{- if .Values.terminationGracePeriodSeconds  }}
           terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-{{- end }}
-{{- if .Values.hdfsDatanodeMemory }}
+          {{- end }}
+          {{- if .Values.hdfsDatanodeMemory }}
           resources:
             requests:
               memory: "{{ .Values.hdfsDatanodeMemory }}"
-            limits:
-              memory: "{{ .Values.hdfsDatanodeMemory }}"
-{{- end }}
-{{- if .Values.hdfsDatanodeStorageSize }}
+          {{- end }}
+          {{- if .Values.hdfsDatanodeStorageSize }}
           storage:
             size: {{ .Values.hdfsDatanodeStorageSize }}
-{{- end }}
+          {{- end }}
         namenode:
-{{- if .Values.dateAnnotationValue }}
+          {{- if .Values.dateAnnotationValue }}
           annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
-{{- end }}
-{{- if .Values.terminationGracePeriodSeconds  }}
+          {{- end }}
+          {{- if .Values.terminationGracePeriodSeconds  }}
           terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-{{- end }}
-{{- if .Values.hdfsNamenodeMemory }}
+          {{- end }}
+          {{- if .Values.hdfsNamenodeMemory }}
           resources:
             requests:
               memory: "{{ .Values.hdfsNamenodeMemory }}"
-            limits:
-              memory: "{{ .Values.hdfsNamenodeMemory }}"
-{{- end }}
-{{- if .Values.hdfsNamenodeStorageSize   }}
+          {{- end }}
+          {{- if .Values.hdfsNamenodeStorageSize   }}
           storage:
             size: {{ .Values.hdfsNamenodeStorageSize }}
-{{- end }}
+          {{- end }}

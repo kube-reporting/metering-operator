@@ -7,13 +7,21 @@ enableAwsBilling: false
 imagePullSecretName: ""
 dateAnnotationValue: ""
 terminationGracePeriodSeconds: null
+
 hdfsDatanodeStorageSize: null
 hdfsDatanodeMemory: null
 hdfsNamenodeStorageSize: null
 hdfsNamenodeMemory: null
+
 hiveMetastoreStorageSize: null
 hiveMetastoreMemory: null
 hiveMetastoreCpu: null
+hiveServerMemory: null
+hiveServerCpu: null
+
 prestoMemory: null
 prestoCpu: null
+
 reportingOperatorReplicas: 1
+reportingOperatorMemory: null
+reportingOperatorCpu: null
