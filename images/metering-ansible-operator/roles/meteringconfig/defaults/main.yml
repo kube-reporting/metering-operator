@@ -224,7 +224,7 @@ meteringconfig_create_metering_root_ca_secret: "{{ meteringconfig_spec.tls.enabl
 meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
 meteringconfig_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
-meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createCredentialsSecret | default(false) }}"
+meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createSecret | default(false) }}"
 
 meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
