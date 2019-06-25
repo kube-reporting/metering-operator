@@ -8,7 +8,7 @@ For more information, see [Turning on the AWS Cost and Usage report][enable-aws-
 
 Next, update update the `bucket`, `prefix` and `region` to the location of your AWS Detailed billing report in the `openshift-reporting.spec.awsBillingReportDataSource` in the [aws-billing.yaml][example-config] example configuration manifest.
 
-The `spec.reporting-operator.spec.config.aws.secretName` and `spec.presto.spec.config.awsCredentialsSecretName` fields should be set to the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
+The `spec.reporting-operator.spec.config.aws.secretName` and `spec.presto.spec.config.aws.secretName` fields should be set to the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
 
 For example:
 

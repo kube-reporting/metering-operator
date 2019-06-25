@@ -86,8 +86,9 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- end }}
       config:
-        awsAccessKeyID: "{{ .Values.awsAccessKeyId }}"
-        awsSecretAccessKey: "{{ .Values.awsSecretAccessKey }}"
+        aws:
+          accessKeyID: "{{ .Values.awsAccessKeyId }}"
+          secretAccessKey: "{{ .Values.awsSecretAccessKey }}"
       {{- if or .Values.prestoMemory .Values.prestoCpu }}
       coordinator:
         {{- if or .Values.prestoMemory .Values.prestoCpu }}

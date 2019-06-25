@@ -427,10 +427,11 @@ presto:
       tag: 4.2
 
     config:
-      awsAccessKeyID: ""
-      awsCredentialsSecretName: ""
-      awsSecretAccessKey: ""
-      createAwsCredentialsSecret: false
+      aws:
+        accessKeyID: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
 
       hadoopConfigSecretName: hadoop-config
       useHadoopConfig: true

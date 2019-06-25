@@ -73,8 +73,9 @@ _storage_overrides:
     presto:
       spec:
         config:
-          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
-          createAwsCredentialsSecret: false
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+            createSecret: false
     hive:
       spec:
         config:
@@ -229,7 +230,7 @@ meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.creat
 meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.createAwsCredentialsSecret | default(false) }}"
 
-meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
+meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
 
 #
 # Enabling Presto TLS/Auth by Default
