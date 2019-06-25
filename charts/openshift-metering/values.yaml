@@ -19,7 +19,7 @@ storage:
   #   type: "s3"
   #   s3:
   #     bucket: "bucketname/path/"
-  #     awsCredentialsSecretName: "my-aws-secret"
+  #     secretName: "my-aws-secret"
   #     createBucket: true
   #     region: "us-west-1"
 
