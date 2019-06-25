@@ -711,8 +711,8 @@ hadoop:
       aws:
         accessKeyID: ""
         secretAccessKey: ""
-        createCredentialsSecret: false
-        credentialsSecretName: hadoop-aws-credentials
+        createSecret: false
+        secretName: ""
 
     image:
       pullPolicy: Always

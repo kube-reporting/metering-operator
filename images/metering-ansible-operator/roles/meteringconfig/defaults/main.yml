@@ -224,7 +224,7 @@ meteringcon***REMOVED***g_create_metering_root_ca_secret: "{{ meteringcon***REMO
 meteringcon***REMOVED***g_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
 meteringcon***REMOVED***g_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
-meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createCredentialsSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
