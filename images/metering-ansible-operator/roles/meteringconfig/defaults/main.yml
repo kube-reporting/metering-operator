@@ -11,7 +11,6 @@ meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_
 meteringconfig_spec_overrides: "{{ _metering_openshift_io_meteringconfig.spec }}"
 
 # The default specs for each component
-_storage_defaults: "{{ meteringconfig_default_values.storage }}"
 _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringconfig_default_values.hadoop.spec }}"
@@ -25,6 +24,8 @@ meteringconfig_hive_default_image_repo: "{{ _presto_default_spec.hive.image.repo
 meteringconfig_hive_default_image_tag: "{{ _presto_default_spec.hive.image.tag }}"
 meteringconfig_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
 meteringconfig_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
+
+_storage_spec: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides) | json_query('storage') | default({}, true) }}"
 
 # Override the default images we use with env vars if set, falling back to the values.yaml configured default if not set.
 meteringconfig_default_image_overrides:
@@ -54,20 +55,20 @@ _storage_overrides:
     reporting-operator:
       spec:
         config:
-          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
     presto:
       spec:
         config:
-          awsCredentialsSecretName: "{{ _storage_defaults | json_query('hive.s3.awsCredentialsSecretName') }}"
+          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
           createAwsCredentialsSecret: false
         hive:
           config:
-            metastoreWarehouseDir: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
+            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
     hadoop:
       spec:
         config:
-          defaultFS: "s3a://{{ _storage_defaults | json_query('hive.s3.bucket') }}"
+          defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
         hdfs:
           enabled: false
 
@@ -75,7 +76,7 @@ _storage_overrides:
     hadoop:
       spec:
         config:
-          defaultFS: "hdfs://{{ _storage_defaults | json_query('hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
+          defaultFS: "hdfs://{{ _storage_spec | json_query('hive.hdfs.namenode') | default('hdfs-namenode-0.hdfs-namenode:9820', true) }}"
         hdfs:
           enabled: "{{ meteringconfig_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
 
@@ -85,23 +86,23 @@ _storage_overrides:
         config:
           sharedVolume:
             enabled: true
-            createPVC: "{{ _storage_defaults | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
-            mountPath: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
-            claimName: "{{ _storage_defaults | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
-            size: "{{ _storage_defaults | json_query('hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
-            storageClass: "{{ _storage_defaults | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
+            createPVC: "{{ _storage_spec | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
+            mountPath: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ _storage_spec | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.config.sharedVolume.claimName, true) }}"
+            size: "{{ _storage_spec | json_query('hive.sharedPVC.size') | default(_presto_default_spec.config.sharedVolume.size, true) }}"
+            storageClass: "{{ _storage_spec | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.config.sharedVolume.storageClass, true) }}"
         hive:
           config:
-            metastoreWarehouseDir: "{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            metastoreWarehouseDir: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
 
     hadoop:
       spec:
         config:
-          defaultFS: "file://{{ _storage_defaults | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+          defaultFS: "file://{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
         hdfs:
           enabled: false
 
-meteringconfig_storage_hive_storage_type: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('storage.hive.type') }}"
+meteringconfig_storage_hive_storage_type: "{{ _storage_spec | json_query('hive.type') }}"
 meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_hive_storage_type] | default({}, true) }}"
 
 meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, recursive=True) }}"
