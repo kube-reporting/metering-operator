@@ -101,8 +101,8 @@ _storage_overrides:
         hdfs:
           enabled: false
 
-meteringcon***REMOVED***g_storage_hive_store_type: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides) | json_query('storage.hive.type') }}"
-meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon***REMOVED***g_storage_hive_store_type] | default({}, true) }}"
+meteringcon***REMOVED***g_storage_hive_storage_type: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('storage.hive.type') }}"
+meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon***REMOVED***g_storage_hive_storage_type] | default({}, true) }}"
 
 meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, recursive=True) }}"
 
