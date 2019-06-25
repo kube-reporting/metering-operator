@@ -30,6 +30,9 @@ storage:
   #     size: 5Gi
   #     mountPath: "/"
 
+tls:
+  enabled: false
+
 permissions:
   meteringAdmins: []
   meteringViewers: []
