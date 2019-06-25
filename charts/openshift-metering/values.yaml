@@ -427,10 +427,11 @@ presto:
       tag: 4.2
 
     con***REMOVED***g:
-      awsAccessKeyID: ""
-      awsCredentialsSecretName: ""
-      awsSecretAccessKey: ""
-      createAwsCredentialsSecret: false
+      aws:
+        accessKeyID: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
 
       hadoopCon***REMOVED***gSecretName: hadoop-con***REMOVED***g
       useHadoopCon***REMOVED***g: true

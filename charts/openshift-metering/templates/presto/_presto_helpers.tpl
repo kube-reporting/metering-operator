@@ -64,16 +64,16 @@ connector.name=tpch
     resourceFieldRef:
       containerName: presto
       resource: limits.memory
-{{- if or .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName .Values.presto.spec.con***REMOVED***g.createAwsCredentialsSecret }}
+{{- if or .Values.presto.spec.con***REMOVED***g.aws.secretName .Values.presto.spec.con***REMOVED***g.aws.createSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.con***REMOVED***g.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-access-key-id
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.con***REMOVED***g.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-secret-access-key
 {{- end }}
 {{- end }}
