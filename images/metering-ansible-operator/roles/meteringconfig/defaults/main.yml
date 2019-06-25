@@ -210,7 +210,8 @@ _presto_spec: "{{ meteringconfig_spec.presto.spec }}"
 _reporting_op_spec: "{{ meteringconfig_spec['reporting-operator'].spec }}"
 _hadoop_spec: "{{ meteringconfig_spec.hadoop.spec }}"
 
-meteringconfig_create_metering_default_storage: "{{ _openshift_reporting_spec.defaultStorageLocation.create | default(true) }}"
+meteringconfig_create_metering_default_storage: "{{ _openshift_reporting_spec.defaultStorageLocation.enabled }}"
+meteringconfig_create_metering_default_datasources: "{{ _openshift_reporting_spec.defaultReportDataSources.enabled }}"
 
 meteringconfig_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
 meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"

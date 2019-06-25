@@ -12,6 +12,7 @@
       - template_file: templates/openshift-reporting/datasources/default-datasources.yaml
         apis: [ {kind: reportdatasource, api_version: 'metering.openshift.io/v1'} ]
         prune_label_value: default-datasources
+        create: "{{ meteringconfig_create_metering_default_datasources }}"
       - template_file: templates/openshift-reporting/report-queries/cluster-capacity.yaml
         apis: [ {kind: reportquery, api_version: 'metering.openshift.io/v1'} ]
         prune_label_value: report-queries-cluster-capacity
