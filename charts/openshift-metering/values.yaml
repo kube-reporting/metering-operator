@@ -427,20 +427,15 @@ presto:
       tag: 4.2
 
     config:
+      environment: production
+      nodeSchedulerIncludeCoordinator: true
+      maxQueryLength: "10000000"
+
       aws:
         accessKeyID: ""
         secretAccessKey: ""
         createSecret: false
         secretName: ""
-
-      hadoopConfigSecretName: hadoop-config
-      useHadoopConfig: true
-
-      environment: production
-      hiveMetastoreURI: thrift://hive-metastore:9083
-      metastoreTimeout: null
-      nodeSchedulerIncludeCoordinator: true
-      maxQueryLength: "10000000"
 
       tls:
         # server cert
@@ -467,6 +462,13 @@ presto:
         secretName: ""
 
       connectors:
+        hive:
+          hadoopConfigSecretName: hadoop-config
+          useHadoopConfig: true
+
+          metastoreURI: thrift://hive-metastore:9083
+          metastoreTimeout: null
+
         extraConnectorFiles: []
 
     coordinator:

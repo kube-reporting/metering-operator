@@ -139,7 +139,7 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
-{{- if .Values.presto.spec.config.useHadoopConfig}}
+{{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
         - name: hadoop-config
           mountPath: /hadoop-config
 {{- end }}
@@ -173,10 +173,10 @@ spec:
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
-{{- if .Values.presto.spec.config.useHadoopConfig }}
+{{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
       - name: hadoop-config
         secret:
-          secretName: {{ .Values.presto.spec.config.hadoopConfigSecretName }}
+          secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
 {{- end }}
 {{- if .Values.presto.spec.config.tls.enabled }}
       - name: presto-tls

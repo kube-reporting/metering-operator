@@ -6,9 +6,9 @@ hive.storage-format={{ .Values.hive.spec.config.defaultFileFormat | upper }}
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
-hive.metastore.uri={{ .Values.presto.spec.config.hiveMetastoreURI }}
-{{- if .Values.presto.spec.config.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.presto.spec.config.metastoreTimeout }}
+hive.metastore.uri={{ .Values.presto.spec.config.connectors.hive.metastoreURI }}
+{{- if .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 {{- end }}
 {{- if .Values.presto.spec.config.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
