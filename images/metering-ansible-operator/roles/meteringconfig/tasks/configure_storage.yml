@@ -30,4 +30,4 @@
         aws_secret_key: "{{ operator_s3_credentials_secret.resources[0].data['aws-secret-access-key'] | b64decode | default(omit) }}"
       when: operator_s3_credentials_secret.resources | length > 0
 
-  when: meteringconfig_storage_hive_store_type == 's3' and meteringconfig_storage_s3_create_bucket
+  when: meteringconfig_storage_hive_storage_type == 's3' and meteringconfig_storage_s3_create_bucket
