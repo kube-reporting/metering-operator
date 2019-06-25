@@ -1,12 +1,7 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-{{- range $name, $body := $reportingValues.spec.defaultReportDataSources }}
+{{- if $reportingValues.spec.defaultReportDataSources.enabled }}
+{{- range $i, $body := $reportingValues.spec.defaultReportDataSources.items }}
 ---
-apiVersion: metering.openshift.io/v1
-kind: ReportDataSource
-metadata:
-  name: "{{ $name }}"
-  labels:
-    operator-metering: "true"
-spec:
-{{ toYaml $body.spec | indent 2 }}
+{{- include "new-report-datasource" $body -}}
+{{- end }}
 {{- end }}
