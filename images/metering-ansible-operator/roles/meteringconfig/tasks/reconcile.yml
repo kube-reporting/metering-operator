@@ -23,6 +23,7 @@
 
 - include_tasks: "{{ item }}"
   loop:
+    - reconcile_metering.yml
     - reconcile_monitoring.yml
     - reconcile_hdfs.yml
     - reconcile_hive.yml
