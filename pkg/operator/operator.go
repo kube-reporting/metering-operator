@@ -105,13 +105,14 @@ type Config struct {
 	HiveUseTLS bool
 	HiveCAFile string
 
-	PrestoHost              string
-	PrestoUseTLS            bool
-	PrestoUseClientCertAuth bool
-	PrestoCAFile            string
-	PrestoClientCertFile    string
-	PrestoClientKeyFile     string
-	PrestoClientCACertFile  string
+	PrestoHost                  string
+	PrestoUseTLS                bool
+	PrestoUseClientCertAuth     bool
+	PrestoTLSInsecureSkipVerify bool
+	PrestoCAFile                string
+	PrestoClientCertFile        string
+	PrestoClientKeyFile         string
+	PrestoClientCACertFile      string
 
 	PrestoMaxQueryLength int
 
@@ -458,7 +459,8 @@ func (op *Reporting) Run(ctx context.Context) error {
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
 		prestoTLSConfig := &tls.Config{
-			RootCAs: rootCertPool,
+			RootCAs:            rootCertPool,
+			InsecureSkipVerify: op.cfg.PrestoTLSInsecureSkipVerify,
 		}
 
 		if op.cfg.PrestoUseClientCertAuth {
