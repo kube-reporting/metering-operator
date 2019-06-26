@@ -11,3 +11,7 @@
       - template_***REMOVED***le: templates/metering/metering-rolebindings.yaml
         apis: [ {kind: rolebindings, api_version: 'rbac.authorization.k8s.io/v1'} ]
         prune_label_value: openshift-metering-rolebindings
+      - template_***REMOVED***le: templates/metering/metering-root-ca-secret.yaml
+        apis: [ {kind: Secret} ]
+        prune_label_value: openshift-metering-root-ca-secret
+        create: "{{ meteringcon***REMOVED***g_create_metering_root_ca_secret }}"
