@@ -32,6 +32,10 @@ storage:
 
 tls:
   enabled: false
+  # the name of the secret containing root CA key/cert
+  certi***REMOVED***cate: ""
+  key: ""
+  secretName: "metering-operator-root-ca-secret"
 
 permissions:
   meteringAdmins: []
