@@ -74,11 +74,13 @@ _storage_overrides:
           createAwsCredentialsSecret: false
         hive:
           con***REMOVED***g:
-            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
+            # regex_replace to append a trailing slash if missing
+            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
     hadoop:
       spec:
         con***REMOVED***g:
-          defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
+          # regex_replace to append a trailing slash if missing
+          defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
         hdfs:
           enabled: false
 
@@ -181,7 +183,7 @@ meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabl
 meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
 
 meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') }}"
-meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') ).split('/')[0] }}"
+meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
 meteringcon***REMOVED***g_storage_s3_bucket_region: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.region') }}"
 meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
 
