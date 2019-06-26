@@ -52,6 +52,16 @@ meteringconfig_default_image_overrides:
 
 _storage_overrides:
   s3:
+    storage:
+      hive:
+        # s3 storage defaults
+        s3:
+          # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
+          bucket: "-unconfigured-metering-bucket-name-"
+          awsCredentialsSecretName: ""
+          # create buckets by default
+          createBucket: true
+          region: ""
     reporting-operator:
       spec:
         config:
@@ -64,11 +74,13 @@ _storage_overrides:
           createAwsCredentialsSecret: false
         hive:
           config:
-            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
+            # regex_replace to append a trailing slash if missing
+            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
     hadoop:
       spec:
         config:
-          defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') }}"
+          # regex_replace to append a trailing slash if missing
+          defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
         hdfs:
           enabled: false
 
@@ -170,12 +182,10 @@ meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_over
 # combine the meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
 meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_tls_overrides, recursive=True) }}"
 
-meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') | default(true, true) }}"
-# Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
-_default_metering_bucket_name: "-unconfigured-metering-bucket-name-"
-meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default(_default_metering_bucket_name, true)).split('/')[0] }}"
-meteringconfig_storage_s3_bucket_region: "{{ meteringconfig_spec | json_query('storage.hive.s3.region') | default(omit, true) }}"
-meteringconfig_storage_s3_aws_credentials_secret_name: "{{ meteringconfig_spec | json_query('storage.hive.s3.awsCredentialsSecretName') | default(omit, true) }}"
+meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') }}"
+meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
+meteringconfig_storage_s3_bucket_region: "{{ meteringconfig_spec | json_query('storage.hive.s3.region') }}"
+meteringconfig_storage_s3_aws_credentials_secret_name: "{{ meteringconfig_spec | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
 
 ########################
 # All Variables below are setup to consume the result of merging the defaults, internal overrides, and user overrides.

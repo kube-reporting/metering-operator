@@ -20,6 +20,8 @@ storage:
   #   s3:
   #     bucket: "bucketname/path/"
   #     awsCredentialsSecretName: "my-aws-secret"
+  #     createBucket: true
+  #     region: "us-west-1"
 
   # hive:
   #   type: "sharedPVC"
