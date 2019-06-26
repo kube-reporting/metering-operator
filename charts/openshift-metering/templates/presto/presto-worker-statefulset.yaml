@@ -126,6 +126,10 @@ spec:
           containerPort: 8082
           protocol: TCP
         volumeMounts:
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+        - name: hadoop-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+{{- end }} 
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
         - name: presto-common-con***REMOVED***g
@@ -147,6 +151,11 @@ spec:
         resources:
 {{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
       volumes:
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+      - name: hadoop-con***REMOVED***g
+        secret:
+          secretName: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopSecretName }}
+{{- end }}
       - name: presto-worker-con***REMOVED***g
         con***REMOVED***gMap:
           name: presto-worker-con***REMOVED***g

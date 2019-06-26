@@ -10,6 +10,10 @@ hive.metastore.uri={{ .Values.presto.spec.hive.con***REMOVED***g.metastoreURIs }
 {{- if .Values.presto.spec.presto.con***REMOVED***g.metastoreTimeout }}
 hive.metastore-timeout={{ .Values.presto.spec.presto.con***REMOVED***g.metastoreTimeout }}
 {{- end }}
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
+{{- end }}
+
 {{ end }}
 
 {{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}

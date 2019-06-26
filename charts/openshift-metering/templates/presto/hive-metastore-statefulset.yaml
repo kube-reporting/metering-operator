@@ -99,7 +99,7 @@ spec:
           mountPath: /hive-con***REMOVED***g
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***gMap }}
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g }}
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
 {{- end }}
@@ -136,10 +136,10 @@ spec:
         con***REMOVED***gMap:
           name: hive-scripts
           defaultMode: 0555
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***gMap }}
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g }}
       - name: hadoop-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopCon***REMOVED***gMapName }}
+        secret:
+          secretName: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopSecretName }}
 {{- end }}
       - name: hive-jmx-con***REMOVED***g
         con***REMOVED***gMap:

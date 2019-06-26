@@ -5,9 +5,9 @@
   vars:
     values_***REMOVED***le: /tmp/metering-values.yaml
     resources:
-      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***gmap.yaml
-        apis: [ {kind: con***REMOVED***gmap} ]
-        prune_label_value: hadoop-con***REMOVED***gmap
+      - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***g.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-con***REMOVED***g
         # always create the hadoop-con***REMOVED***gmap
         create: true
       - template_***REMOVED***le: templates/hadoop/hadoop-aws-credentials.yaml
