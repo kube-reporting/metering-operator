@@ -5,9 +5,9 @@
   vars:
     values_file: /tmp/metering-values.yaml
     resources:
-      - template_file: templates/hadoop/hadoop-configmap.yaml
-        apis: [ {kind: configmap} ]
-        prune_label_value: hadoop-configmap
+      - template_file: templates/hadoop/hadoop-config.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-config
         # always create the hadoop-configmap
         create: true
       - template_file: templates/hadoop/hadoop-aws-credentials.yaml
