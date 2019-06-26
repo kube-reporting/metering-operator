@@ -31,7 +31,7 @@ storage:
   #     mountPath: "/"
 
 tls:
-  enabled: false
+  enabled: true
   # the name of the secret containing root CA key/cert
   certificate: ""
   key: ""
