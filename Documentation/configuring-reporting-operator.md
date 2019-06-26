@@ -147,12 +147,16 @@ curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-
 
 ### Openshift Authentication
 
-Authentication can be enabled by setting the options below to true.
+Authentication can be enabled by con***REMOVED***guring the options below.
 Enabling authentication con***REMOVED***gures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.
 This adjusts the ports so that the reporting-operator API isn't exposed directly, but instead is proxied to via the auth-proxy sidecar container.
 
 - `reporting-operator.spec.authProxy.enabled`
 - `reporting-operator.spec.authProxy.cookieSeed`
+
+You need to set `reporting-operator.spec.authProxy.enabled` to true and `reporting-operator.spec.authProxy.cookieSeed` to a 32-character random string.
+
+You can generate a 32-character random string using the command `$ openssl rand -base64 32 | head -c32; echo`.
 
 #### Token Authentication
 
