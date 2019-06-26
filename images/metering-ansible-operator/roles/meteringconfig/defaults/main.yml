@@ -126,6 +126,14 @@ meteringconfig_presto_client_ca_certificate: ""
 meteringconfig_presto_client_certificate: ""
 meteringconfig_presto_client_key: ""
 
+meteringconfig_tls_root_ca_certificate: ""
+meteringconfig_tls_root_ca_key: ""
+
+meteringconfig_root_ca_overrides:
+  tls:
+    certificate: "{{ meteringconfig_tls_root_ca_certificate }}"
+    key: "{{ meteringconfig_tls_root_ca_key }}"
+
 _tls_overrides:
   reporting-operator:
     spec:
@@ -168,7 +176,7 @@ _tls_overrides:
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_overrides, {}) }}"
 # combine the meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_tls_overrides, recursive=True) }}"
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_tls_overrides, meteringconfig_root_ca_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') | default(true, true) }}"
 # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
@@ -192,6 +200,7 @@ meteringconfig_create_metering_default_storage: "{{ _openshift_reporting_spec.de
 
 meteringconfig_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
 meteringconfig_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"
+meteringconfig_create_metering_root_ca_secret: "{{ meteringconfig_spec.tls.enabled }}"
 
 meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 

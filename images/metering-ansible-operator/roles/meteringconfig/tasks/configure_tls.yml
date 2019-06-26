@@ -1,7 +1,24 @@
 ---
 
-- name: Configure TLS and client-side authentication in Presto
-  include_tasks: configure_presto_tls.yml
+- name: Configure TLS
+  block:
+  - name: Create temporary directory to store all the necessary certificates/keys
+    tempfile:
+      suffix: certificates
+      state: directory
+    register: certificates_dir
 
-- name: Configure TLS and authentication in the reporting-operator
-  include_tasks: configure_reporting_operator_tls.yml
+  - name: Generate root certificate authority
+    include_tasks: configure_root_ca.yml
+
+  - name: Configure TLS and client-side authentication in Presto
+    include_tasks: configure_presto_tls.yml
+
+  - name: Configure TLS and authentication in the reporting-operator
+    include_tasks: configure_reporting_operator_tls.yml
+
+  always:
+  - name: Cleanup the temporary directory which held the certificates and keys
+    file:
+      path: "{{ certificates_dir.path }}"
+      state: absent
