@@ -1,0 +1,70 @@
+---
+
+- name: Check if Root CA secret already exists
+  k8s_facts:
+    api_version: v1
+    kind: Secret
+    name: "{{ meteringconfig_spec.tls.secretName }}"
+    namespace: "{{ meta.namespace }}"
+  no_log: true
+  register: root_ca_secret_buf
+  when: meteringconfig_tls_enabled
+
+#
+# Generate a Root Certificate Authority
+#
+- name: Setup the root certificate authority
+  block:
+  - name: Generate a RSA private key for the CA
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/ca.key"
+
+  - name: Generate a CSR for the CA
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/ca.csr"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      common_name: Operator Metering Root CA
+      basicConstraints:
+      - 'CA:TRUE'
+      basicConstraints_critical: true
+
+  - name: Generate a certificate for the CA
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/ca.crt"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      csr_path: "{{ certificates_dir.path }}/ca.csr"
+      provider: selfsigned
+      selfsigned_digest: sha256
+
+  - name: Use generate cert/key when secret doesn't already exist
+    set_fact:
+      meteringconfig_tls_root_ca_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/ca.crt') + '\n' }}"
+      meteringconfig_tls_root_ca_key: "{{ lookup('file', '{{ certificates_dir.path }}/ca.key') + '\n' }}"
+
+  vars:
+    root_ca_secret_exists: "{{ root_ca_secret_buf and root_ca_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and not root_ca_secret_exists
+
+- name: Use pre-existing CA secret cert/key when secret already exists
+  block:
+  - set_fact:
+      meteringconfig_tls_root_ca_certificate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+      meteringconfig_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+
+  - name: Add root CA certificate to certificates directory
+    copy:
+      content: "{{ meteringconfig_tls_root_ca_certificate }}"
+      dest: "{{ certificates_dir.path }}/ca.crt"
+    when: meteringconfig_tls_enabled
+
+  - name: Add root CA private key to certificates directory
+    copy:
+      content: "{{ meteringconfig_tls_root_ca_key }}"
+      dest: "{{ certificates_dir.path }}/ca.key"
+    when: meteringconfig_tls_enabled
+
+  vars:
+    root_ca_secret_exists: "{{ root_ca_secret_buf and root_ca_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and root_ca_secret_exists
