@@ -1,0 +1,100 @@
+---
+
+#
+# Generate a Root Certificate Authority
+#
+- name: Setup the root certificate authority
+  block:
+  - name: Generate a RSA private key for the CA
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/ca.key"
+
+  - name: Generate a CSR for the CA
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/ca.csr"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      common_name: Presto Root CA
+      basicConstraints:
+      - 'CA:TRUE'
+      basicConstraints_critical: true
+
+  - name: Generate a certificate for the CA
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/ca.crt"
+      privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      csr_path: "{{ certificates_dir.path }}/ca.csr"
+      provider: selfsigned
+      selfsigned_digest: sha256
+
+#
+# Generate a Server cert/key
+#
+- name: Setup the server certificate/key
+  block:
+  - name: Generate an RSA private key for Presto
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/server.key"
+
+  - name: Generate the Presto server CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/server.csr"
+      privatekey_path: "{{ certificates_dir.path }}/server.key"
+      common_name: "*.presto-nodes"
+      subject_alt_name: "DNS:*.presto-nodes.{{ meta.namespace }}.svc.cluster.local,DNS:presto,DNS:*.presto-nodes"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - serverAuth
+
+  - name: Generate the Presto server certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/server.crt"
+      privatekey_path: "{{ certificates_dir.path }}/server.key"
+      csr_path: "{{ certificates_dir.path }}/server.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256
+
+#
+# Generate the Client cert/key to enable client-side authentication
+#
+- name: Setup the client certificate/key
+  block:
+  - name: Generate an RSA private key for the Presto client
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/client.key"
+
+  - name: Generate the Presto client CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/client.csr"
+      privatekey_path: "{{ certificates_dir.path }}/client.key"
+      common_name: "presto-clients"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - clientAuth
+
+  - name: Generate the Presto client certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/client.crt"
+      privatekey_path: "{{ certificates_dir.path }}/client.key"
+      csr_path: "{{ certificates_dir.path }}/client.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256

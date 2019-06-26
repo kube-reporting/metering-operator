@@ -9,6 +9,9 @@ spec:
   unsupportedFeatures:
     enableHDFS: true
 
+  tls:
+    enabled: true
+
   storage:
     type: "hive"
     hive:

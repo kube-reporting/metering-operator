@@ -105,7 +105,70 @@ _storage_overrides:
 meteringconfig_storage_hive_storage_type: "{{ _storage_spec | json_query('hive.type') }}"
 meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_hive_storage_type] | default({}, true) }}"
 
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, recursive=True) }}"
+#
+# Override the default values with _tls_overrides when spec.tls.enabled is set to true, else use values.yaml and meteringconfig_spec_overrides
+#
+meteringconfig_reporting_operator_presto_server_ca_certificate: ""
+meteringconfig_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
+
+meteringconfig_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
+meteringconfig_reporting_operator_client_cert: ""
+meteringconfig_reporting_operator_presto_client_ca_certificate: ""
+meteringconfig_reporting_operator_client_key: ""
+
+meteringconfig_presto_server_secret_name: "presto-server-tls"
+meteringconfig_presto_server_ca_certificate: ""
+meteringconfig_presto_server_certificate: ""
+meteringconfig_presto_server_key: ""
+
+meteringconfig_presto_client_secret_name: "presto-client-tls"
+meteringconfig_presto_client_ca_certificate: ""
+meteringconfig_presto_client_certificate: ""
+meteringconfig_presto_client_key: ""
+
+_tls_overrides:
+  reporting-operator:
+    spec:
+      config:
+        prestoTLS:
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringconfig_reporting_operator_presto_server_secret_name }}"
+          caCertificate: "{{ meteringconfig_reporting_operator_presto_server_ca_certificate }}"
+
+        prestoAuth:
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
+          certificate: "{{ meteringconfig_reporting_operator_client_cert }}"
+          key: "{{ meteringconfig_reporting_operator_client_key }}"
+          caCertificate: "{{ meteringconfig_reporting_operator_presto_client_ca_certificate }}"
+  presto:
+    spec:
+      presto:
+        config:
+          tls:
+            certificate: "{{  meteringconfig_presto_server_certificate }}"
+            key: "{{ meteringconfig_presto_server_key }}"
+            caCertificate: "{{ meteringconfig_presto_server_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringconfig_presto_server_secret_name }}"
+          auth:
+            certificate: "{{  meteringconfig_presto_client_certificate }}"
+            key: "{{ meteringconfig_presto_client_key }}"
+            caCertificate: "{{ meteringconfig_presto_client_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ meteringconfig_presto_client_secret_name }}"
+
+# check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
+meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
+meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_overrides, {}) }}"
+# combine the meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_tls_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') | default(true, true) }}"
 # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
@@ -138,9 +201,18 @@ meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.create
 meteringconfig_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
 meteringconfig_create_presto_shared_volume_pvc: "{{ _presto_spec.config.sharedVolume.enabled and _presto_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.createAwsCredentialsSecret | default(false) }}"
+
+#
+# Enabling Presto TLS/Auth by Default
+#
+meteringconfig_template_presto_tls_secret: "{{ _presto_spec.presto.config.tls.enabled and _presto_spec.presto.config.tls.createSecret and _presto_spec.presto.config.tls.secretName != 'presto-server-tls' }}"
+meteringconfig_template_presto_auth_secret: "{{ _presto_spec.presto.config.auth.enabled and _presto_spec.presto.config.auth.createSecret and _presto_spec.presto.config.auth.secretName != 'presto-client-tls' }}"
 meteringconfig_create_presto_tls_secrets: "{{ _presto_spec.presto.config.tls.enabled and _presto_spec.presto.config.tls.createSecret | default(false) }}"
 meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.presto.config.auth.enabled and _presto_spec.presto.config.auth.createSecret | default(false) }}"
 
+#
+# Reporting Operator
+#
 meteringconfig_create_reporting_operator_auth_proxy_cookie_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createCookieSecret | default(true) }}"
 meteringconfig_create_reporting_operator_auth_proxy_htpasswd_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createHtpasswdSecret | default(true) }}"
 meteringconfig_create_reporting_operator_auth_proxy_authenticated_emails_secret: "{{ _reporting_op_spec.authProxy.enabled and _reporting_op_spec.authProxy.createAuthenticatedEmailsSecret | default(true) }}"
