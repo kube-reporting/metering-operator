@@ -138,6 +138,14 @@ meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: ""
 meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: ""
 meteringcon***REMOVED***g_presto_client_key: ""
 
+meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: ""
+meteringcon***REMOVED***g_tls_root_ca_key: ""
+
+meteringcon***REMOVED***g_root_ca_overrides:
+  tls:
+    certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+    key: "{{ meteringcon***REMOVED***g_tls_root_ca_key }}"
+
 _tls_overrides:
   reporting-operator:
     spec:
@@ -180,7 +188,7 @@ _tls_overrides:
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabled | ternary(_tls_overrides, {}) }}"
 # combine the meteringcon***REMOVED***g_tls_overrides dictionary last to enforce when spec.tls.enabled is speci***REMOVED***ed and set to true
-meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
+meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_tls_overrides, meteringcon***REMOVED***g_root_ca_overrides, recursive=True) }}"
 
 meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
@@ -202,6 +210,7 @@ meteringcon***REMOVED***g_create_metering_default_storage: "{{ _openshift_report
 
 meteringcon***REMOVED***g_create_metering_monitoring_resources: "{{ _monitoring_conf.enabled | default(true) }}"
 meteringcon***REMOVED***g_create_metering_monitoring_rbac: "{{ _monitoring_conf.enabled and _monitoring_conf.enabled and _monitoring_conf.createRBAC | default(true) }}"
+meteringcon***REMOVED***g_create_metering_root_ca_secret: "{{ meteringcon***REMOVED***g_spec.tls.enabled }}"
 
 meteringcon***REMOVED***g_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
