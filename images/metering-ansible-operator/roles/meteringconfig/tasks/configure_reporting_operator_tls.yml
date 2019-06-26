@@ -1,0 +1,39 @@
+---
+
+#
+# Presto and reporting-operator TLS
+#
+- name: Check for the existence of the reporting-operator prestoTLS.secretName
+  k8s_facts:
+    api_version: v1
+    kind: Secret
+    name: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.prestoTLS.secretName }}"
+    namespace: "{{ meta.namespace }}"
+  no_log: true
+  register: reporting_operator_tls_secret_buf
+  when: meteringcon***REMOVED***g_tls_enabled
+
+- name: Check for the existence of the reporting-operator prestoAuth.secretName
+  k8s_facts:
+    api_version: v1
+    kind: Secret
+    name: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.prestoAuth.secretName }}"
+    namespace: "{{ meta.namespace }}"
+  no_log: true
+  register: reporting_operator_auth_secret_buf
+  when: meteringcon***REMOVED***g_tls_enabled
+
+- name: Con***REMOVED***gure reporting-operator to use existing presto server TLS secret data
+  set_fact:
+    meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: "{{ reporting_operator_tls_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+  no_log: true
+  when: meteringcon***REMOVED***g_tls_enabled and reporting_operator_tls_secret_buf.resources | length > 0
+
+- name: Con***REMOVED***gure reporting-operator to use existing presto client TLS secret data
+  set_fact:
+    meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: "{{ reporting_operator_auth_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+    meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: "{{ reporting_operator_auth_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+    meteringcon***REMOVED***g_reporting_operator_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
+    meteringcon***REMOVED***g_reporting_operator_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
+  no_log: true
+  when: meteringcon***REMOVED***g_tls_enabled and reporting_operator_auth_secret_buf.resources | length > 0

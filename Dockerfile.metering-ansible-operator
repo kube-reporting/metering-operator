@@ -23,6 +23,7 @@ RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 
 RUN pip install --no-cache-dir --upgrade openshift
 RUN pip install boto3
+RUN pip install pyOpenSSL
 
 USER 1001
 ENV HOME /opt/ansible
