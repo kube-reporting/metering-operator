@@ -79,9 +79,10 @@ func init() {
 
 	startCmd.Flags().StringVar(&cfg.PrestoHost, "presto-host", defaultPrestoHost, "the hostname:port for connecting to Presto.")
 	startCmd.Flags().BoolVar(&cfg.PrestoUseTLS, "presto-use-tls", false, "If true, enables TLS when connecting to Presto.")
-	startCmd.Flags().BoolVar(&cfg.PrestoUseClientCertAuth, "presto-use-auth", false, "If true, enables TLS client certi***REMOVED***cate authentication when presto-use-tls is also enabled.")
 	startCmd.Flags().BoolVar(&cfg.PrestoTLSInsecureSkipVerify, "presto-tls-insecure-skip-verify", false, "If true, disables TLS veri***REMOVED***cation when connecting to Presto.")
 	startCmd.Flags().StringVar(&cfg.PrestoCAFile, "presto-ca-***REMOVED***le", "", "The path to the certi***REMOVED***cate authority to use to connect to Presto.")
+
+	startCmd.Flags().BoolVar(&cfg.PrestoUseClientCertAuth, "presto-use-auth", false, "If true, enables TLS client certi***REMOVED***cate authentication when presto-use-tls is also enabled.")
 	startCmd.Flags().StringVar(&cfg.PrestoClientCertFile, "presto-client-cert-***REMOVED***le", "", "The path to the client certi***REMOVED***cate to use to connect to Presto.")
 	startCmd.Flags().StringVar(&cfg.PrestoClientKeyFile, "presto-client-key-***REMOVED***le", "", "The path to the client private key to use to connect to Presto.")
 	startCmd.Flags().StringVar(&cfg.PrestoClientCACertFile, "presto-client-ca-cert-***REMOVED***le", "", "The path to the client certi***REMOVED***cate authority to use to connect to Presto.")
