@@ -134,6 +134,8 @@ meteringcon***REMOVED***g_reporting_operator_client_cert: ""
 meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: ""
 meteringcon***REMOVED***g_reporting_operator_client_key: ""
 
+_meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: ""
+
 meteringcon***REMOVED***g_presto_server_secret_name: "presto-server-tls"
 meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: ""
 meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: ""
@@ -172,6 +174,18 @@ _tls_overrides:
             enabled: true
             createSecret: true
             secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
+      authProxy:
+        enabled: true
+
+        cookie:
+          seed: "{{ _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed }}"
+
+        deletegateURLs:
+          enabled: true
+
+        subjectAccessReview:
+          enabled: true
+
   presto:
     spec:
       con***REMOVED***g:
@@ -196,7 +210,7 @@ _tls_overrides:
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabled | ternary(_tls_overrides, {}) }}"
 # combine the meteringcon***REMOVED***g_tls_overrides dictionary last to enforce when spec.tls.enabled is speci***REMOVED***ed and set to true
-meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_tls_overrides, meteringcon***REMOVED***g_root_ca_overrides, recursive=True) }}"
+meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_root_ca_overrides, meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
 
 meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
