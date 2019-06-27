@@ -1,0 +1,26 @@
+#
+# Validate that the user configured authProxy fields correctly
+#
+- name: Validate the user-provided authProxy fields are not empty
+  block:
+  - name: Verify that authProxy.cookie.secretName is not empty
+    assert:
+      that:
+        # note: we already do validation of the seed being non-empty
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName != ""
+      msg: "spec.reporting-operator.spec.authProxy.cookie.secretName cannot be empty when createSecret is set to true"
+
+  - name: Verify that authProxy.htpasswd.secretName is not empty
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.htpasswd.secretName != ""
+      msg: "spec.reporting-operator.spec.authProxy.htpasswd.secretName cannot be empty when createSecret is set to true"
+
+  - name: Verify that authProxy.authenticatedEmails was configured properly
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.secretName != ""
+        - meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.data != ""
+      msg: "spec.reporting-operator.spec.authProxy.authenticatedEmails: secretName and/or data key(s) cannot be empty when enabled and createSecret is set to true"
+    when: meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.enabled and meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.createSecret
+  when: not meteringconfig_tls_enabled

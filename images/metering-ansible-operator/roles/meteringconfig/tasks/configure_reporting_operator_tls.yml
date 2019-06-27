@@ -27,7 +27,9 @@
   set_fact:
     meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ meteringconfig_tls_root_ca_certificate }}"
   no_log: true
-  when: meteringconfig_tls_enabled and reporting_operator_tls_secret_buf.resources | length > 0
+  vars:
+    reporting_operator_tls_secret_exists: "{{ reporting_operator_tls_secret_buf.resources is defined and reporting_operator_tls_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and reporting_operator_tls_secret_exists
 
 - name: Configure reporting-operator to use existing presto client TLS secret data
   set_fact:
@@ -36,4 +38,43 @@
     meteringconfig_reporting_operator_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
     meteringconfig_reporting_operator_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
   no_log: true
-  when: meteringconfig_tls_enabled and reporting_operator_auth_secret_buf.resources | length > 0
+  vars:
+    reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is defined and reporting_operator_auth_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and reporting_operator_auth_secret_exists
+
+#
+# Reporting Operator Auth-Proxy
+#
+- name: Validate user's authProxy configuration
+  include_tasks: validate_reporting_operator_tls.yml
+  when: not meteringconfig_tls_enabled
+
+- name: Check for the existence of the reporting-operator authProxy cookie seed secret
+  k8s_facts:
+    api_version: v1
+    kind: Secret
+    name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
+    namespace: "{{ meta.namespace }}"
+  no_log: true
+  register: reporting_operator_auth_proxy_cookie_secret_buf
+  when: meteringconfig_tls_enabled
+
+- name: Generate authProxy secret data
+  block:
+  - name: Generate a 32-character random string
+    command: openssl rand -base64 32
+    register: cookie_seed_random_string
+    when: not reporting_operator_auth_proxy_cookie_secret_exists
+
+  - name: Configure authProxy cookie seed secret
+    set_fact:
+      _meteringconfig_reporting_operator_auth_proxy_cookie_seed: "{{ cookie_seed_random_string.stdout }}"
+    when: not reporting_operator_auth_proxy_cookie_secret_exists
+
+  - name: Configure authProxy cookie seed secret to use pre-existing secret data
+    set_fact:
+      _meteringconfig_reporting_operator_auth_proxy_cookie_seed: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources[0].data['cookie-secret-seed'] | b64decode }}"
+    when: reporting_operator_auth_proxy_cookie_secret_exists
+  vars:
+    reporting_operator_auth_proxy_cookie_secret_exists: "{{ reporting_operator_auth_proxy_cookie_secret_buf.resources is defined and reporting_operator_auth_proxy_cookie_secret_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
