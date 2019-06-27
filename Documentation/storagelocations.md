@@ -25,7 +25,7 @@ This ***REMOVED***rst example is what the built-in local storage option looks li
 As you can see, it's con***REMOVED***gured to use Hive, and by default data is stored wherever Hive is con***REMOVED***gured to use storage by default (HDFS, S3, or a ReadWriteMany PVC) since the location isn't set.
 
 ```yaml
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: StorageLocation
 metadata:
   name: hive
@@ -42,7 +42,7 @@ The example below uses an AWS S3 bucket for storage.
 The pre***REMOVED***x is appended to the bucket name when constructing the path to use.
 
 ```yaml
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: StorageLocation
 metadata:
   name: example-s3-storage
@@ -61,7 +61,7 @@ If an annotation `storagelocation.metering.openshift.io/is-default` exists and i
 If more than one resource with the annotation exists, an error will be logged and the operator will consider there to be no default.
 
 ```yaml
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: StorageLocation
 metadata:
   name: example-s3-storage

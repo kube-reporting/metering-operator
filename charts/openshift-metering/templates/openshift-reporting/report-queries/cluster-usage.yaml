@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: cluster-cpu-usage-raw
@@ -32,7 +32,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodCpuUsageRawDataSourceName |}
     GROUP BY "timestamp", dt
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: cluster-cpu-usage
@@ -86,7 +86,7 @@ spec:
       AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     {|- end |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: cluster-memory-usage-raw
@@ -119,7 +119,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodMemoryUsageRawDataSourceName |}
     GROUP BY "timestamp", dt
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: cluster-memory-usage

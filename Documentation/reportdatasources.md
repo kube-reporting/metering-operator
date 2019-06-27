@@ -46,7 +46,7 @@ For ReportDataSources with a `spec.prometheusMetricsImporter` present, their tab
 Below is an example of one of the built-in `ReportDataSource` resources that is installed with Operator Metering by default.
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "pod-request-memory-bytes"
@@ -61,7 +61,7 @@ spec:
 If the data to be scraped is on a non-default Prometheus instance:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "pod-request-memory-bytes"
@@ -87,7 +87,7 @@ This example exposes the `pod-memory-request-raw` ReportQuery as a view.
 The schema is based on the `spec.columns` of the ReportQuery.
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "pod-memory-request-raw"
@@ -106,7 +106,7 @@ For ReportDataSources with a `spec.awsBilling` present, see [here](aws-billing-d
 ### Example AWS Billing Datasource
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "aws-billing"
@@ -129,7 +129,7 @@ A PrestoTable ReportDataSource is merely a way to expose an arbitrary table to t
 ### Example PrestoTable Datasource
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: example-baremetal-cost

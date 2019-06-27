@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 )

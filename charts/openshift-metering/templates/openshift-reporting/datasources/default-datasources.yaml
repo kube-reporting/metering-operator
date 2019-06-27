@@ -1,7 +1,7 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
 {{- range $name, $body := $reportingValues.spec.defaultReportDataSources }}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "{{ $name }}"

@@ -8,8 +8,8 @@ import (
 
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
 	"github.com/operator-framework/operator-metering/test/testhelpers"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
