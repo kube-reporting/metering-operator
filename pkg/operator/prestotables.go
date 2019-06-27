@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/slice"
@@ -154,7 +154,7 @@ func (op *Reporting) handlePrestoTable(logger log.FieldLogger, prestoTable *mete
 
 	if needsUpdate {
 		var err error
-		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+		prestoTable, err = op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 		if err != nil {
 			return fmt.Errorf("unable to update PrestoTable %s status: %s", prestoTable.Name, err)
 		}
@@ -219,7 +219,7 @@ func copyPrestoTableSpecToStatus(prestoTable *metering.PrestoTable) bool {
 
 func (op *Reporting) addPrestoTableFinalizer(prestoTable *metering.PrestoTable) (*metering.PrestoTable, error) {
 	prestoTable.Finalizers = append(prestoTable.Finalizers, prestoTableFinalizer)
-	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	newPrestoTable, err := op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
@@ -234,7 +234,7 @@ func (op *Reporting) removePrestoTableFinalizer(prestoTable *metering.PrestoTabl
 		return prestoTable, nil
 	}
 	prestoTable.Finalizers = slice.RemoveString(prestoTable.Finalizers, prestoTableFinalizer, nil)
-	newPrestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
+	newPrestoTable, err := op.meteringClient.MeteringV1().PrestoTables(prestoTable.Namespace).Update(prestoTable)
 	logger := op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from PrestoTable: %s/%s", prestoTableFinalizer, prestoTable.Namespace, prestoTable.Name)
@@ -301,7 +301,7 @@ func (op *Reporting) createPrestoTableCR(obj metav1.Object, gvk schema.GroupVers
 		},
 	}
 	var err error
-	prestoTable, err := op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Create(newPrestoTable)
+	prestoTable, err := op.meteringClient.MeteringV1().PrestoTables(namespace).Create(newPrestoTable)
 	switch {
 	case apierrors.IsAlreadyExists(err):
 		op.logger.Warnf("PrestoTable %s already exists", resourceName)
@@ -319,7 +319,7 @@ func (op *Reporting) waitForPrestoTable(namespace, name string, pollInterval, ti
 	var prestoTable *metering.PrestoTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
-		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(namespace).Get(name, metav1.GetOptions{})
+		prestoTable, err = op.meteringClient.MeteringV1().PrestoTables(namespace).Get(name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}

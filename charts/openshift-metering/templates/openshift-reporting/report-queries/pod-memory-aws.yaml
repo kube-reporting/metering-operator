@@ -1,6 +1,6 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
 {{- if $reportingValues.spec.awsBillingReportDataSource.enabled -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-request-aws
@@ -83,7 +83,7 @@ spec:
     FROM cluster_usage
     CROSS JOIN aws_billing_sum
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-usage-aws

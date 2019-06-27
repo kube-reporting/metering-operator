@@ -1,6 +1,6 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
 {{- if $reportingValues.spec.defaultStorageLocation.create -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: StorageLocation
 metadata:
   name: {{ $reportingValues.spec.defaultStorageLocation.name }}

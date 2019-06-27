@@ -14,12 +14,12 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
 type Framework struct {
-	MeteringClient        metering.MeteringV1alpha1Interface
+	MeteringClient        metering.MeteringV1Interface
 	KubeClient            kubernetes.Interface
 	HTTPClient            *http.Client
 	Namespace             string

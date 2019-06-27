@@ -3,7 +3,7 @@
 package versioned
 
 import (
-	meteringv1alpha1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	meteringv1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -11,27 +11,27 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	MeteringV1alpha1() meteringv1alpha1.MeteringV1alpha1Interface
+	MeteringV1() meteringv1.MeteringV1Interface
 	// Deprecated: please explicitly pick a version if possible.
-	Metering() meteringv1alpha1.MeteringV1alpha1Interface
+	Metering() meteringv1.MeteringV1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	meteringV1alpha1 *meteringv1alpha1.MeteringV1alpha1Client
+	meteringV1 *meteringv1.MeteringV1Client
 }
 
-// MeteringV1alpha1 retrieves the MeteringV1alpha1Client
-func (c *Clientset) MeteringV1alpha1() meteringv1alpha1.MeteringV1alpha1Interface {
-	return c.meteringV1alpha1
+// MeteringV1 retrieves the MeteringV1Client
+func (c *Clientset) MeteringV1() meteringv1.MeteringV1Interface {
+	return c.meteringV1
 }
 
 // Deprecated: Metering retrieves the default version of MeteringClient.
 // Please explicitly pick a version.
-func (c *Clientset) Metering() meteringv1alpha1.MeteringV1alpha1Interface {
-	return c.meteringV1alpha1
+func (c *Clientset) Metering() meteringv1.MeteringV1Interface {
+	return c.meteringV1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -50,7 +50,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.meteringV1alpha1, err = meteringv1alpha1.NewForConfig(&configShallowCopy)
+	cs.meteringV1, err = meteringv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.meteringV1alpha1 = meteringv1alpha1.NewForConfigOrDie(c)
+	cs.meteringV1 = meteringv1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -75,7 +75,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.meteringV1alpha1 = meteringv1alpha1.New(c)
+	cs.meteringV1 = meteringv1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

@@ -63,7 +63,7 @@ To configure a Metric to be collected, you need to create a [ReportDataSource][r
 Save the snippet below into a file named `unready-deployment-replicas-reportdatasource.yaml`:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: unready-deployment-replicas
@@ -204,7 +204,7 @@ By using inputs, we can override the default ReportDataSource used and by markin
 The format of the table names could change in the future, so always use the `dataSourceTableName` template function to ensure it's always using the correct table name.
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -265,7 +265,7 @@ Once we add these columns filters to our query we get the final version of our R
 Save the snippet below into a file named `unready-deployment-replicas-reportquery.yaml`:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: "unready-deployment-replicas"
@@ -317,7 +317,7 @@ kubectl create -n "$METERING_NAMESPACE" -f unready-deployment-replicas-reportque
 Save the snippet below into a file named `unready-deployment-replicas-report.yaml`:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: unready-deployment-replicas

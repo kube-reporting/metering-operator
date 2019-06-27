@@ -10,7 +10,7 @@ In the following guide, we will create a daily report that aggregates hourly rep
 First, create the hourly report that will be aggregated:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: namespace-cpu-usage-hourly
@@ -28,7 +28,7 @@ The query below is a copy of the built-in `namespace-cpu-usage` query provided t
 It contains a few a custom inputs: most importantly, `NamespaceCPUUsageReportName` is the input we can use to pass name of our sub-report in:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-cpu-usage
@@ -89,7 +89,7 @@ We now have a sub-report and a query that can read data from other reports.
 We can create a `Report` that uses that custom report query with the sub-report:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: namespace-cpu-usage-daily

@@ -16,8 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -457,7 +457,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 				},
 			},
 		}
-		_, err = op.meteringClient.MeteringV1alpha1().ReportDataSources(report.Namespace).Create(newReportDataSource)
+		_, err = op.meteringClient.MeteringV1().ReportDataSources(report.Namespace).Create(newReportDataSource)
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) {
 				logger.Infof("ReportDataSource %s already exists", dataSourceName)
@@ -468,7 +468,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 		logger.Infof("created PrestoTable ReportDataSource %s", dataSourceName)
 
 		report.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
-		report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+		report, err = op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 		if err != nil {
 			logger.WithError(err).Errorf("unable to update Report status with tableName")
 			return err
@@ -717,7 +717,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	}
 
 	// Update the status
-	report, err = op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	report, err = op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 	if err != nil {
 		logger.WithError(err).Errorf("unable to update Report status")
 		return err
@@ -774,7 +774,7 @@ func convertDayOfWeek(dow string) (int, error) {
 
 func (op *Reporting) addReportFinalizer(report *metering.Report) (*metering.Report, error) {
 	report.Finalizers = append(report.Finalizers, reportFinalizer)
-	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	newReport, err := op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s finalizer to Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
@@ -789,7 +789,7 @@ func (op *Reporting) removeReportFinalizer(report *metering.Report) (*metering.R
 		return report, nil
 	}
 	report.Finalizers = slice.RemoveString(report.Finalizers, reportFinalizer, nil)
-	newReport, err := op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	newReport, err := op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 	logger := op.logger.WithFields(log.Fields{"report": report.Name, "namespace": report.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s finalizer from Report: %s/%s", reportFinalizer, report.Namespace, report.Name)
@@ -805,7 +805,7 @@ func reportNeedsFinalizer(report *metering.Report) bool {
 
 func (op *Reporting) updateReportStatus(report *metering.Report, cond *metering.ReportCondition) (*metering.Report, error) {
 	meteringUtil.SetReportCondition(&report.Status, *cond)
-	return op.meteringClient.MeteringV1alpha1().Reports(report.Namespace).Update(report)
+	return op.meteringClient.MeteringV1().Reports(report.Namespace).Update(report)
 }
 
 func (op *Reporting) setReportStatusInvalidReport(report *metering.Report, msg string) error {
@@ -861,7 +861,7 @@ func (op *Reporting) queueDependentReportsForReport(report *metering.Report) err
 // ReportQueries in the namespace which have a dependency on the
 // report
 func (op *Reporting) queueDependentReportQueriesForReport(report *metering.Report) error {
-	queryLister := op.meteringClient.MeteringV1alpha1().ReportQueries(report.Namespace)
+	queryLister := op.meteringClient.MeteringV1().ReportQueries(report.Namespace)
 	queries, err := queryLister.List(metav1.ListOptions{})
 	if err != nil {
 		return err

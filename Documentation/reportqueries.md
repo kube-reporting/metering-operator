@@ -85,7 +85,7 @@ The query is not intended to be used by Reports, but instead is intended to be r
 The important things to note with this query is that it's querying a database table containing Prometheus metric data for the `pod-request-memory-bytes` `ReportDataSource`, and it's getting the table name using the `dataSourceTableName` template function.
 
 ```yaml
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-request-raw

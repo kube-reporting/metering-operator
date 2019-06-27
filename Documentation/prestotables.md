@@ -22,7 +22,7 @@ Please read the [Presto concepts][presto-concepts] documentation to gain an unde
 ## Example PrestoTables
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: PrestoTable
 metadata:
   name: example-baremetal-cost

@@ -38,11 +38,11 @@ import (
 	"k8s.io/client-go/transport"
 	"k8s.io/client-go/util/workqueue"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/db"
 	cbClientset "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned"
 	factory "github.com/operator-framework/operator-metering/pkg/generated/informers/externalversions"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	_ "github.com/operator-framework/operator-metering/pkg/util/reflector/prometheus" // for prometheus metric registration
@@ -263,12 +263,12 @@ func newReportingOperator(
 
 	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
 
-	prestoTableInformer := informerFactory.Metering().V1alpha1().PrestoTables()
-	hiveTableInformer := informerFactory.Metering().V1alpha1().HiveTables()
-	reportDataSourceInformer := informerFactory.Metering().V1alpha1().ReportDataSources()
-	reportQueryInformer := informerFactory.Metering().V1alpha1().ReportQueries()
-	reportInformer := informerFactory.Metering().V1alpha1().Reports()
-	storageLocationInformer := informerFactory.Metering().V1alpha1().StorageLocations()
+	prestoTableInformer := informerFactory.Metering().V1().PrestoTables()
+	hiveTableInformer := informerFactory.Metering().V1().HiveTables()
+	reportDataSourceInformer := informerFactory.Metering().V1().ReportDataSources()
+	reportQueryInformer := informerFactory.Metering().V1().ReportQueries()
+	reportInformer := informerFactory.Metering().V1().Reports()
+	storageLocationInformer := informerFactory.Metering().V1().StorageLocations()
 
 	reportQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reports")
 	reportDataSourceQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "reportdatasources")

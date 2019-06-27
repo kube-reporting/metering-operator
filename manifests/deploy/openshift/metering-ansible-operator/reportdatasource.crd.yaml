@@ -4,7 +4,14 @@ metadata:
   name: reportdatasources.metering.openshift.io
 spec:
   group: metering.openshift.io
-  version: v1alpha1
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+  - name: v1alpha1
+    served: true
+    storage: false
   scope: Namespaced
   names:
     plural: reportdatasources

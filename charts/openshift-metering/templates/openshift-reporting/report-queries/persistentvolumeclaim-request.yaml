@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-request-raw
@@ -54,7 +54,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimRequestBytesDataSourceName |}
     WHERE element_at(labels, 'volumename') IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-request
@@ -108,7 +108,7 @@ spec:
     GROUP BY persistentvolumeclaim, namespace, persistentvolume, storageclass
     ORDER BY persistentvolumeclaim, namespace, persistentvolume, storageclass ASC, volume_request_storage_byte_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-persistentvolumeclaim-request
@@ -150,7 +150,7 @@ spec:
     GROUP BY namespace
     ORDER BY volume_request_storage_byte_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: cluster-persistentvolumeclaim-request

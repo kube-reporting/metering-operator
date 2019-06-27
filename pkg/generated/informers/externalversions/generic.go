@@ -5,7 +5,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	v1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -36,19 +36,19 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=metering.openshift.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("hivetables"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().HiveTables().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("prestotables"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().PrestoTables().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("reports"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().Reports().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("reportdatasources"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ReportDataSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("reportqueries"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().ReportQueries().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("storagelocations"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1alpha1().StorageLocations().Informer()}, nil
+	// Group=metering.openshift.io, Version=v1
+	case v1.SchemeGroupVersion.WithResource("hivetables"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().HiveTables().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("prestotables"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().PrestoTables().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("reports"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().Reports().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("reportdatasources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().ReportDataSources().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("reportqueries"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().ReportQueries().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("storagelocations"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().StorageLocations().Informer()}, nil
 
 	}
 
