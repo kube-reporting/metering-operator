@@ -10,50 +10,50 @@ data:
   log-reports: {{ $operatorValues.spec.con***REMOVED***g.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.con***REMOVED***g.logDMLQueries | quote}}
-  presto-host: {{ $operatorValues.spec.con***REMOVED***g.prestoHost | quote }}
-  hive-host: {{ $operatorValues.spec.con***REMOVED***g.hiveHost | quote }}
-  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" $operatorValues.spec.con***REMOVED***g.prometheusURL | quote}}
-  disable-prometheus-metrics-importer: {{ $operatorValues.spec.con***REMOVED***g.disablePrometheusMetricsImporter | quote}}
+  presto-host: {{ $operatorValues.spec.con***REMOVED***g.presto.host | quote }}
+  hive-host: {{ $operatorValues.spec.con***REMOVED***g.hive.host | quote }}
+  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
+  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.enabled | quote}}
   enable-***REMOVED***nalizers: {{ $operatorValues.spec.con***REMOVED***g.enableFinalizers | quote}}
-{{- if $operatorValues.spec.con***REMOVED***g.prestoTLS.enabled }}
+{{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
   presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/ca.crt"
-{{- if $operatorValues.spec.con***REMOVED***g.prestoAuth.enabled }}
+{{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
   presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/tls.crt"
   presto-client-key-***REMOVED***le: "/var/run/secrets/presto-auth/tls.key"
   presto-client-ca-cert-***REMOVED***le: "/var/run/secrets/presto-auth/ca.crt"
 {{- end }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterPollInterval }}
-  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterPollInterval | quote}}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval }}
+  prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval | quote}}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterChunkSize }}
-  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterChunkSize | quote}}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.chunkSize }}
+  prometheus-metrics-importer-chunk-size: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.chunkSize | quote}}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterStepSize }}
-  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.con***REMOVED***g.prometheusMetricsImporterStepSize | quote}}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.stepSize }}
+  prometheus-metrics-importer-step-size: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.stepSize | quote}}
 {{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.leaderLeaseDuration }}
   leader-lease-duration: {{ $operatorValues.spec.con***REMOVED***g.leaderLeaseDuration | quote }}
 {{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.prestoMaxQueryLength }}
-  presto-max-query-length: {{ $operatorValues.spec.con***REMOVED***g.prestoMaxQueryLength | quote }}
+  presto-max-query-length: {{ $operatorValues.spec.con***REMOVED***g.presto.maxQueryLength | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusDatasourceMaxQueryRangeDuration }}
-  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheusDatasourceMaxQueryRangeDuration | quote }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxQueryRangeDuration }}
+  prometheus-datasource-max-query-range-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxQueryRangeDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusDatasourceMaxImportBack***REMOVED***llDuration }}
-  prometheus-datasource-max-import-back***REMOVED***ll-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheusDatasourceMaxImportBack***REMOVED***llDuration | quote }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxImportBack***REMOVED***llDuration }}
+  prometheus-datasource-max-import-back***REMOVED***ll-duration: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.maxImportBack***REMOVED***llDuration | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusDatasourceImportFrom }}
-  prometheus-datasource-import-from: {{ $operatorValues.spec.con***REMOVED***g.prometheusDatasourceImportFrom | quote }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.importFrom }}
+  prometheus-datasource-import-from: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.importFrom | quote }}
 {{- end }}
-{{- if $operatorValues.spec.con***REMOVED***g.prometheusImporter.auth.useServiceAccountToken }}
+{{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.auth.useServiceAccountToken }}
   prometheus-bearer-token-***REMOVED***le: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 {{- ***REMOVED*** }}
   prometheus-bearer-token-***REMOVED***le: "/var/run/reporting-operator/token"
 {{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.allNamespaces }}
-  all-namespaces: {{ $operatorValues.spec.con***REMOVED***g.allNamespaces | quote }}
+  all-namespaces: "true"
 {{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.targetNamespaces }}
   target-namespaces: {{ $operatorValues.spec.con***REMOVED***g.targetNamespaces | join "," | quote }}
