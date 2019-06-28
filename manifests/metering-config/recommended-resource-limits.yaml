@@ -37,68 +37,69 @@ spec:
 
   presto:
     spec:
-      presto:
-        # for Presto, more memory and more CPUs is better and can speed things
-        # up, and becomes necessary when dealing with larger amounts of
-        # metrics.
-        coordinator:
-          resources:
-            requests:
-              memory: "4Gi"
-              cpu: "4"
-            limits:
-              memory: "4Gi"
-              cpu: "4"
-        worker:
-          # Change this from 0 to increase parallelism when generating larger
-          # reports.
-          # Adjusting replicas doesn't improve ReportDataSource import
-          # performance which must go through the coordinator.
-          replicas: 0
-          resources:
-            requests:
-              memory: "4Gi"
-              cpu: "4"
-            limits:
-              memory: "4Gi"
-              cpu: "4"
-      hive:
-        metastore:
-          # Hive Metastore often requires more memory, and is heavily utilized
-          # by Presto.
-          # It tracks a lot of things like table statistics, and is
-          # communicated with by both presto, and hive-server.
-          #
-          # Increasing CPU improves GC performance, as less than a core of CPU
-          # is generally not enough for most Java applications.
-          resources:
-            requests:
-              memory: "1.5Gi"
-              cpu: "1"
-            limits:
-              memory: "1.5Gi"
-              cpu: "1"
-          storage:
-            # class defaults to null, which means using the default storage
-            # class.
-            # If you have a storageClass which provides SSDs, uncomment and
-            # specify it here:
-            # class: "fast-ssd"
-            class: null
-            # Generally the default metastore size of 5Gi is suf***REMOVED***cient, but
-            # with a large amount of ReportDataSources, you may wish to
-            # increase it.
-            size: "10Gi"
-        server:
-          # Hive server is generally mostly idle and currently doesn't require
-          # many resources.
-          resources:
-            requests:
-              memory: "500Mi"
-              cpu: "250m"
-            limits:
-              memory: "500Mi"
-              cpu: "250m"
+      # for Presto, more memory and more CPUs is better and can speed things
+      # up, and becomes necessary when dealing with larger amounts of
+      # metrics.
+      coordinator:
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "4Gi"
+            cpu: "4"
+      worker:
+        # Change this from 0 to increase parallelism when generating larger
+        # reports.
+        # Adjusting replicas doesn't improve ReportDataSource import
+        # performance which must go through the coordinator.
+        replicas: 0
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "4Gi"
+            cpu: "4"
+  hive:
+    spec:
+      metastore:
+        # Hive Metastore often requires more memory, and is heavily utilized
+        # by Presto.
+        # It tracks a lot of things like table statistics, and is
+        # communicated with by both presto, and hive-server.
+        #
+        # Increasing CPU improves GC performance, as less than a core of CPU
+        # is generally not enough for most Java applications.
+        resources:
+          requests:
+            memory: "1.5Gi"
+            cpu: "1"
+          limits:
+            memory: "1.5Gi"
+            cpu: "1"
+        storage:
+          # class defaults to null, which means using the default storage
+          # class.
+          # If you have a storageClass which provides SSDs, uncomment and
+          # specify it here:
+          # class: "fast-ssd"
+          class: null
+          # Generally the default metastore size of 5Gi is suf***REMOVED***cient, but
+          # with a large amount of ReportDataSources, you may wish to
+          # increase it.
+          size: "10Gi"
+      server:
+        # Hive server is generally mostly idle and currently doesn't require
+        # many resources.
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "250m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"
+
   hadoop:
     spec:
       hdfs:
