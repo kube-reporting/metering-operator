@@ -69,7 +69,7 @@ spec:
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.labels | indent 8 }}
 {{- end }}
       annotations:
-        hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-configmap.yaml") . | sha256sum }}
+        hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-config.yaml") . | sha256sum }}
         hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
         hdfs-jmx-config-hash: {{ include (print $.Template.BasePath "/hadoop/hdfs-jmx-config.yaml") . | sha256sum }}
 {{- if .Values.hadoop.spec.config.aws.createCredentialsSecret }}
@@ -186,8 +186,8 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-config
-        configMap:
-          name: "{{ .Values.hadoop.spec.configMapName }}"
+        secret:
+          secretName: "{{ .Values.hadoop.spec.configSecretName }}"
           defaultMode: 0555
       - name: hadoop-scripts
         configMap:

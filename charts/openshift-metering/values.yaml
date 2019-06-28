@@ -448,8 +448,8 @@ presto:
         metastoreClientSocketTimeout: null
         metastoreURIs: thrift://hive-metastore:9083
         metastoreWarehouseDir: null
-        hadoopConfigMapName: hadoop-config
-        useHadoopConfigMap: true
+        hadoopSecretName: hadoop-config
+        useHadoopConfig: true
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-metering-hive
@@ -655,7 +655,7 @@ presto:
 
 hadoop:
   spec:
-    configMapName: hadoop-config
+    configSecretName: hadoop-config
 
     config:
       defaultFS: hdfs://hdfs-namenode-0.hdfs-namenode:9820
