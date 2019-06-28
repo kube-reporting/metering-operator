@@ -21,6 +21,7 @@ export DEPLOY_PLATFORM
 export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
 
+: "${USE_KUBE_114_metrics:=true}"
 : "${ENABLE_AWS_BILLING:=false}"
 : "${DISABLE_PROMETHEUS_METRICS_IMPORTER:=false}"
 : "${AWS_ACCESS_KEY_ID:=}"
@@ -55,6 +56,7 @@ HELM_ARGS=(\
     --set "reportingOperatorReplicas=${REPORTING_OPERATOR_REPLICAS}" \
     --set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_DEPLOY_REPO}" \
     --set "reportingOperatorDeployTag=${REPORTING_OPERATOR_DEPLOY_TAG}" \
+    --set "useKube114Metrics=${USE_KUBE_114_metrics}" \
     --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
     --set "disablePrometheusMetricsImporter=${DISABLE_PROMETHEUS_METRICS_IMPORTER}" \
     --set "awsAccessKeyId=${AWS_ACCESS_KEY_ID}" \
