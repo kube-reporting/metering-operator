@@ -10,10 +10,10 @@ Additionally, Hive metastore requires storage for it's database containing metad
 By default, metering has no stored configured but can be configured to store data in S3.
 
 To use S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-config] configuration.
-Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.awsCredentialsSecretName` values.
+Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.secretName` values.
 The `bucket` should be the name and optionally the path within the bucket you wish to store metering data at, and the `region` should be the region to create your bucket in.
 If you wish to provide an existing bucket, or do not want to provide IAM credentials that have CreateBucket permissions, set `spec.storage.hive.s3.createBucket` to `false` and provide the name of a pre-existing bucket for `spec.storage.hive.s3.bucket`.
-The `awsCredentialsSecretName` should be the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
+The `secretName` should be the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
 
 For example:
 

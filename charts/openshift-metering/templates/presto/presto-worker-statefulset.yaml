@@ -6,62 +6,65 @@ metadata:
     app: presto
     presto: worker
 spec:
-  replicas: {{ .Values.presto.spec.presto.worker.replicas }}
+  replicas: {{ .Values.presto.spec.worker.replicas }}
   serviceName: presto-nodes
   selector:
     matchLabels:
       app: presto
       presto: worker
-{{- if .Values.presto.spec.presto.labels }}
-{{ toYaml .Values.presto.spec.presto.labels | indent 6 }}
+{{- if .Values.presto.spec.labels }}
+{{ toYaml .Values.presto.spec.labels | indent 6 }}
 {{- end }}
   template:
     metadata:
       labels:
         app: presto
         presto: worker
-{{- if .Values.presto.spec.presto.labels }}
-{{ toYaml .Values.presto.spec.presto.labels | indent 8 }}
+{{- if .Values.presto.spec.labels }}
+{{ toYaml .Values.presto.spec.labels | indent 8 }}
 {{- end }}
       annotations:
         presto-worker-config-hash: {{ include (print $.Template.BasePath "/presto/presto-worker-config.yaml") . | sha256sum }}
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
         presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
         presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.presto.config.tls.enabled .Values.presto.spec.presto.config.tls.createSecret }}
+{{- if .Values.presto.spec.config.aws.createSecret -}}
+        presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if and .Values.presto.spec.config.tls.enabled .Values.presto.spec.config.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.presto.config.auth.enabled .Values.presto.spec.presto.config.auth.createSecret}}
+{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret}}
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- end }}
-{{- if .Values.presto.spec.presto.annotations }}
-{{ toYaml .Values.presto.spec.presto.annotations | indent 8 }}
+{{- if .Values.presto.spec.annotations }}
+{{ toYaml .Values.presto.spec.annotations | indent 8 }}
 {{- end }}
     spec:
-{{- if .Values.presto.spec.presto.securityContext }}
+{{- if .Values.presto.spec.securityContext }}
       securityContext:
-{{ toYaml .Values.presto.spec.presto.securityContext | indent 8 }}
+{{ toYaml .Values.presto.spec.securityContext | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.affinity }}
+{{- if .Values.presto.spec.worker.affinity }}
       affinity:
-{{ toYaml .Values.presto.spec.presto.worker.affinity | indent 8 }}
+{{ toYaml .Values.presto.spec.worker.affinity | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.nodeSelector }}
+{{- if .Values.presto.spec.worker.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.presto.spec.presto.worker.nodeSelector | indent 8 }}
+{{ toYaml .Values.presto.spec.worker.nodeSelector | indent 8 }}
 {{- end }}
-{{- if .Values.presto.spec.presto.worker.tolerations }}
+{{- if .Values.presto.spec.worker.tolerations }}
       tolerations:
-{{ toYaml .Values.presto.spec.presto.worker.tolerations | indent 8 }}
+{{ toYaml .Values.presto.spec.worker.tolerations | indent 8 }}
 {{- end }}
       initContainers:
       - name: copy-presto-config
-        image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
-        imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
+        image: "{{ .Values.presto.spec.image.repository }}:{{ .Values.presto.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted configuration data into the presto-etc emptyDir volume so we can write to the config files
         env:
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
         - name: PRESTO_SERVER_KEYFILE
           value: /presto-server/tls.key
         - name: PRESTO_SERVER_CRTFILE
@@ -72,7 +75,7 @@ spec:
           value: /opt/presto/tls/keystore.pem
         - name: PRESTO_TRUSTSTORE_PEM
           value: /opt/presto/tls/truststore.pem
-{{- if .Values.presto.spec.presto.config.auth.enabled }}
+{{- if .Values.presto.spec.config.auth.enabled }}
         - name: PRESTO_CLIENT_KEYFILE
           value: /presto-client/tls.key
         - name: PRESTO_CLIENT_CRTFILE
@@ -93,12 +96,12 @@ spec:
           mountPath: /var/presto/data
         - name: presto-common-config
           mountPath: /presto-common
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
         - name: presto-server-pem
           mountPath: /presto-server
-{{- if .Values.presto.spec.presto.config.auth.enabled }}
+{{- if .Values.presto.spec.config.auth.enabled }}
         - name: presto-client-pem
           mountPath: /presto-client
 {{- end }}
@@ -112,8 +115,8 @@ spec:
             memory: 100Mi
       containers:
       - name: presto
-        image: "{{ .Values.presto.spec.presto.image.repository }}:{{ .Values.presto.spec.presto.image.tag }}"
-        imagePullPolicy: {{ .Values.presto.spec.presto.image.pullPolicy }}
+        image: "{{ .Values.presto.spec.image.repository }}:{{ .Values.presto.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/entrypoint.sh']
         args: ['/opt/presto/presto-server/bin/launcher', 'run']
         env:
@@ -126,10 +129,6 @@ spec:
           containerPort: 8082
           protocol: TCP
         volumeMounts:
-{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
-        - name: hadoop-config
-          mountPath: /hadoop-config
-{{- end }} 
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
         - name: presto-common-config
@@ -140,22 +139,21 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
+        - name: hadoop-config
+          mountPath: /hadoop-config
+{{- end }}
+{{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
 {{- end }}
-{{- if .Values.presto.spec.config.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
         - name: hive-warehouse-data
-          mountPath: {{ .Values.presto.spec.config.sharedVolume.mountPath }}
+          mountPath: {{ .Values.hive.spec.config.sharedVolume.mountPath }}
 {{- end }}
         resources:
-{{ toYaml .Values.presto.spec.presto.worker.resources | indent 10 }}
+{{ toYaml .Values.presto.spec.worker.resources | indent 10 }}
       volumes:
-{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
-      - name: hadoop-config
-        secret:
-          secretName: {{ .Values.presto.spec.hive.config.hadoopSecretName }}
-{{- end }}
       - name: presto-worker-config
         configMap:
           name: presto-worker-config
@@ -175,22 +173,27 @@ spec:
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
-{{- if .Values.presto.spec.presto.config.tls.enabled }}
+{{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
+      - name: hadoop-config
+        secret:
+          secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
+{{- end }}
+{{- if .Values.presto.spec.config.tls.enabled }}
       - name: presto-tls
         emptyDir: {}
       - name: presto-server-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.config.tls.secretName }}
-{{- if .Values.presto.spec.presto.config.auth.enabled }}
+          secretName: {{ .Values.presto.spec.config.tls.secretName }}
+{{- if .Values.presto.spec.config.auth.enabled }}
       - name: presto-client-pem
         secret:
-          secretName: {{ .Values.presto.spec.presto.config.auth.secretName }}
+          secretName: {{ .Values.presto.spec.config.auth.secretName }}
 {{- end }}
 {{- end }}
-{{- if .Values.presto.spec.config.sharedVolume.enabled }}
+{{- if .Values.hive.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
         persistentVolumeClaim:
-          claimName: {{ .Values.presto.spec.config.sharedVolume.claimName }}
+          claimName: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -199,4 +202,4 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.presto.spec.imagePullSecrets | indent 8 }}
 {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.presto.spec.presto.worker.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.presto.spec.worker.terminationGracePeriodSeconds }}

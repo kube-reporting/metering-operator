@@ -2,15 +2,15 @@
 connector.name=hive-hadoop2
 hive.allow-drop-table=true
 hive.allow-rename-table=true
-hive.storage-format={{ .Values.presto.spec.hive.config.defaultFileFormat | upper }}
+hive.storage-format={{ .Values.hive.spec.config.defaultFileFormat | upper }}
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
-hive.metastore.uri={{ .Values.presto.spec.hive.config.metastoreURIs }}
-{{- if .Values.presto.spec.presto.config.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.presto.spec.presto.config.metastoreTimeout }}
+hive.metastore.uri={{ .Values.presto.spec.config.connectors.hive.metastoreURI }}
+{{- if .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 {{- end }}
-{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
+{{- if .Values.presto.spec.config.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
 {{- end }}
 
@@ -64,16 +64,16 @@ connector.name=tpch
     resourceFieldRef:
       containerName: presto
       resource: limits.memory
-{{- if or .Values.presto.spec.config.awsCredentialsSecretName .Values.presto.spec.config.createAwsCredentialsSecret }}
+{{- if or .Values.presto.spec.config.aws.secretName .Values.presto.spec.config.aws.createSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.config.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-access-key-id
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.config.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.config.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-secret-access-key
 {{- end }}
 {{- end }}

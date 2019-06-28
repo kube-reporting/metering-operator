@@ -22,5 +22,11 @@ spec:
   presto:
     spec:
       config:
-        awsCredentialsSecretName: "your-aws-secret"
+        aws:
+          secretName: "your-aws-secret"
 
+  hive:
+    spec:
+      config:
+        aws:
+          secretName: "your-aws-secret"

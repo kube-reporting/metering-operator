@@ -74,7 +74,7 @@ spec:
         hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-config.yaml") . | sha256sum }}
         hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
         hdfs-jmx-config-hash: {{ include (print $.Template.BasePath "/hadoop/hdfs-jmx-config.yaml") . | sha256sum }}
-{{- if .Values.hadoop.spec.config.aws.createCredentialsSecret }}
+{{- if .Values.hadoop.spec.config.aws.createSecret }}
         hadoop-aws-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-aws-credentials.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.hadoop.spec.hdfs.datanode.annotations }}
@@ -139,18 +139,18 @@ spec:
         env:
         - name: HADOOP_LOGLEVEL
           value: "{{ upper .Values.hadoop.spec.hdfs.config.logLevel }}"
+{{- if or .Values.hadoop.spec.config.aws.secretName .Values.hadoop.spec.config.aws.createSecret }}
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hadoop.spec.config.aws.credentialsSecretName }}"
+              name: "{{ .Values.hadoop.spec.config.aws.secretName | default "hadoop-aws-credentials" }}"
               key: aws-access-key-id
-              optional: true
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hadoop.spec.config.aws.credentialsSecretName }}"
+              name: "{{ .Values.hadoop.spec.config.aws.secretName | default "hadoop-aws-credentials" }}"
               key: aws-secret-access-key
-              optional: true
+{{- end }}
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:

@@ -9,7 +9,7 @@
 
     - name: Validate Metering S3 credentials
       fail:
-        msg: "storage.hive.s3.awsCredentialsSecretName cannot be empty"
+        msg: "storage.hive.s3.secretName cannot be empty"
       when: meteringconfig_storage_s3_aws_credentials_secret_name == ""
 
     - name: Obtaining AWS credentials to configure S3 bucket
