@@ -163,3 +163,8 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 {{- end}}
+{{- if .Values.hive.spec.server.config.tls.enabled }}
+      - name: hive-server-tls-secret
+        secret:
+          secretName: {{ .Values.hive.spec.metastore.config.tls.secretName }}
+{{- end }}

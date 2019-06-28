@@ -669,6 +669,11 @@ hive:
           maxRAMPercentage: null
           minRAMPercentage: null
 
+        tls:
+          enabled: false
+          createSecret: false
+          secretName: ""
+
       resources:
         limits:
           cpu: 1
