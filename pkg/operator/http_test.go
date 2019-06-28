@@ -20,8 +20,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/test/testhelpers"

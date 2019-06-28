@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig"
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"

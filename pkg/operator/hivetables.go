@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/cache"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -150,7 +150,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 		hiveTable.Status.TableProperties = hiveTable.Spec.TableProperties
 		hiveTable.Status.External = hiveTable.Spec.External
 		hiveTable.Status.Partitions = hiveTable.Spec.Partitions
-		hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 		if err != nil {
 			return err
 		}
@@ -183,7 +183,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 				Columns:   prestoColumns,
 			},
 		}
-		prestoTable, err = op.meteringClient.MeteringV1alpha1().PrestoTables(hiveTable.Namespace).Create(prestoTable)
+		prestoTable, err = op.meteringClient.MeteringV1().PrestoTables(hiveTable.Namespace).Create(prestoTable)
 		if err != nil {
 			if apierrors.IsAlreadyExists(err) && prestoTable.Status.TableName != "" {
 				logger.Infof("PrestoTable %s already exists", prestoTable.Name)
@@ -264,7 +264,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 		hiveTable.Status.Partitions = desiredPartitions
 		var err error
-		hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 		if err != nil {
 			return err
 		}
@@ -276,7 +276,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 func (op *Reporting) addHiveTableFinalizer(hiveTable *metering.HiveTable) (*metering.HiveTable, error) {
 	hiveTable.Finalizers = append(hiveTable.Finalizers, hiveTableFinalizer)
-	newHiveTable, err := op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
@@ -292,7 +292,7 @@ func (op *Reporting) removeHiveTableFinalizer(hiveTable *metering.HiveTable) (*m
 	}
 	hiveTable.Finalizers = slice.RemoveString(hiveTable.Finalizers, hiveTableFinalizer, nil)
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace})
-	newHiveTable, err := op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	newHiveTable, err := op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from HiveTable: %s/%s", hiveTableFinalizer, hiveTable.Namespace, hiveTable.Name)
 		return nil, err
@@ -362,7 +362,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 		},
 	}
 	var err error
-	hiveTable, err := op.meteringClient.MeteringV1alpha1().HiveTables(namespace).Create(newHiveTable)
+	hiveTable, err := op.meteringClient.MeteringV1().HiveTables(namespace).Create(newHiveTable)
 	switch {
 	case apierrors.IsAlreadyExists(err):
 		op.logger.Warnf("HiveTable %s already exists", resourceName)
@@ -380,7 +380,7 @@ func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, time
 	var hiveTable *metering.HiveTable
 	err := wait.Poll(pollInterval, timeout, func() (bool, error) {
 		var err error
-		hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(namespace).Get(name, metav1.GetOptions{})
+		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(namespace).Get(name, metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			return false, nil
 		}

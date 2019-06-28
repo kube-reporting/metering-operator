@@ -16,7 +16,7 @@ If the report has a schedule, it will wait until the period currently being proc
 The following example Report will contain information on every Pod's CPU requests, and will run every hour, adding the last hours worth of data each time it runs.
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: pod-cpu-request-hourly
@@ -36,7 +36,7 @@ The following example report will contain information on every Pod's CPU request
 After completion it does not run again.
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: pod-cpu-request-hourly
@@ -122,7 +122,7 @@ For a complete list of ***REMOVED***elds each report query produces, use `kubect
 ```
 kubectl -n $METERING_NAMESPACE get reportqueries namespace-memory-request -o yaml
 
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-memory-request
@@ -207,7 +207,7 @@ If `reportingStart` is left unset, the Report will run at the next full reportin
 As an example of how to use this ***REMOVED***eld, if you had data already collected dating back to January 1st, 2019 which you wanted to be included in your Report, you could create a report with the following values:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: pod-cpu-request-hourly
@@ -229,7 +229,7 @@ If left unset, then the Report will run forever, or until a `reportingEnd` is se
 For example, if you wanted to create a report that runs once a week for the month of July:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: pod-cpu-request-hourly
@@ -312,7 +312,7 @@ The execution of a scheduled report can be tracked using its status ***REMOVED**
 
 The `status` ***REMOVED***eld of a `Report` currently has two ***REMOVED***elds:
 
-- `conditions`: Conditions is a list of conditions, each of which have a `type`, `status`, `reason`, and `message` ***REMOVED***eld. Possible values of a condition's `type` ***REMOVED***eld are `Running` and `Failure`, indicating the current state of the scheduled report. The `reason` indicates why its `condition` is in its current state with the `status` being either `true`, `false` or `unknown`. The `message` provides a human readable indicating why the condition is in the current state. For detailed information on the `reason` values see [`pkg/apis/metering/v1alpha1/util/report_util.go`](https://github.com/operator-framework/operator-metering/blob/master/pkg/apis/metering/v1alpha1/util/report_util.go#L10).
+- `conditions`: Conditions is a list of conditions, each of which have a `type`, `status`, `reason`, and `message` ***REMOVED***eld. Possible values of a condition's `type` ***REMOVED***eld are `Running` and `Failure`, indicating the current state of the scheduled report. The `reason` indicates why its `condition` is in its current state with the `status` being either `true`, `false` or `unknown`. The `message` provides a human readable indicating why the condition is in the current state. For detailed information on the `reason` values see [`pkg/apis/metering/v1/util/report_util.go`](https://github.com/operator-framework/operator-metering/blob/master/pkg/apis/metering/v1/util/report_util.go#L10).
 - `lastReportTime`: Indicates the time Metering has collected data up to.
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8

@@ -14,9 +14,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
-	cbInterfaces "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
+	cbInterfaces "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
@@ -148,7 +148,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 		logger.Infof("created Hive table %s in database %s", tableName, hiveStorage.Status.Hive.DatabaseName)
 
-		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		})
@@ -295,7 +295,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		}
 
 		// Update the status to indicate where we are in the metric import process
-		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.PrometheusMetricsImportStatus = importStatus
 		})
@@ -348,7 +348,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		}
 
 		logger.Debugf("successfully created AWS Billing DataSource table %s pointing to s3 bucket %s at pre***REMOVED***x %s", tableName, source.Bucket, source.Pre***REMOVED***x)
-		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: hiveTable.Name}
 		})
@@ -361,7 +361,7 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 		if err != nil {
 			// if not found, try for the uncached copy
 			if apierrors.IsNotFound(err) {
-				hiveTable, err = op.meteringClient.MeteringV1alpha1().HiveTables(dataSource.Namespace).Get(hiveTableResourceName, metav1.GetOptions{})
+				hiveTable, err = op.meteringClient.MeteringV1().HiveTables(dataSource.Namespace).Get(hiveTableResourceName, metav1.GetOptions{})
 				if err != nil {
 					return err
 				}
@@ -427,7 +427,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 		}
 
-		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		})
@@ -546,7 +546,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 		logger.Infof("created view %s", viewName)
 
-		dsClient := op.meteringClient.MeteringV1alpha1().ReportDataSources(dataSource.Namespace)
+		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef.Name = prestoTable.Name
 		})
@@ -568,7 +568,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 
 func (op *Reporting) addReportDataSourceFinalizer(ds *metering.ReportDataSource) (*metering.ReportDataSource, error) {
 	ds.Finalizers = append(ds.Finalizers, reportDataSourceFinalizer)
-	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
+	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error adding %s ***REMOVED***nalizer to ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)
@@ -583,7 +583,7 @@ func (op *Reporting) removeReportDataSourceFinalizer(ds *metering.ReportDataSour
 		return ds, nil
 	}
 	ds.Finalizers = slice.RemoveString(ds.Finalizers, reportDataSourceFinalizer, nil)
-	newReportDataSource, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(ds.Namespace).Update(ds)
+	newReportDataSource, err := op.meteringClient.MeteringV1().ReportDataSources(ds.Namespace).Update(ds)
 	logger := op.logger.WithFields(log.Fields{"reportDataSource": ds.Name, "namespace": ds.Namespace})
 	if err != nil {
 		logger.WithError(err).Errorf("error removing %s ***REMOVED***nalizer from ReportDataSource: %s/%s", reportDataSourceFinalizer, ds.Namespace, ds.Name)

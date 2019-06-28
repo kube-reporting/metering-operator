@@ -22,9 +22,9 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1/util"
-	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
+	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"

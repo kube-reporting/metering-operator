@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/aws"
 	"github.com/operator-framework/operator-metering/pkg/hive"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -126,7 +126,7 @@ func (op *Reporting) updateAWSBillingPartitions(logger log.FieldLogger, dataSour
 		return err
 	}
 
-	_, err = op.meteringClient.MeteringV1alpha1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+	_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 	if err != nil {
 		logger.WithError(err).Errorf("failed to update HiveTable %s partitions for ReportDataSource %s: %s", hiveTable.Name, dataSource.Name, err)
 		return err

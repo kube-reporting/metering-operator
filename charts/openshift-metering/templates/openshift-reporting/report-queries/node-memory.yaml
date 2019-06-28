@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-memory-capacity-raw
@@ -45,7 +45,7 @@ spec:
         dt
     FROM {| dataSourceTableName .Report.Inputs.NodeCapacityMemoryBytesDataSourceName |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-memory-capacity
@@ -89,7 +89,7 @@ spec:
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-memory-allocatable-raw
@@ -135,7 +135,7 @@ spec:
         dt
     FROM {| dataSourceTableName .Report.Inputs.NodeAllocatableMemoryBytesDataSourceName |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-memory-allocatable
@@ -179,7 +179,7 @@ spec:
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-memory-utilization

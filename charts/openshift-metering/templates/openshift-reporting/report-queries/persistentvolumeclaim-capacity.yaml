@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-capacity-raw
@@ -44,7 +44,7 @@ spec:
         dt
     FROM {| dataSourceTableName .Report.Inputs.PersistentvolumeclaimCapacityBytesDataSourceName |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: persistentvolumeclaim-capacity
