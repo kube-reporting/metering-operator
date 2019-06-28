@@ -27,6 +27,10 @@ spec:
         pre***REMOVED***x: "{{ .Values.awsBillingBucketPre***REMOVED***x }}"
         region: "{{ .Values.awsBillingBucketRegion }}"
 
+      defaultReportDataSources:
+        postKube_1_14:
+          enabled: {{ .Values.useKube114Metrics }}
+
   reporting-operator:
     spec:
       replicas: "{{ .Values.reportingOperatorReplicas }}"
