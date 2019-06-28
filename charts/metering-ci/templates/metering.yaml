@@ -1,4 +1,4 @@
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: MeteringCon***REMOVED***g
 metadata:
   name: "{{ .Values.deployPlatform }}-metering"
