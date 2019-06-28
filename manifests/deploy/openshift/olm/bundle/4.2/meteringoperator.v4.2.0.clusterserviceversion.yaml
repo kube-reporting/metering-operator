@@ -7,7 +7,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "metering.openshift.io/v1alpha1",
+          "apiVersion": "metering.openshift.io/v1",
           "kind": "MeteringCon***REMOVED***g",
           "metadata": {
             "name": "operator-metering"
@@ -486,7 +486,7 @@ spec:
       displayName: Metering Con***REMOVED***guration
       kind: MeteringCon***REMOVED***g
       name: meteringcon***REMOVED***gs.metering.openshift.io
-      version: v1alpha1
+      version: v1
     - description: A scheduled or on-off Metering Report summarizes data based on the
         query speci***REMOVED***ed.
       displayName: Metering Report
