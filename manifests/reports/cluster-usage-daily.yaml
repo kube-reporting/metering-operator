@@ -6,7 +6,7 @@ spec:
   query: "cluster-cpu-usage"
   # this con***REMOVED***gures the this report to aggregate the hourly one
   inputs:
-  - name: ClusterCpuusageReportName
+  - name: ClusterCpuUsageReportName
     value: cluster-cpu-usage-hourly
   schedule:
     period: "daily"
@@ -21,7 +21,7 @@ spec:
   query: "cluster-memory-usage"
   # this con***REMOVED***gures the this report to aggregate the hourly one
   inputs:
-  - name: ClusterMemoryusageReportName
+  - name: ClusterMemoryUsageReportName
     value: cluster-memory-usage-hourly
   schedule:
     period: "daily"
