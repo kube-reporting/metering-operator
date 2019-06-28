@@ -151,6 +151,22 @@ spec:
               name: "{{ .Values.hadoop.spec.config.aws.secretName | default "hadoop-aws-credentials" }}"
               key: aws-secret-access-key
 {{- end }}
+
+{{- if or .Values.hadoop.spec.config.azure.secretName .Values.hadoop.spec.config.azure.createSecret }}
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-secret-access-key
+{{- end }}
+
+
+
         - name: MY_NODE_NAME
           valueFrom:
             fieldRef:
