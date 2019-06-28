@@ -29,10 +29,10 @@ In the case where you disabled the top-level `spec.tls.enabled` key, you would i
 kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
 ```
 
-After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
+After the above command you should be given a prompt, where you can run queries. Use the `show tables from metering;` query to view the list of tables:
 
 ```
-presto:default> show tables;
+presto:default> show tables from metering;
                                  Table
 ------------------------------------------------------------------------
  datasource_your_namespace_cluster_cpu_capacity_raw
@@ -87,7 +87,7 @@ kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pod
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
 
 ```
-0: jdbc:hive2://127.0.0.1:10000/default> show tables;
+0: jdbc:hive2://127.0.0.1:10000/default> show tables from metering;
 +----------------------------------------------------+
 |                      tab_name                      |
 +----------------------------------------------------+

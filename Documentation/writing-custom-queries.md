@@ -89,10 +89,10 @@ Open up a Presto-cli session by following the [Query Presto using presto-cli dev
 After you have a session run the following query:
 
 ```
-show tables;
+show tables from hive.metering;
 ```
 
-This should give you a list of Database Tables created in Presto, and you should see quite a few entries.
+This should give you a list of Database Tables created in Presto, within the hive catalog, in the metering schema, and you should see quite a few entries.
 Among these entries, `datasource_your_namespace_unready_deployment_replicas` should be in the list (replacing `your_namespace` with the value of `$METERING_NAMESPACE` with `-` replaced with `_`), and if it's not, it's possible the table has not be created yet, or there was an error.
 In this case, you should [check the metering operator logs][reporting-operator-logs] for errors.
 
