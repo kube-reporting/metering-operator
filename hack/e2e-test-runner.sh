@@ -9,7 +9,6 @@
 : "${TEST_JUNIT_REPORT_FILE:=tests-junit.xml}"
 : "${TEST_LOG_FILE:=tests.txt}"
 : "${DEPLOY_LOG_FILE:=deploy.log}"
-: "${DEPLOY_POD_LOGS_LOG_FILE:=pod-logs.log}"
 
 : "${DEPLOY_METERING:=true}"
 : "${TEST_METERING:=true}"
@@ -53,7 +52,6 @@ TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_LOG_FILE}"
 TEST_TAP_FILE_PATH="${TEST_TAP_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_TAP_FILE}"
 TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_JUNIT_REPORT_FILE}"
 DEPLOY_LOG_FILE_PATH="${DEPLOY_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_LOG_FILE}"
-DEPLOY_POD_LOGS_LOG_FILE_PATH="${DEPLOY_POD_LOGS_LOG_FILE_PATH:-$LOG_DIR/$DEPLOY_POD_LOGS_LOG_FILE}"
 
 mkdir -p "$LOG_DIR" "$TEST_OUTPUT_DIR" "$REPORT_RESULTS_DIR" "$METERINGCONFIGS_DIR" "$REPORTS_DIR" "$DATASOURCES_DIR" "$REPORTQUERIES_DIR" "$HIVETABLES_DIR" "$PRESTOTABLES_DIR" "$STORAGELOCATIONS_DIR"
 
@@ -190,7 +188,6 @@ function cleanup() {
     fi
 
     echo "Stopping background jobs"
-    # kill any background jobs, such as stern
     kill $(jobs -rp)
     # Wait for any jobs
     wait 2>/dev/null
@@ -200,16 +197,6 @@ function cleanup() {
 }
 
 if [ "$DEPLOY_METERING" == "true" ]; then
-    if [ -n "$DEPLOY_POD_LOGS_LOG_FILE" ]; then
-        echo "Streaming pod logs"
-        echo "Storing logs at $DEPLOY_POD_LOGS_LOG_FILE_PATH"
-        if [ "$OUTPUT_POD_LOG_STDOUT" == "true" ]; then
-            stern --timestamps -n "$METERING_NAMESPACE" '.*' | tee -a "$DEPLOY_POD_LOGS_LOG_FILE_PATH" &
-        else
-            stern --timestamps -n "$METERING_NAMESPACE" '.*' > "$DEPLOY_POD_LOGS_LOG_FILE_PATH" &
-        fi
-    fi
-
     trap cleanup EXIT
 
     echo "Deploying Metering"
