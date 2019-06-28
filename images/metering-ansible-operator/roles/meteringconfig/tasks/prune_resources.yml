@@ -15,7 +15,8 @@
 - name: Delete {{ resource.apis | map(attribute='kind') | join(', ') }} resources with selector {{ label_selector}}
   k8s:
     state: absent
-    definition: "{{ to_delete.results | map(attribute='resources') | flatten }}"
+    definition: "{{ to_delete_results }}"
   vars:
-    label_selector: "{{ meteringconfig_prune_label_key }}={{ resource.prune_label_value }}"
-  when: to_delete.changed
+    to_delete_results: "{{ to_delete.results | map(attribute='resources') | flatten }}"
+    label_selector: "{{ meteringconfig_prune_label_key }}={{ resource.prune_label_value }},{{ meteringconfig_prune_namespace_label_key }}={{ namespace }}"
+  when: to_delete_results | length > 0
