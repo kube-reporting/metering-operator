@@ -32,7 +32,7 @@ When created, a HiveTable resource causes the reporting-operator to create a tab
 ## Example HiveTables
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: HiveTable
 metadata:
   name: apache-log

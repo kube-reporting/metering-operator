@@ -11,7 +11,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 )
@@ -162,7 +162,7 @@ type prometheusImportResults struct {
 }
 
 func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace, dsName string, start, end time.Time) ([]*prometheusImportResults, error) {
-	reportDataSources, err := op.meteringClient.MeteringV1alpha1().ReportDataSources(namespace).List(metav1.ListOptions{})
+	reportDataSources, err := op.meteringClient.MeteringV1().ReportDataSources(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

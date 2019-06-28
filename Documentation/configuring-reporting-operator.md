@@ -116,7 +116,7 @@ If your NodePorts and/or LoadBalancers are not accessible to others, then you ca
 Exposing the reporting API is as simple as changing the type of `Service` used for the reporting-operator:
 
 ```
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: MeteringConfig
 metadata:
   name: "operator-metering"

@@ -1,4 +1,4 @@
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: namespace-memory-usage-daily
@@ -9,7 +9,7 @@ spec:
 
 ---
 
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: Report
 metadata:
   name: namespace-cpu-usage-daily

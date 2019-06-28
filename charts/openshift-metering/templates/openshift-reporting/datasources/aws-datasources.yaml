@@ -1,7 +1,7 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
 {{- if $reportingValues.spec.awsBillingReportDataSource.enabled }}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "aws-billing"
@@ -16,7 +16,7 @@ spec:
 
 ---
 
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
   name: "aws-ec2-billing-data-raw-raw"

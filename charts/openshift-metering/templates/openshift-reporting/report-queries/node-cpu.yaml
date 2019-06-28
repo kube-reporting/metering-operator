@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-cpu-capacity-raw
@@ -44,7 +44,7 @@ spec:
         dt
     FROM {| dataSourceTableName .Report.Inputs.NodeCapacityCpuCoresDataSourceName |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-cpu-capacity
@@ -88,7 +88,7 @@ spec:
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-cpu-allocatable-raw
@@ -133,7 +133,7 @@ spec:
         dt
     FROM {| dataSourceTableName .Report.Inputs.NodeAllocatableCpuCoresDataSourceName |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-cpu-allocatable
@@ -177,7 +177,7 @@ spec:
     AND dt <= '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prometheusMetricPartitionFormat |}'
     GROUP BY node, resource_id
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: node-cpu-utilization

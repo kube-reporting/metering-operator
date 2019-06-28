@@ -3,9 +3,9 @@ package reporting
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
-	meteringClient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1alpha1"
-	meteringListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringClient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	meteringListers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
 )
 
 type ReportDataSourceGetter interface {

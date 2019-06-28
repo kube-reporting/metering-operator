@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1alpha1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 )
 
 func GetAndValidateQueryDependencies(

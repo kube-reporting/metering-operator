@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-request-raw
@@ -50,7 +50,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodRequestMemoryBytesDataSourceName |}
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-usage-raw
@@ -101,7 +101,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodUsageMemoryBytesDataSourceName |}
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-request
@@ -151,7 +151,7 @@ spec:
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_request_memory_byte_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-memory-usage
@@ -201,7 +201,7 @@ spec:
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_usage_memory_byte_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-memory-request
@@ -253,7 +253,7 @@ spec:
     GROUP BY namespace
     {|- end |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-memory-usage
@@ -305,7 +305,7 @@ spec:
     GROUP BY namespace
     {|- end |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-memory-utilization

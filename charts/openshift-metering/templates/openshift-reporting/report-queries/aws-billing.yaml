@@ -1,6 +1,6 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
 {{- if $reportingValues.spec.awsBillingReportDataSource.enabled -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: aws-ec2-billing-data-raw
@@ -45,7 +45,7 @@ spec:
     AND lineItem_UsageStartDate IS NOT NULL
     AND lineItem_UsageEndDate IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: aws-ec2-billing-data
@@ -107,7 +107,7 @@ spec:
     -- make sure lineItem entries overlap with our range
     AND (usage_end_date >= timestamp '{| default .Report.ReportingStart .Report.Inputs.ReportingStart | prestoTimestamp |}' AND usage_start_date <= timestamp '{| default .Report.ReportingEnd .Report.Inputs.ReportingEnd | prestoTimestamp |}')
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: aws-ec2-cluster-cost

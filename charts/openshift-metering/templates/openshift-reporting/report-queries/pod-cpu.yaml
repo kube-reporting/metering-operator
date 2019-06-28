@@ -1,5 +1,5 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-cpu-request-raw
@@ -50,7 +50,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodRequestCpuCoresDataSourceName |}
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-cpu-usage-raw
@@ -101,7 +101,7 @@ spec:
     FROM {| dataSourceTableName .Report.Inputs.PodUsageCpuCoresDataSourceName |}
     WHERE element_at(labels, 'node') IS NOT NULL
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-cpu-request
@@ -151,7 +151,7 @@ spec:
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_request_cpu_core_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: pod-cpu-usage
@@ -201,7 +201,7 @@ spec:
     GROUP BY namespace, pod, node
     ORDER BY namespace, pod, node ASC, pod_usage_cpu_core_seconds DESC
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-cpu-request
@@ -253,7 +253,7 @@ spec:
     GROUP BY namespace
     {|- end |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-cpu-usage
@@ -305,7 +305,7 @@ spec:
     GROUP BY namespace
     {|- end |}
 ---
-apiVersion: metering.openshift.io/v1alpha1
+apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
   name: namespace-cpu-utilization
