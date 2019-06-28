@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ .Values.hadoop.spec.con***REMOVED***gSecretName }}"
+data:
+
+{{- if .Values.hadoop.spec.hdfs.enabled }}
+  hdfs-site.xml : {{ include "hdfs-site-xml" . | b64enc }}
+{{- end}}
+  core-site.xml: {{ include "core-site-xml" . | b64enc }}

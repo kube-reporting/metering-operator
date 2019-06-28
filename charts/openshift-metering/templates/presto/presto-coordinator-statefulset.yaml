@@ -102,6 +102,10 @@ spec:
         - name: presto-client-pem
           mountPath: /presto-client
 {{- end }}
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+        - name: hadoop-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+{{- end }}        
 {{- end }}
         resources:
           limits:
@@ -136,6 +140,11 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+        - name: hadoop-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+{{- end }}
+
 {{- if .Values.presto.spec.presto.con***REMOVED***g.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
@@ -160,6 +169,11 @@ spec:
       - name: presto-jmx-con***REMOVED***g
         con***REMOVED***gMap:
           name: presto-jmx-con***REMOVED***g
+{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+      - name: hadoop-con***REMOVED***g
+        secret:
+          secretName: {{ .Values.presto.spec.hive.con***REMOVED***g.hadoopSecretName }}
+{{- end }}
       - name: presto-etc
         emptyDir: {}
       - name: presto-data

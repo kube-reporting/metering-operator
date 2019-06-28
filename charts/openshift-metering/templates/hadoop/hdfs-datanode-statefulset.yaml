@@ -71,7 +71,7 @@ spec:
 {{ toYaml .Values.hadoop.spec.hdfs.datanode.labels | indent 8 }}
 {{- end }}
       annotations:
-        hadoop-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-con***REMOVED***gmap.yaml") . | sha256sum }}
+        hadoop-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-con***REMOVED***g.yaml") . | sha256sum }}
         hadoop-scripts-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-scripts.yaml") . | sha256sum }}
         hdfs-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hadoop/hdfs-jmx-con***REMOVED***g.yaml") . | sha256sum }}
 {{- if .Values.hadoop.spec.con***REMOVED***g.aws.createCredentialsSecret }}
@@ -227,8 +227,8 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-con***REMOVED***g
-        con***REMOVED***gMap:
-          name: "{{ .Values.hadoop.spec.con***REMOVED***gMapName }}"
+        secret:
+          secretName: "{{ .Values.hadoop.spec.con***REMOVED***gSecretName }}"
           defaultMode: 0555
       - name: hadoop-scripts
         con***REMOVED***gMap:

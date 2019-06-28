@@ -453,8 +453,8 @@ presto:
         metastoreClientSocketTimeout: null
         metastoreURIs: thrift://hive-metastore:9083
         metastoreWarehouseDir: null
-        hadoopCon***REMOVED***gMapName: hadoop-con***REMOVED***g
-        useHadoopCon***REMOVED***gMap: true
+        hadoopSecretName: hadoop-con***REMOVED***g
+        useHadoopCon***REMOVED***g: true
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-metering-hive
@@ -664,7 +664,7 @@ presto:
 
 hadoop:
   spec:
-    con***REMOVED***gMapName: hadoop-con***REMOVED***g
+    con***REMOVED***gSecretName: hadoop-con***REMOVED***g
 
     con***REMOVED***g:
       defaultFS: hdfs://hdfs-namenode-0.hdfs-namenode:9820
