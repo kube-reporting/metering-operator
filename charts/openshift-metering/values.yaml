@@ -572,7 +572,6 @@ hive:
 
     con***REMOVED***g:
       metastoreClientSocketTimeout: null
-      metastoreURIs: thrift://hive-metastore:9083
       metastoreWarehouseDir: null
 
       defaultCompression: zlib
@@ -628,6 +627,9 @@ hive:
           createSecret: false
           secretName: ""
 
+        auth:
+          enabled: false
+
       resources:
         limits:
           cpu: 4
@@ -668,6 +670,12 @@ hive:
           initialRAMPercentage: null
           maxRAMPercentage: null
           minRAMPercentage: null
+
+        metastoreTLS:
+          # TLS options for connecting to hive-metastore from hive-server
+          enabled: false
+          createSecret: false
+          secretName: ""
 
       resources:
         limits:

@@ -31,7 +31,11 @@ data:
       </property>
       <property>
         <name>hive.metastore.uris</name>
-        <value>{{ .Values.hive.spec.con***REMOVED***g.metastoreURIs }}</value>
+{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+        <value>thrift://localhost:8443</value>
+{{- ***REMOVED*** }}
+        <value>thrift://hive-metastore:9083</value>
+{{- end }}
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
@@ -169,4 +173,3 @@ data:
     rootLogger.level = ${sys:hive.log.level}
     rootLogger.appenderRefs = root
     rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
-

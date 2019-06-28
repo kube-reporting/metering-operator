@@ -135,7 +135,7 @@ spec:
         args:
         - server
         - --listen
-        - localhost:8443
+        - 0.0.0.0:8443
         - --target
         - localhost:9083
         - --key
@@ -144,8 +144,12 @@ spec:
         - $(HIVE_METASTORE_CRTFILE)
         - --cacert
         -  $(HIVE_METASTORE_CA_CRTFILE)
+{{- if .Values.hive.spec.metastore.con***REMOVED***g.auth.enabled }}
         - --allow-cn
-        - Any
+        - hive-server
+{{- ***REMOVED*** }}
+        - --disable-authentication
+{{- end }}
         ports:
         - name: ghostunnel
           containerPort: 8443
