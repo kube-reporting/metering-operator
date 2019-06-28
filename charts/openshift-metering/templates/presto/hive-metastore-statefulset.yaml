@@ -99,7 +99,7 @@ spec:
           mountPath: /hive-config
         - name: hive-scripts
           mountPath: /hive-scripts
-{{- if .Values.presto.spec.hive.config.useHadoopConfigMap }}
+{{- if .Values.presto.spec.hive.config.useHadoopConfig }}
         - name: hadoop-config
           mountPath: /hadoop-config
 {{- end }}
@@ -169,10 +169,10 @@ spec:
         configMap:
           name: hive-scripts
           defaultMode: 0555
-{{- if .Values.presto.spec.hive.config.useHadoopConfigMap }}
+{{- if .Values.presto.spec.hive.config.useHadoopConfig }}
       - name: hadoop-config
-        configMap:
-          name: {{ .Values.presto.spec.hive.config.hadoopConfigMapName }}
+        secret:
+          secretName: {{ .Values.presto.spec.hive.config.hadoopSecretName }}
 {{- end }}
       - name: hive-jmx-config
         configMap:
