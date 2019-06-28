@@ -11,7 +11,7 @@
   k8s_facts:
     api_version: v1
     kind: Secret
-    name: "{{ meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.tls.secretName }}"
+    name: "{{ meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.secretName }}"
     namespace: "{{ meta.namespace }}"
   no_log: true
   register: presto_secret_tls_buf
@@ -21,7 +21,7 @@
   k8s_facts:
     api_version: v1
     kind: Secret
-    name: "{{ meteringcon***REMOVED***g_spec.presto.spec.presto.con***REMOVED***g.auth.secretName }}"
+    name: "{{ meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.secretName }}"
     namespace: "{{ meta.namespace }}"
   no_log: true
   register: presto_secret_auth_buf

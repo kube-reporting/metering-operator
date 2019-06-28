@@ -8,7 +8,7 @@
       - template_***REMOVED***le: templates/hadoop/hadoop-con***REMOVED***g.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-con***REMOVED***g
-        # always create the hadoop-con***REMOVED***gmap
+        # always create the hadoop-con***REMOVED***g
         create: true
       - template_***REMOVED***le: templates/hadoop/hadoop-aws-credentials.yaml
         apis: [ {kind: secret} ]

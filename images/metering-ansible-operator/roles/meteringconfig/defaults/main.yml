@@ -12,16 +12,17 @@ meteringcon***REMOVED***g_spec_overrides: "{{ _metering_openshift_io_meteringcon
 
 # The default specs for each component
 _presto_default_spec: "{{ meteringcon***REMOVED***g_default_values.presto.spec }}"
+_hive_default_spec: "{{ meteringcon***REMOVED***g_default_values.hive.spec }}"
 _reporting_op_default_spec: "{{ meteringcon***REMOVED***g_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringcon***REMOVED***g_default_values.hadoop.spec }}"
 
 # Default image repository and tag from the defaults
 meteringcon***REMOVED***g_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
 meteringcon***REMOVED***g_reporting_operator_default_image_tag: "{{ _reporting_op_default_spec.image.tag }}"
-meteringcon***REMOVED***g_presto_default_image_repo: "{{ _presto_default_spec.presto.image.repository }}"
-meteringcon***REMOVED***g_presto_default_image_tag: "{{ _presto_default_spec.presto.image.tag }}"
-meteringcon***REMOVED***g_hive_default_image_repo: "{{ _presto_default_spec.hive.image.repository }}"
-meteringcon***REMOVED***g_hive_default_image_tag: "{{ _presto_default_spec.hive.image.tag }}"
+meteringcon***REMOVED***g_presto_default_image_repo: "{{ _presto_default_spec.image.repository }}"
+meteringcon***REMOVED***g_presto_default_image_tag: "{{ _presto_default_spec.image.tag }}"
+meteringcon***REMOVED***g_hive_default_image_repo: "{{ _hive_default_spec.image.repository }}"
+meteringcon***REMOVED***g_hive_default_image_tag: "{{ _hive_default_spec.image.tag }}"
 meteringcon***REMOVED***g_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
 meteringcon***REMOVED***g_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
 
@@ -40,10 +41,11 @@ meteringcon***REMOVED***g_default_image_overrides:
         image:
           repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_presto_default_image_repo, true) }}"
           tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_presto_default_image_tag, true) }}"
-      hive:
-        image:
-          repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_hive_default_image_repo, true) }}"
-          tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_hive_default_image_tag, true) }}"
+  hive:
+    spec:
+      image:
+        repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_hive_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_hive_default_image_tag, true) }}"
   hadoop:
     spec:
       image:
@@ -58,7 +60,7 @@ _storage_overrides:
         s3:
           # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
           bucket: "-uncon***REMOVED***gured-metering-bucket-name-"
-          awsCredentialsSecretName: ""
+          secretName: ""
           # create buckets by default
           createBucket: true
           region: ""
@@ -66,17 +68,22 @@ _storage_overrides:
       spec:
         con***REMOVED***g:
           aws:
-            secretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
+            secretName: "{{ _storage_spec | json_query('hive.s3.secretName') }}"
             createSecret: false
     presto:
       spec:
         con***REMOVED***g:
-          awsCredentialsSecretName: "{{ _storage_spec | json_query('hive.s3.awsCredentialsSecretName') }}"
-          createAwsCredentialsSecret: false
-        hive:
-          con***REMOVED***g:
-            # regex_replace to append a trailing slash if missing
-            metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.secretName') }}"
+            createSecret: false
+    hive:
+      spec:
+        con***REMOVED***g:
+          # regex_replace to append a trailing slash if missing
+          metastoreWarehouseDir: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
+          aws:
+            secretName: "{{ _storage_spec | json_query('hive.s3.secretName') }}"
+            createSecret: false
     hadoop:
       spec:
         con***REMOVED***g:
@@ -94,19 +101,17 @@ _storage_overrides:
           enabled: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('unsupportedFeatures.enableHDFS') | default(false, true) }}"
 
   sharedPVC:
-    presto:
+    hive:
       spec:
         con***REMOVED***g:
+          metastoreWarehouseDir: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
           sharedVolume:
             enabled: true
             createPVC: "{{ _storage_spec | json_query('hive.sharedPVC.createPVC') | default(false, true) }}"
             mountPath: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
-            claimName: "{{ _storage_spec | json_query('hive.sharedPVC.claimName') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.claimName, true) }}"
-            size: "{{ _storage_spec | json_query('hive.sharedPVC.size') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.size, true) }}"
-            storageClass: "{{ _storage_spec | json_query('hive.sharedPVC.storageClass') | default(_presto_default_spec.con***REMOVED***g.sharedVolume.storageClass, true) }}"
-        hive:
-          con***REMOVED***g:
-            metastoreWarehouseDir: "{{ _storage_spec | json_query('hive.sharedPVC.mountPath') | default('/user/hive/warehouse', true) }}"
+            claimName: "{{ _storage_spec | json_query('hive.sharedPVC.claimName') | default(_hive_default_spec.con***REMOVED***g.sharedVolume.claimName, true) }}"
+            size: "{{ _storage_spec | json_query('hive.sharedPVC.size') | default(_hive_default_spec.con***REMOVED***g.sharedVolume.size, true) }}"
+            storageClass: "{{ _storage_spec | json_query('hive.sharedPVC.storageClass') | default(_hive_default_spec.con***REMOVED***g.sharedVolume.storageClass, true) }}"
 
     hadoop:
       spec:
@@ -169,24 +174,23 @@ _tls_overrides:
             secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
   presto:
     spec:
-      presto:
-        con***REMOVED***g:
-          tls:
-            certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate }}"
-            key: "{{ meteringcon***REMOVED***g_presto_server_key }}"
-            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate }}"
+      con***REMOVED***g:
+        tls:
+          certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate }}"
+          key: "{{ meteringcon***REMOVED***g_presto_server_key }}"
+          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate }}"
 
-            enabled: true
-            createSecret: true
-            secretName: "{{ meteringcon***REMOVED***g_presto_server_secret_name }}"
-          auth:
-            certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate }}"
-            key: "{{ meteringcon***REMOVED***g_presto_client_key }}"
-            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate }}"
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringcon***REMOVED***g_presto_server_secret_name }}"
+        auth:
+          certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate }}"
+          key: "{{ meteringcon***REMOVED***g_presto_client_key }}"
+          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate }}"
 
-            enabled: true
-            createSecret: true
-            secretName: "{{ meteringcon***REMOVED***g_presto_client_secret_name }}"
+          enabled: true
+          createSecret: true
+          secretName: "{{ meteringcon***REMOVED***g_presto_client_secret_name }}"
 
 # check if the user's spec contains the top-level tls.enabled ***REMOVED***eld. if true, use the value stored in that ***REMOVED***eld, ***REMOVED*** default to the value stored in values.yaml
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
@@ -197,7 +201,7 @@ meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | c
 meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
 meteringcon***REMOVED***g_storage_s3_bucket_region: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.region') }}"
-meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.awsCredentialsSecretName') }}"
+meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.secretName') }}"
 
 ########################
 # All Variables below are setup to consume the result of merging the defaults, internal overrides, and user overrides.
@@ -207,6 +211,7 @@ meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name: "{{ meteringco
 _monitoring_conf: "{{ meteringcon***REMOVED***g_spec.monitoring }}"
 _openshift_reporting_spec: "{{ meteringcon***REMOVED***g_spec['openshift-reporting'].spec }}"
 _presto_spec: "{{ meteringcon***REMOVED***g_spec.presto.spec }}"
+_hive_spec: "{{ meteringcon***REMOVED***g_spec.hive.spec }}"
 _reporting_op_spec: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec }}"
 _hadoop_spec: "{{ meteringcon***REMOVED***g_spec.hadoop.spec }}"
 
@@ -219,19 +224,21 @@ meteringcon***REMOVED***g_create_metering_root_ca_secret: "{{ meteringcon***REMO
 meteringcon***REMOVED***g_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBillingReportDataSource.enabled | default(false) }}"
 
 meteringcon***REMOVED***g_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
-meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createCredentialsSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 
-meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _presto_spec.hive.metastore.storage.create | default(true) }}"
-meteringcon***REMOVED***g_create_presto_shared_volume_pvc: "{{ _presto_spec.con***REMOVED***g.sharedVolume.enabled and _presto_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
-meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.createAwsCredentialsSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
+meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
+meteringcon***REMOVED***g_create_hive_aws_credentials: "{{ _hive_spec.con***REMOVED***g.createAwsCredentialsSecret | default(false) }}"
+
+meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 
 #
 # Enabling Presto TLS/Auth by Default
 #
-meteringcon***REMOVED***g_template_presto_tls_secret: "{{ _presto_spec.presto.con***REMOVED***g.tls.enabled and _presto_spec.presto.con***REMOVED***g.tls.createSecret and _presto_spec.presto.con***REMOVED***g.tls.secretName != 'presto-server-tls' }}"
-meteringcon***REMOVED***g_template_presto_auth_secret: "{{ _presto_spec.presto.con***REMOVED***g.auth.enabled and _presto_spec.presto.con***REMOVED***g.auth.createSecret and _presto_spec.presto.con***REMOVED***g.auth.secretName != 'presto-client-tls' }}"
-meteringcon***REMOVED***g_create_presto_tls_secrets: "{{ _presto_spec.presto.con***REMOVED***g.tls.enabled and _presto_spec.presto.con***REMOVED***g.tls.createSecret | default(false) }}"
-meteringcon***REMOVED***g_create_presto_auth_secrets: "{{ _presto_spec.presto.con***REMOVED***g.auth.enabled and _presto_spec.presto.con***REMOVED***g.auth.createSecret | default(false) }}"
+meteringcon***REMOVED***g_template_presto_tls_secret: "{{ _presto_spec.con***REMOVED***g.tls.enabled and _presto_spec.con***REMOVED***g.tls.createSecret and _presto_spec.con***REMOVED***g.tls.secretName != 'presto-server-tls' }}"
+meteringcon***REMOVED***g_template_presto_auth_secret: "{{ _presto_spec.con***REMOVED***g.auth.enabled and _presto_spec.con***REMOVED***g.auth.createSecret and _presto_spec.con***REMOVED***g.auth.secretName != 'presto-client-tls' }}"
+meteringcon***REMOVED***g_create_presto_tls_secrets: "{{ _presto_spec.con***REMOVED***g.tls.enabled and _presto_spec.con***REMOVED***g.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_auth_secrets: "{{ _presto_spec.con***REMOVED***g.auth.enabled and _presto_spec.con***REMOVED***g.auth.createSecret | default(false) }}"
 
 #
 # Reporting Operator

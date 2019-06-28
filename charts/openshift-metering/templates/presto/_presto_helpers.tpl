@@ -2,15 +2,15 @@
 connector.name=hive-hadoop2
 hive.allow-drop-table=true
 hive.allow-rename-table=true
-hive.storage-format={{ .Values.presto.spec.hive.con***REMOVED***g.defaultFileFormat | upper }}
+hive.storage-format={{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat | upper }}
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
-hive.metastore.uri={{ .Values.presto.spec.hive.con***REMOVED***g.metastoreURIs }}
-{{- if .Values.presto.spec.presto.con***REMOVED***g.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.presto.spec.presto.con***REMOVED***g.metastoreTimeout }}
+hive.metastore.uri={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreURI }}
+{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
+hive.metastore-timeout={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
 {{- end }}
-{{- if .Values.presto.spec.hive.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+{{- if .Values.presto.spec.con***REMOVED***g.useHadoopCon***REMOVED***g}}
 hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
 {{- end }}
 
@@ -64,16 +64,16 @@ connector.name=tpch
     resourceFieldRef:
       containerName: presto
       resource: limits.memory
-{{- if or .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName .Values.presto.spec.con***REMOVED***g.createAwsCredentialsSecret }}
+{{- if or .Values.presto.spec.con***REMOVED***g.aws.secretName .Values.presto.spec.con***REMOVED***g.aws.createSecret }}
 - name: AWS_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.con***REMOVED***g.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-access-key-id
 - name: AWS_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: "{{ .Values.presto.spec.con***REMOVED***g.awsCredentialsSecretName | default "presto-aws-credentials" }}"
+      name: "{{ .Values.presto.spec.con***REMOVED***g.aws.secretName | default "presto-aws-credentials" }}"
       key: aws-secret-access-key
 {{- end }}
 {{- end }}
