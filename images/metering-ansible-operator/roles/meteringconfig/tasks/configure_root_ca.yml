@@ -44,7 +44,7 @@
       meteringcon***REMOVED***g_tls_root_ca_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.key') + '\n' }}"
 
   vars:
-    root_ca_secret_exists: "{{ root_ca_secret_buf and root_ca_secret_buf.resources | length > 0 }}"
+    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
   when: meteringcon***REMOVED***g_tls_enabled and not root_ca_secret_exists
 
 - name: Use pre-existing CA secret cert/key when secret already exists
@@ -66,5 +66,5 @@
     when: meteringcon***REMOVED***g_tls_enabled
 
   vars:
-    root_ca_secret_exists: "{{ root_ca_secret_buf and root_ca_secret_buf.resources | length > 0 }}"
+    root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
   when: meteringcon***REMOVED***g_tls_enabled and root_ca_secret_exists
