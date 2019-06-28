@@ -197,3 +197,8 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.claimName }}
 {{- end}}
+{{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
+      - name: hive-metastore-tls-secret
+        secret:
+          secretName: {{ .Values.hive.spec.metastore.con***REMOVED***g.tls.secretName }}
+{{- end }}
