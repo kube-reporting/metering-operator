@@ -26,15 +26,6 @@ RUN ln -s /usr/bin/oc /usr/bin/kubectl
 
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 
-ENV STERN_VERSION 1.6.0
-RUN curl \
-    --silent \
-    --show-error \
-    --location \
-    "https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_linux_amd64" \
-    -o /usr/local/bin/stern \
-    && chmod +x /usr/local/bin/stern
-
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
 COPY gotools /go/src/gotools

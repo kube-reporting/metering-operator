@@ -33,7 +33,7 @@ function cleanup() {
     echo "Performing cleanup"
 
     echo "Stopping background jobs"
-    # kill any background jobs, such as stern
+    # kill any background jobs
     jobs -p | xargs kill
     # Wait for any jobs
     wait 2>/dev/null
