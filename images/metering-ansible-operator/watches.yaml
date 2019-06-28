@@ -1,5 +1,5 @@
 ---
-- version: v1alpha1
+- version: v1
   group: metering.openshift.io
   kind: MeteringConfig
   role: /opt/ansible/roles/meteringconfig

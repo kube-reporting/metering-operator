@@ -253,7 +253,7 @@ olm:
         displayName: Metering Configuration
         kind: MeteringConfig
         name: meteringconfigs.metering.openshift.io
-        version: v1alpha1
+        version: v1
       - description: A scheduled or on-off Metering Report summarizes data based on the
           query specified.
         displayName: Metering Report
@@ -302,7 +302,7 @@ olm:
       alm-examples: |-
         [
           {
-            "apiVersion": "metering.openshift.io/v1alpha1",
+            "apiVersion": "metering.openshift.io/v1",
             "kind": "MeteringConfig",
             "metadata": {
               "name": "operator-metering"
