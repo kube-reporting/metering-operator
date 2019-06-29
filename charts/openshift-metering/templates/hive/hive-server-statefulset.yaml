@@ -124,6 +124,33 @@ spec:
 {{- end }}
         resources:
 {{ toYaml .Values.hive.spec.server.resources | indent 10 }}
+{{- if .Values.hive.spec.server.config.tls.enabled }}
+      - name: ghostunnel-client
+        image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
+        env:
+        - name: HIVE_SERVER_CA_CRTFILE
+          value: /opt/hive-server/tls/ca.crt
+        - name: HIVE_SERVER_COMBINED_PEM
+          value: /opt/hive-server/tls/tls.key
+        command: ["ghostunnel"]
+        args:
+        - client
+        - --listen
+        - localhost:9083
+        - --target
+        - localhost:8443
+        - --keystore
+        -  $(HIVE_SERVER_COMBINED_PEM)
+        - --cacert
+        -  $(HIVE_METASTORE_CA_CRTFILE)
+        ports:
+        - name: ghostunnel
+          containerPort: 9083
+        volumeMounts:
+        - name: hive-server-tls-secret
+          mountPath: /opt/hive-server/tls
+{{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.spec.terminationGracePeriodSeconds }}
@@ -166,5 +193,5 @@ spec:
 {{- if .Values.hive.spec.server.config.tls.enabled }}
       - name: hive-server-tls-secret
         secret:
-          secretName: {{ .Values.hive.spec.metastore.config.tls.secretName }}
+          secretName: {{ .Values.hive.spec.server.config.tls.secretName }}
 {{- end }}
