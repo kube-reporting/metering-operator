@@ -9,7 +9,7 @@ Operator Metering is a collection of a few components:
 
 Operator Metering requires the following components:
 
-- A Kubernetes v1.8 or newer cluster
+- A Kubernetes v1.11 or newer cluster
 - A StorageClass for dynamic volume provisioning. ([See con***REMOVED***guring metering][con***REMOVED***guring-metering] for more information.)
 - A Prometheus installation within the cluster con***REMOVED***gured to do Kubernetes cluster-monitoring.
     - The prometheus-operator repository's [kube-prometheus instructions][kube-prometheus] are the standard way of achieving Prometheus cluster-monitoring.
