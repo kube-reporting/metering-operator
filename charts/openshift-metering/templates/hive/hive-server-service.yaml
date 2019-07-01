@@ -13,6 +13,8 @@ spec:
     port: 10002
   - name: metrics
     port: 8082
+  - name:
+    port: 9083
   selector:
     app: hive
     hive: server
