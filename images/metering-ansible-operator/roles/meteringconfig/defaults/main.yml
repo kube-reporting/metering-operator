@@ -215,6 +215,9 @@ _hive_spec: "{{ meteringcon***REMOVED***g_spec.hive.spec }}"
 _reporting_op_spec: "{{ meteringcon***REMOVED***g_spec['reporting-operator'].spec }}"
 _hadoop_spec: "{{ meteringcon***REMOVED***g_spec.hadoop.spec }}"
 
+
+meteringcon***REMOVED***g_log_helm_template: "{{ meteringcon***REMOVED***g_spec.logHelmTemplate | default(false) }}"
+
 meteringcon***REMOVED***g_create_metering_default_storage: "{{ _openshift_reporting_spec.defaultStorageLocation.enabled }}"
 meteringcon***REMOVED***g_create_metering_default_datasources: "{{ _openshift_reporting_spec.defaultReportDataSources.enabled }}"
 

@@ -7,7 +7,7 @@
     loop_var: resource
     label: "{{ resource.template_***REMOVED***le }}"
   when: resource.create | default(true)
-  no_log: true
+  no_log: "{{ not meteringcon***REMOVED***g_log_helm_template }}"
   register: template_results
 
 - name: Add prune label to resources
