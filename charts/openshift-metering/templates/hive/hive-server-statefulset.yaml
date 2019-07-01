@@ -139,7 +139,7 @@ spec:
         - --listen
         - localhost:9083
         - --target
-        - meta:8443
+        - hive-metastore:8443
         - --keystore
         -  $(HIVE_SERVER_COMBINED_PEM)
         - --cacert
