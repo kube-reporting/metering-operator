@@ -11,8 +11,9 @@ REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
 
 DOCKER_BUILD_CMD = docker build
+OKD_BUILD = false
 OCP_BUILD = false
-REPO_FILE = $(ROOT_DIR)/hack/ocp-util/redhat.repo
+REPO_DIR = $(ROOT_DIR)/hack/ocp-util/repos
 SUB_MGR_FILE = $(ROOT_DIR)/hack/ocp-util/subscription-manager.conf
 
 IMAGE_REPOSITORY = quay.io
@@ -38,12 +39,16 @@ METERING_OPERATOR_IMAGE_TAG=4.2
 REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator
 METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator
 
+ifeq ($(OKD_BUILD), true)
+	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
+	REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator.okd
+endif
+
 ifeq ($(OCP_BUILD), true)
-	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_FILE):/etc/yum.repos.d/redhat.repo -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
+	DOCKER_BUILD_CMD=imagebuilder -mount $(REPO_DIR):/etc/yum.repos.d/ -mount $(SUB_MGR_FILE):/etc/yum/pluginconf.d/subscription-manager.conf
 	REPORTING_OPERATOR_DOCKERFILE=Docker***REMOVED***le.reporting-operator.rhel
 	METERING_ANSIBLE_OPERATOR_DOCKERFILE=Docker***REMOVED***le.metering-ansible-operator.rhel
 endif
-
 
 GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
