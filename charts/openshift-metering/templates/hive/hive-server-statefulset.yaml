@@ -130,23 +130,23 @@ spec:
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: HIVE_SERVER_CA_CRTFILE
-          value: /opt/hive-server/tls/ca.crt
+          value: /opt/hive/tls/ca.crt
         - name: HIVE_SERVER_COMBINED_PEM
-          value: /opt/hive-server/tls/tls.pem
+          value: /opt/hive/tls/tls.pem
         command: ["ghostunnel"]
         args:
         - client
         - --listen
         - localhost:9083
         - --target
-        - localhost:8443
+        - meta:8443
         - --keystore
         -  $(HIVE_SERVER_COMBINED_PEM)
         - --cacert
         -  $(HIVE_SERVER_CA_CRTFILE)
         volumeMounts:
         - name: hive-server-tls-secret
-          mountPath: /opt/hive-server/tls
+          mountPath: /opt/hive/tls
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always

@@ -137,7 +137,7 @@ spec:
         - --listen
         - localhost:8443
         - --target
-        - meta:9083
+        - localhost:9083
         - --key
         -  $(HIVE_METASTORE_KEYFILE)
         - --cert

@@ -29,12 +29,10 @@ data:
         <name>hive.service.metrics.reporter</name>
         <value>JMX</value>
       </property>
-{{- if .Values.hive.spec.server.config.tls.enabled }}
       <property>
         <name>hive.metastore.uris</name>
         <value>{{ .Values.hive.spec.config.metastoreURIs }}</value>
       </property>
-{{ -end }}
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
         <value>{{ .Values.hive.spec.config.db.url }}</value>
