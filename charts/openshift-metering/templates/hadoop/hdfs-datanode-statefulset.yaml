@@ -130,6 +130,10 @@ spec:
         # required for openshift
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
       containers:
       - name: hdfs-datanode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -213,6 +217,8 @@ spec:
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
         - name: hdfs-jmx-config
@@ -243,9 +249,11 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-config
+        emptyDir: {}
+      - name: hadoop-starting-config
         secret:
-          secretName: "{{ .Values.hadoop.spec.configSecretName }}"
-          defaultMode: 0555
+          secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
+        
       - name: hadoop-scripts
         configMap:
           name: hadoop-scripts

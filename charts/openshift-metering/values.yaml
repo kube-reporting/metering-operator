@@ -437,6 +437,11 @@ presto:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+      azure:
+        storageAccountName: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
 
       tls:
         # server cert
@@ -716,6 +721,12 @@ hadoop:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+      azure:
+        storageAccountName: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
 
     image:
       pullPolicy: Always
