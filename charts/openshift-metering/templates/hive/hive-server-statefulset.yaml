@@ -132,7 +132,7 @@ spec:
         - name: HIVE_SERVER_CA_CRTFILE
           value: /opt/hive-server/tls/ca.crt
         - name: HIVE_SERVER_COMBINED_PEM
-          value: /opt/hive-server/tls/tls.key
+          value: /opt/hive-server/tls/tls.pem
         command: ["ghostunnel"]
         args:
         - client
@@ -143,7 +143,7 @@ spec:
         - --keystore
         -  $(HIVE_SERVER_COMBINED_PEM)
         - --cacert
-        -  $(HIVE_METASTORE_CA_CRTFILE)
+        -  $(HIVE_SERVER_CA_CRTFILE)
         ports:
         - name: ghostunnel
           containerPort: 9083
