@@ -137,16 +137,13 @@ spec:
         args:
         - client
         - --listen
-        - localhost:10001
+        - localhost:9083
         - --target
         - localhost:8443
         - --keystore
         -  $(HIVE_SERVER_COMBINED_PEM)
         - --cacert
         -  $(HIVE_SERVER_CA_CRTFILE)
-        ports:
-        - name: ghostunnel
-          containerPort: 10001
         volumeMounts:
         - name: hive-server-tls-secret
           mountPath: /opt/hive-server/tls
