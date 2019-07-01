@@ -29,10 +29,12 @@ data:
         <name>hive.service.metrics.reporter</name>
         <value>JMX</value>
       </property>
+{{- if .Values.hive.spec.server.config.tls.enabled }}
       <property>
         <name>hive.metastore.uris</name>
         <value>{{ .Values.hive.spec.config.metastoreURIs }}</value>
       </property>
+{{ -end }}
       <property>
         <name>javax.jdo.option.ConnectionURL</name>
         <value>{{ .Values.hive.spec.config.db.url }}</value>
@@ -169,4 +171,3 @@ data:
     rootLogger.level = ${sys:hive.log.level}
     rootLogger.appenderRefs = root
     rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
-

@@ -572,7 +572,7 @@ hive:
 
     config:
       metastoreClientSocketTimeout: null
-      metastoreURIs: thrift://hive-metastore:9083
+      metastoreURIs: thrift://localhost:9083
       metastoreWarehouseDir: null
 
       defaultCompression: zlib
