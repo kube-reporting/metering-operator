@@ -680,6 +680,13 @@ hive:
 
         metastoreTLS:
           # TLS options for connecting to hive-metastore from hive-server
+          # client cert
+          certi***REMOVED***cate: ""
+          # client private key
+          key: ""
+          # CA for the client cert
+          caCerti***REMOVED***cate: ""
+
           enabled: false
           createSecret: false
           secretName: ""
