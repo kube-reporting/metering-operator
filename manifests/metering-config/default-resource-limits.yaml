@@ -6,79 +6,53 @@ spec:
   reporting-operator:
     spec:
       resources:
-        requests:
-          memory: "50Mi"
-          cpu: "50m"
         limits:
-          memory: "150Mi"
-          cpu: "100m"
-  presto:
-    spec:
-      presto:
-        coordinator:
-          resources:
-            requests:
-              memory: "2Gi"
-              cpu: "2"
-            limits:
-              memory: "2Gi"
-              cpu: "2"
-        worker:
-          replicas: 0
-          resources:
-            requests:
-              memory: "2Gi"
-              cpu: "2"
-            limits:
-              memory: "2Gi"
-              cpu: "2"
-      hive:
-        metastore:
-          resources:
-            requests:
-              memory: "650Mi"
-              cpu: "500m"
-            limits:
-              memory: "650Mi"
-              cpu: "500m"
-          storage:
-            create: true
-            # Default to null, which means using the default storage class
-            class: null
-            size: "5Gi"
-        server:
-          resources:
-            requests:
-              memory: "500Mi"
-              cpu: "100m"
-            limits:
-              memory: "500Mi"
-              cpu: "100m"
-  hadoop:
-    spec:
-      hdfs:
-        datanode:
-          replicas: 1
-          resources:
-            requests:
-              memory: "250Mi"
-              cpu: "250m"
-            limits:
-              memory: "250Mi"
-              cpu: "250m"
-          storage:
-            # Default to null, which means using the default storage class
-            class: null
-            size: "5Gi"
-        namenode:
-          resources:
-            requests:
-              memory: "350Mi"
-              cpu: "250m"
-            limits:
-              memory: "350Mi"
-              cpu: "250m"
-          storage:
-            # Default to null, which means using the default storage class
-            class: null
-            size: "5Gi"
+          cpu: 1
+          memory: 500Mi
+        requests:
+          cpu: 500m
+          memory: 100Mi
+
+presto:
+  spec:
+    coordinator:
+      resources:
+        limits:
+          cpu: 4
+          memory: 4Gi
+        requests:
+          cpu: 2
+          memory: 2Gi
+
+    worker:
+      replicas: 0
+      resources:
+        limits:
+          cpu: 8
+          memory: 8Gi
+        requests:
+          cpu: 4
+          memory: 2Gi
+
+hive:
+  spec:
+    metastore:
+      resources:
+        limits:
+          cpu: 4
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 650Mi
+      storage:
+        class: null
+        create: true
+        size: 5Gi
+    server:
+      resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 500m
+          memory: 500Mi
