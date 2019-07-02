@@ -176,6 +176,43 @@ spec:
         - name: hive-metastore-auth-tls
           mountPath: /opt/hive/tls
 {{- end }}
+{{- if .Values.hive.spec.server.config.tls.enabled }}
+      - name: ghostunnel-server
+        image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
+        env:
+        - name: GHOSTUNNEL_SERVER_CA_CRTFILE
+          value: /opt/hive/server-tls/ca.crt
+        - name: GHOSTUNNEL_SERVER_KEYFILE
+          value: /opt/hive/server-tls/tls.key
+        - name: GHOSTUNNEL_SERVER_CRTFILE
+          value: /opt/hive/server-tls/tls.crt
+        command: ["ghostunnel"]
+        args:
+        - server
+        - --listen
+        - 0.0.0.0:10001
+        - --target
+        - localhost:10000
+        - --key
+        -  $(GHOSTUNNEL_SERVER_KEYFILE)
+        - --cert
+        - $(GHOSTUNNEL_SERVER_CRTFILE)
+        - --cacert
+        -  $(GHOSTUNNEL_SERVER_CA_CRTFILE)
+{{- if .Values.hive.spec.server.config.auth.enabled }}
+        - --allow-cn
+        - reporting-operator
+{{- else }}
+        - --disable-authentication
+{{- end }}
+        ports:
+        - name: ghostunnel
+          containerPort: 8443
+        volumeMounts:
+        - name: hive-server-tls-secret
+          mountPath: /opt/hive/server-tls
+{{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: {{ .Values.hive.spec.terminationGracePeriodSeconds }}
@@ -221,4 +258,9 @@ spec:
       - name: hive-metastore-auth-tls-secrets
         secret:
           secretName: {{ .Values.hive.spec.server.config.metastoreTLS.secretName }}
+{{- end }}
+{{- if .Values.hive.spec.server.config.tls.enabled }}
+      - name: hive-server-tls-secret
+        secret:
+          secretName: {{ .Values.hive.spec.server.config.tls.secretName }}
 {{- end }}
