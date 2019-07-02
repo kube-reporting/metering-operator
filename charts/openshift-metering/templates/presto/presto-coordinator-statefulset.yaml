@@ -160,7 +160,7 @@ spec:
       - name: presto-common-con***REMOVED***g
         con***REMOVED***gMap:
           name: presto-common-con***REMOVED***g
-          defaultMode: 0774
+          defaultMode: 0775
       - name: presto-catalog-con***REMOVED***g
         secret:
           secretName: presto-catalog-con***REMOVED***g
