@@ -48,6 +48,32 @@ spec:
       affinity:
 {{ toYaml .Values.hive.spec.server.affinity | indent 8 }}
 {{- end }}
+{{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
+      initContainers:
+      - name: copy-hive-tls
+        image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
+        env:
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
+          value: /opt/hive/tls/ca.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_CERT
+          value: /opt/hive/tls/tls.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_KEY
+          value: /opt/hive/tls/tls.key
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/hive/tls/keystore-combined.pem
+        command:
+        - /bin/bash
+        - -c
+        - |
+            cp /hive-metastore-auth-tls-secrets/* /opt/hive/tls
+            cat $(GHOSTUNNEL_CLIENT_TLS_CERT) $(GHOSTUNNEL_CLIENT_TLS_KEY) > $(GHOSTUNNEL_CLIENT_KEYSTORE)
+        volumeMounts:
+        - name: hive-metastore-auth-tls
+          mountPath: /opt/hive/tls
+        - name: hive-metastore-auth-tls-secrets
+          mountPath: /hive-metastore-auth-tls-secrets
+{{- end }}
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
@@ -131,10 +157,10 @@ spec:
         image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
-        - name: HIVE_SERVER_CA_CRTFILE
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
           value: /opt/hive/tls/ca.crt
-        - name: HIVE_SERVER_COMBINED_PEM
-          value: /opt/hive/tls/tls.pem
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/hive/tls/keystore-combined.pem
         command: ["ghostunnel"]
         args:
         - client
@@ -143,11 +169,11 @@ spec:
         - --target
         - hive-metastore:8443
         - --keystore
-        -  $(HIVE_SERVER_COMBINED_PEM)
+        -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
         - --cacert
-        -  $(HIVE_SERVER_CA_CRTFILE)
+        -  $(GHOSTUNNEL_CLIENT_CA_CRTFILE)
         volumeMounts:
-        - name: hive-server-tls-secret
+        - name: hive-metastore-auth-tls
           mountPath: /opt/hive/tls
 {{- end }}
       dnsPolicy: ClusterFirst
@@ -190,7 +216,9 @@ spec:
           claimName: {{ .Values.hive.spec.config.sharedVolume.claimName }}
 {{- end}}
 {{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
-      - name: hive-server-tls-secret
+      - name: hive-metastore-auth-tls
+        emptyDir: {}
+      - name: hive-metastore-auth-tls-secrets
         secret:
           secretName: {{ .Values.hive.spec.server.config.metastoreTLS.secretName }}
 {{- end }}
