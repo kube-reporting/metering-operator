@@ -17,6 +17,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hive-aws-credentials-secret
         create: "{{ meteringcon***REMOVED***g_create_hive_aws_credentials }}"
+      - template_***REMOVED***le: templates/hive/hive-metastore-tls-secrets.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hive-metastore-tls-secrets
+        create: "{{ meteringcon***REMOVED***g_create_hive_metastore_tls_secrets }}"
       - template_***REMOVED***le: templates/hive/hive-con***REMOVED***gmap.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hive-con***REMOVED***gmap

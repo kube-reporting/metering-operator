@@ -209,6 +209,7 @@ _tls_overrides:
 # check if the user's spec contains the top-level tls.enabled ***REMOVED***eld. if true, use the value stored in that ***REMOVED***eld, ***REMOVED*** default to the value stored in values.yaml
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabled | ternary(_tls_overrides, {}) }}"
+
 # combine the meteringcon***REMOVED***g_tls_overrides dictionary last to enforce when spec.tls.enabled is speci***REMOVED***ed and set to true
 meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_root_ca_overrides, meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
 
@@ -247,6 +248,8 @@ meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***
 meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
 meteringcon***REMOVED***g_create_hive_aws_credentials: "{{ _hive_spec.con***REMOVED***g.createAwsCredentialsSecret | default(false) }}"
+
+meteringcon***REMOVED***g_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 
