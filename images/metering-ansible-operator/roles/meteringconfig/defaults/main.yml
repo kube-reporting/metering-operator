@@ -250,6 +250,7 @@ meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume
 meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.createAwsCredentialsSecret | default(false) }}"
 
 meteringconfig_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret | default(false) }}"
+meteringconfig_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.config.metastoreTLS.enabled and _hive_spec.server.config.metastoreTLS.createSecret | default(false) }}"
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
 
