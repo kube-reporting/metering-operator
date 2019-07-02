@@ -600,6 +600,13 @@ hive:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+      
+      azure:
+        storageAccountName: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
 
       sharedVolume:
         enabled: false
