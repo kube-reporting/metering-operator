@@ -126,33 +126,33 @@ meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon*
 #
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, ***REMOVED*** use values.yaml and meteringcon***REMOVED***g_spec_overrides
 #
-meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
+_meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
 
-meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
-meteringcon***REMOVED***g_reporting_operator_client_cert: ""
-meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_reporting_operator_client_key: ""
+_meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
+_meteringcon***REMOVED***g_reporting_operator_client_cert: ""
+_meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_reporting_operator_client_key: ""
 
 _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: ""
 
-meteringcon***REMOVED***g_presto_server_secret_name: "presto-server-tls"
-meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_presto_server_key: ""
+_meteringcon***REMOVED***g_presto_server_secret_name: "presto-server-tls"
+_meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_server_key: ""
 
-meteringcon***REMOVED***g_presto_client_secret_name: "presto-client-tls"
-meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_presto_client_key: ""
+_meteringcon***REMOVED***g_presto_client_secret_name: "presto-client-tls"
+_meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_client_key: ""
 
-meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: ""
-meteringcon***REMOVED***g_tls_root_ca_key: ""
+_meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_tls_root_ca_key: ""
 
 meteringcon***REMOVED***g_root_ca_overrides:
   tls:
-    certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-    key: "{{ meteringcon***REMOVED***g_tls_root_ca_key }}"
+    certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+    key: "{{ _meteringcon***REMOVED***g_tls_root_ca_key }}"
 
 _tls_overrides:
   reporting-operator:
@@ -160,20 +160,20 @@ _tls_overrides:
       con***REMOVED***g:
         presto:
           tls:
-            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate }}"
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate }}"
 
             enabled: true
             createSecret: true
-            secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name }}"
+            secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name }}"
 
           auth:
-            certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_client_cert }}"
-            key: "{{ meteringcon***REMOVED***g_reporting_operator_client_key }}"
-            caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate }}"
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_client_cert }}"
+            key: "{{ _meteringcon***REMOVED***g_reporting_operator_client_key }}"
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate }}"
 
             enabled: true
             createSecret: true
-            secretName: "{{ meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
+            secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
       authProxy:
         enabled: true
 
@@ -190,21 +190,21 @@ _tls_overrides:
     spec:
       con***REMOVED***g:
         tls:
-          certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate }}"
-          key: "{{ meteringcon***REMOVED***g_presto_server_key }}"
-          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate }}"
+          certi***REMOVED***cate: "{{  _meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate }}"
+          key: "{{ _meteringcon***REMOVED***g_presto_server_key }}"
+          caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate }}"
 
           enabled: true
           createSecret: true
-          secretName: "{{ meteringcon***REMOVED***g_presto_server_secret_name }}"
+          secretName: "{{ _meteringcon***REMOVED***g_presto_server_secret_name }}"
         auth:
-          certi***REMOVED***cate: "{{  meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate }}"
-          key: "{{ meteringcon***REMOVED***g_presto_client_key }}"
-          caCerti***REMOVED***cate: "{{ meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate }}"
+          certi***REMOVED***cate: "{{  _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate }}"
+          key: "{{ _meteringcon***REMOVED***g_presto_client_key }}"
+          caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate }}"
 
           enabled: true
           createSecret: true
-          secretName: "{{ meteringcon***REMOVED***g_presto_client_secret_name }}"
+          secretName: "{{ _meteringcon***REMOVED***g_presto_client_secret_name }}"
 
 # check if the user's spec contains the top-level tls.enabled ***REMOVED***eld. if true, use the value stored in that ***REMOVED***eld, ***REMOVED*** default to the value stored in values.yaml
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"

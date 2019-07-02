@@ -40,8 +40,8 @@
 
   - name: Use generate cert/key when secret doesn't already exist
     set_fact:
-      meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.crt') + '\n' }}"
-      meteringcon***REMOVED***g_tls_root_ca_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.key') + '\n' }}"
+      _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.crt') + '\n' }}"
+      _meteringcon***REMOVED***g_tls_root_ca_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.key') + '\n' }}"
 
   vars:
     root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
@@ -50,18 +50,18 @@
 - name: Use pre-existing CA secret cert/key when secret already exists
   block:
   - set_fact:
-      meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
-      meteringcon***REMOVED***g_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+      _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+      _meteringcon***REMOVED***g_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
 
   - name: Add root CA certi***REMOVED***cate to certi***REMOVED***cates directory
     copy:
-      content: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      content: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
       dest: "{{ certi***REMOVED***cates_dir.path }}/ca.crt"
     when: meteringcon***REMOVED***g_tls_enabled
 
   - name: Add root CA private key to certi***REMOVED***cates directory
     copy:
-      content: "{{ meteringcon***REMOVED***g_tls_root_ca_key }}"
+      content: "{{ _meteringcon***REMOVED***g_tls_root_ca_key }}"
       dest: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
     when: meteringcon***REMOVED***g_tls_enabled
 
