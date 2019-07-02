@@ -63,6 +63,8 @@ spec:
           protocol: TCP
         - containerPort: 8082
           name: metrics
+        - containerPort: 10004
+          name: metastore
 {{- if .Values.hive.spec.server.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.hive.spec.server.readinessProbe | indent 10 }}
@@ -137,7 +139,7 @@ spec:
         args:
         - client
         - --listen
-        - localhost:9083
+        - localhost:10000
         - --target
         - hive-metastore:8443
         - --keystore
