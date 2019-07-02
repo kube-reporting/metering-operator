@@ -101,8 +101,6 @@ spec:
       - name: copy-starter-hadoop
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
-
-
         command:
         - '/bin/bash'
         - '-c'
