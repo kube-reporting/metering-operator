@@ -623,6 +623,13 @@ hive:
           minRAMPercentage: null
 
         tls:
+          # server cert
+          certificate: ""
+          # server private key
+          key: ""
+          # CA for the server cert
+          caCertificate: ""
+
           enabled: false
           createSecret: false
           secretName: ""
