@@ -31,7 +31,7 @@ data:
       </property>
       <property>
         <name>hive.metastore.uris</name>
-        <value>{{ .Values.hive.spec.config.metastoreURIs }}</value>
+        <value>thrift://localhost:8443</value>
       </property>
       <property>
         <name>javax.jdo.option.ConnectionURL</name>

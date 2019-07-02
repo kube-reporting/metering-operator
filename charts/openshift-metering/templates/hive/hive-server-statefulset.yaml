@@ -139,7 +139,7 @@ spec:
         args:
         - client
         - --listen
-        - localhost:10000
+        - localhost:8443
         - --target
         - hive-metastore:8443
         - --keystore
