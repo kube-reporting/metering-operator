@@ -14,17 +14,56 @@ spec:
         # Leave this value as-is.
         namenode: "hdfs-namenode-0.hdfs-namenode:9820"
 
-  hdfs:
+  hadoop:
     spec:
-      datanode:
-        storage:
-          # Default is null, which means using the default storage class if it exists.
-          # If you wish to use a different storage class, specify it here
-          class: null
-          # class: "fast-ssd"
-          size: "5Gi"
-      namenode:
-        storage:
-          class: null
-          # class: "fast-ssd"
-          size: "5Gi"
+      hdfs:
+        datanode:
+          # 3 replicas is recommended to ensure data is replicated.
+          replicas: 3
+          # Since HDFS stores all of the data, and its frequently being accessed,
+          # it requires an increased amount of memory as metrics grow or when
+          # there's a large cluster.
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 1
+              memory: 1G
+          storage:
+            # class defaults to null, which means using the default storage
+            # class.
+            # If you have a storageClass which provides SSDs, uncomment and
+            # specify it here:
+            # class: "fast-ssd"
+            class: null
+            # The default size of 5Gi is fairly small. With 1000 namespaces and
+            # at least 5 pods per namespace you could expect a few hundred Mb of
+            # storage per week.
+            # With multiple replicas, storage capacity is also increased.
+            # Additionally, on many clouds, IOPS are provisioned based on disk
+            # size, meaning a larger PVC can be faster.
+            size: "20Gi"
+        namenode:
+          # The HDFS Namenode stores metadata, and requires more resources as the
+          # amount of storage increases.
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 1
+              memory: 1Gi
+          storage:
+            # class defaults to null, which means using the default storage
+            # class.
+            # If you have a storageClass which provides SSDs, uncomment and
+            # specify it here:
+            # class: "fast-ssd"
+            class: null
+            # Namenodes mostly need larger disks because they consume more
+            # inodes, and the amount of storage needed grows over time as more
+            # blocks are created on HDFS datanodes.
+            # Additionally, on many clouds, IOPS are provisioned based on disk
+            # size, meaning a larger PVC can be faster.
+            size: "20Gi"
