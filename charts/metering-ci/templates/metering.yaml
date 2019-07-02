@@ -40,6 +40,9 @@ spec:
       annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
       {{- end }}
 
+      route:
+        enabled: true
+
       config:
         logLevel: "debug"
         aws:

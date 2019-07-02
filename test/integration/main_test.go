@@ -244,12 +244,14 @@ func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	ns := flag.String("namespace", "metering-ci", "test namespace")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
-	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", true, "If true, uses kubernetes API proxy to access reportingAPI")
+	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
+	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
 	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
+	routeBearerToken := flag.String("route-bearer-token", "", "The bearer token to the reporting-operator serviceaccount if use-route-for-reporting-api is set to true")
 	flag.Parse()
 
 	var err error
-	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *reportingAPIURL); err != nil {
+	if testFramework, err = framework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL); err != nil {
 		logrus.Fatalf("failed to setup framework: %v\n", err)
 	}
 
