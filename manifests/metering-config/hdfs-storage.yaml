@@ -44,6 +44,12 @@ spec:
             # Additionally, on many clouds, IOPS are provisioned based on disk
             # size, meaning a larger PVC can be faster.
             size: "20Gi"
+
+          # # uncomment and adjust if you want to restrict the datanodes pods to
+          # # a particular set of nodes
+          # nodeSelector:
+          #   "node-role.kubernetes.io/infra": "true"
+
         namenode:
           # The HDFS Namenode stores metadata, and requires more resources as the
           # amount of storage increases.
@@ -54,6 +60,7 @@ spec:
             requests:
               cpu: 1
               memory: 1Gi
+
           storage:
             # class defaults to null, which means using the default storage
             # class.
@@ -67,3 +74,8 @@ spec:
             # Additionally, on many clouds, IOPS are provisioned based on disk
             # size, meaning a larger PVC can be faster.
             size: "20Gi"
+
+          # # uncomment and adjust if you want to restrict the datanodes pods to
+          # # a particular set of nodes
+          # nodeSelector:
+          #   "node-role.kubernetes.io/infra": "true"
