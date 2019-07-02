@@ -678,6 +678,21 @@ hive:
           maxRAMPercentage: null
           minRAMPercentage: null
 
+        tls:
+          # server cert
+          certi***REMOVED***cate: ""
+          # server private key
+          key: ""
+          # CA for the server cert
+          caCerti***REMOVED***cate: ""
+
+          enabled: false
+          createSecret: false
+          secretName: ""
+
+        auth:
+          enabled: false
+
         metastoreTLS:
           # TLS options for connecting to hive-metastore from hive-server
           # client cert
