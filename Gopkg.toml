@@ -106,3 +106,7 @@ required = [
 [[override]]
   name = "k8s.io/gengo"
   revision = "b90029ef6cd877cb3f422d75b3a07707e3aac6b7"
+
+[[override]]
+  name = "github.com/openshift/client-go"
+  branch = "master"
