@@ -126,33 +126,33 @@ meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_
 #
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, else use values.yaml and meteringconfig_spec_overrides
 #
-meteringconfig_reporting_operator_presto_server_ca_certificate: ""
-meteringconfig_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
+_meteringconfig_reporting_operator_presto_server_ca_certificate: ""
+_meteringconfig_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
 
-meteringconfig_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
-meteringconfig_reporting_operator_client_cert: ""
-meteringconfig_reporting_operator_presto_client_ca_certificate: ""
-meteringconfig_reporting_operator_client_key: ""
+_meteringconfig_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
+_meteringconfig_reporting_operator_client_cert: ""
+_meteringconfig_reporting_operator_presto_client_ca_certificate: ""
+_meteringconfig_reporting_operator_client_key: ""
 
 _meteringconfig_reporting_operator_auth_proxy_cookie_seed: ""
 
-meteringconfig_presto_server_secret_name: "presto-server-tls"
-meteringconfig_presto_server_ca_certificate: ""
-meteringconfig_presto_server_certificate: ""
-meteringconfig_presto_server_key: ""
+_meteringconfig_presto_server_secret_name: "presto-server-tls"
+_meteringconfig_presto_server_ca_certificate: ""
+_meteringconfig_presto_server_certificate: ""
+_meteringconfig_presto_server_key: ""
 
-meteringconfig_presto_client_secret_name: "presto-client-tls"
-meteringconfig_presto_client_ca_certificate: ""
-meteringconfig_presto_client_certificate: ""
-meteringconfig_presto_client_key: ""
+_meteringconfig_presto_client_secret_name: "presto-client-tls"
+_meteringconfig_presto_client_ca_certificate: ""
+_meteringconfig_presto_client_certificate: ""
+_meteringconfig_presto_client_key: ""
 
-meteringconfig_tls_root_ca_certificate: ""
-meteringconfig_tls_root_ca_key: ""
+_meteringconfig_tls_root_ca_certificate: ""
+_meteringconfig_tls_root_ca_key: ""
 
 meteringconfig_root_ca_overrides:
   tls:
-    certificate: "{{ meteringconfig_tls_root_ca_certificate }}"
-    key: "{{ meteringconfig_tls_root_ca_key }}"
+    certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+    key: "{{ _meteringconfig_tls_root_ca_key }}"
 
 _tls_overrides:
   reporting-operator:
@@ -160,20 +160,20 @@ _tls_overrides:
       config:
         presto:
           tls:
-            caCertificate: "{{ meteringconfig_reporting_operator_presto_server_ca_certificate }}"
+            caCertificate: "{{ _meteringconfig_reporting_operator_presto_server_ca_certificate }}"
 
             enabled: true
             createSecret: true
-            secretName: "{{ meteringconfig_reporting_operator_presto_server_secret_name }}"
+            secretName: "{{ _meteringconfig_reporting_operator_presto_server_secret_name }}"
 
           auth:
-            certificate: "{{ meteringconfig_reporting_operator_client_cert }}"
-            key: "{{ meteringconfig_reporting_operator_client_key }}"
-            caCertificate: "{{ meteringconfig_reporting_operator_presto_client_ca_certificate }}"
+            certificate: "{{ _meteringconfig_reporting_operator_client_cert }}"
+            key: "{{ _meteringconfig_reporting_operator_client_key }}"
+            caCertificate: "{{ _meteringconfig_reporting_operator_presto_client_ca_certificate }}"
 
             enabled: true
             createSecret: true
-            secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
+            secretName: "{{ _meteringconfig_reporting_operator_presto_client_secret_name }}"
       authProxy:
         enabled: true
 
@@ -190,21 +190,21 @@ _tls_overrides:
     spec:
       config:
         tls:
-          certificate: "{{  meteringconfig_presto_server_certificate }}"
-          key: "{{ meteringconfig_presto_server_key }}"
-          caCertificate: "{{ meteringconfig_presto_server_ca_certificate }}"
+          certificate: "{{  _meteringconfig_presto_server_certificate }}"
+          key: "{{ _meteringconfig_presto_server_key }}"
+          caCertificate: "{{ _meteringconfig_presto_server_ca_certificate }}"
 
           enabled: true
           createSecret: true
-          secretName: "{{ meteringconfig_presto_server_secret_name }}"
+          secretName: "{{ _meteringconfig_presto_server_secret_name }}"
         auth:
-          certificate: "{{  meteringconfig_presto_client_certificate }}"
-          key: "{{ meteringconfig_presto_client_key }}"
-          caCertificate: "{{ meteringconfig_presto_client_ca_certificate }}"
+          certificate: "{{  _meteringconfig_presto_client_certificate }}"
+          key: "{{ _meteringconfig_presto_client_key }}"
+          caCertificate: "{{ _meteringconfig_presto_client_ca_certificate }}"
 
           enabled: true
           createSecret: true
-          secretName: "{{ meteringconfig_presto_client_secret_name }}"
+          secretName: "{{ _meteringconfig_presto_client_secret_name }}"
 
 # check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"

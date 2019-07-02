@@ -40,8 +40,8 @@
 
   - name: Use generate cert/key when secret doesn't already exist
     set_fact:
-      meteringconfig_tls_root_ca_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/ca.crt') + '\n' }}"
-      meteringconfig_tls_root_ca_key: "{{ lookup('file', '{{ certificates_dir.path }}/ca.key') + '\n' }}"
+      _meteringconfig_tls_root_ca_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/ca.crt') + '\n' }}"
+      _meteringconfig_tls_root_ca_key: "{{ lookup('file', '{{ certificates_dir.path }}/ca.key') + '\n' }}"
 
   vars:
     root_ca_secret_exists: "{{ root_ca_secret_buf.resources is defined and root_ca_secret_buf.resources | length > 0 }}"
@@ -50,18 +50,18 @@
 - name: Use pre-existing CA secret cert/key when secret already exists
   block:
   - set_fact:
-      meteringconfig_tls_root_ca_certificate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
-      meteringconfig_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+      _meteringconfig_tls_root_ca_certificate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
+      _meteringconfig_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
 
   - name: Add root CA certificate to certificates directory
     copy:
-      content: "{{ meteringconfig_tls_root_ca_certificate }}"
+      content: "{{ _meteringconfig_tls_root_ca_certificate }}"
       dest: "{{ certificates_dir.path }}/ca.crt"
     when: meteringconfig_tls_enabled
 
   - name: Add root CA private key to certificates directory
     copy:
-      content: "{{ meteringconfig_tls_root_ca_key }}"
+      content: "{{ _meteringconfig_tls_root_ca_key }}"
       dest: "{{ certificates_dir.path }}/ca.key"
     when: meteringconfig_tls_enabled
 
