@@ -10,27 +10,17 @@ spec:
 
   presto:
     spec:
-      presto:
-        coordinator:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
-        worker:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
-      hive:
-        metastore:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
-        server:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
-
-  hadoop:
+      coordinator:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
+      worker:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
+  hive:
     spec:
-      hdfs:
-        namenode:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
-        datanode:
-          nodeSelector:
-            "node-role.kubernetes.io/infra": "true"
+      metastore:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
+      server:
+        nodeSelector:
+          "node-role.kubernetes.io/infra": "true"
