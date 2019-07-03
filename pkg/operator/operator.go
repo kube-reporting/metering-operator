@@ -101,18 +101,23 @@ type Con***REMOVED***g struct {
 	MetricsListen string
 	PprofListen   string
 
-	HiveHost   string
-	HiveUseTLS bool
-	HiveCAFile string
+	HiveHost                  string
+	HiveUseTLS                bool
+	HiveCAFile                string
+	HiveTLSInsecureSkipVerify bool
+
+	HiveUseClientCertAuth bool
+	HiveClientCertFile    string
+	HiveClientKeyFile     string
 
 	PrestoHost                  string
 	PrestoUseTLS                bool
-	PrestoUseClientCertAuth     bool
-	PrestoTLSInsecureSkipVerify bool
 	PrestoCAFile                string
-	PrestoClientCertFile        string
-	PrestoClientKeyFile         string
-	PrestoClientCACertFile      string
+	PrestoTLSInsecureSkipVerify bool
+
+	PrestoUseClientCertAuth bool
+	PrestoClientCertFile    string
+	PrestoClientKeyFile     string
 
 	PrestoMaxQueryLength int
 
@@ -408,23 +413,34 @@ func (op *Reporting) Run(ctx context.Context) error {
 	go op.informerFactory.Start(ctx.Done())
 
 	op.logger.Infof("setting up DB clients")
-	var dialer hive.Dialer
+	var hiveDialer hive.Dialer = hive.DialWrapper{}
 	if op.cfg.HiveUseTLS {
-		cert, err := ioutil.ReadFile(op.cfg.HiveCAFile)
+		rootCert, err := ioutil.ReadFile(op.cfg.HiveCAFile)
 		if err != nil {
-			return err
+			return fmt.Errorf("error loading Hive CA File: %s", err)
 		}
-		certPool := x509.NewCertPool()
-		certPool.AppendCertsFromPEM(cert)
-		dialer = hive.TLSDialer{
-			Con***REMOVED***g: &tls.Con***REMOVED***g{
-				RootCAs: certPool,
-			},
+		rootCertPool := x509.NewCertPool()
+		rootCertPool.AppendCertsFromPEM(rootCert)
+
+		hiveTLSCon***REMOVED***g := &tls.Con***REMOVED***g{
+			RootCAs: rootCertPool,
 		}
-	} ***REMOVED*** {
-		dialer = hive.DialWrapper{}
+
+		if op.cfg.HiveUseClientCertAuth {
+			clientCert, err := tls.LoadX509KeyPair(op.cfg.HiveClientCertFile, op.cfg.HiveClientKeyFile)
+			if err != nil {
+				return fmt.Errorf("error loading Hive client cert/key: %v", err)
+			}
+
+			// mutate the necessary structure ***REMOVED***elds in hiveTLSCon***REMOVED***g to work with client certi***REMOVED***cates
+			hiveTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
+		}
+
+		hiveDialer = hive.TLSDialer{
+			Con***REMOVED***g: hiveTLSCon***REMOVED***g,
+		}
 	}
-	hiveDB, err := hive.NewConnectorWithDialer(dialer, fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
+	hiveDB, err := hive.NewConnectorWithDialer(hiveDialer, fmt.Sprintf("hive://%s?batch=500", op.cfg.HiveHost))
 	if err != nil {
 		return err
 	}
@@ -468,19 +484,8 @@ func (op *Reporting) Run(ctx context.Context) error {
 			if err != nil {
 				return fmt.Errorf("presto: Error loading SSL Client cert/key ***REMOVED***le: %v", err)
 			}
-
-			clientCACert, err := ioutil.ReadFile(op.cfg.PrestoClientCACertFile)
-			if err != nil {
-				return fmt.Errorf("presto: Error loading SSL Client CA Cert File: %v", err)
-			}
-
-			clientCAPool := x509.NewCertPool()
-			clientCAPool.AppendCertsFromPEM(clientCACert)
-
 			// mutate the necessary structure ***REMOVED***elds in prestoTLSCon***REMOVED***g to work with client certi***REMOVED***cates
 			prestoTLSCon***REMOVED***g.Certi***REMOVED***cates = []tls.Certi***REMOVED***cate{clientCert}
-			prestoTLSCon***REMOVED***g.ClientCAs = clientCAPool
-			prestoTLSCon***REMOVED***g.ClientAuth = tls.RequireAndVerifyClientCert
 		}
 
 		// build up the http client structure to use the correct certi***REMOVED***cates when TLS/auth is enabled/disabled
