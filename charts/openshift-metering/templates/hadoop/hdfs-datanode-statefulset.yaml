@@ -130,8 +130,6 @@ spec:
         # required for openshift
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
-
-
       - name: copy-starter-hadoop
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
@@ -139,16 +137,11 @@ spec:
         - '/bin/bash'
         - '-c'
         - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'        
-        # command: ['cp']
-        # args: ['-v','-L','-r', '-f','/hadoop-starting-config/*','/hadoop-config/']
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
-
-
-      
       containers:
       - name: hdfs-datanode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -267,8 +260,7 @@ spec:
         emptyDir: {}
       - name: hadoop-starting-config
         secret:
-          secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
-        
+          secretName: {{ .Values.hadoop.spec.configSecretName }}        
       - name: hadoop-scripts
         configMap:
           name: hadoop-scripts

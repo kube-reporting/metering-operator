@@ -48,7 +48,6 @@ spec:
       affinity:
 {{ toYaml .Values.hive.spec.server.affinity | indent 8 }}
 {{- end }}
-
       initContainers:
       - name: copy-starter-hive
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
@@ -65,15 +64,11 @@ spec:
             secretKeyRef:
               name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hive-azure-credentials" }}"
               key: azure-secret-access-key
-        
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
-
-
-
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
@@ -134,7 +129,6 @@ spec:
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
-
 {{- end}}
         - name: hive-jmx-config
           mountPath: /opt/jmx_exporter/config
@@ -174,7 +168,7 @@ spec:
         emptyDir: {}
       - name: hadoop-starting-config
         secret:
-          secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
+          secretName: {{ .Values.hive.spec.config.hadoopConfigSecretName }} 
 {{- end }}
       - name: hive-jmx-config
         configMap:

@@ -100,7 +100,10 @@ spec:
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
+<<<<<<< HEAD
 
+=======
+>>>>>>> copied-core-site.xml
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
