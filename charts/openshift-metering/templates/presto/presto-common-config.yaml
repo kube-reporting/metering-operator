@@ -22,6 +22,7 @@ data:
 {{- end }}
 
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
+    cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
 
   entrypoint.sh: |
     #!/bin/bash
