@@ -60,5 +60,9 @@
       <name>fs.defaultFS</name>
       <value>{{ .Values.hadoop.spec.config.defaultFS }}</value>
   </property>
+  <property>
+      <name>fs.AbstractFileSystem.wasb.Impl</name>
+      <value>org.apache.hadoop.fs.azure.Wasb</value>
+  </property>
 </configuration>
 {{- end }}

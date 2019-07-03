@@ -53,12 +53,19 @@ spec:
       - name: copy-starter-hive
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
-        command:
-        - '/bin/bash'
-        - '-c'
-        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'
-        # command: ['cp']
-        # args: ['-v','-L','-r', '-f','/hadoop-starting-config/*','/hadoop-config/']
+        command: ["/hive-scripts/azure_secret_copy.sh"]
+        env:
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.storageAccountName | default "hive-azure-credentials" }}"
+              key: azure_storage_account_name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hive-azure-credentials" }}"
+              key: azure-secret-access-key
+        
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
