@@ -47,7 +47,20 @@ spec:
 {{- if .Values.hive.spec.metastore.affinity }}
       affinity:
 {{ toYaml .Values.hive.spec.metastore.affinity | indent 8 }}
-{{- end }}
+{{- end }}         
+      initContainers:
+      - name: copy-starter-hive
+        image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
+        command:
+        - '/bin/bash'
+        - '-c'
+        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'
+        volumeMounts:
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
       containers:
       - name: metastore
         command: ["/hive-scripts/entrypoint.sh"]
@@ -102,6 +115,8 @@ spec:
 {{- if .Values.hive.spec.config.useHadoopConfig }}
         - name: hadoop-config
           mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
 {{- end }}
         - name: hive-jmx-config
           mountPath: /opt/jmx_exporter/config
@@ -171,6 +186,8 @@ spec:
           defaultMode: 0555
 {{- if .Values.hive.spec.config.useHadoopConfig }}
       - name: hadoop-config
+        emptyDir: {}
+      - name: hadoop-starting-config
         secret:
           secretName: {{ .Values.hive.spec.config.hadoopConfigSecretName }}
 {{- end }}

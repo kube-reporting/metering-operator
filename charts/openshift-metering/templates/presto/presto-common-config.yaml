@@ -18,6 +18,8 @@ data:
 
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
 
+    cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
+
   entrypoint.sh: |
     #!/bin/bash
     set -e
@@ -41,8 +43,8 @@ data:
       echo "hive.s3.aws-access-key=$AWS_ACCESS_KEY_ID" >> "$HIVE_CATALOG_CONFIG"
       echo "hive.s3.aws-secret-key=$AWS_SECRET_ACCESS_KEY" >> "$HIVE_CATALOG_CONFIG"
     fi
-  
- 
+
+
 
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then
