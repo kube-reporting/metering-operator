@@ -35,7 +35,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 				t.Parallel()
 			}
 
-			query, err := testFramework.GetMeteringReportQuery(test.queryName)
+			query, err := testFramework.WaitForMeteringReportQuery(t, test.queryName, 5*time.Second, 5*time.Minute)
 			require.NoError(t, err, "report query for report should exist")
 
 			dsGetter := reporting.NewReportDataSourceClientGetter(testFramework.MeteringClient)
