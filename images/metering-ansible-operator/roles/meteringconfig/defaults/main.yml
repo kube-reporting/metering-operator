@@ -134,6 +134,8 @@ meteringconfig_reporting_operator_client_cert: ""
 meteringconfig_reporting_operator_presto_client_ca_certificate: ""
 meteringconfig_reporting_operator_client_key: ""
 
+_meteringconfig_reporting_operator_auth_proxy_cookie_seed: ""
+
 meteringconfig_presto_server_secret_name: "presto-server-tls"
 meteringconfig_presto_server_ca_certificate: ""
 meteringconfig_presto_server_certificate: ""
@@ -172,6 +174,18 @@ _tls_overrides:
             enabled: true
             createSecret: true
             secretName: "{{ meteringconfig_reporting_operator_presto_client_secret_name }}"
+      authProxy:
+        enabled: true
+
+        cookie:
+          seed: "{{ _meteringconfig_reporting_operator_auth_proxy_cookie_seed }}"
+
+        deletegateURLs:
+          enabled: true
+
+        subjectAccessReview:
+          enabled: true
+
   presto:
     spec:
       config:
@@ -196,7 +210,7 @@ _tls_overrides:
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_overrides, {}) }}"
 # combine the meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_tls_overrides, meteringconfig_root_ca_overrides, recursive=True) }}"
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_root_ca_overrides, meteringconfig_tls_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"

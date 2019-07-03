@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator"
 )
@@ -22,6 +23,7 @@ type Framework struct {
 	MeteringClient        metering.MeteringV1Interface
 	KubeClient            kubernetes.Interface
 	HTTPClient            *http.Client
+	RouteClient           routev1client.RouteV1Client
 	Namespace             string
 	DefaultTimeout        time.Duration
 	ReportOutputDirectory string
@@ -30,6 +32,8 @@ type Framework struct {
 	KubeAPIPath string
 
 	UseKubeProxyForReportingAPI bool
+	UseRouteForReportingAPI     bool
+	RouteBearerToken            string
 	ReportingAPIURL             *url.URL
 	HTTPSAPI                    bool
 
@@ -40,7 +44,7 @@ type Framework struct {
 }
 
 // New initializes a test framework and returns it.
-func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI bool, reportingAPIURL string) (*Framework, error) {
+func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI, useRouteForReportingAPI bool, routeBearerToken, reportingAPIURL string) (*Framework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("build config from flags failed: err %v", err)
@@ -75,6 +79,11 @@ func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI boo
 		httpc.Timeout = configCopy.Timeout
 	}
 
+	routeClient, err := routev1client.NewForConfig(config)
+	if err != nil {
+		return nil, fmt.Errorf("creating openshift route client failed, err: %v", err)
+	}
+
 	meteringClient, err := metering.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
@@ -94,6 +103,7 @@ func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI boo
 		KubeClient:                  kubeClient,
 		MeteringClient:              meteringClient,
 		HTTPClient:                  httpc,
+		RouteClient:                 *routeClient,
 		Namespace:                   namespace,
 		ReportOutputDirectory:       reportOutputDir,
 		DefaultTimeout:              time.Minute,
@@ -102,6 +112,8 @@ func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI boo
 		HTTPSAPI:                    httpsAPI,
 		ReportingAPIURL:             reportAPI,
 		UseKubeProxyForReportingAPI: useKubeProxyForReportingAPI,
+		UseRouteForReportingAPI:     useRouteForReportingAPI,
+		RouteBearerToken:            routeBearerToken,
 	}
 
 	return f, nil

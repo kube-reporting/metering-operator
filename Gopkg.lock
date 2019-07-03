@@ -289,6 +289,25 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:e87d3f313113709e01fcf7a8b23cba603c0fce432557b93b970e06fda29ca445"
+  name = "github.com/openshift/api"
+  packages = ["route/v1"]
+  pruneopts = "NUT"
+  revision = "0d921e363e951d89f583292c60d013c318df64dc"
+  version = "v3.9.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:34a691c1a3fd6a77b18d229f81ab1d952f76896d8aeaf5b96b284863ded39e2b"
+  name = "github.com/openshift/client-go"
+  packages = [
+    "route/clientset/versioned/scheme",
+    "route/clientset/versioned/typed/route/v1",
+  ]
+  pruneopts = "NUT"
+  revision = "c44a8b61b9f46cd9e802384dfeda0bc9942db68a"
+
+[[projects]]
   branch = "master"
   digest = "1:3bf17a6e6eaa6ad24152148a631d18662f7212e21637c2699bff3369b7f00fa2"
   name = "github.com/petar/GoLLRB"
@@ -810,6 +829,7 @@
     "github.com/golang/mock/gomock",
     "github.com/golang/mock/mockgen",
     "github.com/golang/mock/mockgen/model",
+    "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1",
     "github.com/prestodb/presto-go-client/presto",
     "github.com/prometheus/client_golang/api",
     "github.com/prometheus/client_golang/api/prometheus/v1",
