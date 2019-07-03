@@ -80,7 +80,7 @@ There are a few ways to do authentication, you can use service account tokens fo
 See the [openshift authentication](#openshift-authentication) section below for details on how authentication and authorization works.
 See the [expose-route.yaml][expose-route-config] configuration for an example of setting enabling an Openshift route and configuring authentication with both options enabled.
 
-Make sure you modify the `reporting-operator.spec.authProxy.httpasswdData` and `reporting-operator.spec.authProxy.cookieSeed` values.
+Make sure you modify the `reporting-operator.spec.authProxy.httpasswd.data` and `reporting-operator.spec.authProxy.cookie.seed` values.
 
 Once installed with the customized configuration to enable the route, you should query in your namespace to check for the route:
 
@@ -152,9 +152,10 @@ Enabling authentication configures the reporting-operator pod to run the Openshi
 This adjusts the ports so that the reporting-operator API isn't exposed directly, but instead is proxied to via the auth-proxy sidecar container.
 
 - `reporting-operator.spec.authProxy.enabled`
-- `reporting-operator.spec.authProxy.cookieSeed`
+- `reporting-operator.spec.authProxy.cookie.createSecret`
+- `reporting-operator.spec.authProxy.cookie.seed`
 
-You need to set `reporting-operator.spec.authProxy.enabled` to true and `reporting-operator.spec.authProxy.cookieSeed` to a 32-character random string.
+You need to set `reporting-operator.spec.authProxy.enabled` and `reporting-operator.spec.authProxy.cookie.createSecret` to true and `reporting-operator.spec.authProxy.cookie.seed` to a 32-character random string.
 
 You can generate a 32-character random string using the command `$ openssl rand -base64 32 | head -c32; echo`.
 
@@ -163,8 +164,8 @@ You can generate a 32-character random string using the command `$ openssl rand 
 When the following options are set to true, authentication using a bearer token is enabled for the reporting REST API.
 Bearer tokens may come from serviceAccounts or users.
 
-- `reporting-operator.spec.authProxy.subjectAccessReviewEnabled`
-- `reporting-operator.spec.authProxy.delegateURLsEnabled`
+- `reporting-operator.spec.authProxy.subjectAccessReview.enabled`
+- `reporting-operator.spec.authProxy.delegateURLs.enabled`
 
 When authentication is enabled, the Bearer token used to query the reporting API of the user or serviceAccount must be granted access using one of the following roles:
 
@@ -186,7 +187,7 @@ In this document, most examples will prefer this method.
 
 #### Basic Authentication (username/password)
 
-If `reporting-operator.spec.authProxy.htpasswdData` is non-empty, its contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
+If `reporting-operator.spec.authProxy.htpasswd.data` is non-empty, its contents must be that of an [htpasswd file](https://httpd.apache.org/docs/2.4/programs/htpasswd.html).
 When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide your username and password that has a corresponding entry in the `htpasswdData` contents.
 
 [route]: https://docs.openshift.com/container-platform/3.11/dev_guide/routes.html
