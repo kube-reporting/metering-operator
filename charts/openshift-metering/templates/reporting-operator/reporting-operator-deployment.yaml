@@ -38,8 +38,14 @@ spec:
 {{- if and $operatorValues.spec.config.presto.tls.enabled $operatorValues.spec.config.presto.tls.createSecret }}
         reporting-operator-presto-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
+{{- if and $operatorValues.spec.config.hive.tls.enabled $operatorValues.spec.config.hive.tls.createSecret }}
+        reporting-operator-hive-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if and $operatorValues.spec.config.presto.auth.enabled $operatorValues.spec.config.presto.auth.createSecret }}
         reporting-operator-presto-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-auth-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.config.hive.auth.enabled $operatorValues.spec.config.hive.auth.createSecret }}
+        reporting-operator-hive-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.cookie.createSecret }}
         reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
@@ -217,11 +223,6 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: presto-client-key-file
-        - name: REPORTING_OPERATOR_PRESTO_CLIENT_CA_CERT_FILE
-          valueFrom:
-            configMapKeyRef:
-              name: reporting-operator-config
-              key: presto-client-ca-cert-file
 {{- else }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
@@ -231,6 +232,37 @@ spec:
             configMapKeyRef:
               name: reporting-operator-config
               key: hive-host
+
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
+        - name: REPORTING_OPERATOR_HIVE_USE_TLS
+          value: "true"
+        - name: REPORTING_OPERATOR_HIVE_CA_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-ca-file
+{{- else }}
+        - name: REPORTING_OPERATOR_HIVE_USE_TLS
+          value: "false"
+{{- end }}
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
+        - name: REPORTING_OPERATOR_HIVE_USE_AUTH
+          value: "true"
+        - name: REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-client-cert-file
+        - name: REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: reporting-operator-config
+              key: hive-client-key-file
+{{- else }}
+        - name: REPORTING_OPERATOR_HIVE_USE_AUTH
+          value: "false"
+{{- end }}
+
         - name: REPORTING_OPERATOR_LEASE_DURATION
           valueFrom:
             configMapKeyRef:
@@ -295,6 +327,14 @@ spec:
 {{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
 {{- end }}
         volumeMounts:
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
+        - name: hive-tls
+          mountPath: /var/run/secrets/hive-tls
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
+        - name: hive-auth
+          mountPath: /var/run/secrets/hive-auth
+{{- end }}
+{{- end }}
 {{- if $operatorValues.spec.config.presto.tls.enabled }}
         - name: presto-tls
           mountPath: /var/run/secrets/presto-tls
@@ -386,6 +426,16 @@ spec:
 {{- end }}
 {{- end }}{{/* end of authProxy.enabled */}}
       volumes:
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
+      - name: hive-tls
+        secret:
+          secretName: {{ $operatorValues.spec.config.hive.tls.secretName }}
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
+      - name: hive-auth
+        secret:
+          secretName: {{ $operatorValues.spec.config.hive.auth.secretName }}
+{{- end }}
+{{- end }}
 {{- if $operatorValues.spec.config.presto.tls.enabled }}
       - name: presto-tls
         secret:

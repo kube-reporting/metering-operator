@@ -131,7 +131,6 @@ _meteringconfig_reporting_operator_presto_server_secret_name: "reporting-operato
 
 _meteringconfig_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
 _meteringconfig_reporting_operator_client_cert: ""
-_meteringconfig_reporting_operator_presto_client_ca_certificate: ""
 _meteringconfig_reporting_operator_client_key: ""
 
 _meteringconfig_reporting_operator_auth_proxy_cookie_seed: ""
@@ -169,11 +168,11 @@ _tls_overrides:
           auth:
             certificate: "{{ _meteringconfig_reporting_operator_client_cert }}"
             key: "{{ _meteringconfig_reporting_operator_client_key }}"
-            caCertificate: "{{ _meteringconfig_reporting_operator_presto_client_ca_certificate }}"
 
             enabled: true
             createSecret: true
             secretName: "{{ _meteringconfig_reporting_operator_presto_client_secret_name }}"
+
       authProxy:
         enabled: true
 
@@ -275,6 +274,8 @@ meteringconfig_create_reporting_operator_prometheus_certificate_authority: "{{ _
 meteringconfig_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.config.aws.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.config.presto.tls.enabled and _reporting_op_spec.config.presto.tls.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.config.presto.auth.enabled and _reporting_op_spec.config.presto.auth.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_hive_tls_secrets: "{{ _reporting_op_spec.config.hive.tls.enabled and _reporting_op_spec.config.hive.tls.createSecret | default(false) }}"
+meteringconfig_create_reporting_operator_hive_auth_secrets: "{{ _reporting_op_spec.config.hive.auth.enabled and _reporting_op_spec.config.hive.auth.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.api.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"

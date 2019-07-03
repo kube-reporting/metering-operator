@@ -10,19 +10,26 @@ data:
   log-reports: {{ $operatorValues.spec.config.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.config.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.config.logDMLQueries | quote}}
-  presto-host: {{ $operatorValues.spec.config.presto.host | quote }}
   hive-host: {{ $operatorValues.spec.config.hive.host | quote }}
-  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" $operatorValues.spec.config.prometheus.url | quote}}
-  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.config.prometheus.metricsImporter.enabled | quote}}
-  enable-finalizers: {{ $operatorValues.spec.config.enableFinalizers | quote}}
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
+  hive-ca-file: "/var/run/secrets/hive-tls/ca.crt"
+{{- if $operatorValues.spec.config.hive.auth.enabled }}
+  hive-client-cert-file: "/var/run/secrets/hive-auth/tls.crt"
+  hive-client-key-file: "/var/run/secrets/hive-auth/tls.key"
+{{- end }}
+{{- end }}
+
+  presto-host: {{ $operatorValues.spec.config.presto.host | quote }}
 {{- if $operatorValues.spec.config.presto.tls.enabled }}
   presto-ca-file: "/var/run/secrets/presto-tls/ca.crt"
 {{- if $operatorValues.spec.config.presto.auth.enabled }}
   presto-client-cert-file: "/var/run/secrets/presto-auth/tls.crt"
   presto-client-key-file: "/var/run/secrets/presto-auth/tls.key"
-  presto-client-ca-cert-file: "/var/run/secrets/presto-auth/ca.crt"
 {{- end }}
 {{- end }}
+
+  prometheus-url: {{ required "a valid reporting-operator.spec.config.prometheusURL must be set" $operatorValues.spec.config.prometheus.url | quote}}
+  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.config.prometheus.metricsImporter.enabled | quote}}
 {{- if $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval }}
   prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.config.prometheus.metricsImporter.config.pollInterval | quote}}
 {{- end }}
@@ -58,3 +65,4 @@ data:
 {{- if $operatorValues.spec.config.targetNamespaces }}
   target-namespaces: {{ $operatorValues.spec.config.targetNamespaces | join "," | quote }}
 {{- end }}
+  enable-finalizers: {{ $operatorValues.spec.config.enableFinalizers | quote}}
