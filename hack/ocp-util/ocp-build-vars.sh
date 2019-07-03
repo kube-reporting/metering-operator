@@ -11,6 +11,6 @@ _readlink() {
 }
 
 SUB_MGR_FILE="$(_readlink -f "$DIR/subscription-manager.conf")"
-REPO_FILE="$(_readlink -f "$DIR/redhat.repo")"
+REPO_DIR="$(_readlink -f "$DIR/repos")"
 
-export SUB_MGR_FILE REPO_FILE
+export SUB_MGR_FILE REPO_DIR
