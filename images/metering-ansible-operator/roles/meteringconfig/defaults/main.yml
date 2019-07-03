@@ -131,7 +131,6 @@ _meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name: "report
 
 _meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
 _meteringcon***REMOVED***g_reporting_operator_client_cert: ""
-_meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: ""
 _meteringcon***REMOVED***g_reporting_operator_client_key: ""
 
 _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: ""
@@ -169,11 +168,11 @@ _tls_overrides:
           auth:
             certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_client_cert }}"
             key: "{{ _meteringcon***REMOVED***g_reporting_operator_client_key }}"
-            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate }}"
 
             enabled: true
             createSecret: true
             secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
+
       authProxy:
         enabled: true
 
@@ -275,6 +274,8 @@ meteringcon***REMOVED***g_create_reporting_operator_prometheus_certi***REMOVED**
 meteringcon***REMOVED***g_create_reporting_operator_aws_credentials: "{{ _reporting_op_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_presto_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.presto.tls.enabled and _reporting_op_spec.con***REMOVED***g.presto.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_presto_auth_secrets: "{{ _reporting_op_spec.con***REMOVED***g.presto.auth.enabled and _reporting_op_spec.con***REMOVED***g.presto.auth.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_hive_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.hive.tls.enabled and _reporting_op_spec.con***REMOVED***g.hive.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_reporting_operator_hive_auth_secrets: "{{ _reporting_op_spec.con***REMOVED***g.hive.auth.enabled and _reporting_op_spec.con***REMOVED***g.hive.auth.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.api.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"
