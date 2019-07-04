@@ -160,7 +160,7 @@ spec:
       - name: presto-common-config
         configMap:
           name: presto-common-config
-          defaultMode: 0774
+          defaultMode: 0775
       - name: presto-catalog-config
         secret:
           secretName: presto-catalog-config
