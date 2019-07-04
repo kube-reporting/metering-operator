@@ -147,6 +147,8 @@ spec:
 {{- if .Values.hive.spec.metastore.config.auth.enabled }}
         - --allow-cn
         - hive-server
+        - --allow-cn
+        - presto-clients
 {{- else }}
         - --disable-authentication
 {{- end }}

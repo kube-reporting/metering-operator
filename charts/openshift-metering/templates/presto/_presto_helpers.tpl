@@ -6,7 +6,14 @@ hive.storage-format={{ .Values.hive.spec.config.defaultFileFormat | upper }}
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
+
+{{- if .Values.presto.spec.config.connectors.hive.metastoreURI }}
 hive.metastore.uri={{ .Values.presto.spec.config.connectors.hive.metastoreURI }}
+{{- else if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+hive.metastore.uri=thrift://localhost:9083
+{{- else }}
+hive.metastore.uri=thrift://hive-metastore:9083
+{{- end }}
 {{- if .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 {{- end }}

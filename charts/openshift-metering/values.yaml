@@ -467,8 +467,20 @@ presto:
           hadoopConfigSecretName: hadoop-config
           useHadoopConfig: true
 
-          metastoreURI: thrift://hive-metastore:9083
+          metastoreURI: null
           metastoreTimeout: null
+
+          tls:
+            # client cert
+            certificate: ""
+            # client private key
+            key: ""
+            # CA for metastore
+            caCertificate: ""
+
+            createSecret: false
+            enabled: false
+            secretName: ""
 
         extraConnectorFiles: []
 
