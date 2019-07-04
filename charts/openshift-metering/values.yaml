@@ -467,8 +467,20 @@ presto:
           hadoopCon***REMOVED***gSecretName: hadoop-con***REMOVED***g
           useHadoopCon***REMOVED***g: true
 
-          metastoreURI: thrift://hive-metastore:9083
+          metastoreURI: null
           metastoreTimeout: null
+
+          tls:
+            # client cert
+            certi***REMOVED***cate: ""
+            # client private key
+            key: ""
+            # CA for metastore
+            caCerti***REMOVED***cate: ""
+
+            createSecret: false
+            enabled: false
+            secretName: ""
 
         extraConnectorFiles: []
 
