@@ -258,17 +258,26 @@ reporting-operator:
       hive:
         # note this will contain more information once TLS/Auth is enabled w/ Hive
         host: hive-server:10000
-        # tls:
-        #   # client cert
-        #   certificate: ""
-        #   # client private key
-        #   key: ""
-        #   # CA for the client cert
-        #   caCertificate: ""
+        tls:
+          # client cert
+          certificate: ""
+          # client private key
+          key: ""
+          # CA for the client cert
+          caCertificate: ""
 
-        #   createSecret: false
-        #   enabled: false
-        #   secretName: ""
+          createSecret: false
+          enabled: false
+          secretName: ""
+        auth:
+          # client cert
+          certificate: ""
+          # client private key
+          key: ""
+
+          createSecret: false
+          enabled: false
+          secretName: ""
 
       presto:
         host: presto:8080
@@ -286,8 +295,6 @@ reporting-operator:
           certificate: ""
           # client private key
           key: ""
-          # CA for the client cert
-          caCertificate: ""
 
           createSecret: false
           enabled: false
