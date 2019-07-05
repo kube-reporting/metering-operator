@@ -37,19 +37,19 @@
 
   - name: Con***REMOVED***gure Presto to use generated TLS ***REMOVED***les
     set_fact:
-      meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
 
-      meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.crt') + '\n' }}"
-      meteringcon***REMOVED***g_presto_server_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.key') + '\n' }}"
+      _meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.crt') + '\n' }}"
+      _meteringcon***REMOVED***g_presto_server_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_server.key') + '\n' }}"
 
-      meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      meteringcon***REMOVED***g_reporting_operator_client_cert: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
-      meteringcon***REMOVED***g_reporting_operator_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
+      _meteringcon***REMOVED***g_reporting_operator_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringcon***REMOVED***g_reporting_operator_client_cert: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
+      _meteringcon***REMOVED***g_reporting_operator_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
 
-      meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-      meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
-      meteringcon***REMOVED***g_presto_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
+      _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+      _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.crt') + '\n' }}"
+      _meteringcon***REMOVED***g_presto_client_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/presto_client.key') + '\n' }}"
     no_log: true
   when: meteringcon***REMOVED***g_tls_enabled and (presto_secret_tls_buf.resources | length == 0 or presto_secret_auth_buf.resources | length == 0)
 
@@ -58,16 +58,16 @@
 #
 - name: Con***REMOVED***gure Presto to use existing server TLS secret data
   set_fact:
-    meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-    meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ presto_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
-    meteringcon***REMOVED***g_presto_server_key: "{{ presto_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+    _meteringcon***REMOVED***g_presto_server_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+    _meteringcon***REMOVED***g_presto_server_certi***REMOVED***cate: "{{ presto_secret_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+    _meteringcon***REMOVED***g_presto_server_key: "{{ presto_secret_tls_buf.resources[0].data['tls.key'] | b64decode }}"
   no_log: true
   when: meteringcon***REMOVED***g_tls_enabled and presto_secret_tls_buf.resources | length > 0
 
 - name: Con***REMOVED***gure Presto to use existing client TLS secret data
   set_fact:
-    meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
-    meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ presto_secret_auth_buf.resources[0].data['tls.crt'] | b64decode }}"
-    meteringcon***REMOVED***g_presto_client_key: "{{ presto_secret_auth_buf.resources[0].data['tls.key'] | b64decode }}"
+    _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
+    _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: "{{ presto_secret_auth_buf.resources[0].data['tls.crt'] | b64decode }}"
+    _meteringcon***REMOVED***g_presto_client_key: "{{ presto_secret_auth_buf.resources[0].data['tls.key'] | b64decode }}"
   no_log: true
   when: meteringcon***REMOVED***g_tls_enabled and presto_secret_auth_buf.resources | length > 0
