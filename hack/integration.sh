@@ -39,6 +39,7 @@ if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
     export METERING_HTTPS_API="false"
     export METERING_REPORTING_API_URL="http://$REPORTING_OPERATOR_API_LISTEN"
     export METERING_USE_KUBE_PROXY_FOR_REPORTING_API="false"
+    export METERING_USE_ROUTE_FOR_REPORTING_API="false"
 fi
 if [ "$DEPLOY_METERING_OPERATOR_LOCAL" == "true" ]; then
     export METERING_OPERATOR_CONTAINER_NAME="metering-operator-integration"
