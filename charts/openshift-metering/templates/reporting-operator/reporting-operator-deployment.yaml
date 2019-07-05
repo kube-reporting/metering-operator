@@ -38,8 +38,14 @@ spec:
 {{- if and $operatorValues.spec.con***REMOVED***g.presto.tls.enabled $operatorValues.spec.con***REMOVED***g.presto.tls.createSecret }}
         reporting-operator-presto-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
+{{- if and $operatorValues.spec.con***REMOVED***g.hive.tls.enabled $operatorValues.spec.con***REMOVED***g.hive.tls.createSecret }}
+        reporting-operator-hive-server-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if and $operatorValues.spec.con***REMOVED***g.presto.auth.enabled $operatorValues.spec.con***REMOVED***g.presto.auth.createSecret }}
         reporting-operator-presto-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-presto-auth-secrets.yaml") . | sha256sum }}
+{{- end }}
+{{- if and $operatorValues.spec.con***REMOVED***g.hive.auth.enabled $operatorValues.spec.con***REMOVED***g.hive.auth.createSecret }}
+        reporting-operator-hive-client-tls-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-hive-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if and $operatorValues.spec.authProxy.enabled $operatorValues.spec.authProxy.cookie.createSecret }}
         reporting-operator-auth-proxy-cookie-secrets-hash: {{ include (print $.Template.BasePath "/reporting-operator/reporting-operator-auth-proxy-cookie-secret.yaml") . | sha256sum }}
@@ -217,11 +223,6 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: presto-client-key-***REMOVED***le
-        - name: REPORTING_OPERATOR_PRESTO_CLIENT_CA_CERT_FILE
-          valueFrom:
-            con***REMOVED***gMapKeyRef:
-              name: reporting-operator-con***REMOVED***g
-              key: presto-client-ca-cert-***REMOVED***le
 {{- ***REMOVED*** }}
         - name: REPORTING_OPERATOR_PRESTO_USE_AUTH
           value: "false"
@@ -231,6 +232,37 @@ spec:
             con***REMOVED***gMapKeyRef:
               name: reporting-operator-con***REMOVED***g
               key: hive-host
+
+{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+        - name: REPORTING_OPERATOR_HIVE_USE_TLS
+          value: "true"
+        - name: REPORTING_OPERATOR_HIVE_CA_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: hive-ca-***REMOVED***le
+{{- ***REMOVED*** }}
+        - name: REPORTING_OPERATOR_HIVE_USE_TLS
+          value: "false"
+{{- end }}
+{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+        - name: REPORTING_OPERATOR_HIVE_USE_AUTH
+          value: "true"
+        - name: REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: hive-client-cert-***REMOVED***le
+        - name: REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: reporting-operator-con***REMOVED***g
+              key: hive-client-key-***REMOVED***le
+{{- ***REMOVED*** }}
+        - name: REPORTING_OPERATOR_HIVE_USE_AUTH
+          value: "false"
+{{- end }}
+
         - name: REPORTING_OPERATOR_LEASE_DURATION
           valueFrom:
             con***REMOVED***gMapKeyRef:
@@ -295,6 +327,14 @@ spec:
 {{ toYaml $operatorValues.spec.livenessProbe | indent 10 }}
 {{- end }}
         volumeMounts:
+{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+        - name: hive-tls
+          mountPath: /var/run/secrets/hive-tls
+{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+        - name: hive-auth
+          mountPath: /var/run/secrets/hive-auth
+{{- end }}
+{{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
         - name: presto-tls
           mountPath: /var/run/secrets/presto-tls
@@ -386,6 +426,16 @@ spec:
 {{- end }}
 {{- end }}{{/* end of authProxy.enabled */}}
       volumes:
+{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+      - name: hive-tls
+        secret:
+          secretName: {{ $operatorValues.spec.con***REMOVED***g.hive.tls.secretName }}
+{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+      - name: hive-auth
+        secret:
+          secretName: {{ $operatorValues.spec.con***REMOVED***g.hive.auth.secretName }}
+{{- end }}
+{{- end }}
 {{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
       - name: presto-tls
         secret:

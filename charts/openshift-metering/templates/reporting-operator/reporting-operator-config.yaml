@@ -10,19 +10,26 @@ data:
   log-reports: {{ $operatorValues.spec.con***REMOVED***g.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.con***REMOVED***g.logDMLQueries | quote}}
-  presto-host: {{ $operatorValues.spec.con***REMOVED***g.presto.host | quote }}
   hive-host: {{ $operatorValues.spec.con***REMOVED***g.hive.host | quote }}
-  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
-  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.enabled | quote}}
-  enable-***REMOVED***nalizers: {{ $operatorValues.spec.con***REMOVED***g.enableFinalizers | quote}}
+{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
+  hive-ca-***REMOVED***le: "/var/run/secrets/hive-tls/ca.crt"
+{{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
+  hive-client-cert-***REMOVED***le: "/var/run/secrets/hive-auth/tls.crt"
+  hive-client-key-***REMOVED***le: "/var/run/secrets/hive-auth/tls.key"
+{{- end }}
+{{- end }}
+
+  presto-host: {{ $operatorValues.spec.con***REMOVED***g.presto.host | quote }}
 {{- if $operatorValues.spec.con***REMOVED***g.presto.tls.enabled }}
   presto-ca-***REMOVED***le: "/var/run/secrets/presto-tls/ca.crt"
 {{- if $operatorValues.spec.con***REMOVED***g.presto.auth.enabled }}
   presto-client-cert-***REMOVED***le: "/var/run/secrets/presto-auth/tls.crt"
   presto-client-key-***REMOVED***le: "/var/run/secrets/presto-auth/tls.key"
-  presto-client-ca-cert-***REMOVED***le: "/var/run/secrets/presto-auth/ca.crt"
 {{- end }}
 {{- end }}
+
+  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
+  disable-prometheus-metrics-importer: {{ not $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.enabled | quote}}
 {{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval }}
   prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval | quote}}
 {{- end }}
@@ -58,3 +65,4 @@ data:
 {{- if $operatorValues.spec.con***REMOVED***g.targetNamespaces }}
   target-namespaces: {{ $operatorValues.spec.con***REMOVED***g.targetNamespaces | join "," | quote }}
 {{- end }}
+  enable-***REMOVED***nalizers: {{ $operatorValues.spec.con***REMOVED***g.enableFinalizers | quote}}
