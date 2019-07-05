@@ -17,6 +17,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: presto-auth-secrets
         create: "{{ meteringcon***REMOVED***g_create_presto_auth_secrets }}"
+      - template_***REMOVED***le: templates/presto/presto-hive-metastore-tls-secrets.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-hive-metastore-tls-secrets
+        create: "{{ meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets }}"
       - template_***REMOVED***le: templates/presto/presto-catalog-con***REMOVED***g-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-catalog-con***REMOVED***g-secret

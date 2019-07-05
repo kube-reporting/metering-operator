@@ -253,6 +253,7 @@ meteringcon***REMOVED***g_create_hive_server_metastore_tls_secrets: "{{ _hive_sp
 meteringcon***REMOVED***g_create_hive_server_tls_secrets: "{{ _hive_spec.server.con***REMOVED***g.tls.enabled and _hive_spec.server.con***REMOVED***g.tls.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
 
 #
 # Enabling Presto TLS/Auth by Default
