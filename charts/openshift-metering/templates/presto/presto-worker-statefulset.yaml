@@ -129,6 +129,10 @@ spec:
           containerPort: 8082
           protocol: TCP
         volumeMounts:
+{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
+        - name: hadoop-config
+          mountPath: /hadoop-config
+{{- end }} 
         - name: presto-etc
           mountPath: /opt/presto/presto-server/etc
         - name: presto-common-config
@@ -156,6 +160,11 @@ spec:
         resources:
 {{ toYaml .Values.presto.spec.worker.resources | indent 10 }}
       volumes:
+{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
+      - name: hadoop-config
+        secret:
+          secretName: {{ .Values.presto.spec.hive.config.hadoopSecretName }}
+{{- end }}
       - name: presto-worker-config
         configMap:
           name: presto-worker-config

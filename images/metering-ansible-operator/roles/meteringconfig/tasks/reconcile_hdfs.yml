@@ -8,7 +8,11 @@
       - template_file: templates/hadoop/hadoop-config.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-config
+<<<<<<< HEAD
         # always create the hadoop-config
+=======
+        # always create the hadoop-configmap
+>>>>>>> efaddf2b697bce934a7c4cded77fb80c472bc91d
         create: true
       - template_file: templates/hadoop/hadoop-aws-credentials.yaml
         apis: [ {kind: secret} ]

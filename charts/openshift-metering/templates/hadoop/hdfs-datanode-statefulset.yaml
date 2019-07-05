@@ -136,7 +136,7 @@ spec:
         command:
         - '/bin/bash'
         - '-c'
-        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'        
+        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
@@ -260,7 +260,7 @@ spec:
         emptyDir: {}
       - name: hadoop-starting-config
         secret:
-          secretName: {{ .Values.hadoop.spec.configSecretName }}        
+          secretName: {{ .Values.hadoop.spec.configSecretName }}
       - name: hadoop-scripts
         configMap:
           name: hadoop-scripts

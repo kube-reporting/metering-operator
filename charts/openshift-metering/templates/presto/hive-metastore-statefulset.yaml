@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hive-metastore
+  labels:
+    app: hive
+    hive: metastore
+spec:
+  serviceName: hive-metastore
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: hive
+      hive: metastore
+{{- if .Values.presto.spec.hive.labels }}
+{{ toYaml .Values.presto.spec.hive.labels | indent 6 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: hive
+        hive: metastore
+{{- if .Values.presto.spec.hive.labels }}
+{{ toYaml .Values.presto.spec.hive.labels | indent 8 }}
+{{- end }}
+      annotations:
+        hive-configmap-hash: {{ include (print $.Template.BasePath "/presto/hive-configmap.yaml") . | sha256sum }}
+        hive-scripts-hash: {{ include (print $.Template.BasePath "/presto/hive-scripts-configmap.yaml") . | sha256sum }}
+        hive-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/hive-jmx-config.yaml") . | sha256sum }}
+        presto-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
+{{- if .Values.presto.spec.hive.annotations }}
+{{ toYaml .Values.presto.spec.hive.annotations | indent 8 }}
+{{- end }}
+    spec:
+      securityContext:
+{{ toYaml .Values.presto.spec.hive.securityContext | indent 8 }}
+{{- if .Values.presto.spec.hive.metastore.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.presto.spec.hive.metastore.nodeSelector | indent 8 }}
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.tolerations }}
+      tolerations:
+{{ toYaml .Values.presto.spec.hive.metastore.tolerations | indent 8 }}
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.affinity }}
+      affinity:
+{{ toYaml .Values.presto.spec.hive.metastore.affinity | indent 8 }}
+{{- end }}
+      containers:
+      - name: metastore
+        command: ["/hive-scripts/entrypoint.sh"]
+        args: ["/opt/hive/bin/hive", "--service", "metastore"]
+        image: "{{ .Values.presto.spec.hive.image.repository }}:{{ .Values.presto.spec.hive.image.tag }}"
+        imagePullPolicy: {{ .Values.presto.spec.hive.image.pullPolicy }}
+        ports:
+        - name: meta
+          containerPort: 9083
+          protocol: TCP
+        - containerPort: 8082
+          name: metrics
+{{- if .Values.presto.spec.hive.metastore.readinessProbe }}
+        readinessProbe:
+{{ toYaml .Values.presto.spec.hive.metastore.readinessProbe | indent 10 }}
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.livenessProbe }}
+        livenessProbe:
+{{ toYaml .Values.presto.spec.hive.metastore.livenessProbe | indent 10 }}
+{{- end }}
+        env:
+        - name: HIVE_LOGLEVEL
+          value: {{ upper .Values.presto.spec.hive.metastore.config.logLevel | quote}}
+{{- if .Values.presto.spec.hive.metastore.config.jvm.initialRAMPercentage }}
+        - name: JVM_INITIAL_RAM_PERCENTAGE
+          value: "{{ .Values.presto.spec.hive.metastore.config.jvm.initialRAMPercentage }}"
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.config.jvm.maxRAMPercentage }}
+        - name: JVM_MAX_RAM_PERCENTAGE
+          value: "{{ .Values.presto.spec.hive.metastore.config.jvm.maxRAMPercentage }}"
+{{- end }}
+{{- if .Values.presto.spec.hive.metastore.config.jvm.maxRAMPercentage }}
+        - name: JVM_MIN_RAM_PERCENTAGE
+          value: "{{ .Values.presto.spec.hive.metastore.config.jvm.minRAMPercentage }}"
+{{- end }}
+{{ include "hive-env" . | indent 8 }}
+        - name: MY_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: requests.memory
+        - name: MY_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: metastore
+              resource: limits.memory
+        volumeMounts:
+        - name: hive-config
+          mountPath: /hive-config
+        - name: hive-scripts
+          mountPath: /hive-scripts
+{{- if .Values.presto.spec.hive.config.useHadoopConfig }}
+        - name: hadoop-config
+          mountPath: /hadoop-config
+{{- end }}
+        - name: hive-jmx-config
+          mountPath: /opt/jmx_exporter/config
+        - name: hive-metastore-db-data
+          mountPath: /var/lib/hive
+        # openshift requires volumeMounts for VOLUMEs in a Dockerfile
+        - name: namenode-empty
+          mountPath: /hadoop/dfs/name
+        - name: datanode-empty
+          mountPath: /hadoop/dfs/data
+        - name: hadoop-logs
+          mountPath: /opt/hadoop/logs
+{{- if .Values.presto.spec.config.sharedVolume.enabled }}
+        - name: hive-warehouse-data
+          mountPath: {{ .Values.presto.spec.config.sharedVolume.mountPath }}
+{{- end }}
+        resources:
+{{ toYaml .Values.presto.spec.hive.metastore.resources | indent 10 }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: {{ .Values.presto.spec.hive.terminationGracePeriodSeconds }}
+      serviceAccount: hive
+{{- if .Values.presto.spec.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.presto.spec.imagePullSecrets | indent 8 }}
+{{- end }}
+      volumes:
+      - name: hive-config
+        configMap:
+          name: hive-config
+      - name: hive-scripts
+        configMap:
+          name: hive-scripts
+          defaultMode: 0555
+{{- if .Values.presto.spec.hive.config.useHadoopConfig }}
+      - name: hadoop-config
+        secret:
+          secretName: {{ .Values.presto.spec.hive.config.hadoopSecretName }}
+{{- end }}
+      - name: hive-jmx-config
+        configMap:
+          name: hive-jmx-config
+      # these emptyDir volumes are necessary because Openshift requires VOLUMEs
+      # in a Dockerfile have a corresponding volumeMount
+      - name: namenode-empty
+        emptyDir: {}
+      - name: datanode-empty
+        emptyDir: {}
+      - name: hadoop-logs
+        emptyDir: {}
+      - name: hive-metastore-db-data
+{{- if .Values.presto.spec.hive.metastore.storage.create }}
+        persistentVolumeClaim:
+          claimName: hive-metastore-db-data
+{{- else }}
+        emptyDir: {}
+{{- end }}
+{{- if .Values.presto.spec.config.sharedVolume.enabled }}
+      - name: hive-warehouse-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.presto.spec.config.sharedVolume.claimName }}
+{{- end}}

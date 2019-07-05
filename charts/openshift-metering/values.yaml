@@ -618,6 +618,7 @@ hive:
         size: 5Gi
         storageClass: null
 
+<<<<<<< HEAD
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hive
@@ -629,6 +630,105 @@ hive:
       nodeSelector: {}
       tolerations: []
 
+=======
+    hive:
+      annotations: {}
+      config:
+        autoCreateMetastoreSchema: true
+        dbConnectionDriver: org.apache.derby.jdbc.EmbeddedDriver
+        dbConnectionPassword: null
+        dbConnectionURL: jdbc:derby:;databaseName=/var/lib/hive/data;create=true
+        dbConnectionUsername: null
+        defaultCompression: zlib
+        defaultFileFormat: orc
+        enableMetastoreSchemaVerification: false
+        metastoreClientSocketTimeout: null
+        metastoreURIs: thrift://hive-metastore:9083
+        metastoreWarehouseDir: null
+        hadoopSecretName: hadoop-config
+        useHadoopConfig: true
+      image:
+        pullPolicy: Always
+        repository: quay.io/openshift/origin-metering-hive
+        tag: 4.2
+      labels: {}
+      metastore:
+        affinity: {}
+        config:
+          jvm:
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
+          logLevel: info
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          successThreshold: 1
+          tcpSocket:
+            port: 9083
+          timeoutSeconds: 15
+        nodeSelector: {}
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          successThreshold: 1
+          tcpSocket:
+            port: 9083
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 4
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 650Mi
+        storage:
+          class: null
+          create: true
+          size: 5Gi
+        tolerations: []
+      securityContext:
+        fsGroup: null
+        runAsNonRoot: true
+      server:
+        affinity: {}
+        config:
+          jvm:
+            initialRAMPercentage: null
+            maxRAMPercentage: null
+            minRAMPercentage: null
+          logLevel: info
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          successThreshold: 1
+          tcpSocket:
+            port: 10000
+          timeoutSeconds: 15
+        nodeSelector: {}
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          successThreshold: 1
+          tcpSocket:
+            port: 10000
+          timeoutSeconds: 15
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 500Mi
+        tolerations: []
+      terminationGracePeriodSeconds: 30
+    presto:
+      annotations: {}
+>>>>>>> efaddf2b697bce934a7c4cded77fb80c472bc91d
       config:
         logLevel: info
         jvm:

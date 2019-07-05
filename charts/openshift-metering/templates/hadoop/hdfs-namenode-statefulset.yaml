@@ -213,10 +213,16 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-config
+<<<<<<< HEAD
         emptyDir: {}
       - name: hadoop-starting-config
         secret:
           secretName: {{ .Values.hadoop.spec.configSecretName }}
+=======
+        secret:
+          secretName: "{{ .Values.hadoop.spec.configSecretName }}"
+          defaultMode: 0555
+>>>>>>> efaddf2b697bce934a7c4cded77fb80c472bc91d
       - name: hadoop-scripts
         configMap:
           name: hadoop-scripts

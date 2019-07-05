@@ -10,7 +10,11 @@ hive.metastore.uri={{ .Values.presto.spec.config.connectors.hive.metastoreURI }}
 {{- if .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 {{- end }}
+<<<<<<< HEAD
 {{- if .Values.presto.spec.config.useHadoopConfig}}
+=======
+{{- if .Values.presto.spec.hive.config.useHadoopConfig}}
+>>>>>>> efaddf2b697bce934a7c4cded77fb80c472bc91d
 hive.config.resources=/hadoop-config/core-site.xml
 {{- end }}
 
