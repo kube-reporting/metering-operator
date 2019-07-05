@@ -31,6 +31,9 @@ spec:
 {{- if .Values.presto.spec.config.aws.createSecret -}}
         presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
+{{- if .Values.presto.spec.config.azure.createSecret -}}
+        presto-azure-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-azure-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- if and .Values.presto.spec.config.tls.enabled .Values.presto.spec.config.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
 {{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret}}
@@ -100,10 +103,6 @@ spec:
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
-<<<<<<< HEAD
-
-=======
->>>>>>> copied-core-site.xml
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls

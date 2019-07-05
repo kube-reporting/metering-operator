@@ -226,12 +226,18 @@ meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBi
 
 meteringconfig_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
 meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_hadoop_azure_credentials: "{{ _hadoop_spec.config.azure.createSecret | default(false) }}"
+
 
 meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.createAwsCredentialsSecret | default(false) }}"
+meteringconfig_create_hive_azure_credentials_secret: "{{ _hive_spec.config.createAzureCredentialsSecret | default(false) }}"
+
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_presto_azure_credentials: "{{ _presto_spec.config.azure.createSecret | default(false) }}"
+
 
 #
 # Enabling Presto TLS/Auth by Default

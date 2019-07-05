@@ -30,6 +30,8 @@ spec:
         hive-scripts-hash: {{ include (print $.Template.BasePath "/hive/hive-scripts-configmap.yaml") . | sha256sum }}
         hive-jmx-config-hash: {{ include (print $.Template.BasePath "/hive/hive-jmx-config.yaml") . | sha256sum }}
         hive-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-aws-credentials-secret.yaml") . | sha256sum }}
+        hive-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-azure-credentials-secret.yaml") . | sha256sum }}
+
 {{- if .Values.hive.spec.annotations }}
 {{ toYaml .Values.hive.spec.annotations | indent 8 }}
 {{- end }}
@@ -57,12 +59,12 @@ spec:
         - name: AZURE_STORAGE_ACCOUNT_NAME
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hadoop.spec.config.azure.storageAccountName | default "hive-azure-credentials" }}"
-              key: azure_storage_account_name
+              name: "{{ .Values.hive.spec.config.azure.secretName | default "hive-azure-credentials-secret" }}"
+              key: azure-storage-account-name
         - name: AZURE_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hive-azure-credentials" }}"
+              name: "{{ .Values.hive.spec.config.azure.secretName | default "hive-azure-credentials-secret" }}"
               key: azure-secret-access-key
         volumeMounts:
         - name: hadoop-config
@@ -168,7 +170,7 @@ spec:
         emptyDir: {}
       - name: hadoop-starting-config
         secret:
-          secretName: {{ .Values.hive.spec.config.hadoopConfigSecretName }} 
+          secretName: {{ .Values.hive.spec.config.hadoopConfigSecretName }}
 {{- end }}
       - name: hive-jmx-config
         configMap:

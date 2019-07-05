@@ -6,9 +6,10 @@ data:
   azure_secret_copy.sh: |
     set -x
     cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/
-    # export AZURE_PROPERTY_NAME="fs.azure.account.key."$AZURE_STORAGE_ACCOUNT_NAME".blob.core.windows.net"
-    faq '.configuration.property+=[{name: "fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net", value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp && cp core-site.xml.temp core-site.xml
-
+    export AZURE_PROPERTY_NAME="fs.azure.account.key."$AZURE_STORAGE_ACCOUNT_NAME".blob.core.windows.net"
+    #faq '.configuration.property+=[{name: "fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net", value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp && cp core-site.xml.temp core-site.xml
+    faq '.configuration.property+=[{name: env.AZURE_PROPERTY_NAME , value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp && cp core-site.xml.temp core-site.xml
+        hive-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-aws-credentials-secret.yaml") . | sha256sum }}
 
   entrypoint.sh: |
     #!/bin/bash

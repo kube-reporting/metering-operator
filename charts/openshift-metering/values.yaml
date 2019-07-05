@@ -437,6 +437,7 @@ presto:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+
       azure:
         storageAccountName: ""
         secretAccessKey: ""
@@ -600,11 +601,11 @@ hive:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
-      
+
       azure:
         storageAccountName: ""
         secretAccessKey: ""
-        createSecret: false
+        createSecret: true
         secretName: ""
 
 
@@ -728,6 +729,7 @@ hadoop:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+
       azure:
         storageAccountName: ""
         secretAccessKey: ""
