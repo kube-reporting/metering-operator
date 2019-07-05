@@ -209,6 +209,7 @@ _tls_overrides:
 # check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_overrides, {}) }}"
+
 # combine the meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
 meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_spec_overrides, meteringconfig_root_ca_overrides, meteringconfig_tls_overrides, recursive=True) }}"
 
@@ -247,6 +248,10 @@ meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.create
 meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.createAwsCredentialsSecret | default(false) }}"
+
+meteringconfig_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret | default(false) }}"
+meteringconfig_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.config.metastoreTLS.enabled and _hive_spec.server.config.metastoreTLS.createSecret | default(false) }}"
+meteringconfig_create_hive_server_tls_secrets: "{{ _hive_spec.server.config.tls.enabled and _hive_spec.server.config.tls.createSecret | default(false) }}"
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
 
