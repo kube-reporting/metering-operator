@@ -33,9 +33,12 @@ spec:
 {{- end }}
 {{- if and .Values.presto.spec.config.tls.enabled .Values.presto.spec.config.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret}}
+{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret }}
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
+{{- end }}
+{{- if and .Values.presto.spec.config.connectors.hive.tls.enabled .Values.presto.spec.config.connectors.hive.tls.createSecret }}
+        presto-hive-metastore-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-hive-metastore-tls-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.presto.spec.annotations }}
 {{ toYaml .Values.presto.spec.annotations | indent 8 }}
@@ -84,6 +87,16 @@ spec:
           value: /presto-client/ca.crt
 {{- end }}
 {{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
+          value: /opt/ghostunnel/tls/ca.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_CERT
+          value: /opt/ghostunnel/tls/tls.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_KEY
+          value: /opt/ghostunnel/tls/tls.key
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/ghostunnel/tls/keystore-combined.pem
+{{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc
@@ -105,6 +118,12 @@ spec:
         - name: presto-client-pem
           mountPath: /presto-client
 {{- end }}
+{{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+        - name: hive-metastore-auth-tls
+          mountPath: /opt/ghostunnel/tls
+        - name: hive-metastore-auth-tls-secrets
+          mountPath: /hive-metastore-auth-tls-secrets
 {{- end }}
         resources:
           limits:
@@ -153,6 +172,30 @@ spec:
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.coordinator.resources | indent 10 }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+      - name: ghostunnel-client
+        image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
+        env:
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
+          value: /opt/ghostunnel/tls/ca.crt
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/ghostunnel/tls/keystore-combined.pem
+        command: ["ghostunnel"]
+        args:
+        - client
+        - --listen
+        - localhost:9083
+        - --target
+        - hive-metastore:8443
+        - --keystore
+        -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
+        - --cacert
+        -  $(GHOSTUNNEL_CLIENT_CA_CRTFILE)
+        volumeMounts:
+        - name: hive-metastore-auth-tls
+          mountPath: /opt/ghostunnel/tls
+{{- end }}
       volumes:
       - name: presto-coordinator-config
         configMap:
@@ -189,6 +232,13 @@ spec:
         secret:
           secretName: {{ .Values.presto.spec.config.auth.secretName }}
 {{- end }}
+{{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+      - name: hive-metastore-auth-tls
+        emptyDir: {}
+      - name: hive-metastore-auth-tls-secrets
+        secret:
+          secretName: {{ .Values.presto.spec.config.connectors.hive.tls.secretName }}
 {{- end }}
 {{- if .Values.hive.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data

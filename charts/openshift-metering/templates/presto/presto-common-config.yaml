@@ -5,7 +5,7 @@ metadata:
 data:
   initialize_presto.sh: |
     #!/bin/bash
-    set -e
+    set -ex
 
 {{- if .Values.presto.spec.config.auth.enabled }}
     cat $PRESTO_CLIENT_KEYFILE $PRESTO_CLIENT_CRTFILE $PRESTO_CLIENT_CA_CRTFILE > $PRESTO_TRUSTSTORE_PEM
@@ -14,6 +14,11 @@ data:
     # copy all necessary tls.crt/tls.key from read-only secret volumes - append server bundle and CA cert to truststore
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE > $PRESTO_KEYSTORE_PEM
     cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE >> $PRESTO_TRUSTSTORE_PEM
+{{- end }}
+
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+    cp /hive-metastore-auth-tls-secrets/* /opt/ghostunnel/tls
+    cat $GHOSTUNNEL_CLIENT_TLS_CERT $GHOSTUNNEL_CLIENT_TLS_KEY > $GHOSTUNNEL_CLIENT_KEYSTORE
 {{- end }}
 
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
@@ -41,8 +46,8 @@ data:
       echo "hive.s3.aws-access-key=$AWS_ACCESS_KEY_ID" >> "$HIVE_CATALOG_CONFIG"
       echo "hive.s3.aws-secret-key=$AWS_SECRET_ACCESS_KEY" >> "$HIVE_CATALOG_CONFIG"
     fi
-  
- 
+
+
 
     # add UID to /etc/passwd if missing
     if ! whoami &> /dev/null; then

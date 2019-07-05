@@ -253,6 +253,7 @@ meteringconfig_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.c
 meteringconfig_create_hive_server_tls_secrets: "{{ _hive_spec.server.config.tls.enabled and _hive_spec.server.config.tls.createSecret | default(false) }}"
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.config.connectors.hive.tls.createSecret | default(false) }}"
 
 #
 # Enabling Presto TLS/Auth by Default
