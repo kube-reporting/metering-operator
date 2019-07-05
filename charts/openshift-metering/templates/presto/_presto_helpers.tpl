@@ -12,6 +12,7 @@ hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTi
 {{- end }}
 {{- if .Values.presto.spec.config.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
+hive.collect-column-statistics-on-write=true
 {{- end }}
 
 {{ end }}
