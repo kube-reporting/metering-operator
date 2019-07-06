@@ -256,8 +256,7 @@ reporting-operator:
         secretName: ""
 
       hive:
-        # note this will contain more information once TLS/Auth is enabled w/ Hive
-        host: hive-server:10000
+        host: null
         tls:
           # client cert
           certificate: ""
