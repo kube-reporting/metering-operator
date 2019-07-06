@@ -1,0 +1,20 @@
+---
+
+- name: Query Kubernetes for API version
+  command: kubectl version -o json
+  register: kube_version
+
+- name: Set default ReportDataSources to use based on Kubernetes version
+  block:
+    - name: Log Kubernetes version
+      debug:
+        msg: |
+          Kubernetes Minor Version: {{ kube_minor_version }}
+          Kubernetes version at least 1.14: {{ kube_version_at_least_1_14 }}
+
+    - name: Set default ReportDataSources to use based on Kubernetes version
+      set_fact:
+        meteringcon***REMOVED***g_reporting_enable_post_kube_1_14_datasources: "{{ kube_version_at_least_1_14 }}"
+  vars:
+    kube_minor_version: "{{ (kube_version.stdout | from_json | json_query('serverVersion.minor')).rstrip('+') }}"
+    kube_version_at_least_1_14: "{{ (kube_minor_version | int) >= 14 }}"
