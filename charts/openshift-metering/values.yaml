@@ -377,7 +377,7 @@ reporting-operator:
       type: ClusterIP
 
     route:
-      enabled: false
+      enabled: true
       name: metering
 
     authProxy:
