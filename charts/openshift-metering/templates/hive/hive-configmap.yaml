@@ -32,7 +32,7 @@ data:
       <property>
         <name>hive.metastore.uris</name>
 {{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
-        <value>thrift://localhost:8443</value>
+        <value>thrift://localhost:9083</value>
 {{- ***REMOVED*** }}
         <value>thrift://hive-metastore:9083</value>
 {{- end }}
