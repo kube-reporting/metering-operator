@@ -1,5 +1,68 @@
 #
-# Validate that the user con***REMOVED***gured authProxy ***REMOVED***elds correctly
+# Validate that the user-provided reporting-operator Presto ***REMOVED***elds were properly con***REMOVED***gured
+#
+- name: Validate that the user-provided Presto server TLS ***REMOVED***elds are not empty
+  block:
+  - name: Validate that the user provided a non-empty TLS CA certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+  when: meteringcon***REMOVED***g_template_presto_tls_secret
+
+- name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
+  block:
+  - name: Validate that the user provided a non-empty auth certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.certi***REMOVED***cate != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.presto.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty auth key value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.key != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.presto.auth.key cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that TLS is enabled when auth is enabled
+    assert:
+      that:
+        - not meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.enabled
+      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+  when: meteringcon***REMOVED***g_template_presto_auth_secret
+
+#
+# Validate that the user-provided reporting-operator Hive ***REMOVED***elds were properly con***REMOVED***gured
+#
+- name: Validate that the user-provided Hive TLS/auth ***REMOVED***elds are not empty
+  block:
+  - name: Validate that the user provided a non-empty Hive TLS CA certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.caCerti***REMOVED***cate != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty Hive auth certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.certi***REMOVED***cate != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.hive.auth.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty Hive auth key value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.key != ""
+      msg: "reporting-operator.spec.con***REMOVED***g.hive.auth.key cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that TLS is enabled when auth is enabled
+    assert:
+      that:
+        - not meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.enabled
+      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+  when: meteringcon***REMOVED***g_template_hive_secrets
+
+#
+# Validate that the user-provided authProxy ***REMOVED***elds were properly con***REMOVED***gured
 #
 - name: Validate the user-provided authProxy ***REMOVED***elds are not empty
   block:

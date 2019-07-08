@@ -48,5 +48,26 @@
     assert:
       that:
         - not meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.enabled
-      msg: "Invalid con***REMOVED***guration passed: you cannot enable auth but disable TLS."
+      msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
   when: meteringcon***REMOVED***g_template_presto_auth_secret
+
+- name: Validate that the user provided Presto/Hive client TLS ***REMOVED***elds are not empty
+  block:
+  - name: Validate that the user provided a non-empty Hive client TLS certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.certi***REMOVED***cate != ""
+      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.certi***REMOVED***cate cannot be empty when createSecret is set to true"
+
+  - name: Validate that the user provided a non-empty Hive client TLS key value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.key != ""
+      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.key cannot be empty when createSecret is set to true"
+
+  - name: Validate that the user provided a non-empty Hive client TLS CA certi***REMOVED***cate value
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate != ""
+      msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate cannot be empty when createSecret is set to true"
+  when: meteringcon***REMOVED***g_template_presto_hive_tls_secret

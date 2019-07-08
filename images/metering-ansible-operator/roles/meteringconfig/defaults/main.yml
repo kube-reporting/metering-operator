@@ -130,8 +130,15 @@ _meteringcon***REMOVED***g_reporting_operator_presto_server_ca_certi***REMOVED**
 _meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
 
 _meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
-_meteringcon***REMOVED***g_reporting_operator_client_cert: ""
-_meteringcon***REMOVED***g_reporting_operator_client_key: ""
+_meteringcon***REMOVED***g_reporting_operator_presto_client_cert: ""
+_meteringcon***REMOVED***g_reporting_operator_presto_client_key: ""
+
+_meteringcon***REMOVED***g_reporting_operator_hive_client_secret_name: "reporting-operator-hive-client-tls"
+_meteringcon***REMOVED***g_reporting_operator_hive_client_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_reporting_operator_hive_client_key: ""
+
+_meteringcon***REMOVED***g_reporting_operator_hive_server_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_reporting_operator_hive_server_secret_name: "reporting-operator-hive-server-tls"
 
 _meteringcon***REMOVED***g_reporting_operator_auth_proxy_cookie_seed: ""
 
@@ -144,6 +151,26 @@ _meteringcon***REMOVED***g_presto_client_secret_name: "presto-client-tls"
 _meteringcon***REMOVED***g_presto_client_ca_certi***REMOVED***cate: ""
 _meteringcon***REMOVED***g_presto_client_certi***REMOVED***cate: ""
 _meteringcon***REMOVED***g_presto_client_key: ""
+
+_meteringcon***REMOVED***g_presto_hive_client_secret_name: "presto-hive-metastore-client-tls"
+_meteringcon***REMOVED***g_presto_hive_client_ca_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_hive_client_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_presto_hive_client_key: ""
+
+_meteringcon***REMOVED***g_hive_metastore_server_secret_name: "hive-metastore-server-tls"
+_meteringcon***REMOVED***g_hive_metastore_server_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_hive_metastore_server_key: ""
+_meteringcon***REMOVED***g_hive_metastore_server_ca_certi***REMOVED***cate: ""
+
+_meteringcon***REMOVED***g_hive_server_secret_name: "hive-server-tls"
+_meteringcon***REMOVED***g_hive_server_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_hive_server_key: ""
+_meteringcon***REMOVED***g_hive_server_ca_certi***REMOVED***cate: ""
+
+_meteringcon***REMOVED***g_hive_server_client_secret_name: "hive-server-auth-tls"
+_meteringcon***REMOVED***g_hive_server_client_certi***REMOVED***cate: ""
+_meteringcon***REMOVED***g_hive_server_client_key: ""
+_meteringcon***REMOVED***g_hive_server_client_ca_certi***REMOVED***cate: ""
 
 _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: ""
 _meteringcon***REMOVED***g_tls_root_ca_key: ""
@@ -166,12 +193,28 @@ _tls_overrides:
             secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_server_secret_name }}"
 
           auth:
-            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_client_cert }}"
-            key: "{{ _meteringcon***REMOVED***g_reporting_operator_client_key }}"
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_cert }}"
+            key: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_key }}"
 
             enabled: true
             createSecret: true
             secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_presto_client_secret_name }}"
+
+        hive:
+          tls:
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_hive_server_ca_certi***REMOVED***cate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_hive_server_secret_name }}"
+
+          auth:
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_reporting_operator_hive_client_certi***REMOVED***cate }}"
+            key: "{{ _meteringcon***REMOVED***g_reporting_operator_hive_client_key }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringcon***REMOVED***g_reporting_operator_hive_client_secret_name }}"
 
       authProxy:
         enabled: true
@@ -204,6 +247,57 @@ _tls_overrides:
           enabled: true
           createSecret: true
           secretName: "{{ _meteringcon***REMOVED***g_presto_client_secret_name }}"
+
+        connectors:
+          hive:
+            tls:
+              certi***REMOVED***cate: "{{  _meteringcon***REMOVED***g_presto_hive_client_certi***REMOVED***cate }}"
+              key: "{{ _meteringcon***REMOVED***g_presto_hive_client_key }}"
+              caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_presto_hive_client_ca_certi***REMOVED***cate }}"
+
+              enabled: true
+              createSecret: true
+              secretName: "{{ _meteringcon***REMOVED***g_presto_hive_client_secret_name }}"
+
+  hive:
+    spec:
+      metastore:
+        con***REMOVED***g:
+          tls:
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_metastore_server_certi***REMOVED***cate }}"
+            key: "{{ _meteringcon***REMOVED***g_hive_metastore_server_key }}"
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_metastore_server_ca_certi***REMOVED***cate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringcon***REMOVED***g_hive_metastore_server_secret_name }}"
+
+          auth:
+            enabled: true
+
+      server:
+        con***REMOVED***g:
+          tls:
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_server_certi***REMOVED***cate }}"
+            key: "{{ _meteringcon***REMOVED***g_hive_server_key }}"
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_server_ca_certi***REMOVED***cate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringcon***REMOVED***g_hive_server_secret_name }}"
+
+          auth:
+            enabled: true
+
+          metastoreTLS:
+            certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_server_client_certi***REMOVED***cate }}"
+            key: "{{ _meteringcon***REMOVED***g_hive_server_client_key }}"
+            caCerti***REMOVED***cate: "{{ _meteringcon***REMOVED***g_hive_server_client_ca_certi***REMOVED***cate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringcon***REMOVED***g_hive_server_client_secret_name }}"
+
 
 # check if the user's spec contains the top-level tls.enabled ***REMOVED***eld. if true, use the value stored in that ***REMOVED***eld, ***REMOVED*** default to the value stored in values.yaml
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
@@ -265,13 +359,19 @@ meteringcon***REMOVED***g_create_hive_server_tls_secrets: "{{ _hive_spec.server.
 
 meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_azure_credentials: "{{ _presto_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
-meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.enabled and _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
+
+meteringcon***REMOVED***g_template_hive_metastore_tls_secret: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret and _hive_spec.metastore.con***REMOVED***g.tls.secretName != 'hive-metastore-server-tls'}}"
+meteringcon***REMOVED***g_template_hive_server_tls_secret: "{{ _hive_spec.server.con***REMOVED***g.tls.enabled and _hive_spec.server.con***REMOVED***g.tls.createSecret and _hive_spec.server.con***REMOVED***g.tls.secretName != 'hive-server-tls'}}"
+meteringcon***REMOVED***g_template_hive_server_auth_secret: "{{ _hive_spec.server.con***REMOVED***g.metastoreTLS.enabled and _hive_spec.server.con***REMOVED***g.metastoreTLS.createSecret and _hive_spec.server.con***REMOVED***g.metastoreTLS.secretName != 'hive-server-auth-tls' }}"
+meteringcon***REMOVED***g_template_hive_secrets: "{{ meteringcon***REMOVED***g_template_hive_metastore_tls_secret or meteringcon***REMOVED***g_template_hive_server_tls_secret or meteringcon***REMOVED***g_template_hive_server_auth_secret }}"
 
 #
 # Enabling Presto TLS/Auth by Default
 #
 meteringcon***REMOVED***g_template_presto_tls_secret: "{{ _presto_spec.con***REMOVED***g.tls.enabled and _presto_spec.con***REMOVED***g.tls.createSecret and _presto_spec.con***REMOVED***g.tls.secretName != 'presto-server-tls' }}"
 meteringcon***REMOVED***g_template_presto_auth_secret: "{{ _presto_spec.con***REMOVED***g.auth.enabled and _presto_spec.con***REMOVED***g.auth.createSecret and _presto_spec.con***REMOVED***g.auth.secretName != 'presto-client-tls' }}"
+meteringcon***REMOVED***g_template_presto_hive_tls_secret: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.enabled and _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret and _presto_spec.con***REMOVED***g.connectors.hive.tls.secretName != 'presto-hive-metastore-client-tls' }}"
 meteringcon***REMOVED***g_create_presto_tls_secrets: "{{ _presto_spec.con***REMOVED***g.tls.enabled and _presto_spec.con***REMOVED***g.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_auth_secrets: "{{ _presto_spec.con***REMOVED***g.auth.enabled and _presto_spec.con***REMOVED***g.auth.createSecret | default(false) }}"
 
