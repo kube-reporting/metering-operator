@@ -53,6 +53,8 @@ data:
         ***REMOVED***
     ***REMOVED***
 
+    cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/
+
     # symlink our con***REMOVED***guration ***REMOVED***les to the correct location
     ln -s -f /hadoop-con***REMOVED***g/core-site.xml /etc/hadoop/core-site.xml
     ln -s -f /hadoop-con***REMOVED***g/hdfs-site.xml /etc/hadoop/hdfs-site.xml

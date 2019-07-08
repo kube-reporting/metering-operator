@@ -48,6 +48,19 @@ spec:
       af***REMOVED***nity:
 {{ toYaml .Values.hive.spec.metastore.af***REMOVED***nity | indent 8 }}
 {{- end }}
+      initContainers:
+      - name: copy-starter-hive
+        image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
+        command:
+        - '/bin/bash'
+        - '-c'
+        - 'cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/'
+        volumeMounts:
+        - name: hadoop-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+        - name: hadoop-starting-con***REMOVED***g
+          mountPath: /hadoop-starting-con***REMOVED***g
       containers:
       - name: metastore
         command: ["/hive-scripts/entrypoint.sh"]
@@ -102,6 +115,8 @@ spec:
 {{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
+        - name: hadoop-starting-con***REMOVED***g
+          mountPath: /hadoop-starting-con***REMOVED***g
 {{- end }}
         - name: hive-jmx-con***REMOVED***g
           mountPath: /opt/jmx_exporter/con***REMOVED***g
@@ -177,8 +192,10 @@ spec:
           defaultMode: 0555
 {{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
       - name: hadoop-con***REMOVED***g
+        emptyDir: {}
+      - name: hadoop-starting-con***REMOVED***g
         secret:
-          secretName: {{ .Values.hive.spec.con***REMOVED***g.hadoopCon***REMOVED***gSecretName }}
+          secretName: {{ .Values.hive.spec.con***REMOVED***g.hadoopCon***REMOVED***gSecretName  }}
 {{- end }}
       - name: hive-jmx-con***REMOVED***g
         con***REMOVED***gMap:

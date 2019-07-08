@@ -130,6 +130,18 @@ spec:
         # required for openshift
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
+      - name: copy-starter-hadoop
+        image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
+        command:
+        - '/bin/bash'
+        - '-c'
+        - 'cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/'
+        volumeMounts:
+        - name: hadoop-con***REMOVED***g
+          mountPath: /hadoop-con***REMOVED***g
+        - name: hadoop-starting-con***REMOVED***g
+          mountPath: /hadoop-starting-con***REMOVED***g
       containers:
       - name: hdfs-datanode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -197,6 +209,8 @@ spec:
         volumeMounts:
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
+        - name: hadoop-starting-con***REMOVED***g
+          mountPath: /hadoop-starting-con***REMOVED***g
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
         - name: hdfs-jmx-con***REMOVED***g
@@ -227,6 +241,8 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-con***REMOVED***g
+        emptyDir: {}
+      - name: hadoop-starting-con***REMOVED***g
         secret:
           secretName: "{{ .Values.hadoop.spec.con***REMOVED***gSecretName }}"
           defaultMode: 0555
