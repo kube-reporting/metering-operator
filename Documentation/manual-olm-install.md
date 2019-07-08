@@ -77,14 +77,14 @@ metering-operator-c7545d555-h5m6x   2/2     Running   0          32s
 
 ### Install Metering
 
-Once the metering-operator is installed, we can now use it to install the rest of the Metering stack by con***REMOVED***guring a `Metering` CR.
+Once the metering-operator is installed, we can now use it to install the rest of the Metering stack by con***REMOVED***guring a `MeteringCon***REMOVED***g` CR.
 
 #### Con***REMOVED***guration
 
 All of the supported con***REMOVED***guration options are documented in [con***REMOVED***guring metering][con***REMOVED***guring-metering].
 In this document, we will refer to your con***REMOVED***guration as your `metering.yaml`.
 
-To start, download the example [default.yaml][default-con***REMOVED***g] Metering resource and save it as `metering.yaml`, and make any additional customizations you require.
+To start, download the example [default.yaml][default-con***REMOVED***g] `MeteringCon***REMOVED***g` resource and save it as `metering.yaml`, and make any additional customizations you require.
 
 #### Install Metering Custom Resource
 

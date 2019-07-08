@@ -1,7 +1,7 @@
 # Con***REMOVED***guring reporting-operator
 
-reporting-operator is responsible for collecting data from Prometheus, storing the metrics in Presto, running report queries against Presto, and exposing their results via an HTTP API.
-Con***REMOVED***guring the operator is done primarily within a `Metering` CR's `spec.reporting-operator.spec` section.
+The reporting-operator is responsible for collecting data from Prometheus, storing the metrics in Presto, running report queries against Presto, and exposing their results via an HTTP API.
+Con***REMOVED***guring the operator is primarily done within a `MeteringCon***REMOVED***g` Custom Resources's `spec.reporting-operator.spec` section.
 
 ## Prometheus connection
 
@@ -62,7 +62,7 @@ spec:
 
 There are two ways to expose the reporting API depending on if you're using regular Kubernetes, or Openshift.
 
-For Openshift, you can expose a [Route][route], and for anything ***REMOVED*** you can use regular [Load Balancer][load-balancer-svc] or [Node Port][node-port-svc] [Kubernetes services][kube-svc].
+For Openshift, the metering operator exposes a [Route][route] by default, and for anything ***REMOVED*** you can use regular [Load Balancer][load-balancer-svc] or [Node Port][node-port-svc] [Kubernetes services][kube-svc].
 
 ### Openshift Route
 
@@ -73,43 +73,15 @@ Using an Openshift route has a few advantages over using a load balancer or node
 
 Additionally, on Openshift:
 
-- We can take advantage of the [Openshift service serving certi***REMOVED***cates][service-certs] to protect the reporting API with TLS
-- We deploy the [Openshift OAuth proxy][oauth-proxy] as a side-car container for reporting-operator, which protects the reporting API with authentication
+- We can take advantage of the [Openshift service serving certi***REMOVED***cates][service-certs] to protect the reporting API with TLS.
+- We deploy the [Openshift OAuth proxy][oauth-proxy] as a side-car container for reporting-operator, which protects the reporting API with authentication.
 
-There are a few ways to do authentication, you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd ***REMOVED***le.
+There are a few ways to do authentication: you can use service account tokens for authentication, and/or you can also use a static username/password via an httpasswd ***REMOVED***le.
 See the [openshift authentication](#openshift-authentication) section below for details on how authentication and authorization works.
-See the [expose-route.yaml][expose-route-con***REMOVED***g] con***REMOVED***guration for an example of setting enabling an Openshift route and con***REMOVED***guring authentication with both options enabled.
-
-Make sure you modify the `reporting-operator.spec.authProxy.httpasswd.data` and `reporting-operator.spec.authProxy.cookie.seed` values.
-
-Once installed with the customized con***REMOVED***guration to enable the route, you should query in your namespace to check for the route:
-
-```
-oc -n openshift-metering get routes
-NAME       HOST/PORT                                         PATH      SERVICES             PORT      TERMINATION   WILDCARD
-metering   metering-openshift-metering.apps.example.com                reporting-operator   http      reencrypt     None
-```
-
-This will provide a URL you can use to access the reporting API.
-
-To authenticate, you can do one of two options depending on which authentication methods you enabled:
-
-To authenticate with a service account, pass it using the Authorization header as a bearer token:
-
-```
-TOKEN=$(oc -n openshift-metering serviceaccounts get-token reporting-operator)
-curl -H "Authorization: Bearer $TOKEN" -k "https://metering-openshift-metering.apps.example.com/api/v1/reports/get?name=cluster-memory-capacity-hourly&namespace=openshift-metering&format=tab"
-```
-
-And to authenticate using a username and password, use basic authentication:
-
-```
-curl -u testuser:password123 -k "https://metering-openshift-metering.apps.example.com/api/v1/reports/get?name=cluster-memory-capacity-hourly&namespace=openshift-metering&format=tab"
-```
 
 ### Load Balancer/Node Port services
 
-Using a LoadBalancer service or NodePort while possible, isn't currently recommended as the reporting-operator doesn't have any authentication methods available on non-openshift environments and exposing the API would result in your reporting being accessible to others.
+While possible, using a LoadBalancer service or NodePort isn't currently recommended as the reporting-operator doesn't have any authentication methods available on non-openshift environments and exposing the API would result in your reporting being accessible to others.
 This includes being able to download the raw collected data, reporting data, and the ability to push data as well.
 If your NodePorts and/or LoadBalancers are not accessible to others, then you can consider enabling this, however it is still recommended to look into alternatives such as exposing metering using an Ingress controller that can provide authentication.
 
@@ -146,6 +118,46 @@ curl "http://35.227.172.86:8080/api/v1/reports/get?name=cluster-memory-capacity-
 ```
 
 ### Openshift Authentication
+
+By default, the reporting API is secured with TLS and authentication. This is done by con***REMOVED***guring the reporting-operator to deploy a pod containing both the reporting-operator's container, and a sidecar container running [Openshift auth-proxy](https://github.com/openshift/oauth-proxy).
+
+If you want to manually con***REMOVED***gure authentication in Openshift, disable it entirely, or want more information on the reporting-operator options, see the [manual setup](#manual-setup) section.
+
+In order to access the reporting API, the metering operator exposes a route. Once that route has been installed, you can run the command below to get the route's hostname.
+
+```
+METERING_ROUTE_NAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
+```
+
+Also, make sure the `METERING_NAMESPACE` environment variable is set before continuing on with the next sections.
+
+To authenticate and access the reporting API, you can do one of two options:
+
+##### Authenticate using a service account token
+See the [token authentication](#token-authentication) section for more information on how to extend the capabilities of this method using permissions.
+
+With this method, we use the token in the reporting operator's service account, and pass that bearer token to the Authorization header in the following command:
+
+```
+TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
+curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_NAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
+```
+
+Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above. 
+
+##### Authenticate using a username and password
+We are able to do basic authentication using a username and password combination, which is speci***REMOVED***ed in the contents of a htpasswd ***REMOVED***le. We, by default, create a secret containing an empty htpasswd data. You can, however, con***REMOVED***gure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
+
+Once you have speci***REMOVED***ed the above in your `MeteringCon***REMOVED***g` CR, you can run the following command:
+```
+curl -u testuser:password123 -k "https://$METERING_ROUTE_NAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
+```
+
+Be sure to replace `testuser:password123` with a valid username and password combination.
+
+### Manual Setup
+
+In order to manually con***REMOVED***gure, or disable OAuth in the reporting-operator, you need to set `spec.tls.enabled: false` in your `MeteringCon***REMOVED***g` CR. Warning: this also disables all TLS/authentication between the reporting-operator, presto, and hive. You would need to manually con***REMOVED***gure these resources yourself.
 
 Authentication can be enabled by con***REMOVED***guring the options below.
 Enabling authentication con***REMOVED***gures the reporting-operator pod to run the Openshift auth-proxy as a sidecar container in the pod.

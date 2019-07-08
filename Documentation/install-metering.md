@@ -53,13 +53,13 @@ For instructions on installing using our manual install scripts follow the [manu
 
 ## Verifying operation
 
-First, wait until the Metering Helm operator deploys all of the Metering components:
+First, wait until the Metering Ansible operator deploys all of the Metering components:
 
 ```
 kubectl get pods -n $METERING_NAMESPACE -l app=metering-operator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE logs -f {} -c metering-operator
 ```
 
-It will potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
+This can potentially take a minute or two to complete, but when it's done, you should see log output similar the following:
 
 ```
 {"level":"info","ts":1560984641.7900484,"logger":"runner","msg":"Ansible-runner exited successfully","job":"7911455193145848968","name":"operator-metering","namespace":"metering"}
