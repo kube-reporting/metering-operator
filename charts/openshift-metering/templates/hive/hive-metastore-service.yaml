@@ -9,10 +9,13 @@ spec:
   ports:
   - name: meta
     port: 9083
+{{- if .Values.hive.spec.metastore.config.tls.enabled }}
+    targetPort: ghostunnel
+{{- else }}
+    targetPort: meta
+{{- end }}
   - name: metrics
     port: 8082
-  - name: ghostunnel
-    port: 8443
   selector:
     app: hive
     hive: metastore
