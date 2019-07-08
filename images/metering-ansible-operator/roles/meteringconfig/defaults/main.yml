@@ -149,7 +149,7 @@ _meteringcon***REMOVED***g_presto_client_key: ""
 _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: ""
 _meteringcon***REMOVED***g_tls_root_ca_key: ""
 
-meteringcon***REMOVED***g_root_ca_overrides:
+_meteringcon***REMOVED***g_root_ca_overrides:
   tls:
     certi***REMOVED***cate: "{{ _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate }}"
     key: "{{ _meteringcon***REMOVED***g_tls_root_ca_key }}"
@@ -208,7 +208,7 @@ _tls_overrides:
 
 # check if the user's spec contains the top-level tls.enabled ***REMOVED***eld. if true, use the value stored in that ***REMOVED***eld, ***REMOVED*** default to the value stored in values.yaml
 meteringcon***REMOVED***g_tls_enabled: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
-meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabled | ternary(_tls_overrides, {}) }}"
+_meteringcon***REMOVED***g_tls_overrides: "{{ meteringcon***REMOVED***g_tls_enabled | ternary(_tls_overrides, {}) }}"
 
 # openshift-reporting overrides
 meteringcon***REMOVED***g_reporting_enable_post_kube_1_14_datasources: "{{ _openshift_reporting_default_spec.defaultReportDataSources.postKube_1_14.enabled }}"
@@ -221,7 +221,7 @@ meteringcon***REMOVED***g_reporting_overrides:
           enabled: "{{ meteringcon***REMOVED***g_reporting_enable_post_kube_1_14_datasources }}"
 
 # combine the _meteringcon***REMOVED***g_tls_overrides dictionary last to enforce when spec.tls.enabled is speci***REMOVED***ed and set to true
-meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_reporting_overrides, meteringcon***REMOVED***g_spec_overrides, meteringcon***REMOVED***g_root_ca_overrides, meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
+meteringcon***REMOVED***g_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_default_image_overrides, meteringcon***REMOVED***g_storage_overrides, meteringcon***REMOVED***g_reporting_overrides, meteringcon***REMOVED***g_spec_overrides, _meteringcon***REMOVED***g_root_ca_overrides, _meteringcon***REMOVED***g_tls_overrides, recursive=True) }}"
 
 meteringcon***REMOVED***g_storage_s3_create_bucket: "{{ meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringcon***REMOVED***g_storage_s3_bucket_name: "{{ (meteringcon***REMOVED***g_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"
