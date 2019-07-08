@@ -10,17 +10,19 @@ data:
   log-reports: {{ $operatorValues.spec.config.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.config.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.config.logDMLQueries | quote}}
+
 {{- if $operatorValues.spec.config.hive.host }}
   hive-host: {{ $operatorValues.spec.config.hive.host | quote }}
-{{- else if $operatorValues.spec.config.hive.tls.enabled }}
-  hive-host: "hive-server:10001"
+{{- else }}
+  hive-host: "hive-server:10000"
+{{- end }}
+
+{{- if $operatorValues.spec.config.hive.tls.enabled }}
   hive-ca-file: "/var/run/secrets/hive-tls/ca.crt"
 {{- if $operatorValues.spec.config.hive.auth.enabled }}
   hive-client-cert-file: "/var/run/secrets/hive-auth/tls.crt"
   hive-client-key-file: "/var/run/secrets/hive-auth/tls.key"
 {{- end }}
-{{- else }}
-  hive-host: "hive-server:10000"
 {{- end }}
 
   presto-host: {{ $operatorValues.spec.config.presto.host | quote }}
