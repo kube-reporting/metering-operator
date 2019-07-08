@@ -1,5 +1,68 @@
 #
-# Validate that the user configured authProxy fields correctly
+# Validate that the user-provided reporting-operator Presto fields were properly configured
+#
+- name: Validate that the user-provided Presto server TLS fields are not empty
+  block:
+  - name: Validate that the user provided a non-empty TLS CA certificate value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.tls.caCertificate != ""
+      msg: "reporting-operator.spec.config.presto.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
+  when: meteringconfig_template_presto_tls_secret
+
+- name: Validate that the user-provided Presto client Auth fields are not empty
+  block:
+  - name: Validate that the user provided a non-empty auth certificate value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.auth.certificate != ""
+      msg: "reporting-operator.spec.config.presto.auth.certificate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty auth key value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.auth.key != ""
+      msg: "reporting-operator.spec.config.presto.auth.key cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that TLS is enabled when auth is enabled
+    assert:
+      that:
+        - not meteringconfig_spec['reporting-operator'].spec.config.presto.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.presto.auth.enabled
+      msg: "Invalid configuration: you cannot enable auth but disable TLS."
+  when: meteringconfig_template_presto_auth_secret
+
+#
+# Validate that the user-provided reporting-operator Hive fields were properly configured
+#
+- name: Validate that the user-provided Hive TLS/auth fields are not empty
+  block:
+  - name: Validate that the user provided a non-empty Hive TLS CA certificate value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.tls.caCertificate != ""
+      msg: "reporting-operator.spec.config.presto.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty Hive auth certificate value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.auth.certificate != ""
+      msg: "reporting-operator.spec.config.hive.auth.certificate cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that the user provided a non-empty Hive auth key value
+    assert:
+      that:
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.auth.key != ""
+      msg: "reporting-operator.spec.config.hive.auth.key cannot be empty if createSecret: true and secretName != ''"
+
+  - name: Validate that TLS is enabled when auth is enabled
+    assert:
+      that:
+        - not meteringconfig_spec['reporting-operator'].spec.config.hive.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.hive.auth.enabled
+      msg: "Invalid configuration: you cannot enable auth but disable TLS."
+  when: meteringconfig_template_hive_secrets
+
+#
+# Validate that the user-provided authProxy fields were properly configured
 #
 - name: Validate the user-provided authProxy fields are not empty
   block:

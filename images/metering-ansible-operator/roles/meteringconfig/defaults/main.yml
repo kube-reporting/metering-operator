@@ -130,8 +130,15 @@ _meteringconfig_reporting_operator_presto_server_ca_certificate: ""
 _meteringconfig_reporting_operator_presto_server_secret_name: "reporting-operator-presto-server-tls"
 
 _meteringconfig_reporting_operator_presto_client_secret_name: "reporting-operator-presto-client-tls"
-_meteringconfig_reporting_operator_client_cert: ""
-_meteringconfig_reporting_operator_client_key: ""
+_meteringconfig_reporting_operator_presto_client_cert: ""
+_meteringconfig_reporting_operator_presto_client_key: ""
+
+_meteringconfig_reporting_operator_hive_client_secret_name: "reporting-operator-hive-client-tls"
+_meteringconfig_reporting_operator_hive_client_certificate: ""
+_meteringconfig_reporting_operator_hive_client_key: ""
+
+_meteringconfig_reporting_operator_hive_server_ca_certificate: ""
+_meteringconfig_reporting_operator_hive_server_secret_name: "reporting-operator-hive-server-tls"
 
 _meteringconfig_reporting_operator_auth_proxy_cookie_seed: ""
 
@@ -144,6 +151,26 @@ _meteringconfig_presto_client_secret_name: "presto-client-tls"
 _meteringconfig_presto_client_ca_certificate: ""
 _meteringconfig_presto_client_certificate: ""
 _meteringconfig_presto_client_key: ""
+
+_meteringconfig_presto_hive_client_secret_name: "presto-hive-metastore-client-tls"
+_meteringconfig_presto_hive_client_ca_certificate: ""
+_meteringconfig_presto_hive_client_certificate: ""
+_meteringconfig_presto_hive_client_key: ""
+
+_meteringconfig_hive_metastore_server_secret_name: "hive-metastore-server-tls"
+_meteringconfig_hive_metastore_server_certificate: ""
+_meteringconfig_hive_metastore_server_key: ""
+_meteringconfig_hive_metastore_server_ca_certificate: ""
+
+_meteringconfig_hive_server_secret_name: "hive-server-tls"
+_meteringconfig_hive_server_certificate: ""
+_meteringconfig_hive_server_key: ""
+_meteringconfig_hive_server_ca_certificate: ""
+
+_meteringconfig_hive_server_client_secret_name: "hive-server-auth-tls"
+_meteringconfig_hive_server_client_certificate: ""
+_meteringconfig_hive_server_client_key: ""
+_meteringconfig_hive_server_client_ca_certificate: ""
 
 _meteringconfig_tls_root_ca_certificate: ""
 _meteringconfig_tls_root_ca_key: ""
@@ -166,12 +193,28 @@ _tls_overrides:
             secretName: "{{ _meteringconfig_reporting_operator_presto_server_secret_name }}"
 
           auth:
-            certificate: "{{ _meteringconfig_reporting_operator_client_cert }}"
-            key: "{{ _meteringconfig_reporting_operator_client_key }}"
+            certificate: "{{ _meteringconfig_reporting_operator_presto_client_cert }}"
+            key: "{{ _meteringconfig_reporting_operator_presto_client_key }}"
 
             enabled: true
             createSecret: true
             secretName: "{{ _meteringconfig_reporting_operator_presto_client_secret_name }}"
+
+        hive:
+          tls:
+            caCertificate: "{{ _meteringconfig_reporting_operator_hive_server_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringconfig_reporting_operator_hive_server_secret_name }}"
+
+          auth:
+            certificate: "{{ _meteringconfig_reporting_operator_hive_client_certificate }}"
+            key: "{{ _meteringconfig_reporting_operator_hive_client_key }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringconfig_reporting_operator_hive_client_secret_name }}"
 
       authProxy:
         enabled: true
@@ -204,6 +247,57 @@ _tls_overrides:
           enabled: true
           createSecret: true
           secretName: "{{ _meteringconfig_presto_client_secret_name }}"
+
+        connectors:
+          hive:
+            tls:
+              certificate: "{{  _meteringconfig_presto_hive_client_certificate }}"
+              key: "{{ _meteringconfig_presto_hive_client_key }}"
+              caCertificate: "{{ _meteringconfig_presto_hive_client_ca_certificate }}"
+
+              enabled: true
+              createSecret: true
+              secretName: "{{ _meteringconfig_presto_hive_client_secret_name }}"
+
+  hive:
+    spec:
+      metastore:
+        config:
+          tls:
+            certificate: "{{ _meteringconfig_hive_metastore_server_certificate }}"
+            key: "{{ _meteringconfig_hive_metastore_server_key }}"
+            caCertificate: "{{ _meteringconfig_hive_metastore_server_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringconfig_hive_metastore_server_secret_name }}"
+
+          auth:
+            enabled: true
+
+      server:
+        config:
+          tls:
+            certificate: "{{ _meteringconfig_hive_server_certificate }}"
+            key: "{{ _meteringconfig_hive_server_key }}"
+            caCertificate: "{{ _meteringconfig_hive_server_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringconfig_hive_server_secret_name }}"
+
+          auth:
+            enabled: true
+
+          metastoreTLS:
+            certificate: "{{ _meteringconfig_hive_server_client_certificate }}"
+            key: "{{ _meteringconfig_hive_server_client_key }}"
+            caCertificate: "{{ _meteringconfig_hive_server_client_ca_certificate }}"
+
+            enabled: true
+            createSecret: true
+            secretName: "{{ _meteringconfig_hive_server_client_secret_name }}"
+
 
 # check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
 meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
@@ -265,13 +359,19 @@ meteringconfig_create_hive_server_tls_secrets: "{{ _hive_spec.server.config.tls.
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
 meteringconfig_create_presto_azure_credentials: "{{ _presto_spec.config.azure.createSecret | default(false) }}"
-meteringconfig_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.config.connectors.hive.tls.createSecret | default(false) }}"
+meteringconfig_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.config.connectors.hive.tls.enabled and _presto_spec.config.connectors.hive.tls.createSecret | default(false) }}"
+
+meteringconfig_template_hive_metastore_tls_secret: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret and _hive_spec.metastore.config.tls.secretName != 'hive-metastore-server-tls'}}"
+meteringconfig_template_hive_server_tls_secret: "{{ _hive_spec.server.config.tls.enabled and _hive_spec.server.config.tls.createSecret and _hive_spec.server.config.tls.secretName != 'hive-server-tls'}}"
+meteringconfig_template_hive_server_auth_secret: "{{ _hive_spec.server.config.metastoreTLS.enabled and _hive_spec.server.config.metastoreTLS.createSecret and _hive_spec.server.config.metastoreTLS.secretName != 'hive-server-auth-tls' }}"
+meteringconfig_template_hive_secrets: "{{ meteringconfig_template_hive_metastore_tls_secret or meteringconfig_template_hive_server_tls_secret or meteringconfig_template_hive_server_auth_secret }}"
 
 #
 # Enabling Presto TLS/Auth by Default
 #
 meteringconfig_template_presto_tls_secret: "{{ _presto_spec.config.tls.enabled and _presto_spec.config.tls.createSecret and _presto_spec.config.tls.secretName != 'presto-server-tls' }}"
 meteringconfig_template_presto_auth_secret: "{{ _presto_spec.config.auth.enabled and _presto_spec.config.auth.createSecret and _presto_spec.config.auth.secretName != 'presto-client-tls' }}"
+meteringconfig_template_presto_hive_tls_secret: "{{ _presto_spec.config.connectors.hive.tls.enabled and _presto_spec.config.connectors.hive.tls.createSecret and _presto_spec.config.connectors.hive.tls.secretName != 'presto-hive-metastore-client-tls' }}"
 meteringconfig_create_presto_tls_secrets: "{{ _presto_spec.config.tls.enabled and _presto_spec.config.tls.createSecret | default(false) }}"
 meteringconfig_create_presto_auth_secrets: "{{ _presto_spec.config.auth.enabled and _presto_spec.config.auth.createSecret | default(false) }}"
 

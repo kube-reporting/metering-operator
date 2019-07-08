@@ -1,5 +1,8 @@
 ---
-
+#
+# Check if the metering root CA secret already exists and instead needs to be copied into a temp directory
+# This temp directory would contain all the necessary TLS data (shared with Presto, Hive, reporting-operator)
+#
 - name: Check for the existence of the Metering Root CA secret
   block:
   - name: Check if Root CA secret already exists
@@ -11,11 +14,13 @@
     no_log: true
     register: root_ca_secret_buf
 
+  # note: other resources (presto, hive, reporting-operator) depend on these variables
   - name: Use pre-existing CA secret cert/key when secret already exists
     block:
     - set_fact:
         _meteringconfig_tls_root_ca_certificate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
         _meteringconfig_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+      no_log: true
 
     - name: Add root CA certificate to certificates directory
       copy:
@@ -32,7 +37,7 @@
   when: meteringconfig_tls_enabled
 
 #
-# Generate a Root Certificate Authority
+# Generate the metering root certificate authority
 #
 - name: Setup the root certificate authority
   block:
@@ -63,6 +68,7 @@
     set_fact:
       _meteringconfig_tls_root_ca_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/ca.crt') + '\n' }}"
       _meteringconfig_tls_root_ca_key: "{{ lookup('file', '{{ certificates_dir.path }}/ca.key') + '\n' }}"
+    no_log: true
   vars:
     root_ca_secret_exists: "{{ root_ca_secret_buf.resources is defined and root_ca_secret_buf.resources | length > 0 }}"
   when: meteringconfig_tls_enabled and not root_ca_secret_exists
