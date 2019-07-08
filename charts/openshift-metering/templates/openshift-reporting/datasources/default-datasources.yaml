@@ -1,7 +1,27 @@
 {{- $reportingValues :=  index .Values "openshift-reporting" -}}
-{{- if $reportingValues.spec.defaultReportDataSources.enabled }}
-{{- range $i, $body := $reportingValues.spec.defaultReportDataSources.items }}
+
+{{- if $reportingValues.spec.defaultReportDataSources.base.enabled }}
+# base reportDataSources
+{{- range $_, $body := $reportingValues.spec.defaultReportDataSources.base.items }}
 ---
 {{- include "new-report-datasource" $body -}}
-{{- end }}
-{{- end }}
+{{- end }}{{/* end range */}}
+{{- end }}{{/* end if */}}
+
+{{- if $reportingValues.spec.defaultReportDataSources.postKube_1_14.enabled }}
+
+# post-kubernetes 1.14 reportDataSources
+{{- range $_, $body := $reportingValues.spec.defaultReportDataSources.postKube_1_14.items }}
+---
+{{- include "new-report-datasource" $body -}}
+{{- end }}{{/* end range */}}
+
+{{- ***REMOVED*** }}
+
+# pre-kubernetes 1.14 reportDataSources
+{{- range $_, $body := $reportingValues.spec.defaultReportDataSources.preKube_1_14.items }}
+---
+{{- include "new-report-datasource" $body -}}
+{{- end }}{{/* end range */}}
+
+{{- end }}{{/* end if */}}
