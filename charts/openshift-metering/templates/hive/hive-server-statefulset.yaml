@@ -223,7 +223,7 @@ spec:
 {{- end }}
         ports:
         - name: ghostunnel
-          containerPort: 8443
+          containerPort: 100001
         volumeMounts:
         - name: hive-server-tls-secret
           mountPath: /opt/hive/server-tls
