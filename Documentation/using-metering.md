@@ -61,10 +61,9 @@ $ kubectl -n $METERING_NAMESPACE get report namespace-cpu-request -o json
 Once a report's status has changed to `Finished`, the report is ready to be
 downloaded. The Metering Pod exposes an HTTP API for this.
 
-First, use `kubectl` to set up a proxy for accessing Kubernetes services:
-
+If you're using Openshift, we need to get the metering route's hostname:
 ```
-$ kubectl proxy
+METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
 ```
 
 The URL used to fetch a report changes based on the report's name and format.
@@ -72,6 +71,22 @@ The `format` parameter may be either `csv`, `json`, or `tab`. The URL scheme is:
 
 ```
 /api/v1/reports/get?name=[Report Name]&namespace=[Report Namespace]&format=[Format]
+```
+
+Using the URL scheme above and the metering route hostname, we can run the following command to access a report's data:
+```
+TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
+curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
+```
+
+For example, if we wanted the results of a report with the name `namespace-cpu-request` and in the CSV format, we would run:
+```
+curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=namespace-cpu-request&namespace=$METERING_NAMESPACE&format=csv"
+```
+
+If you're using Kubernetes, we first need to setup a proxy to access Kubernetes services:
+```
+$ kubectl proxy
 ```
 
 Using `kubectl proxy` requires that the URL be accessed through a prefix that
