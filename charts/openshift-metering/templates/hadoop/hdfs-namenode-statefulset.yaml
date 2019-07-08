@@ -96,6 +96,19 @@ spec:
       tolerations:
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.tolerations | indent 8 }}
 {{- end }}
+      initContainers:
+      - name: copy-starter-hadoop
+        image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
+        imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
+        command:
+        - '/bin/bash'
+        - '-c'
+        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'
+        volumeMounts:
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -163,6 +176,8 @@ spec:
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
         - name: hdfs-jmx-config
@@ -186,6 +201,8 @@ spec:
 {{- end }}
       volumes:
       - name: hadoop-config
+        emptyDir: {}
+      - name: hadoop-starting-config
         secret:
           secretName: "{{ .Values.hadoop.spec.configSecretName }}"
           defaultMode: 0555

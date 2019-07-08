@@ -109,6 +109,10 @@ spec:
           mountPath: /var/presto/data
         - name: presto-common-config
           mountPath: /presto-common
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
@@ -161,6 +165,8 @@ spec:
 {{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
         - name: hadoop-config
           mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
 {{- end }}
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
@@ -218,6 +224,8 @@ spec:
         emptyDir: {}
 {{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig }}
       - name: hadoop-config
+        emptyDir: {}
+      - name: hadoop-starting-config
         secret:
           secretName: {{ .Values.presto.spec.config.connectors.hive.hadoopConfigSecretName }}
 {{- end }}
