@@ -89,7 +89,7 @@ Open up a Presto-cli session by following the [Query Presto using presto-cli dev
 After you have a session run the following query:
 
 ```
-show tables from hive.metering;
+show tables from metering;
 ```
 
 This should give you a list of Database Tables created in Presto, within the hive catalog, in the metering schema, and you should see quite a few entries.
@@ -343,14 +343,12 @@ kubectl -n $METERING_NAMESPACE get report unready-deployment-replicas -o json
 Once the Report's status has changed to `Finished` (this can take a few minutes depending on cluster size and amount of data collected), we can query the operator's HTTP API for the results:
 
 ```
-kubectl proxy &
-sleep 2
-curl "http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
+METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
+TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
+curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
 ```
-If you are using Openshift, you'll need to change the url to the following:
-```
-http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv
-```
+
+If you aren't using Openshift, or have disabled `spec.tls.enabled` top-level key, follow the [viewing reports][viewing-reports] section, and come back to this document afterwards.
 
 This should output a CSV report that looks similar to this:
 
@@ -391,3 +389,4 @@ Here's a summary of what we did in this guide:
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [using-metering]: using-metering.md
 [datasource-table-schema]: reportdatasources.md#table-schemas
+[viewing-reports]: using-metering.md#viewing-reports

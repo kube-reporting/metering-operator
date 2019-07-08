@@ -14,7 +14,7 @@ export METERING_NAMESPACE=your-namespace
 The command below will follow the logs of the reporting-operator.
 
 ```
-kubectl -n $METERING_NAMESPACE get pods  -l app=reporting-operator -o name | cut -d/ -f2 | xargs -o -I{} kubectl -n $METERING_NAMESPACE logs -f {}
+kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods -l app=reporting-operator -o name | cut -c 5-)" -c reporting-operator
 ```
 
 ## Query Presto using presto-cli
@@ -132,6 +132,9 @@ After the above command you should be given a prompt, where you can run queries.
 
 The Presto web UI can be very useful when debugging.
 It will show what queries are running, which have succeeded, and which queries have failed.
+
+Note: Due to client-side authentication being enabled in Presto by default, you won't be able to view the Presto web UI at this time.
+However, you can specify `spec.tls.enabled: false` and stop there to disable TLS/auth entirely, or only con***REMOVED***gure Presto to work with TLS (`spec.presto.tls`) and not client-side authentication.
 
 ```
 kubectl -n $METERING_NAMESPACE get pods  -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
