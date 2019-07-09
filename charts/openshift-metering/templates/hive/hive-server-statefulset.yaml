@@ -48,8 +48,8 @@ spec:
       affinity:
 {{ toYaml .Values.hive.spec.server.affinity | indent 8 }}
 {{- end }}
-{{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
       initContainers:
+{{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
       - name: copy-hive-tls
         image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
@@ -74,7 +74,6 @@ spec:
         - name: hive-metastore-auth-tls-secrets
           mountPath: /hive-metastore-auth-tls-secrets
 {{- end }}
-      initContainers:
       - name: copy-starter-hive
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
