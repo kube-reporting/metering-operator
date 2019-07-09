@@ -68,9 +68,10 @@ spec:
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         ports:
+{{- if not .Values.hive.spec.metastore.config.tls.enabled }}
         - name: meta
           containerPort: 9083
-          protocol: TCP
+{{- end }}
         - containerPort: 8082
           name: metrics
 {{- if .Values.hive.spec.metastore.readinessProbe }}
@@ -150,7 +151,7 @@ spec:
         args:
         - server
         - --listen
-        - 0.0.0.0:8443
+        - 0.0.0.0:9084
         - --target
         - localhost:9083
         - --key
@@ -169,7 +170,7 @@ spec:
 {{- end }}
         ports:
         - name: ghostunnel
-          containerPort: 8443
+          containerPort: 9084
         volumeMounts:
         - name: hive-metastore-tls-secret
           mountPath: /opt/hive/tls

@@ -94,16 +94,14 @@ spec:
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         ports:
+{{- if not .Values.hive.spec.server.config.tls.enabled }}
         - name: thrift
           containerPort: 10000
-          protocol: TCP
         - name: ui
           containerPort: 10002
-          protocol: TCP
+{{- end }}
         - containerPort: 8082
           name: metrics
-        - containerPort: 10004
-          name: metastore
 {{- if .Values.hive.spec.server.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.hive.spec.server.readinessProbe | indent 10 }}
@@ -180,9 +178,9 @@ spec:
         args:
         - client
         - --listen
-        - localhost:8443
+        - localhost:9083
         - --target
-        - hive-metastore:8443
+        - hive-metastore:9083
         - --keystore
         -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
         - --cacert
@@ -223,7 +221,7 @@ spec:
 {{- end }}
         ports:
         - name: ghostunnel
-          containerPort: 8443
+          containerPort: 10001
         volumeMounts:
         - name: hive-server-tls-secret
           mountPath: /opt/hive/server-tls
