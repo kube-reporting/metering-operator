@@ -193,7 +193,7 @@ spec:
         - --listen
         - localhost:9083
         - --target
-        - hive-metastore:8443
+        - hive-metastore:9083
         - --keystore
         -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
         - --cacert

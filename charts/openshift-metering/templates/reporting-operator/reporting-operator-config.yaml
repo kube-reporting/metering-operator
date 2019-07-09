@@ -10,17 +10,19 @@ data:
   log-reports: {{ $operatorValues.spec.con***REMOVED***g.logReports | quote}}
   log-ddl-queries: {{ $operatorValues.spec.con***REMOVED***g.logDDLQueries | quote}}
   log-dml-queries: {{ $operatorValues.spec.con***REMOVED***g.logDMLQueries | quote}}
+
 {{- if $operatorValues.spec.con***REMOVED***g.hive.host }}
   hive-host: {{ $operatorValues.spec.con***REMOVED***g.hive.host | quote }}
-{{- ***REMOVED*** if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
-  hive-host: "hive-server:10001"
+{{- ***REMOVED*** }}
+  hive-host: "hive-server:10000"
+{{- end }}
+
+{{- if $operatorValues.spec.con***REMOVED***g.hive.tls.enabled }}
   hive-ca-***REMOVED***le: "/var/run/secrets/hive-tls/ca.crt"
 {{- if $operatorValues.spec.con***REMOVED***g.hive.auth.enabled }}
   hive-client-cert-***REMOVED***le: "/var/run/secrets/hive-auth/tls.crt"
   hive-client-key-***REMOVED***le: "/var/run/secrets/hive-auth/tls.key"
 {{- end }}
-{{- ***REMOVED*** }}
-  hive-host: "hive-server:10000"
 {{- end }}
 
   presto-host: {{ $operatorValues.spec.con***REMOVED***g.presto.host | quote }}
