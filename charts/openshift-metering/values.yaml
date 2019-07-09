@@ -465,6 +465,12 @@ presto:
         createSecret: false
         secretName: ""
 
+      azure:
+        storageAccountName: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
       tls:
         # server cert
         certi***REMOVED***cate: ""
@@ -634,6 +640,12 @@ hive:
         createSecret: false
         secretName: ""
 
+      azure:
+        storageAccountName: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
       sharedVolume:
         enabled: false
         mountPath: /user/hive/warehouse
@@ -789,6 +801,12 @@ hadoop:
 
       aws:
         accessKeyID: ""
+        secretAccessKey: ""
+        createSecret: false
+        secretName: ""
+
+      azure:
+        storageAccountName: ""
         secretAccessKey: ""
         createSecret: false
         secretName: ""

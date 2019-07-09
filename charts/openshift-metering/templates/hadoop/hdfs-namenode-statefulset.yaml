@@ -100,15 +100,32 @@ spec:
       - name: copy-starter-hadoop
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
-        command:
-        - '/bin/bash'
-        - '-c'
-        - 'cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/'
+        command: ["/hadoop-scripts/copy-hadoop-con***REMOVED***g.sh"]
+{{- if or .Values.hadoop.spec.con***REMOVED***g.azure.secretName .Values.hadoop.spec.con***REMOVED***g.azure.createSecret }}
+        env:
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.con***REMOVED***g.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.con***REMOVED***g.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-secret-access-key
+{{- end }}
         volumeMounts:
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
         - name: hadoop-starting-con***REMOVED***g
           mountPath: /hadoop-starting-con***REMOVED***g
+        - name: hadoop-scripts
+          mountPath: /hadoop-scripts
+      volumes:
+      - name: hadoop-scripts
+        con***REMOVED***gMap:
+          name: hadoop-scripts
+          defaultMode: 0775
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -205,11 +222,11 @@ spec:
       - name: hadoop-starting-con***REMOVED***g
         secret:
           secretName: "{{ .Values.hadoop.spec.con***REMOVED***gSecretName }}"
-          defaultMode: 0555
+          defaultMode: 0775
       - name: hadoop-scripts
         con***REMOVED***gMap:
           name: hadoop-scripts
-          defaultMode: 0555
+          defaultMode: 0775
       - name: hdfs-jmx-con***REMOVED***g
         con***REMOVED***gMap:
           name: hdfs-jmx-con***REMOVED***g
