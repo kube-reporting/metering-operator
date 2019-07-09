@@ -410,8 +410,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 		srvErrChan <- fmt.Errorf("pprof server error: %v", srvErr)
 	}()
 
-	go op.informerFactory.Start(ctx.Done())
-
 	op.logger.Infof("setting up DB clients")
 	var hiveDialer hive.Dialer = hive.DialWrapper{}
 	if op.cfg.HiveUseTLS {
@@ -512,13 +510,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 		return err
 	}
 
-	op.logger.Info("waiting for caches to sync")
-	for t, synced := range op.informerFactory.WaitForCacheSync(ctx.Done()) {
-		if !synced {
-			return fmt.Errorf("cache for %s not synced in time", t)
-		}
-	}
-
 	var prestoQueryBufferPool *sync.Pool
 	if op.cfg.PrestoMaxQueryLength > 0 {
 		bufferPool := prestostore.NewBufferPool(op.cfg.PrestoMaxQueryLength)
@@ -587,6 +578,16 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	op.logger.Info("basic initialization completed")
 	op.setInitialized()
+
+	op.logger.Info("starting informers")
+	go op.informerFactory.Start(ctx.Done())
+
+	op.logger.Info("waiting for caches to sync")
+	for t, synced := range op.informerFactory.WaitForCacheSync(ctx.Done()) {
+		if !synced {
+			return fmt.Errorf("cache for %s not synced in time", t)
+		}
+	}
 
 	eventBroadcaster := record.NewBroadcaster()
 	eventBroadcaster.StartLogging(op.logger.Infof)
