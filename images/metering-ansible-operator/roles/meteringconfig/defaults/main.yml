@@ -92,7 +92,6 @@ _storage_overrides:
           defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
         hdfs:
           enabled: false
-
   hdfs:
     hadoop:
       spec:
@@ -253,16 +252,19 @@ meteringconfig_enable_reporting_aws_billing: "{{ _openshift_reporting_spec.awsBi
 
 meteringconfig_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
 meteringconfig_create_hadoop_aws_credentials: "{{ _hadoop_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_hadoop_azure_credentials: "{{ _hadoop_spec.config.azure.createSecret | default(false) }}"
 
 meteringconfig_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringconfig_create_hive_shared_volume_pvc: "{{ _hive_spec.config.sharedVolume.enabled and _hive_spec.config.sharedVolume.createPVC | default(false) }}"
 meteringconfig_create_hive_aws_credentials: "{{ _hive_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_hive_azure_credentials: "{{ _hive_spec.config.azure.createSecret | default(false) }}"
 
 meteringconfig_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.config.tls.enabled and _hive_spec.metastore.config.tls.createSecret | default(false) }}"
 meteringconfig_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.config.metastoreTLS.enabled and _hive_spec.server.config.metastoreTLS.createSecret | default(false) }}"
 meteringconfig_create_hive_server_tls_secrets: "{{ _hive_spec.server.config.tls.enabled and _hive_spec.server.config.tls.createSecret | default(false) }}"
 
 meteringconfig_create_presto_aws_credentials: "{{ _presto_spec.config.aws.createSecret | default(false) }}"
+meteringconfig_create_presto_azure_credentials: "{{ _presto_spec.config.azure.createSecret | default(false) }}"
 meteringconfig_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.config.connectors.hive.tls.createSecret | default(false) }}"
 
 #

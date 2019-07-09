@@ -100,15 +100,32 @@ spec:
       - name: copy-starter-hadoop
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
-        command:
-        - '/bin/bash'
-        - '-c'
-        - 'cp -v -L -r -f /hadoop-starting-config/* /hadoop-config/'
+        command: ["/hadoop-scripts/copy-hadoop-config.sh"]
+{{- if or .Values.hadoop.spec.config.azure.secretName .Values.hadoop.spec.config.azure.createSecret }}
+        env:
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.azure.secretName | default "hadoop-azure-credentials" }}"
+              key: azure-secret-access-key
+{{- end }}
         volumeMounts:
         - name: hadoop-config
           mountPath: /hadoop-config
         - name: hadoop-starting-config
           mountPath: /hadoop-starting-config
+        - name: hadoop-scripts
+          mountPath: /hadoop-scripts
+      volumes:
+      - name: hadoop-scripts
+        configMap:
+          name: hadoop-scripts
+          defaultMode: 0775
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -205,11 +222,11 @@ spec:
       - name: hadoop-starting-config
         secret:
           secretName: "{{ .Values.hadoop.spec.configSecretName }}"
-          defaultMode: 0555
+          defaultMode: 0775
       - name: hadoop-scripts
         configMap:
           name: hadoop-scripts
-          defaultMode: 0555
+          defaultMode: 0775
       - name: hdfs-jmx-config
         configMap:
           name: hdfs-jmx-config

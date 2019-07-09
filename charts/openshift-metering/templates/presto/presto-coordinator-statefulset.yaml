@@ -28,6 +28,7 @@ spec:
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
         presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
         presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
+        presto-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-azure-credentials-secret.yaml") . | sha256sum }}
 {{- if .Values.presto.spec.config.aws.createSecret -}}
         presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
@@ -96,6 +97,18 @@ spec:
           value: /opt/ghostunnel/tls/tls.key
         - name: GHOSTUNNEL_CLIENT_KEYSTORE
           value: /opt/ghostunnel/tls/keystore-combined.pem
+{{- end }}
+{{- if or .Values.presto.spec.config.azure.secretName .Values.presto.spec.config.azure.createSecret }}
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.presto.spec.config.azure.secretName | default "presto-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.presto.spec.config.azure.secretName | default "presto-azure-credentials" }}"
+              key: azure-secret-access-key
 {{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
