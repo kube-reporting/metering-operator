@@ -48,5 +48,5 @@ if [ "$SKIP_DELETE_CRDS" == "true" ]; then
 
 if [ "$DELETE_PVCS" == "true" ]; then
     echo "Deleting PVCs"
-    kube-remove-non-***REMOVED***le pvc -l "app in (hive-metastore, hdfs-namenode, hdfs-datanode)"
+    kube-remove-non-***REMOVED***le pvc -l "app in (hive, hdfs)"
 ***REMOVED***

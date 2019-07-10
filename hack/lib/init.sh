@@ -17,7 +17,7 @@ source "${ROOT_DIR}/hack/lib/util.sh"
 : "${CREATE_NAMESPACE:=true}"
 : "${SKIP_DELETE_CRDS:=true}"
 : "${SKIP_METERING_OPERATOR_DEPLOYMENT:=false}"
-: "${DELETE_PVCS:=false}"
+: "${DELETE_PVCS:=true}"
 
 : "${DEPLOY_PLATFORM:=openshift}"
 METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
