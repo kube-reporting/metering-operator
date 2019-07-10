@@ -76,7 +76,7 @@ ifeq ($(RUN_UPDATE_CODEGEN), true)
 	CODEGEN_OUTPUT_GO_FILES := $(shell $(ROOT_DIR)/hack/codegen_output_files.sh)
 endif
 
-all: fmt unit metering-manifests docker-build-all
+all: fmt unit verify docker-build-all
 
 docker-build-all: reporting-operator-docker-build metering-ansible-operator-docker-build
 
