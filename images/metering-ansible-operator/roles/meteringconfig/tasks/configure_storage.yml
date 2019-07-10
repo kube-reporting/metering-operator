@@ -3,14 +3,17 @@
 - name: Con***REMOVED***gure S3 Storage
   block:
     - name: Validate Metering S3 bucket name
-      fail:
-        msg: "storage.hive.s3.bucket and storage.hive.s3.region cannot be empty, got bucket: '{{ meteringcon***REMOVED***g_storage_s3_bucket_name }}', and region: '{{ meteringcon***REMOVED***g_storage_s3_bucket_region }}'"
-      when: meteringcon***REMOVED***g_storage_s3_bucket_name == "" or meteringcon***REMOVED***g_storage_s3_bucket_region == ""
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3_bucket_name != ""
+          - meteringcon***REMOVED***g_storage_s3_bucket_region != ""
+        msg: "storage.hive.s3.bucket and storage.hive.s3.region cannot be empty"
 
     - name: Validate Metering S3 credentials
-      fail:
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name != ""
         msg: "storage.hive.s3.secretName cannot be empty"
-      when: meteringcon***REMOVED***g_storage_s3_aws_credentials_secret_name == ""
 
     - name: Obtaining AWS credentials to con***REMOVED***gure S3 bucket
       k8s_facts:
