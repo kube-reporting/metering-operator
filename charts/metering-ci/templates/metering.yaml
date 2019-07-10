@@ -3,6 +3,8 @@ kind: MeteringConfig
 metadata:
   name: "{{ .Values.deployPlatform }}-metering"
 spec:
+  logHelmTemplate: true
+
   monitoring:
     enabled: true
 
