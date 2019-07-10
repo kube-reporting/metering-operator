@@ -252,8 +252,16 @@ func (op *Reporting) deletePrestoTable(obj interface{}) {
 	// exist in our store, so we eagerly drop the table upon seeing the delete
 	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && prestoTable != nil {
-		// TODO: fix
-		_ = op.dropPrestoTable(prestoTable)
+		err := op.dropPrestoTable(prestoTable)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).WithError(err).Errorf("couldn't drop PrestoTable: %#v", prestoTable)
+			return
+		}
+		_, err = op.removePrestoTableFinalizer(prestoTable)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"prestoTable": prestoTable.Name, "namespace": prestoTable.Namespace}).WithError(err).Errorf("unable to remove finalizers from PrestoTable: %#v", prestoTable)
+			return
+		}
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(prestoTable)
 	if err != nil {
@@ -313,7 +321,16 @@ func (op *Reporting) deleteHiveTable(obj interface{}) {
 	// exist in our store, so we eagerly drop the table upon seeing the delete
 	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && hiveTable != nil {
-		_ = op.dropHiveTable(hiveTable)
+		err := op.dropHiveTable(hiveTable)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).WithError(err).Errorf("couldn't drop HiveTable: %#v", hiveTable)
+			return
+		}
+		_, err = op.removeHiveTableFinalizer(hiveTable)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace}).WithError(err).Errorf("unable to remove finalizers from HiveTable: %#v", hiveTable)
+			return
+		}
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(hiveTable)
 	if err != nil {
@@ -373,7 +390,17 @@ func (op *Reporting) deleteStorageLocation(obj interface{}) {
 	// exist in our store, so we eagerly drop the storageLocation upon seeing the delete
 	// event when finalizers are disabled
 	if !op.cfg.EnableFinalizers && storageLocation != nil {
-		_ = op.deleteStorage(storageLocation)
+		err := op.deleteStorage(storageLocation)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("couldn't delete storage for storageLocation: %#v", storageLocation)
+			return
+		}
+
+		_, err = op.removeStorageLocationFinalizer(storageLocation)
+		if err != nil {
+			op.logger.WithFields(log.Fields{"storageLocation": storageLocation.Name, "namespace": storageLocation.Namespace}).WithError(err).Errorf("unable to remove finalizers for storageLocation: %#v", storageLocation)
+			return
+		}
 	}
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(storageLocation)
 	if err != nil {

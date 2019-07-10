@@ -118,7 +118,7 @@ func generateDropDatabaseSQL(dbName string, ignoreNotExists, cascade bool) strin
 		`DROP DATABASE
 %s
 %s
-%s`, dbName, ifExists, cascadeStr)
+%s`, ifExists, dbName, cascadeStr)
 }
 
 // generateColumnListSQL returns a Hive CREATE column string from a slice of
