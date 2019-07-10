@@ -220,7 +220,7 @@ spec:
     unit: kubernetes_namespace
   - name: pod_request_cpu_core_seconds
     type: double
-    unit: core_seconds
+    unit: cpu_core_seconds
   inputs:
   - name: ReportingStart
     type: time
@@ -272,7 +272,7 @@ spec:
     unit: kubernetes_namespace
   - name: pod_usage_cpu_core_seconds
     type: double
-    unit: core_seconds
+    unit: cpu_core_seconds
   inputs:
   - name: ReportingStart
     type: time
@@ -324,10 +324,10 @@ spec:
     unit: kubernetes_namespace
   - name: pod_usage_cpu_core_seconds
     type: double
-    unit: core_seconds
+    unit: cpu_core_seconds
   - name: pod_request_cpu_core_seconds
     type: double
-    unit: core_seconds
+    unit: cpu_core_seconds
   - name: pod_cpu_usage_percent
     type: double
   - name: pod_cpu_request_percent
