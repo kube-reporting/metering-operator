@@ -23,4 +23,3 @@
         - meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.data != ""
       msg: "spec.reporting-operator.spec.authProxy.authenticatedEmails: secretName and/or data key(s) cannot be empty when enabled and createSecret is set to true"
     when: meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.enabled and meteringconfig_spec['reporting-operator'].spec.authProxy.authenticatedEmails.createSecret
-  when: not meteringconfig_tls_enabled

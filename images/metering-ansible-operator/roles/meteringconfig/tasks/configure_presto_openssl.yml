@@ -35,6 +35,7 @@
       ownca_path: "{{ certificates_dir.path }}/ca.crt"
       ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
       selfsigned_digest: sha256
+  when: not presto_tls_secret_exists
 
 #
 # Generate the Client cert/key to enable client-side authentication
@@ -70,3 +71,4 @@
       ownca_path: "{{ certificates_dir.path }}/ca.crt"
       ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
       selfsigned_digest: sha256
+  when: not presto_auth_secret_exists

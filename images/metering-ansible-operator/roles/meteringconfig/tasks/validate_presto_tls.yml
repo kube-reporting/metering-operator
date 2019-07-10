@@ -6,40 +6,47 @@
 - name: Validate that the user-provided Presto server TLS fields are not empty
   block:
   - name: Validate that the user provided a non-empty TLS certificate value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.tls.certificate == ""
       msg: "presto.spec.config.tls.certificate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.tls.certificate == ""
 
   - name: Validate that the user provided a non-empty TLS CA certificate value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.tls.caCertificate == ""
       msg: "presto.spec.config.tls.caCertificate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.tls.caCertificate == ""
 
   - name: Validate that the user provided a non-empty TLS key value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.tls.key == ""
       msg: "presto.spec.config.tls.key cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.tls.key == ""
   when: meteringconfig_template_presto_tls_secret
 
 - name: Validate that the user-provided Presto client Auth fields are not empty
   block:
   - name: Validate that the user provided a non-empty auth certificate value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.auth.certificate == ""
       msg: "presto.spec.config.auth.certificate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.auth.certificate == ""
 
   - name: Validate that the user provided a non-empty auth CA certificate value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.auth.caCertificate == ""
       msg: "presto.spec.config.auth.caCertificate cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.auth.caCertificate == ""
 
   - name: Validate that the user provided a non-empty auth key value
-    fail:
+    assert:
+      that:
+        - meteringconfig_spec.presto.spec.config.auth.key == ""
       msg: "presto.spec.config.auth.key cannot be empty if createSecret: true and secretName != ''"
-    when: meteringconfig_spec.presto.spec.config.auth.key == ""
 
   - name: Validate that TLS is enabled when auth is enabled
-    fail:
+    assert:
+      that:
+        - not meteringconfig_spec.presto.spec.config.tls.enabled and meteringconfig_spec.presto.spec.config.auth.enabled
       msg: "Invalid configuration passed: you cannot enable auth but disable TLS."
-    when: not meteringconfig_spec.presto.spec.config.tls.enabled and meteringconfig_spec.presto.spec.config.auth.enabled
   when: meteringconfig_template_presto_auth_secret
