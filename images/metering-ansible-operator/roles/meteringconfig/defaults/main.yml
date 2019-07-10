@@ -3,7 +3,6 @@
 meteringconfig_chart_path: "{{ lookup('env','HELM_CHART_PATH') }}"
 meteringconfig_prune_label_key: 'metering.openshift.io/prune'
 meteringconfig_prune_namespace_label_key: 'metering.openshift.io/ns-prune'
-
 meteringconfig_default_values_file: "{{ meteringconfig_chart_path + '/values.yaml' }}"
 meteringconfig_default_values: "{{ lookup('file', meteringconfig_default_values_file) | from_yaml }}"
 
@@ -53,7 +52,7 @@ meteringconfig_default_image_overrides:
         repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hadoop_default_image_repo, true) }}"
         tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hadoop_default_image_tag, true) }}"
 
-_storage_overrides:
+_base_storage_overrides:
   s3:
     storage:
       hive:
@@ -92,6 +91,48 @@ _storage_overrides:
           defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
         hdfs:
           enabled: false
+
+  azure:
+    storage:
+      hive:
+        # azure storage defaults
+        azure:
+          # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
+          container: "-unconfigured-metering-container-name-"
+          secretName: ""
+          storageAccountName: ""
+          secretAccessKey: ""
+          createSecret: false
+          rootDirectory: ""
+    presto:
+      spec:
+        config:
+          azure:
+            secretName: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.azure.createSecret') }}"
+            storageAccountName: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
+            secretAccessKey: "{{ _storage_spec | json_query('hive.azure.secretAccessKey') }}"
+    hive:
+      spec:
+        config:
+          metastoreWarehouseDir: "wasbs://{{ _storage_spec | json_query('hive.azure.container') }}@{{ _storage_spec | json_query('hive.azure.storageAccountName') }}.blob.core.windows.net{{ _storage_spec | json_query('hive.azure.rootDirectory') | default('/', True) | regex_replace('^\\/?', '/') }}"
+          azure:
+            secretName: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.azure.createSecret') }}"
+            storageAccountName: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
+            secretAccessKey: "{{ _storage_spec | json_query('hive.azure.secretAccessKey') }}"
+    hadoop:
+      spec:
+        config:
+          defaultFS: "wasbs://{{ _storage_spec | json_query('hive.azure.container') }}@{{ _storage_spec | json_query('hive.azure.storageAccountName') }}.blob.core.windows.net{{ _storage_spec | json_query('hive.azure.rootDirectory') | default('/', True) | regex_replace('^\\/?', '/') }}"
+          azure:
+            secretName: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.azure.createSecret') }}"
+            storageAccountName: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
+            secretAccessKey: "{{ _storage_spec | json_query('hive.azure.secretAccessKey') }}"
+        hdfs:
+          enabled: false
+
   hdfs:
     hadoop:
       spec:
@@ -120,6 +161,29 @@ _storage_overrides:
         hdfs:
           enabled: false
 
+# overides the accountname(potentially empty) from a designated secret and generate the storage URL
+meteringconfig_storage_azure_create_secret: "{{ _storage_spec | json_query('hive.azure.createSecret') | default(false, true) }}"
+
+_azure_secret_account_name: ""
+#
+# Use _azure_account_overides when meteringconfig_storage_azure_create_secret is false to correctly set the defaultFS and metastoreWarehouseDir with the storage account name from the user's secret.
+#
+_azure_account_overides:
+  azure:
+    hadoop:
+      spec:
+        config:
+          defaultFS: "wasbs://{{ _storage_spec | json_query('hive.azure.container') }}@{{ _azure_secret_account_name  }}.blob.core.windows.net{{ _storage_spec | json_query('hive.azure.rootDirectory')| default('/', True) | regex_replace('^\\/?', '/') }}"
+    hive:
+      spec:
+        config:
+          metastoreWarehouseDir: "wasbs://{{ _storage_spec | json_query('hive.azure.container') }}@{{ _azure_secret_account_name }}.blob.core.windows.net{{ _storage_spec | json_query('hive.azure.rootDirectory')| default('/', True) | regex_replace('^\\/?', '/') }}"
+
+_meteringconfig_azure_overrides: "{{ meteringconfig_storage_azure_create_secret | ternary({} , _azure_account_overides ) | default({}, true) }}"
+_storage_overrides: "{{ _base_storage_overrides | combine(_meteringconfig_azure_overrides, recursive = True) }}"
+meteringconfig_storage_azure_container_name: "{{ _storage_spec | json_query('hive.azure.container') }}"
+meteringconfig_storage_azure_storage_account_name: "{{ _storage_spec | json_query('hive.azure.storageAccountName') }}"
+meteringconfig_storage_azure_credentials_secret_name: "{{ _storage_spec | json_query('hive.azure.secretName') }}"
 meteringconfig_storage_hive_storage_type: "{{ _storage_spec | json_query('hive.type') }}"
 meteringconfig_storage_overrides: "{{ _storage_overrides[meteringconfig_storage_hive_storage_type] | default({}, true) }}"
 
@@ -392,3 +456,4 @@ meteringconfig_create_reporting_operator_hive_auth_secrets: "{{ _reporting_op_sp
 meteringconfig_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.config.tls.api.createSecret | default(false) }}"
 meteringconfig_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringconfig_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"
+
