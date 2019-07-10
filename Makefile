@@ -167,10 +167,13 @@ vet:
 push-olm-manifests: verify-olm-manifests
 	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering $(OLM_PACKAGE_VERSION)
 
-# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
-verify: verify-codegen verify-olm-manifests fmt vet
+verify: verify-codegen verify-olm-manifests verify-helm-templates fmt vet
 	@echo Checking for unstaged changes
+	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
 	git diff --stat HEAD --ignore-submodules --exit-code -- $(VERIFY_FILE_PATHS)
+
+verify-helm-templates:
+	helm template ./charts/openshift-metering > /dev/null
 
 verify-olm-manifests: metering-manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
