@@ -48,5 +48,5 @@ fi
 
 if [ "$DELETE_PVCS" == "true" ]; then
     echo "Deleting PVCs"
-    kube-remove-non-file pvc -l "app in (hive-metastore, hdfs-namenode, hdfs-datanode)"
+    kube-remove-non-file pvc -l "app in (hive, hdfs)"
 fi
