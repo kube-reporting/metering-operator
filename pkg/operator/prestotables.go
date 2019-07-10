@@ -250,6 +250,9 @@ func prestoTableNeedsFinalizer(prestoTable *metering.PrestoTable) bool {
 
 func (op *Reporting) dropPrestoTable(prestoTable *metering.PrestoTable) error {
 	if !prestoTable.Spec.Unmanaged {
+		if prestoTable.Status.TableName == "" {
+			return nil
+		}
 		if prestoTable.Status.View {
 			return op.prestoTableManager.DropView(prestoTable.Status.Catalog, prestoTable.Status.Schema, prestoTable.Status.TableName, true)
 		} ***REMOVED*** {

@@ -404,6 +404,9 @@ func (op *Reporting) waitForHiveTable(namespace, name string, pollInterval, time
 func (op *Reporting) dropHiveTable(hiveTable *metering.HiveTable) error {
 	tableName := hiveTable.Status.TableName
 	databaseName := hiveTable.Status.DatabaseName
+	if tableName == "" {
+		return nil
+	}
 	logger := op.logger.WithFields(log.Fields{"hiveTable": hiveTable.Name, "namespace": hiveTable.Namespace, "tableName": tableName})
 	logger.Infof("dropping hive table %s", tableName)
 	err := op.hiveTableManager.DropTable(databaseName, tableName, true)

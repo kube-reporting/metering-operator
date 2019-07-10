@@ -165,7 +165,7 @@ func storageLocationNeedsFinalizer(storageLocation *metering.StorageLocation) bo
 
 func (op *Reporting) deleteStorage(storageLocation *metering.StorageLocation) error {
 	if storageLocation.Spec.Hive != nil {
-		if !storageLocation.Spec.Hive.UnmanagedDatabase {
+		if !storageLocation.Spec.Hive.UnmanagedDatabase && storageLocation.Status.Hive.DatabaseName != "" {
 			return op.hiveDatabaseManager.DropDatabase(storageLocation.Status.Hive.DatabaseName, true, false)
 		}
 	}
