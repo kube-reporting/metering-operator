@@ -1,0 +1,13 @@
+apiVersion: metering.openshift.io/v1
+kind: MeteringCon***REMOVED***g
+metadata:
+  name: "operator-metering"
+spec:
+  storage:
+    type: "hive"
+    hive:
+      type: "azure"
+      azure:
+        container: "bucket1"
+        secretName: "my-azure-secret"
+        rootDirectory: "/testDir"
