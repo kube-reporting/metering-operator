@@ -1,65 +1,82 @@
 ---
 
 #
-# Presto and reporting-operator TLS
+# Reporting Operator Presto TLS/auth
 #
-- name: Check for the existence of the reporting-operator presto server TLS secret
-  k8s_facts:
-    api_version: v1
-    kind: Secret
-    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.tls.secretName }}"
-    namespace: "{{ meta.namespace }}"
-  no_log: true
-  register: reporting_operator_tls_secret_buf
-  when: meteringconfig_tls_enabled
+- name: Check for the existence of the reporting-operator Presto TLS-related secrets
+  block:
+  - name: Check for the existence of the reporting-operator Presto server TLS secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.tls.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: reporting_operator_tls_secret_buf
 
-- name: Check for the existence of the reporting-operator presto client auth TLS secret
-  k8s_facts:
-    api_version: v1
-    kind: Secret
-    name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
-    namespace: "{{ meta.namespace }}"
-  no_log: true
-  register: reporting_operator_auth_secret_buf
-  when: meteringconfig_tls_enabled
+  - name: Check for the existence of the reporting-operator Presto client auth TLS secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.config.presto.auth.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: reporting_operator_auth_secret_buf
 
-- name: Configure reporting-operator to use existing presto server TLS secret data
-  set_fact:
-    _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
-  no_log: true
+  - name: Configure the reporting operator Presto TLS to use existing Root CA data
+    set_fact:
+      _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+    when: not reporting_operator_tls_secret_exists
+
+  - name: Configure TLS and authentication in the reporting-operator to Presto
+    block:
+    - name: Generate reporting-operator client certs as needed
+      include_tasks: configure_reporting_operator_openssl.yml
+
+    - name: Configure reporting-operator to use generated client TLS data
+      set_fact:
+        _meteringconfig_reporting_operator_presto_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+        _meteringconfig_reporting_operator_client_cert: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.crt') + '\n' }}"
+        _meteringconfig_reporting_operator_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/reporting_operator_client.key') + '\n' }}"
+    when: not reporting_operator_auth_secret_exists
+
+  - name: Configure the reporting-operator to use existing presto server TLS secret data
+    set_fact:
+      _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+    no_log: true
+    when: reporting_operator_tls_secret_exists
+
+  - name: Configure the reporting-operator to use existing presto client TLS secret data
+    set_fact:
+      _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_reporting_operator_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_reporting_operator_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
+    no_log: true
+    when: reporting_operator_auth_secret_exists
   vars:
     reporting_operator_tls_secret_exists: "{{ reporting_operator_tls_secret_buf.resources is defined and reporting_operator_tls_secret_buf.resources | length > 0 }}"
-  when: meteringconfig_tls_enabled and reporting_operator_tls_secret_exists
-
-- name: Configure reporting-operator to use existing presto client TLS secret data
-  set_fact:
-    _meteringconfig_reporting_operator_presto_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
-    _meteringconfig_reporting_operator_client_cert: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.crt'] | b64decode }}"
-    _meteringconfig_reporting_operator_client_key: "{{ reporting_operator_auth_secret_buf.resources[0].data['tls.key'] | b64decode }}"
-  no_log: true
-  vars:
     reporting_operator_auth_secret_exists: "{{ reporting_operator_auth_secret_buf.resources is defined and reporting_operator_auth_secret_buf.resources | length > 0 }}"
-  when: meteringconfig_tls_enabled and reporting_operator_auth_secret_exists
+  when: meteringconfig_tls_enabled
 
 #
 # Reporting Operator Auth-Proxy
 #
-- name: Validate user's authProxy configuration
+- name: Validate the user-provided authProxy configuration
   include_tasks: validate_reporting_operator_tls.yml
   when: not meteringconfig_tls_enabled
 
-- name: Check for the existence of the reporting-operator authProxy cookie seed secret
-  k8s_facts:
-    api_version: v1
-    kind: Secret
-    name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
-    namespace: "{{ meta.namespace }}"
-  no_log: true
-  register: reporting_operator_auth_proxy_cookie_secret_buf
-  when: meteringconfig_tls_enabled
-
-- name: Generate authProxy secret data
+- name: Check for the existence of reporting-operator authProxy-related secret data
   block:
+  - name: Check for the existence of the reporting-operator authProxy cookie seed secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec['reporting-operator'].spec.authProxy.cookie.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: reporting_operator_auth_proxy_cookie_secret_buf
+    when: meteringconfig_tls_enabled
+
   - name: Generate a 32-character random string
     command: openssl rand -base64 32
     register: cookie_seed_random_string

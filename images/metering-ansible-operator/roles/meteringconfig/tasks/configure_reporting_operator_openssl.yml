@@ -1,0 +1,37 @@
+---
+
+#
+# Generate the reporting-operator client cert/key
+# The reporting-operator talks to Presto and Hive Server
+#
+- name: Setup the client certificate/key
+  block:
+  - name: Generate an RSA private key for the reporting-operator client
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/reporting_operator_client.key"
+
+  - name: Generate the reporting-operator client CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/reporting_operator_client.csr"
+      privatekey_path: "{{ certificates_dir.path }}/reporting_operator_client.key"
+      common_name: "reporting-operator"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - clientAuth
+
+  - name: Generate the reporting-operator client certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/reporting_operator_client.crt"
+      privatekey_path: "{{ certificates_dir.path }}/reporting_operator_client.key"
+      csr_path: "{{ certificates_dir.path }}/reporting_operator_client.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256
