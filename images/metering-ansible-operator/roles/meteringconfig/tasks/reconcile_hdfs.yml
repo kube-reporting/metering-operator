@@ -14,6 +14,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-aws-credentials
         create: "{{ meteringcon***REMOVED***g_create_hadoop_aws_credentials }}"
+      - template_***REMOVED***le: templates/hadoop/hadoop-azure-credentials.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-azure-credentials
+        create: "{{ meteringcon***REMOVED***g_create_hadoop_azure_credentials }}"
       - template_***REMOVED***le: templates/hadoop/hadoop-scripts.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hadoop-scripts

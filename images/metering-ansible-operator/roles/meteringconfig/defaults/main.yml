@@ -92,7 +92,6 @@ _storage_overrides:
           defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
         hdfs:
           enabled: false
-
   hdfs:
     hadoop:
       spec:
@@ -253,16 +252,19 @@ meteringcon***REMOVED***g_enable_reporting_aws_billing: "{{ _openshift_reporting
 
 meteringcon***REMOVED***g_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
 meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hadoop_azure_credentials: "{{ _hadoop_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
 meteringcon***REMOVED***g_create_hive_aws_credentials: "{{ _hive_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hive_azure_credentials: "{{ _hive_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.con***REMOVED***g.metastoreTLS.enabled and _hive_spec.server.con***REMOVED***g.metastoreTLS.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_server_tls_secrets: "{{ _hive_spec.server.con***REMOVED***g.tls.enabled and _hive_spec.server.con***REMOVED***g.tls.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_azure_credentials: "{{ _presto_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
 
 #

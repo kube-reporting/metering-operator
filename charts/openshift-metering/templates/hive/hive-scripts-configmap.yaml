@@ -3,6 +3,14 @@ kind: Con***REMOVED***gMap
 metadata:
   name: hive-scripts
 data:
+  copy-hadoop-con***REMOVED***g.sh: |
+    #!/bin/bash
+    set -ex
+    cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/
+    cd /hadoop-con***REMOVED***g/
+    faq '.con***REMOVED***guration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
+    cp core-site.xml.temp core-site.xml
+
   entrypoint.sh: |
     #!/bin/bash
     set -e

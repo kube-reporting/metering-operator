@@ -30,6 +30,7 @@ spec:
         hive-scripts-hash: {{ include (print $.Template.BasePath "/hive/hive-scripts-con***REMOVED***gmap.yaml") . | sha256sum }}
         hive-jmx-con***REMOVED***g-hash: {{ include (print $.Template.BasePath "/hive/hive-jmx-con***REMOVED***g.yaml") . | sha256sum }}
         hive-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-aws-credentials-secret.yaml") . | sha256sum }}
+        hive-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-azure-credentials-secret.yaml") . | sha256sum }}
 {{- if .Values.hive.spec.annotations }}
 {{ toYaml .Values.hive.spec.annotations | indent 8 }}
 {{- end }}
@@ -77,15 +78,32 @@ spec:
       - name: copy-starter-hive
         image: "{{ .Values.hive.spec.image.repository }}:{{ .Values.hive.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
-        command:
-        - '/bin/bash'
-        - '-c'
-        - 'cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/'
+        command: ["/hive-scripts/copy-hadoop-con***REMOVED***g.sh"]
+{{- if or .Values.hive.spec.con***REMOVED***g.azure.secretName .Values.hive.spec.con***REMOVED***g.azure.createSecret }}
+        env:
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hive.spec.con***REMOVED***g.azure.secretName | default "hive-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hive.spec.con***REMOVED***g.azure.secretName | default "hive-azure-credentials" }}"
+              key: azure-secret-access-key
+{{- end }}
         volumeMounts:
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
         - name: hadoop-starting-con***REMOVED***g
           mountPath: /hadoop-starting-con***REMOVED***g
+        - name: hive-scripts
+          mountPath: /hive-scripts
+      volumes:
+      - name: hive-scripts
+        con***REMOVED***gMap:
+          name: hive-scripts
+          defaultMode: 0555
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
