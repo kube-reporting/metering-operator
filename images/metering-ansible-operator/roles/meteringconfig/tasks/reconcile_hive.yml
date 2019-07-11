@@ -17,6 +17,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hive-aws-credentials-secret
         create: "{{ meteringconfig_create_hive_aws_credentials }}"
+      - template_file: templates/hive/hive-azure-credentials-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hive-azure-credentials-secret
+        create: "{{ meteringconfig_create_hive_azure_credentials }}"
       - template_file: templates/hive/hive-metastore-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-metastore-tls-secrets
