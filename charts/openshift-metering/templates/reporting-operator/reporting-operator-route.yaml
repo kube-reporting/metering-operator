@@ -6,7 +6,7 @@ metadata:
   name: {{ $operatorValues.spec.route.name }}
 spec:
   port:
-    targetPort: http
+    targetPort: api
   tls:
     termination: Reencrypt
     insecureEdgeTerminationPolicy: Allow
