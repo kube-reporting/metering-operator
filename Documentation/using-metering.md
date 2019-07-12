@@ -91,16 +91,16 @@ $ kubectl proxy
 
 Using `kubectl proxy` requires that the URL be accessed through a pre***REMOVED***x that
 points to the Kubernetes service. (See the upstream documentation on
-[manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes that Metering is deployed in the `metering` namespace:
+[manually constructing apiserver proxy URLs][accessing-services] for more details.) The following example assumes that the `$METERING_NAMESPACE` environment variable is properly set:
 
 ```
-http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/http:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
+http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/http:reporting-operator:api/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
 ```
 
-If you are using Openshift, you'll need to change to the following, which uses the `openshift-metering` namespace and HTTPS by default:
+If you are using Openshift, you'll need to change to the following, which uses HTTPS by default:
 
 ```
-http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:http/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
+http://127.0.0.1:8001/api/v1/namespaces/$METERING_NAMESPACE/services/https:reporting-operator:api/proxy/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]
 ```
 
 For example, the results of a report with the name `namespace-cpu-request` report can be fetched in
