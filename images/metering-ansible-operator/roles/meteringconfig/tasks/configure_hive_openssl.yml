@@ -1,0 +1,111 @@
+---
+
+#
+# Generate a Hive Metastore Server cert/key
+#
+- name: Setup the Hive Metastore server certificate/key
+  block:
+  - name: Generate an RSA private key for Hive Metastore server
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/hive_metastore_server.key"
+
+  - name: Generate the Hive Metastore server CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/hive_metastore_server.csr"
+      privatekey_path: "{{ certificates_dir.path }}/hive_metastore_server.key"
+      common_name: "hive-metastore"
+      subject_alt_name: "DNS:localhost,DNS:hive-metastore,DNS:hive-metastore.{{ meta.namespace }}.svc.cluster.local"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - serverAuth
+
+  - name: Generate the Hive Metastore server certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/hive_metastore_server.crt"
+      privatekey_path: "{{ certificates_dir.path }}/hive_metastore_server.key"
+      csr_path: "{{ certificates_dir.path }}/hive_metastore_server.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256
+  when: not hive_metastore_tls_secret_exists
+
+#
+# Generate the Hive Server, Server cert/key
+#
+- name: Setup the Hive Server server certificate/key
+  block:
+  - name: Generate an RSA private key for Hive Server server
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/hive_server.key"
+
+  - name: Generate the Hive Server server CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/hive_server.csr"
+      privatekey_path: "{{ certificates_dir.path }}/hive_server.key"
+      common_name: "hive-server"
+      subject_alt_name: "DNS:localhost,DNS:hive-server,DNS:hive-server.{{ meta.namespace }}.svc.cluster.local"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - serverAuth
+
+  - name: Generate the Hive Server server certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/hive_server.crt"
+      privatekey_path: "{{ certificates_dir.path }}/hive_server.key"
+      csr_path: "{{ certificates_dir.path }}/hive_server.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256
+  when: not hive_server_tls_secret_exists
+
+#
+# Generate the Hive Server Client TLS cert/key to enable authentication
+#
+- name: Setup the Hive Server client certificate/key
+  block:
+  - name: Generate an RSA private key for the Hive Server client
+    openssl_privatekey:
+      size: 2048
+      type: RSA
+      path: "{{ certificates_dir.path }}/hive_server_client.key"
+
+  - name: Generate the Hive Server client CSR
+    openssl_csr:
+      path: "{{ certificates_dir.path }}/hive_server_client.csr"
+      privatekey_path: "{{ certificates_dir.path }}/hive_server_client.key"
+      common_name: "hive-server"
+      basicConstraints:
+      - 'CA:FALSE'
+      basicConstraints_critical: false
+      key_usage:
+      - digitalSignature
+      - keyEncipherment
+      extended_key_usage:
+      - clientAuth
+
+  - name: Generate the Hive Server client certificate
+    openssl_certificate:
+      path: "{{ certificates_dir.path }}/hive_server_client.crt"
+      privatekey_path: "{{ certificates_dir.path }}/hive_server_client.key"
+      csr_path: "{{ certificates_dir.path }}/hive_server_client.csr"
+      provider: ownca
+      ownca_path: "{{ certificates_dir.path }}/ca.crt"
+      ownca_privatekey_path: "{{ certificates_dir.path }}/ca.key"
+      selfsigned_digest: sha256
+  when: not hive_server_client_tls_secret_exists

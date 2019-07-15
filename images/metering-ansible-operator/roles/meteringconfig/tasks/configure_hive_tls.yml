@@ -1,0 +1,108 @@
+---
+#
+# Validate user-provided Hive TLS configuration when top-level spec.tls.enabled is set to false
+#
+- name: Validate the user-provided Hive TLS configuration
+  include_tasks: validate_hive_tls.yml
+  when: not meteringconfig_tls_enabled
+
+#
+# Check for Hive TLS and auth secret existence (to avoid re-generating/overwriting the secret data if that secret name already exists)
+#
+- name: Check for the existence of Hive TLS-related secrets
+  block:
+  - name: Check for the existence of the Hive Metastore TLS secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec.hive.spec.metastore.config.tls.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: hive_metastore_tls_buf
+
+  - name: Check for the existence of the Hive Server Metastore TLS secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec.hive.spec.server.config.metastoreTLS.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: hive_server_client_tls_buf
+
+  - name: Check for the existence of the Hive Server TLS secret
+    k8s_facts:
+      api_version: v1
+      kind: Secret
+      name: "{{ meteringconfig_spec.hive.spec.server.config.tls.secretName }}"
+      namespace: "{{ meta.namespace }}"
+    no_log: true
+    register: hive_server_tls_buf
+
+  - name: Configure Hive Metastore to use existing server TLS secret data
+    set_fact:
+      _meteringconfig_hive_metastore_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_metastore_server_certificate: "{{ hive_metastore_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_hive_metastore_server_key: "{{ hive_metastore_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+    no_log: true
+    when: hive_metastore_tls_secret_exists
+
+  - name: Configure Hive Server to use existing server TLS secret data
+    set_fact:
+      _meteringconfig_hive_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_server_certificate: "{{ hive_server_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_hive_server_key: "{{ hive_server_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+    no_log: true
+    when: hive_server_tls_secret_exists
+
+  - name: Configure Hive Server to use existing client TLS secret data
+    set_fact:
+      _meteringconfig_hive_server_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_server_client_certificate: "{{ hive_server_client_tls_buf.resources[0].data['tls.crt'] | b64decode }}"
+      _meteringconfig_hive_server_client_key: "{{ hive_server_client_tls_buf.resources[0].data['tls.key'] | b64decode }}"
+    no_log: true
+    when: hive_server_client_tls_secret_exists
+  vars:
+    hive_metastore_tls_secret_exists: "{{ hive_metastore_tls_buf.resources is defined and hive_metastore_tls_buf.resources | length > 0 }}"
+    hive_server_tls_secret_exists: "{{ hive_server_tls_buf.resources is defined and hive_server_tls_buf.resources | length > 0 }}"
+    hive_server_client_tls_secret_exists: "{{ hive_server_client_tls_buf.resources is defined and hive_server_client_tls_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled
+
+#
+# Generate server and client certificates using the Ansible OpenSSL modules when top-level spec.tls.enabled is set to true
+#
+- name: Configure TLS and authentication for Hive
+  block:
+  - name: Generate certificates and keys for Hive
+    include_tasks: configure_hive_openssl.yml
+
+  - name: Configure Hive to use the generated TLS files
+    set_fact:
+      # hive.spec.metastore.config.tls
+      _meteringconfig_hive_metastore_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_metastore_server_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/hive_metastore_server.crt') + '\n' }}"
+      _meteringconfig_hive_metastore_server_key: "{{ lookup('file', '{{ certificates_dir.path }}/hive_metastore_server.key') + '\n' }}"
+    no_log: true
+    when: not hive_metastore_tls_secret_exists
+
+  - name: Configure Hive Server to use the generated server cert/key data
+    set_fact:
+      # hive.spec.server.config.tls
+      _meteringconfig_hive_server_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_server_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/hive_server.crt') + '\n' }}"
+      _meteringconfig_hive_server_key: "{{ lookup('file', '{{ certificates_dir.path }}/hive_server.key') + '\n' }}"
+    no_log: true
+    when: not hive_server_tls_secret_exists
+
+  - name: Configure Hive Server to use the generated client cert/key data
+    set_fact:
+      # hive.spec.server.config.metastoreTLS
+      _meteringconfig_hive_server_client_ca_certificate: "{{ _meteringconfig_tls_root_ca_certificate }}"
+      _meteringconfig_hive_server_client_certificate: "{{ lookup('file', '{{ certificates_dir.path }}/hive_server_client.crt') + '\n' }}"
+      _meteringconfig_hive_server_client_key: "{{ lookup('file', '{{ certificates_dir.path }}/hive_server_client.key') + '\n' }}"
+    no_log: true
+    when: not hive_server_client_tls_secret_exists
+  vars:
+    hive_metastore_tls_secret_exists: "{{ hive_metastore_tls_buf.resources is defined and hive_metastore_tls_buf.resources | length > 0 }}"
+    hive_server_tls_secret_exists: "{{ hive_server_tls_buf.resources is defined and hive_server_tls_buf.resources | length > 0 }}"
+    hive_server_client_tls_secret_exists: "{{ hive_server_client_tls_buf.resources is defined and hive_server_client_tls_buf.resources | length > 0 }}"
+  when: meteringconfig_tls_enabled and (not hive_metastore_tls_secret_exists or not hive_server_tls_secret_exists or not hive_server_client_tls_secret_exists)

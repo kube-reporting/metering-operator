@@ -417,11 +417,13 @@ func (op *Reporting) Run(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("error loading Hive CA File: %s", err)
 		}
+
 		rootCertPool := x509.NewCertPool()
 		rootCertPool.AppendCertsFromPEM(rootCert)
 
 		hiveTLSConfig := &tls.Config{
-			RootCAs: rootCertPool,
+			RootCAs:            rootCertPool,
+			InsecureSkipVerify: op.cfg.HiveTLSInsecureSkipVerify,
 		}
 
 		if op.cfg.HiveUseClientCertAuth {
