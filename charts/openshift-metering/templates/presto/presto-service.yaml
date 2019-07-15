@@ -8,7 +8,7 @@ metadata:
     component: presto-coordinator
 spec:
   ports:
-  - name: http
+  - name: api
     port: 8080
   - name: metrics
     port: 8082
@@ -28,7 +28,7 @@ metadata:
     component: presto-coordinator
 spec:
   ports:
-  - name: http
+  - name: api
     port: 8080
   - name: metrics
     port: 8082
@@ -46,7 +46,7 @@ metadata:
     app: presto
 spec:
   ports:
-  - name: http
+  - name: api
     port: 8080
   clusterIP: None
   selector:
