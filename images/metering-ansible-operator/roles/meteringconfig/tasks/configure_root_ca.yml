@@ -1,5 +1,8 @@
 ---
-
+#
+# Check if the metering root CA secret already exists and instead needs to be copied into a temp directory
+# This temp directory would contain all the necessary TLS data (shared with Presto, Hive, reporting-operator)
+#
 - name: Check for the existence of the Metering Root CA secret
   block:
   - name: Check if Root CA secret already exists
@@ -11,11 +14,13 @@
     no_log: true
     register: root_ca_secret_buf
 
+  # note: other resources (presto, hive, reporting-operator) depend on these variables
   - name: Use pre-existing CA secret cert/key when secret already exists
     block:
     - set_fact:
         _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ root_ca_secret_buf.resources[0].data['ca.crt'] | b64decode }}"
         _meteringcon***REMOVED***g_tls_root_ca_key: "{{ root_ca_secret_buf.resources[0].data['ca.key'] | b64decode }}"
+      no_log: true
 
     - name: Add root CA certi***REMOVED***cate to certi***REMOVED***cates directory
       copy:
@@ -32,7 +37,7 @@
   when: meteringcon***REMOVED***g_tls_enabled
 
 #
-# Generate a Root Certi***REMOVED***cate Authority
+# Generate the metering root certi***REMOVED***cate authority
 #
 - name: Setup the root certi***REMOVED***cate authority
   block:
@@ -63,6 +68,7 @@
     set_fact:
       _meteringcon***REMOVED***g_tls_root_ca_certi***REMOVED***cate: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.crt') + '\n' }}"
       _meteringcon***REMOVED***g_tls_root_ca_key: "{{ lookup('***REMOVED***le', '{{ certi***REMOVED***cates_dir.path }}/ca.key') + '\n' }}"
+    no_log: true
   vars:
     root_ca_secret_exists: "{{ root_ca_secret_buf.resources is de***REMOVED***ned and root_ca_secret_buf.resources | length > 0 }}"
   when: meteringcon***REMOVED***g_tls_enabled and not root_ca_secret_exists

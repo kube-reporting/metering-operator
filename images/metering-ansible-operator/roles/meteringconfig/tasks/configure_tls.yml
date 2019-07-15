@@ -8,11 +8,14 @@
       state: directory
     register: certi***REMOVED***cates_dir
 
-  - name: Generate root certi***REMOVED***cate authority
+  - name: Generate the metering root certi***REMOVED***cate authority
     include_tasks: con***REMOVED***gure_root_ca.yml
 
   - name: Con***REMOVED***gure TLS and client-side authentication in Presto
     include_tasks: con***REMOVED***gure_presto_tls.yml
+
+  - name: Con***REMOVED***gure TLS and authentication in Hive
+    include_tasks: con***REMOVED***gure_hive_tls.yml
 
   - name: Con***REMOVED***gure TLS and authentication in the reporting-operator
     include_tasks: con***REMOVED***gure_reporting_operator_tls.yml
