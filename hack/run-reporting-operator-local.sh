@@ -23,6 +23,7 @@ source "${ROOT_DIR}/hack/common.sh"
 : "${METERING_PROMETHEUS_HOST:="127.0.0.1:${METERING_PROMETHEUS_PORT_FORWARD_PORT}"}"
 
 : "${METERING_PRESTO_USE_TLS:=true}"
+: "${METERING_HIVE_USE_TLS:=true}"
 
 TMPDIR="$(mktemp -d)"
 
@@ -90,17 +91,53 @@ if [ "$METERING_PRESTO_USE_TLS" == "true" ]; then
     done
 
     export REPORTING_OPERATOR_PRESTO_USE_TLS=true
-    export REPORTING_OPERATOR_PRESTO_CA_FILE="$TMPDIR/reporting-operator-presto-server-ca.crt"
     export REPORTING_OPERATOR_PRESTO_USE_AUTH=true
+    export REPORTING_OPERATOR_PRESTO_TLS_INSECURE_SKIP_VERIFY=true
+
+    export REPORTING_OPERATOR_PRESTO_CA_FILE="$TMPDIR/reporting-operator-presto-server-ca.crt"
     export REPORTING_OPERATOR_PRESTO_CLIENT_CERT_FILE="$TMPDIR/reporting-operator-presto-client-tls.crt"
     export REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE="$TMPDIR/reporting-operator-presto-client-tls.key"
-    export REPORTING_OPERATOR_PRESTO_CLIENT_CA_CERT_FILE="$TMPDIR/reporting-operator-presto-client-ca.crt"
-    export REPORTING_OPERATOR_PRESTO_TLS_INSECURE_SKIP_VERIFY=true
 
     jq -Mcr '.data["ca.crt"] | @base64d' "$TMPDIR/reporting-operator-presto-server-tls.json" > "$REPORTING_OPERATOR_PRESTO_CA_FILE"
     jq -Mcr '.data["tls.crt"] | @base64d' "$TMPDIR/reporting-operator-presto-client-tls.json" > "$REPORTING_OPERATOR_PRESTO_CLIENT_CERT_FILE"
     jq -Mcr '.data["tls.key"] | @base64d' "$TMPDIR/reporting-operator-presto-client-tls.json" > "$REPORTING_OPERATOR_PRESTO_CLIENT_KEY_FILE"
-    jq -Mcr '.data["ca.crt"] | @base64d' "$TMPDIR/reporting-operator-presto-client-tls.json" > "$REPORTING_OPERATOR_PRESTO_CLIENT_CA_CERT_FILE"
+fi
+
+if [ "$METERING_HIVE_USE_TLS" == "true" ]; then
+    maxTries=50
+    tries=0
+    echo "Getting reporting-operator Hive server TLS secrets"
+    until kubectl -n "$METERING_NAMESPACE" get secrets reporting-operator-hive-server-tls -o json > "$TMPDIR/reporting-operator-hive-server-tls.json"; do
+        if [ "$tries" -gt "$maxTries" ]; then
+            echo "Timed out waiting for secret reporting-operator-hive-server-tls"
+            exit 1
+        fi
+        tries+=1
+        echo 'Waiting for secret reporting-operator-hive-server-tls'
+        sleep 5
+    done
+    echo "Getting reporting-operator Hive client TLS secrets"
+    until kubectl -n "$METERING_NAMESPACE" get secrets reporting-operator-hive-client-tls -o json > "$TMPDIR/reporting-operator-hive-client-tls.json"; do
+        if [ "$tries" -gt "$maxTries" ]; then
+            echo "Timed out waiting for secret reporting-operator-hive-client-tls"
+            exit 1
+        fi
+        tries+=1
+        echo 'Waiting for secret reporting-operator-hive-client-tls'
+        sleep 5
+    done
+
+    export REPORTING_OPERATOR_HIVE_USE_TLS=true
+    export REPORTING_OPERATOR_HIVE_USE_AUTH=true
+    export REPORTING_OPERATOR_HIVE_TLS_INSECURE_SKIP_VERIFY=true
+
+    export REPORTING_OPERATOR_HIVE_CA_FILE="$TMPDIR/reporting-operator-hive-server-ca.crt"
+    export REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE="$TMPDIR/reporting-operator-hive-client-tls.crt"
+    export REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE="$TMPDIR/reporting-operator-hive-client-tls.key"
+
+    jq -Mcr '.data["ca.crt"] | @base64d' "$TMPDIR/reporting-operator-hive-server-tls.json" > "$REPORTING_OPERATOR_HIVE_CA_FILE"
+    jq -Mcr '.data["tls.crt"] | @base64d' "$TMPDIR/reporting-operator-hive-client-tls.json" > "$REPORTING_OPERATOR_HIVE_CLIENT_CERT_FILE"
+    jq -Mcr '.data["tls.key"] | @base64d' "$TMPDIR/reporting-operator-hive-client-tls.json" > "$REPORTING_OPERATOR_HIVE_CLIENT_KEY_FILE"
 fi
 
 sleep 6
