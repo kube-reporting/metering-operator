@@ -122,7 +122,7 @@ spec:
         env:
 {{- include "presto-common-env" . | indent 8 }}
         ports:
-        - name: http
+        - name: api
           containerPort: 8080
           protocol: TCP
         - name: metrics

@@ -313,11 +313,11 @@ spec:
         resources:
 {{ toYaml $operatorValues.spec.resources | indent 10 }}
         ports:
-        - name: "http"
+        - name: api
           containerPort: 8080
-        - name: "pprof"
+        - name: pprof
           containerPort: 6060
-        - name: "metrics"
+        - name: metrics
           containerPort: 8082
 {{/* When using auth-proxy, disable probes against the reporting-operator pod since we'll listen on localhost, and we'll con***REMOVED***gure to probe the auth proxy pod instead */}}
 {{- if not $operatorValues.spec.authProxy.enabled }}
