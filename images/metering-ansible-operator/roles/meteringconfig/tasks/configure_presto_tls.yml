@@ -44,8 +44,8 @@
     no_log: true
     when: presto_auth_secret_exists
   vars:
-    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources and presto_secret_tls_buf.resources | length > 0 }}"
-    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources and presto_secret_auth_buf.resources | length > 0 }}"
+    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources is defined and presto_secret_tls_buf.resources | length > 0 }}"
+    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources is defined and presto_secret_auth_buf.resources | length > 0 }}"
   when: meteringconfig_tls_enabled
 
 #
@@ -72,6 +72,6 @@
     no_log: true
     when: not presto_auth_secret_exists
   vars:
-    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources and presto_secret_tls_buf.resources | length > 0 }}"
-    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources and presto_secret_auth_buf.resources | length > 0 }}"
+    presto_tls_secret_exists: "{{ presto_secret_tls_buf.resources is defined and presto_secret_tls_buf.resources | length > 0 }}"
+    presto_auth_secret_exists: "{{ presto_secret_auth_buf.resources is defined and presto_secret_auth_buf.resources | length > 0 }}"
   when: meteringconfig_tls_enabled and (not presto_tls_secret_exists or not presto_auth_secret_exists)
