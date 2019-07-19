@@ -57,4 +57,3 @@
       - template_file: templates/hive/hive-server-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-server-statefulset
-

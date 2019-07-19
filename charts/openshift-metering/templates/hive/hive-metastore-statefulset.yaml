@@ -78,7 +78,7 @@ spec:
       - name: hive-scripts
         configMap:
           name: hive-scripts
-          defaultMode: 0555
+          defaultMode: 0775
       containers:
       - name: metastore
         command: ["/hive-scripts/entrypoint.sh"]
@@ -208,7 +208,7 @@ spec:
       - name: hive-scripts
         configMap:
           name: hive-scripts
-          defaultMode: 0555
+          defaultMode: 0775
 {{- if .Values.hive.spec.config.useHadoopConfig }}
       - name: hadoop-config
         emptyDir: {}

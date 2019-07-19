@@ -7,10 +7,10 @@
 
 - name: Validate Hive storage configuration
   fail:
-    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', or 'sharedPVC'"
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', or 'sharedPVC'"
   vars:
     hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
-  when: hiveStorageType is undefined or hiveStorageType not in ['s3', 'sharedPVC', 'hdfs']
+  when: hiveStorageType is undefined or hiveStorageType not in ['s3', 'sharedPVC', 'hdfs', 'azure']
 
 - name: Configure TLS
   include_tasks: configure_tls.yml
