@@ -37,6 +37,9 @@ spec:
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- end }}
+{{- if and .Values.presto.spec.config.connectors.hive.tls.enabled .Values.presto.spec.config.connectors.hive.tls.createSecret }}
+        presto-hive-metastore-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-hive-metastore-tls-secrets.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.presto.spec.annotations }}
 {{ toYaml .Values.presto.spec.annotations | indent 8 }}
 {{- end }}
@@ -84,6 +87,28 @@ spec:
           value: /presto-client/ca.crt
 {{- end }}
 {{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
+          value: /opt/ghostunnel/tls/ca.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_CERT
+          value: /opt/ghostunnel/tls/tls.crt
+        - name: GHOSTUNNEL_CLIENT_TLS_KEY
+          value: /opt/ghostunnel/tls/tls.key
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/ghostunnel/tls/keystore-combined.pem
+{{- end }}
+{{- if or .Values.presto.spec.config.azure.secretName .Values.presto.spec.config.azure.createSecret }}
+        - name: AZURE_STORAGE_ACCOUNT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.presto.spec.config.azure.secretName | default "presto-azure-credentials" }}"
+              key: azure-storage-account-name
+        - name: AZURE_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.presto.spec.config.azure.secretName | default "presto-azure-credentials" }}"
+              key: azure-secret-access-key
+{{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc
@@ -96,6 +121,10 @@ spec:
           mountPath: /var/presto/data
         - name: presto-common-config
           mountPath: /presto-common
+        - name: hadoop-config
+          mountPath: /hadoop-config
+        - name: hadoop-starting-config
+          mountPath: /hadoop-starting-config
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
@@ -105,6 +134,12 @@ spec:
         - name: presto-client-pem
           mountPath: /presto-client
 {{- end }}
+{{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+        - name: hive-metastore-auth-tls
+          mountPath: /opt/ghostunnel/tls
+        - name: hive-metastore-auth-tls-secrets
+          mountPath: /hive-metastore-auth-tls-secrets
 {{- end }}
         resources:
           limits:
@@ -155,6 +190,30 @@ spec:
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.worker.resources | indent 10 }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+      - name: ghostunnel-client
+        image: {{ .Values.__ghostunnel.image.repository }}:{{ .Values.__ghostunnel.image.tag }}
+        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
+        env:
+        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
+          value: /opt/ghostunnel/tls/ca.crt
+        - name: GHOSTUNNEL_CLIENT_KEYSTORE
+          value: /opt/ghostunnel/tls/keystore-combined.pem
+        command: ["ghostunnel"]
+        args:
+        - client
+        - --listen
+        - localhost:9083
+        - --target
+        - hive-metastore:9083
+        - --keystore
+        -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
+        - --cacert
+        -  $(GHOSTUNNEL_CLIENT_CA_CRTFILE)
+        volumeMounts:
+        - name: hive-metastore-auth-tls
+          mountPath: /opt/ghostunnel/tls
+{{- end }}
       volumes:
       - name: presto-worker-config
         configMap:
@@ -193,6 +252,13 @@ spec:
         secret:
           secretName: {{ .Values.presto.spec.config.auth.secretName }}
 {{- end }}
+{{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
+      - name: hive-metastore-auth-tls
+        emptyDir: {}
+      - name: hive-metastore-auth-tls-secrets
+        secret:
+          secretName: {{ .Values.presto.spec.config.connectors.hive.tls.secretName }}
 {{- end }}
 {{- if .Values.hive.spec.config.sharedVolume.enabled }}
       - name: hive-warehouse-data
