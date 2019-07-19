@@ -1,15 +1,15 @@
 # Installing Metering using Operator Lifecycle Manager (OLM)
 
 Currently, installing Metering via OLM is only supported on OpenShift 4.x from the OpenShift Marketplace.
-If you want to install metering into a non-OpenShift Kubernetes cluster, use the [manual installation documentation][manual-install].
+If you want to install Metering into a non-OpenShift Kubernetes cluster, use the [manual installation documentation][manual-install].
 
 This procedure covers:
 - Installing the metering-operator using the OperatorHub within the OpenShift web console
 - Creating a Metering resource that defines the installation configuration for the rest of the Metering stack
 
-## Installing Metering Operator
+## Installing the Metering Operator
 
-Create a dedicated OpenShift project for metering, and then install the Metering Operator:
+Create a dedicated OpenShift project for Metering, and then install the Metering Operator:
 
 1. Create a new project/namespace called *metering* using the OpenShift web console (navigate to **Project > Create Project**) or the `oc` command:
 
@@ -29,7 +29,7 @@ From the ClusterServiceVersion overview, you can create different resources rela
 
 ## Installing the Metering stack
 
-Next, create a Metering resource that instructs the metering-operator to install the metering stack in the namespace.
+Next, create a Metering resource that instructs the metering-operator to install the Metering stack in the namespace.
 
 This resource holds all the top level configuration for each component (such as requests, limits, storage, etc.).
 
@@ -51,11 +51,11 @@ All supported configuration options are documented in [configuring metering][con
 Once all pods are ready, you can begin using Metering to collect information and report on your cluster.
 
 **NOTE:**
-For further reading on using metering, see the [using metering documentation][using-metering]. The metering documentation refers to `$METERING_NAMESPACE` in most examples; this value will be `metering` if you followed the above instructions to create the metering project/namespace.
+For further reading on using Metering, see the [using Metering documentation][using-metering]. The Metering documentation refers to `$METERING_NAMESPACE` in most examples; this value will be `metering` if you followed the above instructions to create the Metering project/namespace.
 
 ## Manual/CLI based OLM install
 
-To learn more about how the OLM installation process works under the hood, or to use the CLI to install metering via OLM, see the [manual OLM install documentation][manual-olm-install].
+To learn more about how the OLM installation process works under the hood, or to use the CLI to install Metering via OLM, see the [manual OLM install documentation][manual-olm-install].
 
 [manual-install]: manual-install.md
 [manual-olm-install]: manual-olm-install.md
