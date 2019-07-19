@@ -65,6 +65,8 @@ This can potentially take a minute or two to complete, but when it's done, you s
 {"level":"info","ts":1560984641.7900484,"logger":"runner","msg":"Ansible-runner exited successfully","job":"7911455193145848968","name":"operator-metering","namespace":"metering"}
 ```
 
+If you see any failures, check out [debugging the Metering Ansible operator][ansible-debugging] section for troubleshooting tips.
+
 Next, get the list of pods:
 
 ```
@@ -100,3 +102,4 @@ For instructions on using Operator Metering, please see [using Operator Metering
 [olm-install]: olm-install.md
 [manual-install]: manual-install.md
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
+[ansible-debugging]: dev/debugging.md#metering-ansible-operator
