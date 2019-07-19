@@ -1,59 +1,61 @@
-# Installation using Operator Lifecycle Manager (OLM)
+# Installing Metering using Operator Lifecycle Manager (OLM)
 
-Currently Metering via OLM is only supported on Openshift 4.x via the Openshift Marketplace.
-If you want to install metering into a non-Openshift Kubernetes cluster, please use the [manual installation documentation][manual-install].
+Currently, installing Metering via OLM is only supported on OpenShift 4.x from the OpenShift Marketplace.
+If you want to install Metering into a non-OpenShift Kubernetes cluster, use the [manual installation documentation][manual-install].
 
-## Install
+This procedure covers:
+- Installing the metering-operator using the OperatorHub within the OpenShift web console
+- Creating a Metering resource that defines the installation configuration for the rest of the Metering stack
 
-This will cover installing the metering-operator using the OperatorHub within the Openshift admin console and will then create a Metering resource defining the configuration for the metering-operator to use to install the rest of the Metering stack.
+## Installing the Metering Operator
 
-### Install Metering Operator
+Create a dedicated OpenShift project for Metering, and then install the Metering Operator:
 
-The first step to installing metering is creating a dedicated Openshift Project for it.
-
-Either using the Openshift admin console, or `oc` create a project/namespace called `metering`:
+1. Create a new project/namespace called *metering* using the OpenShift web console (navigate to **Project > Create Project**) or the `oc` command:
 
 ```
 oc create project metering
 ```
 
-Next, from the admin console, go to the Operator Hub, and search for `metering`, then click on the Metering card.
+2. From the web console, click **Catalog > OperatorHub**, and search for *metering* to find the Metering Operator.
 
-Next you should see a description of the Metering package, and at the top left an `Install` button should be available, click it.
+3. Click the Metering card to open its package description, then click **Install**.
 
-In the following screen, specify the `metering` namespace in the `A specific namespace on the cluster` drop-down, adjust your update channel and update approval strategy and click `Subscribe` to install the metering-operator in to your selected namespace.
+4. In the **Create Operator Subscription** screen, select the *metering* namespace in the **A specific namespace on the cluster** drop-down, and specify your update channel and approval strategy. Click **Subscribe** to install the metering-operator into your selected namespace.
 
-Next, you will wait until the Upgrade status under the Subscription Overview indicates `1 installed`.
-Once the status indicates the operator is installed, click on the `1 installed` link or the `installed version` link to view the ClusterServiceVersion for the operator.
+5. On the **Subscription Overview** screen, the **Upgrade status** indicates *1 installed* when the Metering Operator has finished installing. Click the *1 installed* (or *installed version*) link to view the ClusterServiceVersion overview for the metering-operator.
 
-From the ClusterServiceVersion overview page, you can create different resources related to Metering.
+From the ClusterServiceVersion overview, you can create different resources related to Metering.
 
-### Install metering
+## Installing the Metering stack
 
-Next we need to create a `Metering` resource which will instruct the metering-operator, to install the metering stack in the namespace.
-This resource holds all the top level configuration for each component (requests, limits, storage, etc).
-There must only be one Metering resource in the namespace containing metering-operator – any other configuration is not supported.
+Next, create a Metering resource that instructs the metering-operator to install the Metering stack in the namespace.
 
-From the admin console, ensure your on on the ClusterServiceVersion overview page for Metering.
-This can be reached by going to the installed operators page within the catalog, then clicking on Metering in the list.
+This resource holds all the top level configuration for each component (such as requests, limits, storage, etc.).
 
-In the provided APIs section of the ClusterServiceVersion overview page, click `Create New` on the `Metering` card.
+**IMPORTANT:**
+There can only be one Metering resource in the namespace containing the metering-operator. Any other configuration is not supported.
 
-From here, you will be prompted with a yaml editor to define your Metering installation configuration.
-All of the supported configuration options are documented in [configuring metering][configuring-metering].
-To start, download the example [default.yaml][default-config] Metering resource and make any additional customizations you require.
+1. From the web console, ensure you are on the ClusterServiceVersion overview page for the Metering project.
+You can navigate to this page from **Catalog > Installed Operators**, then selecting the *Metering* operator.
 
-Once satisfied with your configuration, put it into the yaml editor within the admin console, and click the `create` button.
+2. Under **Provided APIs**, click **Create New** on the *Metering* card. This opens a YAML editor where you can define your Metering installation configuration.
 
-From there, go to the Pods page under the Workloads section in the sidebar, and wait for everything to get created and become ready.
-Once all pods are ready, you can begin using Metering to collect and Report on your cluster.
+3. Download the example [default.yaml][default-config] Metering resource and customize the YAML as desired. Enter your configuration into the YAML editor and click **Create**.
 
-For further reading on using metering, see the [using metering documentation][using-metering].
-*Note:* The metering documentation will refer to `$METERING_NAMESPACE` in most of it's examples, this will be `metering` if you followed the above instructions to create the metering project/namespace.
+**NOTE:**
+All supported configuration options are documented in [configuring metering][configuring-metering].
+
+4. Navigate to **Workloads > Pods** and wait for your resources to be created and become ready.
+
+Once all pods are ready, you can begin using Metering to collect information and report on your cluster.
+
+**NOTE:**
+For further reading on using Metering, see the [using Metering documentation][using-metering]. The Metering documentation refers to `$METERING_NAMESPACE` in most examples; this value will be `metering` if you followed the above instructions to create the Metering project/namespace.
 
 ## Manual/CLI based OLM install
 
-If you want to know more about how the OLM installation process works under the hood, or want to use the CLI to install metering via OLM, then you can read the [manual OLM install documentation][manual-olm-install].
+To learn more about how the OLM installation process works under the hood, or to use the CLI to install Metering via OLM, see the [manual OLM install documentation][manual-olm-install].
 
 [manual-install]: manual-install.md
 [manual-olm-install]: manual-olm-install.md
