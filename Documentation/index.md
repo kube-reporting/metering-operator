@@ -13,7 +13,7 @@
     - [exposing the reporting API](configuring-reporting-operator.md#exposing-the-reporting-api)
     - [configuring Authentication on Openshift](configuring-reporting-operator.md#openshift-authentication)
   - [configuring storage](configuring-storage.md)
-    - [storing data in s3](configuring-storage.md#storing-data-in-s3)
+    - [storing data in Amazon S3](configuring-storage.md#storing-data-in-s3)
     - [storing data in a ReadWriteMany PVC](configuring-storage.md#using-shared-volumes-for-storage)
   - [configuring the Hive metastore](configuring-hive-metastore.md)
   - [configuring aws billing correlation for cost correlation](configuring-aws-billing.md)
