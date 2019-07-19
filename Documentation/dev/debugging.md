@@ -2,6 +2,7 @@
 
 Debugging metering can be fairly difficult if you do not know how to directly interact with the components the operator is speaking to.
 Below, we detail how you can connect and query Presto and Hive, as well as view the dashboards of the Presto and HDFS components.
+For debugging issues surrounding the metering-ansible-operator, see the [ansible-operator](#metering-ansible-operator) section.
 
 All of the follow commands assume you've set the `METERING_NAMESPACE` environment variable to the namespace your Metering installation is located in:
 
@@ -169,3 +170,34 @@ kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 9864
 ```
 
 To check other datanodes, run the above command, replacing `hdfs-datanode-0` with the pod you want to view information on.
+
+## Metering Ansible Operator
+Metering uses the ansible operator to watch and reconcile resources in a cluster environment. When debugging a failed Metering install, it can be helpful to view the Ansible logs or status of your `MeteringConfig` custom resource.
+
+##### Accessing Ansible Logs
+There are a couple of ways of accessing the Ansible logs depending on how you installed the Metering resources.
+
+In a typical install, the Metering operator is deployed as a pod. In this case, we can simply check the logs of the `ansible` container within this pod:
+```
+kubectl -n $METERING_NAMESPACE logs $(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o name | cut -d/ -f2) -c ansible
+```
+
+Alternatively, you can view the logs of the `operator` container (replace `-c ansible` with `-c operator`) for condensed output.
+
+If you are running the Metering operator locally (i.e. `make run-metering-operator-local`), there won't be a dedicated pod, and so you would need to run the following command ():
+```
+docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringConfig/*/*/artifacts/*/stdout'
+```
+
+When tracking down a failed task, you may encounter this output:
+```
+changed: [localhost] => (item=None) => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
+```
+
+This is because we use the Ansible module, `no_log`, on output-extensive tasks (running helm template, creation of resources, etc.). If your install fails during the Helm templating task, you can specify `spec.logHelmTemplate: true` in your `MeteringConfig` CR, which will enable logging for that task, and you can re-run your installation for more information on why it failed.
+
+##### Checking the `MeteringConfig` Status
+It can be helpful to view the `.status` field of your `MeteringConfig` custom resource to debug any recent failures. You can do this with the following command:
+```
+kubectl -n $METERING_NAMESPACE get meteringconfig operator-metering -o json | jq '.status'
+```
