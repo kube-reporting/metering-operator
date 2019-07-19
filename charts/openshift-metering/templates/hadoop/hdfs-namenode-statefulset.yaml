@@ -121,11 +121,6 @@ spec:
           mountPath: /hadoop-starting-con***REMOVED***g
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
-      volumes:
-      - name: hadoop-scripts
-        con***REMOVED***gMap:
-          name: hadoop-scripts
-          defaultMode: 0775
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"

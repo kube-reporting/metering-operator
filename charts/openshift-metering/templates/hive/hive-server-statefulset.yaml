@@ -103,7 +103,7 @@ spec:
       - name: hive-scripts
         con***REMOVED***gMap:
           name: hive-scripts
-          defaultMode: 0555
+          defaultMode: 0775
       containers:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
@@ -258,7 +258,7 @@ spec:
       - name: hive-scripts
         con***REMOVED***gMap:
           name: hive-scripts
-          defaultMode: 0555
+          defaultMode: 0775
 {{- if .Values.hive.spec.con***REMOVED***g.useHadoopCon***REMOVED***g }}
       - name: hadoop-con***REMOVED***g
         emptyDir: {}

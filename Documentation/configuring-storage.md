@@ -34,6 +34,22 @@ If you left `spec.storage.hive.s3.createBucket` set to true, or unset, then you 
 Please note that this must be done before installation.
 Changing these settings after installation will result in broken and unexpected behavior.
 
+## Storing data in Azure
+
+You can also store your data in Azure blob storage, and to do so, you must use an existing container.
+Edit the `spec.storage` section in the example [azure-blob-storage.yaml][azure-blob-storage-con***REMOVED***g]] con***REMOVED***guration.
+Set the `spec.storage.hive.azure.container` and `spec.storage.hive.azure.secretName` with the secret following this format:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: your-azure-secret
+data:
+  azure-storage-account-name: "dGVzdAo="
+  azure-secret-access-key: "c2VjcmV0Cg=="
+```
+The `spec.storage.hive.azure.container` should be the container you wish to store metering data at, and the optional `spec.storage.hive.azure.rootDirectory` should be the folder you want your data in, inside the container.
+
 ## Using shared volumes for storage
 
 Metering has no storage by default, but can use any ReadWriteMany PersistentVolume or [StorageClass][storage-classes] that provisions a ReadWriteMany PersistentVolume.
@@ -59,6 +75,7 @@ For more details read [con***REMOVED***guring HDFS][con***REMOVED***guring-hdfs]
 
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 [s3-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/s3-storage.yaml
+[azure-blob-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/azure-blob-storage.yaml
 [shared-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/shared-storage.yaml
 [hdfs-storage-con***REMOVED***g]: ../manifests/metering-con***REMOVED***g/hdfs-storage.yaml
 [con***REMOVED***guring-hive-metastore]: con***REMOVED***guring-hive-metastore.md
