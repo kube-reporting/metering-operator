@@ -45,17 +45,55 @@ The value of an input depends on a if the user specified a value in their `Repor
 
 Each input can have a different `type`, which determines how the input should be processed.
 
-Available options are `varchar`, `time`, and `int`, `ReportDataSource`, `ReportQuery`, and `Report`.
+Available options are `string`, `time`, and `int`, `ReportDataSource`, `ReportQuery`, and `Report`.
 If left empty, it defaults to `varchar`.
 
 For each of these types, the behavior varies:
 
-- `varchar`: Varchars are passed through directly.
+- `string`: A string value is passed through as a Go [string](https://golang.org/pkg/builtin/#string).
 - `time`: A string value is parsed as an RFC3339 timestamp. Within the template context, the variable with be a Go [time.Time][go-time] object.
 - `int`: An int value is passed through as a Go [int](https://golang.org/pkg/builtin/#int).
 - `ReportDataSource`: A string value referencing the name of a [ReportDataSource][reportdatasources] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportDataSource` inputs are validated by checking that all the ReportDataSources specified exist.
 - `ReportQuery`: A string value referencing the name of a [ReportQuery][reportqueries] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `ReportQuery` inputs are validated by checking that all the ReportQueries specified exist.
 - `Report`: A string value referencing the name of a [Report][reports] within the same namespace as the query. When this query is referenced by a Report or ReportDataSource, all `Report` inputs are validated by checking that all the Reports specified exist.
+
+##### Specifying Inputs
+
+Below is an example of a ReportQuery `spec.inputs` input definitions configuration.
+
+```
+inputs:
+- name: a_string_input
+  type: string
+- name: a_int_input
+  type: int
+- name: a_time_input
+  type: time
+- name: a_datasource_input
+  type: ReportDataSource
+- name: a_reportquery_input
+  type: ReportQuery
+- name: a_report_input
+  type: Report
+```
+
+Next is an example of specifying input values for the definitions above that might be specified in a `Report`'s `spec.inputs` or from a `ReportDataSource`'s `spec.reportQueryView.inputs`:
+
+```
+inputs:
+- name: a_string_input
+  value: "helloworld"
+- name: a_int_input
+  value: 47
+- name: a_time_input
+  value: '2019-10-09T00:00:00Z'
+- name: a_datasource_input
+  value: "pod-usage-cpu-cores" # must be the name of a ReportDataSource that exists in the namespace of the resource.
+- name: a_reportquery_input
+  value: "namespace-cpu-usage" # must be the name of a ReportQuery that exists in the namespace of the resource.
+- name: a_report_input
+  value: "namespace-cpu-usage-hourly" # must be the name of a Report that exists in the namespace of the resource.
+```
 
 ### Template functions
 

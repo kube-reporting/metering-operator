@@ -248,7 +248,7 @@ For reports with a schedule set, it will not wait for each period's reportingEnd
 
 ### Inputs
 
-The `spec.inputs` field of a Report can be used to override or set values defined in a [ReportQuery's spec.input field][query-inputs].
+The `spec.inputs` field of a Report can be used to override or set values defined in a [ReportQuery's spec.inputs field][query-inputs].
 
 It is a list of name-value pairs:
 
@@ -259,7 +259,11 @@ spec:
     value: "namespace-cpu-usage-hourly"
 ```
 
+The `name` of an input must exist in the ReportQuery's `inputs` list.
+The `value` of the input must be the correct type for the input's `type`.
+
 For an example of how this can be used, see it in action [in a roll-up report](rollup-reports.md#3-create-the-aggregator-report).
+For more details on how inputs can be specified read the [Specifying Inputs][specifying-inputs] section of the ReportQueries documentation.
 
 ## Roll-up Reports
 
@@ -317,3 +321,4 @@ The `status` field of a `Report` currently has two fields:
 
 [rfc3339]: https://tools.ietf.org/html/rfc3339#section-5.8
 [query-inputs]: reportqueries.md#query-inputs
+[specifying-inputs]: reportqueries.md#specifying-inputs
