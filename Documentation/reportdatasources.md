@@ -25,7 +25,7 @@ To read more details on how the different ReportDataSources work, read the [mete
     - `region`: The region where bucket is located.
 - `reportQueryView`: If this section is present, then the `ReportDataSource` will be con***REMOVED***gured to create a View in Presto using the rendered `spec.query` as the query for the view.
   - `queryName`: The name of a [ReportQuery][reportquery] to create a view from.
-  - `inputs`: A list of inputs this report query accepts to control its behavior. For more in depth details, see the [ReportQuery query inputs][query-inputs] documentation.
+  - `inputs`: Used to override or set values de***REMOVED***ned in a [ReportQuery's spec.input ***REMOVED***eld][query-inputs]. For details on how inputs can be speci***REMOVED***ed read the [Specifying Inputs][specifying-inputs] section of the ReportQueries documentation.
   - `storage`: This section controls the `StorageLocation` options, allowing you to control on a per ReportDataSource level, where data is stored.
     - `storageLocationName`: The name of the `StorageLocation` resource to use.
 - `prestoTable`: If present, then the `ReportDataSource` will simply make it possible to reference a database table within Presto as a ReportDataSource.
@@ -98,6 +98,24 @@ spec:
     queryName: pod-memory-request-raw
 ```
 
+If you wanted to specify some inputs to a [ReportQuery that accepts inputs][query-inputs], you can set them in the `spec.reportQueryView.inputs`:
+
+```
+apiVersion: metering.openshift.io/v1
+kind: ReportDataSource
+metadata:
+  name: "cluster-cpu-capacity-2019"
+spec:
+  reportQueryView:
+    queryName: cluster-cpu-capacity
+    inputs:
+    - name: ReportingStart
+      value: "2019-01-01T00:00:00Z"
+    - name: ReportingEnd
+      value: "2020-01-01T00:00:00Z"
+```
+
+For more details on how inputs can be speci***REMOVED***ed read the [Specifying Inputs][specifying-inputs] section of the ReportQueries documentation.
 
 ## AWS Billing Datasource
 
@@ -146,6 +164,6 @@ spec:
 [architecture]: metering-architecture.md
 [presto-types]: https://prestodb.io/docs/current/language/types.html
 [query-inputs]: reportqueries.md#query-inputs
+[specifying-inputs]: reportqueries.md#specifying-inputs
 [reportquery]: reportqueries.md
-[query-inputs]: reportqueries.md#query-inputs
 [prestotables]: prestotables.md
