@@ -5,18 +5,18 @@ The primary storage requirement is to persist data collected by the reporting-op
 
 Additionally, Hive metastore requires storage for it's database containing metadata about database tables managed by Presto or Hive. By default, this information is stored in an embedded database called Derby, which keeps it's data on disk in a PersistentVolume, but metastore can also be con***REMOVED***gured to use an existing Mysql or Postgresql database, instead of Derby. Read the [con***REMOVED***guring the Hive metastore documentation][con***REMOVED***guring-hive-metastore] for more details.
 
-## Storing data in S3
+## Storing data in Amazon S3
+**Note**: Metering only supports Amazon S3, and not any S3 compatible API at this time.
 
-By default, metering has no stored con***REMOVED***gured but can be con***REMOVED***gured to store data in S3.
-
-To use S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-con***REMOVED***g] con***REMOVED***guration.
+To use Amazon S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-con***REMOVED***g] con***REMOVED***guration.
 Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.secretName` values.
-The `bucket` should be the name and optionally the path within the bucket you wish to store metering data at, and the `region` should be the region to create your bucket in.
-If you wish to provide an existing bucket, or do not want to provide IAM credentials that have CreateBucket permissions, set `spec.storage.hive.s3.createBucket` to `false` and provide the name of a pre-existing bucket for `spec.storage.hive.s3.bucket`.
-The `secretName` should be the name of a secret in the metering namespace containing AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` ***REMOVED***elds.
+
+The `bucket` and `region` ***REMOVED***elds should be the name, and optionally the path within the bucket you wish to store Metering data at, and the region in which you wish to create your bucket in, respectively.
+
+If you want to provide an existing S3 bucket, or do not want to provide IAM credentials that have CreateBucket permissions, set `spec.storage.hive.s3.createBucket` to `false` and provide the name of a pre-existing bucket for `spec.storage.hive.s3.bucket`.
+The `secretName` should be the name of a secret in the Metering namespace containing the AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` ***REMOVED***elds.
 
 For example:
-
 ```
 apiVersion: v1
 kind: Secret
@@ -27,8 +27,8 @@ data:
   aws-secret-access-key: "c2VjcmV0Cg=="
 ```
 
-To store data in S3, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
-For an example of an IAM policy granting the required permissions see the [aws/read-write.json](aws/read-write.json) ***REMOVED***le.
+To store data in Amazon S3, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
+For an example of an IAM policy granting the required permissions, see the [aws/read-write.json](aws/read-write.json) ***REMOVED***le.
 If you left `spec.storage.hive.s3.createBucket` set to true, or unset, then you should use [aws/read-write-create.json](aws/read-write-create.json) which contains permissions for creating and deleting buckets.
 
 Please note that this must be done before installation.
