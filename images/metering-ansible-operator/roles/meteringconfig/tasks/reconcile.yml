@@ -9,8 +9,8 @@
 - name: Validate Hive storage configuration
   assert:
     that:
-      - hiveStorageType is not undefined and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure']
-    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', or 'sharedPVC'"
+      - hiveStorageType is not undefined and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs']
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', or 'sharedPVC'"
   vars:
     hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
 

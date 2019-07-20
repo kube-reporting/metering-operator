@@ -50,6 +50,26 @@ data:
 ```
 The `spec.storage.hive.azure.container` should be the container you wish to store metering data at, and the optional `spec.storage.hive.azure.rootDirectory` should be the folder you want your data in, inside the container.
 
+## Storing data in Google Cloud Storage
+
+You can also store your data in Google Cloud Storage, and to do so, you must use an existing bucket.
+Edit the `spec.storage` section in the example [gcs-storage.yaml][gcs-config] configuration.
+Set the `spec.storage.hive.gcs.bucket` and `spec.storage.hive.gcs.secretName` with the secret following this format:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: your-gcs-secret
+data:
+  gcs-service-account.json: "c2VjcmV0Cg=="
+```
+You can easily create the secret by calling:
+```
+kubectl -n $METERING_NAMESPACE create secret generic your-gcs-secret --from-file gcs-service-account.json=/path/to/your/service-account-key.json
+```
+Where $METERING_NAMESPACE is your namespace.
+The spec.storage.hive.gcs.bucket field should be the name of the bucket you wish to hold your metering data. You can also specify a sub-directory within this bucket by appending the name of the directory after the bucket name. For example: bucket: metering-gcs/test, where the bucket's name is metering-gcs and test is the name of the sub-directory.
+
 ## Using shared volumes for storage
 
 Metering has no storage by default, but can use any ReadWriteMany PersistentVolume or [StorageClass][storage-classes] that provisions a ReadWriteMany PersistentVolume.
@@ -76,6 +96,7 @@ For more details read [configuring HDFS][configuring-hdfs].
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 [s3-storage-config]: ../manifests/metering-config/s3-storage.yaml
 [azure-blob-storage-config]: ../manifests/metering-config/azure-blob-storage.yaml
+[gcs-config]: ../manifests/metering-config/gcs-storage.yaml
 [shared-storage-config]: ../manifests/metering-config/shared-storage.yaml
 [hdfs-storage-config]: ../manifests/metering-config/hdfs-storage.yaml
 [configuring-hive-metastore]: configuring-hive-metastore.md
