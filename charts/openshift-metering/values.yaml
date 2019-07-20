@@ -467,6 +467,11 @@ presto:
         createSecret: false
         secretName: ""
 
+      gcs:
+        createSecret: false
+        secretName: ""
+        serviceAccountKeyJSON: ""
+
       tls:
         # server cert
         certi***REMOVED***cate: ""
@@ -642,6 +647,11 @@ hive:
         createSecret: false
         secretName: ""
 
+      gcs:
+        createSecret: false
+        secretName: ""
+        serviceAccountKeyJSON: ""
+
       sharedVolume:
         enabled: false
         mountPath: /user/hive/warehouse
@@ -808,6 +818,11 @@ hadoop:
         secretAccessKey: ""
         createSecret: false
         secretName: ""
+
+      gcs:
+        createSecret: false
+        secretName: ""
+        serviceAccountKeyJSON: ""
 
     image:
       pullPolicy: Always

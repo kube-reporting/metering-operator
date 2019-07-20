@@ -101,8 +101,8 @@ spec:
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command: ["/hadoop-scripts/copy-hadoop-con***REMOVED***g.sh"]
-{{- if or .Values.hadoop.spec.con***REMOVED***g.azure.secretName .Values.hadoop.spec.con***REMOVED***g.azure.createSecret }}
         env:
+{{- if or .Values.hadoop.spec.con***REMOVED***g.azure.secretName .Values.hadoop.spec.con***REMOVED***g.azure.createSecret }}
         - name: AZURE_STORAGE_ACCOUNT_NAME
           valueFrom:
             secretKeyRef:
@@ -121,6 +121,10 @@ spec:
           mountPath: /hadoop-starting-con***REMOVED***g
         - name: hadoop-scripts
           mountPath: /hadoop-scripts
+{{- if or .Values.hadoop.spec.con***REMOVED***g.gcs.secretName .Values.hadoop.spec.con***REMOVED***g.gcs.createSecret }}
+        - name: gcs-json
+          mountPath: /gcs-json
+{{- end }}
       containers:
       - name: hdfs-namenode
         image: "{{ .Values.hadoop.spec.image.repository }}:{{ .Values.hadoop.spec.image.tag }}"
@@ -229,6 +233,11 @@ spec:
         emptyDir: {}
       - name: hadoop-logs
         emptyDir: {}
+{{- if or .Values.hadoop.spec.con***REMOVED***g.gcs.secretName .Values.hadoop.spec.con***REMOVED***g.gcs.createSecret }}
+      - name: gcs-json
+        secret:
+          secretName: "{{ .Values.hadoop.spec.con***REMOVED***g.gcs.secretName | default "hadoop-gcs-credentials" }}"
+{{- end }}
   volumeClaimTemplates:
   - metadata:
       name: "hdfs-namenode-data"

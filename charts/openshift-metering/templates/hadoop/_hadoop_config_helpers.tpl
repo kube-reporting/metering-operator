@@ -61,8 +61,24 @@
       <value>{{ .Values.hadoop.spec.con***REMOVED***g.defaultFS }}</value>
   </property>
   <property>
+      <name>fs.gs.impl</name>
+      <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+  </property>
+  <property>
       <name>fs.AbstractFileSystem.wasb.Impl</name>
       <value>org.apache.hadoop.fs.azure.Wasb</value>
+  </property>
+  <property>
+      <name>fs.AbstractFileSystem.gs.impl</name>
+      <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+  </property>
+  <property>
+      <name>fs.gs.auth.service.account.enable</name>
+      <value>true</value>
+  </property>
+  <property>
+      <name>fs.gs.reported.permissions</name>
+      <value>733</value>
   </property>
 </con***REMOVED***guration>
 {{- end }}

@@ -133,6 +133,42 @@ _base_storage_overrides:
         hdfs:
           enabled: false
 
+  gcs:
+    storage:
+      hive:
+        # gcs storage defaults
+        gcs:
+          # Intentionally an invalid default name to ensure that this is overridden, and obvious when it's not.
+          bucket: "-uncon***REMOVED***gured-metering-bucket-name-"
+          secretName: ""
+          createSecret: false
+          serviceAccountKeyJSON: ""
+    presto:
+      spec:
+        con***REMOVED***g:
+          gcs:
+            secretName: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.gcs.createSecret') }}"
+            serviceAccountKeyJSON: "{{ _storage_spec | json_query('hive.gcs.serviceAccountKeyJSON') }}"
+    hive:
+      spec:
+        con***REMOVED***g:
+          metastoreWarehouseDir: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') }}"
+          gcs:
+            secretName: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.gcs.createSecret') }}"
+            serviceAccountKeyJSON: "{{ _storage_spec | json_query('hive.gcs.serviceAccountKeyJSON') }}"
+    hadoop:
+      spec:
+        con***REMOVED***g:
+          defaultFS: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') }}"
+          gcs:
+            secretName: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
+            createSecret: "{{ _storage_spec | json_query('hive.gcs.createSecret') }}"
+            serviceAccountKeyJSON: "{{ _storage_spec | json_query('hive.gcs.serviceAccountKeyJSON') }}"
+        hdfs:
+          enabled: false
+
   hdfs:
     hadoop:
       spec:
@@ -187,6 +223,10 @@ meteringcon***REMOVED***g_storage_azure_credentials_secret_name: "{{ _storage_sp
 meteringcon***REMOVED***g_storage_hive_storage_type: "{{ _storage_spec | json_query('hive.type') }}"
 meteringcon***REMOVED***g_storage_overrides: "{{ _storage_overrides[meteringcon***REMOVED***g_storage_hive_storage_type] | default({}, true) }}"
 
+# variables for validating GCS
+meteringcon***REMOVED***g_storage_gcs_bucket_name: "{{ _storage_spec | json_query('hive.gcs.bucket') }}"
+meteringcon***REMOVED***g_storage_gcs_create_secret: "{{ _storage_spec | json_query('hive.gcs.createSecret') | default(false, true) }}"
+meteringcon***REMOVED***g_storage_gcs_credentials_secret_name: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
 #
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, ***REMOVED*** use values.yaml and meteringcon***REMOVED***g_spec_overrides
 #
@@ -411,11 +451,13 @@ meteringcon***REMOVED***g_enable_reporting_aws_billing: "{{ _openshift_reporting
 meteringcon***REMOVED***g_enable_hdfs: "{{ _hadoop_spec.hdfs.enabled | default(true) }}"
 meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hadoop_azure_credentials: "{{ _hadoop_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hadoop_gcs_credentials: "{{ _hadoop_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
 meteringcon***REMOVED***g_create_hive_aws_credentials: "{{ _hive_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_azure_credentials: "{{ _hive_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hive_gcs_credentials: "{{ _hive_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.con***REMOVED***g.metastoreTLS.enabled and _hive_spec.server.con***REMOVED***g.metastoreTLS.createSecret | default(false) }}"
@@ -424,6 +466,7 @@ meteringcon***REMOVED***g_create_hive_server_tls_secrets: "{{ _hive_spec.server.
 meteringcon***REMOVED***g_create_presto_aws_credentials: "{{ _presto_spec.con***REMOVED***g.aws.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_azure_credentials: "{{ _presto_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.enabled and _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_gcs_credentials: "{{ _presto_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_template_hive_metastore_tls_secret: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret and _hive_spec.metastore.con***REMOVED***g.tls.secretName != 'hive-metastore-server-tls'}}"
 meteringcon***REMOVED***g_template_hive_server_tls_secret: "{{ _hive_spec.server.con***REMOVED***g.tls.enabled and _hive_spec.server.con***REMOVED***g.tls.createSecret and _hive_spec.server.con***REMOVED***g.tls.secretName != 'hive-server-tls'}}"
@@ -456,4 +499,3 @@ meteringcon***REMOVED***g_create_reporting_operator_hive_auth_secrets: "{{ _repo
 meteringcon***REMOVED***g_create_reporting_operator_tls_secrets: "{{ _reporting_op_spec.con***REMOVED***g.tls.api.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_route: "{{ _reporting_op_spec.route.enabled | default(false) }}"
 meteringcon***REMOVED***g_create_reporting_operator_cluster_monitoring_view_rbac: "{{ _reporting_op_spec.rbac.createClusterMonitoringViewRBAC | default(true) }}"
-

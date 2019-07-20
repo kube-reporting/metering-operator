@@ -58,7 +58,7 @@
 
 - name: Con***REMOVED***gure Azure Storage
   block:
-    - name: Validate Metering Azure bucket name
+    - name: Validate Metering Azure container name
       assert:
         that:
           - meteringcon***REMOVED***g_storage_azure_container_name != ""
@@ -73,3 +73,26 @@
 
   when: meteringcon***REMOVED***g_storage_hive_storage_type == 'azure' and meteringcon***REMOVED***g_storage_azure_create_secret
 
+- name: Con***REMOVED***gure GCS Storage
+  block:
+    - name: Validate Metering gcs bucket name
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_gcs_bucket_name != ""
+        msg: "storage.hive.gcs.bucket cannot be empty"
+
+    - name: Validate Metering gcs credentials
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_gcs_credentials_secret_name == ""
+        msg: "storage.hive.gcs.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+      when: meteringcon***REMOVED***g_storage_gcs_create_secret
+
+    - name: Validate Metering gcs credentials
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_gcs_credentials_secret_name != ""
+        msg: "storage.hive.gcs.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+      when: not meteringcon***REMOVED***g_storage_gcs_create_secret
+
+  when: meteringcon***REMOVED***g_storage_hive_storage_type == 'gcs'
