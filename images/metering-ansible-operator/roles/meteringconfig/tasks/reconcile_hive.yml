@@ -21,6 +21,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hive-gcs-credentials-secret
         create: "{{ meteringconfig_create_hive_gcs_credentials }}"
+      - template_file: templates/hive/hive-s3-compatible-credentials-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hive-s3-compatible-credentials-secret
+        create: "{{ meteringconfig_create_hive_s3_compatible_credentials }}"
       - template_file: templates/hive/hive-azure-credentials-secret.yaml
         apis: [ {kind: secret} ]
         prune_label_value: hive-azure-credentials-secret

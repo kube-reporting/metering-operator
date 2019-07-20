@@ -62,6 +62,7 @@ spec:
                       - s3
                       - azure
                       - gcs
+                      - s3Compatible
                     hdfs:
                       type: object
                       required:
@@ -156,6 +157,53 @@ spec:
                         serviceAccountKeyJSON:
                           type: string
                           minLength: 1
+                    s3Compatible:
+                      type: object
+                      required:
+                        - bucket
+                        - endpoint
+                      properties:
+                        bucket:
+                          type: string
+                          minLength: 1
+                        secretName:
+                          type: string
+                          minLength: 1
+                        createSecret:
+                          type: boolean
+                        accessKeyID:
+                          type: string
+                          minLength: 1
+                        secretAccessKey:
+                          type: string
+                          minLength: 1
+                        endpoint:
+                          type: string
+                          format: uri
+                          minLength: 1
+                      oneOf:
+                      - required:
+                        - accessKeyID
+                        - secretAccessKey
+                        properties:
+                          createSecret:
+                            enum:
+                            - true
+                        allOf:
+                        - not:
+                            required:
+                            - secretName
+                      - required:
+                        - secretName
+                        properties:
+                          createSecret:
+                            enum:
+                            - false
+                        allOf:
+                        - not:
+                            required:
+                            - accessKeyID
+                            - secretAccessKey
                     sharedPVC:
                       type: object
                       properties:
@@ -203,6 +251,9 @@ spec:
                         - gcs
                     - not:
                         required:
+                        - s3Compatible
+                    - not:
+                        required:
                         - sharedPVC
                   - required:
                     - s3
@@ -222,6 +273,9 @@ spec:
                         - gcs
                     - not:
                         required:
+                        - s3Compatible
+                    - not:
+                        required:
                         - sharedPVC
                   - required:
                     - azure
@@ -239,6 +293,9 @@ spec:
                     - not:
                         required:
                         - gcs
+                    - not:
+                        required:
+                        - s3Compatible
                     - not:
                         required:
                         - sharedPVC
@@ -261,6 +318,31 @@ spec:
                     - not:
                         required:
                         - sharedPVC
+                    - not:
+                        required:
+                        - s3Compatible
+                  - required:
+                    - s3Compatible
+                    properties:
+                      type:
+                        enum:
+                        - s3Compatible
+                    allOf:
+                    - not:
+                        required:
+                        - hdfs
+                    - not:
+                        required:
+                        - azure
+                    - not:
+                        required:
+                        - gcs
+                    - not:
+                        required:
+                        - s3
+                    - not:
+                        required:
+                        - sharedPVC
                   - required:
                     - sharedPVC
                     properties:
@@ -277,6 +359,9 @@ spec:
                     - not:
                         required:
                         - gcs
+                    - not:
+                        required:
+                        - s3Compatible
                     - not:
                         required:
                         - azure
@@ -1310,6 +1395,22 @@ spec:
                               type: boolean
                             serviceAccountKeyJSON:
                               type: string
+
+                        s3Compatible:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            accessKeyID:
+                              type: string
+                            secretAccessKey:
+                              type: string
+                            endpoint:
+                              type: string
+                              format: uri
+
                         connectors:
                           type: object
                           properties:
@@ -1799,6 +1900,20 @@ spec:
                               type: boolean
                             serviceAccountKeyJSON:
                               type: string
+                        s3Compatible:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            accessKeyID:
+                              type: string
+                            secretAccessKey:
+                              type: string
+                            endpoint:
+                              type: string
+                              format: uri
                         db:
                           type: object
                           properties:
@@ -2318,6 +2433,20 @@ spec:
                               type: boolean
                             serviceAccountKeyJSON:
                               type: string
+                        s3Compatible:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            accessKeyID:
+                              type: string
+                            secretAccessKey:
+                              type: string
+                            endpoint:
+                              type: string
+                              format: uri
                         defaultFS:
                           type: string
                     configSecretName:
