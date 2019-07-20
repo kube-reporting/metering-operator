@@ -9,8 +9,8 @@
 - name: Validate Hive storage con***REMOVED***guration
   assert:
     that:
-      - hiveStorageType is not unde***REMOVED***ned and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs']
-    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', or 'sharedPVC'"
+      - hiveStorageType is not unde***REMOVED***ned and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', 's3Compatible' or 'sharedPVC'"
   vars:
     hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
 

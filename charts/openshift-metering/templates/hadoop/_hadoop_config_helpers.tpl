@@ -60,6 +60,23 @@
       <name>fs.defaultFS</name>
       <value>{{ .Values.hadoop.spec.con***REMOVED***g.defaultFS }}</value>
   </property>
+{{- if .Values.hadoop.spec.con***REMOVED***g.s3Compatible.endpoint }}
+  <property>
+    <name>fs.s3a.impl</name>
+    <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+    <description>The implementation of S3A Filesystem</description>
+  </property>
+  <property>
+    <name>fs.s3a.path.style.access</name>
+    <value>true</value>
+    <description>Enable S3 path style access.</description>
+  </property>
+  <property>
+    <name>fs.s3a.endpoint</name>
+    <description>AWS S3 endpoint to connect to.</description>
+    <value>{{ .Values.hadoop.spec.con***REMOVED***g.s3Compatible.endpoint }}</value>
+  </property>
+{{- end }}
   <property>
       <name>fs.gs.impl</name>
       <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>

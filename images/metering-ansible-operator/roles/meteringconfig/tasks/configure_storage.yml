@@ -36,6 +36,36 @@
 
   when: meteringcon***REMOVED***g_storage_hive_storage_type == 's3' and meteringcon***REMOVED***g_storage_s3_create_bucket
 
+- name: Con***REMOVED***gure S3 Compatible Storage
+  block:
+    - name: Validate Metering s3Compatible bucket name
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3Compatible_bucket_name != ""
+        msg: "storage.hive.s3Compatible.bucket cannot be empty"
+
+    - name: Validating nonempty endpoint
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3Compatible_endpoint != ""
+        msg: "storage.hive.s3Compatible.endpoint cannot be empty"
+
+    - name: Validate if createSecret is true secretName is empty
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3Compatible_credentials_secret_name == ""
+        msg: "storage.hive.s3Compatible.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+      when: meteringcon***REMOVED***g_storage_s3Compatible_create_secret
+
+    - name: Validate if createSecret is false secretName is nonempty
+      assert:
+        that:
+          - meteringcon***REMOVED***g_storage_s3Compatible_credentials_secret_name != ""
+        msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+      when: not meteringcon***REMOVED***g_storage_s3Compatible_create_secret
+
+  when: meteringcon***REMOVED***g_storage_hive_storage_type == 's3Compatible'
+
 - name: Get azure storage account name
   block:
     - name: Get Azure storage credentials secret

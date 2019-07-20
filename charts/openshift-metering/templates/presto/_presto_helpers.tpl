@@ -21,8 +21,12 @@ hive.metastore-timeout={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.
 {{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g}}
 hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
 {{- end }}
-
-{{ end }}
+{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
+hive.s3.endpoint={{ .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
+hive.s3.path-style-access=true
+hive.s3.ssl.enabled=false
+{{- end }}
+{{- end }}
 
 {{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}
 connector.name=jmx
@@ -82,6 +86,18 @@ connector.name=tpch
   valueFrom:
     secretKeyRef:
       name: "{{ .Values.presto.spec.con***REMOVED***g.aws.secretName | default "presto-aws-credentials" }}"
+      key: aws-secret-access-key
+{{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
+- name: AWS_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: "{{ .Values.presto.spec.con***REMOVED***g.s3Compatible.secretName | default "presto-s3-compatible-credentials" }}"
+      key: aws-access-key-id
+- name: AWS_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: "{{ .Values.presto.spec.con***REMOVED***g.s3Compatible.secretName | default "presto-s3-compatible-credentials" }}"
       key: aws-secret-access-key
 {{- end }}
 {{- end }}
