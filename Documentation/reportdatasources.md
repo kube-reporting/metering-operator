@@ -166,4 +166,4 @@ spec:
 [query-inputs]: reportqueries.md#query-inputs
 [specifying-inputs]: reportqueries.md#specifying-inputs
 [reportquery]: reportqueries.md
-[prestotables]: prestotables.md
+[prestotable]: prestotables.md
