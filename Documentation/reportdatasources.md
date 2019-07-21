@@ -140,7 +140,7 @@ spec:
 
 ## PrestoTable Datasource
 
-For ReportDataSources with a `spec.prestoTable` present, the reporting-operator will simply verify that a [PrestoTable resource][prestotables] resource exists and it's `status.tableName` is set.
+For ReportDataSources with a `spec.prestoTable` present, the reporting-operator will simply verify that a [PrestoTable][prestotables] resource exists and it's `status.tableName` is set.
 If it does, then the ReportDataSource will simply point at the existing PrestoTable.
 A PrestoTable ReportDataSource is merely a way to expose an arbitrary table to the rest of the metering resources which expect to interact with a ReportDataSource.
 
