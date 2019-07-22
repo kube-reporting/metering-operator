@@ -25,7 +25,6 @@ RUN pip install --no-cache-dir --upgrade openshift
 RUN pip install boto3
 RUN pip install pyOpenSSL
 
-USER 1001
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
 
@@ -37,7 +36,13 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
-ENTRYPOINT ["/tini", "--", "/usr/local/bin/ansible-operator", "run", "ansible", "--watches-file=/opt/ansible/watches.yaml"]
+# to allow running as non-root
+RUN chown -R 1001:0 $HOME && \
+    chmod -R 774 $HOME /etc/passwd
+
+USER 1001
+
+ENTRYPOINT ["/opt/ansible/scripts/entrypoint.sh"]
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and configuration of all other metering components." \
