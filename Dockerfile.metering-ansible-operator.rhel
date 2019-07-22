@@ -19,7 +19,6 @@ RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 RUN yum -y update python-openshift
 RUN yum install pyOpenSSL
 
-USER 1001
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
 
@@ -31,7 +30,13 @@ COPY charts/openshift-metering ${HELM_CHART_PATH}
 
 COPY manifests/deploy/openshift/olm/bundle /manifests
 
-ENTRYPOINT ["/tini", "--", "/usr/local/bin/ansible-operator", "run", "ansible", "--watches-***REMOVED***le=/opt/ansible/watches.yaml"]
+# to allow running as non-root
+RUN chown -R 1001:0 $HOME && \
+    chmod -R 774 $HOME /etc/passwd
+
+ENTRYPOINT ["/opt/ansible/scripts/entrypoint.sh"]
+
+USER 1001
 
 LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and con***REMOVED***guration of all other metering components." \
