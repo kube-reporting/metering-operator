@@ -37,7 +37,7 @@ Changing these settings after installation will result in broken and unexpected 
 ## Storing data in Azure
 
 You can also store your data in Azure blob storage, and to do so, you must use an existing container.
-Edit the `spec.storage` section in the example [azure-blob-storage.yaml][azure-blob-storage-con***REMOVED***g]] con***REMOVED***guration.
+Edit the `spec.storage` section in the example [azure-blob-storage.yaml][azure-blob-storage-con***REMOVED***g] con***REMOVED***guration.
 Set the `spec.storage.hive.azure.container` and `spec.storage.hive.azure.secretName` with the secret following this format:
 ```
 apiVersion: v1
