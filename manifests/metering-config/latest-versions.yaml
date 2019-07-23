@@ -8,3 +8,18 @@ spec:
       image:
         repository: quay.io/openshift/origin-metering-reporting-operator
         tag: latest
+  presto:
+    spec:
+      image:
+        repository: quay.io/openshift/origin-metering-presto
+        tag: latest
+  hive:
+    spec:
+      image:
+        repository: quay.io/openshift/origin-metering-hive
+        tag: latest
+  hadoop:
+    spec:
+      image:
+        repository: quay.io/openshift/origin-metering-hadoop
+        tag: latest
