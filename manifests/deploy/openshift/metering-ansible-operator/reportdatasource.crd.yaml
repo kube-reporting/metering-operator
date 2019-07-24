@@ -133,17 +133,13 @@ spec:
                     name:
                       type: string
                       minLength: 1
-          anyOf:
-          - type: object
-            required:
+          oneOf:
+          - required:
             - prometheusMetricsImporter
-          - type: object
-            required:
+          - required:
             - reportQueryView
-          - type: object
-            required:
+          - required:
             - awsBilling
-          - type: object
-            required:
+          - required:
             - prestoTable
 
