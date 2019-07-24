@@ -20,14 +20,14 @@ spec:
   - name: v1alpha1
     served: true
     storage: false
-  preserveUnknownFields: true
-  validation:
+    validation:
     openAPIV3Schema:
       required:
       - spec
       properties:
         spec:
           type: object
+          x-kubernetes-preserve-unknown-fields: true
           required:
           - storage
           properties:
