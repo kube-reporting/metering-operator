@@ -20,6 +20,7 @@ spec:
   - name: v1alpha1
     served: true
     storage: false
+  #preserveUnknownFields: false	# Do not use "false" in k8s 1.15, recursively nested "match" sections are dropped.
   validation:
     openAPIV3Schema:
 <<<<<<< HEAD
@@ -37,7 +38,6 @@ spec:
       properties:
         spec:
           type: object
-          x-kubernetes-preserve-unknown-fields: true
           required:
           - storage
           properties:
