@@ -20,3 +20,1647 @@ spec:
   - name: v1alpha1
     served: true
     storage: false
+  validation:
+    openAPIV3Schema:
+      type: object
+      required:
+      - spec
+      properties:
+        spec:
+          type: object
+          required:
+          - storage
+          properties:
+            __ghostunnel:
+              type: object
+              properties:
+                image:
+                  type: object
+                  properties:
+                    pullPolicy:
+                      type: string
+                      pattern: ^(.*)$
+                    repository:
+                      type: string
+                      pattern: ^(.*)$
+                    tag:
+                      type: string
+            global:
+              type: object
+              properties:
+                ownerReferences:
+                  type: array
+            hadoop:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    config:
+                      type: object
+                      properties:
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                            storageAccountName:
+                              type: string
+                              pattern: ^(.*)$
+                        defaultFS:
+                          type: string
+                          pattern: ^(.*)$
+                    configSecretName:
+                      type: string
+                      pattern: ^(.*)$
+                    hdfs:
+                      type: object
+                      properties:
+                        config:
+                          type: object
+                          properties:
+                            datanodeDataDirPerms:
+                              type: string
+                              pattern: ^(.*)$
+                            logLevel:
+                              type: string
+                              pattern: ^(.*)$
+                            replicationFactor:
+                              type: integer
+                        datanode:
+                          type: object
+                          properties:
+                            affinity:
+                              type: object
+                              properties:
+                                podAntiAffinity:
+                                  type: object
+                                  properties:
+                                    requiredDuringSchedulingIgnoredDuringExecution:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          labelSelector:
+                                            type: object
+                                            properties:
+                                              matchExpressions:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    key:
+                                                      type: string
+                                                      pattern: ^(.*)$
+                                                    operator:
+                                                      type: string
+                                                      pattern: ^(.*)$
+                                                    values:
+                                                      type: array
+                                                      items:
+                                                        type: string
+                                                        pattern: ^(.*)$
+                                          topologyKey:
+                                            type: string
+                                            pattern: ^(.*)$
+                            annotations:
+                              type: object
+                            config:
+                              type: object
+                              properties:
+                                jvm:
+                                  type: object
+                                  properties:
+                                    initialRAMPercentage:
+                                      type: string
+                                    maxRAMPercentage:
+                                      type: string
+                                    minRAMPercentage:
+                                      type: string
+                            labels:
+                              type: object
+                            nodeSelector:
+                              type: object
+                            replicas:
+                              type: string
+                            resources:
+                              type: object
+                              properties:
+                                limits:
+                                  type: object
+                                  properties:
+                                    cpu:
+                                      type: string
+                                    memory:
+                                      type: string
+                                      pattern: ^(.*)$
+                                requests:
+                                  type: object
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    memory:
+                                      type: string
+                                      pattern: ^(.*)$
+                            storage:
+                              type: object
+                              properties:
+                                class:
+                                  type: string
+                                size:
+                                  type: string
+                                  pattern: ^(.*)$
+                            terminationGracePeriodSeconds:
+                              type: integer
+                            tolerations:
+                              type: array
+                        enabled:
+                          type: boolean
+                        namenode:
+                          type: object
+                          properties:
+                            affinity:
+                              type: object
+                              properties:
+                                podAntiAffinity:
+                                  type: object
+                                  properties:
+                                    requiredDuringSchedulingIgnoredDuringExecution:
+                                      type: array
+                                        Schema
+                                      items:
+                                        type: object
+                                        properties:
+                                          labelSelector:
+                                            type: object
+                                            properties:
+                                              matchExpressions:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    key:
+                                                      type: string
+                                                      pattern: ^(.*)$
+                                                    operator:
+                                                      type: string
+                                                      pattern: ^(.*)$
+                                                    values:
+                                                      type: array
+                                                      items:
+                                                        type: string
+                                                        pattern: ^(.*)$
+                                          topologyKey:
+                                            type: string
+                                            pattern: ^(.*)$
+                            annotations:
+                              type: object
+                            config:
+                              type: object
+                              properties:
+                                jvm:
+                                  type: object
+                                  properties:
+                                    initialRAMPercentage:
+                                      type: string
+                                      default:
+                                    maxRAMPercentage:
+                                      type: string
+                                    minRAMPercentage:
+                                      type: type
+                            labels:
+                              type: object
+                            nodeSelector:
+                              type: object
+                            resources:
+                              type: object
+                              properties:
+                                limits:
+                                  type: object
+                                  properties:
+                                    cpu:
+                                      type: string
+                                    memory:
+                                      type: string
+                                      pattern: ^(.*)$
+                                requests:
+                                  type: object
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    memory:
+                                      type: string
+                                      pattern: ^(.*)$
+                            storage:
+                              type: object
+                              properties:
+                                class:
+                                  type: string
+                                size:
+                                  type: string
+                                  pattern: ^(.*)$
+                            terminationGracePeriodSeconds:
+                              type: integer
+                            tolerations:
+                              type: array
+                        securityContext:
+                          type: object
+                          properties:
+                            fsGroup:
+                              type: string
+                            runAsNonRoot:
+                              type: boolean
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                          pattern: ^(.*)$
+                        pullSecrets:
+                          type: string
+                        repository:
+                          type: string
+                          pattern: ^(.*)$
+                        tag:
+                          type: string
+            hive:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    annotations:
+                      type: object
+                    config:
+                      type: object
+                      properties:
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                            storageAccountName:
+                              type: string
+                              pattern: ^(.*)$
+                        db:
+                          type: object
+                          properties:
+                            autoCreateMetastoreSchema:
+                              type: boolean
+                            driver:
+                              type: string
+                              pattern: ^(.*)$
+                            enableMetastoreSchemaVerification:
+                              type: boolean
+                            password:
+                              type: string
+                            url:
+                              type: string
+                              pattern: ^(.*)$
+                            username:
+                              type: string
+                        defaultCompression:
+                          type: string
+                          pattern: ^(.*)$
+                        defaultFileFormat:
+                          type: string
+                          pattern: ^(.*)$
+                        hadoopConfigSecretName:
+                          type: string
+                          pattern: ^(.*)$
+                        metastoreClientSocketTimeout:
+                          type: string
+                        metastoreWarehouseDir:
+                          type: string
+                        sharedVolume:
+                          type: object
+                          properties:
+                            claimName:
+                              type: string
+                              pattern: ^(.*)$
+                            createPVC:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            mountPath:
+                              type: string
+                              pattern: ^(.*)$
+                            size:
+                              type: string
+                              pattern: ^(.*)$
+                            storageClass:
+                              type: string
+                        useHadoopConfig:
+                          type: boolean
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                          pattern: ^(.*)$
+                        pullSecrets:
+                          type: array
+                        repository:
+                          type: string
+                          pattern: ^(.*)$
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    metastore:
+                      type: object
+                      properties:
+                        affinity:
+                          type: object
+                        config:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                enabled:
+                                  type: boolean
+                            jvm:
+                              type: object
+                              properties:
+                                initialRAMPercentage:
+                                  type: string
+                                maxRAMPercentage:
+                                  type: string
+                                minRAMPercentage:
+                                  type: string
+                            logLevel:
+                              type: string
+                              pattern: ^(.*)$
+                            tls:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                        livenessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
+                        nodeSelector:
+                          type: object
+                        readinessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                            requests:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                  pattern: ^(.*)$
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                        storage:
+                          type: object
+                          properties:
+                            class:
+                              type: string
+                            create:
+                              type: boolean
+                            size:
+                              type: string
+                              pattern: ^(.*)$
+                        tolerations:
+                          type: array
+                    securityContext:
+                      type: object
+                      properties:
+                        fsGroup:
+                          type: string
+                        runAsNonRoot:
+                          type: boolean
+                    server:
+                      type: object
+                      properties:
+                        affinity:
+                          type: object
+                        config:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                enabled:
+                                  type: boolean
+                            jvm:
+                              type: object
+                              properties:
+                                initialRAMPercentage:
+                                  type: string
+                                maxRAMPercentage:
+                                  type: string
+                                minRAMPercentage:
+                                  type: string
+                            logLevel:
+                              type: string
+                              pattern: ^(.*)$
+                            metastoreTLS:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                            tls:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                        livenessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
+                        nodeSelector:
+                          type: object
+                        readinessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                            requests:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                  pattern: ^(.*)$
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                        tolerations:
+                          type: array
+                    terminationGracePeriodSeconds:
+                      type: integer
+            monitoring:
+              type: object
+              properties:
+                createRBAC:
+                  type: boolean
+                enabled:
+                  type: boolean
+                namespace:
+                  type: string
+                  pattern: ^(.*)$
+            openshift-reporting:
+              type: object
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    awsBillingReportDataSource:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                    defaultReportDataSources:
+                      type: object
+                      properties:
+                        base:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                - name
+                                - spec
+                                properties:
+                                  name:
+                                    type: string
+                                    pattern: ^(.*)$
+                                  spec:
+                                    type: object
+                                    required:
+                                    - reportQueryView
+                                    properties:
+                                      reportQueryView:
+                                        type: object
+                                        required:
+                                        - queryName
+                                        properties:
+                                          queryName:
+                                            type: string
+                                            pattern: ^(.*)$
+                        postKube_1_14:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                - name
+                                - spec
+                                properties:
+                                  name:
+                                    type: string
+                                    pattern: ^(.*)$
+                                  spec:
+                                    type: object
+                                    required:
+                                    - prometheusMetricsImporter
+                                    properties:
+                                      prometheusMetricsImporter:
+                                        type: object
+                                        required:
+                                        - query
+                                        properties:
+                                          query:
+                                            type: string
+                                            pattern: ^(.*)$
+                        preKube_1_14:
+                          type: object
+                          required:
+                          - items
+                          properties:
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                - name
+                                - spec
+                                properties:
+                                  name:
+                                    type: string
+                                    pattern: ^(.*)$
+                                  spec:
+                                    type: object
+                                    required:
+                                    - prometheusMetricsImporter
+                                    properties:
+                                      prometheusMetricsImporter:
+                                        type: object
+                                        required:
+                                        - query
+                                        properties:
+                                          query:
+                                            type: string
+                                            pattern: ^(.*)$
+                    defaultStorageLocation:
+                      type: object
+                      required:
+                      - enabled
+                      - hive
+                      - isDefault
+                      - name
+                      - type
+                      properties:
+                        enabled:
+                          type: boolean
+                        hive:
+                          type: object
+                          required:
+                          - databaseName
+                          - location
+                          - unmanagedDatabase
+                          properties:
+                            databaseName:
+                              type: string
+                              pattern: ^(.*)$
+                            location:
+                              type: string
+                              pattern: ^(.*)$
+                            unmanagedDatabase:
+                              type: boolean
+                        isDefault:
+                          type: boolean
+                        name:
+                          type: string
+                          pattern: ^(.*)$
+                        type:
+                          type: string
+                          pattern: ^(.*)$
+            permissions:
+              type: object
+              properties:
+                meteringAdmins:
+                  type: array
+                meteringViewers:
+                  type: array
+                reportExporters:
+                  type: array
+                reportingAdmins:
+                  type: array
+                reportingViewers:
+                  type: array
+            presto:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    config:
+                      type: object
+                      properties:
+                        auth:
+                          type: object
+                          properties:
+                            caCertificate:
+                              type: string
+                              pattern: ^(.*)$
+                            certificate:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            key:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                            storageAccountName:
+                              type: string
+                              pattern: ^(.*)$
+                        connectors:
+                          type: object
+                          properties:
+                            extraConnectorFiles:
+                              type: array
+                            hive:
+                              type: object
+                              properties:
+                                hadoopConfigSecretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                                metastoreTimeout:
+                                  type: string
+                                metastoreURI:
+                                  type: string
+                                tls:
+                                  type: object
+                                  properties:
+                                    caCertificate:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    certificate:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    createSecret:
+                                      type: boolean
+                                    enabled:
+                                      type: boolean
+                                    key:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    secretName:
+                                      type: string
+                                      pattern: ^(.*)$
+                                useHadoopConfig:
+                                  type: boolean
+                        environment:
+                          type: string
+                          pattern: ^(.*)$
+                        maxQueryLength:
+                          type: string
+                          pattern: ^(.*)$
+                        nodeSchedulerIncludeCoordinator:
+                          type: boolean
+                        tls:
+                          type: object
+                          properties:
+                            caCertificate:
+                              type: string
+                              pattern: ^(.*)$
+                            certificate:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            key:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                    coordinator:
+                      type: object
+                      properties:
+                        affinity:
+                          type: object
+                          required:
+                          - podAntiAffinity
+                          properties:
+                            podAntiAffinity:
+                              type: object
+                              required:
+                              - requiredDuringSchedulingIgnoredDuringExecution
+                              properties:
+                                requiredDuringSchedulingIgnoredDuringExecution:
+                                  type: array
+                                    Schema
+                                  items:
+                                    type: object
+                                    required:
+                                    - labelSelector
+                                    - topologyKey
+                                    properties:
+                                      labelSelector:
+                                        type: object
+                                        required:
+                                        - matchExpressions
+                                        properties:
+                                          matchExpressions:
+                                            type: array
+                                            items:
+                                              type: object
+                                              required:
+                                              - key
+                                              - operator
+                                              - values
+                                              properties:
+                                                key:
+                                                  type: string
+                                                  pattern: ^(.*)$
+                                                operator:
+                                                  type: string
+                                                  pattern: ^(.*)$
+                                                values:
+                                                  type: array
+                                                  items:
+                                                    type: string
+                                                    pattern: ^(.*)$
+                                      topologyKey:
+                                        type: string
+                                        pattern: ^(.*)$
+                        config:
+                          type: object
+                          properties:
+                            jvm:
+                              type: object
+                              properties:
+                                G1HeapRegionSize:
+                                  type: string
+                                concGCThreads:
+                                  type: string
+                                extraFlags:
+                                  type: array
+                                initialRAMPercentage:
+                                  type: string
+                                  pattern: ^(.*)$
+                                initiatingHeapOccupancyPercent:
+                                  type: string
+                                maxCachedBufferSize:
+                                  type: string
+                                maxDirectMemorySize:
+                                  type: string
+                                maxGcPauseMillis:
+                                  type: string
+                                maxRAMPercentage:
+                                  type: string
+                                  pattern: ^(.*)$
+                                minRAMPercentage:
+                                  type: string
+                                parallelGCThreads:
+                                  type: string
+                                permSize:
+                                  type: string
+                                reservedCodeCacheSize:
+                                  type: string
+                            logLevel:
+                              type: string
+                              pattern: ^(.*)$
+                            taskMaxWorkerThreads:
+                              type: string
+                            taskMinDrivers:
+                              type: string
+                        nodeSelector:
+                          type: object
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                            requests:
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                        terminationGracePeriodSeconds:
+                          type: integer
+                        tolerations:
+                          type: array
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                          pattern: ^(.*)$
+                        repository:
+                          type: string
+                          pattern: ^(.*)$
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    securityContext:
+                      type: object
+                      properties:
+                        fsGroup:
+                          type: string
+                        runAsNonRoot:
+                          type: boolean
+                    worker:
+                      type: object
+                      properties:
+                        affinity:
+                          type: object
+                          required:
+                          - podAntiAffinity
+                          properties:
+                            podAntiAffinity:
+                              type: object
+                              required:
+                              - requiredDuringSchedulingIgnoredDuringExecution
+                              properties:
+                                requiredDuringSchedulingIgnoredDuringExecution:
+                                  type: array
+                                    Schema
+                                  items:
+                                    type: object
+                                    required:
+                                    - labelSelector
+                                    - topologyKey
+                                    properties:
+                                      labelSelector:
+                                        type: object
+                                        required:
+                                        - matchExpressions
+                                        properties:
+                                          matchExpressions:
+                                            type: array
+                                            items:
+                                              type: object
+                                              required:
+                                              - key
+                                              - operator
+                                              - values
+                                              properties:
+                                                key:
+                                                  type: string
+                                                  pattern: ^(.*)$
+                                                operator:
+                                                  type: string
+                                                  pattern: ^(.*)$
+                                                values:
+                                                  type: array
+                                                  items:
+                                                    type: string
+                                                    pattern: ^(.*)$
+                                      topologyKey:
+                                        type: string
+                                        pattern: ^(.*)$
+                        config:
+                          type: object
+                          properties:
+                            jvm:
+                              type: object
+                              properties:
+                                G1HeapRegionSize:
+                                  type: string
+                                concGCThreads:
+                                  type: string
+                                extraFlags:
+                                  type: array
+                                initialRAMPercentage:
+                                  type: string
+                                  pattern: ^(.*)$
+                                initiatingHeapOccupancyPercent:
+                                  type: string
+                                maxCachedBufferSize:
+                                  type: string
+                                maxDirectMemorySize:
+                                  type: string
+                                maxGcPauseMillis:
+                                  type: string
+                                maxRAMPercentage:
+                                  type: string
+                                  pattern: ^(.*)$
+                                minRAMPercentage:
+                                  type: string
+                                parallelGCThreads:
+                                  type: string
+                                permSize:
+                                  type: string
+                                reservedCodeCacheSize:
+                                  type: string
+                            logLevel:
+                              type: string
+                              pattern: ^(.*)$
+                            taskMaxWorkerThreads:
+                              type: string
+                            taskMinDrivers:
+                              type: string
+                        nodeSelector:
+                          type: object
+                        replicas:
+                          type: string
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                            requests:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                        terminationGracePeriodSeconds:
+                          type: integer
+                        tolerations:
+                          type: array
+            reporting-operator:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    affinity:
+                      type: object
+                    annotations:
+                      type: object
+                    apiService:
+                      type: object
+                      properties:
+                        annotations:
+                          type: object
+                          properties:
+                            service.alpha.openshift.io/serving-cert-secret-name:
+                              type: string
+                              pattern: ^(.*)$
+                        nodePort:
+                          type: string
+                        type:
+                          type: string
+                          pattern: ^(.*)$
+                    authProxy:
+                      type: object
+                      properties:
+                        authenticatedEmails:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            data:
+                              type: string
+                              pattern: ^(.*)$
+                            enabled:
+                              type: boolean
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        cookie:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                            seed:
+                              type: string
+                              pattern: ^(.*)$
+                        delegateURLs:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            policy:
+                              type: string
+                              pattern: ^(.*)$
+                        enabled:
+                          type: boolean
+                        htpasswd:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            data:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        image:
+                          type: object
+                          properties:
+                            pullPolicy:
+                              type: string
+                              pattern: ^(.*)$
+                            pullSecrets:
+                              type: array
+                            repository:
+                              type: string
+                              pattern: ^(.*)$
+                            tag:
+                              type: string
+                              pattern: ^(.*)$
+                        rbac:
+                          type: object
+                          required:
+                          - createAuthProxyClusterRole
+                          properties:
+                            createAuthProxyClusterRole:
+                              type: boolean
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                  pattern: ^(.*)$
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                            requests:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                  pattern: ^(.*)$
+                                memory:
+                                  type: string
+                                  pattern: ^(.*)$
+                        subjectAccessReview:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            policy:
+                              type: string
+                              pattern: ^(.*)$
+                    config:
+                      type: object
+                      properties:
+                        allNamespaces:
+                          type: boolean
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                              pattern: ^(.*)$
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        enableFinalizers:
+                          type: boolean
+                        hive:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                            host:
+                              type: string
+                            tls:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                        leaderLeaseDuration:
+                          type: string
+                          pattern: ^(.*)$
+                        logDDLQueries:
+                          type: boolean
+                        logDMLQueries:
+                          type: boolean
+                        logLevel:
+                          type: string
+                          pattern: ^(.*)$
+                        logReports:
+                          type: boolean
+                        presto:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                            host:
+                              type: string
+                              pattern: ^(.*)$
+                            maxQueryLength:
+                              type: string
+                            tls:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                        prometheus:
+                          type: object
+                          properties:
+                            certificateAuthority:
+                              type: object
+                              properties:
+                                configMap:
+                                  type: object
+                                  properties:
+                                    create:
+                                      type: boolean
+                                    enabled:
+                                      type: boolean
+                                    filename:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    name:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    value:
+                                      type: string
+                                      pattern: ^(.*)$
+                                useServiceAccountCA:
+                                  type: boolean
+                            metricsImporter:
+                              type: object
+                              properties:
+                                auth:
+                                  type: object
+                                  properties:
+                                    tokenSecret:
+                                      type: object
+                                      properties:
+                                        create:
+                                          type: boolean
+                                        enabled:
+                                          type: boolean
+                                        name:
+                                          type: string
+                                          pattern: ^(.*)$
+                                        value:
+                                          type: string
+                                          pattern: ^(.*)$
+                                    useServiceAccountToken:
+                                      type: boolean
+                                config:
+                                  type: object
+                                  properties:
+                                    chunkSize:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    importFrom:
+                                      type: string
+                                    maxImportBackfillDuration:
+                                      type: string
+                                    maxQueryRangeDuration:
+                                      type: string
+                                    pollInterval:
+                                      type: string
+                                      pattern: ^(.*)$
+                                    stepSize:
+                                      type: string
+                                      pattern: ^(.*)$
+                                enabled:
+                                  type: boolean
+                            url:
+                              type: string
+                              pattern: ^(.*)$
+                        tls:
+                          type: object
+                          properties:
+                            api:
+                              type: object
+                              properties:
+                                caCertificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                certificate:
+                                  type: string
+                                  pattern: ^(.*)$
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                  pattern: ^(.*)$
+                                secretName:
+                                  type: string
+                                  pattern: ^(.*)$
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                          pattern: ^(.*)$
+                        pullSecrets:
+                          type: array
+                        repository:
+                          type: string
+                          pattern: ^(.*)$
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    livenessProbe:
+                      type: object
+                      properties:
+                        failureThreshold:
+                          type: integer
+                        httpGet:
+                          type: object
+                          required:
+                          - path
+                          - port
+                          - scheme
+                          properties:
+                            path:
+                              type: string
+                              pattern: ^(.*)$
+                            port:
+                              type: integer
+                            scheme:
+                              type: string
+                              pattern: ^(.*)$
+                        initialDelaySeconds:
+                          type: integer
+                        periodSeconds:
+                          type: integer
+                        successThreshold:
+                          type: integer
+                        timeoutSeconds:
+                          type: integer
+                    nodeSelector:
+                      type: object
+                    rbac:
+                      type: object
+                      required:
+                      - createClusterMonitoringViewRBAC
+                      properties:
+                        createClusterMonitoringViewRBAC:
+                          type: boolean
+                    readinessProbe:
+                      type: object
+                      properties:
+                        failureThreshold:
+                          type: integer
+                        httpGet:
+                          type: object
+                          required:
+                          - path
+                          - port
+                          - scheme
+                          properties:
+                            path:
+                              type: string
+                              pattern: ^(.*)$
+                            port:
+                              type: integer
+                            scheme:
+                              type: string
+                              pattern: ^(.*)$
+                        initialDelaySeconds:
+                          type: integer
+                        periodSeconds:
+                          type: integer
+                        successThreshold:
+                          type: integer
+                        timeoutSeconds:
+                          type: integer
+                    replicas:
+                      type: string
+                    resources:
+                      type: object
+                      properties:
+                        limits:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                              pattern: ^(.*)$
+                        requests:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                              pattern: ^(.*)$
+                            memory:
+                              type: string
+                              pattern: ^(.*)$
+                    route:
+                      type: object
+                      required:
+                      - enabled
+                      properties:
+                        enabled:
+                          type: boolean
+                        name:
+                          type: string
+                          pattern: ^(.*)$
+                    tolerations:
+                      type: array
+                    updateStrategy:
+                      type: object
+                      required:
+                      - type
+                      properties:
+                        type:
+                          type: string
+                          pattern: ^(.*)$
+            storage:
+              type: object
+              properties:
+                hive:
+                  type: object
+                type:
+                  type: string
+                  pattern: ^(.*)$
+            tls:
+              type: object
+              properties:
+                certificate:
+                  type: string
+                  pattern: ^(.*)$
+                enabled:
+                  type: boolean
+                key:
+                  type: string
+                  pattern: ^(.*)$
+                secretName:
+                  type: string
+                  pattern: ^(.*)$
+            unsupportedFeatures:
+              type: object
+              properties:
+                enableHDFS:
+                  type: boolean
