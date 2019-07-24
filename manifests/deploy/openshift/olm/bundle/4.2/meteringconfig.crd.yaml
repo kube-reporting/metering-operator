@@ -20,4 +20,1497 @@ spec:
   - name: v1alpha1
     served: true
     storage: false
+  validation:
+    openAPIV3Schema:
+      required:
+      - spec
+      properties:
+        spec:
+          type: object
+          required:
+          - storage
+          properties:
+            logHelmTemplate:
+              type: boolean
+
+            unsupportedFeatures:
+              type: object
+              properties:
+                enableHDFS:
+                  type: boolean
+
+            storage:
+              type: object
+              required:
+              - type
+              - hive
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - hive
+                hive:
+                  type: object
+                  required:
+                  - type
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - hdfs
+                      - sharedPVC
+                      - s3
+                      - azure
+                    hdfs:
+                      type: object
+                      required:
+                      - namenode
+                      properties:
+                        namenode:
+                          type: string
+                          format: uri
+                          minLength: 1
+                    s3:
+                      type: object
+                      required:
+                      - bucket
+                      - region
+                      - secretName
+                      properties:
+                        bucket:
+                          type: string
+                          minLength: 1
+                        region:
+                          type: string
+                          minLength: 1
+                        secretName:
+                          type: string
+                          minLength: 1
+                        createBucket:
+                          type: boolean
+                    azure:
+                      type: object
+                      required:
+                      - container
+                      - secretName
+                      properties:
+                        container:
+                          type: string
+                        secretName:
+                          type: string
+                        rootDirectory:
+                          type: string
+                    sharedPVC:
+                      type: object
+                      properties:
+                        claimName:
+                          type: string
+                        storageClass:
+                          type: string
+                        size:
+                          type: string
+                        createPVC:
+                          type: boolean
+                      oneOf:
+                      - required:
+                        - claimName
+                      - required:
+                        - storageClass
+                        - createPVC
+                        properties:
+                          createPVC:
+                            enum:
+                            - true
+                  oneOf:
+                  # note: this is for spec.storage.hive
+                  - required:
+                    - hdfs
+                    properties:
+                      type:
+                        enum:
+                        - hdfs
+                  - required:
+                    - s3
+                    properties:
+                      type:
+                        enum:
+                        - s3
+                  - required:
+                    - azure
+                    properties:
+                      type:
+                        enum:
+                        - azure
+                  - required:
+                    - sharedPVC
+                    properties:
+                      type:
+                        enum:
+                        - sharedPVC
+
+            tls:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                certi***REMOVED***cate:
+                  type: string
+                key:
+                  type: string
+                secretName:
+                  type: string
+
+            permissions:
+              type: object
+              properties:
+                meteringAdmins:
+                  type: array
+                meteringViewers:
+                  type: array
+                reportExporters:
+                  type: array
+                reportingAdmins:
+                  type: array
+                reportingViewers:
+                  type: array
+
+            monitoring:
+              type: object
+              properties:
+                createRBAC:
+                  type: boolean
+                enabled:
+                  type: boolean
+                namespace:
+                  type: string
+
+            openshift-reporting:
+              type: object
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    defaultStorageLocation:
+                      type: object
+                      required:
+                      - enabled
+                      - isDefault
+                      - name
+                      - type
+                      - hive
+                      properties:
+                        enabled:
+                          type: boolean
+                        isDefault:
+                          type: boolean
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        hive:
+                          type: object
+                          required:
+                          - databaseName
+                          - unmanagedDatabase
+                          properties:
+                            databaseName:
+                              type: string
+                            unmanagedDatabase:
+                              type: boolean
+                            location:
+                              type: string
+                    awsBillingReportDataSource:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                        bucket:
+                          type: string
+                        pre***REMOVED***x:
+                          type: string
+                        region:
+                          type: string
+                    defaultReportDataSources:
+                      type: object
+                      properties:
+                        base:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                - name
+                                - spec
+                                properties:
+                                  name:
+                                    type: string
+                                  spec:
+                                    type: object
+                                    required:
+                                    - reportQueryView
+                                    properties:
+                                      reportQueryView:
+                                        type: object
+                                        required:
+                                        - queryName
+                                        properties:
+                                          queryName:
+                                            type: string
+                        postKube_1_14:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+
+            reporting-operator:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    af***REMOVED***nity:
+                      type: object
+                    annotations:
+                      type: object
+                    apiService:
+                      type: object
+                      properties:
+                        nodePort:
+                          type: integer
+                        type:
+                          type: string
+                    authProxy:
+                      type: object
+                      properties:
+                        authenticatedEmails:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            data:
+                              type: string
+                            enabled:
+                              type: boolean
+                            secretName:
+                              type: string
+                        cookie:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretName:
+                              type: string
+                            seed:
+                              type: string
+                        delegateURLs:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            policy:
+                              type: string
+                        enabled:
+                          type: boolean
+                        htpasswd:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            data:
+                              type: string
+                            secretName:
+                              type: string
+                        image:
+                          type: object
+                          properties:
+                            pullPolicy:
+                              type: string
+                            pullSecrets:
+                              type: array
+                            repository:
+                              type: string
+                            tag:
+                              type: string
+                        rbac:
+                          type: object
+                          required:
+                          - createAuthProxyClusterRole
+                          properties:
+                            createAuthProxyClusterRole:
+                              type: boolean
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                            requests:
+                              type: object
+                        subjectAccessReview:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            policy:
+                              type: string
+                    con***REMOVED***g:
+                      type: object
+                      properties:
+                        allNamespaces:
+                          type: boolean
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                        enableFinalizers:
+                          type: boolean
+                        hive:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                            host:
+                              type: string
+                            tls:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                        leaderLeaseDuration:
+                          type: string
+                        logDDLQueries:
+                          type: boolean
+                        logDMLQueries:
+                          type: boolean
+                        logLevel:
+                          type: string
+                        logReports:
+                          type: boolean
+                        presto:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                            host:
+                              type: string
+                            maxQueryLength:
+                              type: integer
+                            tls:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                        prometheus:
+                          type: object
+                          properties:
+                            certi***REMOVED***cateAuthority:
+                              type: object
+                              properties:
+                                con***REMOVED***gMap:
+                                  type: object
+                                  properties:
+                                    create:
+                                      type: boolean
+                                    enabled:
+                                      type: boolean
+                                    ***REMOVED***lename:
+                                      type: string
+                                    name:
+                                      type: string
+                                    value:
+                                      type: string
+                                useServiceAccountCA:
+                                  type: boolean
+                            metricsImporter:
+                              type: object
+                              properties:
+                                auth:
+                                  type: object
+                                  properties:
+                                    tokenSecret:
+                                      type: object
+                                      properties:
+                                        create:
+                                          type: boolean
+                                        enabled:
+                                          type: boolean
+                                        name:
+                                          type: string
+                                        value:
+                                          type: string
+                                    useServiceAccountToken:
+                                      type: boolean
+                                con***REMOVED***g:
+                                  type: object
+                                  properties:
+                                    chunkSize:
+                                      type: string
+                                    importFrom:
+                                      type: string
+                                    maxImportBack***REMOVED***llDuration:
+                                      type: string
+                                    maxQueryRangeDuration:
+                                      type: string
+                                    pollInterval:
+                                      type: string
+                                    stepSize:
+                                      type: string
+                                enabled:
+                                  type: boolean
+                            url:
+                              type: string
+                        tls:
+                          type: object
+                          properties:
+                            api:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                        pullSecrets:
+                          type: array
+                        repository:
+                          type: string
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    nodeSelector:
+                      type: object
+                    rbac:
+                      type: object
+                      required:
+                      - createClusterMonitoringViewRBAC
+                      properties:
+                        createClusterMonitoringViewRBAC:
+                          type: boolean
+                    replicas:
+                      type: integer
+                      format: int32
+                    resources:
+                      type: object
+                      properties:
+                        limits:
+                          type: object
+                        requests:
+                          type: object
+                    route:
+                      type: object
+                      required:
+                      - enabled
+                      properties:
+                        enabled:
+                          type: boolean
+                        name:
+                          type: string
+                    tolerations:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          effect:
+                            type: string
+                          key:
+                            type: string
+                          operator:
+                            type: string
+                          tolerationSeconds:
+                            format: int64
+                            type: integer
+                          value:
+                            type: string
+                    updateStrategy:
+                      type: object
+                      required:
+                      - type
+                      properties:
+                        type:
+                          type: string
+
+            presto:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    annotations:
+                      type: object
+                    terminationGracePeriodSeconds:
+                      type: integer
+                    con***REMOVED***g:
+                      type: object
+                      properties:
+                        auth:
+                          type: object
+                          properties:
+                            caCerti***REMOVED***cate:
+                              type: string
+                            certi***REMOVED***cate:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            key:
+                              type: string
+                            secretName:
+                              type: string
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                            storageAccountName:
+                              type: string
+                        connectors:
+                          type: object
+                          properties:
+                            extraConnectorFiles:
+                              type: array
+                            hive:
+                              type: object
+                              properties:
+                                hadoopCon***REMOVED***gSecretName:
+                                  type: string
+                                metastoreTimeout:
+                                  type: string
+                                metastoreURI:
+                                  type: string
+                                tls:
+                                  type: object
+                                  properties:
+                                    caCerti***REMOVED***cate:
+                                      type: string
+                                    certi***REMOVED***cate:
+                                      type: string
+                                    createSecret:
+                                      type: boolean
+                                    enabled:
+                                      type: boolean
+                                    key:
+                                      type: string
+                                    secretName:
+                                      type: string
+                                useHadoopCon***REMOVED***g:
+                                  type: boolean
+                        environment:
+                          type: string
+                        maxQueryLength:
+                          type: integer
+                        nodeSchedulerIncludeCoordinator:
+                          type: boolean
+                        tls:
+                          type: object
+                          properties:
+                            caCerti***REMOVED***cate:
+                              type: string
+                            certi***REMOVED***cate:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            key:
+                              type: string
+                            secretName:
+                              type: string
+                    coordinator:
+                      type: object
+                      properties:
+                        af***REMOVED***nity:
+                          type: object
+                          properties:
+                            podAntiAf***REMOVED***nity:
+                              type: object
+                              properties:
+                                requiredDuringSchedulingIgnoredDuringExecution:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - topologyKey
+                                    properties:
+                                      labelSelector:
+                                        type: object
+                                        properties:
+                                          matchExpressions:
+                                            type: array
+                                            items:
+                                              type: object
+                                              required:
+                                              - key
+                                              - operator
+                                              properties:
+                                                key:
+                                                  type: string
+                                                operator:
+                                                  type: string
+                                                values:
+                                                  type: array
+                                                  items:
+                                                    type: string
+                                      topologyKey:
+                                        type: string
+                        con***REMOVED***g:
+                          type: object
+                          properties:
+                            jvm:
+                              type: object
+                              properties:
+                                G1HeapRegionSize:
+                                  anyOf:
+                                  - type: integer
+                                    minimum: 0
+                                  - type: string
+                                    minLength: 3
+                                concGCThreads:
+                                  type: integer
+                                  minimum: 0
+                                extraFlags:
+                                  type: array
+                                initialRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                initiatingHeapOccupancyPercent:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                maxCachedBufferSize:
+                                  type: integer
+                                  minimum: 0
+                                maxDirectMemorySize:
+                                  anyOf:
+                                  - type: integer
+                                    minimum: 0
+                                  - type: string
+                                    minLength: 2
+                                maxGcPauseMillis:
+                                  type: integer
+                                  minimum: 0
+                                maxRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                minRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                parallelGCThreads:
+                                  type: integer
+                                  minimum: 0
+                                permSize:
+                                  type: string
+                                  minLength: 2
+                                reservedCodeCacheSize:
+                                  type: string
+                                  minLength: 2
+                            logLevel:
+                              type: string
+                            taskMaxWorkerThreads:
+                              type: integer
+                            taskMinDrivers:
+                              type: integer
+                        nodeSelector:
+                          type: object
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                            requests:
+                              type: object
+                        terminationGracePeriodSeconds:
+                          type: integer
+                        tolerations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              effect:
+                                type: string
+                              key:
+                                type: string
+                              operator:
+                                type: string
+                              tolerationSeconds:
+                                format: int64
+                                type: integer
+                              value:
+                                type: string
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                        repository:
+                          type: string
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    securityContext:
+                      type: object
+                      properties:
+                        fsGroup:
+                          type: string
+                        runAsGroup:
+                          type: integer
+                          format: int64
+                        runAsNonRoot:
+                          type: boolean
+                        runAsUser:
+                          type: integer
+                          format: int64
+                    worker:
+                      type: object
+                      properties:
+                        af***REMOVED***nity:
+                          type: object
+                          properties:
+                            podAntiAf***REMOVED***nity:
+                              type: object
+                              properties:
+                                requiredDuringSchedulingIgnoredDuringExecution:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                    - topologyKey
+                                    properties:
+                                      labelSelector:
+                                        type: object
+                                        required:
+                                        - matchExpressions
+                                        properties:
+                                          matchExpressions:
+                                            type: array
+                                            items:
+                                              type: object
+                                              required:
+                                              - key
+                                              - operator
+                                              properties:
+                                                key:
+                                                  type: string
+                                                operator:
+                                                  type: string
+                                                values:
+                                                  type: array
+                                                  items:
+                                                    type: string
+                                      topologyKey:
+                                        type: string
+                        con***REMOVED***g:
+                          type: object
+                          properties:
+                            jvm:
+                              type: object
+                              properties:
+                                G1HeapRegionSize:
+                                  anyOf:
+                                  - type: integer
+                                    minimum: 0
+                                  - type: string
+                                    minLength: 3
+                                concGCThreads:
+                                  type: integer
+                                  minimum: 0
+                                extraFlags:
+                                  type: array
+                                initialRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                initiatingHeapOccupancyPercent:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                maxCachedBufferSize:
+                                  type: integer
+                                  minimum: 0
+                                maxDirectMemorySize:
+                                  anyOf:
+                                  - type: integer
+                                    minimum: 0
+                                  - type: string
+                                    minLength: 2
+                                maxGcPauseMillis:
+                                  type: integer
+                                  minimum: 0
+                                maxRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                minRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                parallelGCThreads:
+                                  type: integer
+                                  minimum: 0
+                                permSize:
+                                  type: string
+                                  minLength: 2
+                                reservedCodeCacheSize:
+                                  type: string
+                                  minLength: 2
+                            logLevel:
+                              type: string
+                            taskMaxWorkerThreads:
+                              type: integer
+                            taskMinDrivers:
+                              type: integer
+                        nodeSelector:
+                          type: object
+                        replicas:
+                          type: integer
+                          format: int32
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                            requests:
+                              type: object
+                        terminationGracePeriodSeconds:
+                          type: integer
+                        tolerations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              effect:
+                                type: string
+                              key:
+                                type: string
+                              operator:
+                                type: string
+                              tolerationSeconds:
+                                format: int64
+                                type: integer
+                              value:
+                                type: string
+
+            hive:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    annotations:
+                      type: object
+                    con***REMOVED***g:
+                      type: object
+                      properties:
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                            storageAccountName:
+                              type: string
+                        db:
+                          type: object
+                          properties:
+                            autoCreateMetastoreSchema:
+                              type: boolean
+                            driver:
+                              type: string
+                            enableMetastoreSchemaVeri***REMOVED***cation:
+                              type: boolean
+                            password:
+                              type: string
+                            url:
+                              type: string
+                            username:
+                              type: string
+                        defaultCompression:
+                          type: string
+                        defaultFileFormat:
+                          type: string
+                        hadoopCon***REMOVED***gSecretName:
+                          type: string
+                        metastoreClientSocketTimeout:
+                          type: string
+                        metastoreWarehouseDir:
+                          type: string
+                        sharedVolume:
+                          type: object
+                          properties:
+                            claimName:
+                              type: string
+                            createPVC:
+                              type: boolean
+                            enabled:
+                              type: boolean
+                            mountPath:
+                              type: string
+                            size:
+                              type: string
+                            storageClass:
+                              type: string
+                        useHadoopCon***REMOVED***g:
+                          type: boolean
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                        pullSecrets:
+                          type: array
+                        repository:
+                          type: string
+                        tag:
+                          type: string
+                    labels:
+                      type: object
+                    metastore:
+                      type: object
+                      properties:
+                        af***REMOVED***nity:
+                          type: object
+                        con***REMOVED***g:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                enabled:
+                                  type: boolean
+                            jvm:
+                              type: object
+                              properties:
+                                initialRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                maxRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                minRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                            logLevel:
+                              type: string
+                            tls:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                        nodeSelector:
+                          type: object
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                            requests:
+                              type: object
+                        storage:
+                          type: object
+                          properties:
+                            class:
+                              type: string
+                            create:
+                              type: boolean
+                            size:
+                              type: string
+                        tolerations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              effect:
+                                type: string
+                              key:
+                                type: string
+                              operator:
+                                type: string
+                              tolerationSeconds:
+                                format: int64
+                                type: integer
+                              value:
+                                type: string
+                    securityContext:
+                      type: object
+                      properties:
+                        fsGroup:
+                          type: string
+                        runAsGroup:
+                          type: integer
+                          format: int64
+                        runAsNonRoot:
+                          type: boolean
+                        runAsUser:
+                          type: integer
+                          format: int64
+                    server:
+                      type: object
+                      properties:
+                        af***REMOVED***nity:
+                          type: object
+                        con***REMOVED***g:
+                          type: object
+                          properties:
+                            auth:
+                              type: object
+                              properties:
+                                enabled:
+                                  type: boolean
+                            jvm:
+                              type: object
+                              properties:
+                                initialRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                maxRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                                minRAMPercentage:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                            logLevel:
+                              type: string
+                            metastoreTLS:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                            tls:
+                              type: object
+                              properties:
+                                caCerti***REMOVED***cate:
+                                  type: string
+                                certi***REMOVED***cate:
+                                  type: string
+                                createSecret:
+                                  type: boolean
+                                enabled:
+                                  type: boolean
+                                key:
+                                  type: string
+                                secretName:
+                                  type: string
+                        nodeSelector:
+                          type: object
+                        resources:
+                          type: object
+                          properties:
+                            limits:
+                              type: object
+                            requests:
+                              type: object
+                        tolerations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              effect:
+                                type: string
+                              key:
+                                type: string
+                              operator:
+                                type: string
+                              tolerationSeconds:
+                                format: int64
+                                type: integer
+                              value:
+                                type: string
+                    terminationGracePeriodSeconds:
+                      type: integer
+
+            __ghostunnel:
+              type: object
+              properties:
+                image:
+                  type: object
+                  properties:
+                    pullPolicy:
+                      type: string
+                    repository:
+                      type: string
+                    tag:
+                      type: string
+
+            hadoop:
+              type: object
+              required:
+              - spec
+              properties:
+                spec:
+                  type: object
+                  properties:
+                    con***REMOVED***g:
+                      type: object
+                      properties:
+                        aws:
+                          type: object
+                          properties:
+                            accessKeyID:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                        azure:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretAccessKey:
+                              type: string
+                            secretName:
+                              type: string
+                            storageAccountName:
+                              type: string
+                        defaultFS:
+                          type: string
+                    con***REMOVED***gSecretName:
+                      type: string
+                    hdfs:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                        con***REMOVED***g:
+                          type: object
+                          properties:
+                            datanodeDataDirPerms:
+                              type: string
+                            logLevel:
+                              type: string
+                            replicationFactor:
+                              type: integer
+                        datanode:
+                          type: object
+                          properties:
+                            af***REMOVED***nity:
+                              type: object
+                              properties:
+                                podAntiAf***REMOVED***nity:
+                                  type: object
+                                  properties:
+                                    requiredDuringSchedulingIgnoredDuringExecution:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          labelSelector:
+                                            type: object
+                                            properties:
+                                              matchExpressions:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    key:
+                                                      type: string
+                                                    operator:
+                                                      type: string
+                                                    values:
+                                                      type: array
+                                                      items:
+                                                        type: string
+                                          topologyKey:
+                                            type: string
+                            annotations:
+                              type: object
+                            con***REMOVED***g:
+                              type: object
+                              properties:
+                                jvm:
+                                  type: object
+                                  properties:
+                                    initialRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                                    maxRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                                    minRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                            labels:
+                              type: object
+                            nodeSelector:
+                              type: object
+                            replicas:
+                              type: integer
+                              format: int32
+                            resources:
+                              type: object
+                              properties:
+                                limits:
+                                  type: object
+                                requests:
+                                  type: object
+                            storage:
+                              type: object
+                              properties:
+                                class:
+                                  type: string
+                                size:
+                                  type: string
+                            terminationGracePeriodSeconds:
+                              type: integer
+                            tolerations:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  effect:
+                                    type: string
+                                  key:
+                                    type: string
+                                  operator:
+                                    type: string
+                                  tolerationSeconds:
+                                    format: int64
+                                    type: integer
+                                  value:
+                                    type: string
+                                enabled:
+                                  type: boolean
+                        namenode:
+                          type: object
+                          properties:
+                            af***REMOVED***nity:
+                              type: object
+                              properties:
+                                podAntiAf***REMOVED***nity:
+                                  type: object
+                                  properties:
+                                    requiredDuringSchedulingIgnoredDuringExecution:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          labelSelector:
+                                            type: object
+                                            properties:
+                                              matchExpressions:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    key:
+                                                      type: string
+                                                    operator:
+                                                      type: string
+                                                    values:
+                                                      type: array
+                                                      items:
+                                                        type: string
+                                          topologyKey:
+                                            type: string
+                            annotations:
+                              type: object
+                            con***REMOVED***g:
+                              type: object
+                              properties:
+                                jvm:
+                                  type: object
+                                  properties:
+                                    initialRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                                    maxRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                                    minRAMPercentage:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 100
+                            labels:
+                              type: object
+                            nodeSelector:
+                              type: object
+                            resources:
+                              type: object
+                              properties:
+                                limits:
+                                  type: object
+                                requests:
+                                  type: object
+                            storage:
+                              type: object
+                              properties:
+                                class:
+                                  type: string
+                                size:
+                                  type: string
+                            terminationGracePeriodSeconds:
+                              type: integer
+                            tolerations:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  effect:
+                                    type: string
+                                  key:
+                                    type: string
+                                  operator:
+                                    type: string
+                                  tolerationSeconds:
+                                    format: int64
+                                    type: integer
+                                  value:
+                                    type: string
+                        securityContext:
+                          type: object
+                          properties:
+                            fsGroup:
+                              type: string
+                            runAsGroup:
+                              type: integer
+                              format: int64
+                            runAsNonRoot:
+                              type: boolean
+                            runAsUser:
+                              type: integer
+                              format: int64
+                    image:
+                      type: object
+                      properties:
+                        pullPolicy:
+                          type: string
+                        pullSecrets:
+                          type: string
+                        repository:
+                          type: string
+                        tag:
+                          type: string
 
