@@ -20,7 +20,7 @@ spec:
   - name: v1alpha1
     served: true
     storage: false
-    validation:
+  validation:
     openAPIV3Schema:
 <<<<<<< HEAD
 <<<<<<< HEAD
