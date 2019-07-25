@@ -82,6 +82,10 @@ spec:
                               type: string
                         defaultFS:
                           type: string
+<<<<<<< HEAD
+=======
+                          pattern: ^(.*)$
+>>>>>>> Remove required keys that were too restrictive.
                     configSecretName:
                       type: string
                     hdfs:
