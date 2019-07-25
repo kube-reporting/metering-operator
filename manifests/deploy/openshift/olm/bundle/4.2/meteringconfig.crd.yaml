@@ -3583,8 +3583,7 @@ spec:
                             enum:
                             - true
                   oneOf:
-                    # note: current problem - is there a way to enforce only hdfs is set?
-                    # note: for above, maybe move this `oneOf` to the parent column and verify all fields are set?
+                  # this is for spec.storage.hive
                   - required:
                     - hdfs
                     properties:
