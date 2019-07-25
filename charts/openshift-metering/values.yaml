@@ -701,20 +701,21 @@ hive:
         size: 5Gi
 
       livenessProbe:
+        tcpSocket:
+          port: 9083
         failureThreshold: 3
         initialDelaySeconds: 90
         periodSeconds: 30
         successThreshold: 1
+        timeoutSeconds: 15
+
+      readinessProbe:
         tcpSocket:
           port: 9083
-        timeoutSeconds: 15
-      readinessProbe:
         failureThreshold: 3
         initialDelaySeconds: 60
         periodSeconds: 20
         successThreshold: 1
-        tcpSocket:
-          port: 9083
         timeoutSeconds: 15
 
     server:
@@ -766,20 +767,21 @@ hive:
           memory: 500Mi
 
       livenessProbe:
+        tcpSocket:
+          port: 10000
         failureThreshold: 3
         initialDelaySeconds: 300
         periodSeconds: 30
         successThreshold: 1
+        timeoutSeconds: 15
+
+      readinessProbe:
         tcpSocket:
           port: 10000
-        timeoutSeconds: 15
-      readinessProbe:
         failureThreshold: 3
         initialDelaySeconds: 60
         periodSeconds: 20
         successThreshold: 1
-        tcpSocket:
-          port: 10000
         timeoutSeconds: 15
 
     securityContext:
