@@ -43,22 +43,27 @@ spec:
                     pullPolicy:
                       type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                     repository:
                       type: string
                     tag:
                       type: string
 =======
                       default: "Always"
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                       pattern: ^(.*)$
                     repository:
                       type: string
-                      default: "quay.io/openshift/origin-ghostunnel"
                       pattern: ^(.*)$
                     tag:
                       type: number
+<<<<<<< HEAD
                       default: 0
                       - 4.2
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
             global:
               type: object
               properties:
@@ -81,6 +86,7 @@ spec:
                             accessKeyID:
                               type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                             createSecret:
                               type: boolean
                             secretAccessKey:
@@ -90,20 +96,16 @@ spec:
 =======
                               default: ""
                               - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         azure:
@@ -111,6 +113,7 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
+<<<<<<< HEAD
 <<<<<<< HEAD
                             secretAccessKey:
                               type: string
@@ -125,30 +128,23 @@ spec:
 =======
                               default: false
                               - false
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         defaultFS:
                           type: string
-                          default: ""
-                          - hdfs://hdfs-namenode-0.hdfs-namenode:9820
+                          # should this be format: uri?
                           pattern: ^(.*)$
                     configSecretName:
                       type: string
-                      default: ""
-                      - hadoop-config
                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                     hdfs:
@@ -160,6 +156,7 @@ spec:
                             datanodeDataDirPerms:
                               type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                             logLevel:
                               type: string
                             replicationFactor:
@@ -167,17 +164,20 @@ spec:
 =======
                               default: ""
                               - "775"
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             logLevel:
                               type: string
-                              default: ""
-                              - info
                               pattern: ^(.*)$
                             replicationFactor:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 3
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         datanode:
                           type: object
                           properties:
@@ -190,9 +190,12 @@ spec:
                                     requiredDuringSchedulingIgnoredDuringExecution:
                                       type: array
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                         Schema
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                       items:
                                         type: object
                                         properties:
@@ -207,16 +210,17 @@ spec:
                                                     key:
                                                       type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                     operator:
                                                       type: string
 =======
                                                       default: ""
                                                       - app
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                       pattern: ^(.*)$
                                                     operator:
                                                       type: string
-                                                      default: ""
-                                                      - In
                                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                                     values:
@@ -224,16 +228,17 @@ spec:
                                                       items:
                                                         type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                           topologyKey:
                                             type: string
 =======
                                                         default: ""
                                                         - hdfs-datanode
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                         pattern: ^(.*)$
                                           topologyKey:
                                             type: string
-                                            default: ""
-                                            - kubernetes.io/hostname
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             annotations:
@@ -246,6 +251,7 @@ spec:
                                   properties:
                                     initialRAMPercentage:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       type: string
                                     maxRAMPercentage:
                                       type: string
@@ -255,15 +261,20 @@ spec:
                                       type: "null"
                                       default: null
                                       - null
+=======
+                                      type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                     maxRAMPercentage:
-                                      type: "null"
-                                      default: null
-                                      - null
+                                      type: string
                                     minRAMPercentage:
+<<<<<<< HEAD
                                       type: "null"
                                       default: null
                                       - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                                      type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             labels:
                               type: object
                             nodeSelector:
@@ -273,9 +284,12 @@ spec:
                               type: string
 =======
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 1
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             resources:
                               type: object
                               properties:
@@ -289,12 +303,8 @@ spec:
                                       type: string
 =======
                                       type: integer
-                                      default: 0
-                                      - 1
                                     memory:
                                       type: string
-                                      default: ""
-                                      - 1Gi
                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                 requests:
@@ -303,22 +313,24 @@ spec:
                                     cpu:
                                       type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     memory:
                                       type: string
 =======
                                       default: ""
                                       - 250m
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                       pattern: ^(.*)$
                                     memory:
                                       type: string
-                                      default: ""
-                                      - 500Mi
                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             storage:
                               type: object
                               properties:
                                 class:
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   type: string
                                 size:
@@ -329,25 +341,32 @@ spec:
                                   type: "null"
                                   default: null
                                   - null
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 size:
                                   type: string
-                                  default: ""
-                                  - 5Gi
                                   pattern: ^(.*)$
                             terminationGracePeriodSeconds:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 30
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tolerations:
                               type: array
                         enabled:
                           type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                           default: false
                           - false
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         namenode:
                           type: object
                           properties:
@@ -374,16 +393,17 @@ spec:
                                                     key:
                                                       type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                     operator:
                                                       type: string
 =======
                                                       default: ""
                                                       - app
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                       pattern: ^(.*)$
                                                     operator:
                                                       type: string
-                                                      default: ""
-                                                      - In
                                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                                     values:
@@ -391,16 +411,17 @@ spec:
                                                       items:
                                                         type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                           topologyKey:
                                             type: string
 =======
                                                         default: ""
                                                         - hdfs-namenode
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                         pattern: ^(.*)$
                                           topologyKey:
                                             type: string
-                                            default: ""
-                                            - kubernetes.io/hostname
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             annotations:
@@ -413,6 +434,7 @@ spec:
                                   properties:
                                     initialRAMPercentage:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       type: string
                                       default:
                                     maxRAMPercentage:
@@ -423,15 +445,21 @@ spec:
                                       type: "null"
                                       default: null
                                       - null
+=======
+                                      type: string
+                                      default:
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                     maxRAMPercentage:
-                                      type: "null"
-                                      default: null
-                                      - null
+                                      type: string
                                     minRAMPercentage:
+<<<<<<< HEAD
                                       type: "null"
                                       default: null
                                       - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                                      type: type
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             labels:
                               type: object
                             nodeSelector:
@@ -449,12 +477,8 @@ spec:
                                       type: string
 =======
                                       type: integer
-                                      default: 0
-                                      - 2
                                     memory:
                                       type: string
-                                      default: ""
-                                      - 2Gi
                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                 requests:
@@ -463,22 +487,24 @@ spec:
                                     cpu:
                                       type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     memory:
                                       type: string
 =======
                                       default: ""
                                       - 500m
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                       pattern: ^(.*)$
                                     memory:
                                       type: string
-                                      default: ""
-                                      - 500Mi
                                       pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             storage:
                               type: object
                               properties:
                                 class:
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   type: string
                                 size:
@@ -489,22 +515,27 @@ spec:
                                   type: "null"
                                   default: null
                                   - null
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 size:
                                   type: string
-                                  default: ""
-                                  - 5Gi
                                   pattern: ^(.*)$
                             terminationGracePeriodSeconds:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 30
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tolerations:
                               type: array
                         securityContext:
                           type: object
                           properties:
                             fsGroup:
+<<<<<<< HEAD
 <<<<<<< HEAD
                               type: string
                             runAsNonRoot:
@@ -518,11 +549,17 @@ spec:
                               default: false
                               - true
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                              type: string
+                            runAsNonRoot:
+                              type: boolean
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     image:
                       type: object
                       properties:
                         pullPolicy:
                           type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                         pullSecrets:
                           type: string
@@ -533,21 +570,22 @@ spec:
 =======
                           default: ""
                           - Always
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                           pattern: ^(.*)$
                         pullSecrets:
-                          type: "null"
-                          default: null
-                          - null
+                          type: string
                         repository:
                           type: string
-                          default: ""
-                          - quay.io/openshift/origin-metering-hadoop
                           pattern: ^(.*)$
                         tag:
                           type: number
+<<<<<<< HEAD
                           default: 0
                           - 4.2
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
             hive:
               type: object
               required:
@@ -567,6 +605,7 @@ spec:
                             accessKeyID:
                               type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                             createSecret:
                               type: boolean
                             secretAccessKey:
@@ -576,20 +615,16 @@ spec:
 =======
                               default: ""
                               - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         azure:
@@ -597,6 +632,7 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
+<<<<<<< HEAD
 <<<<<<< HEAD
                             secretAccessKey:
                               type: string
@@ -607,20 +643,16 @@ spec:
 =======
                               default: false
                               - false
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         db:
@@ -628,6 +660,7 @@ spec:
                           properties:
                             autoCreateMetastoreSchema:
                               type: boolean
+<<<<<<< HEAD
 <<<<<<< HEAD
                             driver:
                               type: string
@@ -652,57 +685,46 @@ spec:
 =======
                               default: false
                               - true
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             driver:
                               type: string
-                              default: ""
-                              - org.apache.derby.jdbc.EmbeddedDriver
                               pattern: ^(.*)$
                             enableMetastoreSchemaVerification:
                               type: boolean
-                              default: false
-                              - false
                             password:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                             url:
                               type: string
-                              default: ""
-                              - jdbc:derby:;databaseName=/var/lib/hive/data;create=true
                               pattern: ^(.*)$
                             username:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                         defaultCompression:
                           type: string
-                          default: ""
-                          - zlib
                           pattern: ^(.*)$
                         defaultFileFormat:
                           type: string
-                          default: ""
-                          - orc
                           pattern: ^(.*)$
                         hadoopConfigSecretName:
                           type: string
-                          default: ""
-                          - hadoop-config
                           pattern: ^(.*)$
                         metastoreClientSocketTimeout:
-                          type: "null"
-                          default: null
-                          - null
+                          type: string
                         metastoreWarehouseDir:
+<<<<<<< HEAD
                           type: "null"
                           default: null
                           - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                          type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         sharedVolume:
                           type: object
                           properties:
                             claimName:
                               type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                             createPVC:
                               type: boolean
@@ -719,49 +741,48 @@ spec:
 =======
                               default: ""
                               - hive-warehouse-data
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             createPVC:
                               type: boolean
-                              default: false
-                              - false
                             enabled:
                               type: boolean
-                              default: false
-                              - false
                             mountPath:
                               type: string
-                              default: ""
-                              - /user/hive/warehouse
                               pattern: ^(.*)$
                             size:
                               type: string
-                              default: ""
-                              - 5Gi
                               pattern: ^(.*)$
                             storageClass:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                         useHadoopConfig:
                           type: boolean
+<<<<<<< HEAD
                           default: false
                           - true
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     image:
                       type: object
                       properties:
                         pullPolicy:
                           type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                           default: ""
                           - Always
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                           pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         pullSecrets:
                           type: array
                         repository:
                           type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                         tag:
                           type: string
@@ -774,6 +795,11 @@ spec:
                           default: 0
                           - 4.2
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                          pattern: ^(.*)$
+                        tag:
+                          type: number
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     labels:
                       type: object
                     metastore:
@@ -790,14 +816,18 @@ spec:
                                 enabled:
                                   type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                   default: false
                                   - false
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             jvm:
                               type: object
                               properties:
                                 initialRAMPercentage:
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   type: string
                                 maxRAMPercentage:
@@ -810,18 +840,15 @@ spec:
                                   type: "null"
                                   default: null
                                   - null
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 maxRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 minRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                             logLevel:
                               type: string
-                              default: ""
-                              - info
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             tls:
@@ -830,6 +857,7 @@ spec:
                                 caCertificate:
                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 certificate:
                                   type: string
                                 createSecret:
@@ -843,29 +871,21 @@ spec:
 =======
                                   default: ""
                                   - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         livenessProbe:
@@ -874,6 +894,7 @@ spec:
                             failureThreshold:
                               type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
                             initialDelaySeconds:
                               type: integer
                             periodSeconds:
@@ -883,24 +904,26 @@ spec:
 =======
                               default: 0
                               - 3
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             initialDelaySeconds:
                               type: integer
-                              default: 0
-                              - 90
                             periodSeconds:
                               type: integer
-                              default: 0
-                              - 30
                             successThreshold:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 1
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tcpSocket:
                               type: object
                               properties:
                                 port:
                                   type: integer
+<<<<<<< HEAD
 <<<<<<< HEAD
                             timeoutSeconds:
                               type: integer
@@ -912,6 +935,10 @@ spec:
                               default: 0
                               - 15
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                            timeoutSeconds:
+                              type: integer
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         nodeSelector:
                           type: object
                         readinessProbe:
@@ -920,6 +947,7 @@ spec:
                             failureThreshold:
                               type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
                             initialDelaySeconds:
                               type: integer
                             periodSeconds:
@@ -929,24 +957,26 @@ spec:
 =======
                               default: 0
                               - 3
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             initialDelaySeconds:
                               type: integer
-                              default: 0
-                              - 60
                             periodSeconds:
                               type: integer
-                              default: 0
-                              - 20
                             successThreshold:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 1
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tcpSocket:
                               type: object
                               properties:
                                 port:
                                   type: integer
+<<<<<<< HEAD
 <<<<<<< HEAD
                             timeoutSeconds:
                               type: integer
@@ -958,6 +988,10 @@ spec:
                               default: 0
                               - 15
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                            timeoutSeconds:
+                              type: integer
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         resources:
                           type: object
                           properties:
@@ -971,12 +1005,8 @@ spec:
                                   type: string
 =======
                                   type: integer
-                                  default: 0
-                                  - 4
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 2Gi
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             requests:
@@ -985,22 +1015,24 @@ spec:
                                 cpu:
                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 memory:
                                   type: string
 =======
                                   default: ""
                                   - 500m
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 650Mi
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         storage:
                           type: object
                           properties:
                             class:
+<<<<<<< HEAD
 <<<<<<< HEAD
                               type: string
                             create:
@@ -1011,14 +1043,13 @@ spec:
                               type: "null"
                               default: null
                               - null
+=======
+                              type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             create:
                               type: boolean
-                              default: false
-                              - true
                             size:
                               type: string
-                              default: ""
-                              - 5Gi
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         tolerations:
@@ -1027,6 +1058,7 @@ spec:
                       type: object
                       properties:
                         fsGroup:
+<<<<<<< HEAD
 <<<<<<< HEAD
                           type: string
                         runAsNonRoot:
@@ -1037,10 +1069,11 @@ spec:
                           type: "null"
                           default: null
                           - null
+=======
+                          type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         runAsNonRoot:
                           type: boolean
-                          default: false
-                          - true
                     server:
                       type: object
                       required:
@@ -1064,14 +1097,18 @@ spec:
                                 enabled:
                                   type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                   default: false
                                   - false
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             jvm:
                               type: object
                               properties:
                                 initialRAMPercentage:
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   type: string
                                 maxRAMPercentage:
@@ -1084,18 +1121,15 @@ spec:
                                   type: "null"
                                   default: null
                                   - null
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 maxRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 minRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                             logLevel:
                               type: string
-                              default: ""
-                              - info
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             metastoreTLS:
@@ -1104,6 +1138,7 @@ spec:
                                 caCertificate:
                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 certificate:
                                   type: string
                                 createSecret:
@@ -1117,29 +1152,21 @@ spec:
 =======
                                   default: ""
                                   - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             tls:
@@ -1148,6 +1175,7 @@ spec:
                                 caCertificate:
                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 certificate:
                                   type: string
                                 createSecret:
@@ -1161,29 +1189,21 @@ spec:
 =======
                                   default: ""
                                   - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         livenessProbe:
@@ -1192,6 +1212,7 @@ spec:
                             failureThreshold:
                               type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
                             initialDelaySeconds:
                               type: integer
                             periodSeconds:
@@ -1201,24 +1222,26 @@ spec:
 =======
                               default: 0
                               - 3
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             initialDelaySeconds:
                               type: integer
-                              default: 0
-                              - 300
                             periodSeconds:
                               type: integer
-                              default: 0
-                              - 30
                             successThreshold:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 1
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tcpSocket:
                               type: object
                               properties:
                                 port:
                                   type: integer
+<<<<<<< HEAD
 <<<<<<< HEAD
                             timeoutSeconds:
                               type: integer
@@ -1230,6 +1253,10 @@ spec:
                               default: 0
                               - 15
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                            timeoutSeconds:
+                              type: integer
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         nodeSelector:
                           type: object
                         readinessProbe:
@@ -1238,6 +1265,7 @@ spec:
                             failureThreshold:
                               type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
                             initialDelaySeconds:
                               type: integer
                             periodSeconds:
@@ -1247,24 +1275,26 @@ spec:
 =======
                               default: 0
                               - 3
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             initialDelaySeconds:
                               type: integer
-                              default: 0
-                              - 60
                             periodSeconds:
                               type: integer
-                              default: 0
-                              - 20
                             successThreshold:
                               type: integer
+<<<<<<< HEAD
                               default: 0
                               - 1
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             tcpSocket:
                               type: object
                               properties:
                                 port:
                                   type: integer
+<<<<<<< HEAD
 <<<<<<< HEAD
                             timeoutSeconds:
                               type: integer
@@ -1276,6 +1306,10 @@ spec:
                               default: 0
                               - 15
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                            timeoutSeconds:
+                              type: integer
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         resources:
                           type: object
                           properties:
@@ -1289,12 +1323,8 @@ spec:
                                   type: string
 =======
                                   type: integer
-                                  default: 0
-                                  - 1
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 1Gi
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                             requests:
@@ -1303,16 +1333,17 @@ spec:
                                 cpu:
                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 memory:
                                   type: string
 =======
                                   default: ""
                                   - 500m
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 500Mi
                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         tolerations:
@@ -1320,15 +1351,19 @@ spec:
                     terminationGracePeriodSeconds:
                       type: integer
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                       default: 0
                       - 30
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
             monitoring:
               type: object
               properties:
                 createRBAC:
                   type: boolean
+<<<<<<< HEAD
 <<<<<<< HEAD
                 enabled:
                   type: boolean
@@ -1337,14 +1372,12 @@ spec:
 =======
                   default: false
                   - true
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                 enabled:
                   type: boolean
-                  default: false
-                  - true
                 namespace:
                   type: string
-                  default: ""
-                  - openshift-monitoring
                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
             openshift-reporting:
@@ -1365,9 +1398,12 @@ spec:
                       properties:
                         enabled:
                           type: boolean
+<<<<<<< HEAD
                           default: false
                           - false
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     defaultReportDataSources:
                       type: object
                       properties:
@@ -1384,9 +1420,12 @@ spec:
                           properties:
                             enabled:
                               type: boolean
+<<<<<<< HEAD
                               default: false
                               - true
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             items:
                               type: array
                               items:
@@ -1398,9 +1437,12 @@ spec:
                                   name:
                                     type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                     default: ""
                                     - cluster-cpu-capacity-raw
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                     pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                   spec:
@@ -1416,9 +1458,12 @@ spec:
                                           queryName:
                                             type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                             default: ""
                                             - cluster-cpu-capacity-raw
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         postKube_1_14:
@@ -1427,10 +1472,13 @@ spec:
                             enabled:
                               type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                               default: false
                               - true
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                             items:
                               type: array
                               items:
@@ -1442,9 +1490,12 @@ spec:
                                   name:
                                     type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                     default: ""
                                     - pod-usage-cpu-cores
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                     pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                   spec:
@@ -1460,9 +1511,12 @@ spec:
                                           query:
                                             type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                             default: ""
                                             - |
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                               sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod!=""}[1m])) BY (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
@@ -1482,9 +1536,12 @@ spec:
                                   name:
                                     type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                     default: ""
                                     - pod-usage-cpu-cores
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                     pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                   spec:
@@ -1500,9 +1557,12 @@ spec:
                                           query:
                                             type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                             default: ""
                                             - |
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                               label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
@@ -1518,10 +1578,13 @@ spec:
                         enabled:
                           type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                           default: false
                           - true
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         hive:
                           type: object
                           required:
@@ -1531,6 +1594,7 @@ spec:
                           properties:
                             databaseName:
                               type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                             location:
                               type: string
@@ -1547,29 +1611,21 @@ spec:
 =======
                               default: ""
                               - metering
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             location:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             unmanagedDatabase:
                               type: boolean
-                              default: false
-                              - false
                         isDefault:
                           type: boolean
-                          default: false
-                          - true
                         name:
                           type: string
-                          default: ""
-                          - hive
                           pattern: ^(.*)$
                         type:
                           type: string
-                          default: ""
-                          - hive
                           pattern: ^(.*)$
             permissions:
               type: object
@@ -1675,31 +1731,19 @@ spec:
                           properties:
                             caCertificate:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             certificate:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             enabled:
                               type: boolean
-                              default: false
-                              - false
                             key:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         aws:
                           type: object
@@ -1711,22 +1755,14 @@ spec:
                           properties:
                             accessKeyID:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         azure:
                           type: object
@@ -1738,22 +1774,14 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         connectors:
                           type: object
@@ -1824,17 +1852,11 @@ spec:
                               properties:
                                 hadoopConfigSecretName:
                                   type: string
-                                  default: ""
-                                  - hadoop-config
                                   pattern: ^(.*)$
                                 metastoreTimeout:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 metastoreURI:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 tls:
                                   type: object
                                   required:
@@ -1847,50 +1869,30 @@ spec:
                                   properties:
                                     caCertificate:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                     certificate:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                     createSecret:
                                       type: boolean
-                                      default: false
-                                      - false
                                     enabled:
                                       type: boolean
-                                      default: false
-                                      - false
                                     key:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                     secretName:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                 useHadoopConfig:
                                   type: boolean
-                                  default: false
-                                  - true
                         environment:
                           type: string
-                          default: ""
-                          - production
                           pattern: ^(.*)$
                         maxQueryLength:
                           type: string
-                          default: ""
-                          - "10000000"
                           pattern: ^(.*)$
                         nodeSchedulerIncludeCoordinator:
                           type: boolean
-                          default: false
-                          - true
                         tls:
                           type: object
                           required:
@@ -1903,31 +1905,19 @@ spec:
                           properties:
                             caCertificate:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             certificate:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             enabled:
                               type: boolean
-                              default: false
-                              - false
                             key:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                     coordinator:
                       type: object
@@ -1976,22 +1966,24 @@ spec:
                                                 key:
                                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                 operator:
                                                   type: string
 =======
                                                   default: ""
                                                   - app
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                   pattern: ^(.*)$
                                                 operator:
                                                   type: string
-                                                  default: ""
-                                                  - In
                                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                                 values:
                                                   type: array
                                                   items:
                                                     type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                                       topologyKey:
                                         type: string
@@ -2008,11 +2000,11 @@ spec:
 =======
                                                     default: ""
                                                     - presto
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                     pattern: ^(.*)$
                                       topologyKey:
                                         type: string
-                                        default: ""
-                                        - kubernetes.io/hostname
                                         pattern: ^(.*)$
                         config:
                           type: object
@@ -2040,18 +2032,21 @@ spec:
                               - reservedCodeCacheSize
                               properties:
                                 G1HeapRegionSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 concGCThreads:
+<<<<<<< HEAD
                                   type: "null"
                                   default: null
                                   - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 extraFlags:
                                   type: array
                                 initialRAMPercentage:
                                   type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                                 initiatingHeapOccupancyPercent:
                                   type: string
@@ -2080,58 +2075,42 @@ spec:
 =======
                                   default: ""
                                   - "50.0"
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 initiatingHeapOccupancyPercent:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxCachedBufferSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxDirectMemorySize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxGcPauseMillis:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxRAMPercentage:
                                   type: string
-                                  default: ""
-                                  - "50.0"
                                   pattern: ^(.*)$
                                 minRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 parallelGCThreads:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 permSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 reservedCodeCacheSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                             logLevel:
                               type: string
-                              default: ""
-                              - info
                               pattern: ^(.*)$
                             taskMaxWorkerThreads:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                             taskMinDrivers:
+<<<<<<< HEAD
                               type: "null"
                               default: null
                               - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                              type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         nodeSelector:
                           type: object
                         resources:
@@ -2166,12 +2145,8 @@ spec:
                               properties:
                                 cpu:
                                   type: integer
-                                  default: 0
-                                  - 4
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 4Gi
                                   pattern: ^(.*)$
                             requests:
                               type: object
@@ -2181,18 +2156,17 @@ spec:
                               properties:
                                 cpu:
                                   type: integer
-                                  default: 0
-                                  - 2
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 2Gi
                                   pattern: ^(.*)$
                         terminationGracePeriodSeconds:
                           type: integer
+<<<<<<< HEAD
                           default: 0
                           - 30
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         tolerations:
                           type: array
                     image:
@@ -2213,19 +2187,18 @@ spec:
                       properties:
                         pullPolicy:
                           type: string
-                          default: ""
-                          - Always
                           pattern: ^(.*)$
                         repository:
                           type: string
-                          default: ""
-                          - quay.io/openshift/origin-metering-presto
                           pattern: ^(.*)$
                         tag:
                           type: number
+<<<<<<< HEAD
                           default: 0
                           - 4.2
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     labels:
                       type: object
                     securityContext:
@@ -2244,13 +2217,9 @@ spec:
                       - runAsNonRoot
                       properties:
                         fsGroup:
-                          type: "null"
-                          default: null
-                          - null
+                          type: string
                         runAsNonRoot:
                           type: boolean
-                          default: false
-                          - true
                     worker:
                       type: object
                       required:
@@ -2299,22 +2268,24 @@ spec:
                                                 key:
                                                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                 operator:
                                                   type: string
 =======
                                                   default: ""
                                                   - app
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                   pattern: ^(.*)$
                                                 operator:
                                                   type: string
-                                                  default: ""
-                                                  - In
                                                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                                                 values:
                                                   type: array
                                                   items:
                                                     type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                                       topologyKey:
                                         type: string
@@ -2331,11 +2302,11 @@ spec:
 =======
                                                     default: ""
                                                     - presto
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                                     pattern: ^(.*)$
                                       topologyKey:
                                         type: string
-                                        default: ""
-                                        - kubernetes.io/hostname
                                         pattern: ^(.*)$
                         config:
                           type: object
@@ -2363,18 +2334,21 @@ spec:
                               - reservedCodeCacheSize
                               properties:
                                 G1HeapRegionSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 concGCThreads:
+<<<<<<< HEAD
                                   type: "null"
                                   default: null
                                   - null
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                                  type: string
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                 extraFlags:
                                   type: array
                                 initialRAMPercentage:
                                   type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                                 initiatingHeapOccupancyPercent:
                                   type: string
@@ -2426,63 +2400,39 @@ spec:
 =======
                                   default: ""
                                   - "50.0"
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                                   pattern: ^(.*)$
                                 initiatingHeapOccupancyPercent:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxCachedBufferSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxDirectMemorySize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxGcPauseMillis:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 maxRAMPercentage:
                                   type: string
-                                  default: ""
-                                  - "50.0"
                                   pattern: ^(.*)$
                                 minRAMPercentage:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 parallelGCThreads:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 permSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                                 reservedCodeCacheSize:
-                                  type: "null"
-                                  default: null
-                                  - null
+                                  type: string
                             logLevel:
                               type: string
-                              default: ""
-                              - info
                               pattern: ^(.*)$
                             taskMaxWorkerThreads:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                             taskMinDrivers:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                         nodeSelector:
                           type: object
                         replicas:
                           type: integer
-                          default: 0
-                          - 0
                         resources:
                           type: object
                           required:
@@ -2497,12 +2447,8 @@ spec:
                               properties:
                                 cpu:
                                   type: integer
-                                  default: 0
-                                  - 8
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 8Gi
                                   pattern: ^(.*)$
                             requests:
                               type: object
@@ -2512,18 +2458,17 @@ spec:
                               properties:
                                 cpu:
                                   type: integer
-                                  default: 0
-                                  - 4
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 2Gi
                                   pattern: ^(.*)$
                         terminationGracePeriodSeconds:
                           type: integer
+<<<<<<< HEAD
                           default: 0
                           - 30
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         tolerations:
                           type: array
             reporting-operator:
@@ -2625,23 +2570,14 @@ spec:
                       properties:
                         annotations:
                           type: object
-                          required:
-                          - service.alpha.openshift.io/serving-cert-secret-name
                           properties:
                             service.alpha.openshift.io/serving-cert-secret-name:
                               type: string
-                                Schema
-                              default: ""
-                              - reporting-operator-api-tls-secrets
                               pattern: ^(.*)$
                         nodePort:
-                          type: "null"
-                          default: null
-                          - null
+                          type: string
                         type:
                           type: string
-                          default: ""
-                          - ClusterIP
                           pattern: ^(.*)$
                     authProxy:
                       type: object
@@ -2666,21 +2602,13 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
-                              default: false
-                              - true
                             data:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             enabled:
                               type: boolean
-                              default: false
-                              - false
                             secretName:
                               type: string
-                              default: ""
-                              - reporting-operator-auth-proxy-authenticated-emails
                               pattern: ^(.*)$
                         cookie:
                           type: object
@@ -2691,17 +2619,11 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
-                              default: false
-                              - true
                             secretName:
                               type: string
-                              default: ""
-                              - reporting-operator-auth-proxy-cookie-seed
                               pattern: ^(.*)$
                             seed:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         delegateURLs:
                           type: object
@@ -2711,19 +2633,11 @@ spec:
                           properties:
                             enabled:
                               type: boolean
-                              default: false
-                              - true
                             policy:
                               type: string
-                              default: ""
-                              - '{"/": {"group": "metering.openshift.io", "resource": "reports",
-                                "namespace": "$(NAMESPACE)", "subresource": "export", "verb":
-                                "get"}}'
                               pattern: ^(.*)$
                         enabled:
                           type: boolean
-                          default: false
-                          - false
                         htpasswd:
                           type: object
                           required:
@@ -2733,6 +2647,7 @@ spec:
                           properties:
                             createSecret:
                               type: boolean
+<<<<<<< HEAD
                               default: false
                               - true
                             data:
@@ -2827,6 +2742,15 @@ spec:
                         enableFinalizers:
                           type: boolean
                         hive:
+=======
+                            data:
+                              type: string
+                              pattern: ^(.*)$
+                            secretName:
+                              type: string
+                              pattern: ^(.*)$
+                        image:
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                           type: object
                           properties:
                             auth:
@@ -2844,6 +2768,7 @@ spec:
                                   type: string
                             host:
                               type: string
+<<<<<<< HEAD
                             tls:
                               type: object
                               properties:
@@ -2901,8 +2826,21 @@ spec:
                                 secretName:
                                   type: string
                         prometheus:
+=======
+                              pattern: ^(.*)$
+                            pullSecrets:
+                              type: array
+                            repository:
+                              type: string
+                              pattern: ^(.*)$
+                            tag:
+                              type: string
+                              pattern: ^(.*)$
+                        rbac:
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                           type: object
                           properties:
+<<<<<<< HEAD
                             certificateAuthority:
                               type: object
                               properties:
@@ -2985,6 +2923,10 @@ spec:
 =======
                               default: false
                               - true
+=======
+                            createAuthProxyClusterRole:
+                              type: boolean
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         resources:
                           type: object
                           required:
@@ -2999,13 +2941,9 @@ spec:
                               properties:
                                 cpu:
                                   type: string
-                                  default: ""
-                                  - 500m
                                   pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 100Mi
                                   pattern: ^(.*)$
                             requests:
                               type: object
@@ -3015,13 +2953,9 @@ spec:
                               properties:
                                 cpu:
                                   type: string
-                                  default: ""
-                                  - 100m
                                   pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  default: ""
-                                  - 50Mi
                                   pattern: ^(.*)$
                         subjectAccessReview:
                           type: object
@@ -3031,14 +2965,8 @@ spec:
                           properties:
                             enabled:
                               type: boolean
-                              default: false
-                              - true
                             policy:
                               type: string
-                              default: ""
-                              - '{"group": "metering.openshift.io", "resource": "reports",
-                                "namespace": "$(NAMESPACE)", "subresource": "export", "verb":
-                                "get"}'
                               pattern: ^(.*)$
                     config:
                       type: object
@@ -3058,8 +2986,6 @@ spec:
                       properties:
                         allNamespaces:
                           type: boolean
-                          default: false
-                          - false
                         aws:
                           type: object
                           required:
@@ -3070,27 +2996,17 @@ spec:
                           properties:
                             accessKeyID:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             createSecret:
                               type: boolean
-                              default: false
-                              - false
                             secretAccessKey:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                             secretName:
                               type: string
-                              default: ""
-                              - ""
                               pattern: ^(.*)$
                         enableFinalizers:
                           type: boolean
-                          default: false
-                          - false
                         hive:
                           type: object
                           required:
@@ -3109,31 +3025,19 @@ spec:
                               properties:
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                             host:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                             tls:
                               type: object
                               required:
@@ -3146,54 +3050,32 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                         leaderLeaseDuration:
                           type: string
-                          default: ""
-                          - 60s
                           pattern: ^(.*)$
                         logDDLQueries:
                           type: boolean
-                          default: false
-                          - false
                         logDMLQueries:
                           type: boolean
-                          default: false
-                          - false
                         logLevel:
                           type: string
-                          default: ""
-                          - info
                           pattern: ^(.*)$
                         logReports:
                           type: boolean
-                          default: false
-                          - false
                         presto:
                           type: object
                           required:
@@ -3213,36 +3095,22 @@ spec:
                               properties:
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                             host:
                               type: string
-                              default: ""
-                              - presto:8080
                               pattern: ^(.*)$
                             maxQueryLength:
-                              type: "null"
-                              default: null
-                              - null
+                              type: string
                             tls:
                               type: object
                               required:
@@ -3253,21 +3121,13 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - false
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                         prometheus:
                           type: object
@@ -3293,31 +3153,19 @@ spec:
                                   properties:
                                     create:
                                       type: boolean
-                                      default: false
-                                      - false
                                     enabled:
                                       type: boolean
-                                      default: false
-                                      - false
                                     filename:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                     name:
                                       type: string
-                                      default: ""
-                                      - reporting-operator-certificate-authority-config
                                       pattern: ^(.*)$
                                     value:
                                       type: string
-                                      default: ""
-                                      - ""
                                       pattern: ^(.*)$
                                 useServiceAccountCA:
                                   type: boolean
-                                  default: false
-                                  - true
                             metricsImporter:
                               type: object
                               required:
@@ -3341,26 +3189,16 @@ spec:
                                       properties:
                                         create:
                                           type: boolean
-                                          default: false
-                                          - false
                                         enabled:
                                           type: boolean
-                                          default: false
-                                          - false
                                         name:
                                           type: string
-                                          default: ""
-                                          - reporting-operator-prometheus-bearer-secrets
                                           pattern: ^(.*)$
                                         value:
                                           type: string
-                                          default: ""
-                                          - ""
                                           pattern: ^(.*)$
                                     useServiceAccountToken:
                                       type: boolean
-                                      default: false
-                                      - true
                                 config:
                                   type: object
                                   required:
@@ -3373,39 +3211,23 @@ spec:
                                   properties:
                                     chunkSize:
                                       type: string
-                                      default: ""
-                                      - 5m
                                       pattern: ^(.*)$
                                     importFrom:
-                                      type: "null"
-                                      default: null
-                                      - null
+                                      type: string
                                     maxImportBackfillDuration:
-                                      type: "null"
-                                      default: null
-                                      - null
+                                      type: string
                                     maxQueryRangeDuration:
-                                      type: "null"
-                                      default: null
-                                      - null
+                                      type: string
                                     pollInterval:
                                       type: string
-                                      default: ""
-                                      - 5m
                                       pattern: ^(.*)$
                                     stepSize:
                                       type: string
-                                      default: ""
-                                      - 60s
                                       pattern: ^(.*)$
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - true
                             url:
                               type: string
-                              default: ""
-                              - https://prometheus-k8s.openshift-monitoring.svc:9091/
                               pattern: ^(.*)$
                         tls:
                           type: object
@@ -3424,31 +3246,19 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
-                                  default: false
-                                  - false
                                 enabled:
                                   type: boolean
-                                  default: false
-                                  - true
                                 key:
                                   type: string
-                                  default: ""
-                                  - ""
                                   pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  default: ""
-                                  - reporting-operator-api-tls-secrets
                                   pattern: ^(.*)$
                     image:
                       type: object
@@ -3460,14 +3270,13 @@ spec:
                       properties:
                         pullPolicy:
                           type: string
-                          default: ""
-                          - Always
                           pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         pullSecrets:
                           type: array
                         repository:
                           type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                         tag:
                           type: string
@@ -3480,6 +3289,11 @@ spec:
                           default: 0
                           - 4.2
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+                          pattern: ^(.*)$
+                        tag:
+                          type: number
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     labels:
                       type: object
                     livenessProbe:
@@ -3499,9 +3313,12 @@ spec:
                       properties:
                         failureThreshold:
                           type: integer
+<<<<<<< HEAD
                           default: 0
                           - 5
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         httpGet:
                           type: object
                           required:
@@ -3511,6 +3328,7 @@ spec:
                           properties:
                             path:
                               type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                             port:
                               type: integer
@@ -3527,33 +3345,28 @@ spec:
 =======
                               default: ""
                               - /healthy
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             port:
                               type: integer
-                              default: 0
-                              - 8080
                             scheme:
                               type: string
-                              default: ""
-                              - HTTP
                               pattern: ^(.*)$
                         initialDelaySeconds:
                           type: integer
-                          default: 0
-                          - 120
                         periodSeconds:
                           type: integer
-                          default: 0
-                          - 60
                         successThreshold:
                           type: integer
-                          default: 0
-                          - 1
                         timeoutSeconds:
                           type: integer
+<<<<<<< HEAD
                           default: 0
                           - 60
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     nodeSelector:
                       type: object
                     rbac:
@@ -3564,6 +3377,7 @@ spec:
                         createClusterMonitoringViewRBAC:
                           type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
                     readinessProbe:
                       type: object
                       properties:
@@ -3572,6 +3386,8 @@ spec:
 =======
                           default: false
                           - true
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                     readinessProbe:
                       type: object
                       required:
@@ -3584,9 +3400,12 @@ spec:
                       properties:
                         failureThreshold:
                           type: integer
+<<<<<<< HEAD
                           default: 0
                           - 3
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         httpGet:
                           type: object
                           required:
@@ -3596,6 +3415,7 @@ spec:
                           properties:
                             path:
                               type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                             port:
                               type: integer
@@ -3631,36 +3451,24 @@ spec:
 =======
                               default: ""
                               - /ready
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                               pattern: ^(.*)$
                             port:
                               type: integer
-                              default: 0
-                              - 8080
                             scheme:
                               type: string
-                              default: ""
-                              - HTTP
                               pattern: ^(.*)$
                         initialDelaySeconds:
                           type: integer
-                          default: 0
-                          - 60
                         periodSeconds:
                           type: integer
-                          default: 0
-                          - 60
                         successThreshold:
                           type: integer
-                          default: 0
-                          - 1
                         timeoutSeconds:
                           type: integer
-                          default: 0
-                          - 60
                     replicas:
                       type: integer
-                      default: 0
-                      - 1
                     resources:
                       type: object
                       required:
@@ -3675,12 +3483,8 @@ spec:
                           properties:
                             cpu:
                               type: integer
-                              default: 0
-                              - 1
                             memory:
                               type: string
-                              default: ""
-                              - 500Mi
                               pattern: ^(.*)$
                         requests:
                           type: object
@@ -3690,13 +3494,9 @@ spec:
                           properties:
                             cpu:
                               type: string
-                              default: ""
-                              - 500m
                               pattern: ^(.*)$
                             memory:
                               type: string
-                              default: ""
-                              - 100Mi
                               pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                     route:
@@ -3707,15 +3507,16 @@ spec:
                         enabled:
                           type: boolean
 <<<<<<< HEAD
+<<<<<<< HEAD
                         name:
                           type: string
 =======
                           default: false
                           - true
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                         name:
                           type: string
-                          default: ""
-                          - metering
                           pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                     tolerations:
@@ -3728,11 +3529,14 @@ spec:
                         type:
                           type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
             storage:
               type: object
 =======
                           default: ""
                           - RollingUpdate
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                           pattern: ^(.*)$
             storage:
               type: object
@@ -3746,9 +3550,12 @@ spec:
                 type:
                   type: string
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                   default: ""
                   - hive
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
             tls:
@@ -3756,6 +3563,7 @@ spec:
               properties:
                 certificate:
                   type: string
+<<<<<<< HEAD
 <<<<<<< HEAD
                 enabled:
                   type: boolean
@@ -3771,20 +3579,16 @@ spec:
 =======
                   default: ""
                   - ""
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
                   pattern: ^(.*)$
                 enabled:
                   type: boolean
-                  default: false
-                  - true
                 key:
                   type: string
-                  default: ""
-                  - ""
                   pattern: ^(.*)$
                 secretName:
                   type: string
-                  default: ""
-                  - metering-operator-root-ca
                   pattern: ^(.*)$
             unsupportedFeatures:
               type: object
@@ -3793,7 +3597,10 @@ spec:
               properties:
                 enableHDFS:
                   type: boolean
+<<<<<<< HEAD
                   default: false
                   - false
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Remove invalid fields from MeteringConfig CRD.
 
