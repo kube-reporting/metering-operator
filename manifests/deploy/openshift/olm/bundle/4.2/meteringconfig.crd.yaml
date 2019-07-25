@@ -25,6 +25,7 @@ spec:
     openAPIV3Schema:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       type: object
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
@@ -33,6 +34,9 @@ spec:
 =======
 >>>>>>> Update the storage portion of the MeteringConfig CRD to use OpenAPI V3 schema validation.
 >>>>>>> Update the storage portion of the MeteringConfig CRD to use OpenAPI V3 schema validation.
+=======
+      type: object
+>>>>>>> Integrate changes proposed to PR 851 with more detailed storage object.
       required:
       - spec
       properties:
@@ -41,7 +45,6 @@ spec:
           required:
           - storage
           properties:
-<<<<<<< HEAD
             __ghostunnel:
               type: object
               properties:
@@ -2466,124 +2469,6 @@ spec:
               type: object
               required:
               - spec
-=======
-            unsupportedFeatures:
-              type: object
-              properties:
-                enableHDFS:
-                  type: boolean
-
-            storage:
-              type: object
-              required:
-              - hive
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - hive
-                hive:
-                  type: object
-                  required:
-                  - type
-                  properties:
-                    type:
-                      type: string
-                      enum:
-                      - hdfs
-                      - sharedPVC
-                      - s3
-                      - azure
-                    hdfs:
-                      type: object
-                      required:
-                      - namenode
-                      properties:
-                        namenode:
-                          type: string
-                          format: uri
-                          minLength: 1
-                    s3:
-                      type: object
-                      required:
-                      - bucket
-                      - region
-                      - secretName
-                      properties:
-                        bucket:
-                          type: string
-                          minLength: 1
-                        region:
-                          type: string
-                          minLength: 1
-                        secretName:
-                          type: string
-                          minLength: 1
-                        createBucket:
-                          type: boolean
-                    azure:
-                      type: object
-                      required:
-                      - container
-                      - secretName
-                      properties:
-                        container:
-                          type: string
-                        secretName:
-                          type: string
-                        rootDirectory:
-                          type: string
-                    sharedPVC:
-                      type: object
-                      properties:
-                        claimName:
-                          type: string
-                        storageClass:
-                          type: string
-                        size:
-                          type: string
-                        createPVC:
-                          type: boolean
-                      oneOf:
-                      - required:
-                        - claimName
-                      - required:
-                        - storageClass
-                        - createPVC
-                        properties:
-                          createPVC:
-                            enum:
-                            - true
-                  oneOf:
-                    # note: current problem - is there a way to enforce only hdfs is set?
-                    # note: for above, maybe move this `oneOf` to the parent column and verify all fields are set?
-                  - required:
-                    - hdfs
-                    properties:
-                      type:
-                        enum:
-                        - hdfs
-                  - required:
-                    - s3
-                    properties:
-                      type:
-                        enum:
-                        - s3
-                  - required:
-                    - azure
-                    properties:
-                      type:
-                        enum:
-                        - azure
-                  - required:
-                    - sharedPVC
-                    properties:
-                      type:
-                        enum:
-                        - sharedPVC
-            hadoop:
-              type: object
->>>>>>> Update the storage portion of the MeteringConfig CRD to use OpenAPI V3 schema validation.
               properties:
                 spec:
                   type: object
@@ -2611,7 +2496,6 @@ spec:
 =======
 >>>>>>> Remove required keys that were too restrictive.
                   properties:
-<<<<<<< HEAD
                     affinity:
                       type: object
                     annotations:
@@ -3524,6 +3408,7 @@ spec:
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
                           pattern: ^(.*)$
+<<<<<<< HEAD
             storage:
               type: object
 <<<<<<< HEAD
@@ -3547,6 +3432,8 @@ spec:
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
                   pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
+=======
+>>>>>>> Integrate changes proposed to PR 851 with more detailed storage object.
             tls:
               type: object
               properties:
@@ -3579,11 +3466,13 @@ spec:
                 secretName:
                   type: string
                   pattern: ^(.*)$
+
             unsupportedFeatures:
               type: object
               properties:
                 enableHDFS:
                   type: boolean
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                   default: false
@@ -3593,24 +3482,37 @@ spec:
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
 =======
 =======
+=======
+
+            storage:
+              type: object
+              required:
+              - hive
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - hive
+                hive:
+                  type: object
+                  required:
+                  - type
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - hdfs
+                      - sharedPVC
+                      - s3
+                      - azure
+>>>>>>> Integrate changes proposed to PR 851 with more detailed storage object.
                     hdfs:
                       type: object
+                      required:
+                      - namenode
                       properties:
-                        datanode:
-                          type: object
-                          properties:
-                            # note: should this be added in this PR (not including resource limits)?
-                            replicas:
-                              type: integer
-                              minimum: 0
-                            storage:
-                              type: object
-                              properties:
-                                class:
-                                  type: string
-                                size:
-                                  type: string
                         namenode:
+<<<<<<< HEAD
                           type: object
                           properties:
                             replicas:
@@ -3625,4 +3527,87 @@ spec:
                                   type: string
 >>>>>>> Update the storage portion of the MeteringConfig CRD to use OpenAPI V3 schema validation.
 >>>>>>> Update the storage portion of the MeteringConfig CRD to use OpenAPI V3 schema validation.
+=======
+                          type: string
+                          format: uri
+                          minLength: 1
+                    s3:
+                      type: object
+                      required:
+                      - bucket
+                      - region
+                      - secretName
+                      properties:
+                        bucket:
+                          type: string
+                          minLength: 1
+                        region:
+                          type: string
+                          minLength: 1
+                        secretName:
+                          type: string
+                          minLength: 1
+                        createBucket:
+                          type: boolean
+                    azure:
+                      type: object
+                      required:
+                      - container
+                      - secretName
+                      properties:
+                        container:
+                          type: string
+                        secretName:
+                          type: string
+                        rootDirectory:
+                          type: string
+                    sharedPVC:
+                      type: object
+                      properties:
+                        claimName:
+                          type: string
+                        storageClass:
+                          type: string
+                        size:
+                          type: string
+                        createPVC:
+                          type: boolean
+                      oneOf:
+                      - required:
+                        - claimName
+                      - required:
+                        - storageClass
+                        - createPVC
+                        properties:
+                          createPVC:
+                            enum:
+                            - true
+                  oneOf:
+                    # note: current problem - is there a way to enforce only hdfs is set?
+                    # note: for above, maybe move this `oneOf` to the parent column and verify all fields are set?
+                  - required:
+                    - hdfs
+                    properties:
+                      type:
+                        enum:
+                        - hdfs
+                  - required:
+                    - s3
+                    properties:
+                      type:
+                        enum:
+                        - s3
+                  - required:
+                    - azure
+                    properties:
+                      type:
+                        enum:
+                        - azure
+                  - required:
+                    - sharedPVC
+                    properties:
+                      type:
+                        enum:
+                        - sharedPVC
+>>>>>>> Integrate changes proposed to PR 851 with more detailed storage object.
 
