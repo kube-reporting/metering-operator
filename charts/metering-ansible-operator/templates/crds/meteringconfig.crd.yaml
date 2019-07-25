@@ -22,7 +22,6 @@ spec:
     storage: false
   validation:
     openAPIV3Schema:
-      type: object
       required:
       - spec
       properties:
@@ -39,10 +38,8 @@ spec:
                   properties:
                     pullPolicy:
                       type: string
-                      pattern: ^(.*)$
                     repository:
                       type: string
-                      pattern: ^(.*)$
                     tag:
                       type: string
             global:
@@ -66,15 +63,12 @@ spec:
                           properties:
                             accessKeyID:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         azure:
                           type: object
                           properties:
@@ -82,19 +76,14 @@ spec:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              pattern: ^(.*)$
                         defaultFS:
                           type: string
-                          pattern: ^(.*)$
                     configSecretName:
                       type: string
-                      pattern: ^(.*)$
                     hdfs:
                       type: object
                       properties:
@@ -103,10 +92,8 @@ spec:
                           properties:
                             datanodeDataDirPerms:
                               type: string
-                              pattern: ^(.*)$
                             logLevel:
                               type: string
-                              pattern: ^(.*)$
                             replicationFactor:
                               type: integer
                         datanode:
@@ -133,18 +120,14 @@ spec:
                                                   properties:
                                                     key:
                                                       type: string
-                                                      pattern: ^(.*)$
                                                     operator:
                                                       type: string
-                                                      pattern: ^(.*)$
                                                     values:
                                                       type: array
                                                       items:
                                                         type: string
-                                                        pattern: ^(.*)$
                                           topologyKey:
                                             type: string
-                                            pattern: ^(.*)$
                             annotations:
                               type: object
                             config:
@@ -175,16 +158,13 @@ spec:
                                       type: string
                                     memory:
                                       type: string
-                                      pattern: ^(.*)$
                                 requests:
                                   type: object
                                   properties:
                                     cpu:
                                       type: string
-                                      pattern: ^(.*)$
                                     memory:
                                       type: string
-                                      pattern: ^(.*)$
                             storage:
                               type: object
                               properties:
@@ -192,7 +172,6 @@ spec:
                                   type: string
                                 size:
                                   type: string
-                                  pattern: ^(.*)$
                             terminationGracePeriodSeconds:
                               type: integer
                             tolerations:
@@ -224,18 +203,14 @@ spec:
                                                   properties:
                                                     key:
                                                       type: string
-                                                      pattern: ^(.*)$
                                                     operator:
                                                       type: string
-                                                      pattern: ^(.*)$
                                                     values:
                                                       type: array
                                                       items:
                                                         type: string
-                                                        pattern: ^(.*)$
                                           topologyKey:
                                             type: string
-                                            pattern: ^(.*)$
                             annotations:
                               type: object
                             config:
@@ -265,16 +240,13 @@ spec:
                                       type: string
                                     memory:
                                       type: string
-                                      pattern: ^(.*)$
                                 requests:
                                   type: object
                                   properties:
                                     cpu:
                                       type: string
-                                      pattern: ^(.*)$
                                     memory:
                                       type: string
-                                      pattern: ^(.*)$
                             storage:
                               type: object
                               properties:
@@ -282,7 +254,6 @@ spec:
                                   type: string
                                 size:
                                   type: string
-                                  pattern: ^(.*)$
                             terminationGracePeriodSeconds:
                               type: integer
                             tolerations:
@@ -299,12 +270,10 @@ spec:
                       properties:
                         pullPolicy:
                           type: string
-                          pattern: ^(.*)$
                         pullSecrets:
                           type: string
                         repository:
                           type: string
-                          pattern: ^(.*)$
                         tag:
                           type: string
             hive:
@@ -325,15 +294,12 @@ spec:
                           properties:
                             accessKeyID:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         azure:
                           type: object
                           properties:
@@ -341,13 +307,10 @@ spec:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              pattern: ^(.*)$
                         db:
                           type: object
                           properties:
@@ -355,25 +318,20 @@ spec:
                               type: boolean
                             driver:
                               type: string
-                              pattern: ^(.*)$
                             enableMetastoreSchemaVerification:
                               type: boolean
                             password:
                               type: string
                             url:
                               type: string
-                              pattern: ^(.*)$
                             username:
                               type: string
                         defaultCompression:
                           type: string
-                          pattern: ^(.*)$
                         defaultFileFormat:
                           type: string
-                          pattern: ^(.*)$
                         hadoopConfigSecretName:
                           type: string
-                          pattern: ^(.*)$
                         metastoreClientSocketTimeout:
                           type: string
                         metastoreWarehouseDir:
@@ -383,17 +341,14 @@ spec:
                           properties:
                             claimName:
                               type: string
-                              pattern: ^(.*)$
                             createPVC:
                               type: boolean
                             enabled:
                               type: boolean
                             mountPath:
                               type: string
-                              pattern: ^(.*)$
                             size:
                               type: string
-                              pattern: ^(.*)$
                             storageClass:
                               type: string
                         useHadoopConfig:
@@ -403,12 +358,10 @@ spec:
                       properties:
                         pullPolicy:
                           type: string
-                          pattern: ^(.*)$
                         pullSecrets:
                           type: array
                         repository:
                           type: string
-                          pattern: ^(.*)$
                         tag:
                           type: string
                     labels:
@@ -437,26 +390,21 @@ spec:
                                   type: string
                             logLevel:
                               type: string
-                              pattern: ^(.*)$
                             tls:
                               type: object
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                         livenessProbe:
                           type: object
                           properties:
@@ -505,16 +453,13 @@ spec:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                             requests:
                               type: object
                               properties:
                                 cpu:
                                   type: string
-                                  pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                         storage:
                           type: object
                           properties:
@@ -524,7 +469,6 @@ spec:
                               type: boolean
                             size:
                               type: string
-                              pattern: ^(.*)$
                         tolerations:
                           type: array
                     securityContext:
@@ -558,45 +502,36 @@ spec:
                                   type: string
                             logLevel:
                               type: string
-                              pattern: ^(.*)$
                             metastoreTLS:
                               type: object
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                             tls:
                               type: object
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                         livenessProbe:
                           type: object
                           properties:
@@ -645,16 +580,13 @@ spec:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                             requests:
                               type: object
                               properties:
                                 cpu:
                                   type: string
-                                  pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                         tolerations:
                           type: array
                     terminationGracePeriodSeconds:
@@ -668,7 +600,6 @@ spec:
                   type: boolean
                 namespace:
                   type: string
-                  pattern: ^(.*)$
             openshift-reporting:
               type: object
               properties:
@@ -698,7 +629,6 @@ spec:
                                 properties:
                                   name:
                                     type: string
-                                    pattern: ^(.*)$
                                   spec:
                                     type: object
                                     required:
@@ -711,7 +641,6 @@ spec:
                                         properties:
                                           queryName:
                                             type: string
-                                            pattern: ^(.*)$
                         postKube_1_14:
                           type: object
                           properties:
@@ -727,7 +656,6 @@ spec:
                                 properties:
                                   name:
                                     type: string
-                                    pattern: ^(.*)$
                                   spec:
                                     type: object
                                     required:
@@ -740,7 +668,6 @@ spec:
                                         properties:
                                           query:
                                             type: string
-                                            pattern: ^(.*)$
                         preKube_1_14:
                           type: object
                           required:
@@ -756,7 +683,6 @@ spec:
                                 properties:
                                   name:
                                     type: string
-                                    pattern: ^(.*)$
                                   spec:
                                     type: object
                                     required:
@@ -769,7 +695,6 @@ spec:
                                         properties:
                                           query:
                                             type: string
-                                            pattern: ^(.*)$
                     defaultStorageLocation:
                       type: object
                       required:
@@ -790,20 +715,16 @@ spec:
                           properties:
                             databaseName:
                               type: string
-                              pattern: ^(.*)$
                             location:
                               type: string
-                              pattern: ^(.*)$
                             unmanagedDatabase:
                               type: boolean
                         isDefault:
                           type: boolean
                         name:
                           type: string
-                          pattern: ^(.*)$
                         type:
                           type: string
-                          pattern: ^(.*)$
             permissions:
               type: object
               properties:
@@ -833,34 +754,27 @@ spec:
                           properties:
                             caCertificate:
                               type: string
-                              pattern: ^(.*)$
                             certificate:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             enabled:
                               type: boolean
                             key:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         aws:
                           type: object
                           properties:
                             accessKeyID:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         azure:
                           type: object
                           properties:
@@ -868,13 +782,10 @@ spec:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                             storageAccountName:
                               type: string
-                              pattern: ^(.*)$
                         connectors:
                           type: object
                           properties:
@@ -885,7 +796,6 @@ spec:
                               properties:
                                 hadoopConfigSecretName:
                                   type: string
-                                  pattern: ^(.*)$
                                 metastoreTimeout:
                                   type: string
                                 metastoreURI:
@@ -895,28 +805,22 @@ spec:
                                   properties:
                                     caCertificate:
                                       type: string
-                                      pattern: ^(.*)$
                                     certificate:
                                       type: string
-                                      pattern: ^(.*)$
                                     createSecret:
                                       type: boolean
                                     enabled:
                                       type: boolean
                                     key:
                                       type: string
-                                      pattern: ^(.*)$
                                     secretName:
                                       type: string
-                                      pattern: ^(.*)$
                                 useHadoopConfig:
                                   type: boolean
                         environment:
                           type: string
-                          pattern: ^(.*)$
                         maxQueryLength:
                           type: string
-                          pattern: ^(.*)$
                         nodeSchedulerIncludeCoordinator:
                           type: boolean
                         tls:
@@ -924,20 +828,16 @@ spec:
                           properties:
                             caCertificate:
                               type: string
-                              pattern: ^(.*)$
                             certificate:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             enabled:
                               type: boolean
                             key:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                     coordinator:
                       type: object
                       properties:
@@ -976,18 +876,14 @@ spec:
                                               properties:
                                                 key:
                                                   type: string
-                                                  pattern: ^(.*)$
                                                 operator:
                                                   type: string
-                                                  pattern: ^(.*)$
                                                 values:
                                                   type: array
                                                   items:
                                                     type: string
-                                                    pattern: ^(.*)$
                                       topologyKey:
                                         type: string
-                                        pattern: ^(.*)$
                         config:
                           type: object
                           properties:
@@ -1002,7 +898,6 @@ spec:
                                   type: array
                                 initialRAMPercentage:
                                   type: string
-                                  pattern: ^(.*)$
                                 initiatingHeapOccupancyPercent:
                                   type: string
                                 maxCachedBufferSize:
@@ -1013,7 +908,6 @@ spec:
                                   type: string
                                 maxRAMPercentage:
                                   type: string
-                                  pattern: ^(.*)$
                                 minRAMPercentage:
                                   type: string
                                 parallelGCThreads:
@@ -1024,7 +918,6 @@ spec:
                                   type: string
                             logLevel:
                               type: string
-                              pattern: ^(.*)$
                             taskMaxWorkerThreads:
                               type: string
                             taskMinDrivers:
@@ -1041,14 +934,12 @@ spec:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                             requests:
                               properties:
                                 cpu:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                         terminationGracePeriodSeconds:
                           type: integer
                         tolerations:
@@ -1058,10 +949,8 @@ spec:
                       properties:
                         pullPolicy:
                           type: string
-                          pattern: ^(.*)$
                         repository:
                           type: string
-                          pattern: ^(.*)$
                         tag:
                           type: string
                     labels:
@@ -1111,18 +1000,14 @@ spec:
                                               properties:
                                                 key:
                                                   type: string
-                                                  pattern: ^(.*)$
                                                 operator:
                                                   type: string
-                                                  pattern: ^(.*)$
                                                 values:
                                                   type: array
                                                   items:
                                                     type: string
-                                                    pattern: ^(.*)$
                                       topologyKey:
                                         type: string
-                                        pattern: ^(.*)$
                         config:
                           type: object
                           properties:
@@ -1137,7 +1022,6 @@ spec:
                                   type: array
                                 initialRAMPercentage:
                                   type: string
-                                  pattern: ^(.*)$
                                 initiatingHeapOccupancyPercent:
                                   type: string
                                 maxCachedBufferSize:
@@ -1148,7 +1032,6 @@ spec:
                                   type: string
                                 maxRAMPercentage:
                                   type: string
-                                  pattern: ^(.*)$
                                 minRAMPercentage:
                                   type: string
                                 parallelGCThreads:
@@ -1159,7 +1042,6 @@ spec:
                                   type: string
                             logLevel:
                               type: string
-                              pattern: ^(.*)$
                             taskMaxWorkerThreads:
                               type: string
                             taskMinDrivers:
@@ -1178,7 +1060,6 @@ spec:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                             requests:
                               type: object
                               properties:
@@ -1186,7 +1067,6 @@ spec:
                                   type: string
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                         terminationGracePeriodSeconds:
                           type: integer
                         tolerations:
@@ -1211,12 +1091,10 @@ spec:
                           properties:
                             service.alpha.openshift.io/serving-cert-secret-name:
                               type: string
-                              pattern: ^(.*)$
                         nodePort:
                           type: string
                         type:
                           type: string
-                          pattern: ^(.*)$
                     authProxy:
                       type: object
                       properties:
@@ -1227,12 +1105,10 @@ spec:
                               type: boolean
                             data:
                               type: string
-                              pattern: ^(.*)$
                             enabled:
                               type: boolean
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         cookie:
                           type: object
                           properties:
@@ -1240,10 +1116,8 @@ spec:
                               type: boolean
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                             seed:
                               type: string
-                              pattern: ^(.*)$
                         delegateURLs:
                           type: object
                           properties:
@@ -1251,7 +1125,6 @@ spec:
                               type: boolean
                             policy:
                               type: string
-                              pattern: ^(.*)$
                         enabled:
                           type: boolean
                         htpasswd:
@@ -1261,24 +1134,19 @@ spec:
                               type: boolean
                             data:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         image:
                           type: object
                           properties:
                             pullPolicy:
                               type: string
-                              pattern: ^(.*)$
                             pullSecrets:
                               type: array
                             repository:
                               type: string
-                              pattern: ^(.*)$
                             tag:
                               type: string
-                              pattern: ^(.*)$
                         rbac:
                           type: object
                           required:
@@ -1294,19 +1162,15 @@ spec:
                               properties:
                                 cpu:
                                   type: string
-                                  pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                             requests:
                               type: object
                               properties:
                                 cpu:
                                   type: string
-                                  pattern: ^(.*)$
                                 memory:
                                   type: string
-                                  pattern: ^(.*)$
                         subjectAccessReview:
                           type: object
                           properties:
@@ -1314,7 +1178,6 @@ spec:
                               type: boolean
                             policy:
                               type: string
-                              pattern: ^(.*)$
                     config:
                       type: object
                       properties:
@@ -1325,15 +1188,12 @@ spec:
                           properties:
                             accessKeyID:
                               type: string
-                              pattern: ^(.*)$
                             createSecret:
                               type: boolean
                             secretAccessKey:
                               type: string
-                              pattern: ^(.*)$
                             secretName:
                               type: string
-                              pattern: ^(.*)$
                         enableFinalizers:
                           type: boolean
                         hive:
@@ -1344,17 +1204,14 @@ spec:
                               properties:
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                             host:
                               type: string
                             tls:
@@ -1362,30 +1219,24 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                         leaderLeaseDuration:
                           type: string
-                          pattern: ^(.*)$
                         logDDLQueries:
                           type: boolean
                         logDMLQueries:
                           type: boolean
                         logLevel:
                           type: string
-                          pattern: ^(.*)$
                         logReports:
                           type: boolean
                         presto:
@@ -1396,20 +1247,16 @@ spec:
                               properties:
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                             host:
                               type: string
-                              pattern: ^(.*)$
                             maxQueryLength:
                               type: string
                             tls:
@@ -1417,14 +1264,12 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                         prometheus:
                           type: object
                           properties:
@@ -1440,13 +1285,10 @@ spec:
                                       type: boolean
                                     filename:
                                       type: string
-                                      pattern: ^(.*)$
                                     name:
                                       type: string
-                                      pattern: ^(.*)$
                                     value:
                                       type: string
-                                      pattern: ^(.*)$
                                 useServiceAccountCA:
                                   type: boolean
                             metricsImporter:
@@ -1464,10 +1306,8 @@ spec:
                                           type: boolean
                                         name:
                                           type: string
-                                          pattern: ^(.*)$
                                         value:
                                           type: string
-                                          pattern: ^(.*)$
                                     useServiceAccountToken:
                                       type: boolean
                                 config:
@@ -1475,7 +1315,6 @@ spec:
                                   properties:
                                     chunkSize:
                                       type: string
-                                      pattern: ^(.*)$
                                     importFrom:
                                       type: string
                                     maxImportBackfillDuration:
@@ -1484,15 +1323,12 @@ spec:
                                       type: string
                                     pollInterval:
                                       type: string
-                                      pattern: ^(.*)$
                                     stepSize:
                                       type: string
-                                      pattern: ^(.*)$
                                 enabled:
                                   type: boolean
                             url:
                               type: string
-                              pattern: ^(.*)$
                         tls:
                           type: object
                           properties:
@@ -1501,31 +1337,25 @@ spec:
                               properties:
                                 caCertificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 certificate:
                                   type: string
-                                  pattern: ^(.*)$
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
                                 key:
                                   type: string
-                                  pattern: ^(.*)$
                                 secretName:
                                   type: string
-                                  pattern: ^(.*)$
                     image:
                       type: object
                       properties:
                         pullPolicy:
                           type: string
-                          pattern: ^(.*)$
                         pullSecrets:
                           type: array
                         repository:
                           type: string
-                          pattern: ^(.*)$
                         tag:
                           type: string
                     labels:
@@ -1544,12 +1374,10 @@ spec:
                           properties:
                             path:
                               type: string
-                              pattern: ^(.*)$
                             port:
                               type: integer
                             scheme:
                               type: string
-                              pattern: ^(.*)$
                         initialDelaySeconds:
                           type: integer
                         periodSeconds:
@@ -1581,12 +1409,10 @@ spec:
                           properties:
                             path:
                               type: string
-                              pattern: ^(.*)$
                             port:
                               type: integer
                             scheme:
                               type: string
-                              pattern: ^(.*)$
                         initialDelaySeconds:
                           type: integer
                         periodSeconds:
@@ -1607,16 +1433,13 @@ spec:
                               type: string
                             memory:
                               type: string
-                              pattern: ^(.*)$
                         requests:
                           type: object
                           properties:
                             cpu:
                               type: string
-                              pattern: ^(.*)$
                             memory:
                               type: string
-                              pattern: ^(.*)$
                     route:
                       type: object
                       required:
@@ -1626,7 +1449,6 @@ spec:
                           type: boolean
                         name:
                           type: string
-                          pattern: ^(.*)$
                     tolerations:
                       type: array
                     updateStrategy:
@@ -1636,7 +1458,6 @@ spec:
                       properties:
                         type:
                           type: string
-                          pattern: ^(.*)$
             storage:
               type: object
               properties:
@@ -1644,21 +1465,17 @@ spec:
                   type: object
                 type:
                   type: string
-                  pattern: ^(.*)$
             tls:
               type: object
               properties:
                 certificate:
                   type: string
-                  pattern: ^(.*)$
                 enabled:
                   type: boolean
                 key:
                   type: string
-                  pattern: ^(.*)$
                 secretName:
                   type: string
-                  pattern: ^(.*)$
             unsupportedFeatures:
               type: object
               properties:
