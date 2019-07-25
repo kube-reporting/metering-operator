@@ -672,6 +672,10 @@ spec:
                                         properties:
                                           query:
                                             type: string
+<<<<<<< HEAD
+=======
+                                            pattern: ^(.*)$
+>>>>>>> Replace the types of various fields.
                         preKube_1_14:
                           type: object
                           required:
@@ -699,6 +703,10 @@ spec:
                                         properties:
                                           query:
                                             type: string
+<<<<<<< HEAD
+=======
+                                            pattern: ^(.*)$
+>>>>>>> Replace the types of various fields.
                     defaultStorageLocation:
                       type: object
                       required:

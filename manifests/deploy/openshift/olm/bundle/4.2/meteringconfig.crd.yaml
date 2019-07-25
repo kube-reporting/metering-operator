@@ -57,6 +57,7 @@ spec:
                       type: string
                       pattern: ^(.*)$
                     tag:
+<<<<<<< HEAD
                       type: number
 <<<<<<< HEAD
                       default: 0
@@ -64,6 +65,9 @@ spec:
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                      type: string
+>>>>>>> Replace the types of various fields.
             global:
               type: object
               properties:
@@ -280,6 +284,7 @@ spec:
                               type: object
                             replicas:
 <<<<<<< HEAD
+<<<<<<< HEAD
                               type: string
 =======
                               type: integer
@@ -289,6 +294,9 @@ spec:
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                              type: string
+>>>>>>> Replace the types of various fields.
                             resources:
                               type: object
                               properties:
@@ -297,11 +305,15 @@ spec:
                                   properties:
                                     cpu:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       type: string
                                     memory:
                                       type: string
 =======
                                       type: integer
+=======
+                                      type: string
+>>>>>>> Replace the types of various fields.
                                     memory:
                                       type: string
                                       pattern: ^(.*)$
@@ -471,11 +483,15 @@ spec:
                                   properties:
                                     cpu:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       type: string
                                     memory:
                                       type: string
 =======
                                       type: integer
+=======
+                                      type: string
+>>>>>>> Replace the types of various fields.
                                     memory:
                                       type: string
                                       pattern: ^(.*)$
@@ -578,6 +594,7 @@ spec:
                           type: string
                           pattern: ^(.*)$
                         tag:
+<<<<<<< HEAD
                           type: number
 <<<<<<< HEAD
                           default: 0
@@ -585,6 +602,9 @@ spec:
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                          type: string
+>>>>>>> Replace the types of various fields.
             hive:
               type: object
               required:
@@ -797,8 +817,12 @@ spec:
 =======
                           pattern: ^(.*)$
                         tag:
+<<<<<<< HEAD
                           type: number
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                          type: string
+>>>>>>> Replace the types of various fields.
                     labels:
                       type: object
                     metastore:
@@ -999,11 +1023,15 @@ spec:
                               properties:
                                 cpu:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   type: string
                                 memory:
                                   type: string
 =======
                                   type: integer
+=======
+                                  type: string
+>>>>>>> Replace the types of various fields.
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
@@ -1320,11 +1348,15 @@ spec:
                               properties:
                                 cpu:
 <<<<<<< HEAD
+<<<<<<< HEAD
                                   type: string
                                 memory:
                                   type: string
 =======
                                   type: integer
+=======
+                                  type: string
+>>>>>>> Replace the types of various fields.
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
@@ -1520,12 +1552,15 @@ spec:
                                             type: string
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                             default: ""
                                             - |
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
                                               sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod!=""}[1m])) BY (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+=======
+>>>>>>> Replace the types of various fields.
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                         preKube_1_14:
@@ -1566,12 +1601,15 @@ spec:
                                             type: string
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                                             default: ""
                                             - |
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
                                               label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+=======
+>>>>>>> Replace the types of various fields.
                                             pattern: ^(.*)$
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
                     defaultStorageLocation:
@@ -2108,14 +2146,14 @@ spec:
                               type: object
                               properties:
                                 cpu:
-                                  type: integer
+                                  type: string
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
                             requests:
                               properties:
                                 cpu:
-                                  type: integer
+                                  type: string
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
@@ -2155,6 +2193,7 @@ spec:
                           type: string
                           pattern: ^(.*)$
                         tag:
+<<<<<<< HEAD
                           type: number
 <<<<<<< HEAD
                           default: 0
@@ -2162,6 +2201,9 @@ spec:
 >>>>>>> Add structural schema validation to the MeteringConfig CRD using OpenAPI v3.
 =======
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                          type: string
+>>>>>>> Replace the types of various fields.
                     labels:
                       type: object
                     securityContext:
@@ -2382,7 +2424,7 @@ spec:
                         nodeSelector:
                           type: object
                         replicas:
-                          type: integer
+                          type: string
                         resources:
                           type: object
                           properties:
@@ -2390,7 +2432,7 @@ spec:
                               type: object
                               properties:
                                 cpu:
-                                  type: integer
+                                  type: string
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
@@ -2398,7 +2440,7 @@ spec:
                               type: object
                               properties:
                                 cpu:
-                                  type: integer
+                                  type: string
                                 memory:
                                   type: string
                                   pattern: ^(.*)$
@@ -3111,6 +3153,7 @@ spec:
                           - quay.io/openshift/origin-metering-reporting-operator
                           pattern: ^(.*)$
                         tag:
+<<<<<<< HEAD
                           type: number
                           default: 0
                           - 4.2
@@ -3120,6 +3163,9 @@ spec:
                         tag:
                           type: number
 >>>>>>> Remove invalid fields from MeteringConfig CRD.
+=======
+                          type: string
+>>>>>>> Replace the types of various fields.
                     labels:
                       type: object
                     livenessProbe:
@@ -3290,7 +3336,7 @@ spec:
                         timeoutSeconds:
                           type: integer
                     replicas:
-                      type: integer
+                      type: string
                     resources:
                       type: object
                       properties:
@@ -3298,7 +3344,7 @@ spec:
                           type: object
                           properties:
                             cpu:
-                              type: integer
+                              type: string
                             memory:
                               type: string
                               pattern: ^(.*)$
