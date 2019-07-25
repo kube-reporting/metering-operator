@@ -1,3 +1,8 @@
+{{/* When using TLS set probes to use the ghostunnel server port */}}
+{{- if .Values.hive.spec.server.con***REMOVED***g.tls.enabled -}}
+{{- $_ := set .Values.hive.spec.server.readinessProbe.tcpSocket "port" 10001 -}}
+{{- $_ := set .Values.hive.spec.server.livenessProbe.tcpSocket "port" 10001 -}}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -119,6 +124,7 @@ spec:
 {{- end }}
         - containerPort: 8082
           name: metrics
+{{- if not .Values.hive.spec.server.con***REMOVED***g.tls.enabled }}
 {{- if .Values.hive.spec.server.readinessProbe }}
         readinessProbe:
 {{ toYaml .Values.hive.spec.server.readinessProbe | indent 10 }}
@@ -126,6 +132,7 @@ spec:
 {{- if .Values.hive.spec.server.livenessProbe }}
         livenessProbe:
 {{ toYaml .Values.hive.spec.server.livenessProbe | indent 10 }}
+{{- end }}
 {{- end }}
         terminationMessagePath: /dev/termination-log
         env:
@@ -242,6 +249,15 @@ spec:
         volumeMounts:
         - name: hive-server-tls-secret
           mountPath: /opt/hive/server-tls
+{{- if .Values.hive.spec.server.readinessProbe }}
+        readinessProbe:
+{{ toYaml .Values.hive.spec.server.readinessProbe | indent 10 }}
+{{- end }}
+{{- if .Values.hive.spec.server.livenessProbe }}
+        livenessProbe:
+{{ toYaml .Values.hive.spec.server.livenessProbe | indent 10 }}
+{{- end }}
+
 {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
