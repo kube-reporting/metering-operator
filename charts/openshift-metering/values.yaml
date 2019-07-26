@@ -4,6 +4,8 @@ global:
 unsupportedFeatures:
   enableHDFS: false
 
+logHelmTemplate: true
+
 storage:
   type: "hive"
   hive: {}
