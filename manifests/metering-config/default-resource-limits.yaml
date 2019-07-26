@@ -13,46 +13,46 @@ spec:
           cpu: 500m
           memory: 100Mi
 
-presto:
-  spec:
-    coordinator:
-      resources:
-        limits:
-          cpu: 4
-          memory: 4Gi
-        requests:
-          cpu: 2
-          memory: 2Gi
+  presto:
+    spec:
+      coordinator:
+        resources:
+          limits:
+            cpu: 4
+            memory: 4Gi
+          requests:
+            cpu: 2
+            memory: 2Gi
 
-    worker:
-      replicas: 0
-      resources:
-        limits:
-          cpu: 8
-          memory: 8Gi
-        requests:
-          cpu: 4
-          memory: 2Gi
+      worker:
+        replicas: 0
+        resources:
+          limits:
+            cpu: 8
+            memory: 8Gi
+          requests:
+            cpu: 4
+            memory: 2Gi
 
-hive:
-  spec:
-    metastore:
-      resources:
-        limits:
-          cpu: 4
-          memory: 2Gi
-        requests:
-          cpu: 500m
-          memory: 650Mi
-      storage:
-        class: null
-        create: true
-        size: 5Gi
-    server:
-      resources:
-        limits:
-          cpu: 1
-          memory: 1Gi
-        requests:
-          cpu: 500m
-          memory: 500Mi
+  hive:
+    spec:
+      metastore:
+        resources:
+          limits:
+            cpu: 4
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 650Mi
+        storage:
+          class: null
+          create: true
+          size: 5Gi
+      server:
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 500Mi
