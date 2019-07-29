@@ -159,6 +159,28 @@ spec:
                   type: string
                 secretName:
                   type: string
+              oneOf:
+              - required:
+                - enabled
+                allOf:
+                - not:
+                    required:
+                    - certi***REMOVED***cate
+                - not:
+                    required:
+                    - key
+              - required:
+                - enabled
+                - certi***REMOVED***cate
+                - key
+                properties:
+                  enabled:
+                    enum:
+                    - false
+                  certi***REMOVED***cate:
+                    minLength: 1
+                  key:
+                    minLength: 1
 
             permissions:
               type: object
@@ -392,6 +414,60 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  enabled:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                             host:
                               type: string
                             tls:
@@ -399,16 +475,57 @@ spec:
                               properties:
                                 caCerti***REMOVED***cate:
                                   type: string
-                                certi***REMOVED***cate:
-                                  type: string
                                 createSecret:
                                   type: boolean
                                 enabled:
                                   type: boolean
-                                key:
-                                  type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - createSecret
+                                - secretName
+                                properties:
+                                  caCerti***REMOVED***cate:
+                                    minLength: 1
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  enabled:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                         leaderLeaseDuration:
                           type: string
                         logDDLQueries:
@@ -435,6 +552,60 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                             host:
                               type: string
                             maxQueryLength:
@@ -450,6 +621,51 @@ spec:
                                   type: boolean
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - createSecret
+                                - secretName
+                                properties:
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                         prometheus:
                           type: object
                           properties:
@@ -527,6 +743,69 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  caCerti***REMOVED***cate:
+                                    minLength: 1
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                     image:
                       type: object
                       properties:
@@ -622,6 +901,69 @@ spec:
                               type: string
                             secretName:
                               type: string
+                          oneOf:
+                          - required:
+                            - enabled
+                            properties:
+                              enabled:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - caCerti***REMOVED***cate
+                            - not:
+                                required:
+                                - certi***REMOVED***cate
+                            - not:
+                                required:
+                                - key
+                            - not:
+                                required:
+                                - createSecret
+                            - not:
+                                required:
+                                - secretName
+                          - required:
+                            - createSecret
+                            - secretName
+                            properties:
+                              createSecret:
+                                enum:
+                                - false
+                              secretName:
+                                minLength: 1
+                            allOf:
+                            - not:
+                                required:
+                                - caCerti***REMOVED***cate
+                            - not:
+                                required:
+                                - certi***REMOVED***cate
+                            - not:
+                                required:
+                                - key
+                          - required:
+                            - caCerti***REMOVED***cate
+                            - certi***REMOVED***cate
+                            - key
+                            - createSecret
+                            - secretName
+                            properties:
+                              caCerti***REMOVED***cate:
+                                minLength: 1
+                              certi***REMOVED***cate:
+                                minLength: 1
+                              key:
+                                minLength: 1
+                              enabled:
+                                enum:
+                                - true
+                              createSecret:
+                                enum:
+                                - true
+                              secretName:
+                                minLength: 1
                         aws:
                           type: object
                           properties:
@@ -673,6 +1015,69 @@ spec:
                                       type: string
                                     secretName:
                                       type: string
+                                  oneOf:
+                                  - required:
+                                    - enabled
+                                    properties:
+                                      enabled:
+                                        enum:
+                                        - false
+                                    allOf:
+                                    - not:
+                                        required:
+                                        - caCerti***REMOVED***cate
+                                    - not:
+                                        required:
+                                        - certi***REMOVED***cate
+                                    - not:
+                                        required:
+                                        - key
+                                    - not:
+                                        required:
+                                        - createSecret
+                                    - not:
+                                        required:
+                                        - secretName
+                                  - required:
+                                    - createSecret
+                                    - secretName
+                                    properties:
+                                      createSecret:
+                                        enum:
+                                        - false
+                                      secretName:
+                                        minLength: 1
+                                    allOf:
+                                    - not:
+                                        required:
+                                        - caCerti***REMOVED***cate
+                                    - not:
+                                        required:
+                                        - certi***REMOVED***cate
+                                    - not:
+                                        required:
+                                        - key
+                                  - required:
+                                    - caCerti***REMOVED***cate
+                                    - certi***REMOVED***cate
+                                    - key
+                                    - createSecret
+                                    - secretName
+                                    properties:
+                                      caCerti***REMOVED***cate:
+                                        minLength: 1
+                                      certi***REMOVED***cate:
+                                        minLength: 1
+                                      key:
+                                        minLength: 1
+                                      enabled:
+                                        enum:
+                                        - true
+                                      createSecret:
+                                        enum:
+                                        - true
+                                      secretName:
+                                        minLength: 1
                                 useHadoopCon***REMOVED***g:
                                   type: boolean
                         environment:
@@ -696,6 +1101,57 @@ spec:
                               type: string
                             secretName:
                               type: string
+                          oneOf:
+                          - required:
+                            - enabled
+                            properties:
+                              enabled:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - caCerti***REMOVED***cate
+                            - not:
+                                required:
+                                - certi***REMOVED***cate
+                            - not:
+                                required:
+                                - key
+                            - not:
+                                required:
+                                - createSecret
+                            - not:
+                                required:
+                                - secretName
+                          - required:
+                            - createSecret
+                            - secretName
+                            properties:
+                              createSecret:
+                                enum:
+                                - false
+                              secretName:
+                                minLength: 1
+                            allOf:
+                            - not:
+                                required:
+                                - caCerti***REMOVED***cate
+                          - required:
+                            - caCerti***REMOVED***cate
+                            - createSecret
+                            - secretName
+                            properties:
+                              certi***REMOVED***cate:
+                                minLength: 1
+                              enabled:
+                                enum:
+                                - true
+                              createSecret:
+                                enum:
+                                - true
+                              secretName:
+                                minLength: 1
                     coordinator:
                       type: object
                       properties:
@@ -1109,6 +1565,87 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  caCerti***REMOVED***cate:
+                                    minLength: 1
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
+                        livenessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
                         nodeSelector:
                           type: object
                         resources:
@@ -1201,6 +1738,69 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  caCerti***REMOVED***cate:
+                                    minLength: 1
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
                             tls:
                               type: object
                               properties:
@@ -1216,6 +1816,90 @@ spec:
                                   type: string
                                 secretName:
                                   type: string
+                              oneOf:
+                              - required:
+                                - enabled
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - false
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                                - not:
+                                    required:
+                                    - createSecret
+                                - not:
+                                    required:
+                                    - secretName
+                              - required:
+                                - createSecret
+                                - secretName
+                                properties:
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - false
+                                  secretName:
+                                    minLength: 1
+                                allOf:
+                                - not:
+                                    required:
+                                    - caCerti***REMOVED***cate
+                                - not:
+                                    required:
+                                    - certi***REMOVED***cate
+                                - not:
+                                    required:
+                                    - key
+                              - required:
+                                - caCerti***REMOVED***cate
+                                - certi***REMOVED***cate
+                                - key
+                                - createSecret
+                                - secretName
+                                properties:
+                                  caCerti***REMOVED***cate:
+                                    minLength: 1
+                                  certi***REMOVED***cate:
+                                    minLength: 1
+                                  key:
+                                    minLength: 1
+                                  enabled:
+                                    enum:
+                                    - true
+                                  createSecret:
+                                    enum:
+                                    - true
+                                  secretName:
+                                    minLength: 1
+                        livenessProbe:
+                          type: object
+                          properties:
+                            failureThreshold:
+                              type: integer
+                            initialDelaySeconds:
+                              type: integer
+                            periodSeconds:
+                              type: integer
+                            successThreshold:
+                              type: integer
+                            tcpSocket:
+                              type: object
+                              properties:
+                                port:
+                                  type: integer
+                            timeoutSeconds:
+                              type: integer
                         nodeSelector:
                           type: object
                         resources:

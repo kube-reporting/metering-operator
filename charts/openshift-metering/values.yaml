@@ -279,10 +279,6 @@ reporting-operator:
       hive:
         host: null
         tls:
-          # client cert
-          certi***REMOVED***cate: ""
-          # client private key
-          key: ""
           # CA for the client cert
           caCerti***REMOVED***cate: ""
 
