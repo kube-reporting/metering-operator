@@ -84,7 +84,6 @@ spec:
           # If you have a storageClass which provides SSDs, uncomment and
           # specify it here:
           # class: "fast-ssd"
-          class: null
           # Generally the default metastore size of 5Gi is sufficient, but
           # with a large amount of ReportDataSources, you may wish to
           # increase it.
