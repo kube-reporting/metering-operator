@@ -4,6 +4,7 @@ metadata:
   name: "operator-metering"
 spec:
   storage:
+    type: "hive"
     hive:
       type: "sharedPVC"
       sharedPVC:
