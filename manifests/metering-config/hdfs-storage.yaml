@@ -36,7 +36,6 @@ spec:
             # If you have a storageClass which provides SSDs, uncomment and
             # specify it here:
             # class: "fast-ssd"
-            class: null
             # The default size of 5Gi is fairly small. With 1000 namespaces and
             # at least 5 pods per namespace you could expect a few hundred Mb of
             # storage per week.
@@ -67,7 +66,6 @@ spec:
             # If you have a storageClass which provides SSDs, uncomment and
             # specify it here:
             # class: "fast-ssd"
-            class: null
             # Namenodes mostly need larger disks because they consume more
             # inodes, and the amount of storage needed grows over time as more
             # blocks are created on HDFS datanodes.
