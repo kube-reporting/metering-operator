@@ -9,25 +9,25 @@
   - name: Validate that the user provided a non-empty Hive Metastore TLS certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.certi***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.certi***REMOVED***cate != ""
       msg: "hive.spec.metastore.con***REMOVED***g.tls.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Metastore TLS CA certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.caCerti***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.caCerti***REMOVED***cate != ""
       msg: "hive.spec.metastore.con***REMOVED***g.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Metastore TLS key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.key == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.key != ""
       msg: "hive.spec.metastore.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.auth.enabled
+        - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.auth.enabled
       msg: "Invalid con***REMOVED***guration for hive.spec.metastore.con***REMOVED***g.tls: you cannot enable auth but disable TLS."
   when: meteringcon***REMOVED***g_template_hive_metastore_tls_secret
 
@@ -36,25 +36,25 @@
   - name: Validate that the user provided a non-empty Hive Server TLS certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.certi***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.certi***REMOVED***cate != ""
       msg: "hive.spec.server.con***REMOVED***g.tls.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Server TLS CA certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.caCerti***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.caCerti***REMOVED***cate != ""
       msg: "hive.spec.server.con***REMOVED***g.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Server TLS key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.key == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.key != ""
       msg: "hive.spec.server.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.auth.enabled
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.auth.enabled
       msg: "Invalid con***REMOVED***guration for hive.spec.server.con***REMOVED***g.tls: you cannot enable auth but disable TLS."
   when: meteringcon***REMOVED***g_template_hive_server_tls_secret
 
@@ -63,18 +63,18 @@
   - name: Validate that the user provided a non-empty Hive Server client TLS certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.certi***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.certi***REMOVED***cate != ""
       msg: "hive.spec.server.con***REMOVED***g.metastoreTLS.certi***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Server client TLS CA certi***REMOVED***cate value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.caCerti***REMOVED***cate == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.caCerti***REMOVED***cate != ""
       msg: "hive.spec.server.con***REMOVED***g.metastoreTLS.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
 
   - name: Validate that the user provided a non-empty Hive Server client TLS key value
     assert:
       that:
-        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.key == ""
+        - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.key != ""
       msg: "hive.spec.server.con***REMOVED***g.metastoreTLS.key cannot be empty if createSecret: true and secretName != ''"
   when: meteringcon***REMOVED***g_template_hive_server_auth_secret

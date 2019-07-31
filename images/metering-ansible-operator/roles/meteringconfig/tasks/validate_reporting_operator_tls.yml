@@ -27,7 +27,7 @@
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.enabled
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.enabled
       msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
   when: meteringcon***REMOVED***g_template_presto_auth_secret
 
@@ -57,7 +57,7 @@
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.enabled
+        - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.enabled
       msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
   when: meteringcon***REMOVED***g_template_hive_secrets
 
