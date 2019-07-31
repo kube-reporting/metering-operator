@@ -27,7 +27,7 @@
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringconfig_spec['reporting-operator'].spec.config.presto.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.presto.auth.enabled
+        - meteringconfig_spec['reporting-operator'].spec.config.presto.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.presto.auth.enabled
       msg: "Invalid configuration: you cannot enable auth but disable TLS."
   when: meteringconfig_template_presto_auth_secret
 
@@ -57,7 +57,7 @@
   - name: Validate that TLS is enabled when auth is enabled
     assert:
       that:
-        - not meteringconfig_spec['reporting-operator'].spec.config.hive.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.hive.auth.enabled
+        - meteringconfig_spec['reporting-operator'].spec.config.hive.tls.enabled and meteringconfig_spec['reporting-operator'].spec.config.hive.auth.enabled
       msg: "Invalid configuration: you cannot enable auth but disable TLS."
   when: meteringconfig_template_hive_secrets
 
