@@ -129,24 +129,64 @@ spec:
                       type:
                         enum:
                         - hdfs
+                    allOf:
+                    - not:
+                        required:
+                        - s3
+                    - not:
+                        required:
+                        - azure
+                    - not:
+                        required:
+                        - sharedPVC
                   - required:
                     - s3
                     properties:
                       type:
                         enum:
                         - s3
+                    allOf:
+                    - not:
+                        required:
+                        - hdfs
+                    - not:
+                        required:
+                        - azure
+                    - not:
+                        required:
+                        - sharedPVC
                   - required:
                     - azure
                     properties:
                       type:
                         enum:
                         - azure
+                    allOf:
+                    - not:
+                        required:
+                        - hdfs
+                    - not:
+                        required:
+                        - s3
+                    - not:
+                        required:
+                        - sharedPVC
                   - required:
                     - sharedPVC
                     properties:
                       type:
                         enum:
                         - sharedPVC
+                    allOf:
+                    - not:
+                        required:
+                        - hdfs
+                    - not:
+                        required:
+                        - s3
+                    - not:
+                        required:
+                        - azure
 
             tls:
               type: object
