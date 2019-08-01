@@ -122,6 +122,7 @@ When committing new dependencies, please use the following guidelines:
 ## Developer install
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
+If you need a minimal storage con***REMOVED***guration with no external dependencies, use the [manifests/metering-con***REMOVED***g/hdfs-minimal.yaml](manifests/metering-con***REMOVED***g/hdfs-minimal.yaml) example con***REMOVED***guration.
 
 # Releasing
 
