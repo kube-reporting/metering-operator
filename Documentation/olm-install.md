@@ -11,17 +11,17 @@ This procedure covers:
 
 Create a dedicated OpenShift project for Metering, and then install the Metering Operator:
 
-1. Create a new project/namespace called *metering* using the OpenShift web console (navigate to **Project > Create Project**) or the `oc` command:
+1. Create a new project/namespace called *openshift-metering* using the OpenShift web console (navigate to **Administration > Namespaces > Create Namespace**) or the `oc` command:
 
 ```
-oc new-project metering
+oc create namespace openshift-metering
 ```
 
 2. From the web console, click **Catalog > OperatorHub**, and search for *metering* to find the Metering Operator.
 
 3. Click the Metering card to open its package description, then click **Install**.
 
-4. In the **Create Operator Subscription** screen, select the *metering* namespace in the **A specific namespace on the cluster** drop-down, and specify your update channel and approval strategy. Click **Subscribe** to install the metering-operator into your selected namespace.
+4. In the **Create Operator Subscription** screen, select the *openshift-metering* namespace in the **A specific namespace on the cluster** drop-down, and specify your update channel and approval strategy. Click **Subscribe** to install the metering-operator into your selected namespace.
 
 5. On the **Subscription Overview** screen, the **Upgrade status** indicates *1 installed* when the Metering Operator has finished installing. Click the *1 installed* (or *installed version*) link to view the ClusterServiceVersion overview for the metering-operator.
 
