@@ -17,7 +17,7 @@ Create a dedicated OpenShift project for Metering, and then install the Metering
 oc create namespace openshift-metering
 ```
 
-2. From the web console, click **Catalog > OperatorHub**, and search for *metering* to ***REMOVED***nd the Metering Operator.
+2. From the web console, click **Catalog > OperatorHub**, and search for *metering-ocp* to ***REMOVED***nd the Metering Operator.
 
 3. Click the Metering card to open its package description, then click **Install**.
 
