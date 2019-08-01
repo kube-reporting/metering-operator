@@ -501,12 +501,8 @@ olm:
 
   subscriptionName: metering
   subscriptionChannel: stable
-  subscriptionCatalogSource: metering-operators
-  subscriptionCatalogSourceNamespace: openshift-metering
+  subscriptionCatalogSource: redhat-operators
+  subscriptionCatalogSourceNamespace: openshift-marketplace
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["openshift-metering"]
-
-  catalogSourceCon***REMOVED***gName: metering-operators
-  catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
-  catalogTargetNamespace: openshift-metering

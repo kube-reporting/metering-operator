@@ -19,35 +19,6 @@ First, start by creating the `openshift-metering` namespace:
 kubectl create ns openshift-metering
 ```
 
-Next a `CatalogSourceCon***REMOVED***g` needs to be added to the `openshift-marketplace` namespace.
-This results in a `CatalogSource` containing the `metering` OLM package being created in the `openshift-metering` namespace.
-
-Download the `metering-operators` [metering.catalogsourcecon***REMOVED***g.yaml][metering-catalogsourcecon***REMOVED***g] and install it into the `openshift-marketplace` namespace:
-
-```
-kubectl apply -n openshift-marketplace -f metering.catalogsourcecon***REMOVED***g.yaml
-```
-
-After it is created, con***REMOVED***rm a new `CatalogSource` is created in the `openshift-metering` namespace:
-
-```
-kubectl -n openshift-metering get catalogsources
-NAME                 NAME     TYPE   PUBLISHER   AGE
-metering-operators   Custom   grpc   Custom      7s
-```
-
-You should also see a pod with a name resembling `metering-operators-12345` in the `openshift-marketplace` namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
-
-```
-kubectl -n openshift-marketplace get pods
-NAME                                    READY   STATUS    RESTARTS   AGE
-certi***REMOVED***ed-operators-77b9986c5f-b7ndr    1/1     Running   0          25m
-community-operators-7d57677987-88477    1/1     Running   0          25m
-marketplace-operator-77dd7759cc-4thqm   1/1     Running   0          25m
-metering-operators-784f4ccccc-ctdxd     1/1     Running   0          43s
-redhat-operators-569bcbb8c5-7v2kw       1/1     Running   0          25m
-```
-
 Next, you will create an `OperatorGroup` in your namespace that restricts the namespaces the operator will monitor to the `openshift-metering` namespace.
 
 Download the `metering-operators` [metering.operatorgroup.yaml][metering-operatorgroup] and install it into the `openshift-metering` namespace:
