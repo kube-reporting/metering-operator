@@ -70,14 +70,11 @@ Within a minute you should see resources being created in your namespace:
 ```
 kubectl -n openshift-metering get pods
 NAME                                  READY   STATUS              RESTARTS   AGE
-hdfs-datanode-0                       0/1     Init:0/1            0          25s
-hdfs-namenode-0                       0/1     ContainerCreating   0          25s
-hive-metastore-0                      0/1     ContainerCreating   0          25s
-hive-server-0                         0/1     ContainerCreating   0          25s
-metering-operator-c7545d555-h5m6x     2/2     Running             0          105s
-metering-operators-bvpf7              1/1     Running             0          2m33s
-presto-coordinator-584789c6b-kpfpc    0/1     Init:0/1            0          25s
-reporting-operator-5c8db66985-9ghz4   0/1     Running             0          25s
+hive-metastore-0                      1/2     Running             0          52s
+hive-server-0                         2/3     Running             0          52s
+metering-operator-68dd64cfb6-pxh8v    2/2     Running             0          2m49s
+presto-coordinator-0                  2/2     Running             0          31s
+reporting-operator-56c6c878fb-2zbhp   0/2     ContainerCreating   0          4s
 ```
 
 It can take several minutes for all the pods to become "Ready".
@@ -88,14 +85,11 @@ Eventually your pod output should look like this:
 
 ```
 NAME                                  READY   STATUS    RESTARTS   AGE
-hdfs-datanode-0                       1/1     Running   0          7m24s
-hdfs-namenode-0                       1/1     Running   0          7m24s
-hive-metastore-0                      1/1     Running   0          7m24s
-hive-server-0                         1/1     Running   1          7m24s
-metering-operator-c7545d555-h5m6x     2/2     Running   0          8m44s
-metering-operators-bvpf7              1/1     Running   0          9m32s
-presto-coordinator-584789c6b-kpfpc    1/1     Running   0          7m24s
-reporting-operator-5c8db66985-9ghz4   1/1     Running   0          7m24s
+hive-metastore-0                      2/2     Running   0          3m28s
+hive-server-0                         3/3     Running   0          3m28s
+metering-operator-68dd64cfb6-2k7d9    2/2     Running   0          5m17s
+presto-coordinator-0                  2/2     Running   0          3m9s
+reporting-operator-5588964bf8-x2tkn   2/2     Running   0          2m40s
 ```
 
 Once all pods are ready, you can begin using Metering to collect and Report on your cluster.
