@@ -14,7 +14,7 @@ Create a dedicated OpenShift project for Metering, and then install the Metering
 1. Create a new project/namespace called *metering* using the OpenShift web console (navigate to **Project > Create Project**) or the `oc` command:
 
 ```
-oc create project metering
+oc new-project metering
 ```
 
 2. From the web console, click **Catalog > OperatorHub**, and search for *metering* to find the Metering Operator.
