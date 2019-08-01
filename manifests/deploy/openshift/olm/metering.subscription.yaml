@@ -3,8 +3,8 @@ kind: Subscription
 metadata:
   name: metering
 spec:
-  channel: preview
-  name: metering
+  channel: stable
+  name: metering-ocp
   source: metering-operators
   sourceNamespace: openshift-metering
 
