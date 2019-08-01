@@ -1,6 +1,6 @@
 # Installing Metering using Operator Lifecycle Manager (OLM)
 
-Currently, installing Metering via OLM is only supported on OpenShift 4.x from the OpenShift Marketplace.
+Currently, installing Metering via OLM is only supported on OpenShift 4.2 and newer from the OpenShift Marketplace.
 If you want to install Metering into a non-OpenShift Kubernetes cluster, use the [manual installation documentation][manual-install].
 
 This procedure covers:
