@@ -158,9 +158,9 @@ operator:
       verbs: ["*"]
 
 olm:
-  packageName: metering
+  packageName: metering-ocp
   channels:
-  - name: preview
+  - name: stable
     currentCSV: metering-operator.v4.2.0
 
   imageTags:
@@ -486,7 +486,7 @@ olm:
         ]
 
   subscriptionName: metering
-  subscriptionChannel: preview
+  subscriptionChannel: stable
   subscriptionCatalogSource: metering-operators
   subscriptionCatalogSourceNamespace: openshift-metering
 
