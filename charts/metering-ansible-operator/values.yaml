@@ -187,6 +187,7 @@ olm:
 
   csv:
     version: "4.2.0"
+    minKubeVersion: "1.11.0"
     name : metering-operator.v4.2.0
     displayName: Metering
 

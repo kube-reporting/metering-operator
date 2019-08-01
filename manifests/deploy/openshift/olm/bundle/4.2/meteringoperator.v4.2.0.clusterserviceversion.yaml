@@ -234,6 +234,7 @@ spec:
 
   keywords: [metering metrics reporting prometheus chargeback]
   version: "4.2.0"
+  minKubeVersion: "1.11.0"
   maturity: alpha
   maintainers:
     - email: sd-operator-metering@redhat.com
@@ -415,7 +416,7 @@ spec:
           spec:
             replicas: 1
             strategy:
-              type: Recreate
+              type: RollingUpdate
             selector:
               matchLabels:
                 app: metering-operator
