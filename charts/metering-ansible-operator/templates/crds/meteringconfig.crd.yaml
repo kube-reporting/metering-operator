@@ -94,23 +94,40 @@ spec:
                       - container
                       - secretName
                       properties:
+                        createSecret:
+                          type: boolean
                         container:
                           type: string
+                          minLength: 1
                         secretName:
                           type: string
+                          minLength: 1
+                        storageAccountName:
+                          type: string
+                          minLength: 1
+                        secretAccessKey:
+                          type: string
+                          minLength: 1
                         rootDirectory:
                           type: string
+                          minLength: 1
                     sharedPVC:
                       type: object
                       properties:
-                        claimName:
-                          type: string
-                        storageClass:
-                          type: string
-                        size:
-                          type: string
                         createPVC:
                           type: boolean
+                        claimName:
+                          type: string
+                          minLength: 1
+                        storageClass:
+                          type: string
+                          minLength: 1
+                        size:
+                          type: string
+                          minLength: 1
+                        mountPath:
+                          type: string
+                          minLength: 1
                       oneOf:
                       - required:
                         - claimName
