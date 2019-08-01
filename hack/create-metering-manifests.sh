@@ -103,6 +103,8 @@ BUNDLE_DIR="$OLM_OUTPUT_DIR/bundle"
 CSV_BUNDLE_DIR="$BUNDLE_DIR/${major}.${minor}"
 
 PACKAGE_MANIFEST_DESTINATION="$BUNDLE_DIR/package.yaml"
+ART_CONFIG_DESTINATION="$BUNDLE_DIR/art.yaml"
+
 CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
 IMAGE_REFERENCES_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/image-references"
 
@@ -120,6 +122,12 @@ helm template "$CHART" \
     -x "templates/olm/package.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
+
+helm template "$CHART" \
+    "${VALUES_ARGS[@]}" \
+    -x "templates/olm/art.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$ART_CONFIG_DESTINATION"
 
 helm template "$CHART" \
     "${VALUES_ARGS[@]}" \
