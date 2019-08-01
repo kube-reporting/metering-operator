@@ -6,6 +6,7 @@ hive.storage-format={{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat | u
 hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
+hive.collect-column-statistics-on-write=true
 
 {{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreURI }}
 hive.metastore.uri={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreURI }}
@@ -17,9 +18,8 @@ hive.metastore.uri=thrift://hive-metastore:9083
 {{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
 hive.metastore-timeout={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
 {{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.useHadoopCon***REMOVED***g}}
+{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g}}
 hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
-hive.collect-column-statistics-on-write=true
 {{- end }}
 
 {{ end }}
