@@ -123,6 +123,7 @@ When committing new dependencies, please use the following guidelines:
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
 If you need a minimal storage configuration with no external dependencies, use the [manifests/metering-config/hdfs-minimal.yaml](manifests/metering-config/hdfs-minimal.yaml) example configuration.
+Configure this with `export METERING_CR_FILE=manifests/metering-config/hdfs-storage.yaml`, you *must* choose some storage option for a successful install.
 
 # Releasing
 
