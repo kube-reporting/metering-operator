@@ -5,8 +5,31 @@ metadata:
 spec:
   storage:
     type: hive
+    # uncomment one of the hive sections below, picking one of S3, Azure, or
+    # sharedPVC
+    #
+    # # AWS S3 configuration
     # hive:
     #   type: "s3"
     #   s3:
     #     bucket: "bucketname/path/"
     #     secretName: "my-aws-secret"
+    #
+    # # Azure Blob Storage configuration
+    # hive:
+    #   type: "azure"
+    #   azure:
+    #     container: "bucket1"
+    #     secretName: "my-azure-secret"
+    #     rootDirectory: "/testDir"
+    #
+    # # Use a ReadWriteMany PersistentVolumeClaim as storage
+    # hive:
+    #   type: "sharedPVC"
+    #   sharedPVC:
+    #     # change claimName to your PVC's name
+    #     claimName: "metering-nfs"
+    #     # uncomment the lines below to provision a new PVC using the specified storageClass.
+    #     # createPVC: true
+    #     # storageClass: "my-nfs-storage-class"
+    #     # size: 5Gi
