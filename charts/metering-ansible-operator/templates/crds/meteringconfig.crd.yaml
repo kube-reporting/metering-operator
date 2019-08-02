@@ -1349,6 +1349,7 @@ spec:
                       properties:
                         fsGroup:
                           type: integer
+                          format: int64
                         runAsGroup:
                           type: integer
                           format: int64
@@ -1742,6 +1743,7 @@ spec:
                       properties:
                         fsGroup:
                           type: integer
+                          format: int64
                         runAsGroup:
                           type: integer
                           format: int64
@@ -2235,6 +2237,7 @@ spec:
                           properties:
                             fsGroup:
                               type: integer
+                              format: int64
                             runAsGroup:
                               type: integer
                               format: int64
