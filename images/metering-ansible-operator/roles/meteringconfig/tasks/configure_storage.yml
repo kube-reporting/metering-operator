@@ -46,6 +46,11 @@
         namespace: "{{ meta.namespace }}"
       register: azure_secret_buf
 
+    - name: Verify azure storage credentials secret exists
+      assert:
+        that:
+          - azure_secret_buf is de***REMOVED***ned and azure_secret_buf.resources | length > 0
+          - azure_secret_buf.resources[0].data['azure-storage-account-name'] != ""
     - name: Extract Azure storage account name
       set_fact:
         _azure_secret_account_name: "{{ azure_secret_buf.resources[0].data['azure-storage-account-name'] | b64decode | default(omit)  }}"
