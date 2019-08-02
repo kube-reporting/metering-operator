@@ -17,4 +17,5 @@ if ! whoami &> /dev/null; then
     ***REMOVED***
 ***REMOVED***
 
-exec /tini -- /usr/local/bin/ansible-operator run ansible --watches-***REMOVED***le=/opt/ansible/watches.yaml "$@"
+# we expect tini to be in the $PATH
+exec tini -- /usr/local/bin/ansible-operator run ansible --watches-***REMOVED***le=/opt/ansible/watches.yaml "$@"
