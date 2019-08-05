@@ -367,17 +367,65 @@ spec:
                     authProxy:
                       type: object
                       properties:
+                        enabled:
+                          type: boolean
                         authenticatedEmails:
                           type: object
                           properties:
+                            enabled:
+                              type: boolean
                             createSecret:
                               type: boolean
                             data:
                               type: string
-                            enabled:
-                              type: boolean
+                              minLength: 1
                             secretName:
                               type: string
+                              minLength: 1
+                          oneOf:
+                          - required:
+                            - enabled
+                            properties:
+                              enabled:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - createSecret
+                            - not:
+                                required:
+                                - data
+                            - not:
+                                required:
+                                - secretName
+                          - required:
+                            - enabled
+                            - createSecret
+                            - secretName
+                            properties:
+                              enabled:
+                                enum:
+                                - true
+                              createSecret:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - seed
+                          - required:
+                            - enabled
+                            - createSecret
+                            - data
+                            - secretName
+                            properties:
+                              enabled:
+                                enum:
+                                - true
+                              createSecret:
+                                enum:
+                                - true
                         cookie:
                           type: object
                           properties:
@@ -385,8 +433,29 @@ spec:
                               type: boolean
                             secretName:
                               type: string
+                              minLength: 1
                             seed:
                               type: string
+                              minLength: 32
+                          oneOf:
+                          - required:
+                            - createSecret
+                            - seed
+                            properties:
+                              createSecret:
+                                enum:
+                                - true
+                          - required:
+                            - createSecret
+                            - secretName
+                            properties:
+                              createSecret:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - seed
                         delegateURLs:
                           type: object
                           properties:
@@ -394,8 +463,7 @@ spec:
                               type: boolean
                             policy:
                               type: string
-                        enabled:
-                          type: boolean
+                              minLength: 1
                         htpasswd:
                           type: object
                           properties:
@@ -403,19 +471,43 @@ spec:
                               type: boolean
                             data:
                               type: string
+                              minLength: 1
                             secretName:
                               type: string
+                              minLength: 1
+                        oneOf:
+                        - required:
+                          - createSecret
+                          - data
+                          properties:
+                            createSecret:
+                              enum:
+                              - true
+                        - required:
+                          - createSecret
+                          - secretName
+                          properties:
+                            createSecret:
+                              enum:
+                              - false
+                          allOf:
+                          - not:
+                              required:
+                              - data
                         image:
                           type: object
                           properties:
                             pullPolicy:
                               type: string
+                              minLength: 1
                             pullSecrets:
                               type: array
                             repository:
                               type: string
+                              minLength: 1
                             tag:
                               type: string
+                              minLength: 1
                         rbac:
                           type: object
                           required:
@@ -432,11 +524,14 @@ spec:
                               type: object
                         subjectAccessReview:
                           type: object
+                          required:
+                          - enabled
                           properties:
                             enabled:
                               type: boolean
                             policy:
                               type: string
+                              minLength: 1
                     config:
                       type: object
                       properties:
