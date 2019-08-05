@@ -74,7 +74,6 @@ spec:
                       type: object
                       required:
                       - bucket
-                      - region
                       - secretName
                       properties:
                         bucket:
