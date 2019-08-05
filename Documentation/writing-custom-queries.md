@@ -343,7 +343,7 @@ kubectl -n $METERING_NAMESPACE get report unready-deployment-replicas -o json
 Once the Report's status has changed to `Finished` (this can take a few minutes depending on cluster size and amount of data collected), we can query the operator's HTTP API for the results:
 
 ```
-METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
+METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
 curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=unready-deployment-replicas&namespace=$METERING_NAMESPACE&format=csv"
 ```

@@ -50,7 +50,7 @@ In both cases, the data is persisted as ORC files in either S3, HDFS, or a ReadW
 
 For user-docs containing a description of the fields, and examples, see [ReportDataSources][reportdatasources].
 
-A `ReportDataSource` represents a database table data lives.
+A `ReportDataSource` indicates where a database table lives.
 There are many types of ReportDataSources, with the most common being a "PrometheusMetricsImporter" ReportDataSource.
 
 A PrometheusMetricsImporter ReportDataSource instructs the reporting-operator to create a database table for storing Prometheus metric data and to being the process of importing Prometheus metrics.

@@ -63,7 +63,7 @@ downloaded. The Metering Pod exposes an HTTP API for this.
 
 If you're using Openshift, we need to get the metering route's hostname:
 ```
-METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
+METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 ```
 
 The URL used to fetch a report changes based on the report's name and format.

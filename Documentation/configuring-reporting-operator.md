@@ -126,7 +126,7 @@ If you want to manually configure authentication in Openshift, disable it entire
 In order to access the reporting API, the metering operator exposes a route. Once that route has been installed, you can run the command below to get the route's hostname.
 
 ```
-METERING_ROUTE_NAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq '.status.ingress[].host')
+METERING_ROUTE_NAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 ```
 
 Also, make sure the `METERING_NAMESPACE` environment variable is set before continuing on with the next sections.
