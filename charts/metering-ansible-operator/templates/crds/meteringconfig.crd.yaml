@@ -474,25 +474,25 @@ spec:
                             secretName:
                               type: string
                               minLength: 1
-                        oneOf:
-                        - required:
-                          - createSecret
-                          - data
-                          properties:
-                            createSecret:
-                              enum:
-                              - true
-                        - required:
-                          - createSecret
-                          - secretName
-                          properties:
-                            createSecret:
-                              enum:
-                              - false
-                          allOf:
-                          - not:
-                              required:
-                              - data
+                          oneOf:
+                          - required:
+                            - createSecret
+                            - data
+                            properties:
+                              createSecret:
+                                enum:
+                                - true
+                          - required:
+                            - createSecret
+                            - secretName
+                            properties:
+                              createSecret:
+                                enum:
+                                - false
+                            allOf:
+                            - not:
+                                required:
+                                - data
                         image:
                           type: object
                           properties:
