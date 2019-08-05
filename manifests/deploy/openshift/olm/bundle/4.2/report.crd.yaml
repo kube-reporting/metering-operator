@@ -184,6 +184,102 @@ spec:
                     expression:
                       type: string
                       pattern: '^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?){4}$'
+              oneOf:
+              - required:
+                - hourly
+                properties:
+                  period:
+                    enum:
+                    - hourly
+                allOf:
+                - not:
+                    required:
+                    - daily
+                - not:
+                    required:
+                    - weekly
+                - not:
+                    required:
+                    - monthly
+                - not:
+                    required:
+                    - cron
+              - required:
+                - daily
+                properties:
+                  period:
+                    enum:
+                    - daily
+                allOf:
+                - not:
+                    required:
+                    - hourly
+                - not:
+                    required:
+                    - weekly
+                - not:
+                    required:
+                    - monthly
+                - not:
+                    required:
+                    - cron
+              - required:
+                - weekly
+                properties:
+                  period:
+                    enum:
+                    - weekly
+                allOf:
+                - not:
+                    required:
+                    - hourly
+                - not:
+                    required:
+                    - daily
+                - not:
+                    required:
+                    - monthly
+                - not:
+                    required:
+                    - cron
+              - required:
+                - monthly
+                properties:
+                  period:
+                    enum:
+                    - monthly
+                allOf:
+                - not:
+                    required:
+                    - hourly
+                - not:
+                    required:
+                    - daily
+                - not:
+                    required:
+                    - weekly
+                - not:
+                    required:
+                    - cron
+              - required:
+                - cron
+                properties:
+                  period:
+                    enum:
+                    - cron
+                allOf:
+                - not:
+                    required:
+                    - hourly
+                - not:
+                    required:
+                    - daily
+                - not:
+                    required:
+                    - weekly
+                - not:
+                    required:
+                    - monthly
 
           anyOf:
           # runOnce report
