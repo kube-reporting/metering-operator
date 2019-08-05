@@ -27,6 +27,23 @@ $ brew install go kubernetes-helm make docker dep coreutils jq faq python@3
 $ pip3 install operator-courier
 ```
 
+## Setup
+
+It is important that you clone the project to the right location in your $GOPATH.
+
+The repository much be located at:
+
+```
+$GOPATH/src/github.com/operator-framework/operator-metering
+```
+
+When cloning this repository, you can run the following commands to ensure that the project ***REMOVED***les are stored in the right location:
+
+```
+mkdir -p $GOPATH/src/github.com/operator-framework/
+git clone https://github.com/operator-framework/operator-metering $GOPATH/src/github.com/operator-framework/operator-metering
+```
+
 ## Building
 
 To build the reporting-operator binary using your local Go:
