@@ -126,7 +126,7 @@ If you want to manually configure authentication in Openshift, disable it entire
 In order to access the reporting API, the metering operator exposes a route. Once that route has been installed, you can run the command below to get the route's hostname.
 
 ```
-METERING_ROUTE_NAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
+METERING_ROUTE_HOSTNAME=$(oc -n $METERING_NAMESPACE get routes metering -o json | jq -r '.status.ingress[].host')
 ```
 
 Also, make sure the `METERING_NAMESPACE` environment variable is set before continuing on with the next sections.
@@ -140,17 +140,17 @@ With this method, we use the token in the reporting operator's service account, 
 
 ```
 TOKEN=$(oc -n $METERING_NAMESPACE serviceaccounts get-token reporting-operator)
-curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_NAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
+curl -H "Authorization: Bearer $TOKEN" -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
 ```
 
-Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above. 
+Be sure to replace the `name=[Report Name]` and `format=[Format]` parameters in the URL above.
 
 ##### Authenticate using a username and password
 We are able to do basic authentication using a username and password combination, which is specified in the contents of a htpasswd file. We, by default, create a secret containing an empty htpasswd data. You can, however, configure the `reporting-operator.spec.authProxy.htpasswd.data` and `reporting-operator.spec.authProxy.htpasswd.createSecret` keys to use this method. See the [basic authentication](#basic-authentication-usernamepassword) section for more information.
 
 Once you have specified the above in your `MeteringConfig` CR, you can run the following command:
 ```
-curl -u testuser:password123 -k "https://$METERING_ROUTE_NAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
+curl -u testuser:password123 -k "https://$METERING_ROUTE_HOSTNAME/api/v1/reports/get?name=[Report Name]&namespace=$METERING_NAMESPACE&format=[Format]"
 ```
 
 Be sure to replace `testuser:password123` with a valid username and password combination.
