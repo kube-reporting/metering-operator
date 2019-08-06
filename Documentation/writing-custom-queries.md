@@ -18,7 +18,7 @@ This guide assumes you've already [installed Metering][install-metering] and hav
 > This guide assumes you've set the `METERING_NAMESPACE` environment variable to the namespace your Operator Metering installation is running. All resources must be created in that namespace for the operator to view and access them.
 > Additionally, in some cases, the value of `$METERING_NAMESPACE` will be used directly and the command you need to run may need to be adjusted based on your value. To make it clear where you will need to adjust your values, we will assume the value of "$METERING_NAMESPACE" is `your-namespace`.
 
-Many of the examples below, you will have you run a Prometheus query outside of the Metering operator.
+Many of the examples below, will have you run a Prometheus query outside of the Metering operator.
 The easiest way to do this is open a port-forward to your Prometheus pod in your cluster.
 Below is a command that will open up a port-forward, exposing Prometheus on `127.0.0.1:9090`.
 
@@ -86,10 +86,11 @@ One way to do this is to check the [metering operator logs][reporting-operator-l
 
 The other way however is to exec into the Presto pod and open up a Presto-cli session which allows us to interactively query Presto.
 Open up a Presto-cli session by following the [Query Presto using presto-cli developer documentation][presto-cli-exec].
-After you have a session run the following query:
+After you have a session, set the schema to `metering`, and run the following query:
 
 ```
-show tables from metering;
+use metering;
+show tables;
 ```
 
 This should give you a list of Database Tables created in Presto, within the hive catalog, in the metering schema, and you should see quite a few entries.
@@ -106,7 +107,7 @@ SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
 If at least one row shows up, then everything is working correctly, an example of the output expected is shown below:
 
 ```
-presto:default> SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
+presto:metering> SELECT * FROM datasource_your_namespace_unready_deployment_replicas LIMIT 10;
  amount |        timestamp        | timeprecision |                              labels                              |     dt
 --------+-------------------------+---------------+------------------------------------------------------------------+------------
     0.0 | 2019-05-03 16:01:00.000 |          60.0 | {namespace=telemeter-tschuy, deployment=presto-worker}           | 2019-05-03
