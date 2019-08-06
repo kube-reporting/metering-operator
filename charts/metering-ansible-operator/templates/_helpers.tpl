@@ -1,7 +1,7 @@
 {{- de***REMOVED***ne "operator-deployment-spec" -}}
 replicas: 1
 strategy:
-  type: Recreate
+  type: RollingUpdate
 selector:
   matchLabels:
     app: {{ .Values.operator.name }}

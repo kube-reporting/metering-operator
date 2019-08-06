@@ -158,9 +158,9 @@ operator:
       verbs: ["*"]
 
 olm:
-  packageName: metering
+  packageName: metering-ocp
   channels:
-  - name: preview
+  - name: stable
     currentCSV: metering-operator.v4.2.0
 
   imageTags:
@@ -187,6 +187,7 @@ olm:
 
   csv:
     version: "4.2.0"
+    minKubeVersion: "1.11.0"
     name : metering-operator.v4.2.0
     displayName: Metering
 
@@ -224,7 +225,7 @@ olm:
     icon:
       - base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMzcgMTI3Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2MwMDt9LmNscy0ye2ZpbGw6I2ZmZjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPm9wZXJhdG9yX2xvZ29fbWV0ZXJpbmdfY29sb3I8L3RpdGxlPjxnIGlkPSJQYWdlLTEiPjxwYXRoIGlkPSJGaWxsLTEiIGNsYXNzPSJjbHMtMSIgZD0iTTY2LjUsMjRBNDIuNSw0Mi41LDAsMSwxLDI0LDY2LjUsNDIuNTEsNDIuNTEsMCwwLDEsNjYuNSwyNCIvPjxwYXRoIGlkPSJGaWxsLTUiIGNsYXNzPSJjbHMtMiIgZD0iTTQxLjUzLDczLDc2LjA4LDI5Yy43NywxLjUyLDAsMi4zOC0uMywzLjI5LTMuMTQsOC42MS02LjIzLDE3LjI4LTkuNTIsMjUuODQtLjgxLDIuMTctLjQ2LDIuNjgsMS44MiwyLjY4SDkwLjMyYy42LDAsMS40Mi0uMywxLjc3LjM2cy0uNDEsMS4xNi0uNzYsMS42N0w2MywxMDAuMzNjLS40NS42MS0uOSwxLjUyLTEuNzIsMS4wN3MtLjMtMS4zNywwLTIuMTNjMi4xOC04LDQuMjYtMTUuOTEsNi41NC0yMy44Ni41Ni0xLjg3LDAtMi4yOC0xLjcyLTIuMjNINDVaIi8+PC9nPjxwYXRoIGQ9Ik0xMjIuNzMsNTIuNzljMC01LjE5LDIuNDYtMTAuODYsOS4yMS0xMC44NnM5LjIxLDUuNjcsOS4yMSwxMC44Ni0yLjQzLDEwLjg2LTkuMjEsMTAuODZTMTIyLjczLDU4LDEyMi43Myw1Mi43OVptMTQuNywwYzAtMy40NS0xLjQxLTcuNDEtNS40OS03LjQxcy01LjQ5LDQuMTctNS40OSw3LjQxYzAsMy40MiwxLjQxLDcuNDEsNS40OSw3LjQxUzEzNy40Myw1NiwxMzcuNDMsNTIuNzlaIi8+PHBhdGggZD0iTTE0NS41LDQyLjI5aDguNzNjNS4yMiwwLDcuMDUsMy4zLDcuMDUsNi41MSwwLDMtMiw2LjU0LTcuMDUsNi41NEgxNDkuMXY3Ljk1aC0zLjZabTEyLjA2LDYuNTFhMi45LDIuOSwwLDAsMC0zLjE1LTMuMDlIMTQ5LjF2Ni4yMWg1LjMxQTIuOTQsMi45NCwwLDAsMCwxNTcuNTYsNDguOFoiLz48cGF0aCBkPSJNMTY0LjU4LDQyLjI5aDEzLjY4djMuMzlIMTY4LjE4djUuMDdoNi4yMXYzLjM5aC02LjIxVjU5LjloMTAuNzR2My4zOUgxNjQuNThaIi8+PHBhdGggZD0iTTE4Myw0Mi4yOWg5LjNjNS4yMiwwLDYuOSwzLjA5LDYuOSw2LjM5YTYuMTUsNi4xNSwwLDAsMS00LjMyLDZsNC4yLDguNjFIMTk1TDE5MSw1NS4wN2gtNC4zOHY4LjIySDE4M1ptOS4zNiw5LjM2YzIuMzQsMCwzLjEyLTEuNDQsMy4xMi0zcy0uNjYtMy0zLjEyLTNoLTUuNzZ2NS45NFoiLz48cGF0aCBkPSJNMjE1LjI1LDU4LjdoLTguMzFsLTEuNjUsNC41OWgtMy44MWw3LjgzLTIxaDMuNTdsNy44LDIxSDIxNi45Wm0tMy40NS05LjU0YTE3LjYzLDE3LjYzLDAsMCwxLS42OS0yLjEzYy0uMTguNjMtLjQ4LDEuNTMtLjY5LDIuMTNsLTIuMzQsNi4zaDZaIi8+PHBhdGggZD0iTTIyOS43MSw2My4yOWgtMy42VjQ1Ljc0aC02VjQyLjI5aDE1LjU0djMuNDVoLTZaIi8+PHBhdGggZD0iTTIzNy42OSw1Mi43OWMwLTUuMTksMi40Ni0xMC44Niw5LjIxLTEwLjg2czkuMjEsNS42Nyw5LjIxLDEwLjg2LTIuNDMsMTAuODYtOS4yMSwxMC44NlMyMzcuNjksNTgsMjM3LjY5LDUyLjc5Wm0xNC43LDBjMC0zLjQ1LTEuNDEtNy40MS01LjQ5LTcuNDFzLTUuNDksNC4xNy01LjQ5LDcuNDFjMCwzLjQyLDEuNDEsNy40MSw1LjQ5LDcuNDFTMjUyLjM5LDU2LDI1Mi4zOSw1Mi43OVoiLz48cGF0aCBkPSJNMjYwLjQ2LDQyLjI5aDkuM2M1LjIyLDAsNi45LDMuMDksNi45LDYuMzlhNi4xNSw2LjE1LDAsMCwxLTQuMzIsNmw0LjIsOC42MWgtNC4wNWwtNC4wNS04LjIyaC00LjM4djguMjJoLTMuNlptOS4zNiw5LjM2YzIuMzQsMCwzLjEyLTEuNDQsMy4xMi0zcy0uNjYtMy0zLjEyLTNoLTUuNzZ2NS45NFoiLz48cGF0aCBkPSJNMTQ1LDEwMC4yOVY4NS40MWMwLTEsLjA4LTIuNi4xNi0zLjM2LS4zNiwxLjA4LS44OCwyLjQ0LTEuMjgsMy40NGwtNi43OSwxNS4yOC02LjgtMTUuMzZjLS40NC0xLTEtMi4yOC0xLjMyLTMuMzYuMDguNzYuMTYsMi4zNi4xNiwzLjM2djE0Ljg4aC00Ljh2LTI4aDQuODRsNy4yLDE2LjQ0Yy4yOC42OC41NiwxLjQ0Ljc2LDIuMDguMi0uNjQuNDgtMS40Ljc2LTIuMDhsNy4yMy0xNi40NGg0LjY4djI4WiIvPjxwYXRoIGQ9Ik0xNTYuNjEsNzIuMjloMTguMjN2NC41MkgxNjEuNDF2Ni43Nmg4LjI4djQuNTJoLTguMjh2Ny42OGgxNC4zMXY0LjUySDE1Ni42MVoiLz48cGF0aCBkPSJNMTkyLjA5LDEwMC4yOWgtNC44Vjc2Ljg5aC04di00LjZIMjAwdjQuNmgtNy45NVoiLz48cGF0aCBkPSJNMjA1LjA1LDcyLjI5aDE4LjIzdjQuNTJIMjA5Ljg1djYuNzZoOC4yN3Y0LjUyaC04LjI3djcuNjhoMTQuMzF2NC41MkgyMDUuMDVaIi8+PHBhdGggZD0iTTIyOS41Nyw3Mi4yOUgyNDJjNywwLDkuMiw0LjEyLDkuMiw4LjUyYTguMiw4LjIsMCwwLDEtNS43Niw4bDUuNiwxMS40OGgtNS40bC01LjQtMTFoLTUuODN2MTFoLTQuOFpNMjQyLDg0Ljc3YzMuMTIsMCw0LjE2LTEuOTIsNC4xNi00LDAtMS44OC0uODgtNC00LjE2LTRoLTcuNjd2Ny45MloiLz48cGF0aCBkPSJNMjU3LjE3LDcyLjI5SDI2MnYyOGgtNC44WiIvPjxwYXRoIGQ9Ik0yODYuMzYsMTAwLjI5bC0xMS42LTE3LjY4Yy0uMzYtLjU2LS44LTEuMzYtMS4xNi0yLjA4YTE2LjEzLDE2LjEzLDAsMCwxLC4xMywyLjA4djE3LjY4SDI2OXYtMjhoNC42M2wxMS4zMiwxNy40YTIxLDIxLDAsMCwxLDEuMTYsMi4xMiwyMC41NCwyMC41NCwwLDAsMS0uMTItMi4xMlY3Mi4yOWg0Ljc2djI4WiIvPjxwYXRoIGQ9Ik0yOTYuNTMsODYuMjljMC02Ljg0LDMuODctMTQuNDgsMTIuMjctMTQuNDgsNS40LDAsOCwyLjcyLDkuOCw1LjY0bC00LjI4LDIuNDRjLTEuMjQtMS44NC0yLjg4LTMuNDQtNS41Mi0zLjQ0LTUuNjQsMC03LjMyLDUuNDgtNy4zMiw5Ljg0LDAsNSwyLjEyLDkuODQsNy4zMiw5Ljg0YTUuMjIsNS4yMiwwLDAsMCw1LjQtNS4yNHYtLjQ0aC00LjkyVjg1LjkzaDkuOHYzLjg4YzAsNy4xMi00LjQ4LDExLTEwLjI4LDExQzMwMC4xNywxMDAuNzcsMjk2LjUzLDkzLjYxLDI5Ni41Myw4Ni4yOVoiLz48L3N2Zz4K
         mediatype: image/svg+xml
-    maturity: alpha
+    maturity: stable
     maintainers:
     - name: Red Hat
       email: sd-operator-metering@redhat.com
@@ -307,7 +308,20 @@ olm:
             "metadata": {
               "name": "operator-metering"
             },
-            "spec": {}
+            "spec": {
+              "storage": {
+                "hive": {
+                  "s3": {
+                    "bucket": "bucketname/path/",
+                    "createBucket": true,
+                    "region": "us-west-1",
+                    "secretName": "my-aws-secret"
+                  },
+                  "type": "s3"
+                },
+                "type": "hive"
+              }
+            }
           },
           {
             "apiVersion": "metering.openshift.io/v1",
@@ -486,13 +500,9 @@ olm:
         ]
 
   subscriptionName: metering
-  subscriptionChannel: preview
-  subscriptionCatalogSource: metering-operators
-  subscriptionCatalogSourceNamespace: openshift-metering
+  subscriptionChannel: stable
+  subscriptionCatalogSource: redhat-operators
+  subscriptionCatalogSourceNamespace: openshift-marketplace
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["openshift-metering"]
-
-  catalogSourceCon***REMOVED***gName: metering-operators
-  catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
-  catalogTargetNamespace: openshift-metering
