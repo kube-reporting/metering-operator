@@ -12,7 +12,20 @@ metadata:
           "metadata": {
             "name": "operator-metering"
           },
-          "spec": {}
+          "spec": {
+            "storage": {
+              "hive": {
+                "s3": {
+                  "bucket": "bucketname/path/",
+                  "createBucket": true,
+                  "region": "us-west-1",
+                  "secretName": "my-aws-secret"
+                },
+                "type": "s3"
+              },
+              "type": "hive"
+            }
+          }
         },
         {
           "apiVersion": "metering.openshift.io/v1",
@@ -234,7 +247,8 @@ spec:
 
   keywords: [metering metrics reporting prometheus chargeback]
   version: "4.2.0"
-  maturity: alpha
+  minKubeVersion: "1.11.0"
+  maturity: stable
   maintainers:
     - email: sd-operator-metering@redhat.com
       name: Red Hat
@@ -415,7 +429,7 @@ spec:
           spec:
             replicas: 1
             strategy:
-              type: Recreate
+              type: RollingUpdate
             selector:
               matchLabels:
                 app: metering-operator

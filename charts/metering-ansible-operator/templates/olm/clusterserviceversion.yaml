@@ -17,6 +17,7 @@ spec:
 {{ .Values.olm.csv.description | indent 4 }}
   keywords: {{ .Values.olm.csv.keywords }}
   version: {{ .Values.olm.csv.version | quote }}
+  minKubeVersion: {{ .Values.olm.csv.minKubeVersion | quote }}
   maturity: {{ .Values.olm.csv.maturity }}
   maintainers:
 {{ toYaml .Values.olm.csv.maintainers | indent 4 }}

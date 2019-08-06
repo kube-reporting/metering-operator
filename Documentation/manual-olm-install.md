@@ -1,6 +1,6 @@
 # Manual Installation using Operator Lifecycle Manager (OLM)
 
-Currently Metering via OLM is only supported on Openshift 4.x via the Openshift Marketplace.
+Currently Metering via OLM is only supported on Openshift 4.2 or newer via the Openshift Marketplace.
 If you want to install metering into a non-Openshift Kubernetes cluster, please use the [manual installation documentation][manual-install].
 
 ## Install
@@ -17,35 +17,6 @@ First, start by creating the `openshift-metering` namespace:
 
 ```
 kubectl create ns openshift-metering
-```
-
-Next a `CatalogSourceConfig` needs to be added to the `openshift-marketplace` namespace.
-This results in a `CatalogSource` containing the `metering` OLM package being created in the `openshift-metering` namespace.
-
-Download the `metering-operators` [metering.catalogsourceconfig.yaml][metering-catalogsourceconfig] and install it into the `openshift-marketplace` namespace:
-
-```
-kubectl apply -n openshift-marketplace -f metering.catalogsourceconfig.yaml
-```
-
-After it is created, confirm a new `CatalogSource` is created in the `openshift-metering` namespace:
-
-```
-kubectl -n openshift-metering get catalogsources
-NAME                 NAME     TYPE   PUBLISHER   AGE
-metering-operators   Custom   grpc   Custom      7s
-```
-
-You should also see a pod with a name resembling `metering-operators-12345` in the `openshift-marketplace` namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
-
-```
-kubectl -n openshift-marketplace get pods
-NAME                                    READY   STATUS    RESTARTS   AGE
-certified-operators-77b9986c5f-b7ndr    1/1     Running   0          25m
-community-operators-7d57677987-88477    1/1     Running   0          25m
-marketplace-operator-77dd7759cc-4thqm   1/1     Running   0          25m
-metering-operators-784f4ccccc-ctdxd     1/1     Running   0          43s
-redhat-operators-569bcbb8c5-7v2kw       1/1     Running   0          25m
 ```
 
 Next, you will create an `OperatorGroup` in your namespace that restricts the namespaces the operator will monitor to the `openshift-metering` namespace.
@@ -99,14 +70,11 @@ Within a minute you should see resources being created in your namespace:
 ```
 kubectl -n openshift-metering get pods
 NAME                                  READY   STATUS              RESTARTS   AGE
-hdfs-datanode-0                       0/1     Init:0/1            0          25s
-hdfs-namenode-0                       0/1     ContainerCreating   0          25s
-hive-metastore-0                      0/1     ContainerCreating   0          25s
-hive-server-0                         0/1     ContainerCreating   0          25s
-metering-operator-c7545d555-h5m6x     2/2     Running             0          105s
-metering-operators-bvpf7              1/1     Running             0          2m33s
-presto-coordinator-584789c6b-kpfpc    0/1     Init:0/1            0          25s
-reporting-operator-5c8db66985-9ghz4   0/1     Running             0          25s
+hive-metastore-0                      1/2     Running             0          52s
+hive-server-0                         2/3     Running             0          52s
+metering-operator-68dd64cfb6-pxh8v    2/2     Running             0          2m49s
+presto-coordinator-0                  2/2     Running             0          31s
+reporting-operator-56c6c878fb-2zbhp   0/2     ContainerCreating   0          4s
 ```
 
 It can take several minutes for all the pods to become "Ready".
@@ -117,18 +85,38 @@ Eventually your pod output should look like this:
 
 ```
 NAME                                  READY   STATUS    RESTARTS   AGE
-hdfs-datanode-0                       1/1     Running   0          7m24s
-hdfs-namenode-0                       1/1     Running   0          7m24s
-hive-metastore-0                      1/1     Running   0          7m24s
-hive-server-0                         1/1     Running   1          7m24s
-metering-operator-c7545d555-h5m6x     2/2     Running   0          8m44s
-metering-operators-bvpf7              1/1     Running   0          9m32s
-presto-coordinator-584789c6b-kpfpc    1/1     Running   0          7m24s
-reporting-operator-5c8db66985-9ghz4   1/1     Running   0          7m24s
+hive-metastore-0                      2/2     Running   0          3m28s
+hive-server-0                         3/3     Running   0          3m28s
+metering-operator-68dd64cfb6-2k7d9    2/2     Running   0          5m17s
+presto-coordinator-0                  2/2     Running   0          3m9s
+reporting-operator-5588964bf8-x2tkn   2/2     Running   0          2m40s
 ```
 
-Once all pods are ready, you can begin using Metering to collect and Report on your cluster.
-For further reading on using metering, see the [using metering documentation][using-metering]
+Next, verify that the ReportDataSources are beginning to import data, indicated by a valid timestamp in the `EARLIEST METRIC` column (this may take a few minutes).
+We filter out the "-raw" ReportDataSources which don't import data:
+
+```
+$ kubectl get reportdatasources -n $METERING_NAMESPACE | grep -v raw
+NAME                                         EARLIEST METRIC        NEWEST METRIC          IMPORT START           IMPORT END             LAST IMPORT TIME       AGE
+node-allocatable-cpu-cores                   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T16:52:00Z   2019-08-05T18:52:00Z   2019-08-05T18:54:45Z   9m50s
+node-allocatable-memory-bytes                2019-08-05T16:51:00Z   2019-08-05T18:51:00Z   2019-08-05T16:51:00Z   2019-08-05T18:51:00Z   2019-08-05T18:54:45Z   9m50s
+node-capacity-cpu-cores                      2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T18:54:39Z   9m50s
+node-capacity-memory-bytes                   2019-08-05T16:52:00Z   2019-08-05T18:41:00Z   2019-08-05T16:52:00Z   2019-08-05T18:41:00Z   2019-08-05T18:54:44Z   9m50s
+persistentvolumeclaim-capacity-bytes         2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T18:54:43Z   9m50s
+persistentvolumeclaim-phase                  2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T16:51:00Z   2019-08-05T18:29:00Z   2019-08-05T18:54:28Z   9m50s
+persistentvolumeclaim-request-bytes          2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T18:54:34Z   9m50s
+persistentvolumeclaim-usage-bytes            2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T18:54:36Z   9m49s
+pod-limit-cpu-cores                          2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T16:52:00Z   2019-08-05T18:30:00Z   2019-08-05T18:54:26Z   9m49s
+pod-limit-memory-bytes                       2019-08-05T16:51:00Z   2019-08-05T18:40:00Z   2019-08-05T16:51:00Z   2019-08-05T18:40:00Z   2019-08-05T18:54:30Z   9m49s
+pod-persistentvolumeclaim-request-info       2019-08-05T16:51:00Z   2019-08-05T18:40:00Z   2019-08-05T16:51:00Z   2019-08-05T18:40:00Z   2019-08-05T18:54:37Z   9m49s
+pod-request-cpu-cores                        2019-08-05T16:51:00Z   2019-08-05T18:18:00Z   2019-08-05T16:51:00Z   2019-08-05T18:18:00Z   2019-08-05T18:54:24Z   9m49s
+pod-request-memory-bytes                     2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T18:54:32Z   9m49s
+pod-usage-cpu-cores                          2019-08-05T16:52:00Z   2019-08-05T17:57:00Z   2019-08-05T16:52:00Z   2019-08-05T17:57:00Z   2019-08-05T18:54:10Z   9m49s
+pod-usage-memory-bytes                       2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T16:52:00Z   2019-08-05T18:08:00Z   2019-08-05T18:54:20Z   9m49s
+```
+
+Once all pods are ready and you have verified that data is being imported, you can begin using Metering to collect and Report on your cluster.
+For further reading on using metering, see the [using metering documentation][using-metering].
 
 [manual-install]: manual-install.md
 [metering-catalogsourceconfig]: ../manifests/deploy/openshift/olm/metering.catalogsourceconfig.yaml
