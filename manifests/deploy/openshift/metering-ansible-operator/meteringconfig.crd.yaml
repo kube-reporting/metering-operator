@@ -92,7 +92,23 @@ spec:
                       type: object
                       required:
                       - container
-                      - secretName
+                      oneOf:
+                      - required:
+                        - secretName
+                        allOf:
+                        - not:
+                            required:
+                            - storageAccountName
+                        - not:
+                            required:
+                            - secretAccessKey
+                      - required:
+                        - storageAccountName
+                        - secretAccessKey
+                        allOf:
+                        - not:
+                            required:
+                            - secretName
                       properties:
                         createSecret:
                           type: boolean
