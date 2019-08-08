@@ -4,6 +4,6 @@ metadata:
   name: "{{ .Values.hadoop.spec.configSecretName }}"
 data:
 {{- if .Values.hadoop.spec.hdfs.enabled }}
-  hdfs-site.xml : {{ include "hdfs-site-xml" . | b64enc }}
+  hdfs-site.xml: {{ include "hdfs-site-xml" . | b64enc }}
 {{- end}}
   core-site.xml: {{ include "core-site-xml" . | b64enc }}

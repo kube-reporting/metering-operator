@@ -61,6 +61,7 @@ spec:
                       - sharedPVC
                       - s3
                       - azure
+                      - gcs
                     hdfs:
                       type: object
                       required:
@@ -110,6 +111,35 @@ spec:
                         rootDirectory:
                           type: string
                           minLength: 1
+                    gcs:
+                      type: object
+                      required:
+                        - bucket
+                      oneOf:
+                      - required:
+                        - serviceAccountKeyJSON
+                        allOf:
+                        - not:
+                            required:
+                            - secretName
+                      - required:
+                        - secretName
+                        allOf:
+                        - not:
+                            required:
+                            - serviceAccountKeyJSON
+                      properties:
+                        bucket:
+                          type: string
+                          minLength: 1
+                        secretName:
+                          type: string
+                          minLength: 1
+                        createSecret:
+                          type: boolean
+                        serviceAccountKeyJSON:
+                          type: string
+                          minLength: 1
                     sharedPVC:
                       type: object
                       properties:
@@ -154,6 +184,9 @@ spec:
                         - azure
                     - not:
                         required:
+                        - gcs
+                    - not:
+                        required:
                         - sharedPVC
                   - required:
                     - s3
@@ -168,6 +201,9 @@ spec:
                     - not:
                         required:
                         - azure
+                    - not:
+                        required:
+                        - gcs
                     - not:
                         required:
                         - sharedPVC
@@ -186,6 +222,28 @@ spec:
                         - s3
                     - not:
                         required:
+                        - gcs
+                    - not:
+                        required:
+                        - sharedPVC
+                  - required:
+                    - gcs
+                    properties:
+                      type:
+                        enum:
+                        - gcs
+                    allOf:
+                    - not:
+                        required:
+                        - hdfs
+                    - not:
+                        required:
+                        - s3
+                    - not:
+                        required:
+                        - azure
+                    - not:
+                        required:
                         - sharedPVC
                   - required:
                     - sharedPVC
@@ -200,6 +258,9 @@ spec:
                     - not:
                         required:
                         - s3
+                    - not:
+                        required:
+                        - gcs
                     - not:
                         required:
                         - azure
@@ -1223,6 +1284,15 @@ spec:
                               type: string
                             storageAccountName:
                               type: string
+                        gcs:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            serviceAccountKeyJSON:
+                              type: string
                         connectors:
                           type: object
                           properties:
@@ -1702,6 +1772,15 @@ spec:
                             secretName:
                               type: string
                             storageAccountName:
+                              type: string
+                        gcs:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            serviceAccountKeyJSON:
                               type: string
                         db:
                           type: object
@@ -2212,6 +2291,15 @@ spec:
                             secretName:
                               type: string
                             storageAccountName:
+                              type: string
+                        gcs:
+                          type: object
+                          properties:
+                            secretName:
+                              type: string
+                            createSecret:
+                              type: boolean
+                            serviceAccountKeyJSON:
                               type: string
                         defaultFS:
                           type: string
