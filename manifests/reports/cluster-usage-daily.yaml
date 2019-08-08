@@ -4,7 +4,7 @@ metadata:
   name: cluster-cpu-usage-daily
 spec:
   query: "cluster-cpu-usage"
-  # this con***REMOVED***gures the this report to aggregate the hourly one
+  # this con***REMOVED***gures the report to aggregate the hourly one
   inputs:
   - name: ClusterCpuUsageReportName
     value: cluster-cpu-usage-hourly
@@ -19,7 +19,7 @@ metadata:
   name: cluster-memory-usage-daily
 spec:
   query: "cluster-memory-usage"
-  # this con***REMOVED***gures the this report to aggregate the hourly one
+  # this con***REMOVED***gures the report to aggregate the hourly one
   inputs:
   - name: ClusterMemoryUsageReportName
     value: cluster-memory-usage-hourly
