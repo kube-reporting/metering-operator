@@ -185,9 +185,7 @@ spec:
                       type: string
                       pattern: '^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?){4}$'
               oneOf:
-              - required:
-                - hourly
-                properties:
+              - properties:
                   period:
                     enum:
                     - hourly
@@ -204,9 +202,7 @@ spec:
                 - not:
                     required:
                     - cron
-              - required:
-                - daily
-                properties:
+              - properties:
                   period:
                     enum:
                     - daily
@@ -223,9 +219,7 @@ spec:
                 - not:
                     required:
                     - cron
-              - required:
-                - weekly
-                properties:
+              - properties:
                   period:
                     enum:
                     - weekly
@@ -242,9 +236,7 @@ spec:
                 - not:
                     required:
                     - cron
-              - required:
-                - monthly
-                properties:
+              - properties:
                   period:
                     enum:
                     - monthly
@@ -261,9 +253,7 @@ spec:
                 - not:
                     required:
                     - cron
-              - required:
-                - cron
-                properties:
+              - properties:
                   period:
                     enum:
                     - cron
