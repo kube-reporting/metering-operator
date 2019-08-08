@@ -104,6 +104,10 @@ spec:
           mountPath: /hadoop-starting-con***REMOVED***g
         - name: hive-scripts
           mountPath: /hive-scripts
+{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+        - name: gcs-json
+          mountPath: /gcs-json
+{{- end }}
       volumes:
       - name: hive-scripts
         con***REMOVED***gMap:
@@ -172,6 +176,10 @@ spec:
         - name: hadoop-starting-con***REMOVED***g
           mountPath: /hadoop-starting-con***REMOVED***g
 {{- end}}
+{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+        - name: gcs-json
+          mountPath: /gcs-json
+{{- end }}
         - name: hive-jmx-con***REMOVED***g
           mountPath: /opt/jmx_exporter/con***REMOVED***g
         # openshift requires volumeMounts for VOLUMEs in a Docker***REMOVED***le
@@ -281,6 +289,11 @@ spec:
       - name: hadoop-starting-con***REMOVED***g
         secret:
           secretName: {{ .Values.hive.spec.con***REMOVED***g.hadoopCon***REMOVED***gSecretName }}
+{{- end }}
+{{- if or .Values.hive.spec.con***REMOVED***g.gcs.secretName .Values.hive.spec.con***REMOVED***g.gcs.createSecret }}
+      - name: gcs-json
+        secret:
+          secretName: {{ .Values.hive.spec.con***REMOVED***g.gcs.secretName | default "hive-gcs-credentials" }}
 {{- end }}
       - name: hive-jmx-con***REMOVED***g
         con***REMOVED***gMap:

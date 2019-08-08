@@ -126,6 +126,10 @@ spec:
           mountPath: /hadoop-con***REMOVED***g
         - name: hadoop-starting-con***REMOVED***g
           mountPath: /hadoop-starting-con***REMOVED***g
+{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
+        - name: gcs-json
+          mountPath: /gcs-json
+{{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
@@ -180,6 +184,10 @@ spec:
           mountPath: /hadoop-con***REMOVED***g
         - name: hadoop-starting-con***REMOVED***g
           mountPath: /hadoop-starting-con***REMOVED***g
+{{- end }}
+{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
+        - name: gcs-json
+          mountPath: /gcs-json
 {{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
         - name: presto-tls
@@ -241,6 +249,11 @@ spec:
       - name: hadoop-starting-con***REMOVED***g
         secret:
           secretName: {{ .Values.presto.spec.con***REMOVED***g.connectors.hive.hadoopCon***REMOVED***gSecretName }}
+{{- end }}
+{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
+      - name: gcs-json
+        secret:
+          secretName: {{ .Values.presto.spec.con***REMOVED***g.gcs.secretName | default "presto-gcs-credentials" }}
 {{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
       - name: presto-tls
