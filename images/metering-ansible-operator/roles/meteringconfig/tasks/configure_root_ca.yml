@@ -52,6 +52,7 @@
       path: "{{ certi***REMOVED***cates_dir.path }}/ca.csr"
       privatekey_path: "{{ certi***REMOVED***cates_dir.path }}/ca.key"
       common_name: Operator Metering Root CA
+      use_common_name_for_san: false
       basicConstraints:
       - 'CA:TRUE'
       basicConstraints_critical: true
