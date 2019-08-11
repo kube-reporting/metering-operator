@@ -153,7 +153,7 @@ _base_storage_overrides:
     hive:
       spec:
         con***REMOVED***g:
-          metastoreWarehouseDir: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') }}"
+          metastoreWarehouseDir: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') | regex_replace('\\/?$', '/') }}"
           gcs:
             secretName: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
             createSecret: "{{ _storage_spec | json_query('hive.gcs.createSecret') }}"
@@ -161,7 +161,7 @@ _base_storage_overrides:
     hadoop:
       spec:
         con***REMOVED***g:
-          defaultFS: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') }}"
+          defaultFS: "gs://{{ _storage_spec | json_query('hive.gcs.bucket') | regex_replace('\\/?$', '/') }}"
           gcs:
             secretName: "{{ _storage_spec | json_query('hive.gcs.secretName') }}"
             createSecret: "{{ _storage_spec | json_query('hive.gcs.createSecret') }}"
