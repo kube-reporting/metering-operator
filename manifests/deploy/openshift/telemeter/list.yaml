@@ -1,0 +1,866 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: telemeter-metering
+parameters:
+- name: NAMESPACE
+  value: telemeter-metering-stage
+objects:
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: hivetables.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: hivetables
+      singular: hivetable
+      kind: HiveTable
+    additionalPrinterColumns:
+    - name: Table Name
+      type: string
+      JSONPath: .status.tableName
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: metering-operator
+  rules:
+    - apiGroups:
+      - ""
+      resources:
+      - namespaces
+      verbs:
+      - get
+      - list
+    - apiGroups:
+      - authorization.k8s.io
+      resources:
+      - subjectaccessreviews
+      verbs:
+      - create
+    - apiGroups:
+      - authentication.k8s.io
+      resources:
+      - tokenreviews
+      verbs:
+      - create
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      resources:
+      - clusterrolebindings
+      - clusterroles
+      verbs:
+      - '*'
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: metering-operator
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: metering-operator
+  subjects:
+  - kind: ServiceAccount
+    name: metering-operator
+    namespace: ${NAMESPACE}
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: metering-operator
+    namespace: ${NAMESPACE}
+    labels:
+      app: metering-operator
+  spec:
+    replicas: 1
+    strategy:
+      type: Recreate
+    selector:
+      matchLabels:
+        app: metering-operator
+    template:
+      metadata:
+        labels:
+          app: metering-operator
+      spec:
+        securityContext:
+          runAsNonRoot: true
+        containers:
+        - name: ansible
+          command:
+          - /opt/ansible/scripts/ansible-logs.sh
+          - /tmp/ansible-operator/runner
+          - stdout
+          image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+          imagePullPolicy: Always
+          volumeMounts:
+          - mountPath: /tmp/ansible-operator/runner
+            name: runner
+            readOnly: true
+        - name: operator
+          image: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+          imagePullPolicy: Always
+          env:
+          - name: OPERATOR_NAME
+            value: "metering-ansible-operator"
+          - name: WATCH_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: METERING_ANSIBLE_OPERATOR_IMAGE
+            value: "quay.io/openshift/origin-metering-ansible-operator:4.2"
+          - name: METERING_REPORTING_OPERATOR_IMAGE
+            value: "quay.io/openshift/origin-metering-reporting-operator:4.2"
+          - name: METERING_PRESTO_IMAGE
+            value: "quay.io/openshift/origin-metering-presto:4.2"
+          - name: METERING_HIVE_IMAGE
+            value: "quay.io/openshift/origin-metering-hive:4.2"
+          - name: METERING_HADOOP_IMAGE
+            value: "quay.io/openshift/origin-metering-hadoop:4.2"
+          volumeMounts:
+          - mountPath: /tmp/ansible-operator/runner
+            name: runner
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 500Mi
+            requests:
+              cpu: 750m
+              memory: 400Mi
+
+        volumes:
+          - name: runner
+            emptyDir: {}
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        serviceAccount: metering-operator
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    name: metering-operator
+    namespace: ${NAMESPACE}
+  rules:
+    - apiGroups:
+      - metering.openshift.io
+      resources:
+      - '*'
+      verbs:
+      - '*'
+    - apiGroups:
+      - monitoring.coreos.com
+      resources:
+      - servicemonitors
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      - pods/attach
+      - pods/exec
+      - pods/portforward
+      - pods/proxy
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      - endpoints
+      - persistentvolumeclaims
+      - secrets
+      - serviceaccounts
+      - services
+      - services/proxy
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - events
+      - namespaces/status
+      - pods/log
+      - pods/status
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - events
+      verbs:
+      - create
+      - update
+      - patch
+    - apiGroups:
+      - ""
+      resources:
+      - namespaces
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - apps
+      resources:
+      - daemonsets
+      - deployments
+      - deployments/finalizers
+      - deployments/rollback
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+      verbs:
+      - '*'
+    - apiGroups:
+      - batch
+      resources:
+      - cronjobs
+      - jobs
+      verbs:
+      - '*'
+    - apiGroups:
+      - extensions
+      resources:
+      - daemonsets
+      - deployments
+      - deployments/rollback
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      verbs:
+      - '*'
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      - authorization.openshift.io
+      resources:
+      - rolebindings
+      - roles
+      verbs:
+      - '*'
+    - apiGroups:
+      - route.openshift.io
+      resources:
+      - routes
+      verbs:
+      - '*'
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: metering-operator
+    namespace: ${NAMESPACE}
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: metering-operator
+  subjects:
+  - kind: ServiceAccount
+    name: metering-operator
+
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: metering-operator
+    namespace: ${NAMESPACE}
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: meteringconfigs.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    names:
+      kind: MeteringConfig
+      listKind: MeteringConfigList
+      plural: meteringconfigs
+      singular: meteringconfig
+    scope: Namespaced
+    subresources:
+      status: {}
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+
+- apiVersion: metering.openshift.io/v1
+  kind: MeteringConfig
+  metadata:
+    name: operator-metering
+    namespace: ${NAMESPACE}
+  spec: {}
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: prestotables.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: prestotables
+      singular: prestotable
+      kind: PrestoTable
+    additionalPrinterColumns:
+    - name: Table Name
+      type: string
+      JSONPath: .status.tableName
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: reports.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: reports
+      kind: Report
+    additionalPrinterColumns:
+    - name: Query
+      type: string
+      JSONPath: .spec.query
+    - name: Schedule
+      type: string
+      JSONPath: .spec.schedule.period
+    - name: Running
+      type: string
+      JSONPath: .status.conditions[?(@.type=="Running")].reason
+    - name: Failed
+      type: string
+      JSONPath: .status.conditions[?(@.type=="Failure")].reason
+    - name: Last Report Time
+      type: string
+      JSONPath: .status.lastReportTime
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
+    validation:
+      openAPIV3Schema:
+        type: object
+        required:
+        - spec
+        properties:
+          # note: see https://github.com/operator-framework/operator-metering/blob/master/Documentation/reports.md for more information
+          # note: apiVersion, kind, metadata is implicitly validated by API server
+          spec:
+            type: object
+            required:
+            - query
+            properties:
+              query:
+                type: string
+                minLength: 1
+
+              reportingStart:
+                type: string
+                format: date-time
+
+              reportingEnd:
+                type: string
+                format: date-time
+
+              runImmediately:
+                type: boolean
+
+              inputs:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                  - name
+                  - value
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    value: {}
+
+              schedule:
+                type: object
+                required:
+                - period
+                properties:
+                  period:
+                    type: string
+                    minLength: 1
+                    enum:
+                    - hourly
+                    - daily
+                    - weekly
+                    - monthly
+                    - cron
+
+                  hourly:
+                    type: object
+                    properties:
+                      minute:
+                        type: integer
+                        minimum: 0
+                        maximum: 59
+                      hour:
+                        type: integer
+                        minimum: 0
+                        maximum: 23
+
+                  daily:
+                    type: object
+                    properties:
+                      second:
+                        type: integer
+                        minimum: 0
+                        maximum: 60
+                      minute:
+                        type: integer
+                        minimum: 0
+                        maximum: 59
+                      hour:
+                        type: integer
+                        minimum: 0
+                        maximum: 23
+
+                  weekly:
+                    type: object
+                    properties:
+                      dayofWeek:
+                        type: string
+                        enum:
+                        - sun
+                        - sunday
+                        - mon
+                        - monday
+                        - tue
+                        - tues
+                        - tuesday
+                        - wed
+                        - weds
+                        - wednesday
+                        - thur
+                        - thurs
+                        - thursday
+                        - fri
+                        - friday
+                        - sat
+                        - saturday
+                      second:
+                        type: integer
+                        minimum: 0
+                        maximum: 60
+                      minute:
+                        type: integer
+                        minimum: 0
+                        maximum: 59
+                      hour:
+                        type: integer
+                        minimum: 0
+                        maximum: 23
+
+                  monthly:
+                    type: object
+                    properties:
+                      dayOfMonth:
+                        type: integer
+                        minimum: 1
+                        maximum: 31
+                      second:
+                        type: integer
+                        minimum: 0
+                        maximum: 60
+                      minute:
+                        type: integer
+                        minimum: 0
+                        maximum: 59
+                      hour:
+                        type: integer
+                        minimum: 0
+                        maximum: 23
+
+                  cron:
+                    type: object
+                    required:
+                    - expression
+                    properties:
+                      expression:
+                        type: string
+                        pattern: '^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?){4}$'
+
+            anyOf:
+            # runOnce report
+            - type: object
+              required:
+              - query
+              - reportingStart
+              - reportingEnd
+            # runImmediately report
+            - type: object
+              required:
+              - query
+              - runImmediately
+              - reportingEnd
+            # scheduled report
+            - type: object
+              required:
+              - query
+              - schedule
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: reportdatasources.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: reportdatasources
+      singular: reportdatasource
+      kind: ReportDataSource
+      shortNames:
+      - datasource
+      - datasources
+    additionalPrinterColumns:
+    - name: Earliest Metric
+      type: string
+      JSONPath: .status.prometheusMetricsImportStatus.earliestImportedMetricTime
+    - name: Newest Metric
+      type: string
+      JSONPath: .status.prometheusMetricsImportStatus.newestImportedMetricTime
+    - name: Import Start
+      type: string
+      JSONPath: .status.prometheusMetricsImportStatus.importDataStartTime
+    - name: Import End
+      type: string
+      JSONPath: .status.prometheusMetricsImportStatus.importDataEndTime
+    - name: Last Import Time
+      type: string
+      JSONPath: .status.prometheusMetricsImportStatus.lastImportTime
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
+    validation:
+      openAPIV3Schema:
+        type: object
+        required:
+        - spec
+        properties:
+          spec:
+            type: object
+            properties:
+              prometheusMetricsImporter:
+                type: object
+                required:
+                - query
+                properties:
+                  query:
+                    type: string
+                    minLength: 1
+                  storage:
+                    type: object
+                    required:
+                    - storageLocationName
+                    properties:
+                      storageLocationName:
+                        type: string
+                        minLength: 1
+                  prometheusConfig:
+                    type: object
+                    required:
+                    - url
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+              reportQueryView:
+                type: object
+                required:
+                - queryName
+                properties:
+                  queryName:
+                    type: string
+                    minLength: 1
+                  inputs:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: object
+                      required:
+                      - name
+                      - value
+                      properties:
+                        name:
+                          type: string
+                          minLength: 1
+                        value: {}
+                  storage:
+                    type: object
+                    required:
+                    - storageLocationName
+                    properties:
+                      storageLocationName:
+                        type: string
+                        minLength: 1
+              awsBilling:
+                type: object
+                required:
+                - source
+                properties:
+                  source:
+                    type: object
+                    required:
+                    - bucket
+                    - region
+                    properties:
+                      bucket:
+                        type: string
+                        minLength: 1
+                      prefix:
+                        type: string
+                      region:
+                        type: string
+                        minLength: 1
+              prestoTable:
+                type: object
+                required:
+                - tableRef
+                properties:
+                  tableRef:
+                    type: object
+                    required:
+                      - name
+                    properties:
+                      name:
+                        type: string
+                        minLength: 1
+            anyOf:
+            - type: object
+              required:
+              - prometheusMetricsImporter
+            - type: object
+              required:
+              - reportQueryView
+            - type: object
+              required:
+              - awsBilling
+            - type: object
+              required:
+              - prestoTable
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: reportqueries.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: reportqueries
+      singular: reportquery
+      kind: ReportQuery
+      shortNames:
+      - rq
+    additionalPrinterColumns:
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
+
+    validation:
+      openAPIV3Schema:
+        type: object
+        required:
+        - spec
+        properties:
+          spec:
+            type: object
+            required:
+            - columns
+            - query
+            properties:
+              columns:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                  - name
+                  - type
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    type:
+                      type: string
+                      enum:
+                        - BOOLEAN
+                        - TINYINT
+                        - SMALLINT
+                        - INTEGER
+                        - BIGINT
+                        - REAL
+                        - DOUBLE
+                        - DECIMAL
+                        - VARCHAR
+                        - CHAR
+                        - VARBINARY
+                        - JSON
+                        - DATE
+                        - TIME
+                        - TIMESTAMP
+                        - ARRAY
+                        - MAP
+                        - MAP<VARCHAR, VARCHAR>
+                        - MAP<VARCHAR, INT>
+                        - MAP<INT, INT>
+                        - MAP<INT, VARCHAR>
+                        - ROW
+                        - IPADDRESS
+                        - UUID
+                        - HYPERLOGLOG
+                        - P4HYPERLOGLOG
+                        - QDIGEST
+                        - boolean
+                        - tinyint
+                        - smallint
+                        - integer
+                        - bigint
+                        - real
+                        - double
+                        - decimal
+                        - varchar
+                        - char
+                        - varbinary
+                        - json
+                        - date
+                        - time
+                        - timestamp
+                        - array
+                        - map
+                        - map<varchar, varchar>
+                        - map<varchar, int>
+                        - map<int, int>
+                        - map<int, varchar>
+                        - row
+                        - ipaddress
+                        - uuid
+                        - hyperloglog
+                        - p4hyperloglog
+                        - qdigest
+                    unit:
+                      type: string
+                      enum:
+                        - date
+                        - kubernetes_pod
+                        - kubernetes_persistentvolumeclaim
+                        - kubernetes_persistentvolume
+                        - kubernetes_storageclass
+                        - kubernetes_namespace
+                        - kubernetes_node
+                        - bytes
+                        - byte_seconds
+                        - time
+                        - cpu_core_seconds
+                        - cpu_cores
+                        - memory_bytes
+                        - memory_byte_seconds
+                        - seconds
+                    tableHidden:
+                      type: boolean
+              inputs:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required:
+                  - name
+                  properties:
+                    name:
+                      type: string
+                      minLength: 1
+                    type:
+                      type: string
+                      enum:
+                        - string
+                        - integer
+                        - time
+                        - ReportDataSource
+                        - ReportQuery
+                        - Report
+                    required:
+                      type: boolean
+                    default: {}
+              query:
+                type: string
+                pattern: '[Ss][Ee][Ll][Ee][Cc][Tt]\s'
+                minLength: 1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: storagelocations.metering.openshift.io
+  spec:
+    group: metering.openshift.io
+    version: v1
+    versions:
+    - name: v1
+      served: true
+      storage: true
+    - name: v1alpha1
+      served: true
+      storage: false
+    scope: Namespaced
+    names:
+      plural: storagelocations
+      kind: StorageLocation
