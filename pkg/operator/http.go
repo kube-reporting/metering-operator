@@ -396,7 +396,10 @@ func convertsToGetReportResults(input []presto.Row, columns []metering.ReportQue
 	}
 	for _, row := range input {
 		var valSlice ReportResultEntry
-		for columnName, columnValue := range row {
+		// iterate by columns to ensure consistent ordering of values
+		for _, column := range columns {
+			columnName := column.Name
+			columnValue := row[columnName]
 			resultsValue := ReportResultValues{
 				Name:        columnName,
 				Value:       columnValue,
