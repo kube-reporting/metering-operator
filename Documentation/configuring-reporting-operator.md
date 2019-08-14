@@ -8,7 +8,7 @@ Con***REMOVED***guring the operator is primarily done within a `MeteringCon***RE
 Depending on how you installed Metering, the default Prometheus URL varies.
 If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
 Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
-If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.con***REMOVED***g.prometheusURL` con***REMOVED***guration option.
+If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.con***REMOVED***g.prometheus.url` con***REMOVED***guration option.
 
 Below is an example of con***REMOVED***guring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
@@ -17,7 +17,8 @@ spec:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
+        prometheus:
+          url: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
 To secure the connection to Prometheus, the default Metering installation uses the Openshift certi***REMOVED***cate authority. If your Prometheus instance uses a different CA, the CA can be injected through a Con***REMOVED***gMap:
@@ -27,17 +28,18 @@ spec:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        prometheusCerti***REMOVED***cateAuthority:
-          useServiceAccountCA: false
-          con***REMOVED***gMap:
-            enabled: true
-            create: true
-            name: reporting-operator-certi***REMOVED***cate-authority-con***REMOVED***g
-            ***REMOVED***lename: "internal-ca.crt"
-            value: |
-              -----BEGIN CERTIFICATE-----
-              (snip)
-              -----END CERTIFICATE-----
+        prometheus:
+          certi***REMOVED***cateAuthority:
+            useServiceAccountCA: false
+            con***REMOVED***gMap:
+              enabled: true
+              create: true
+              name: reporting-operator-certi***REMOVED***cate-authority-con***REMOVED***g
+              ***REMOVED***lename: "internal-ca.crt"
+              value: |
+                -----BEGIN CERTIFICATE-----
+                (snip)
+                -----END CERTIFICATE-----
 ```
 
 Alternatively, to use the system certi***REMOVED***cate authorities for publicly valid certi***REMOVED***cates, set both `useServiceAccountCA` and `con***REMOVED***gMap.enabled` to false.
@@ -49,13 +51,14 @@ spec:
   reporting-operator:
     spec:
       con***REMOVED***g:
-        prometheusImporter:
-          auth:
-            useServiceAccountToken: false
-            tokenSecret:
-              enabled: true
-              create: true
-              value: "abc-123"
+        prometheus:
+          metricsImporter:
+            auth:
+              useServiceAccountToken: false
+              tokenSecret:
+                enabled: true
+                create: true
+                value: "abc-123"
 ```
 
 ## Exposing the reporting API
