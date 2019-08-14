@@ -6,7 +6,6 @@ The primary storage requirement is to persist data collected by the reporting-op
 Additionally, Hive metastore requires storage for it's database containing metadata about database tables managed by Presto or Hive. By default, this information is stored in an embedded database called Derby, which keeps it's data on disk in a PersistentVolume, but metastore can also be configured to use an existing Mysql or Postgresql database, instead of Derby. Read the [configuring the Hive metastore documentation][configuring-hive-metastore] for more details.
 
 ## Storing data in Amazon S3
-**Note**: Metering only supports Amazon S3, and not any S3 compatible API at this time.
 
 To use Amazon S3 for storage, edit the `spec.storage` section in the example [s3-storage.yaml][s3-storage-config] configuration.
 Set the `spec.storage.hive.s3.bucket`, `spec.storage.hive.s3.region` and `spec.storage.hive.s3.secretName` values.
@@ -33,6 +32,29 @@ If you left `spec.storage.hive.s3.createBucket` set to true, or unset, then you 
 
 Please note that this must be done before installation.
 Changing these settings after installation will result in broken and unexpected behavior.
+
+## Storing data in S3 Compatible Storage
+
+To use S3 compatible storage such as Noobaa, edit the `spec.storage` section in the example [s3-compatible-storage.yaml][s3-compatible-storage-config] configuration.
+Set the `spec.storage.hive.s3Compatible.bucket`, `spec.storage.hive.s3Compatible.endpoint` and `spec.storage.hive.s3Compatible.secretName` values.
+
+
+You must provide a existing S3 Compatible bucket, under the field
+`spec.storage.hive.s3Compatible.bucket`. You must also provide the enpoint for your storage, under the setting `spec.storage.hive.s3Compatible.bucket`. The `secretName` should be the name of a secret in the Metering namespace containing the AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` fields.
+
+For example:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: your-aws-secret
+data:
+  aws-access-key-id: "dGVzdAo="
+  aws-secret-access-key: "c2VjcmV0Cg=="
+```
+
+To store data in S3 compatible storages, the `aws-access-key-id` and `aws-secret-access-key` credentials must have read and write access to the bucket.
+
 
 ## Storing data in Azure
 
@@ -95,6 +117,7 @@ For more details read [configuring HDFS][configuring-hdfs].
 
 [storage-classes]: https://kubernetes.io/docs/concepts/storage/storage-classes/
 [s3-storage-config]: ../manifests/metering-config/s3-storage.yaml
+[s3-compatible-storage-config]: ../manifests/metering-config/s3-compatible-storage.yaml
 [azure-blob-storage-config]: ../manifests/metering-config/azure-blob-storage.yaml
 [gcs-config]: ../manifests/metering-config/gcs-storage.yaml
 [shared-storage-config]: ../manifests/metering-config/shared-storage.yaml

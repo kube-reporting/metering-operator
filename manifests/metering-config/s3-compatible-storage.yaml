@@ -1,0 +1,13 @@
+apiVersion: metering.openshift.io/v1
+kind: MeteringConfig
+metadata:
+  name: "operator-metering"
+spec:
+  storage:
+    type: "hive"
+    hive:
+      type: "s3Compatible"
+      s3Compatible:
+        bucket: "bucketname"
+        endpoint: "http://example:port-number"
+        secretName: "my-aws-secret"

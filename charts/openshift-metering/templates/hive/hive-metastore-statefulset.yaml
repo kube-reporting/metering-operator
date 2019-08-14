@@ -34,8 +34,18 @@ spec:
         hive-configmap-hash: {{ include (print $.Template.BasePath "/hive/hive-configmap.yaml") . | sha256sum }}
         hive-scripts-hash: {{ include (print $.Template.BasePath "/hive/hive-scripts-configmap.yaml") . | sha256sum }}
         hive-jmx-config-hash: {{ include (print $.Template.BasePath "/hive/hive-jmx-config.yaml") . | sha256sum }}
+{{- if .Values.hive.spec.config.aws.createSecret }}
         hive-aws-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-aws-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hive.spec.config.azure.createSecret }}
         hive-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-azure-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hive.spec.config.gcs.createSecret }}
+        hive-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-gcs-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hive.spec.config.s3Compatible.createSecret }}
+        hive-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-s3-compatible-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hive.spec.annotations }}
 {{ toYaml .Values.hive.spec.annotations | indent 8 }}
 {{- end }}

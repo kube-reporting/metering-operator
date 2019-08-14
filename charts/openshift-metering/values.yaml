@@ -472,6 +472,13 @@ presto:
         secretName: ""
         serviceAccountKeyJSON: ""
 
+      s3Compatible:
+        secretName: ""
+        createSecret: ""
+        accessKeyID: ""
+        secretAccessKey: ""
+        endpoint: ""
+
       tls:
         # server cert
         certificate: ""
@@ -652,6 +659,13 @@ hive:
         secretName: ""
         serviceAccountKeyJSON: ""
 
+      s3Compatible:
+        secretName: ""
+        createSecret: ""
+        accessKeyID: ""
+        secretAccessKey: ""
+        endpoint: ""
+
       sharedVolume:
         enabled: false
         mountPath: /user/hive/warehouse
@@ -823,6 +837,13 @@ hadoop:
         createSecret: false
         secretName: ""
         serviceAccountKeyJSON: ""
+
+      s3Compatible:
+        secretName: ""
+        createSecret: ""
+        accessKeyID: ""
+        secretAccessKey: ""
+        endpoint: ""
 
     image:
       pullPolicy: Always

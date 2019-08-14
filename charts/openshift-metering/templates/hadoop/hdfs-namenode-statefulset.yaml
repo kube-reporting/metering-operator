@@ -75,6 +75,15 @@ spec:
 {{- if .Values.hadoop.spec.config.aws.createSecret }}
         hadoop-aws-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-aws-credentials.yaml") . | sha256sum }}
 {{- end }}
+{{- if .Values.hadoop.spec.config.azure.createSecret }}
+        hadoop-azure-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-azure-credentials.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hadoop.spec.config.gcs.createSecret }}
+        hadoop-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-gcs-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hadoop.spec.config.s3Compatible.createSecret }}
+        hadoop-s3-compatible-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-s3-compatible-credentials.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hadoop.spec.hdfs.namenode.annotations }}
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.annotations | indent 8 }}
 {{- end }}
@@ -146,6 +155,18 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ .Values.hadoop.spec.config.aws.secretName | default "hadoop-aws-credentials" }}"
+              key: aws-secret-access-key
+{{- end }}
+{{- if .Values.hadoop.spec.config.s3Compatible.endpoint }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.s3Compatible.secretName | default "hadoop-s3-compatible-credentials" }}"
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hadoop.spec.config.s3Compatible.secretName | default "hadoop-s3-compatible-credentials" }}"
               key: aws-secret-access-key
 {{- end }}
         - name: MY_NODE_NAME

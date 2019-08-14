@@ -22,6 +22,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-gcs-credentials
         create: "{{ meteringconfig_create_hadoop_gcs_credentials }}"
+      - template_file: templates/hadoop/hadoop-s3-compatible-credentials.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-s3-compatible-credentials
+        create: "{{ meteringconfig_create_hadoop_s3_compatible_credentials }}"
       - template_file: templates/hadoop/hadoop-scripts.yaml
         apis: [ {kind: configmap} ]
         prune_label_value: hadoop-scripts
