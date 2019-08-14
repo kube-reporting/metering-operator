@@ -8,7 +8,7 @@ Configuring the operator is primarily done within a `MeteringConfig` Custom Reso
 Depending on how you installed Metering, the default Prometheus URL varies.
 If you installed for Openshift then the default assumes Prometheus is available at `https://prometheus-k8s.openshift-monitoring.svc:9091/`.
 Otherwise it assumes that your Prometheus service is available at `http://prometheus-k8s.monitoring.svc:9090`.
-If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheusURL` configuration option.
+If you're not on Openshift and aren't using [kube-prometheus][kube-prometheus], then you will need to override the `reporting-operator.config.prometheus.url` configuration option.
 
 Below is an example of configuring Metering to use the service `prometheus` on port 9090 in the `cluster-monitoring` namespace:
 
@@ -17,7 +17,8 @@ spec:
   reporting-operator:
     spec:
       config:
-        prometheusURL: "http://prometheus.cluster-monitoring.svc:9090"
+        prometheus:
+          url: "http://prometheus.cluster-monitoring.svc:9090"
 ```
 
 To secure the connection to Prometheus, the default Metering installation uses the Openshift certificate authority. If your Prometheus instance uses a different CA, the CA can be injected through a ConfigMap:
@@ -27,17 +28,18 @@ spec:
   reporting-operator:
     spec:
       config:
-        prometheusCertificateAuthority:
-          useServiceAccountCA: false
-          configMap:
-            enabled: true
-            create: true
-            name: reporting-operator-certificate-authority-config
-            filename: "internal-ca.crt"
-            value: |
-              -----BEGIN CERTIFICATE-----
-              (snip)
-              -----END CERTIFICATE-----
+        prometheus:
+          certificateAuthority:
+            useServiceAccountCA: false
+            configMap:
+              enabled: true
+              create: true
+              name: reporting-operator-certificate-authority-config
+              filename: "internal-ca.crt"
+              value: |
+                -----BEGIN CERTIFICATE-----
+                (snip)
+                -----END CERTIFICATE-----
 ```
 
 Alternatively, to use the system certificate authorities for publicly valid certificates, set both `useServiceAccountCA` and `configMap.enabled` to false.
@@ -49,13 +51,14 @@ spec:
   reporting-operator:
     spec:
       config:
-        prometheusImporter:
-          auth:
-            useServiceAccountToken: false
-            tokenSecret:
-              enabled: true
-              create: true
-              value: "abc-123"
+        prometheus:
+          metricsImporter:
+            auth:
+              useServiceAccountToken: false
+              tokenSecret:
+                enabled: true
+                create: true
+                value: "abc-123"
 ```
 
 ## Exposing the reporting API
