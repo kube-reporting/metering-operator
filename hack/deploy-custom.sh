@@ -23,7 +23,8 @@ export DEPLOY_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR"
 
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$INSTALLER_MANIFESTS_DIR" \
-    "$OLM_MANIFESTS_DIR"
+    "$OLM_MANIFESTS_DIR" \
+    "$OCP_TELEMETER_MANIFESTS_DIR"
 
 echo "Deploying"
 "${ROOT_DIR}/hack/deploy.sh"
