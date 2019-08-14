@@ -12,7 +12,7 @@ source "${ROOT_DIR}/hack/common.sh"
 
 VALUES_ARGS=()
 
-if [[ $# -ge 2 ]] ; then
+if [[ $# -ge 3 ]] ; then
     METERING_OPERATOR_OUTPUT_DIR=$1
     echo "metering-operator manifest output directory: ${METERING_OPERATOR_OUTPUT_DIR}"
     mkdir -p "${METERING_OPERATOR_OUTPUT_DIR}"
@@ -21,6 +21,11 @@ if [[ $# -ge 2 ]] ; then
     OLM_OUTPUT_DIR=$1
     echo "OLM manifest output directory: ${OLM_OUTPUT_DIR}"
     mkdir -p "${OLM_OUTPUT_DIR}"
+    shift
+
+    TELEMETER_OUTPUT_DIR=$1
+    echo "Telemeter manifest output directory: ${TELEMETER_OUTPUT_DIR}"
+    mkdir -p "${TELEMETER_OUTPUT_DIR}"
     shift
 
     echo "Values files: [$*]"
@@ -68,6 +73,17 @@ helm template "$CHART" \
     -x "templates/operator/deployment.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$METERING_OPERATOR_OUTPUT_DIR/metering-operator-deployment.yaml"
+
+TELEMETER_OUTPUT="$(helm template "$CHART" \
+    ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"}  \
+    -x "templates/saas-metering/list.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed")"
+
+if [[ -z "$TELEMETER_OUTPUT" ]]; then
+    echo "Skipping telemeter manifests"
+else
+    echo "$TELEMETER_OUTPUT" > "$TELEMETER_OUTPUT_DIR/list.yaml"
+fi
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
@@ -197,4 +213,3 @@ for CRD_DIR in "$METERING_OPERATOR_OUTPUT_DIR" "$CSV_BUNDLE_DIR"; do
         | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
         > "$CRD_DIR/storagelocation.crd.yaml"
 done
-
