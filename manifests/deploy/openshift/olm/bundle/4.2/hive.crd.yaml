@@ -21,4 +21,254 @@ spec:
   - name: Table Name
     type: string
     JSONPath: .status.tableName
+  validation:
+    openAPIV3Schema:
+      description: |
+        HiveTable is a custom resource that represents a database table within Hive.
+        When created, a HiveTable resource causes the reporting-operator to create a
+        table witin Hive according to the con***REMOVED***guration provided.
+      required:
+      - spec
+      properties:
+        spec:
+          type: object
+          description: |
+            HiveTableSpec is the desired speci***REMOVED***cation of a HiveTable custom resource.
+            Required ***REMOVED***elds: database, tableName, and columns.
+            More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/hivetables.md
+          required:
+          - databaseName
+          - tableName
+          - columns
+          properties:
+            databaseName:
+              type: string
+              description: |
+                DatabaseName is the name of the Hive database to use.
+                Generally, this ***REMOVED***eld should be set to "default", or the value of the "databaseName" in a Hive StorageLocation.
+                More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+              minLength: 1
+            tableName:
+              type: string
+              description: |
+                TableName is the desired name of the table to be created in Hive.
+              minLength: 1
+            columns:
+              type: array
+              description: |
+                A list of columns that match the schema of the HiveTable.
+                For each list item, you must specify a `name` ***REMOVED***eld, which is the name of an individual column for the Hive table,
+                and a `type` ***REMOVED***eld, which corresponds to a valid type in Hive.
+                Note: the only complex types supported are map's of primitive types.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
+              items:
+                type: object
+                required:
+                - name
+                - type
+                properties:
+                  name:
+                    type: string
+                    description: |
+                      The name of the column.
+                    minLength: 1
+                  type:
+                    type: string
+                    description: |
+                      The column data type.
+                    minLength: 1
+            partitionedBy:
+              type: array
+              description: |
+                A list of columns that are used as partition columns.
+                Columns in "partitionedBy" and "columns" must not overlap.
+                For each list item, you must specify both a `name` and `type` ***REMOVED***eld.
+                Note: this is an optional ***REMOVED***eld.
+              minItems: 1
+              items:
+                type: object
+                required:
+                - name
+                - type
+                properties:
+                  name:
+                    type: string
+                    description: |
+                      The name of the column.
+                    minLength: 1
+                  type:
+                    type: string
+                    description: |
+                      The column data type.
+                    minLength: 1
+            clusteredBy:
+              type: array
+              description: |
+                A list of columns from "columns" to use for bucketed tables.
+                This ***REMOVED***eld must be set if "numBuckets" is speci***REMOVED***ed.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
+              minItems: 1
+              items:
+                type: string
+            sortedBy:
+              type: array
+              description: |
+                A list of column names from "columns" to use for bucketed tables.
+                This ***REMOVED***eld must be set if "clusteredBy" and "numBuckets" are speci***REMOVED***ed.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
+              required:
+              - name
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: |
+                      The name of the column from "columns".
+                    minLength: 1
+                  descending:
+                    type: boolean
+                    description: |
+                      Descending controls whether the column is descending or ascending.
+                      If "descending" is true, then the column is descending, ***REMOVED*** ascending.
+                      If this ***REMOVED***eld is unspeci***REMOVED***ed, then it defaults to Hive's default behavior.
+                      Note: this is an optional ***REMOVED***eld.
+            numBuckets:
+              type: integer
+              description: |
+                The number of buckets to create for a bucketed table.
+                If this ***REMOVED***eld is set, then "clusteredBy" also needs to be set.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL+BucketedTables
+              format: int32
+              minimum: 0
+            location:
+              type: string
+              description: |
+                Location speci***REMOVED***es the HDFS path to store this Hive table.
+                This ***REMOVED***eld can be set to any URI supported by Hive.
+                Currently, `sda://`, `hdfs://`, and `/local/path` are supported based URIs.
+                Note: this is an optional ***REMOVED***eld.
+              format: uri
+              minLength: 1
+            rowFormat:
+              type: string
+              description: |
+                RowFormat controls how Hive serializes and deserializes rows.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-RowFormats&SerDe
+              minLength: 1
+            ***REMOVED***leFormat:
+              type: string
+              description: |
+                FileFormat controls the ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***lesystem.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
+              minLength: 1
+            tableProperties:
+              type: array
+              description: |
+                TableProperties is an array and allows you to tag the table de***REMOVED***nition with your
+                own metadata key/value pairs. Some prede***REMOVED***ned properties exist to control
+                behavior of the table as well.
+                Note: this is an optional ***REMOVED***eld.
+                More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-listTableProperties
+            external:
+              type: boolean
+              description: |
+                External controls whether an external table is created, instead of a managed table.
+                If external is set to true, this causes Hive to point to an existing location,
+                as speci***REMOVED***ed by the "location" ***REMOVED***eld.
+                Note: this is an optional ***REMOVED***eld.
+            managePartitions:
+              type: boolean
+              description: |
+                ManagePartitions controls whether the reporting-operator needs to check
+                if the table partitions match the partitions listed in the "partitions" ***REMOVED***eld.
+                Note: this is an optional ***REMOVED***eld.
+            partitions:
+              type: array
+              description: |
+                A list of partitions that this Hive table should contain.
+                Note: this is an optional ***REMOVED***eld.
+              nullable: true
+              items:
+                type: object
+                required:
+                - partitionSpec
+                - location
+                properties:
+                  partitionSpec:
+                    type: array
+                    description: |
+                      PartitionSpec is a map containing string keys and values, where each key
+                      is expected to be the name of a partition column, and the value is the
+                      value of the partition column.
+                  location:
+                    type: string
+                    description: |
+                      Location speci***REMOVED***es where the data for this partition is stored.
+                      This should be a sub-directory of the "location" ***REMOVED***eld.
+                    minLength: 1
+                    format: uri
+          anyOf:
+          - required:
+            - numBuckets
+            - clusteredBy
+            properties:
+              external:
+                enum:
+                - true
+              managePartitions:
+                enum:
+                - true
+              partitions:
+                type: array
+          - required:
+            - external
+            - location
+            properties:
+              external:
+                enum:
+                - true
+              managePartitions:
+                enum:
+                - true
+              partitions:
+                type: array
+          - required:
+            - managePartitions
+            - partitions
+            properties:
+              managePartitions:
+                enum:
+                - true
+              partitions:
+                type: array
+              external:
+                enum:
+                - true
+          # note: allow the minimal con***REMOVED***guration, and enforce the schemas de***REMOVED***ned above
+          - allOf:
+            - not:
+                required:
+                - numBuckets
+            - not:
+                required:
+                - clusteredBy
+            - not:
+                required:
+                - sortedBy
+            - not:
+                required:
+                - location
+            properties:
+              external:
+                enum:
+                - false
+              managePartitions:
+                enum:
+                - false
 
