@@ -17,12 +17,19 @@ if [ "$LOCAL_METERING_OPERATOR_RUN_INSTALL" == "true" ]; then
     "$METERING_INSTALL_SCRIPT"
 fi
 
+VOLUMES=(\
+    -v "$KUBECONFIG:/kubeconfig" \
+    -v /tmp/ansible-operator/runner \
+)
+if [ -d "$HOME/.minikube" ]; then
+    VOLUMES+=(-v "$HOME/.minikube")
+fi
+
 docker run \
     --name "${METERING_OPERATOR_CONTAINER_NAME}" \
     --rm \
     -u 0:0 \
-    -v "$KUBECONFIG:/kubeconfig" \
-    -v /tmp/ansible-operator/runner \
+    "${VOLUMES[@]}" \
     -e KUBECONFIG=/kubeconfig \
     -e OPERATOR_NAME="metering-ansible-operator" \
     -e POD_NAME="metering-ansible-operator" \
