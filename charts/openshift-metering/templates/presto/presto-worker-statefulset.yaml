@@ -31,6 +31,15 @@ spec:
 {{- if .Values.presto.spec.con***REMOVED***g.aws.createSecret -}}
         presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.azure.createSecret -}}
+        presto-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-azure-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.gcs.createSecret -}}
+        presto-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-gcs-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.createSecret -}}
+        presto-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-s3-compatible-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- if and .Values.presto.spec.con***REMOVED***g.tls.enabled .Values.presto.spec.con***REMOVED***g.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
 {{- if and .Values.presto.spec.con***REMOVED***g.auth.enabled .Values.presto.spec.con***REMOVED***g.auth.createSecret}}
