@@ -136,6 +136,14 @@ When committing new dependencies, please use the following guidelines:
   - `Gopkg.toml: Add new dependency $your_new_dependency`
   - `Gopkg.lock,vendor: Add new dependency $your_new_dependency`
 
+## Helm templates
+
+If you have added a new Helm Chart and would like to render the template to check the values and nesting within the yaml ***REMOVED***le you can run:
+
+```
+helm template CHART_DIR -x PATH_TO_TEMPLATE/***REMOVED***le.yaml
+```
+
 ## Developer install
 
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
