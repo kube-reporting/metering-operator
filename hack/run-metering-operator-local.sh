@@ -22,7 +22,7 @@ VOLUMES=(\
     -v /tmp/ansible-operator/runner \
 )
 if [ -d "$HOME/.minikube" ]; then
-    VOLUMES+=(-v "$HOME/.minikube")
+    VOLUMES+=(-v "$HOME/.minikube:$HOME/.minikube")
 ***REMOVED***
 
 docker run \
