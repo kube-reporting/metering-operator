@@ -61,7 +61,7 @@ openshift-reporting:
       hive:
         databaseName: metering
         unmanagedDatabase: false
-        location: ""
+        location: null
 
     awsBillingReportDataSource:
       enabled: false
