@@ -1,0 +1,6 @@
+apiVersion: metering.openshift.io/v1
+kind: MeteringCon***REMOVED***g
+metadata:
+  name: operator-metering
+spec: {}
+
