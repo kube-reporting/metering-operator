@@ -149,6 +149,10 @@ helm template CHART_DIR -x PATH_TO_TEMPLATE/***REMOVED***le.yaml
 Developers should generally use the [manual-install guide](../manual-install.md) as it offers the most flexibility when installing.
 If you need a minimal storage con***REMOVED***guration with no external dependencies, use the [manifests/metering-con***REMOVED***g/hdfs-minimal.yaml](manifests/metering-con***REMOVED***g/hdfs-minimal.yaml) example con***REMOVED***guration.
 
+### Testing OCP images
+
+See [Documentation/dev/testing-ocp-images.md](testing-ocp-images.md) for details on how to do a Metering install using OCP images instead of OKD (origin) images.
+
 # Releasing
 
 See the [release documentation](release.md).
