@@ -122,8 +122,8 @@ integration-docker: metering-src-docker-build
 		--name metering-integration-docker \
 		-t \
 		-e METERING_NAMESPACE \
-		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
-		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
+		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
 		-e KUBECONFIG=/kubeconfig \
 		-e TEST_OUTPUT_PATH=/out \
 		-w /go/src/github.com/operator-framework/operator-metering \
@@ -147,8 +147,8 @@ e2e-docker: metering-src-docker-build
 		--name metering-e2e-docker \
 		-t \
 		-e METERING_NAMESPACE \
-		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
-		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
+		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
 		-e KUBECONFIG=/kubeconfig \
 		-e TEST_OUTPUT_PATH=/out \
 		-w /go/src/github.com/operator-framework/operator-metering \
