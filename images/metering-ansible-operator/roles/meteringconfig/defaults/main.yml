@@ -15,6 +15,7 @@ _presto_default_spec: "{{ meteringconfig_default_values.presto.spec }}"
 _hive_default_spec: "{{ meteringconfig_default_values.hive.spec }}"
 _reporting_op_default_spec: "{{ meteringconfig_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringconfig_default_values.hadoop.spec }}"
+_ghostunnel_default: "{{ meteringconfig_default_values.__ghostunnel }}"
 
 # Default image repository and tag from the defaults
 meteringconfig_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
@@ -25,6 +26,8 @@ meteringconfig_hive_default_image_repo: "{{ _hive_default_spec.image.repository 
 meteringconfig_hive_default_image_tag: "{{ _hive_default_spec.image.tag }}"
 meteringconfig_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
 meteringconfig_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
+meteringconfig_ghostunnel_default_image_repo: "{{ _ghostunnel_default.image.repository }}"
+meteringconfig_ghostunnel_default_image_tag: "{{ _ghostunnel_default.image.tag }}"
 
 _storage_spec: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides) | json_query('storage') | default({}, true) }}"
 
@@ -51,6 +54,10 @@ meteringconfig_default_image_overrides:
       image:
         repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringconfig_hadoop_default_image_repo, true) }}"
         tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringconfig_hadoop_default_image_tag, true) }}"
+  __ghostunnel:
+    image:
+      repository: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[0] | default(meteringconfig_ghostunnel_default_image_repo, true) }}"
+      tag: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[1] | default(meteringconfig_ghostunnel_default_image_tag, true) }}"
 
 _base_storage_overrides:
   s3:

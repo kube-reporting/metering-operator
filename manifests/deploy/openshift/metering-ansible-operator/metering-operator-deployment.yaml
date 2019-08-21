@@ -54,6 +54,8 @@ spec:
           value: "quay.io/openshift/origin-metering-hive:4.2"
         - name: METERING_HADOOP_IMAGE
           value: "quay.io/openshift/origin-metering-hadoop:4.2"
+        - name: GHOSTUNNEL_IMAGE
+          value: "quay.io/openshift/origin-ghostunnel:4.2"
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
