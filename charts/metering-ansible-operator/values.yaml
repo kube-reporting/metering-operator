@@ -184,6 +184,10 @@ olm:
     from:
       kind: DockerImage
       name: quay.io/openshift/origin-metering-hadoop:4.2
+  - name: ghostunnel
+    from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-ghostunnel:4.2
 
   csv:
     version: "4.2.0"
