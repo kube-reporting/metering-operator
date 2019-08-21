@@ -15,6 +15,7 @@ _presto_default_spec: "{{ meteringcon***REMOVED***g_default_values.presto.spec }
 _hive_default_spec: "{{ meteringcon***REMOVED***g_default_values.hive.spec }}"
 _reporting_op_default_spec: "{{ meteringcon***REMOVED***g_default_values['reporting-operator'].spec }}"
 _hadoop_default_spec: "{{ meteringcon***REMOVED***g_default_values.hadoop.spec }}"
+_ghostunnel_default: "{{ meteringcon***REMOVED***g_default_values.__ghostunnel }}"
 
 # Default image repository and tag from the defaults
 meteringcon***REMOVED***g_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
@@ -25,6 +26,8 @@ meteringcon***REMOVED***g_hive_default_image_repo: "{{ _hive_default_spec.image.
 meteringcon***REMOVED***g_hive_default_image_tag: "{{ _hive_default_spec.image.tag }}"
 meteringcon***REMOVED***g_hadoop_default_image_repo: "{{ _hadoop_default_spec.image.repository }}"
 meteringcon***REMOVED***g_hadoop_default_image_tag: "{{ _hadoop_default_spec.image.tag }}"
+meteringcon***REMOVED***g_ghostunnel_default_image_repo: "{{ _ghostunnel_default.image.repository }}"
+meteringcon***REMOVED***g_ghostunnel_default_image_tag: "{{ _ghostunnel_default.image.tag }}"
 
 _storage_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides) | json_query('storage') | default({}, true) }}"
 
@@ -51,6 +54,10 @@ meteringcon***REMOVED***g_default_image_overrides:
       image:
         repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_hadoop_default_image_repo, true) }}"
         tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_hadoop_default_image_tag, true) }}"
+  __ghostunnel:
+    image:
+      repository: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_ghostunnel_default_image_repo, true) }}"
+      tag: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_ghostunnel_default_image_tag, true) }}"
 
 _base_storage_overrides:
   s3:
