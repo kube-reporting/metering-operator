@@ -11,5 +11,6 @@ kubectl label \
     namespace "${METERING_NAMESPACE}" \
     "openshift.io/cluster-monitoring=true"
 
-export DEPLOY_PLATFORM=openshift
+export INSTALLER_MANIFESTS_DIR="${INSTALLER_MANIFESTS_DIR:-"$OCP_INSTALLER_MANIFESTS_DIR"}"
+
 "${ROOT_DIR}/hack/install.sh" "$@"
