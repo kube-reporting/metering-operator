@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metering-operator
+  labels:
+    app: metering-operator
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: metering-operator
+  template:
+    metadata:
+      labels:
+        app: metering-operator
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: ansible
+        command:
+        - /opt/ansible/scripts/ansible-logs.sh
+        - /tmp/ansible-operator/runner
+        - stdout
+        image: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator:v4.2"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /tmp/ansible-operator/runner
+          name: runner
+          readOnly: true
+      - name: operator
+        image: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator:v4.2"
+        imagePullPolicy: Always
+        env:
+        - name: OPERATOR_NAME
+          value: "metering-ansible-operator"
+        - name: DISABLE_OCP_FEATURES
+          value: "false"
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: METERING_ANSIBLE_OPERATOR_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator:v4.2"
+        - name: METERING_REPORTING_OPERATOR_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-reporting-operator:v4.2"
+        - name: METERING_PRESTO_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-presto:v4.2"
+        - name: METERING_HIVE_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hive:v4.2"
+        - name: METERING_HADOOP_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hadoop:v4.2"
+        - name: GHOSTUNNEL_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-ghostunnel:v4.2"
+        - name: OAUTH_PROXY_IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-oauth-proxy:v4.2"
+        volumeMounts:
+        - mountPath: /tmp/ansible-operator/runner
+          name: runner
+        resources:
+          limits:
+            cpu: 1500m
+            memory: 500Mi
+          requests:
+            cpu: 750m
+            memory: 400Mi
+
+      volumes:
+        - name: runner
+          emptyDir: {}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      serviceAccount: metering-operator
+
