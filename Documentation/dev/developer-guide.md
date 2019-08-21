@@ -105,8 +105,8 @@ The steps can be broken down into:
 Replace `pr-1234` with your image tag (usually built by CI), and run one of the following commands to run e2e or integration tests locally against fully deployed metering stack:
 
 ```
-make e2e REPORTING_OPERATOR_DEPLOY_TAG=pr-1234 METERING_OPERATOR_DEPLOY_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_e2e_output
-make integration REPORTING_OPERATOR_DEPLOY_TAG=pr-1234 METERING_OPERATOR_DEPLOY_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_integration_output
+make e2e REPORTING_OPERATOR_IMAGE_TAG=pr-1234 METERING_OPERATOR_IMAGE_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_e2e_output
+make integration REPORTING_OPERATOR_IMAGE_TAG=pr-1234 METERING_OPERATOR_IMAGE_TAG=pr-1234 TEST_OUTPUT_PATH=/tmp/metering_integration_output
 ```
 
 ## Go Dependencies
