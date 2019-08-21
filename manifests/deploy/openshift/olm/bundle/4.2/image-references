@@ -23,4 +23,8 @@ spec:
       kind: DockerImage
       name: quay.io/openshift/origin-metering-hadoop:4.2
     name: metering-hadoop
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-ghostunnel:4.2
+    name: ghostunnel
 
