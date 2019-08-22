@@ -24,6 +24,7 @@ RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 RUN ln -f -s /tini /usr/bin/tini
 
 RUN pip install --no-cache-dir --upgrade openshift boto3 cryptography
+RUN pip install --upgrade ansible>=2.8
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
