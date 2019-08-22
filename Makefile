@@ -164,9 +164,6 @@ e2e-docker: metering-src-docker-build
 vet:
 	go vet $(GO_PKG)/cmd/... $(GO_PKG)/pkg/...
 
-push-olm-manifests: verify-olm-manifests
-	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering $(OLM_PACKAGE_VERSION)
-
 verify: verify-codegen verify-olm-manifests verify-helm-templates fmt vet
 	@echo Checking for unstaged changes
 	# validates no unstaged changes exist in $(VERIFY_FILE_PATHS)
@@ -178,6 +175,9 @@ verify-helm-templates:
 verify-olm-manifests: metering-manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
 	operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
+
+push-olm-manifests: verify-olm-manifests
+	./hack/push-olm-manifests.sh $(OLM_PACKAGE_ORG) metering-ocp $(OLM_PACKAGE_VERSION)
 
 verify-docker: metering-src-docker-build
 	docker run \
