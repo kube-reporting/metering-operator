@@ -36,10 +36,10 @@ This resource holds all the top level configuration for each component (such as 
 **IMPORTANT:**
 There can only be one Metering resource in the namespace containing the metering-operator. Any other configuration is not supported.
 
-1. From the web console, ensure you are on the ClusterServiceVersion overview page for the Metering project.
+1. From the web console, ensure you are on the ClusterServiceVersion overview page for the *openshift-metering* project.
 You can navigate to this page from **Catalog > Installed Operators**, then selecting the *Metering* operator.
 
-2. Under **Provided APIs**, click **Create New** on the *Metering* card. This opens a YAML editor where you can define your Metering installation configuration.
+2. Under **Provided APIs**, click **Create New** on the *Metering Configuration* card. This opens a YAML editor where you can define your Metering installation configuration.
 
 3. Download the example [default.yaml][default-config] Metering resource and customize the YAML as desired. Enter your configuration into the YAML editor and click **Create**.
 
