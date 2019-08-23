@@ -1,18 +1,7 @@
 ---
 
-- name: Validate storage con***REMOVED***guration
-  assert:
-    that:
-      - meteringcon***REMOVED***g_spec | json_query('storage.type') == "hive"
-    msg: "Unsupported spec.storage.type, only 'hive' is  a supported option"
-
-- name: Validate Hive storage con***REMOVED***guration
-  assert:
-    that:
-      - hiveStorageType is not unde***REMOVED***ned and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
-    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', 's3Compatible' or 'sharedPVC'"
-  vars:
-    hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
+- name: Validate Con***REMOVED***gurations
+  include_tasks: validate.yml
 
 - name: Con***REMOVED***gure TLS
   include_tasks: con***REMOVED***gure_tls.yml

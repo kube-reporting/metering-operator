@@ -1,0 +1,39 @@
+---
+
+- name: Validate ***REMOVED***elds when OCP-only features are disabled
+  block:
+  - name: Validate that top-level TLS key is unset/disabled
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec | json_query('tls.enabled') != true
+      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot set the tls.enabled key to true when disabling OCP-only features."
+  - name: Validate that the Prometheus URL is set
+    assert:
+      that:
+        - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.con***REMOVED***g.prometheus.url') != ""
+      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You must set the reporting-operator.spec.con***REMOVED***g.prometheus.url."
+  - name: Validate that the reporting-operator Openshift Route is not enabled
+    assert:
+      that:
+      - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.route.enabled') != true
+      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator route."
+  - name: Validate that the reporting-operator OAuth authProxy is not enabled
+    assert:
+      that:
+      - meteringcon***REMOVED***g_spec['reporting-operator'] | json_query('spec.authProxy.enabled') != true
+      msg: "Invalid con***REMOVED***guration for non-OKD distributions: You cannot enable the Openshift-only reporting-operator authProxy."
+  when: meteringcon***REMOVED***g_ocp_disabled
+
+- name: Validate storage con***REMOVED***guration
+  assert:
+    that:
+      - meteringcon***REMOVED***g_spec | json_query('storage.type') == "hive"
+    msg: "Unsupported spec.storage.type, only 'hive' is  a supported option"
+
+- name: Validate Hive storage con***REMOVED***guration
+  assert:
+    that:
+      - hiveStorageType is not unde***REMOVED***ned and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', 's3Compatible' or 'sharedPVC'"
+  vars:
+    hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
