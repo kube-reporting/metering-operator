@@ -188,6 +188,10 @@ olm:
     from:
       kind: DockerImage
       name: quay.io/openshift/origin-ghostunnel:4.2
+  - name: oauth-proxy
+    from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-oauth-proxy:4.2
 
   csv:
     version: "4.2.0"
