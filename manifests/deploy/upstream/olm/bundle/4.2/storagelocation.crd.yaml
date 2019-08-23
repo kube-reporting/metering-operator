@@ -1,0 +1,89 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDe***REMOVED***nition
+metadata:
+  name: storagelocations.metering.openshift.io
+spec:
+  group: metering.openshift.io
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+  - name: v1alpha1
+    served: true
+    storage: false
+  scope: Namespaced
+  names:
+    plural: storagelocations
+    kind: StorageLocation
+  validation:
+    openAPIV3Schema:
+      description: |
+        StorageLocation is a custom resource that con***REMOVED***gures where data will
+        be stored by the reporting-operator. This included the data collected
+        from Prometheus, and the results produced by generating a `Report` custom
+        resources.
+      required:
+      - spec
+      properties:
+        spec:
+          type: object
+          description: |
+            StorageLocationSpec is the desired speci***REMOVED***cation of a StorageLocation custom resource.
+            Required ***REMOVED***elds: databaseName, unmanagedDatabase, and location.
+            More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/storagelocations.md
+          properties:
+            hive:
+              type: object
+              description: |
+                Con***REMOVED***gures the StorageLocation to store data in Presto by creating
+                the table using Hive Server.
+                Note: databaseName and unmanagedDatabase are required ***REMOVED***elds.
+              required:
+              - databaseName
+              - unmanagedDatabase
+              properties:
+                databaseName:
+                  type: string
+                  description: |
+                    DatabaseName is the name of the database within hive.
+                  minLength: 1
+                unmanagedDatabase:
+                  type: boolean
+                  description: |
+                    UnmanagedDatabase controls whether the StorageLocation will be actively
+                    managed, and if true, the databaseName needs to point to an existing table
+                    in Hive. If set to false, the reporting-operator creates a database in Hive.
+                location:
+                  type: string
+                  description: |
+                    Location is the ***REMOVED***lesystem URL for Presto and Hive to use for the
+                    database. This can be in the form of `hdfs://` or `sda://` ***REMOVED***lesystem URL.
+                    If this ***REMOVED***eld is unset, or set to an empty string, then the default
+                    ***REMOVED***lesystem URL for Hive is used.
+                    Note: this is an optional ***REMOVED***eld.
+                  nullable: true
+                  format: uri
+                defaultTableProperties:
+                  type: object
+                  description: |
+                    DefaultTableProperties contains the con***REMOVED***guration options for creating table
+                    using Hive.
+                    Note: this is an optional ***REMOVED***eld.
+                  properties:
+                    ***REMOVED***leFormat:
+                      type: string
+                      description: |
+                        FileFormat speci***REMOVED***es the ***REMOVED***le format used for storing ***REMOVED***les in the ***REMOVED***le system.
+                        Note: this is an optional ***REMOVED***eld.
+                        More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
+                      minLength: 1
+                    rowFormat:
+                      type: string
+                      description: |
+                        RowFormat speci***REMOVED***es the Hive row format, which is how Hive serializes and
+                        deserializes rows.
+                        Note: this is an optional ***REMOVED***eld.
+                        More info: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-StorageFormatsStorageFormatsRowFormat,StorageFormat,andSerDe
+                      minLength: 1
+
