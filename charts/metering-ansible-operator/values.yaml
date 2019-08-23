@@ -1,6 +1,8 @@
 operator:
   name: metering-operator
 
+  disableOCPFeatures: false
+
   reconcileIntervalSeconds: 30
   targetNamespace: ""
   useTargetNamespacesDownwardAPIValueFrom: false
@@ -274,8 +276,8 @@ olm:
         kind: ReportQuery
         name: reportqueries.metering.openshift.io
         version: v1
-      - description: Used under-the-hood. A resource a database table in Presto. Use by
-          ReportQueries to determine what tables exist, and by the HTTP API to
+      - description: Used under-the-hood. A resource representing a database table in Presto.
+          Used by ReportQueries to determine what tables exist, and by the HTTP API to
           determine how to query a table.
         displayName: Metering Data Source
         kind: ReportDataSource
@@ -293,7 +295,7 @@ olm:
         kind: PrestoTable
         name: prestotables.metering.openshift.io
         version: v1
-      - description: Used under-the-hood. A resource a database table in Hive.
+      - description: Used under-the-hood. A resource representing a database table in Hive.
         displayName: Metering Hive Table
         kind: HiveTable
         name: hivetables.metering.openshift.io

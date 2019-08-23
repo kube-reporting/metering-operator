@@ -4,6 +4,8 @@ global:
 unsupportedFeatures:
   enableHDFS: false
 
+disableOCPFeatures: false
+
 storage:
   type: "hive"
   hive: {}
@@ -317,7 +319,7 @@ reporting-operator:
           secretName: ""
 
       prometheus:
-        url: https://prometheus-k8s.openshift-monitoring.svc:9091/
+        url: ""
 
         certificateAuthority:
           useServiceAccountCA: true
