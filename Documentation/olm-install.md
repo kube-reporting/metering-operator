@@ -36,10 +36,10 @@ This resource holds all the top level con***REMOVED***guration for each componen
 **IMPORTANT:**
 There can only be one Metering resource in the namespace containing the metering-operator. Any other con***REMOVED***guration is not supported.
 
-1. From the web console, ensure you are on the ClusterServiceVersion overview page for the Metering project.
+1. From the web console, ensure you are on the ClusterServiceVersion overview page for the *openshift-metering* project.
 You can navigate to this page from **Catalog > Installed Operators**, then selecting the *Metering* operator.
 
-2. Under **Provided APIs**, click **Create New** on the *Metering* card. This opens a YAML editor where you can de***REMOVED***ne your Metering installation con***REMOVED***guration.
+2. Under **Provided APIs**, click **Create New** on the *Metering Con***REMOVED***guration* card. This opens a YAML editor where you can de***REMOVED***ne your Metering installation con***REMOVED***guration.
 
 3. Download the example [default.yaml][default-con***REMOVED***g] Metering resource and customize the YAML as desired. Enter your con***REMOVED***guration into the YAML editor and click **Create**.
 
