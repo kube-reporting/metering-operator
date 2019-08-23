@@ -34,3 +34,17 @@ olm:
       kind: DockerImage
       name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-oauth-proxy:v4.2
 
+
+  csv:
+    name : metering-operator-testing.v4.2.0
+    version: "4.2.0"
+    provider:
+      name: Metering OCP testing
+
+  packageName: metering-ocp-testing
+  subscriptionName: metering-ocp-testing
+  subscriptionChannel: stable
+
+  catalogSourceCon***REMOVED***gName: installed-custom-metering-operators-openshift-metering
+  catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
+  catalogSourceCon***REMOVED***gTargetNamespace: openshift-metering

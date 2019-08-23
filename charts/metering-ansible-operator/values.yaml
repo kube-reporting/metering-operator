@@ -196,9 +196,9 @@ olm:
       name: quay.io/openshift/origin-oauth-proxy:4.2
 
   csv:
+    name : metering-operator.v4.2.0
     version: "4.2.0"
     minKubeVersion: "1.11.0"
-    name : metering-operator.v4.2.0
     displayName: Metering
 
     description: |
@@ -509,10 +509,11 @@ olm:
           }
         ]
 
-  subscriptionName: metering
+  subscriptionName: metering-ocp
   subscriptionChannel: stable
-  subscriptionCatalogSource: redhat-operators
-  subscriptionCatalogSourceNamespace: openshift-marketplace
+  catalogSourceCon***REMOVED***gName: installed-redhat-metering-operators-openshift-metering
+  catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
+  catalogSourceCon***REMOVED***gTargetNamespace: openshift-metering
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["openshift-metering"]
