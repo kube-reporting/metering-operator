@@ -1,4 +1,4 @@
-packageName: metering-ocp
+packageName: metering-ocp-testing
 channels:
 - currentCSV: metering-operator.v4.2.0
   name: stable

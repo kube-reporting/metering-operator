@@ -43,9 +43,9 @@ olm:
       name: quay.io/coreos/metering-ghostunnel:release-4.2
 
   csv:
+    name : metering-operator-upstream.v4.2.0
     version: "4.2.0"
     minKubeVersion: "1.11.0"
-    name : metering-operator.v4.2.0
 
     maintainers:
     - name: Red Hat
@@ -63,8 +63,11 @@ olm:
 
   subscriptionName: metering
   subscriptionChannel: stable
-  subscriptionCatalogSource: upstream-community-operators
-  subscriptionCatalogSourceNamespace: marketplace
+
+  catalogSourceConfigName: installed-upstream-metering-operators-metering
+  catalogSourceConfigNamespace: marketplace
+  catalogSourceConfigTargetNamespace: metering
+  catalogSourceConfigOperatorSource: upstream-community-operators
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["metering"]

@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: metering-operator.v4.2.0
+  name: metering-operator-upstream.v4.2.0
   namespace: placeholder
   annotations:
     alm-examples: |-
