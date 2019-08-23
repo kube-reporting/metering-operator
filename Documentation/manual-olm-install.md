@@ -19,6 +19,35 @@ First, start by creating the `openshift-metering` namespace:
 kubectl create ns openshift-metering
 ```
 
+Next a `CatalogSourceConfig` needs to be added to the `openshift-marketplace` namespace.
+This results in a `CatalogSource` containing the `metering` OLM package being created in the `openshift-metering` namespace.
+
+Download the `metering-operators` [metering.catalogsourceconfig.yaml][metering-catalogsourceconfig] and install it into the `openshift-marketplace` namespace:
+
+```
+kubectl apply -n openshift-marketplace -f metering.catalogsourceconfig.yaml
+```
+
+After it is created, confirm a new `CatalogSource` is created in the `openshift-metering` namespace:
+
+```
+kubectl -n openshift-metering get catalogsources
+NAME                                                     NAME     TYPE   PUBLISHER   AGE
+installed-redhat-metering-operators-openshift-metering   Custom   grpc   Custom      2m56s
+```
+
+You should also see a pod with a name resembling `metering-operators-12345` in the `openshift-marketplace` namespace, this pod is the package registry pod OLM will use to get the `metering` package contents:
+
+```
+kubectl -n openshift-marketplace get pods
+NAME                                                              READY   STATUS    RESTARTS   AGE
+certified-operators-7f89948b85-mpzw6                              1/1     Running   0          3h36m
+community-operators-7c7b9447cf-gzp78                              1/1     Running   0          3h36m
+installed-redhat-metering-operators-openshift-metering-6d6hhfmg   1/1     Running   0          3m34s
+marketplace-operator-7df66dbf67-99zql                             1/1     Running   2          3h38m
+redhat-operators-7f6b7fd9d9-hffnv                                 1/1     Running   0          3h36m
+```
+
 Next, you will create an `OperatorGroup` in your namespace that restricts the namespaces the operator will monitor to the `openshift-metering` namespace.
 
 Download the `metering-operators` [metering.operatorgroup.yaml][metering-operatorgroup] and install it into the `openshift-metering` namespace:
