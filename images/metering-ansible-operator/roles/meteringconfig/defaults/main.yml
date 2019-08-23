@@ -300,6 +300,68 @@ meteringconfig_storage_s3Compatible_credentials_secret_name: "{{ _storage_spec |
 meteringconfig_storage_s3Compatible_endpoint: "{{ _storage_spec | json_query('hive.s3Compatible.endpoint') }}"
 
 #
+# Override the default values to handle Openshift, and non-Openshift configurations
+#
+meteringconfig_ocp_disabled: "{{ lookup('env', 'DISABLE_OCP_FEATURES') | bool or meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('disableOCPFeatures') }}"
+_meteringconfig_ocp_disabled_overrides: "{{ meteringconfig_ocp_disabled | ternary(_ocp_disabled_overrides, _ocp_enabled_overrides) }}"
+
+_ocp_disabled_overrides:
+  tls:
+    enabled: false
+
+  monitoring:
+    enabled: false
+
+  openshift-reporting:
+    spec:
+      defaultReportDataSources:
+        postKube_1_14:
+          enabled: false
+
+  reporting-operator:
+    spec:
+      route:
+        enabled: false
+
+      config:
+        prometheus:
+          certificateAuthority:
+            useServiceAccountCA: false
+
+          metricsImporter:
+            auth:
+              useServiceAccountToken: true
+              tokenSecret:
+                enabled: false
+
+        tls:
+          api:
+            enabled: false
+
+  presto:
+    spec:
+      securityContext:
+        fsGroup: 0
+
+  hive:
+    spec:
+      securityContext:
+        fsGroup: 0
+
+  hadoop:
+    spec:
+      hdfs:
+        securityContext:
+          fsGroup: 0
+
+_ocp_enabled_overrides:
+  reporting-operator:
+    spec:
+      config:
+        prometheus:
+          url: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+
+#
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, else use values.yaml and meteringconfig_spec_overrides
 #
 _meteringconfig_reporting_operator_presto_server_ca_certificate: ""
@@ -476,7 +538,7 @@ _tls_overrides:
 
 
 # check if the user's spec contains the top-level tls.enabled field. if true, use the value stored in that field, else default to the value stored in values.yaml
-meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
+meteringconfig_tls_enabled: "{{ meteringconfig_default_values | combine(_meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) | json_query('tls.enabled') }}"
 _meteringconfig_tls_overrides: "{{ meteringconfig_tls_enabled | ternary(_tls_overrides, {}) }}"
 
 # openshift-reporting overrides
@@ -490,7 +552,7 @@ meteringconfig_reporting_overrides:
           enabled: "{{ meteringconfig_reporting_enable_post_kube_1_14_datasources }}"
 
 # combine the _meteringconfig_tls_overrides dictionary last to enforce when spec.tls.enabled is specified and set to true
-meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_reporting_overrides, meteringconfig_spec_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, recursive=True) }}"
+meteringconfig_spec: "{{ meteringconfig_default_values | combine(meteringconfig_default_image_overrides, meteringconfig_storage_overrides, meteringconfig_reporting_overrides, _meteringconfig_root_ca_overrides, _meteringconfig_tls_overrides, _meteringconfig_ocp_disabled_overrides, meteringconfig_spec_overrides, recursive=True) }}"
 
 meteringconfig_storage_s3_create_bucket: "{{ meteringconfig_spec | json_query('storage.hive.s3.createBucket') }}"
 meteringconfig_storage_s3_bucket_name: "{{ (meteringconfig_spec | json_query('storage.hive.s3.bucket') | default('', true)).split('/')[0] }}"

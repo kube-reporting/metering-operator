@@ -1,3 +1,5 @@
+---
+
 - name: Query for {{ resource.apis | map(attribute='kind') | join(', ') }} resources with selector {{ label_selector }} to delete
   k8s_facts:
     api_version: "{{ to_delete_item.api_version | default(omit) }}"
