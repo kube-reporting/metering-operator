@@ -20,6 +20,8 @@ _ghostunnel_default: "{{ meteringcon***REMOVED***g_default_values.__ghostunnel }
 # Default image repository and tag from the defaults
 meteringcon***REMOVED***g_reporting_operator_default_image_repo: "{{ _reporting_op_default_spec.image.repository }}"
 meteringcon***REMOVED***g_reporting_operator_default_image_tag: "{{ _reporting_op_default_spec.image.tag }}"
+meteringcon***REMOVED***g_oauth_proxy_default_image_repo: "{{ _reporting_op_default_spec.authProxy.image.repository }}"
+meteringcon***REMOVED***g_oauth_proxy_default_image_tag: "{{ _reporting_op_default_spec.authProxy.image.tag }}"
 meteringcon***REMOVED***g_presto_default_image_repo: "{{ _presto_default_spec.image.repository }}"
 meteringcon***REMOVED***g_presto_default_image_tag: "{{ _presto_default_spec.image.tag }}"
 meteringcon***REMOVED***g_hive_default_image_repo: "{{ _hive_default_spec.image.repository }}"
@@ -38,6 +40,12 @@ meteringcon***REMOVED***g_default_image_overrides:
       image:
         repository: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_reporting_operator_default_image_repo, true) }}"
         tag: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_reporting_operator_default_image_tag, true) }}"
+
+      authProxy:
+        image:
+          repository: "{{ lookup('env','OAUTH_PROXY_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_oauth_proxy_default_image_repo, true) }}"
+          tag: "{{ lookup('env','OAUTH_PROXY_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_oauth_proxy_default_image_tag, true) }}"
+
   presto:
     spec:
       presto:
