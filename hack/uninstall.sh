@@ -13,7 +13,6 @@ trap "rm -rf $TMPDIR" EXIT SIGINT
 cp -r "$INSTALLER_MANIFESTS_DIR" "$TMPDIR"
 customizeMeteringInstallManifests "$TMPDIR"
 
-
 msg "Removing Metering Resource"
 kube-remove \
     "$METERING_CR_FILE"
@@ -37,7 +36,6 @@ if [ "${METERING_UNINSTALL_CLUSTERROLEBINDING}" == "true" ]; then
         -f "$TMPDIR/metering-operator-clusterrole.yaml" \
         -f "$TMPDIR/metering-operator-clusterrolebinding.yaml"
 fi
-
 
 if [ "$SKIP_DELETE_CRDS" == "true" ]; then
     echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource Definitions"
