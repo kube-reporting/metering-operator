@@ -115,15 +115,15 @@ integration: bin/test2json
 	hack/integration.sh
 
 integration-local: reporting-operator-local metering-ansible-operator-docker-build
-	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
+	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
 
 integration-docker: metering-src-docker-build
 	docker run \
 		--name metering-integration-docker \
 		-t \
 		-e METERING_NAMESPACE \
-		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
-		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
+		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
 		-e KUBECONFIG=/kubecon***REMOVED***g \
 		-e TEST_OUTPUT_PATH=/out \
 		-w /go/src/github.com/operator-framework/operator-metering \
@@ -140,15 +140,15 @@ e2e: bin/test2json
 	hack/e2e.sh
 
 e2e-local: reporting-operator-local metering-ansible-operator-docker-build
-	$(MAKE) e2e DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true
+	$(MAKE) e2e DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
 
 e2e-docker: metering-src-docker-build
 	docker run \
 		--name metering-e2e-docker \
 		-t \
 		-e METERING_NAMESPACE \
-		-e METERING_OPERATOR_DEPLOY_REPO -e METERING_OPERATOR_DEPLOY_TAG \
-		-e REPORTING_OPERATOR_DEPLOY_REPO -e REPORTING_OPERATOR_DEPLOY_TAG \
+		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
+		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
 		-e KUBECONFIG=/kubecon***REMOVED***g \
 		-e TEST_OUTPUT_PATH=/out \
 		-w /go/src/github.com/operator-framework/operator-metering \
@@ -189,6 +189,9 @@ verify-docker: metering-src-docker-build
 
 .PHONY: run-metering-operator-local
 run-metering-operator-local: metering-ansible-operator-docker-build
+	export \
+		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
+		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
 	./hack/run-metering-operator-local.sh
 
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)

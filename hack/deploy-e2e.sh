@@ -5,21 +5,19 @@ DIR=$(dirname "${BASH_SOURCE}")
 ROOT_DIR="$DIR/.."
 source "${ROOT_DIR}/hack/common.sh"
 
-: "${METERING_OPERATOR_DEPLOY_REPO:?}"
-: "${REPORTING_OPERATOR_DEPLOY_REPO:?}"
-: "${METERING_OPERATOR_DEPLOY_TAG:?}"
-: "${REPORTING_OPERATOR_DEPLOY_TAG:?}"
-
 TMP_DIR="$(mktemp -d)"
 
 unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr.yaml"
-export CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES=${CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES:-"$TMP_DIR/custom-ansible-operator-values.yaml"}
-export CUSTOM_OLM_OVERRIDE_VALUES=${CUSTOM_OLM_OVERRIDE_VALUES:-"$TMP_DIR/custom-olm-values.yaml"}
 
 export DEPLOY_PLATFORM
 export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
+
+: "${METERING_OPERATOR_IMAGE_REPO:=""}"
+: "${METERING_OPERATOR_IMAGE_TAG:=""}"
+: "${REPORTING_OPERATOR_IMAGE_REPO:=""}"
+: "${REPORTING_OPERATOR_IMAGE_TAG:=""}"
 
 : "${USE_KUBE_114_metrics:=true}"
 : "${ENABLE_AWS_BILLING:=false}"
@@ -54,8 +52,6 @@ if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
 
 HELM_ARGS=(\
     --set "reportingOperatorReplicas=${REPORTING_OPERATOR_REPLICAS}" \
-    --set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_DEPLOY_REPO}" \
-    --set "reportingOperatorDeployTag=${REPORTING_OPERATOR_DEPLOY_TAG}" \
     --set "useKube114Metrics=${USE_KUBE_114_metrics}" \
     --set "enableAwsBilling=${ENABLE_AWS_BILLING}" \
     --set "disablePrometheusMetricsImporter=${DISABLE_PROMETHEUS_METRICS_IMPORTER}" \
@@ -82,25 +78,24 @@ HELM_ARGS=(\
     --set "dateAnnotationValue=currdate-${CUR_DATE}" \
 )
 
+if [ -n "${REPORTING_OPERATOR_IMAGE_REPO}" ]; then
+    HELM_ARGS+=(--set "reportingOperatorDeployRepo=${REPORTING_OPERATOR_IMAGE_REPO}")
+***REMOVED***
+if [ -n "${REPORTING_OPERATOR_IMAGE_TAG}" ]; then
+    HELM_ARGS+=(--set "reportingOperatorDeployTag=${REPORTING_OPERATOR_IMAGE_TAG}")
+***REMOVED***
+
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
     HELM_ARGS+=(--set "imagePullSecretName=$METERING_PULL_SECRET_NAME")
 ***REMOVED***
 
 export METERING_CR_FILE=$CUSTOM_METERING_CR_FILE
+
 helm template \
     "$ROOT_DIR/charts/metering-ci" \
     -x templates/metering.yaml \
     "${HELM_ARGS[@]}" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$CUSTOM_METERING_CR_FILE"
-
-cat <<EOF > "$CUSTOM_HELM_OPERATOR_OVERRIDE_VALUES"
-operator:
-  image:
-    repo: ${METERING_OPERATOR_DEPLOY_REPO}
-    tag: ${METERING_OPERATOR_DEPLOY_TAG}
-  annotations: { "metering.deploy-custom/deploy-time": "${CUR_DATE}" }
-  reconcileIntervalSeconds: 5
-EOF
 
 "$DIR/deploy-custom.sh"
