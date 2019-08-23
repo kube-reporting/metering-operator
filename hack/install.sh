@@ -4,6 +4,8 @@ ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 source "${ROOT_DIR}/hack/lib/customize-manifests.sh"
 
+echo "Using $INSTALLER_MANIFESTS_DIR as manifests directory"
+
 # can also be specified as an argument
 METERING_CR_FILE="${1:-$METERING_CR_FILE}"
 

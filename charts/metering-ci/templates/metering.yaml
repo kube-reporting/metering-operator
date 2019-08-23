@@ -36,12 +36,18 @@ spec:
   reporting-operator:
     spec:
       replicas: {{ .Values.reportingOperatorReplicas }}
+      {{- if or .Values.reportingOperatorDeployRepo .Values.reportingOperatorDeployTag .Values.imagePullSecretName }}
       image:
-        repository: "{{ .Values.reportingOperatorDeployRepo }}"
-        tag: "{{ .Values.reportingOperatorDeployTag }}"
+        {{- if .Values.reportingOperatorDeployRepo }}
+        repository: {{ .Values.reportingOperatorDeployRepo }}
+        {{- end }}
+        {{- if .Values.reportingOperatorDeployTag }}
+        tag: {{ .Values.reportingOperatorDeployTag }}
+        {{- end }}
         {{- if .Values.imagePullSecretName }}
         pullSecrets: [ { name: "{{ .Values.imagePullSecretName }}" } ]
         {{- end }}
+      {{- end }}
       {{- if .Values.dateAnnotationValue }}
       annotations: { "metering.deploy-custom/deploy-time": "{{ .Values.dateAnnotationValue }}" }
       {{- end }}

@@ -30,10 +30,7 @@ METERING_NAMESPACE=$(sanetize_namespace "${METERING_NAMESPACE:-metering}")
 : "${METERING_CR_FILE:=$INSTALLER_MANIFESTS_DIR/meteringconfig.yaml}"
 : "${METERING_UNINSTALL_CLUSTERROLEBINDING:=true}"
 : "${METERING_INSTALL_CLUSTERROLEBINDING:=true}"
-: "${METERING_OPERATOR_IMAGE_REPO:="quay.io/openshift/origin-metering-ansible-operator"}"
-: "${METERING_OPERATOR_IMAGE_TAG:="4.2"}"
-: "${REPORTING_OPERATOR_IMAGE_REPO:="quay.io/openshift/origin-metering-reporting-operator"}"
-: "${REPORTING_OPERATOR_IMAGE_TAG:="4.2"}"
+
 : "${FAQ_BIN:=faq}"
 : "${DEPLOY_REPORTING_OPERATOR_LOCAL:=false}"
 : "${DEPLOY_METERING_OPERATOR_LOCAL:=false}"
