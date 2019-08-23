@@ -402,8 +402,8 @@ reporting-operator:
 
       image:
         pullPolicy: Always
-        repository: openshift/oauth-proxy
-        tag: v1.1.0
+        repository: quay.io/openshift/origin-oauth-proxy
+        tag: 4.2
         pullSecrets: []
 
       authenticatedEmails:
