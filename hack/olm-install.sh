@@ -31,9 +31,6 @@ if [ "$METERING_NAMESPACE" != "openshift-metering" ]; then
         export OLM_MANIFESTS_DIR="$TMPDIR"
 ***REMOVED***
 
-msg "Installing Custom Resource De***REMOVED***nitions"
-kube-install "$CRD_DIR"
-
 msg "Installing Metering Catalog Source Con***REMOVED***g"
 kubectl apply -f \
     "$OLM_MANIFESTS_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
