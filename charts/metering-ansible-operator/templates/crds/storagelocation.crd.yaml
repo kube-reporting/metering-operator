@@ -62,7 +62,6 @@ spec:
                     If this ***REMOVED***eld is unset, or set to an empty string, then the default
                     ***REMOVED***lesystem URL for Hive is used.
                     Note: this is an optional ***REMOVED***eld.
-                  nullable: true
                   format: uri
                 defaultTableProperties:
                   type: object
