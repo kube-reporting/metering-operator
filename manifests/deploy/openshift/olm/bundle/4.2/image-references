@@ -27,4 +27,8 @@ spec:
       kind: DockerImage
       name: quay.io/openshift/origin-ghostunnel:4.2
     name: ghostunnel
+  - from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-oauth-proxy:4.2
+    name: oauth-proxy
 
