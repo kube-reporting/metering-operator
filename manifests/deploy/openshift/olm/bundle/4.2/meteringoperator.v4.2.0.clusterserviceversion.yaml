@@ -239,7 +239,7 @@ spec:
 
     Metering works out of the box without any customizations or configuration. Read the [full documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/metering-config.md) for more details.
 
-    * **Use a specific StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-config/custom-storage.yaml) instead of the Dynamic Provisioner.
+    * **Use a specific StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-config/shared-storage.yaml) instead of the Dynamic Provisioner.
 
     * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/operator-framework/operator-metering/blob/master/Documentation/configuring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
 
