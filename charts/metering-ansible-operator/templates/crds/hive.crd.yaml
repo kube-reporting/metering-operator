@@ -193,7 +193,6 @@ spec:
               description: |
                 A list of partitions that this Hive table should contain.
                 Note: this is an optional ***REMOVED***eld.
-              nullable: true
               items:
                 type: object
                 required:

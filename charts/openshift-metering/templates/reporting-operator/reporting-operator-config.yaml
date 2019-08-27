@@ -34,7 +34,7 @@ data:
 {{- end }}
 {{- end }}
 
-  prometheus-url: {{ required "a valid reporting-operator.spec.con***REMOVED***g.prometheusURL must be set" $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
+  prometheus-url: {{ $operatorValues.spec.con***REMOVED***g.prometheus.url | quote}}
   disable-prometheus-metrics-importer: {{ not $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.enabled | quote}}
 {{- if $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval }}
   prometheus-metrics-importer-poll-interval: {{ $operatorValues.spec.con***REMOVED***g.prometheus.metricsImporter.con***REMOVED***g.pollInterval | quote}}

@@ -239,7 +239,7 @@ spec:
 
     Metering works out of the box without any customizations or con***REMOVED***guration. Read the [full documentation](https://github.com/operator-framework/operator-metering/blob/master/Documentation/metering-con***REMOVED***g.md) for more details.
 
-    * **Use a speci***REMOVED***c StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-con***REMOVED***g/custom-storage.yaml) instead of the Dynamic Provisioner.
+    * **Use a speci***REMOVED***c StorageClass** - Follow the example to [use your own StorageClass](https://github.com/operator-framework/operator-metering/blob/master/manifests/metering-con***REMOVED***g/shared-storage.yaml) instead of the Dynamic Provisioner.
 
     * **Store data in S3 instead of PV** - Store your report output [in an S3 bucket](https://github.com/operator-framework/operator-metering/blob/master/Documentation/con***REMOVED***guring-storage.md#storing-data-in-s3) instead of a PersistentVolume.
 
@@ -458,6 +458,8 @@ spec:
                   env:
                   - name: OPERATOR_NAME
                     value: "metering-ansible-operator"
+                  - name: DISABLE_OCP_FEATURES
+                    value: "false"
                   - name: WATCH_NAMESPACE
                     valueFrom:
                       ***REMOVED***eldRef:
@@ -516,8 +518,8 @@ spec:
       kind: ReportQuery
       name: reportqueries.metering.openshift.io
       version: v1
-    - description: Used under-the-hood. A resource a database table in Presto. Use by
-        ReportQueries to determine what tables exist, and by the HTTP API to determine
+    - description: Used under-the-hood. A resource representing a database table in Presto.
+        Used by ReportQueries to determine what tables exist, and by the HTTP API to determine
         how to query a table.
       displayName: Metering Data Source
       kind: ReportDataSource
@@ -535,7 +537,7 @@ spec:
       kind: PrestoTable
       name: prestotables.metering.openshift.io
       version: v1
-    - description: Used under-the-hood. A resource a database table in Hive.
+    - description: Used under-the-hood. A resource representing a database table in Hive.
       displayName: Metering Hive Table
       kind: HiveTable
       name: hivetables.metering.openshift.io

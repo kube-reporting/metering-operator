@@ -46,4 +46,3 @@ kube-install \
 msg "Installing Metering Resource"
 kube-install \
     "$METERING_CR_FILE"
-
