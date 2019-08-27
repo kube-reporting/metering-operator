@@ -52,7 +52,7 @@ type HiveTableSpec struct {
 	External        bool              `json:"external,omitempty"`
 
 	ManagePartitions bool                 `json:"managePartitions"`
-	Partitions       []HiveTablePartition `json:"partitions,omitempty"`
+	Partitions       []HiveTablePartition `json:"partitions"`
 }
 
 type HiveTableStatus struct {
