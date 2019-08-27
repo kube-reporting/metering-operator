@@ -140,11 +140,18 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+# We don't always want to generate an ART package, so check if the helm template
+# output is empty before redirecting output to a ***REMOVED***le
+HELM_ART_PKG_OUTPUT="$(helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/art.yaml" \
-    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$ART_CONFIG_DESTINATION"
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed")"
+
+if [[ -z "$HELM_ART_PKG_OUTPUT" ]]; then
+    echo "Skipping generating an ART package for $BUNDLE_DIR"
+***REMOVED***
+    echo "$HELM_ART_PKG_OUTPUT" > "$ART_CONFIG_DESTINATION"
+***REMOVED***
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
