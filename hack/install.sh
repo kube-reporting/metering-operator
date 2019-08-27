@@ -18,7 +18,7 @@ elif ! kubectl get namespace "${METERING_NAMESPACE}" 2> /dev/null; then
 fi
 
 msg "Installing Custom Resource Definitions"
-find "$CRD_DIR" -type f -name '*.crd.yaml' -exec kubectl apply -f {} \;
+find "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl apply -f {} \;
 
 if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
     echo "\$SKIP_METERING_OPERATOR_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
