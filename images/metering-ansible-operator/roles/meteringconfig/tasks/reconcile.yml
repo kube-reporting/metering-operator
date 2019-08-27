@@ -1,18 +1,7 @@
 ---
 
-- name: Validate storage configuration
-  assert:
-    that:
-      - meteringconfig_spec | json_query('storage.type') == "hive"
-    msg: "Unsupported spec.storage.type, only 'hive' is  a supported option"
-
-- name: Validate Hive storage configuration
-  assert:
-    that:
-      - hiveStorageType is not undefined and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
-    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of 's3', 'azure', 'gcs', 's3Compatible' or 'sharedPVC'"
-  vars:
-    hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
+- name: Validate Configurations
+  include_tasks: validate.yml
 
 - name: Configure TLS
   include_tasks: configure_tls.yml

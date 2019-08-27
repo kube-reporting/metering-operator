@@ -177,6 +177,7 @@ verify-helm-templates:
 
 verify-olm-manifests: metering-manifests
 	operator-courier verify --ui_validate_io ./manifests/deploy/openshift/olm/bundle
+	operator-courier verify --ui_validate_io ./manifests/deploy/upstream/olm/bundle
 
 verify-docker: metering-src-docker-build
 	docker run \

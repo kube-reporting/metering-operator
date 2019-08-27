@@ -40,6 +40,8 @@ template:
       env:
       - name: OPERATOR_NAME
         value: "metering-ansible-operator"
+      - name: DISABLE_OCP_FEATURES
+        value: "{{ .Values.operator.disableOCPFeatures }}"
       - name: WATCH_NAMESPACE
 {{- if .Values.operator.targetNamespace }}
         value: "{{ .Values.operator.targetNamespace }}"

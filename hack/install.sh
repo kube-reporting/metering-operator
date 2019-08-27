@@ -21,7 +21,7 @@ msg "Installing Custom Resource Definitions"
 find "$INSTALLER_MANIFESTS_DIR" -type f -name '*.crd.yaml' -exec kubectl apply -f {} \;
 
 if [ "$SKIP_METERING_OPERATOR_DEPLOYMENT" == "true" ]; then
-    echo "\$SKIP_METERING_OPERATOR_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
+    echo "\$SKIP_METERING_OPERATOR_DEPLOYMENT=true, not creating metering-operator"
 else
     TMPDIR="$(mktemp -d)"
     # shellcheck disable=SC2064

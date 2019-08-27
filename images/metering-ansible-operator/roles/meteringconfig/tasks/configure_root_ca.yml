@@ -1,4 +1,5 @@
 ---
+
 #
 # Check if the metering root CA secret already exists and instead needs to be copied into a temp directory
 # This temp directory would contain all the necessary TLS data (shared with Presto, Hive, reporting-operator)

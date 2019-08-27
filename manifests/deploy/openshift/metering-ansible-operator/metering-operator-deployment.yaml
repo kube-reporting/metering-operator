@@ -36,6 +36,8 @@ spec:
         env:
         - name: OPERATOR_NAME
           value: "metering-ansible-operator"
+        - name: DISABLE_OCP_FEATURES
+          value: "false"
         - name: WATCH_NAMESPACE
           valueFrom:
             fieldRef:

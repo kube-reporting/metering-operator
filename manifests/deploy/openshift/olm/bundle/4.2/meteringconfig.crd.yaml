@@ -39,6 +39,9 @@ spec:
                 enableHDFS:
                   type: boolean
 
+            disableOCPFeatures:
+              type: boolean
+
             storage:
               type: object
               required:

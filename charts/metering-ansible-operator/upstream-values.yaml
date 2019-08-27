@@ -1,0 +1,70 @@
+operator:
+  name: metering-operator
+
+  useTargetNamespacesDownwardAPIValueFrom: false
+
+  disableOCPFeatures: true
+
+  image:
+    repository: quay.io/coreos/metering-ansible-operator
+    tag: release-4.2
+    pullPolicy: Always
+
+olm:
+  packageName: metering-upstream
+  channels:
+  - name: stable
+    currentCSV: metering-operator.v4.2.0
+
+  imageTags:
+  - name: metering-ansible-operator
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/metering-ansible-operator:release-4.2
+  - name: metering-reporting-operator
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/metering-reporting-operator:release-4.2
+  - name: metering-presto
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/presto:release-4.2
+  - name: metering-hive
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/hive:release-4.2
+  - name: metering-hadoop
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/hadoop:release-4.2
+  - name: ghostunnel
+    from:
+      kind: DockerImage
+      name: quay.io/coreos/metering-ghostunnel:release-4.2
+
+  csv:
+    version: "4.2.0"
+    minKubeVersion: "1.11.0"
+    name : metering-operator.v4.2.0
+
+    maintainers:
+    - name: Red Hat
+      email: sd-operator-metering@redhat.com
+    provider:
+      name: Red Hat
+
+    annotations:
+      categories: "OpenShift Optional, Monitoring"
+      certified: "false"
+      capabilities: Basic Install
+      support: Red Hat, Inc.
+      createdAt: "2019-01-01T11:59:59Z"
+      containerImage: "quay.io/coreos/metering-ansible-operator:latest"
+
+  subscriptionName: metering
+  subscriptionChannel: stable
+  subscriptionCatalogSource: upstream-community-operators
+  subscriptionCatalogSourceNamespace: marketplace
+
+  operatorGroupName: metering-operators
+  operatorGroupTargetNamespaces: ["metering"]
