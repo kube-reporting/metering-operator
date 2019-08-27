@@ -10,7 +10,6 @@ TMP_DIR="$(mktemp -d)"
 unset METERING_CR_FILE
 export CUSTOM_METERING_CR_FILE="$TMP_DIR/custom-metering-cr.yaml"
 
-export DEPLOY_PLATFORM
 export METERING_PULL_SECRET_NAME
 export METERING_CREATE_PULL_SECRET
 

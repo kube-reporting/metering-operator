@@ -1,25 +1,19 @@
 #!/bin/bash
 set -e
 
-: "${DEPLOY_PLATFORM:?must be set to openshift}"
-
-export INSTALL_METHOD="${DEPLOY_PLATFORM}-direct"
 export DELETE_PVCS=${DELETE_PVCS:-true}
 
 : "${CUSTOM_METERING_CR_FILE:?Must set \$CUSTOM_METERING_CR_FILE}"
 
 TMP_DIR="$(mktemp -d)"
 export CUSTOM_DEPLOY_MANIFESTS_DIR=${CUSTOM_DEPLOY_MANIFESTS_DIR:-"$TMP_DIR/custom-deploy-manifests"}
-export CUSTOM_INSTALLER_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/metering-operator"
-export CUSTOM_OLM_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR/$DEPLOY_PLATFORM/olm"
+export CUSTOM_INSTALLER_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR/openshift/metering-operator"
+export CUSTOM_OLM_MANIFESTS_DIR="$CUSTOM_DEPLOY_MANIFESTS_DIR/openshift/olm"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
 
 echo "Creating metering manifests"
-# if [ "$CUSTOM_DEPLOY_MANIFESTS_DIR" != "$DEPLOY_MANIFESTS_DIR" ]; then
-#     cp -r "$DEPLOY_MANIFESTS_DIR" "$CUSTOM_DEPLOY_MANIFESTS_DIR"
-# fi
 
 mkdir -p "$CUSTOM_DEPLOY_MANIFESTS_DIR" "$CUSTOM_OLM_MANIFESTS_DIR"
 
