@@ -45,10 +45,3 @@ kube-remove \
 msg "Removing Metering Catalog Source Con***REMOVED***g"
 kubectl delete -f \
     "$OLM_MANIFESTS_DIR/metering.catalogsourcecon***REMOVED***g.yaml"
-
-if [ "$SKIP_DELETE_CRDS" == "true" ]; then
-    echo "\$SKIP_DELETE_CRDS is true, skipping deletion of Custom Resource De***REMOVED***nitions"
-***REMOVED***
-    msg "Removing Custom Resource De***REMOVED***nitions"
-    kube-remove "$CRD_DIR"
-***REMOVED***
