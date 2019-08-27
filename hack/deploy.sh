@@ -8,10 +8,9 @@ source "${ROOT_DIR}/hack/common.sh"
 
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
 : "${INSTALL_METERING:=true}"
-: "${INSTALL_METHOD:=${DEPLOY_PLATFORM}-direct}"
+: "${INSTALL_METHOD:=openshift-direct}"
 : "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
-: "${INSTALL_METERING:=true}"
 : "${DEPLOY_METERING_OPERATOR_LOCAL:=false}"
 
 if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
