@@ -1,0 +1,50 @@
+operator:
+  image:
+    repository: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator
+    tag: v4.2
+
+olm:
+  imageTags:
+  - name: metering-ansible-operator
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator:v4.2
+  - name: metering-reporting-operator
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-reporting-operator:v4.2
+  - name: metering-presto
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-presto:v4.2
+  - name: metering-hive
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hive:v4.2
+  - name: metering-hadoop
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hadoop:v4.2
+  - name: ghostunnel
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-ghostunnel:v4.2
+  - name: oauth-proxy
+    from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-oauth-proxy:v4.2
+
+
+  csv:
+    name : metering-operator-testing.v4.2.0
+    version: "4.2.0"
+    provider:
+      name: Metering OCP testing
+
+  packageName: metering-ocp-testing
+  subscriptionName: metering-ocp-testing
+  subscriptionChannel: stable
+
+  catalogSourceConfigName: installed-custom-metering-operators-openshift-metering
+  catalogSourceConfigNamespace: openshift-marketplace
+  catalogSourceConfigTargetNamespace: openshift-metering
