@@ -1,7 +1,8 @@
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
- name: metering-operators
+  name: metering-operators
+  namespace: metering
 spec:
  targetNamespaces:
   - metering
