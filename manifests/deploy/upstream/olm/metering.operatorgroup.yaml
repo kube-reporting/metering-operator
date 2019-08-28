@@ -4,6 +4,6 @@ metadata:
   name: metering-operators
   namespace: metering
 spec:
- targetNamespaces:
+  targetNamespaces:
   - metering
 
