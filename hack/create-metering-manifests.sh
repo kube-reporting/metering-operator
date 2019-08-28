@@ -144,6 +144,12 @@ helm template "$CHART" \
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
+    -x "templates/olm/catalogsourcecon***REMOVED***g.yaml" \
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
+    > "$CATALOGSOURCECONFIG_MANIFEST_DESTINATION"
+
+helm template "$CHART" \
+    ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/operatorgroup.yaml" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$OPERATORGROUP_MANIFEST_DESTINATION"

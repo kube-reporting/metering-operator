@@ -1,0 +1,15 @@
+updates:
+  # ***REMOVED***les are relative to art.yaml
+  - ***REMOVED***le: "{MAJOR}.{MINOR}/meteringoperator.v{MAJOR}.{MINOR}.0.clusterserviceversion.yaml"
+    update_list:
+    # replace metadata.name value
+    - search: "name: metering-operator.v{MAJOR}.{MINOR}.0"
+      replace: "name: metering-operator.{FULL_VER}"
+    # replace spec.version value
+    - search: 'version: "4.2.0"'
+      replace: 'version: {FULL_VER}'
+  - ***REMOVED***le: "package.yaml"
+    update_list:
+    - search: "currentCSV: metering-operator.v{MAJOR}.{MINOR}.0"
+      replace: "currentCSV: metering-operator.{FULL_VER}"
+

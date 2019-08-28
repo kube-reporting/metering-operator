@@ -1,0 +1,9 @@
+apiVersion: operators.coreos.com/v1
+kind: CatalogSourceCon***REMOVED***g
+metadata:
+  name: installed-redhat-metering-operators-openshift-metering
+  namespace: openshift-marketplace
+spec:
+  targetNamespace: openshift-metering
+  packages: metering-ocp
+
