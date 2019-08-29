@@ -48,3 +48,4 @@ olm:
   catalogSourceConfigName: installed-custom-metering-operators-openshift-metering
   catalogSourceConfigNamespace: openshift-marketplace
   catalogSourceConfigTargetNamespace: openshift-metering
+  telemeterManifestGeneration: false

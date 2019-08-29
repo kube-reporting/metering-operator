@@ -71,3 +71,4 @@ olm:
 
   operatorGroupName: metering-operators
   operatorGroupTargetNamespaces: ["metering"]
+  telemeterManifestGeneration: false
