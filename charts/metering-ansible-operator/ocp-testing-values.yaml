@@ -48,3 +48,4 @@ olm:
   catalogSourceCon***REMOVED***gName: installed-custom-metering-operators-openshift-metering
   catalogSourceCon***REMOVED***gNamespace: openshift-marketplace
   catalogSourceCon***REMOVED***gTargetNamespace: openshift-metering
+  telemeterManifestGeneration: false
