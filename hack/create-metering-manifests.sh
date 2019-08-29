@@ -119,7 +119,7 @@ BUNDLE_DIR="$OLM_OUTPUT_DIR/bundle"
 # the versioned directory containing CSVs and CRDs for each major.minor version
 CSV_BUNDLE_DIR="$BUNDLE_DIR/${major}.${minor}"
 
-PACKAGE_MANIFEST_DESTINATION="$BUNDLE_DIR/package.yaml"
+PACKAGE_MANIFEST_DESTINATION="$BUNDLE_DIR/metering.package.yaml"
 ART_CONFIG_DESTINATION="$BUNDLE_DIR/art.yaml"
 
 CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
