@@ -196,6 +196,10 @@ _base_storage_overrides:
           accessKeyID: ""
           secretAccessKey: ""
           endpoint: ""
+          ca:
+            createSecret: false
+            secretName: ""
+            content: ""
 
     presto:
       spec:
@@ -206,6 +210,10 @@ _base_storage_overrides:
             accessKeyID: "{{ _storage_spec | json_query('hive.s3Compatible.accessKeyID') }}"
             secretAccessKey: "{{ _storage_spec | json_query('hive.s3Compatible.secretAccessKey') }}"
             endpoint: "{{ _storage_spec | json_query('hive.s3Compatible.endpoint') }}"
+            ca:
+              createSecret: "{{ _storage_spec | json_query('hive.s3Compatible.ca.createSecret') }}"
+              secretName: "{{ _storage_spec | json_query('hive.s3Compatible.ca.secretName') }}"
+              content: "{{ _storage_spec | json_query('hive.s3Compatible.ca.content') }}"
 
     hive:
       spec:
@@ -218,6 +226,10 @@ _base_storage_overrides:
             accessKeyID: "{{ _storage_spec | json_query('hive.s3Compatible.accessKeyID') }}"
             secretAccessKey: "{{ _storage_spec | json_query('hive.s3Compatible.secretAccessKey') }}"
             endpoint: "{{ _storage_spec | json_query('hive.s3Compatible.endpoint') }}"
+            ca:
+              createSecret: "{{ _storage_spec | json_query('hive.s3Compatible.ca.createSecret') }}"
+              secretName: "{{ _storage_spec | json_query('hive.s3Compatible.ca.secretName') }}"
+              content: "{{ _storage_spec | json_query('hive.s3Compatible.ca.content') }}"
 
     hadoop:
       spec:
@@ -230,6 +242,10 @@ _base_storage_overrides:
             accessKeyID: "{{ _storage_spec | json_query('hive.s3Compatible.accessKeyID') }}"
             secretAccessKey: "{{ _storage_spec | json_query('hive.s3Compatible.secretAccessKey') }}"
             endpoint: "{{ _storage_spec | json_query('hive.s3Compatible.endpoint') }}"
+            ca:
+              createSecret: "{{ _storage_spec | json_query('hive.s3Compatible.ca.createSecret') }}"
+              secretName: "{{ _storage_spec | json_query('hive.s3Compatible.ca.secretName') }}"
+              content: "{{ _storage_spec | json_query('hive.s3Compatible.ca.content') }}"
 
         hdfs:
           enabled: false
@@ -587,6 +603,7 @@ meteringcon***REMOVED***g_create_hadoop_aws_credentials: "{{ _hadoop_spec.con***
 meteringcon***REMOVED***g_create_hadoop_azure_credentials: "{{ _hadoop_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hadoop_gcs_credentials: "{{ _hadoop_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hadoop_s3_compatible_credentials: "{{ _hadoop_spec.con***REMOVED***g.s3Compatible.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hadoop_s3_compatible_ca: "{{ _hadoop_spec.con***REMOVED***g.s3Compatible.ca.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_pvc: "{{ _hive_spec.metastore.storage.create | default(true) }}"
 meteringcon***REMOVED***g_create_hive_shared_volume_pvc: "{{ _hive_spec.con***REMOVED***g.sharedVolume.enabled and _hive_spec.con***REMOVED***g.sharedVolume.createPVC | default(false) }}"
@@ -594,6 +611,7 @@ meteringcon***REMOVED***g_create_hive_aws_credentials: "{{ _hive_spec.con***REMO
 meteringcon***REMOVED***g_create_hive_azure_credentials: "{{ _hive_spec.con***REMOVED***g.azure.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_gcs_credentials: "{{ _hive_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_s3_compatible_credentials: "{{ _hive_spec.con***REMOVED***g.s3Compatible.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_hive_s3_compatible_ca: "{{ _hive_spec.con***REMOVED***g.s3Compatible.ca.createSecret | default(false) }}"
 
 meteringcon***REMOVED***g_create_hive_metastore_tls_secrets: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_hive_server_metastore_tls_secrets: "{{ _hive_spec.server.con***REMOVED***g.metastoreTLS.enabled and _hive_spec.server.con***REMOVED***g.metastoreTLS.createSecret | default(false) }}"
@@ -604,6 +622,7 @@ meteringcon***REMOVED***g_create_presto_azure_credentials: "{{ _presto_spec.con*
 meteringcon***REMOVED***g_create_presto_hive_metastore_tls_secrets: "{{ _presto_spec.con***REMOVED***g.connectors.hive.tls.enabled and _presto_spec.con***REMOVED***g.connectors.hive.tls.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_gcs_credentials: "{{ _presto_spec.con***REMOVED***g.gcs.createSecret | default(false) }}"
 meteringcon***REMOVED***g_create_presto_s3_compatible_credentials: "{{ _presto_spec.con***REMOVED***g.s3Compatible.createSecret | default(false) }}"
+meteringcon***REMOVED***g_create_presto_s3_compatible_ca: "{{ _presto_spec.con***REMOVED***g.s3Compatible.ca.createSecret | default(false) }}"
 
 
 meteringcon***REMOVED***g_template_hive_metastore_tls_secret: "{{ _hive_spec.metastore.con***REMOVED***g.tls.enabled and _hive_spec.metastore.con***REMOVED***g.tls.createSecret and _hive_spec.metastore.con***REMOVED***g.tls.secretName != 'hive-metastore-server-tls'}}"
