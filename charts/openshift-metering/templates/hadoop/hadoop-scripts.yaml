@@ -19,6 +19,12 @@ data:
     #!/bin/bash
     set -e
 
+    # if the s3-compatible ca bundle is mounted in, add to the root Java truststore.
+    if [ -a /s3-compatible-ca/ca-bundle.crt ]; then
+      echo "Adding /s3-compatible-ca/ca-bundle.crt to $JAVA_HOME/lib/security/cacerts"
+      keytool -import -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -alias s3 -noprompt -trustcacerts -file /s3-compatible-ca/ca-bundle.crt
+    fi
+
     export HADOOP_LOG_DIR="${HADOOP_HOME}/logs"
     # Set garbage collection settings
     export GC_SETTINGS="-XX:+UseG1GC -XX:G1HeapRegionSize=32M -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${HADOOP_LOG_DIR}/heap_dump.bin -XX:+ExitOnOutOfMemoryError -XX:ErrorFile=${HADOOP_LOG_DIR}/java_error%p.log"

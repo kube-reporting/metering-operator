@@ -84,6 +84,9 @@ spec:
 {{- if .Values.hadoop.spec.config.s3Compatible.createSecret }}
         hadoop-s3-compatible-credentials-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-s3-compatible-credentials.yaml") . | sha256sum }}
 {{- end }}
+{{- if .Values.hadoop.spec.config.s3Compatible.ca.createSecret }}
+        hadoop-s3-compatible-ca-secret-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-s3-compatible-ca-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hadoop.spec.hdfs.namenode.annotations }}
 {{ toYaml .Values.hadoop.spec.hdfs.namenode.annotations | indent 8 }}
 {{- end }}
@@ -219,6 +222,10 @@ spec:
           mountPath: /hadoop-scripts
         - name: hdfs-jmx-config
           mountPath: /opt/jmx_exporter/config
+{{- if or .Values.hadoop.spec.config.s3Compatible.ca.secretName .Values.hadoop.spec.config.s3Compatible.ca.createSecret }}
+        - name: s3-compatible-ca
+          mountPath: /s3-compatible-ca
+{{- end }}
         - name: hdfs-namenode-data
           mountPath: /hadoop/dfs/name
           # we use a subPath to avoid the lost+found directory at the root of
@@ -258,6 +265,11 @@ spec:
       - name: gcs-json
         secret:
           secretName: "{{ .Values.hadoop.spec.config.gcs.secretName | default "hadoop-gcs-credentials" }}"
+{{- end }}
+{{- if or .Values.hadoop.spec.config.s3Compatible.ca.secretName .Values.hadoop.spec.config.s3Compatible.ca.createSecret }}
+      - name: s3-compatible-ca
+        secret:
+          secretName: {{ .Values.hadoop.spec.config.s3Compatible.ca.secretName | default "hadoop-s3-compatible-ca" }}
 {{- end }}
   volumeClaimTemplates:
   - metadata:
