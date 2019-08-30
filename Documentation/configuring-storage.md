@@ -41,7 +41,9 @@ To use S3 compatible storage such as Noobaa, edit the `spec.storage` section in 
 Set the `spec.storage.hive.s3Compatible.bucket`, `spec.storage.hive.s3Compatible.endpoint` and `spec.storage.hive.s3Compatible.secretName` values.
 
 You must provide an existing S3 Compatible bucket, under the ***REMOVED***eld `spec.storage.hive.s3Compatible.bucket`.
-You must also provide the endpoint for your storage, under the ***REMOVED***eld`spec.storage.hive.s3Compatible.endpoint`.
+You must also provide the endpoint for your storage, under the ***REMOVED***eld `spec.storage.hive.s3Compatible.endpoint`.
+If you want to use HTTPS with a self-signed certi***REMOVED***cate on your s3Compatible endpoint, you need to set the options in the `spec.storage.hive.s3Compatible.ca` section.
+Set `spec.storage.hive.s3Compatible.ca.createSecret` to true and `spec.storage.hive.s3Compatible.ca.content` to your PEM encoded CA bundle.
 The `spec.storage.hive.s3Compatible.secretName` should be the name of a secret in the Metering namespace containing the AWS credentials in the `data.aws-access-key-id` and `data.aws-secret-access-key` ***REMOVED***elds.
 
 > **Note**: The values of the `aws-access-key-id` and `aws-secret-access-key` must be base64 encoded.
