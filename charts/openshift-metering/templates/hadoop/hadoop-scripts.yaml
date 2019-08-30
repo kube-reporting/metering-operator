@@ -17,12 +17,35 @@ data:
 
   entrypoint.sh: |
     #!/bin/bash
+    function importCert() {
+      PEM_FILE=$1
+      PASSWORD=$2
+      KEYSTORE=$3
+      # number of certs in the PEM file
+      CERTS=$(grep 'END CERTIFICATE' $PEM_FILE| wc -l)
+
+      # For every cert in the PEM file, extract it and import into the JKS keystore
+      # awk command: step 1, if line is in the desired cert, print the line
+      #              step 2, increment counter when last line of cert is found
+      for N in $(seq 0 $(($CERTS - 1))); do
+        ALIAS="${PEM_FILE%.*}-$N"
+        cat $PEM_FILE |
+          awk "n==$N { print }; /END CERTIFICATE/ { n++ }" |
+          keytool -noprompt -import -trustcacerts \
+                  -alias $ALIAS -keystore $KEYSTORE -storepass $PASSWORD
+      done
+    }
     set -e
 
     # if the s3-compatible ca bundle is mounted in, add to the root Java truststore.
     if [ -a /s3-compatible-ca/ca-bundle.crt ]; then
       echo "Adding /s3-compatible-ca/ca-bundle.crt to $JAVA_HOME/lib/security/cacerts"
-      keytool -import -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -alias s3 -noprompt -trustcacerts -file /s3-compatible-ca/ca-bundle.crt
+      importCert /s3-compatible-ca/ca-bundle.crt changeit $JAVA_HOME/lib/security/cacerts
+    fi
+    # always add the openshift service-ca.crt if it exists
+    if [ -a /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt ]; then
+      echo "Adding /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt to $JAVA_HOME/lib/security/cacerts"
+      importCert /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt changeit $JAVA_HOME/lib/security/cacerts
     fi
 
     export HADOOP_LOG_DIR="${HADOOP_HOME}/logs"
