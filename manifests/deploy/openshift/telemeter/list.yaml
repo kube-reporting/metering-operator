@@ -355,6 +355,17 @@ objects:
                             properties:
                               accessKeyID:
                                 type: string
+                              ca:
+                                properties:
+                                  content:
+                                    minLength: 1
+                                    type: string
+                                  createSecret:
+                                    type: boolean
+                                  secretName:
+                                    minLength: 1
+                                    type: string
+                                type: object
                               createSecret:
                                 type: boolean
                               endpoint:
@@ -660,6 +671,17 @@ objects:
                             properties:
                               accessKeyID:
                                 type: string
+                              ca:
+                                properties:
+                                  content:
+                                    minLength: 1
+                                    type: string
+                                  createSecret:
+                                    type: boolean
+                                  secretName:
+                                    minLength: 1
+                                    type: string
+                                type: object
                               createSecret:
                                 type: boolean
                               endpoint:
@@ -1526,6 +1548,17 @@ objects:
                             properties:
                               accessKeyID:
                                 type: string
+                              ca:
+                                properties:
+                                  content:
+                                    minLength: 1
+                                    type: string
+                                  createSecret:
+                                    type: boolean
+                                  secretName:
+                                    minLength: 1
+                                    type: string
+                                type: object
                               createSecret:
                                 type: boolean
                               endpoint:
@@ -2825,6 +2858,17 @@ objects:
                           bucket:
                             minLength: 1
                             type: string
+                          ca:
+                            properties:
+                              content:
+                                minLength: 1
+                                type: string
+                              createSecret:
+                                type: boolean
+                              secretName:
+                                minLength: 1
+                                type: string
+                            type: object
                           createSecret:
                             type: boolean
                           endpoint:
