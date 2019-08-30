@@ -165,6 +165,8 @@ olm:
   - name: stable
     currentCSV: metering-operator.v4.2.0
 
+  skipARTPackage: false
+
   imageTags:
   - name: metering-ansible-operator
     from:
