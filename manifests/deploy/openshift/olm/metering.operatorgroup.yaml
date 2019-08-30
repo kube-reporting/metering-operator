@@ -4,6 +4,6 @@ metadata:
   name: metering-operators
   namespace: openshift-metering
 spec:
- targetNamespaces:
+  targetNamespaces:
   - openshift-metering
 

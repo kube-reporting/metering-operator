@@ -14,7 +14,9 @@ olm:
   packageName: metering-upstream
   channels:
   - name: stable
-    currentCSV: metering-operator.v4.2.0
+    currentCSV: metering-operator-upstream.v4.2.0
+
+  skipARTPackage: true
 
   imageTags:
   - name: metering-ansible-operator

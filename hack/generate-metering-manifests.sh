@@ -7,21 +7,21 @@ source "${ROOT_DIR}/hack/common.sh"
 TMPDIR="$(mktemp -d)"
 trap "rm -rf $TMPDIR" EXIT
 
-echo "Generating Openshift Manifests"
+msg "Generating Openshift Manifests"
 
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$OCP_INSTALLER_MANIFESTS_DIR" \
     "$OCP_OLM_MANIFESTS_DIR" \
     "$OCP_TELEMETER_MANIFESTS_DIR"
 
-echo "Generating Upstream Manifests"
+msg "Generating Upstream Manifests"
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$UPSTREAM_INSTALLER_MANIFESTS_DIR" \
     "$UPSTREAM_OLM_MANIFESTS_DIR" \
     "$OCP_TELEMETER_MANIFESTS_DIR" \
     "$ROOT_DIR/charts/metering-ansible-operator/upstream-values.yaml"
 
-echo "Generating OCP Testing Manifests"
+msg "Generating OCP Testing Manifests"
 
 "$ROOT_DIR/hack/create-metering-manifests.sh" \
     "$OCP_TESTING_INSTALLER_MANIFESTS_DIR" \

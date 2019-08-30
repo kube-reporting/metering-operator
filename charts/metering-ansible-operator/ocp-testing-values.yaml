@@ -34,6 +34,7 @@ olm:
       kind: DockerImage
       name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-oauth-proxy:v4.2
 
+  skipARTPackage: true
 
   csv:
     name : metering-operator-testing.v4.2.0

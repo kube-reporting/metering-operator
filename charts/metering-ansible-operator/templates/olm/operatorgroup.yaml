@@ -4,5 +4,5 @@ metadata:
   name: {{ .Values.olm.operatorGroupName }}
   namespace: {{ .Values.olm.catalogSourceConfigTargetNamespace }}
 spec:
- targetNamespaces:
+  targetNamespaces:
 {{ toYaml .Values.olm.operatorGroupTargetNamespaces | indent 2 }}

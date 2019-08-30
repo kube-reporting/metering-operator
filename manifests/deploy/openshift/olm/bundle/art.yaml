@@ -12,4 +12,3 @@ updates:
     update_list:
     - search: "currentCSV: metering-operator.v{MAJOR}.{MINOR}.0"
       replace: "currentCSV: metering-operator.{FULL_VER}"
-

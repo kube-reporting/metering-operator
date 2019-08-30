@@ -119,7 +119,7 @@ BUNDLE_DIR="$OLM_OUTPUT_DIR/bundle"
 # the versioned directory containing CSVs and CRDs for each major.minor version
 CSV_BUNDLE_DIR="$BUNDLE_DIR/${major}.${minor}"
 
-PACKAGE_MANIFEST_DESTINATION="$BUNDLE_DIR/package.yaml"
+PACKAGE_MANIFEST_DESTINATION="$BUNDLE_DIR/metering.package.yaml"
 ART_CONFIG_DESTINATION="$BUNDLE_DIR/art.yaml"
 
 CSV_MANIFEST_DESTINATION="$CSV_BUNDLE_DIR/meteringoperator.v${CSV_VERSION}.clusterserviceversion.yaml"
@@ -140,11 +140,18 @@ helm template "$CHART" \
     | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
     > "$PACKAGE_MANIFEST_DESTINATION"
 
-helm template "$CHART" \
+# We don't always want to generate an ART package, so check if the helm template
+# output is empty before redirecting output to a file
+HELM_ART_PKG_OUTPUT="$(helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
     -x "templates/olm/art.yaml" \
-    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed" \
-    > "$ART_CONFIG_DESTINATION"
+    | sed -f "$ROOT_DIR/hack/remove-helm-template-header.sed")"
+
+if [[ -z "$HELM_ART_PKG_OUTPUT" ]]; then
+    echo "Skipping generating an ART package for $BUNDLE_DIR"
+else
+    echo "$HELM_ART_PKG_OUTPUT" > "$ART_CONFIG_DESTINATION"
+fi
 
 helm template "$CHART" \
     ${VALUES_ARGS[@]+"${VALUES_ARGS[@]}"} \
