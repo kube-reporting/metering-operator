@@ -479,6 +479,10 @@ presto:
         accessKeyID: ""
         secretAccessKey: ""
         endpoint: ""
+        ca:
+          secretName: ""
+          createSecret: false
+          content: ""
 
       tls:
         # server cert
@@ -666,6 +670,10 @@ hive:
         accessKeyID: ""
         secretAccessKey: ""
         endpoint: ""
+        ca:
+          secretName: ""
+          createSecret: false
+          content: ""
 
       sharedVolume:
         enabled: false
@@ -845,6 +853,10 @@ hadoop:
         accessKeyID: ""
         secretAccessKey: ""
         endpoint: ""
+        ca:
+          secretName: ""
+          createSecret: false
+          content: ""
 
     image:
       pullPolicy: Always
