@@ -12,6 +12,7 @@ import (
 type MeteringV1Interface interface {
 	RESTClient() rest.Interface
 	HiveTablesGetter
+	MeteringCon***REMOVED***gsGetter
 	PrestoTablesGetter
 	ReportsGetter
 	ReportDataSourcesGetter
@@ -26,6 +27,10 @@ type MeteringV1Client struct {
 
 func (c *MeteringV1Client) HiveTables(namespace string) HiveTableInterface {
 	return newHiveTables(c, namespace)
+}
+
+func (c *MeteringV1Client) MeteringCon***REMOVED***gs(namespace string) MeteringCon***REMOVED***gInterface {
+	return newMeteringCon***REMOVED***gs(c, namespace)
 }
 
 func (c *MeteringV1Client) PrestoTables(namespace string) PrestoTableInterface {

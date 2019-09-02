@@ -10,6 +10,8 @@ import (
 type Interface interface {
 	// HiveTables returns a HiveTableInformer.
 	HiveTables() HiveTableInformer
+	// MeteringCon***REMOVED***gs returns a MeteringCon***REMOVED***gInformer.
+	MeteringCon***REMOVED***gs() MeteringCon***REMOVED***gInformer
 	// PrestoTables returns a PrestoTableInformer.
 	PrestoTables() PrestoTableInformer
 	// Reports returns a ReportInformer.
@@ -36,6 +38,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // HiveTables returns a HiveTableInformer.
 func (v *version) HiveTables() HiveTableInformer {
 	return &hiveTableInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// MeteringCon***REMOVED***gs returns a MeteringCon***REMOVED***gInformer.
+func (v *version) MeteringCon***REMOVED***gs() MeteringCon***REMOVED***gInformer {
+	return &meteringCon***REMOVED***gInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // PrestoTables returns a PrestoTableInformer.

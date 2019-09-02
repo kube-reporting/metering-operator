@@ -10,6 +10,14 @@ type HiveTableListerExpansion interface{}
 // HiveTableNamespaceLister.
 type HiveTableNamespaceListerExpansion interface{}
 
+// MeteringCon***REMOVED***gListerExpansion allows custom methods to be added to
+// MeteringCon***REMOVED***gLister.
+type MeteringCon***REMOVED***gListerExpansion interface{}
+
+// MeteringCon***REMOVED***gNamespaceListerExpansion allows custom methods to be added to
+// MeteringCon***REMOVED***gNamespaceLister.
+type MeteringCon***REMOVED***gNamespaceListerExpansion interface{}
+
 // PrestoTableListerExpansion allows custom methods to be added to
 // PrestoTableLister.
 type PrestoTableListerExpansion interface{}
