@@ -39,6 +39,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=metering.openshift.io, Version=v1
 	case v1.SchemeGroupVersion.WithResource("hivetables"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().HiveTables().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("meteringconfigs"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().MeteringConfigs().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("prestotables"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Metering().V1().PrestoTables().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("reports"):
