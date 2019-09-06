@@ -169,7 +169,7 @@ func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time
 			if chunkEnd.After(endTime) {
 				chunkEnd = truncateToSecond(endTime)
 			}
-			if chunkEnd.Equal(chunkStart) {
+			if chunkEnd.Equal(chunkStart) || chunkEnd.Sub(chunkStart) < stepSize {
 				break
 			}
 		} ***REMOVED*** {
