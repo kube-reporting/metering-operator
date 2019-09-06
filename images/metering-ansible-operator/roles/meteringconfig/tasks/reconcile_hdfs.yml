@@ -26,6 +26,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: hadoop-s3-compatible-credentials
         create: "{{ meteringcon***REMOVED***g_create_hadoop_s3_compatible_credentials }}"
+      - template_***REMOVED***le: templates/hadoop/hadoop-s3-compatible-ca-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: hadoop-s3-compatible-ca-secret
+        create: "{{ meteringcon***REMOVED***g_create_presto_s3_compatible_ca }}"
       - template_***REMOVED***le: templates/hadoop/hadoop-scripts.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: hadoop-scripts

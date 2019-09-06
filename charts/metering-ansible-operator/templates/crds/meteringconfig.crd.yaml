@@ -184,6 +184,17 @@ spec:
                           type: string
                           format: uri
                           minLength: 1
+                        ca:
+                          type: object
+                          properties:
+                            createSecret:
+                              type: boolean
+                            secretName:
+                              type: string
+                              minLength: 1
+                            content:
+                              type: string
+                              minLength: 1
                       oneOf:
                       - required:
                         - accessKeyID
@@ -1413,6 +1424,17 @@ spec:
                             endpoint:
                               type: string
                               format: uri
+                            ca:
+                              type: object
+                              properties:
+                                createSecret:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                                  minLength: 1
+                                content:
+                                  type: string
+                                  minLength: 1
 
                         connectors:
                           type: object
@@ -1917,6 +1939,17 @@ spec:
                             endpoint:
                               type: string
                               format: uri
+                            ca:
+                              type: object
+                              properties:
+                                createSecret:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                                  minLength: 1
+                                content:
+                                  type: string
+                                  minLength: 1
                         db:
                           type: object
                           properties:
@@ -2450,6 +2483,17 @@ spec:
                             endpoint:
                               type: string
                               format: uri
+                            ca:
+                              type: object
+                              properties:
+                                createSecret:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                                  minLength: 1
+                                content:
+                                  type: string
+                                  minLength: 1
                         defaultFS:
                           type: string
                     con***REMOVED***gSecretName:

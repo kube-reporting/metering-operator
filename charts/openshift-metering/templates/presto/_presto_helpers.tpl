@@ -24,7 +24,6 @@ hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
 {{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
 hive.s3.endpoint={{ .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
 hive.s3.path-style-access=true
-hive.s3.ssl.enabled=false
 {{- end }}
 {{- end }}
 
