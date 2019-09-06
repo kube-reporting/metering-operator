@@ -24,7 +24,6 @@ hive.config.resources=/hadoop-config/core-site.xml
 {{- if .Values.presto.spec.config.s3Compatible.endpoint }}
 hive.s3.endpoint={{ .Values.presto.spec.config.s3Compatible.endpoint }}
 hive.s3.path-style-access=true
-hive.s3.ssl.enabled=false
 {{- end }}
 {{- end }}
 

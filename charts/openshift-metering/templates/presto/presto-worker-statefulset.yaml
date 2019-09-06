@@ -28,21 +28,24 @@ spec:
         presto-common-config-hash: {{ include (print $.Template.BasePath "/presto/presto-common-config.yaml") . | sha256sum }}
         presto-catalog-config-hash: {{ include (print $.Template.BasePath "/presto/presto-catalog-config-secret.yaml") . | sha256sum }}
         presto-jmx-config-hash: {{ include (print $.Template.BasePath "/presto/presto-jmx-config.yaml") . | sha256sum }}
-{{- if .Values.presto.spec.config.aws.createSecret -}}
+{{- if .Values.presto.spec.config.aws.createSecret }}
         presto-aws-credentials-hash: {{ include (print $.Template.BasePath "/presto/presto-aws-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.config.azure.createSecret -}}
+{{- if .Values.presto.spec.config.azure.createSecret }}
         presto-azure-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-azure-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.config.gcs.createSecret -}}
+{{- if .Values.presto.spec.config.gcs.createSecret }}
         presto-gcs-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-gcs-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
-{{- if .Values.presto.spec.config.s3Compatible.createSecret -}}
+{{- if .Values.presto.spec.config.s3Compatible.createSecret }}
         presto-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-s3-compatible-credentials-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.presto.spec.config.s3Compatible.ca.createSecret }}
+        presto-s3-compatible-ca-secret-hash: {{ include (print $.Template.BasePath "/presto/presto-s3-compatible-ca-secret.yaml") . | sha256sum }}
 {{- end }}
 {{- if and .Values.presto.spec.config.tls.enabled .Values.presto.spec.config.tls.createSecret }}
         presto-server-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-tls-secrets.yaml") . | sha256sum }}
-{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret}}
+{{- if and .Values.presto.spec.config.auth.enabled .Values.presto.spec.config.auth.createSecret }}
         presto-client-tls-hash: {{ include (print $.Template.BasePath "/presto/presto-auth-secrets.yaml") . | sha256sum }}
 {{- end }}
 {{- end }}
@@ -197,6 +200,10 @@ spec:
         - name: gcs-json
           mountPath: /gcs-json
 {{- end }}
+{{- if or .Values.presto.spec.config.s3Compatible.ca.secretName .Values.presto.spec.config.s3Compatible.ca.createSecret }}
+        - name: s3-compatible-ca
+          mountPath: /s3-compatible-ca
+{{- end }}
 {{- if .Values.presto.spec.config.tls.enabled }}
         - name: presto-tls
           mountPath: /opt/presto/tls
@@ -262,6 +269,11 @@ spec:
       - name: gcs-json
         secret:
           secretName: {{ .Values.presto.spec.config.gcs.secretName | default "presto-gcs-credentials" }}
+{{- end }}
+{{- if or .Values.presto.spec.config.s3Compatible.ca.secretName .Values.presto.spec.config.s3Compatible.ca.createSecret }}
+      - name: s3-compatible-ca
+        secret:
+          secretName: {{ .Values.presto.spec.config.s3Compatible.ca.secretName | default "presto-s3-compatible-ca" }}
 {{- end }}
 {{- if .Values.presto.spec.config.tls.enabled }}
       - name: presto-tls

@@ -21,6 +21,10 @@
         apis: [ {kind: secret} ]
         prune_label_value: presto-s3-compatible-credentials-secret
         create: "{{ meteringconfig_create_presto_s3_compatible_credentials }}"
+      - template_file: templates/presto/presto-s3-compatible-ca-secret.yaml
+        apis: [ {kind: secret} ]
+        prune_label_value: presto-s3-compatible-ca-secret
+        create: "{{ meteringconfig_create_presto_s3_compatible_ca }}"
       - template_file: templates/presto/presto-tls-secrets.yaml
         apis: [ {kind: secret} ]
         prune_label_value: presto-tls-secrets

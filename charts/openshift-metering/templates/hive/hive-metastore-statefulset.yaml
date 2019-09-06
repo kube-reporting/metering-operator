@@ -46,6 +46,12 @@ spec:
 {{- if .Values.hive.spec.config.s3Compatible.createSecret }}
         hive-s3-compatible-credentials-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-s3-compatible-credentials-secret.yaml") . | sha256sum }}
 {{- end }}
+{{- if .Values.hive.spec.config.s3Compatible.ca.createSecret }}
+        hive-s3-compatible-ca-secret-hash: {{ include (print $.Template.BasePath "/hive/hive-s3-compatible-ca-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- if .Values.hive.spec.config.useHadoopConfig }}
+        hadoop-config-hash: {{ include (print $.Template.BasePath "/hadoop/hadoop-config.yaml") . | sha256sum }}
+{{- end }}
 {{- if .Values.hive.spec.annotations }}
 {{ toYaml .Values.hive.spec.annotations | indent 8 }}
 {{- end }}
@@ -162,6 +168,10 @@ spec:
         - name: gcs-json
           mountPath: /gcs-json
 {{- end }}
+{{- if or .Values.hive.spec.config.s3Compatible.ca.secretName .Values.hive.spec.config.s3Compatible.ca.createSecret }}
+        - name: s3-compatible-ca
+          mountPath: /s3-compatible-ca
+{{- end }}
         - name: hive-jmx-config
           mountPath: /opt/jmx_exporter/config
         - name: hive-metastore-db-data
@@ -254,6 +264,11 @@ spec:
       - name: gcs-json
         secret:
           secretName: {{ .Values.hive.spec.config.gcs.secretName | default "hive-gcs-credentials" }}
+{{- end }}
+{{- if or .Values.hive.spec.config.s3Compatible.ca.secretName .Values.hive.spec.config.s3Compatible.ca.createSecret }}
+      - name: s3-compatible-ca
+        secret:
+          secretName: {{ .Values.hive.spec.config.s3Compatible.ca.secretName | default "hive-s3-compatible-ca" }}
 {{- end }}
       - name: hive-jmx-config
         configMap:
