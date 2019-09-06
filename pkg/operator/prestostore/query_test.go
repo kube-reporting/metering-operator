@@ -11,13 +11,12 @@ import (
 func TestGetTimeRanges(t *testing.T) {
 	janOne := time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 	tests := map[string]struct {
-		startTime             time.Time
-		endTime               time.Time
-		chunkSize             time.Duration
-		stepSize              time.Duration
-		maxTimeRanges         int64
-		expectedRanges        []prom.Range
-		allowIncompleteChunks bool
+		startTime      time.Time
+		endTime        time.Time
+		chunkSize      time.Duration
+		stepSize       time.Duration
+		maxTimeRanges  int64
+		expectedRanges []prom.Range
 	}{
 		"start and end are zero": {
 			chunkSize:      time.Minute * 5,
@@ -64,38 +63,12 @@ func TestGetTimeRanges(t *testing.T) {
 				},
 			},
 		},
-		"period is less than divisible by chunkSize with allowIncompleteChunks": {
-			startTime:             janOne,
-			endTime:               janOne.Add(30 * time.Minute),
-			chunkSize:             time.Hour,
-			stepSize:              time.Minute,
-			allowIncompleteChunks: true,
-			expectedRanges: []prom.Range{
-				{
-					Start: janOne,
-					End:   janOne.Add(30 * time.Minute),
-					Step:  time.Minute,
-				},
-			},
-		},
-		"period is exactly divisible by chunkSize with allowIncompleteChunks": {
-			startTime:             janOne,
-			endTime:               janOne.Add(2 * time.Hour),
-			chunkSize:             time.Hour,
-			stepSize:              time.Minute,
-			allowIncompleteChunks: true,
-			expectedRanges: []prom.Range{
-				{
-					Start: janOne,
-					End:   janOne.Add(time.Hour),
-					Step:  time.Minute,
-				},
-				{
-					Start: janOne.Add(time.Hour + time.Minute),
-					End:   janOne.Add(2 * time.Hour),
-					Step:  time.Minute,
-				},
-			},
+		"period is less than divisible by chunkSize": {
+			startTime:      janOne,
+			endTime:        janOne.Add(30 * time.Minute),
+			chunkSize:      time.Hour,
+			stepSize:       time.Minute,
+			expectedRanges: nil,
 		},
 	}
 
@@ -103,7 +76,7 @@ func TestGetTimeRanges(t *testing.T) {
 		// Fix closure captures
 		test := test
 		t.Run(name, func(t *testing.T) {
-			timeRanges := getTimeRangesChunked(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxTimeRanges, test.allowIncompleteChunks)
+			timeRanges := getTimeRangesChunked(test.startTime, test.endTime, test.chunkSize, test.stepSize, test.maxTimeRanges)
 			assert.Equal(t, test.expectedRanges, timeRanges)
 		})
 	}

@@ -237,7 +237,7 @@ func (op *Reporting) importPrometheusForTimeRange(ctx context.Context, namespace
 				promConn = op.promConn
 			}
 
-			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, ctx, start, end, importCfg, true)
+			importResults, err := prestostore.ImportFromTimeRange(dataSourceLogger, op.clock, promConn, op.prometheusMetricsRepo, metricsCollectors, ctx, start, end, importCfg)
 			if err != nil {
 				return fmt.Errorf("error importing Prometheus data for ReportDataSource %s: %v", reportDataSource.Name, err)
 			}
