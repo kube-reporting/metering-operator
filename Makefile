@@ -6,6 +6,7 @@ include build/check_defined.mk
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
+DEPLOY_PKG := $(GO_PKG)/cmd/deploy
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
@@ -54,6 +55,7 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
+DEPLOY_BIN_OUT = bin/operator-metering
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
 RUN_UPDATE_CODEGEN ?= true
@@ -221,6 +223,9 @@ metering-manifests:
 bin/test2json: gotools/test2json/main.go
 	go build -o bin/test2json gotools/test2json/main.go
 
+deploy:
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(DEPLOY_BIN_OUT) $(DEPLOY_PKG)
+
 .PHONY: \
 	test vendor fmt verify \
 	update-codegen verify-codegen \
@@ -228,6 +233,7 @@ bin/test2json: gotools/test2json/main.go
 	docker-build-all docker-tag-all docker-push-all \
 	metering-test-docker \
 	metering-src-docker-build \
+	deploy \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	metering-manifests \
 	install-kube-prometheus-helm
