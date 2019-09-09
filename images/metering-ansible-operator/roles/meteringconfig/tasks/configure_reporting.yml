@@ -17,4 +17,4 @@
         meteringconfig_reporting_enable_post_kube_1_14_datasources: "{{ kube_version_at_least_1_14 }}"
   vars:
     kube_minor_version: "{{ (kube_version.stdout | from_json | json_query('serverVersion.minor')).rstrip('+') }}"
-    kube_version_at_least_1_14: "{{ (kube_minor_version | int) >= 14 }}"
+    kube_version_at_least_1_14: "{{ ((kube_minor_version | int) >= 14) | bool }}"
