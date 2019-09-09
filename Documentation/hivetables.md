@@ -4,7 +4,7 @@ A `HiveTable` is a custom resource that represents a database table within Hive.
 
 When a `HiveTable` resource is created, the reporting-operator creates a table within Hive according to the configuration provided.
 
-A `HiveTable` resource is also implicitly created when a `PrometheusMetricsImporter` ReportDataSource is defined, and the `status.tableRef` field is empty. The metering-operator then creates a `HiveTable` resource, and once that table has been created, the `statue.tableRef` field is updated and references the newly created table within Hive.
+A `HiveTable` resource is also implicitly created when a `PrometheusMetricsImporter` ReportDataSource is defined, and the `status.tableRef` field is empty. The reporting-operator then creates a `HiveTable` resource, and once that table has been created, the `statue.tableRef` field is updated and references the newly created table within Hive.
 
 ## Fields
 ##### Required fields:
