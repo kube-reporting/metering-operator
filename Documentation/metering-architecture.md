@@ -9,7 +9,7 @@ Operator metering is composed of 3 major components:
 
 ## How it works
 
-At a high-level view, it may be helpful to view the metering operator in terms of events and reactions. This is because the metering operator's main responsibility is to interact with custom resources in Kubernetes. We can then characterize any changes made to these custom resources as an event, and the metering operator  reacts to these events as appropriate. 
+At a high-level view, it may be helpful to view the reporting operator in terms of events and reactions. This is because the reporting operator's main responsibility is to interact with custom resources in Kubernetes. We can then characterize any changes made to these custom resources as an event, and the reporting operator reacts to these events as appropriate. 
 
 Internally, Operator Metering uses a database called [Presto][presto-overview] to do analytical querying on collected data using SQL.
 When we use terms like `tables`, `views`, `SQL`, `statement`, or `query` in this document, we're referring to them in the context of the Presto database, and we're using SQL as the primary method of doing analysis and reporting on the data that Operator Metering collects.
@@ -62,7 +62,7 @@ Additionally, there are ReportQueryView ReportDataSource's which create views in
 
 A `PrometheusMetricsImporter` ReportDataSource con***REMOVED***gures the reporting-operator to periodically poll Prometheus for metrics.
 
-When the ReportDataSource is created, the metering operator does the following:
+When the ReportDataSource is created, the reporting operator does the following:
 
 - Checks if this `ReportDataSource` has a table created for it yet by checking the `status.tableRef` ***REMOVED***eld.
 - If the ***REMOVED***eld is empty it creates the table by creating a `HiveTable` resource, and waiting for it's `status.tableName` to be set, indicating the table has been created, then records the HiveTable name as the `status.tableRef`.
@@ -76,7 +76,7 @@ Additionally, in the background the reporting-operator is periodically listing a
   - Currently this is done using an `INSERT` query using Presto, but this is subject to change as other `StorageLocations` are added.
 
 Currently, multiple `PrometheusMetricsImporter` ReportDataSources are collected at the same time concurrently.
-Metric resolution, and poll intervals are controlled at a global level on the metering operator via the `Metering` resource's `spec.reporting-operator.con***REMOVED***g` section.
+Metric resolution, and poll intervals are controlled at a global level on the metering operator via the `MeteringCon***REMOVED***g` resource's `spec.reporting-operator.con***REMOVED***g` section.
 
 #### AWSBilling ReportDataSources
 
@@ -95,11 +95,11 @@ Additionally, in the background the reporting-operator is periodically listing a
 
 This results in a table that has multiple partitions in it. There will be one partition per AWS billing period, and each partition points to an S3 directory containing the most up-to-date billing information for that billing period.
 
-By default, Operator Metering has an section in the `Metering` resource for con***REMOVED***guring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
+By default, Operator Metering has an section in the `MeteringCon***REMOVED***g` resource for con***REMOVED***guring an awsBilling `ReportDataSource`, so you generally shouldn't need to create one directly.
 For more details on con***REMOVED***guring this read the [AWS billing correlation section in the Metering Con***REMOVED***guration doc][metering-aws-billing-conf].
 
 
-#### ReportReportQueryView View ReportDataSources
+#### ReportQueryView View ReportDataSources
 
 A `ReportQuery` ReportDataSource con***REMOVED***gures the reporting-operator to create a Presto view based on the query speci***REMOVED***ed.
 
@@ -122,7 +122,7 @@ When the ReportDataSource is created, the reporting-operator:
 
 For user-docs containing a description of the ***REMOVED***elds, and examples, see [ReportQueries][reportqueries].
 
-When the metering operator sees a new `ReportQuery` in its namespace, it will reprocess anything that depends on it (ReportDataSources or Reports).
+When the reporting operator sees a new `ReportQuery` in its namespace, it will reprocess anything that depends on it (ReportDataSources or Reports).
 
 ### Report
 
