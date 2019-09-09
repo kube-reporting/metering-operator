@@ -25,5 +25,3 @@ prestoCpu: null
 reportingOperatorReplicas: 1
 reportingOperatorMemory: null
 reportingOperatorCpu: null
-
-useKube114Metrics: true
