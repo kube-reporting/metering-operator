@@ -23,13 +23,8 @@ type PrometheusImportResults struct {
 // ***REMOVED***rst error, consult timeRanges to determine how many chunks were queried.
 //
 // If the number of queries exceeds maxTimeRanges, then the timeRanges
-// exceeding that count will be skipped. The allowIncompleteChunks parameter
-// controls whether or not every chunk must be a full chunkSize, or if there
-// can be incomplete chunks. This has an effect when there is only one chunk
-// that's incomplete, and if there are multiple chunks, whether or not the
-// ***REMOVED***nal chunk up to the endTime will be included even if the duration of
-// endTime - startTime isn't perfectly divisible by chunkSize.
-func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prometheusMetricsStorer PrometheusMetricsStorer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Con***REMOVED***g, allowIncompleteChunks bool) (PrometheusImportResults, error) {
+// exceeding that count will be skipped.
+func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn prom.API, prometheusMetricsStorer PrometheusMetricsStorer, metricsCollectors ImporterMetricsCollectors, ctx context.Context, startTime, endTime time.Time, cfg Con***REMOVED***g) (PrometheusImportResults, error) {
 	metricsCollectors.ImportsRunningGauge.Inc()
 
 	queryRangeDuration := endTime.Sub(startTime)
@@ -49,7 +44,7 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 		logger.Debugf("took %s to run import", importDuration)
 	}()
 
-	timeRanges := getTimeRangesChunked(startTime, endTime, cfg.ChunkSize, cfg.StepSize, cfg.MaxTimeRanges, allowIncompleteChunks)
+	timeRanges := getTimeRangesChunked(startTime, endTime, cfg.ChunkSize, cfg.StepSize, cfg.MaxTimeRanges)
 
 	var importResults PrometheusImportResults
 	if len(timeRanges) == 0 {
@@ -156,7 +151,7 @@ func ImportFromTimeRange(logger logrus.FieldLogger, clock clock.Clock, promConn 
 	}
 }
 
-func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64, allowIncompleteChunks bool) []prom.Range {
+func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time.Duration, maxTimeRanges int64) []prom.Range {
 	chunkStart := truncateToSecond(beginTime)
 	chunkEnd := truncateToSecond(chunkStart.Add(chunkSize))
 
@@ -165,23 +160,14 @@ func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time
 
 	var timeRanges []prom.Range
 	for i := int64(0); disableMax || (i < maxTimeRanges); i++ {
-		if allowIncompleteChunks {
-			if chunkEnd.After(endTime) {
-				chunkEnd = truncateToSecond(endTime)
-			}
-			if chunkEnd.Equal(chunkStart) {
-				break
-			}
-		} ***REMOVED*** {
-			// Do not collect data after endTime
-			if chunkEnd.After(endTime) {
-				break
-			}
+		// Do not collect data after endTime
+		if chunkEnd.After(endTime) {
+			break
+		}
 
-			// Only get chunks that are a full chunk size
-			if chunkEnd.Sub(chunkStart) < chunkSize {
-				break
-			}
+		// Only get chunks that are a full chunk size
+		if chunkEnd.Sub(chunkStart) < chunkSize {
+			break
 		}
 		timeRanges = append(timeRanges, prom.Range{
 			Start: chunkStart.UTC(),
@@ -189,7 +175,7 @@ func getTimeRangesChunked(beginTime, endTime time.Time, chunkSize, stepSize time
 			Step:  stepSize,
 		})
 
-		if allowIncompleteChunks && chunkEnd.Equal(truncateToSecond(endTime)) {
+		if chunkEnd.Equal(truncateToSecond(endTime)) {
 			break
 		}
 
