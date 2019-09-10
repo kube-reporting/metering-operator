@@ -107,7 +107,7 @@ For example, the results of a report with the name `namespace-cpu-request` repor
 CSV, with the following command:
 
 ```
-$ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:http/proxy/api/v1/reports/get?name=namespace-cpu-request&namespace=metering&format=csv"
+$ curl "http://127.0.0.1:8001/api/v1/namespaces/metering/services/http:reporting-operator:api/proxy/api/v1/reports/get?name=namespace-cpu-request&namespace=metering&format=csv"
 ```
 
 
