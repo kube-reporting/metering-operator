@@ -95,7 +95,7 @@ func (importer *PrometheusImporter) UpdateConfig(cfg Config) {
 // the next time range starting from where it left off if paused or stopped.
 // For more details on how querying Prometheus is done, see the package
 // pkg/promquery.
-func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context, allowIncompleteChunks bool) (*PrometheusImportResults, error) {
+func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context) (*PrometheusImportResults, error) {
 	importer.importLock.Lock()
 	importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp started")
 	defer importer.logger.Debugf("PrometheusImporter ImportFromLastTimestamp finished")
@@ -156,7 +156,7 @@ func (importer *PrometheusImporter) ImportFromLastTimestamp(ctx context.Context,
 		endTime = startTime.Add(cfg.MaxQueryRangeDuration)
 	}
 
-	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, cfg, allowIncompleteChunks)
+	importResults, err := ImportFromTimeRange(importer.logger, importer.clock, importer.promConn, importer.prometheusMetricsRepo, importer.metricsCollectors, ctx, startTime, endTime, cfg)
 	if err != nil {
 		importer.logger.WithFields(logrus.Fields{"startTime": startTime, "endTime": endTime}).WithError(err).Error("error collecting metrics")
 		// at this point we cannot be sure what is in Presto and what

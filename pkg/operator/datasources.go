@@ -27,10 +27,6 @@ import (
 const (
 	reportDataSourceFinalizer = metering.GroupName + "/reportdatasource"
 	partitionUpdateInterval   = 30 * time.Minute
-	// allowIncompleteChunks must be true generally if we have a large
-	// chunkSize because otherwise we will wait for an entire chunks worth of
-	// data before importing metrics into Presto.
-	allowIncompleteChunks = true
 )
 
 func (op *Reporting) runReportDataSourceWorker() {
@@ -224,7 +220,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 	importStatus.LastImportTime = &metav1.Time{Time: op.clock.Now().UTC()}
 
 	// run the import
-	results, err := importer.ImportFromLastTimestamp(context.Background(), allowIncompleteChunks)
+	results, err := importer.ImportFromLastTimestamp(context.Background())
 	if err != nil {
 		return fmt.Errorf("ImportFromLastTimestamp errored: %v", err)
 	}
