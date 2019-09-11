@@ -4,6 +4,8 @@ package v1
 
 type HiveTableExpansion interface{}
 
+type MeteringCon***REMOVED***gExpansion interface{}
+
 type PrestoTableExpansion interface{}
 
 type ReportExpansion interface{}
