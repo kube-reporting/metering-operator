@@ -39,6 +39,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&PrestoTableList{},
 		&HiveTable{},
 		&HiveTableList{},
+		&MeteringConfig{},
+		&MeteringConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
