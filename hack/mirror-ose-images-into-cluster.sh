@@ -1,12 +1,36 @@
 set -x
+set -e
 
-REPO_NAMESPACE="${REPO_NAMESPACE:-"openshift-metering-images"}"
+ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+
+REPO_NAMESPACE="${REPO_NAMESPACE:-"openshift"}"
 OSE_IMAGE_TAG="${OSE_IMAGE_TAG:-"v4.2"}"
-OSE_IMAGE_REPO="${OSE_IMAGE_REPO:-"brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888"}"
 CLUSTER_REGISTRY_URL="${CLUSTER_REGISTRY_URL:-"$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')"}"
 SETUP_REGISTRY_AUTH="${SETUP_REGISTRY_AUTH:-"true"}"
 PULL_IMAGES="${PULL_IMAGES:-"true"}"
 PUSH_IMAGES="${PUSH_IMAGES:-"true"}"
+
+if [ -z "$CLUSTER_REGISTRY_URL" ]; then
+    echo "Couldn't detect \$CLUSTER_REGISTRY_URL or unset"
+    exit 1
+fi
+
+# default to mirroring the $OSE_IMAGE_TAG for each, but allow overriding the tag to be mirrored per mirror
+METERING_ANSIBLE_OPERATOR_IMAGE_TAG="${METERING_ANSIBLE_OPERATOR_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+METERING_REPORTING_OPERATOR_IMAGE_TAG="${METERING_REPORTING_OPERATOR_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+METERING_PRESTO_IMAGE_TAG="${METERING_PRESTO_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+METERING_HIVE_IMAGE_TAG="${METERING_HIVE_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+METERING_HADOOP_IMAGE_TAG="${METERING_HADOOP_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+GHOSTUNNEL_IMAGE_TAG="${GHOSTUNNEL_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+OAUTH_PROXY_IMAGE_TAG="${OAUTH_PROXY_IMAGE_TAG:-$OSE_IMAGE_TAG}"
+
+METERING_ANSIBLE_OPERATOR_IMAGE="${METERING_ANSIBLE_OPERATOR_IMAGE:-"openshift/ose-metering-ansible-operator:$METERING_ANSIBLE_OPERATOR_IMAGE_TAG"}"
+METERING_REPORTING_OPERATOR_IMAGE="${METERING_REPORTING_OPERATOR_IMAGE:-"openshift/ose-metering-reporting-operator:$METERING_REPORTING_OPERATOR_IMAGE_TAG"}"
+METERING_PRESTO_IMAGE="${METERING_PRESTO_IMAGE:-"openshift/ose-metering-presto:$METERING_PRESTO_IMAGE_TAG"}"
+METERING_HIVE_IMAGE="${METERING_HIVE_IMAGE:-"openshift/ose-metering-hive:$METERING_HIVE_IMAGE_TAG"}"
+METERING_HADOOP_IMAGE="${METERING_HADOOP_IMAGE:-"openshift/ose-metering-hadoop:$METERING_HADOOP_IMAGE_TAG"}"
+GHOSTUNNEL_IMAGE="${GHOSTUNNEL_IMAGE:-"openshift/ose-ghostunnel:$GHOSTUNNEL_IMAGE_TAG"}"
+OAUTH_PROXY_IMAGE="${OAUTH_PROXY_IMAGE:-"openshift/ose-oauth-proxy:$OAUTH_PROXY_IMAGE_TAG"}"
 
 : "${METERING_NAMESPACE:?"\$METERING_NAMESPACE must be set!"}"
 
@@ -14,9 +38,9 @@ if [ "$SETUP_REGISTRY_AUTH" == "true" ]; then
     echo "Creating namespace for images: $REPO_NAMESPACE"
     oc create namespace "$REPO_NAMESPACE" || true
     echo "Creating serviceaccount registry-editor in $REPO_NAMESPACE"
-    oc create serviceaccount registry-editor -n "$REPO_NAMESPACE"
+    oc create serviceaccount registry-editor -n "$REPO_NAMESPACE" || true
     echo "Granting registry-editor registry-editor permissions in $REPO_NAMESPACE"
-    oc adm policy add-role-to-user registry-editor -z registry-editor -n "$REPO_NAMESPACE"
+    oc adm policy add-role-to-user registry-editor -z registry-editor -n "$REPO_NAMESPACE" || true
     echo "Performing docker login as registry-editor to $CLUSTER_REGISTRY_URL"
     set +x
     docker login \
@@ -26,57 +50,37 @@ if [ "$SETUP_REGISTRY_AUTH" == "true" ]; then
     set -x
 fi
 
-if [ "$PULL_IMAGES" == "true" ]; then
-    echo "Pulling Metering OSE images from $OSE_IMAGE_REPO"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-metering-ansible-operator:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-metering-reporting-operator:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-metering-presto:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-metering-hive:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-metering-hadoop:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-ghostunnel:$OSE_IMAGE_TAG"
-    docker pull "$OSE_IMAGE_REPO/openshift/ose-oauth-proxy:$OSE_IMAGE_TAG"
-fi
+echo "Ensuring namespace $REPO_NAMESPACE exists for images to be pushed into"
+oc create namespace "$REPO_NAMESPACE" || true
+echo "Pushing Metering OSE images to $CLUSTER_REGISTRY_URL"
 
-if [ "$PUSH_IMAGES" == "true" ]; then
-    echo "Ensuring namespace $REPO_NAMESPACE exists for images to be pushed into"
-    oc create namespace "$REPO_NAMESPACE" || true
-    echo "Pushing Metering OSE images to $CLUSTER_REGISTRY_URL"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$METERING_ANSIBLE_OPERATOR_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-metering-ansible-operator:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-ansible-operator:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-ansible-operator:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$METERING_REPORTING_OPERATOR_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-metering-reporting-operator:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-reporting-operator:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-reporting-operator:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$METERING_PRESTO_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-metering-presto:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-presto:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-presto:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$METERING_HIVE_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-metering-hive:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-hive:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-hive:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$METERING_HADOOP_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-metering-hadoop:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-hadoop:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-metering-hadoop:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$GHOSTUNNEL_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-ghostunnel:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-ghostunnel:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-ghostunnel:$OSE_IMAGE_TAG"
+"$ROOT_DIR/hack/mirror-ose-image.sh" \
+    "$OAUTH_PROXY_IMAGE" \
+    "$CLUSTER_REGISTRY_URL"
 
-    docker tag \
-        "$OSE_IMAGE_REPO/openshift/ose-oauth-proxy:$OSE_IMAGE_TAG" \
-        "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-oauth-proxy:$OSE_IMAGE_TAG"
-    docker push "$CLUSTER_REGISTRY_URL/$REPO_NAMESPACE/ose-oauth-proxy:$OSE_IMAGE_TAG"
-
-    echo "Granting access to pull images in $REPO_NAMESPACE to all serviceaccounts in \$METERING_NAMESPACE=$METERING_NAMESPACE"
-    oc -n openshift-metering-images policy add-role-to-group system:image-puller "system:serviceaccounts:$METERING_NAMESPACE" --rolebinding-name "$METERING_NAMESPACE-image-pullers"
-fi
+echo "Granting access to pull images in $REPO_NAMESPACE to all serviceaccounts in \$METERING_NAMESPACE=$METERING_NAMESPACE"
+oc -n "$REPO_NAMESPACE" policy add-role-to-group system:image-puller "system:serviceaccounts:$METERING_NAMESPACE" --rolebinding-name "$METERING_NAMESPACE-image-pullers"
