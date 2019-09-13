@@ -247,7 +247,8 @@ reporting-operator:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-reporting-operator
-      tag: 4.2
+      tag: "4.2"
+      override: null
       pullSecrets: []
 
     updateStrategy:
@@ -404,7 +405,8 @@ reporting-operator:
       image:
         pullPolicy: Always
         repository: quay.io/openshift/origin-oauth-proxy
-        tag: 4.2
+        tag: "4.2"
+        override: null
         pullSecrets: []
 
       authenticatedEmails:
@@ -449,7 +451,8 @@ presto:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-presto
-      tag: 4.2
+      tag: "4.2"
+      override: null
 
     config:
       environment: production
@@ -687,7 +690,8 @@ hive:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hive
-      tag: 4.2
+      tag: "4.2"
+      override: null
       pullSecrets: []
 
     metastore:
@@ -821,7 +825,8 @@ __ghostunnel:
   image:
     pullPolicy: Always
     repository: quay.io/openshift/origin-ghostunnel
-    tag: 4.2
+    tag: "4.2"
+    override: null
 
 hadoop:
   spec:
@@ -861,7 +866,8 @@ hadoop:
     image:
       pullPolicy: Always
       repository: quay.io/openshift/origin-metering-hadoop
-      tag: 4.2
+      tag: "4.2"
+      override: null
       pullSecrets: null
 
     hdfs:
