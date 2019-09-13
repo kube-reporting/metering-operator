@@ -48,10 +48,9 @@ meteringconfig_default_image_overrides:
 
   presto:
     spec:
-      presto:
-        image:
-          repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringconfig_presto_default_image_repo, true) }}"
-          tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringconfig_presto_default_image_tag, true) }}"
+      image:
+        repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringconfig_presto_default_image_repo, true) }}"
+        tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringconfig_presto_default_image_tag, true) }}"
   hive:
     spec:
       image:
