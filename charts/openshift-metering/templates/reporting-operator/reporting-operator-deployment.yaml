@@ -76,7 +76,7 @@ spec:
 {{- end }}
       containers:
       - name: reporting-operator
-        image: "{{ $operatorValues.spec.image.repository }}:{{ $operatorValues.spec.image.tag }}"
+        image: "{{ $operatorValues.spec.image.override | default (printf "%s:%s" $operatorValues.spec.image.repository $operatorValues.spec.image.tag) }}"
         imagePullPolicy: {{ $operatorValues.spec.image.pullPolicy }}
         env:
         - name: POD_NAME
@@ -358,7 +358,7 @@ spec:
 {{- end }}
 {{- if $operatorValues.spec.authProxy.enabled }}
       - name: reporting-operator-auth-proxy
-        image: "{{ $operatorValues.spec.authProxy.image.repository }}:{{ $operatorValues.spec.authProxy.image.tag }}"
+        image: "{{ $operatorValues.spec.authProxy.image.override | default (printf "%s:%s" $operatorValues.spec.authProxy.image.repository $operatorValues.spec.authProxy.image.tag) }}"
         imagePullPolicy: {{ $operatorValues.spec.authProxy.image.pullPolicy }}
         env:
         - name: NAMESPACE
