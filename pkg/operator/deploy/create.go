@@ -16,11 +16,21 @@ import (
 )
 
 func (deploy *Deployer) createNamespace() error {
-	_, err := deploy.Client.CoreV1().Namespaces().Get(deploy.Namespace, metav1.GetOptions{})
+	namespace, err := deploy.Client.CoreV1().Namespaces().Get(deploy.Namespace, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		// TODO: mirror the annotation logic in hack/openshift-install.sh
+		namespaceObjectMeta := metav1.ObjectMeta{
+			Name: deploy.Namespace,
+		}
+
+		if deploy.Platform == "openshift" {
+			namespaceObjectMeta.Labels = map[string]string{
+				"openshift.io/cluster-monitoring": "true",
+			}
+			deploy.Logger.Infof("Labeling the %s namespace with 'openshift.io/cluster-monitoring=true'", deploy.Namespace)
+		}
+
 		namespaceObj := &v1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{Name: deploy.Namespace},
+			ObjectMeta: namespaceObjectMeta,
 		}
 
 		_, err := deploy.Client.CoreV1().Namespaces().Create(namespaceObj)
@@ -29,7 +39,25 @@ func (deploy *Deployer) createNamespace() error {
 		}
 		deploy.Logger.Infof("Created the %s namespace", deploy.Namespace)
 	} else if err == nil {
-		deploy.Logger.Infof("The %s namespace already exists", deploy.Namespace)
+		// check if we need to add/update the cluster-monitoring label for Openshift installs.
+		if deploy.Platform == "openshift" {
+			if namespace.ObjectMeta.Labels != nil {
+				namespace.ObjectMeta.Labels["openshift.io/cluster-monitoring"] = "true"
+				deploy.Logger.Infof("Updated the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.Namespace)
+			} else {
+				namespace.ObjectMeta.Labels = map[string]string{
+					"openshift.io/cluster-monitoring": "true",
+				}
+				deploy.Logger.Infof("Added the 'openshift.io/cluster-monitoring' label to the %s namespace", deploy.Namespace)
+			}
+
+			_, err := deploy.Client.CoreV1().Namespaces().Update(namespace)
+			if err != nil {
+				return fmt.Errorf("Failed to add the 'openshift.io/cluster-monitoring' label to the %s namespace: %v", deploy.Namespace, err)
+			}
+		} else {
+			deploy.Logger.Infof("The %s namespace already exists", deploy.Namespace)
+		}
 	} else {
 		return err
 	}
