@@ -31,6 +31,13 @@ meteringcon***REMOVED***g_hadoop_default_image_tag: "{{ _hadoop_default_spec.ima
 meteringcon***REMOVED***g_ghostunnel_default_image_repo: "{{ _ghostunnel_default.image.repository }}"
 meteringcon***REMOVED***g_ghostunnel_default_image_tag: "{{ _ghostunnel_default.image.tag }}"
 
+meteringcon***REMOVED***g_reporting_operator_override_image: "{{ lookup('env', 'METERING_REPORTING_OPERATOR_IMAGE') }}"
+meteringcon***REMOVED***g_oauth_proxy_override_image: "{{ lookup('env', 'OAUTH_PROXY_IMAGE') }}"
+meteringcon***REMOVED***g_presto_override_image: "{{ lookup('env', 'METERING_PRESTO_IMAGE') }}"
+meteringcon***REMOVED***g_hive_override_image: "{{ lookup('env', 'METERING_HIVE_IMAGE') }}"
+meteringcon***REMOVED***g_hadoop_override_image: "{{ lookup('env', 'METERING_HADOOP_IMAGE') }}"
+meteringcon***REMOVED***g_ghostunnel_override_image: "{{ lookup('env', 'GHOSTUNNEL_IMAGE') }}"
+
 _storage_spec: "{{ meteringcon***REMOVED***g_default_values | combine(meteringcon***REMOVED***g_spec_overrides) | json_query('storage') | default({}, true) }}"
 
 # Override the default images we use with env vars if set, falling back to the values.yaml con***REMOVED***gured default if not set.
@@ -38,34 +45,39 @@ meteringcon***REMOVED***g_default_image_overrides:
   reporting-operator:
     spec:
       image:
-        repository: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_reporting_operator_default_image_repo, true) }}"
-        tag: "{{ lookup('env','METERING_REPORTING_OPERATOR_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_reporting_operator_default_image_tag, true) }}"
+        repository: "{{ meteringcon***REMOVED***g_reporting_operator_default_image_repo }}"
+        tag: "{{ meteringcon***REMOVED***g_reporting_operator_default_image_tag }}"
+        override: "{{ meteringcon***REMOVED***g_reporting_operator_override_image }}"
 
       authProxy:
         image:
-          repository: "{{ lookup('env','OAUTH_PROXY_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_oauth_proxy_default_image_repo, true) }}"
-          tag: "{{ lookup('env','OAUTH_PROXY_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_oauth_proxy_default_image_tag, true) }}"
+          repository: "{{ meteringcon***REMOVED***g_oauth_proxy_default_image_repo }}"
+          tag: "{{ meteringcon***REMOVED***g_oauth_proxy_default_image_tag }}"
+          override: "{{ meteringcon***REMOVED***g_oauth_proxy_override_image }}"
 
   presto:
     spec:
-      presto:
-        image:
-          repository: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_presto_default_image_repo, true) }}"
-          tag: "{{ lookup('env','METERING_PRESTO_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_presto_default_image_tag, true) }}"
+      image:
+        repository: "{{ meteringcon***REMOVED***g_presto_default_image_repo }}"
+        tag: "{{ meteringcon***REMOVED***g_presto_default_image_tag }}"
+        override: "{{ meteringcon***REMOVED***g_presto_override_image }}"
   hive:
     spec:
       image:
-        repository: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_hive_default_image_repo, true) }}"
-        tag: "{{ lookup('env','METERING_HIVE_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_hive_default_image_tag, true) }}"
+        repository: "{{ meteringcon***REMOVED***g_hive_default_image_repo }}"
+        tag: "{{ meteringcon***REMOVED***g_hive_default_image_tag }}"
+        override: "{{ meteringcon***REMOVED***g_hive_override_image }}"
   hadoop:
     spec:
       image:
-        repository: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_hadoop_default_image_repo, true) }}"
-        tag: "{{ lookup('env','METERING_HADOOP_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_hadoop_default_image_tag, true) }}"
+        repository: "{{ meteringcon***REMOVED***g_hadoop_default_image_repo }}"
+        tag: "{{ meteringcon***REMOVED***g_hadoop_default_image_tag }}"
+        override: "{{ meteringcon***REMOVED***g_hadoop_override_image }}"
   __ghostunnel:
     image:
-      repository: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[0] | default(meteringcon***REMOVED***g_ghostunnel_default_image_repo, true) }}"
-      tag: "{{ lookup('env','GHOSTUNNEL_IMAGE').split(':')[1] | default(meteringcon***REMOVED***g_ghostunnel_default_image_tag, true) }}"
+      repository: "{{ meteringcon***REMOVED***g_ghostunnel_default_image_repo }}"
+      tag: "{{ meteringcon***REMOVED***g_ghostunnel_default_image_tag }}"
+      override: "{{ meteringcon***REMOVED***g_ghostunnel_override_image }}"
 
 _base_storage_overrides:
   s3:
