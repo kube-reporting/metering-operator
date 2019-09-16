@@ -16,7 +16,7 @@ import (
 func (deploy *Deployer) uninstallNamespace() error {
 	err := deploy.client.CoreV1().Namespaces().Delete(deploy.config.Namespace, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
-		return fmt.Errorf("The %s namespace doesn't exist", deploy.config.Namespace)
+		deploy.logger.Warnf("The %s namespace doesn't exist", deploy.config.Namespace)
 	} else if err == nil {
 		deploy.logger.Infof("Deleted the %s namespace", deploy.config.Namespace)
 	} else {
