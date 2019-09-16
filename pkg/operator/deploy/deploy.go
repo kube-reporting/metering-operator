@@ -100,30 +100,24 @@ func NewDeployer(
 		con***REMOVED***g:         cfg,
 	}
 
-	meteringNamespace := os.Getenv("METERING_NAMESPACE")
-	if meteringNamespace == "" {
-		return nil, fmt.Errorf("Failed to set $METERING_NAMESPACE")
+	if deploy.con***REMOVED***g.Namespace == "" {
+		return deploy, fmt.Errorf("Failed to set the --namespace flag or $METERING_NAMESPACE ENV var")
 	}
-
-	deploy.con***REMOVED***g.Namespace = meteringNamespace
 	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.con***REMOVED***g.Namespace)
 
-	manifestOverrideLocation := os.Getenv("INSTALLER_MANIFESTS_DIR")
-	if manifestOverrideLocation != "" {
-		deploy.con***REMOVED***g.ManifestLocation, err = ***REMOVED***lepath.Abs(manifestOverrideLocation)
+	if deploy.con***REMOVED***g.ManifestLocation != "" {
+		deploy.con***REMOVED***g.ManifestLocation, err = ***REMOVED***lepath.Abs(deploy.con***REMOVED***g.ManifestLocation)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to override the manifest location: %v", err)
+			return nil, fmt.Errorf("Failed to override the manifest location %s: %v", deploy.con***REMOVED***g.ManifestLocation, err)
+		}
+
+		_, err = os.Stat(deploy.con***REMOVED***g.ManifestLocation)
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("Failed to set $INSTALL_MANIFESTS_DIR or --manifest-dir to a valid path: %v", err)
 		}
 
 		deploy.logger.Infof("Overrided manifest location: %s", deploy.con***REMOVED***g.ManifestLocation)
 	} ***REMOVED*** {
-		deployPlatform := os.Getenv("DEPLOY_PLATFORM")
-		if deployPlatform == "" {
-			deploy.con***REMOVED***g.Platform = "openshift"
-		} ***REMOVED*** {
-			deploy.con***REMOVED***g.Platform = deployPlatform
-		}
-
 		defaultManifestBase, err := ***REMOVED***lepath.Abs(manifestDeployDirname)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory: %v", err)
@@ -137,69 +131,23 @@ func NewDeployer(
 		case "ocp-testing":
 			deploy.con***REMOVED***g.ManifestLocation = ***REMOVED***lepath.Join(defaultManifestBase, ocpTestingManifestDirname, manifestAnsibleOperator)
 		default:
-			return nil, fmt.Errorf("Failed to set $DEPLOY_PLATFORM to an invalid value. Supported types: [upstream, openshift, ocp-testing]")
+			return deploy, fmt.Errorf("Failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
 		}
 
 		deploy.logger.Infof("Metering Deploy Platform: %s", deploy.con***REMOVED***g.Platform)
 	}
 
-	meteringCRFile := os.Getenv("METERING_CR_FILE")
-	if meteringCRFile == "" {
-		deploy.logger.Info("The $METERING_CR_FILE env var is unset, using the default MeteringCon***REMOVED***g manifest")
-		deploy.con***REMOVED***g.MeteringCR = deploy.con***REMOVED***g.ManifestLocation + defaultMeteringCon***REMOVED***g
-	} ***REMOVED*** {
-		deploy.con***REMOVED***g.MeteringCR = meteringCRFile
-	}
-
-	deploy.con***REMOVED***g.DeleteAll, err = getBoolEnv("METERING_DELETE_ALL", false)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read $METERING_DELETE_ALL: %v", err)
-	}
-
 	if deploy.con***REMOVED***g.DeleteAll {
-		deploy.con***REMOVED***g.DeleteCRDs = true
-		deploy.con***REMOVED***g.DeleteCRB = true
-		deploy.con***REMOVED***g.DeleteNamespace = true
 		deploy.con***REMOVED***g.DeletePVCs = true
-	} ***REMOVED*** {
-		deploy.con***REMOVED***g.DeleteCRDs, err = getBoolEnv("METERING_DELETE_CRDS", false)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read $METERING_DELETE_CRDS: %v", err)
-		}
-
-		deploy.con***REMOVED***g.DeleteCRB, err = getBoolEnv("METERING_DELETE_CRB", false)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read $METERING_DELETE_CRB: %v", err)
-		}
-
-		deploy.con***REMOVED***g.DeleteNamespace, err = getBoolEnv("METERING_DELETE_NAMESPACE", false)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read $METERING_DELETE_NAMESPACE: %v", err)
-		}
-
-		deploy.con***REMOVED***g.DeletePVCs, err = getBoolEnv("METERING_DELETE_PVCS", true)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to read $METERING_DELETE_PVCS: %v", err)
-		}
-	}
-
-	deploy.con***REMOVED***g.SkipMeteringDeployment, err = getBoolEnv("SKIP_METERING_OPERATOR_DEPLOYMENT", false)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read $SKIP_METERING_OPERATOR_DEPLOYMENT: %v", err)
-	}
-
-	imageRepo := os.Getenv("METERING_OPERATOR_IMAGE_REPO")
-	if imageRepo != "" {
-		deploy.con***REMOVED***g.Repo = imageRepo
-	}
-
-	imageTag := os.Getenv("METERING_OPERATOR_IMAGE_TAG")
-	if imageTag != "" {
-		deploy.con***REMOVED***g.Tag = imageTag
+		deploy.con***REMOVED***g.DeleteNamespace = true
+		deploy.con***REMOVED***g.DeleteCRB = true
+		deploy.con***REMOVED***g.DeleteCRDs = true
 	}
 
 	// initialize a slice of CRD structures and assign to the deploy.crds ***REMOVED***eld
 	// this is used by the install/uninstall drivers to manage the metering CRDs
+	// TODO: this is awkward that the deploy object has all ***REMOVED***elds initialized but
+	// deploy.crds at the start
 	deploy.initMeteringCRDSlice()
 
 	return deploy, nil

@@ -73,7 +73,7 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
 
-	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get("operator-metering", metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(&res)
 		if err != nil {
