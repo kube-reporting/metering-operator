@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:80004fcc5cf64e591486b3e11b406f1e0d17bf85d475d64203c8494f5da4fcd1"
+  name = "cloud.google.com/go"
+  packages = ["compute/metadata"]
+  pruneopts = "NUT"
+  revision = "ceeb313ad77b789a7fa5287b36a1d127b69b7093"
+  version = "v0.44.3"
+
+[[projects]]
   digest = "1:e64acfe8cda1955db545ede8e863c54d69f1ac6cd058df4349be4040320840fd"
   name = "git.apache.org/thrift.git"
   packages = ["lib/go/thrift"]
@@ -9,6 +17,21 @@
   revision = "327ebb6c2b6df8bf075da02ef45a2a034e9b79ba"
   source = "github.com/apache/thrift"
   version = "0.11.0"
+
+[[projects]]
+  digest = "1:ecfb1f91442d655c41cc05e40382977c4b42d73bf8c3f1d5096e71eb8c27ca3b"
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/azure",
+    "autorest/date",
+    "logger",
+    "tracing",
+  ]
+  pruneopts = "NUT"
+  revision = "5e7a399d8bbf4953ab0c8e3167d7fd535fd74ce1"
+  version = "v13.0.0"
 
 [[projects]]
   digest = "1:a26f8da48b22e6176c1c6a2459904bb30bd0c49ada04b2963c2c3a203e81a620"
@@ -86,6 +109,14 @@
   pruneopts = "NUT"
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  digest = "1:7a6852b35eb5bbc184561443762d225116ae630c26a7c4d90546619f1e7d2ad2"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   branch = "master"
@@ -202,6 +233,22 @@
   pruneopts = "NUT"
   revision = "ee43cbb60db7bd22502942cccbc39059117352ab"
   version = "v0.1.0"
+
+[[projects]]
+  digest = "1:80230022ab481c6688b237550bc45017d9d2abfc19e4916e2ce344d24f613a6d"
+  name = "github.com/gophercloud/gophercloud"
+  packages = [
+    ".",
+    "openstack",
+    "openstack/identity/v2/tenants",
+    "openstack/identity/v2/tokens",
+    "openstack/identity/v3/tokens",
+    "openstack/utils",
+    "pagination",
+  ]
+  pruneopts = "NUT"
+  revision = "0398b0cd16bfffade0883973c745180adbbe8918"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
@@ -469,11 +516,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:672ac40c169cc89ec8dfb899ff9dac2d632baef65d19f0ba46b7f063da09d10a"
+  digest = "1:9a0eeb972e14851a3a0490280d736de3b1c686745c7a4d660642ec2706a446e2"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
+    "google",
     "internal",
+    "jws",
+    "jwt",
   ]
   pruneopts = "NUT"
   revision = "921ae394b9430ed4fb549668d7b087601bd60a81"
@@ -543,13 +593,16 @@
   revision = "ccd319aab13add0b98acdb0db5d46c20c2d1fedd"
 
 [[projects]]
-  digest = "1:f229c599a645bffd97518107ac89955adfa6d5e5e4efa3e8cadb29789219639f"
+  digest = "1:7206d98ec77c90c72ec2c405181a1dcf86965803b6dbc4f98ceab7a5047c37a9"
   name = "google.golang.org/appengine"
   packages = [
+    ".",
     "internal",
+    "internal/app_identity",
     "internal/base",
     "internal/datastore",
     "internal/log",
+    "internal/modules",
     "internal/remote_api",
     "internal/urlfetch",
     "urlfetch",
@@ -616,6 +669,19 @@
   version = "kubernetes-1.13.3"
 
 [[projects]]
+  digest = "1:3cf66569a0c7b5dd3b2b9d29bb71698ce9229070cef26f1910e9e1739846bf4b"
+  name = "k8s.io/apiextensions-apiserver"
+  packages = [
+    "pkg/apis/apiextensions",
+    "pkg/apis/apiextensions/v1beta1",
+    "pkg/client/clientset/clientset/scheme",
+    "pkg/client/clientset/clientset/typed/apiextensions/v1beta1",
+  ]
+  pruneopts = "NUT"
+  revision = "d4288ab6494571219e781fa423db363247635942"
+  version = "kubernetes-1.13.3"
+
+[[projects]]
   digest = "1:2608560cd8780556366062c90c9fd2b55d70211a717c4b9d68a8d328380e1556"
   name = "k8s.io/apimachinery"
   packages = [
@@ -667,7 +733,7 @@
   version = "kubernetes-1.13.3"
 
 [[projects]]
-  digest = "1:d7486c407a5b484c06a7ccb8ae4a0b255ac44b1fc41d677c13328ace5571c9ec"
+  digest = "1:48b3779bbff909ae5c138c1097af51f11ec2a6b541cba3a41155d3570714ad66"
   name = "k8s.io/client-go"
   packages = [
     "discovery",
@@ -710,11 +776,16 @@
     "pkg/apis/clientauthentication/v1alpha1",
     "pkg/apis/clientauthentication/v1beta1",
     "pkg/version",
+    "plugin/pkg/client/auth",
+    "plugin/pkg/client/auth/azure",
     "plugin/pkg/client/auth/exec",
+    "plugin/pkg/client/auth/gcp",
     "plugin/pkg/client/auth/oidc",
+    "plugin/pkg/client/auth/openstack",
     "rest",
     "rest/watch",
     "testing",
+    "third_party/forked/golang/template",
     "tools/auth",
     "tools/cache",
     "tools/clientcmd",
@@ -734,6 +805,7 @@
     "util/flowcontrol",
     "util/homedir",
     "util/integer",
+    "util/jsonpath",
     "util/retry",
     "util/workqueue",
   ]
@@ -845,7 +917,11 @@
     "github.com/taozle/go-hive-driver",
     "golang.org/x/sync/errgroup",
     "golang.org/x/sync/singleflight",
+    "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
+    "k8s.io/api/rbac/v1",
+    "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1",
+    "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1",
     "k8s.io/apimachinery/pkg/api/errors",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/***REMOVED***elds",
@@ -859,12 +935,14 @@
     "k8s.io/apimachinery/pkg/util/runtime",
     "k8s.io/apimachinery/pkg/util/sets",
     "k8s.io/apimachinery/pkg/util/wait",
+    "k8s.io/apimachinery/pkg/util/yaml",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/discovery",
     "k8s.io/client-go/discovery/fake",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",
     "k8s.io/client-go/kubernetes/typed/core/v1",
+    "k8s.io/client-go/plugin/pkg/client/auth",
     "k8s.io/client-go/plugin/pkg/client/auth/oidc",
     "k8s.io/client-go/rest",
     "k8s.io/client-go/testing",
