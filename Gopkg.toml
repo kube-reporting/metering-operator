@@ -110,3 +110,7 @@ required = [
 [[override]]
   name = "github.com/openshift/client-go"
   branch = "master"
+
+[[constraint]]
+  name = "k8s.io/apiextensions-apiserver"
+  version = "kubernetes-1.13.3"
