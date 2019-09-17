@@ -9,7 +9,7 @@ updates:
     # replace spec.version value
     - search: 'version: "{{ .Values.olm.csv.version }}"'
       replace: 'version: {FULL_VER}'
-  - file: "package.yaml"
+  - file: "metering.package.yaml"
     update_list:
     - search: "currentCSV: metering-operator.v{MAJOR}.{MINOR}.0"
       replace: "currentCSV: metering-operator.{FULL_VER}"
