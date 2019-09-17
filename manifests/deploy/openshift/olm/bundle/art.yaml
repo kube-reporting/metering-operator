@@ -8,7 +8,7 @@ updates:
     # replace spec.version value
     - search: 'version: "4.2.0"'
       replace: 'version: {FULL_VER}'
-  - ***REMOVED***le: "package.yaml"
+  - ***REMOVED***le: "metering.package.yaml"
     update_list:
     - search: "currentCSV: metering-operator.v{MAJOR}.{MINOR}.0"
       replace: "currentCSV: metering-operator.{FULL_VER}"
