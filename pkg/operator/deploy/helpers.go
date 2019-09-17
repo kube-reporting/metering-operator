@@ -53,39 +53,39 @@ func (deploy *Deployer) initMeteringCRDSlice() {
 
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, hivetableFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, hivetableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, prestotableFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, prestotableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, storagelocationFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, storagelocationFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, reportFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, reportqueryFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportqueryFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, reportdatasourceFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportdatasourceFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "meteringcon***REMOVED***gs.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.ManifestLocation, meteringcon***REMOVED***gFile),
+		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, meteringcon***REMOVED***gFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 
-	deploy.CRDs = crds
+	deploy.crds = crds
 }

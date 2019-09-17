@@ -15,6 +15,7 @@ import (
 
 func main() {
 	logger := setupLogger("info")
+	con***REMOVED***g := deploy.Con***REMOVED***g{}
 
 	kubecon***REMOVED***g := clientcmd.NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
 		clientcmd.NewDefaultClientCon***REMOVED***gLoadingRules(),
@@ -41,31 +42,31 @@ func main() {
 		logger.Fatalf("Failed to initialize the metering clientset: %v", err)
 	}
 
-	deployObj, err := deploy.NewDeployer(client, apiextClient, meteringClient, logger)
+	deployObj, err := deploy.NewDeployer(con***REMOVED***g, client, apiextClient, meteringClient, logger)
 	if err != nil {
 		logger.Fatalf("Failed to deploy metering: %v", err)
 	}
 
 	deployType := os.Getenv("DEPLOY_TYPE")
 	if deployType == "" {
-		deployObj.Logger.Fatalf("error: you need to set the $DEPLOY_TYPE env var")
+		logger.Fatalf("error: you need to set the $DEPLOY_TYPE env var")
 	}
 
 	if deployType == "install" {
 		err = deployObj.Install()
 		if err != nil {
-			deployObj.Logger.Fatalf("Failed to install metering resources: %v", err)
+			logger.Fatalf("Failed to install metering resources: %v", err)
 		}
-		deployObj.Logger.Infof("Finished installing metering")
+		logger.Infof("Finished installing metering")
 	} ***REMOVED*** if deployType == "uninstall" {
 		err = deployObj.Uninstall()
 		if err != nil {
-			deployObj.Logger.Fatalf("Failed to uninstall metering resources: %v", err)
+			logger.Fatalf("Failed to uninstall metering resources: %v", err)
 		}
-		deployObj.Logger.Infof("Finished uninstalling metering")
+		logger.Infof("Finished uninstalling metering")
 	}
 
-	deployObj.Logger.Infof("Finished deploying metering")
+	logger.Infof("Finished deploying metering")
 }
 
 func setupLogger(logLevelStr string) log.FieldLogger {
