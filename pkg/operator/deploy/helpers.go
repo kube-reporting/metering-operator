@@ -53,39 +53,39 @@ func (deploy *Deployer) initMeteringCRDSlice() {
 
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, hivetableFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, hivetableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, prestotableFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, prestotableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, storagelocationFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, storagelocationFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, reportFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, reportFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, reportqueryFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, reportqueryFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, reportdatasourceFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, reportdatasourceFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "meteringconfigs.metering.openshift.io",
-		Path: filepath.Join(deploy.ManifestLocation, meteringconfigFile),
+		Path: filepath.Join(deploy.config.ManifestLocation, meteringconfigFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 
-	deploy.CRDs = crds
+	deploy.crds = crds
 }
