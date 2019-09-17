@@ -394,6 +394,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			return fmt.Errorf("storage incorrectly configured for Report %s, err: %v", report.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
+			op.enqueueStorageLocation(hiveStorage)
 			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 
