@@ -200,24 +200,24 @@ func NewDeployer(
 // Install is the driver function that manages the process of creating all
 // the resources that metering needs to install: namespace, CRDs, etc.
 func (deploy *Deployer) Install() error {
-	err := deploy.createNamespace()
+	err := deploy.installNamespace()
 	if err != nil {
 		return fmt.Errorf("Failed to create the %s namespace: %v", deploy.Namespace, err)
 	}
 
-	err = deploy.createMeteringCRDs()
+	err = deploy.installMeteringCRDs()
 	if err != nil {
 		return fmt.Errorf("Failed to create the Metering CRDs: %v", err)
 	}
 
 	if !deploy.SkipMeteringDeployment {
-		err = deploy.createMeteringResources()
+		err = deploy.installMeteringResources()
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering resources: %v", err)
 		}
 	}
 
-	err = deploy.createMeteringConfig()
+	err = deploy.installMeteringConfig()
 	if err != nil {
 		return fmt.Errorf("Failed to create the MeteringConfig resource: %v", err)
 	}
@@ -229,18 +229,18 @@ func (deploy *Deployer) Install() error {
 // metering had created. Depending on the configuration of the deploy structure,
 // resources like the metering CRDs, PVCs, or cluster role/role binding may be skipped
 func (deploy *Deployer) Uninstall() error {
-	err := deploy.deleteMeteringConfig()
+	err := deploy.uninstallMeteringConfig()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the MeteringConfig resource: %v", err)
 	}
 
-	err = deploy.deleteMeteringResources()
+	err = deploy.uninstallMeteringResources()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering resources: %v", err)
 	}
 
 	if deploy.DeleteCRDs {
-		err = deploy.deleteMeteringCRDs()
+		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the Metering CRDs: %v", err)
 		}
@@ -249,7 +249,7 @@ func (deploy *Deployer) Uninstall() error {
 	}
 
 	if deploy.DeleteNamespace {
-		err = deploy.deleteNamespace()
+		err = deploy.uninstallNamespace()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the %s namespace: %v", deploy.Namespace, err)
 		}
