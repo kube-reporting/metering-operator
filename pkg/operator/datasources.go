@@ -116,6 +116,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
+			op.enqueueStorageLocation(hiveStorage)
 			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 		params := hive.TableParameters{
@@ -503,6 +504,7 @@ func (op *Reporting) handleReportQueryViewDataSource(logger log.FieldLogger, dat
 			return fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %v", dataSource.Name, err)
 		}
 		if hiveStorage.Status.Hive.DatabaseName == "" {
+			op.enqueueStorageLocation(hiveStorage)
 			return fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
 		prestoTables, err := op.prestoTableLister.PrestoTables(dataSource.Namespace).List(labels.Everything())
