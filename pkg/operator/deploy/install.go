@@ -15,7 +15,7 @@ import (
 	"k8s.io/api/core/v1"
 )
 
-func (deploy *Deployer) createNamespace() error {
+func (deploy *Deployer) installNamespace() error {
 	namespace, err := deploy.Client.CoreV1().Namespaces().Get(deploy.Namespace, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		namespaceObjectMeta := metav1.ObjectMeta{
@@ -65,7 +65,7 @@ func (deploy *Deployer) createNamespace() error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringCon***REMOVED***g() error {
+func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 	var res meteringv1.MeteringCon***REMOVED***g
 
 	err := decodeYAMLManifestToObject(deploy.MeteringCR, &res)
@@ -95,33 +95,33 @@ func (deploy *Deployer) createMeteringCon***REMOVED***g() error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringResources() error {
-	err := deploy.createMeteringDeployment(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringDeploymentFile))
+func (deploy *Deployer) installMeteringResources() error {
+	err := deploy.installMeteringDeployment(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringDeploymentFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering deployment: %v", err)
 	}
 
-	err = deploy.createMeteringServiceAccount(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringServiceAccountFile))
+	err = deploy.installMeteringServiceAccount(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringServiceAccountFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering service account: %v", err)
 	}
 
-	err = deploy.createMeteringRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleFile))
+	err = deploy.installMeteringRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role: %v", err)
 	}
 
-	err = deploy.createMeteringRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleBindingFile))
+	err = deploy.installMeteringRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role binding: %v", err)
 	}
 
-	err = deploy.createMeteringClusterRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleFile))
+	err = deploy.installMeteringClusterRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role: %v", err)
 	}
 
-	err = deploy.createMeteringClusterRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleBindingFile))
+	err = deploy.installMeteringClusterRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role binding: %v", err)
 	}
@@ -129,7 +129,7 @@ func (deploy *Deployer) createMeteringResources() error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringDeployment(deploymentName string) error {
+func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
 	var res appsv1.Deployment
 
 	err := decodeYAMLManifestToObject(deploymentName, &res)
@@ -171,7 +171,7 @@ func (deploy *Deployer) createMeteringDeployment(deploymentName string) error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringServiceAccount(serviceAccountPath string) error {
+func (deploy *Deployer) installMeteringServiceAccount(serviceAccountPath string) error {
 	var res corev1.ServiceAccount
 
 	err := decodeYAMLManifestToObject(serviceAccountPath, &res)
@@ -195,7 +195,7 @@ func (deploy *Deployer) createMeteringServiceAccount(serviceAccountPath string) 
 	return nil
 }
 
-func (deploy *Deployer) createMeteringRoleBinding(roleBindingPath string) error {
+func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error {
 	var res rbacv1.RoleBinding
 
 	err := decodeYAMLManifestToObject(roleBindingPath, &res)
@@ -228,7 +228,7 @@ func (deploy *Deployer) createMeteringRoleBinding(roleBindingPath string) error 
 	return nil
 }
 
-func (deploy *Deployer) createMeteringRole(rolePath string) error {
+func (deploy *Deployer) installMeteringRole(rolePath string) error {
 	var res rbacv1.Role
 
 	err := decodeYAMLManifestToObject(rolePath, &res)
@@ -255,7 +255,7 @@ func (deploy *Deployer) createMeteringRole(rolePath string) error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringClusterRoleBinding(clusterrolebindingFile string) error {
+func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile string) error {
 	var res rbacv1.ClusterRoleBinding
 
 	err := decodeYAMLManifestToObject(clusterrolebindingFile, &res)
@@ -286,7 +286,7 @@ func (deploy *Deployer) createMeteringClusterRoleBinding(clusterrolebindingFile 
 	return nil
 }
 
-func (deploy *Deployer) createMeteringClusterRole(clusterrolePath string) error {
+func (deploy *Deployer) installMeteringClusterRole(clusterrolePath string) error {
 	var res rbacv1.ClusterRole
 
 	err := decodeYAMLManifestToObject(clusterrolePath, &res)
@@ -312,9 +312,9 @@ func (deploy *Deployer) createMeteringClusterRole(clusterrolePath string) error 
 	return nil
 }
 
-func (deploy *Deployer) createMeteringCRDs() error {
+func (deploy *Deployer) installMeteringCRDs() error {
 	for _, crd := range deploy.CRDs {
-		err := deploy.createMeteringCRD(crd)
+		err := deploy.installMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to create a CRD while looping: %v", err)
 		}
@@ -323,7 +323,7 @@ func (deploy *Deployer) createMeteringCRDs() error {
 	return nil
 }
 
-func (deploy *Deployer) createMeteringCRD(resource CRD) error {
+func (deploy *Deployer) installMeteringCRD(resource CRD) error {
 	err := decodeYAMLManifestToObject(resource.Path, resource.CRD)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)

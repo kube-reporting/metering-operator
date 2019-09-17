@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (deploy *Deployer) deleteNamespace() error {
+func (deploy *Deployer) uninstallNamespace() error {
 	err := deploy.Client.CoreV1().Namespaces().Delete(deploy.Namespace, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		return fmt.Errorf("The %s namespace doesn't exist", deploy.Namespace)
@@ -26,7 +26,7 @@ func (deploy *Deployer) deleteNamespace() error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringCon***REMOVED***g() error {
+func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
 	var res meteringv1.MeteringCon***REMOVED***g
 
 	err := decodeYAMLManifestToObject(deploy.MeteringCR, &res)
@@ -46,34 +46,34 @@ func (deploy *Deployer) deleteMeteringCon***REMOVED***g() error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringResources() error {
-	err := deploy.deleteMeteringDeployment(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringDeploymentFile))
+func (deploy *Deployer) uninstallMeteringResources() error {
+	err := deploy.uninstallMeteringDeployment(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringDeploymentFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.deleteMeteringServiceAccount(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringServiceAccountFile))
+	err = deploy.uninstallMeteringServiceAccount(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringServiceAccountFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.deleteMeteringRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleFile))
+	err = deploy.uninstallMeteringRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role: %v", err)
 	}
 
-	err = deploy.deleteMeteringRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleBindingFile))
+	err = deploy.uninstallMeteringRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role binding: %v", err)
 	}
 
 	if deploy.DeleteCRB {
-		err = deploy.deleteMeteringClusterRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleFile))
+		err = deploy.uninstallMeteringClusterRole(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleFile))
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role: %v", err)
 		}
 
-		err = deploy.deleteMeteringClusterRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleBindingFile))
+		err = deploy.uninstallMeteringClusterRoleBinding(***REMOVED***lepath.Join(deploy.ManifestLocation, meteringClusterRoleBindingFile))
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role binding: %v", err)
 		}
@@ -82,7 +82,7 @@ func (deploy *Deployer) deleteMeteringResources() error {
 	}
 
 	if deploy.DeletePVCs {
-		err = deploy.deleteMeteringPVCs()
+		err = deploy.uninstallMeteringPVCs()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering PVCs: %v", err)
 		}
@@ -93,9 +93,9 @@ func (deploy *Deployer) deleteMeteringResources() error {
 	return nil
 }
 
-// deleteMeteringPVCs gets a list of all the PVCs associated with the hdfs and hive-metastore
+// uninstallMeteringPVCs gets a list of all the PVCs associated with the hdfs and hive-metastore
 // pods in the $METERING_NAMESPACE namespace, and attempts to delete all the PVCs that match that list criteria
-func (deploy *Deployer) deleteMeteringPVCs() error {
+func (deploy *Deployer) uninstallMeteringPVCs() error {
 	// Attempt to get a list of PVCs that match the hdfs or hive labels
 	pvcs, err := deploy.Client.CoreV1().PersistentVolumeClaims(deploy.Namespace).List(metav1.ListOptions{
 		LabelSelector: "app in (hdfs,hive)",
@@ -121,7 +121,7 @@ func (deploy *Deployer) deleteMeteringPVCs() error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringDeployment(deploymentName string) error {
+func (deploy *Deployer) uninstallMeteringDeployment(deploymentName string) error {
 	var res appsv1.Deployment
 
 	err := decodeYAMLManifestToObject(deploymentName, &res)
@@ -141,7 +141,7 @@ func (deploy *Deployer) deleteMeteringDeployment(deploymentName string) error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringServiceAccount(serviceAccountPath string) error {
+func (deploy *Deployer) uninstallMeteringServiceAccount(serviceAccountPath string) error {
 	var res corev1.ServiceAccount
 
 	err := decodeYAMLManifestToObject(serviceAccountPath, &res)
@@ -161,7 +161,7 @@ func (deploy *Deployer) deleteMeteringServiceAccount(serviceAccountPath string) 
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringRoleBinding(roleBindingPath string) error {
+func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) error {
 	var res rbacv1.RoleBinding
 
 	err := decodeYAMLManifestToObject(roleBindingPath, &res)
@@ -189,7 +189,7 @@ func (deploy *Deployer) deleteMeteringRoleBinding(roleBindingPath string) error 
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringRole(rolePath string) error {
+func (deploy *Deployer) uninstallMeteringRole(rolePath string) error {
 	var res rbacv1.Role
 
 	err := decodeYAMLManifestToObject(rolePath, &res)
@@ -212,7 +212,7 @@ func (deploy *Deployer) deleteMeteringRole(rolePath string) error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringClusterRole(clusterrolePath string) error {
+func (deploy *Deployer) uninstallMeteringClusterRole(clusterrolePath string) error {
 	var res rbacv1.ClusterRole
 
 	err := decodeYAMLManifestToObject(clusterrolePath, &res)
@@ -234,7 +234,7 @@ func (deploy *Deployer) deleteMeteringClusterRole(clusterrolePath string) error 
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringClusterRoleBinding(meteringClusterRoleBindingFile string) error {
+func (deploy *Deployer) uninstallMeteringClusterRoleBinding(meteringClusterRoleBindingFile string) error {
 	var res rbacv1.ClusterRoleBinding
 
 	err := decodeYAMLManifestToObject(meteringClusterRoleBindingFile, &res)
@@ -261,9 +261,9 @@ func (deploy *Deployer) deleteMeteringClusterRoleBinding(meteringClusterRoleBind
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringCRDs() error {
+func (deploy *Deployer) uninstallMeteringCRDs() error {
 	for _, crd := range deploy.CRDs {
-		err := deploy.deleteMeteringCRD(crd)
+		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to delete a CRD while looping: %v", err)
 		}
@@ -272,7 +272,7 @@ func (deploy *Deployer) deleteMeteringCRDs() error {
 	return nil
 }
 
-func (deploy *Deployer) deleteMeteringCRD(resource CRD) error {
+func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
 	err := decodeYAMLManifestToObject(resource.Path, resource.CRD)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
