@@ -47,12 +47,11 @@ type CRD struct {
 	CRD  *apiextv1beta1.CustomResourceDefinition
 }
 
-// Deployer is a structure that holds the information needed to handle different
-// metering deploy configurations like the deploy platform, deleting metering
-// CRDs or the namespace during an install, etc. This structure also contains
-// fields like the various clientsets used to manage  metering resources in
-// the deploy methods, and a reference to an initialized logrus field logger.
-type Deployer struct {
+// Config contains all the information needed to handle different
+// metering deployment configurations and internal states, e.g. what
+// platform to deploy on, whether or not to delete the metering CRDs,
+// or namespace during an install, the location to the manifests dir, etc.
+type Config struct {
 	Namespace              string
 	Platform               string
 	ManifestLocation       string
@@ -65,12 +64,19 @@ type Deployer struct {
 	DeleteAll              bool
 	Repo                   string
 	Tag                    string
-	TargetNamespaces       string
-	CRDs                   []CRD
-	Logger                 log.FieldLogger
-	Client                 *kubernetes.Clientset
-	APIExtClient           apiextclientv1beta1.CustomResourceDefinitionsGetter
-	MeteringClient         *metering.MeteringV1Client
+}
+
+// Deployer holds all the information needed to handle the deployment
+// process of the metering stack. This includes the clientsets needed
+// to provision and remove all the metering resources, and a customized
+// deployment configuration.
+type Deployer struct {
+	config         Config
+	crds           []CRD
+	logger         log.FieldLogger
+	client         *kubernetes.Clientset
+	apiExtClient   apiextclientv1beta1.CustomResourceDefinitionsGetter
+	meteringClient *metering.MeteringV1Client
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -78,6 +84,7 @@ type Deployer struct {
 // environment variables and function parameters, returning a reference to this initialized
 // deploy structure
 func NewDeployer(
+	cfg Config,
 	client *kubernetes.Clientset,
 	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
 	meteringClient *metering.MeteringV1Client,
@@ -86,10 +93,11 @@ func NewDeployer(
 	var err error
 
 	deploy := &Deployer{
-		Client:         client,
-		APIExtClient:   apiextClient,
-		MeteringClient: meteringClient,
-		Logger:         logger,
+		client:         client,
+		apiExtClient:   apiextClient,
+		meteringClient: meteringClient,
+		logger:         logger,
+		config:         cfg,
 	}
 
 	meteringNamespace := os.Getenv("METERING_NAMESPACE")
@@ -97,23 +105,23 @@ func NewDeployer(
 		return nil, fmt.Errorf("Failed to set $METERING_NAMESPACE")
 	}
 
-	deploy.Namespace = meteringNamespace
-	deploy.Logger.Infof("Metering Deploy Namespace: %s", deploy.Namespace)
+	deploy.config.Namespace = meteringNamespace
+	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.config.Namespace)
 
 	manifestOverrideLocation := os.Getenv("INSTALLER_MANIFESTS_DIR")
 	if manifestOverrideLocation != "" {
-		deploy.ManifestLocation, err = filepath.Abs(manifestOverrideLocation)
+		deploy.config.ManifestLocation, err = filepath.Abs(manifestOverrideLocation)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to override the manifest location: %v", err)
 		}
 
-		deploy.Logger.Infof("Overrided manifest location: %s", deploy.ManifestLocation)
+		deploy.logger.Infof("Overrided manifest location: %s", deploy.config.ManifestLocation)
 	} else {
 		deployPlatform := os.Getenv("DEPLOY_PLATFORM")
 		if deployPlatform == "" {
-			deploy.Platform = "openshift"
+			deploy.config.Platform = "openshift"
 		} else {
-			deploy.Platform = deployPlatform
+			deploy.config.Platform = deployPlatform
 		}
 
 		defaultManifestBase, err := filepath.Abs(manifestDeployDirname)
@@ -121,76 +129,76 @@ func NewDeployer(
 			return nil, fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory: %v", err)
 		}
 
-		switch strings.ToLower(deploy.Platform) {
+		switch strings.ToLower(deploy.config.Platform) {
 		case "upstream":
-			deploy.ManifestLocation = filepath.Join(defaultManifestBase, upstreamManifestDirname, manifestAnsibleOperator)
+			deploy.config.ManifestLocation = filepath.Join(defaultManifestBase, upstreamManifestDirname, manifestAnsibleOperator)
 		case "openshift":
-			deploy.ManifestLocation = filepath.Join(defaultManifestBase, openshiftManifestDirname, manifestAnsibleOperator)
+			deploy.config.ManifestLocation = filepath.Join(defaultManifestBase, openshiftManifestDirname, manifestAnsibleOperator)
 		case "ocp-testing":
-			deploy.ManifestLocation = filepath.Join(defaultManifestBase, ocpTestingManifestDirname, manifestAnsibleOperator)
+			deploy.config.ManifestLocation = filepath.Join(defaultManifestBase, ocpTestingManifestDirname, manifestAnsibleOperator)
 		default:
 			return nil, fmt.Errorf("Failed to set $DEPLOY_PLATFORM to an invalid value. Supported types: [upstream, openshift, ocp-testing]")
 		}
 
-		deploy.Logger.Infof("Metering Deploy Platform: %s", deploy.Platform)
+		deploy.logger.Infof("Metering Deploy Platform: %s", deploy.config.Platform)
 	}
 
 	meteringCRFile := os.Getenv("METERING_CR_FILE")
 	if meteringCRFile == "" {
-		deploy.Logger.Info("The $METERING_CR_FILE env var is unset, using the default MeteringConfig manifest")
-		deploy.MeteringCR = deploy.ManifestLocation + defaultMeteringConfig
+		deploy.logger.Info("The $METERING_CR_FILE env var is unset, using the default MeteringConfig manifest")
+		deploy.config.MeteringCR = deploy.config.ManifestLocation + defaultMeteringConfig
 	} else {
-		deploy.MeteringCR = meteringCRFile
+		deploy.config.MeteringCR = meteringCRFile
 	}
 
-	deploy.DeleteAll, err = getBoolEnv("METERING_DELETE_ALL", false)
+	deploy.config.DeleteAll, err = getBoolEnv("METERING_DELETE_ALL", false)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read $METERING_DELETE_ALL: %v", err)
 	}
 
-	if deploy.DeleteAll {
-		deploy.DeleteCRDs = true
-		deploy.DeleteCRB = true
-		deploy.DeleteNamespace = true
-		deploy.DeletePVCs = true
+	if deploy.config.DeleteAll {
+		deploy.config.DeleteCRDs = true
+		deploy.config.DeleteCRB = true
+		deploy.config.DeleteNamespace = true
+		deploy.config.DeletePVCs = true
 	} else {
-		deploy.DeleteCRDs, err = getBoolEnv("METERING_DELETE_CRDS", false)
+		deploy.config.DeleteCRDs, err = getBoolEnv("METERING_DELETE_CRDS", false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to read $METERING_DELETE_CRDS: %v", err)
 		}
 
-		deploy.DeleteCRB, err = getBoolEnv("METERING_DELETE_CRB", false)
+		deploy.config.DeleteCRB, err = getBoolEnv("METERING_DELETE_CRB", false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to read $METERING_DELETE_CRB: %v", err)
 		}
 
-		deploy.DeleteNamespace, err = getBoolEnv("METERING_DELETE_NAMESPACE", false)
+		deploy.config.DeleteNamespace, err = getBoolEnv("METERING_DELETE_NAMESPACE", false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to read $METERING_DELETE_NAMESPACE: %v", err)
 		}
 
-		deploy.DeletePVCs, err = getBoolEnv("METERING_DELETE_PVCS", true)
+		deploy.config.DeletePVCs, err = getBoolEnv("METERING_DELETE_PVCS", true)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to read $METERING_DELETE_PVCS: %v", err)
 		}
 	}
 
-	deploy.SkipMeteringDeployment, err = getBoolEnv("SKIP_METERING_OPERATOR_DEPLOYMENT", false)
+	deploy.config.SkipMeteringDeployment, err = getBoolEnv("SKIP_METERING_OPERATOR_DEPLOYMENT", false)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read $SKIP_METERING_OPERATOR_DEPLOYMENT: %v", err)
 	}
 
 	imageRepo := os.Getenv("METERING_OPERATOR_IMAGE_REPO")
 	if imageRepo != "" {
-		deploy.Repo = imageRepo
+		deploy.config.Repo = imageRepo
 	}
 
 	imageTag := os.Getenv("METERING_OPERATOR_IMAGE_TAG")
 	if imageTag != "" {
-		deploy.Tag = imageTag
+		deploy.config.Tag = imageTag
 	}
 
-	// initialize a slice of CRD structures and assign to the deploy.CRDs field
+	// initialize a slice of CRD structures and assign to the deploy.crds field
 	// this is used by the install/uninstall drivers to manage the metering CRDs
 	deploy.initMeteringCRDSlice()
 
@@ -202,7 +210,7 @@ func NewDeployer(
 func (deploy *Deployer) Install() error {
 	err := deploy.installNamespace()
 	if err != nil {
-		return fmt.Errorf("Failed to create the %s namespace: %v", deploy.Namespace, err)
+		return fmt.Errorf("Failed to create the %s namespace: %v", deploy.config.Namespace, err)
 	}
 
 	err = deploy.installMeteringCRDs()
@@ -210,7 +218,7 @@ func (deploy *Deployer) Install() error {
 		return fmt.Errorf("Failed to create the Metering CRDs: %v", err)
 	}
 
-	if !deploy.SkipMeteringDeployment {
+	if !deploy.config.SkipMeteringDeployment {
 		err = deploy.installMeteringResources()
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering resources: %v", err)
@@ -239,22 +247,22 @@ func (deploy *Deployer) Uninstall() error {
 		return fmt.Errorf("Failed to delete the metering resources: %v", err)
 	}
 
-	if deploy.DeleteCRDs {
+	if deploy.config.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the Metering CRDs: %v", err)
 		}
 	} else {
-		deploy.Logger.Infof("Skipped deleting the metering CRDs")
+		deploy.logger.Infof("Skipped deleting the metering CRDs")
 	}
 
-	if deploy.DeleteNamespace {
+	if deploy.config.DeleteNamespace {
 		err = deploy.uninstallNamespace()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the %s namespace: %v", deploy.Namespace, err)
+			return fmt.Errorf("Failed to delete the %s namespace: %v", deploy.config.Namespace, err)
 		}
 	} else {
-		deploy.Logger.Infof("Skipped deleting the %s namespace", deploy.Namespace)
+		deploy.logger.Infof("Skipped deleting the %s namespace", deploy.config.Namespace)
 	}
 
 	return nil
