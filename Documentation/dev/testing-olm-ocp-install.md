@@ -2,7 +2,7 @@
 
 This document is a summarization of https://docs.google.com/document/d/1t81RSsZbUoGO4r5OgJ1bqAESKt2fM25MvV6pcgQUPSk/edit#, please review this before proceeding as it covers how to request access to the necessary Quay organizations for pulling the OLM app bundles within Quay.io.
 
-# Disable built-in OperatorSources in OCP 4.1:
+# Disable built-in OperatorSources in OCP 4.1
 
 Disable ClusterVersionOperator management of the Marketplace redhat-operators OperatorSource so we can delete the existing one and install ours.
 
@@ -37,7 +37,7 @@ Delete the redhat-operators OperatorSource:
 oc -n openshift-marketplace delete operatorsource redhat-operators
 ```
 
-# Disable built-in OperatorSources in OCP 4.2:
+# Disable built-in OperatorSources in OCP 4.2
 
 Store the following in a ***REMOVED***le called `operatorhub.yaml`:
 
@@ -95,9 +95,11 @@ spec:
   # change to redhat-operators-art for pre-staged content, and use
   # redhat-operators-stage for testing staging images
   # redhat-operators to test live images
-  # registryNamespace: redhat-operators-art
+  # use rh-osbs-operators for the latest thing built in OSBS. rh-osbs-operators is the most regularly updated one.
+  registryNamespace: redhat-operators-art
   # registryNamespace: redhat-operators-stage
   # registryNamespace: redhat-operators
+  # registryNamespace: rh-osbs-operators
   authorizationToken:
     secretName: marketplacesecret
 ```
