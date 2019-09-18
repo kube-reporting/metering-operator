@@ -52,18 +52,18 @@ type CRD struct {
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
 type Con***REMOVED***g struct {
-	Namespace              string
-	Platform               string
-	ManifestLocation       string
-	MeteringCR             string
-	SkipMeteringDeployment bool
-	DeleteCRDs             bool
-	DeleteCRB              bool
-	DeleteNamespace        bool
-	DeletePVCs             bool
-	DeleteAll              bool
-	Repo                   string
-	Tag                    string
+	Namespace                string
+	Platform                 string
+	DeployManifestsDirectory string
+	MeteringCR               string
+	SkipMeteringDeployment   bool
+	DeleteCRDs               bool
+	DeleteCRB                bool
+	DeleteNamespace          bool
+	DeletePVCs               bool
+	DeleteAll                bool
+	Repo                     string
+	Tag                      string
 }
 
 // Deployer holds all the information needed to handle the deployment
@@ -71,12 +71,13 @@ type Con***REMOVED***g struct {
 // to provision and remove all the metering resources, and a customized
 // deployment con***REMOVED***guration.
 type Deployer struct {
-	con***REMOVED***g         Con***REMOVED***g
-	crds           []CRD
-	logger         log.FieldLogger
-	client         *kubernetes.Clientset
-	apiExtClient   apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
-	meteringClient *metering.MeteringV1Client
+	con***REMOVED***g                           Con***REMOVED***g
+	crds                             []CRD
+	ansibleOperatorManifestsLocation string
+	logger                           log.FieldLogger
+	client                           *kubernetes.Clientset
+	apiExtClient                     apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
+	meteringClient                   *metering.MeteringV1Client
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -101,40 +102,46 @@ func NewDeployer(
 	}
 
 	if deploy.con***REMOVED***g.Namespace == "" {
-		return deploy, fmt.Errorf("Failed to set the --namespace flag or $METERING_NAMESPACE ENV var")
+		return deploy, fmt.Errorf("Failed to set $METERING_NAMESPACE or --namespace flag")
 	}
 	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.con***REMOVED***g.Namespace)
 
-	if deploy.con***REMOVED***g.ManifestLocation != "" {
-		deploy.con***REMOVED***g.ManifestLocation, err = ***REMOVED***lepath.Abs(deploy.con***REMOVED***g.ManifestLocation)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to override the manifest location %s: %v", deploy.con***REMOVED***g.ManifestLocation, err)
-		}
+	if deploy.con***REMOVED***g.DeployManifestsDirectory == "" {
+		return nil, fmt.Errorf("Failed to set the $DEPLOY_MANIFESTS_DIR or --deploy-manifests-dir flag to a non-empty value")
+	}
 
-		_, err = os.Stat(deploy.con***REMOVED***g.ManifestLocation)
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("Failed to set $INSTALL_MANIFESTS_DIR or --manifest-dir to a valid path: %v", err)
-		}
+	deployDir, err := ***REMOVED***lepath.Abs(deploy.con***REMOVED***g.DeployManifestsDirectory)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory %s: %v", deploy.con***REMOVED***g.DeployManifestsDirectory, err)
+	}
 
-		deploy.logger.Infof("Overrided manifest location: %s", deploy.con***REMOVED***g.ManifestLocation)
-	} ***REMOVED*** {
-		defaultManifestBase, err := ***REMOVED***lepath.Abs(manifestDeployDirname)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory: %v", err)
-		}
+	dirStat, err := os.Stat(deploy.con***REMOVED***g.DeployManifestsDirectory)
+	if os.IsNotExist(err) {
+		return nil, fmt.Errorf("Failed to get the stat the manifest/deploy directory %s: %v", deploy.con***REMOVED***g.DeployManifestsDirectory, err)
+	}
+	if !dirStat.IsDir() {
+		return nil, fmt.Errorf("Speci***REMOVED***ed deploy directory '%s' is not a directory", deploy.con***REMOVED***g.DeployManifestsDirectory)
+	}
 
-		switch strings.ToLower(deploy.con***REMOVED***g.Platform) {
-		case "upstream":
-			deploy.con***REMOVED***g.ManifestLocation = ***REMOVED***lepath.Join(defaultManifestBase, upstreamManifestDirname, manifestAnsibleOperator)
-		case "openshift":
-			deploy.con***REMOVED***g.ManifestLocation = ***REMOVED***lepath.Join(defaultManifestBase, openshiftManifestDirname, manifestAnsibleOperator)
-		case "ocp-testing":
-			deploy.con***REMOVED***g.ManifestLocation = ***REMOVED***lepath.Join(defaultManifestBase, ocpTestingManifestDirname, manifestAnsibleOperator)
-		default:
-			return deploy, fmt.Errorf("Failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
-		}
+	var ansibleOperatorManifestDir string
 
-		deploy.logger.Infof("Metering Deploy Platform: %s", deploy.con***REMOVED***g.Platform)
+	switch strings.ToLower(deploy.con***REMOVED***g.Platform) {
+	case "upstream":
+		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, upstreamManifestDirname, manifestAnsibleOperator)
+	case "openshift":
+		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, openshiftManifestDirname, manifestAnsibleOperator)
+	case "ocp-testing":
+		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, ocpTestingManifestDirname, manifestAnsibleOperator)
+	default:
+		return deploy, fmt.Errorf("Failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
+	}
+
+	dirStat, err = os.Stat(ansibleOperatorManifestDir)
+	if os.IsNotExist(err) {
+		return nil, fmt.Errorf("Failed to stat the %s deploy platform directory '%s': %v", deploy.con***REMOVED***g.Platform, ansibleOperatorManifestDir, err)
+	}
+	if !dirStat.IsDir() {
+		return nil, fmt.Errorf("Speci***REMOVED***ed %s deploy platform directory '%s' is not a directory", deploy.con***REMOVED***g.Platform, ansibleOperatorManifestDir)
 	}
 
 	if deploy.con***REMOVED***g.DeleteAll {
@@ -144,10 +151,11 @@ func NewDeployer(
 		deploy.con***REMOVED***g.DeleteCRDs = true
 	}
 
+	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.con***REMOVED***g.Platform)
+	deploy.ansibleOperatorManifestsLocation = ansibleOperatorManifestDir
+
 	// initialize a slice of CRD structures and assign to the deploy.crds ***REMOVED***eld
 	// this is used by the install/uninstall drivers to manage the metering CRDs
-	// TODO: this is awkward that the deploy object has all ***REMOVED***elds initialized but
-	// deploy.crds at the start
 	deploy.initMeteringCRDSlice()
 
 	return deploy, nil

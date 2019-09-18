@@ -53,37 +53,37 @@ func (deploy *Deployer) initMeteringCRDSlice() {
 
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, hivetableFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, hivetableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, prestotableFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, prestotableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, storagelocationFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, storagelocationFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, reportFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportqueryFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, reportqueryFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, reportdatasourceFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, reportdatasourceFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 	crds = append(crds, CRD{
 		Name: "meteringcon***REMOVED***gs.metering.openshift.io",
-		Path: ***REMOVED***lepath.Join(deploy.con***REMOVED***g.ManifestLocation, meteringcon***REMOVED***gFile),
+		Path: ***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringcon***REMOVED***gFile),
 		CRD:  new(apiextv1beta1.CustomResourceDe***REMOVED***nition),
 	})
 
