@@ -23,7 +23,7 @@ var (
 	logLevel   string
 
 	rootCmd = &cobra.Command{
-		Use:   "operator-metering",
+		Use:   "deploy-metering",
 		Short: "Deploying the metering operator",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()

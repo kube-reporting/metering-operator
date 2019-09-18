@@ -6,7 +6,6 @@ include build/check_defined.mk
 # Package
 GO_PKG := github.com/operator-framework/operator-metering
 REPORTING_OPERATOR_PKG := $(GO_PKG)/cmd/reporting-operator
-DEPLOY_PKG := $(GO_PKG)/cmd/deploy
 # these are directories/files which get auto-generated or get reformated by
 # gofmt
 VERIFY_FILE_PATHS := cmd pkg test manifests Gopkg.lock
@@ -55,7 +54,8 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-DEPLOY_BIN_OUT = bin/operator-metering
+TEST2JSON_BIN_OUT = bin/test2json
+DEPLOY_METERING_BIN_OUT = bin/deploy-metering
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
 RUN_UPDATE_CODEGEN ?= true
@@ -113,7 +113,7 @@ unit-docker: metering-src-docker-build
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
-integration: bin/test2json
+integration: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
 	hack/integration.sh
 
 integration-local: reporting-operator-local metering-ansible-operator-docker-build
@@ -138,7 +138,7 @@ integration-docker: metering-src-docker-build
 	docker cp metering-integration-docker:/out bin/integration-docker-test-output
 	docker rm metering-integration-docker
 
-e2e: bin/test2json
+e2e: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
 	hack/e2e.sh
 
 e2e-local: reporting-operator-local metering-ansible-operator-docker-build
@@ -220,11 +220,11 @@ metering-manifests:
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
 	./hack/generate-metering-manifests.sh
 
-bin/test2json: gotools/test2json/main.go
-	go build -o bin/test2json gotools/test2json/main.go
+$(TEST2JSON_BIN_OUT): gotools/test2json/main.go
+	go build -o $(TEST2JSON_BIN_OUT) gotools/test2json/main.go
 
-deploy:
-	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(DEPLOY_BIN_OUT) $(DEPLOY_PKG)
+$(DEPLOY_METERING_BIN_OUT): cmd/deploy-metering/main.go
+	go build -o $(DEPLOY_METERING_BIN_OUT) $(GO_PKG)/cmd/deploy-metering
 
 .PHONY: \
 	test vendor fmt verify \
@@ -233,7 +233,6 @@ deploy:
 	docker-build-all docker-tag-all docker-push-all \
 	metering-test-docker \
 	metering-src-docker-build \
-	deploy \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
 	metering-manifests \
 	install-kube-prometheus-helm
