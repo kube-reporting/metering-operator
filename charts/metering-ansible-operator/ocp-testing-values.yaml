@@ -1,6 +1,6 @@
 operator:
   image:
-    repository: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator
+    repository: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator
     tag: v4.2
 
 olm:
@@ -8,31 +8,31 @@ olm:
   - name: metering-ansible-operator
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-ansible-operator:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2
   - name: metering-reporting-operator
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-reporting-operator:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.2
   - name: metering-presto
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-presto:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.2
   - name: metering-hive
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hive:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.2
   - name: metering-hadoop
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-metering-hadoop:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.2
   - name: ghostunnel
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-ghostunnel:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.2
   - name: oauth-proxy
     from:
       kind: DockerImage
-      name: image-registry.openshift-image-registry.svc:5000/openshift-metering-images/ose-oauth-proxy:v4.2
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.2
 
   skipARTPackage: true
 
