@@ -74,7 +74,7 @@ spec:
 {{- end }}
       initContainers:
       - name: copy-presto-config
-        image: "{{ .Values.presto.spec.image.override | default (printf "%s:%s" .Values.presto.spec.image.repository .Values.presto.spec.image.tag) }}"
+        image: "{{ include "presto-image" . }}"
         imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted configuration data into the presto-etc emptyDir volume so we can write to the config files
@@ -166,7 +166,7 @@ spec:
             memory: 100Mi
       containers:
       - name: presto
-        image: "{{ .Values.presto.spec.image.override | default (printf "%s:%s" .Values.presto.spec.image.repository .Values.presto.spec.image.tag) }}"
+        image: "{{ include "presto-image" . }}"
         imagePullPolicy: {{ .Values.presto.spec.image.pullPolicy }}
         command: ['/presto-common/entrypoint.sh']
         args: ['/opt/presto/presto-server/bin/launcher', 'run']
@@ -216,7 +216,7 @@ spec:
 {{ toYaml .Values.presto.spec.worker.resources | indent 10 }}
 {{- if .Values.presto.spec.config.connectors.hive.tls.enabled }}
       - name: ghostunnel-client
-        image: "{{ .Values.__ghostunnel.image.override | default (printf "%s:%s" .Values.__ghostunnel.image.repository .Values.__ghostunnel.image.tag) }}"
+        image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: GHOSTUNNEL_CLIENT_CA_CRTFILE

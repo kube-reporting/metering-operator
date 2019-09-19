@@ -246,9 +246,11 @@ reporting-operator:
 
     image:
       pullPolicy: Always
-      repository: quay.io/openshift/origin-metering-reporting-operator
-      tag: "4.2"
-      override: null
+      defaultRepository: quay.io/openshift/origin-metering-reporting-operator
+      defaultTag: "4.2"
+      defaultOverride: null
+      repository: null
+      tag: null
       pullSecrets: []
 
     updateStrategy:
@@ -404,9 +406,11 @@ reporting-operator:
 
       image:
         pullPolicy: Always
-        repository: quay.io/openshift/origin-oauth-proxy
-        tag: "4.2"
-        override: null
+        defaultRepository: quay.io/openshift/origin-oauth-proxy
+        defaultTag: "4.2"
+        defaultOverride: null
+        repository: null
+        tag: null
         pullSecrets: []
 
       authenticatedEmails:
@@ -450,9 +454,11 @@ presto:
 
     image:
       pullPolicy: Always
-      repository: quay.io/openshift/origin-metering-presto
-      tag: "4.2"
-      override: null
+      defaultRepository: quay.io/openshift/origin-metering-presto
+      defaultTag: "4.2"
+      defaultOverride: null
+      repository: null
+      tag: null
 
     config:
       environment: production
@@ -689,9 +695,11 @@ hive:
 
     image:
       pullPolicy: Always
-      repository: quay.io/openshift/origin-metering-hive
-      tag: "4.2"
-      override: null
+      defaultRepository: quay.io/openshift/origin-metering-hive
+      defaultTag: "4.2"
+      defaultOverride: null
+      repository: null
+      tag: null
       pullSecrets: []
 
     metastore:
@@ -824,9 +832,11 @@ hive:
 __ghostunnel:
   image:
     pullPolicy: Always
-    repository: quay.io/openshift/origin-ghostunnel
-    tag: "4.2"
-    override: null
+    defaultRepository: quay.io/openshift/origin-ghostunnel
+    defaultTag: "4.2"
+    defaultOverride: null
+    repository: null
+    tag: null
 
 hadoop:
   spec:
@@ -865,9 +875,11 @@ hadoop:
 
     image:
       pullPolicy: Always
-      repository: quay.io/openshift/origin-metering-hadoop
-      tag: "4.2"
-      override: null
+      defaultRepository: quay.io/openshift/origin-metering-hadoop
+      defaultTag: "4.2"
+      defaultOverride: null
+      repository: null
+      tag: null
       pullSecrets: null
 
     hdfs:
