@@ -56,6 +56,12 @@ Then apply it:
 oc apply -f operatorhub.yaml
 ```
 
+# Get access to Quay organizations containing staged operator bundles
+
+Add yourself to https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0 and get someone to grant you access.
+This must be done before proceeding.
+Once done, look at https://quay.io/application/ and verify you see the metering-ocp package listed in the registry namespaces `rh-operators-art` and `rh-osbs-operators`.
+
 # Con***REMOVED***gure credentials
 
 Next create a secret containing credentials containing your Quay credentials for accessing the app bundles ART builds.
