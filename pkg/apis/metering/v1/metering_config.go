@@ -100,7 +100,7 @@ End of structures re-used throughout the top-level keys
 */
 
 type ReportingOperator struct {
-	Spec ReportingOperatorSpec `json:"spec,omitempty"`
+	Spec *ReportingOperatorSpec `json:"spec,omitempty"`
 }
 type ReportingOperatorSpec struct {
 	Replicas       *int32                             `json:"replicas,omitempty"`
@@ -124,7 +124,7 @@ type ReportingOperatorConfig struct {
 	LogReports          *bool                              `json:"logReports,omitempty"`
 	LogLevel            string                             `json:"logLevel,omitempty"`
 	LeaderLeaseDuration *meta.Duration                     `json:"leaderLeaseDuration,omitempty"`
-	AWS                 *S3Config                          `json:"aws,omitempty"`
+	AWS                 *AWSConfig                         `json:"aws,omitempty"`
 	Prometheus          *ReportingOperatorPrometheusConfig `json:"prometheus,omitempty"`
 	Hive                *ReportingOperatorHiveConfig       `json:"hive,omitempty"`
 	Presto              *ReportingOperatorPrestoConfig     `json:"presto,omitempty"`
@@ -281,8 +281,8 @@ type OpenshiftReportingConfig struct {
 }
 type OpenshiftReportingConfigSpec struct {
 	OpenshiftReportingDefaultStorageLocation     *OpenshiftReportingDefaultStorageLocationConfig     `json:"defaultStorageLocation,omitempty"`
-	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceConfig `json:"OpenshiftReportingawsBillingReportDataSource,omitempty"`
-	OpenshiftReportinDefaultReportDataSources    *OpenshiftReportinDefaultReportDataSourcesConfig    `json:"OpenshiftReportindefaultReportDataSources,omitempty"`
+	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceConfig `json:"awsBillingReportDataSource,omitempty"`
+	OpenshiftReportingDefaultReportDataSources   *OpenshiftReportingDefaultReportDataSourcesConfig   `json:"defaultReportDataSources,omitempty"`
 }
 type OpenshiftReportingDefaultStorageLocationConfig struct {
 	Enabled   *bool                                  `json:"enabled,omitempty"`
@@ -302,14 +302,14 @@ type OpenshiftReportingAWSBillingReportDataSourceConfig struct {
 	Prefix  string `json:"prefix,omitempty"`
 	Region  string `json:"region,omitempty"`
 }
-type OpenshiftReportinDefaultReportDataSourcesConfig struct {
-	Base            *OpenshiftReportinDefaultReportDataSourcesBaseConfig `json:"base,omitempty"`
-	PostKubeVersion *OpenshiftReportingPostKubeVersionConfig             `json:"postKube_1_14,omitempty"`
+type OpenshiftReportingDefaultReportDataSourcesConfig struct {
+	Base            *OpenshiftReportingDefaultReportDataSourcesBaseConfig `json:"base,omitempty"`
+	PostKubeVersion *OpenshiftReportingPostKubeVersionConfig              `json:"postKube_1_14,omitempty"`
 }
 type OpenshiftReportingPostKubeVersionConfig struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
-type OpenshiftReportinDefaultReportDataSourcesBaseConfig struct {
+type OpenshiftReportingDefaultReportDataSourcesBaseConfig struct {
 	Enabled *bool                                 `json:"enabled,omitempty"`
 	Items   []OpenshiftReportingReportQueryConfig `json:"items,omitempty"`
 }
@@ -318,7 +318,7 @@ type OpenshiftReportingReportQueryConfig struct {
 	Spec *OpenshiftReportingReportQueryConfigSpec `json:"spec,omitempty"`
 }
 type OpenshiftReportingReportQueryConfigSpec struct {
-	OpenshiftReportingReportQueryView *OpenshiftReportingReportQueryView `json:"OpenshiftReportingreportQueryView,omitempty"`
+	OpenshiftReportingReportQueryView *OpenshiftReportingReportQueryView `json:"reportQueryView,omitempty"`
 }
 type OpenshiftReportingReportQueryView struct {
 	QueryName string `json:"queryName,omitempty"`
@@ -375,6 +375,12 @@ type S3Config struct {
 	Region       string `json:"region,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
+type AWSConfig struct {
+	CreateSecret    *bool  `json:"createSecret,omitempty"`
+	AccessKeyID     string `json:"accessKeyID,omitempty"`
+	SecretAccessKey string `json:"secretAccessKey,omitempty"`
+	SecretName      string `json:"secretName,omitempty"`
+}
 type S3CompatibleConfig struct {
 	CreateSecret    *bool  `json:"createSecret,omitempty"`
 	AccessKeyID     string `json:"accessKeyID,omitempty"`
@@ -407,10 +413,10 @@ type PrestoSpec struct {
 	Worker          *PrestoWorkerSpec       `json:"worker,omitempty"`
 }
 type PrestoConfig struct {
-	Environment                     string                 `json:"environment,omitempty"`
 	NodeSchedulerIncludeCoordinator *bool                  `json:"nodeSchedulerIncludeCoordinator,omitempty"`
+	Environment                     string                 `json:"environment,omitempty"`
 	MaxQueryLength                  string                 `json:"maxQueryLength,omitempty"`
-	AWS                             *S3Config              `json:"aws,omitempty"`
+	AWS                             *AWSConfig             `json:"aws,omitempty"`
 	Azure                           *AzureConfig           `json:"azure,omitempty"`
 	Gcs                             *GCSConfig             `json:"gcs,omitempty"`
 	S3Compatible                    *S3CompatibleConfig    `json:"s3Compatible,omitempty"`
@@ -483,7 +489,7 @@ type HiveSpecConfig struct {
 	DefaultCompression           string                  `json:"defaultCompression,omitempty"`
 	DefaultFileFormat            string                  `json:"defaultFileFormat,omitempty"`
 	HadoopConfigSecretName       string                  `json:"hadoopConfigSecretName,omitempty"`
-	AWS                          *S3Config               `json:"aws,omitempty"`
+	AWS                          *AWSConfig              `json:"aws,omitempty"`
 	Azure                        *AzureConfig            `json:"azure,omitempty"`
 	Gcs                          *GCSConfig              `json:"gcs,omitempty"`
 	S3Compatible                 *S3CompatibleConfig     `json:"s3Compatible,omitempty"`
@@ -569,7 +575,7 @@ type HadoopHDFS struct {
 }
 type HadoopSpecConfig struct {
 	DefaultFS    string              `json:"defaultFS,omitempty"`
-	AWS          *S3Config           `json:"aws,omitempty"`
+	AWS          *AWSConfig          `json:"aws,omitempty"`
 	Azure        *AzureConfig        `json:"azure,omitempty"`
 	Gcs          *GCSConfig          `json:"gcs,omitempty"`
 	S3Compatible *S3CompatibleConfig `json:"s3Compatible,omitempty"`
