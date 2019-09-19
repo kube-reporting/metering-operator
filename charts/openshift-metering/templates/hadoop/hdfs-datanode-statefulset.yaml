@@ -117,7 +117,7 @@ spec:
       # would always be resolvable, because on Openshift, clusterIP services
       # NAT loses sourceIPs, breaking HDFS clustering.
       - name: wait-for-namenode
-        image: "{{ .Values.hadoop.spec.image.override | default (printf "%s:%s" .Values.hadoop.spec.image.repository .Values.hadoop.spec.image.tag) }}"
+        image: "{{ include "hadoop-image" . }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command:
         - '/bin/bash'
@@ -143,7 +143,7 @@ spec:
         - name: namenode-empty
           mountPath: /hadoop/dfs/name
       - name: copy-starter-hadoop
-        image: "{{ .Values.hadoop.spec.image.override | default (printf "%s:%s" .Values.hadoop.spec.image.repository .Values.hadoop.spec.image.tag) }}"
+        image: "{{ include "hadoop-image" . }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command: ["/hadoop-scripts/copy-hadoop-con***REMOVED***g.sh"]
         env:
@@ -177,7 +177,7 @@ spec:
           defaultMode: 0775
       containers:
       - name: hdfs-datanode
-        image: "{{ .Values.hadoop.spec.image.override | default (printf "%s:%s" .Values.hadoop.spec.image.repository .Values.hadoop.spec.image.tag) }}"
+        image: "{{ include "hadoop-image" . }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command: ["/hadoop-scripts/entrypoint.sh"]
         args: ["/hadoop-scripts/datanode-entrypoint.sh"]

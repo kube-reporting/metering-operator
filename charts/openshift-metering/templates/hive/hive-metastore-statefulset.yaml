@@ -72,7 +72,7 @@ spec:
 {{- end }}
       initContainers:
       - name: copy-starter-hive
-        image: "{{ .Values.hive.spec.image.override | default (printf "%s:%s" .Values.hive.spec.image.repository .Values.hive.spec.image.tag) }}"
+        image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         command: ["/hive-scripts/copy-hadoop-con***REMOVED***g.sh"]
 {{- if or .Values.hive.spec.con***REMOVED***g.azure.secretName .Values.hive.spec.con***REMOVED***g.azure.createSecret }}
@@ -108,7 +108,7 @@ spec:
       - name: metastore
         command: ["/hive-scripts/entrypoint.sh"]
         args: ["/opt/hive/bin/hive", "--service", "metastore"]
-        image: "{{ .Values.hive.spec.image.override | default (printf "%s:%s" .Values.hive.spec.image.repository .Values.hive.spec.image.tag) }}"
+        image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         ports:
 {{- if not .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
@@ -191,7 +191,7 @@ spec:
 {{ toYaml .Values.hive.spec.metastore.resources | indent 10 }}
 {{- if .Values.hive.spec.metastore.con***REMOVED***g.tls.enabled }}
       - name: ghostunnel-server
-        image: "{{ .Values.__ghostunnel.image.override | default (printf "%s:%s" .Values.__ghostunnel.image.repository .Values.__ghostunnel.image.tag) }}"
+        image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: HIVE_METASTORE_CA_CRTFILE

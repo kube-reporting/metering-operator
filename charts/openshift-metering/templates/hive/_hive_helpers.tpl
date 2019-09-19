@@ -36,3 +36,13 @@
       key: aws-secret-access-key
 {{- end }}
 {{- end }}
+
+{{- de***REMOVED***ne "hive-image" -}}
+{{- if or .Values.hive.spec.image.repository .Values.hive.spec.image.tag -}}
+{{- .Values.hive.spec.image.repository | default .Values.hive.spec.image.defaultRepository }}:{{ .Values.hive.spec.image.tag | default .Values.hive.spec.image.defaultTag -}}
+{{- ***REMOVED*** if .Values.hive.spec.image.defaultOverride -}}
+{{- .Values.hive.spec.image.defaultOverride -}}
+{{- ***REMOVED*** -}}
+{{-  .Values.hive.spec.image.defaultRepository }}:{{ .Values.hive.spec.image.defaultTag -}}
+{{- end -}}
+{{- end -}}
