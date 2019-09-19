@@ -39,11 +39,10 @@ function kubectl_files() {
 
 function install_metering() {
     INSTALL_METHOD=$1
-    echo "Installing metering using "$INSTALL_METHOD" install method"
-    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "generic-direct" ]]; then
-        "$ROOT_DIR/hack/install.sh"
-    elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
-        "$ROOT_DIR/hack/openshift-install.sh"
+    echo "Installing metering using the "$INSTALL_METHOD" install method"
+    if [[ "$INSTALL_METHOD" == "openshift" ]]; then
+        "$ROOT_DIR/bin/deploy-metering" install --log-level debug
+    # TODO: update the deploy package/cli to handle OLM
     elif [ "$INSTALL_METHOD" == "olm" ]; then
         "$ROOT_DIR/hack/olm-install.sh"
     else
@@ -54,11 +53,10 @@ function install_metering() {
 
 function uninstall_metering() {
     INSTALL_METHOD=$1
-    echo "Uninstalling metering using "$INSTALL_METHOD" uninstall method"
-    if [[ "$INSTALL_METHOD" == "direct" || "$INSTALL_METHOD" == "generic-direct" ]]; then
-        "$ROOT_DIR/hack/uninstall.sh"
-    elif [ "$INSTALL_METHOD" == "openshift-direct" ]; then
-        "$ROOT_DIR/hack/openshift-uninstall.sh"
+    echo "Uninstalling metering using the "$INSTALL_METHOD" uninstall method"
+    if [[ "$INSTALL_METHOD" == "openshift" ]]; then
+        "$ROOT_DIR/bin/deploy-metering" uninstall --log-level debug
+    # TODO: update the deploy package/cli to handle OLM
     elif [ "$INSTALL_METHOD" == "olm" ]; then
         "$ROOT_DIR/hack/olm-uninstall.sh"
     else
