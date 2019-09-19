@@ -100,7 +100,7 @@ End of structures re-used throughout the top-level keys
 */
 
 type ReportingOperator struct {
-	Spec ReportingOperatorSpec `json:"spec,omitempty"`
+	Spec *ReportingOperatorSpec `json:"spec,omitempty"`
 }
 type ReportingOperatorSpec struct {
 	Replicas       *int32                             `json:"replicas,omitempty"`
@@ -124,7 +124,7 @@ type ReportingOperatorCon***REMOVED***g struct {
 	LogReports          *bool                              `json:"logReports,omitempty"`
 	LogLevel            string                             `json:"logLevel,omitempty"`
 	LeaderLeaseDuration *meta.Duration                     `json:"leaderLeaseDuration,omitempty"`
-	AWS                 *S3Con***REMOVED***g                          `json:"aws,omitempty"`
+	AWS                 *AWSCon***REMOVED***g                         `json:"aws,omitempty"`
 	Prometheus          *ReportingOperatorPrometheusCon***REMOVED***g `json:"prometheus,omitempty"`
 	Hive                *ReportingOperatorHiveCon***REMOVED***g       `json:"hive,omitempty"`
 	Presto              *ReportingOperatorPrestoCon***REMOVED***g     `json:"presto,omitempty"`
@@ -281,8 +281,8 @@ type OpenshiftReportingCon***REMOVED***g struct {
 }
 type OpenshiftReportingCon***REMOVED***gSpec struct {
 	OpenshiftReportingDefaultStorageLocation     *OpenshiftReportingDefaultStorageLocationCon***REMOVED***g     `json:"defaultStorageLocation,omitempty"`
-	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceCon***REMOVED***g `json:"OpenshiftReportingawsBillingReportDataSource,omitempty"`
-	OpenshiftReportinDefaultReportDataSources    *OpenshiftReportinDefaultReportDataSourcesCon***REMOVED***g    `json:"OpenshiftReportindefaultReportDataSources,omitempty"`
+	OpenshiftReportingAWSBillingReportDataSource *OpenshiftReportingAWSBillingReportDataSourceCon***REMOVED***g `json:"awsBillingReportDataSource,omitempty"`
+	OpenshiftReportingDefaultReportDataSources   *OpenshiftReportingDefaultReportDataSourcesCon***REMOVED***g   `json:"defaultReportDataSources,omitempty"`
 }
 type OpenshiftReportingDefaultStorageLocationCon***REMOVED***g struct {
 	Enabled   *bool                                  `json:"enabled,omitempty"`
@@ -302,14 +302,14 @@ type OpenshiftReportingAWSBillingReportDataSourceCon***REMOVED***g struct {
 	Pre***REMOVED***x  string `json:"pre***REMOVED***x,omitempty"`
 	Region  string `json:"region,omitempty"`
 }
-type OpenshiftReportinDefaultReportDataSourcesCon***REMOVED***g struct {
-	Base            *OpenshiftReportinDefaultReportDataSourcesBaseCon***REMOVED***g `json:"base,omitempty"`
-	PostKubeVersion *OpenshiftReportingPostKubeVersionCon***REMOVED***g             `json:"postKube_1_14,omitempty"`
+type OpenshiftReportingDefaultReportDataSourcesCon***REMOVED***g struct {
+	Base            *OpenshiftReportingDefaultReportDataSourcesBaseCon***REMOVED***g `json:"base,omitempty"`
+	PostKubeVersion *OpenshiftReportingPostKubeVersionCon***REMOVED***g              `json:"postKube_1_14,omitempty"`
 }
 type OpenshiftReportingPostKubeVersionCon***REMOVED***g struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
-type OpenshiftReportinDefaultReportDataSourcesBaseCon***REMOVED***g struct {
+type OpenshiftReportingDefaultReportDataSourcesBaseCon***REMOVED***g struct {
 	Enabled *bool                                 `json:"enabled,omitempty"`
 	Items   []OpenshiftReportingReportQueryCon***REMOVED***g `json:"items,omitempty"`
 }
@@ -318,7 +318,7 @@ type OpenshiftReportingReportQueryCon***REMOVED***g struct {
 	Spec *OpenshiftReportingReportQueryCon***REMOVED***gSpec `json:"spec,omitempty"`
 }
 type OpenshiftReportingReportQueryCon***REMOVED***gSpec struct {
-	OpenshiftReportingReportQueryView *OpenshiftReportingReportQueryView `json:"OpenshiftReportingreportQueryView,omitempty"`
+	OpenshiftReportingReportQueryView *OpenshiftReportingReportQueryView `json:"reportQueryView,omitempty"`
 }
 type OpenshiftReportingReportQueryView struct {
 	QueryName string `json:"queryName,omitempty"`
@@ -375,6 +375,12 @@ type S3Con***REMOVED***g struct {
 	Region       string `json:"region,omitempty"`
 	SecretName   string `json:"secretName,omitempty"`
 }
+type AWSCon***REMOVED***g struct {
+	CreateSecret    *bool  `json:"createSecret,omitempty"`
+	AccessKeyID     string `json:"accessKeyID,omitempty"`
+	SecretAccessKey string `json:"secretAccessKey,omitempty"`
+	SecretName      string `json:"secretName,omitempty"`
+}
 type S3CompatibleCon***REMOVED***g struct {
 	CreateSecret    *bool  `json:"createSecret,omitempty"`
 	AccessKeyID     string `json:"accessKeyID,omitempty"`
@@ -407,10 +413,10 @@ type PrestoSpec struct {
 	Worker          *PrestoWorkerSpec       `json:"worker,omitempty"`
 }
 type PrestoCon***REMOVED***g struct {
-	Environment                     string                 `json:"environment,omitempty"`
 	NodeSchedulerIncludeCoordinator *bool                  `json:"nodeSchedulerIncludeCoordinator,omitempty"`
+	Environment                     string                 `json:"environment,omitempty"`
 	MaxQueryLength                  string                 `json:"maxQueryLength,omitempty"`
-	AWS                             *S3Con***REMOVED***g              `json:"aws,omitempty"`
+	AWS                             *AWSCon***REMOVED***g             `json:"aws,omitempty"`
 	Azure                           *AzureCon***REMOVED***g           `json:"azure,omitempty"`
 	Gcs                             *GCSCon***REMOVED***g             `json:"gcs,omitempty"`
 	S3Compatible                    *S3CompatibleCon***REMOVED***g    `json:"s3Compatible,omitempty"`
@@ -483,7 +489,7 @@ type HiveSpecCon***REMOVED***g struct {
 	DefaultCompression           string                  `json:"defaultCompression,omitempty"`
 	DefaultFileFormat            string                  `json:"defaultFileFormat,omitempty"`
 	HadoopCon***REMOVED***gSecretName       string                  `json:"hadoopCon***REMOVED***gSecretName,omitempty"`
-	AWS                          *S3Con***REMOVED***g               `json:"aws,omitempty"`
+	AWS                          *AWSCon***REMOVED***g              `json:"aws,omitempty"`
 	Azure                        *AzureCon***REMOVED***g            `json:"azure,omitempty"`
 	Gcs                          *GCSCon***REMOVED***g              `json:"gcs,omitempty"`
 	S3Compatible                 *S3CompatibleCon***REMOVED***g     `json:"s3Compatible,omitempty"`
@@ -569,7 +575,7 @@ type HadoopHDFS struct {
 }
 type HadoopSpecCon***REMOVED***g struct {
 	DefaultFS    string              `json:"defaultFS,omitempty"`
-	AWS          *S3Con***REMOVED***g           `json:"aws,omitempty"`
+	AWS          *AWSCon***REMOVED***g          `json:"aws,omitempty"`
 	Azure        *AzureCon***REMOVED***g        `json:"azure,omitempty"`
 	Gcs          *GCSCon***REMOVED***g          `json:"gcs,omitempty"`
 	S3Compatible *S3CompatibleCon***REMOVED***g `json:"s3Compatible,omitempty"`
