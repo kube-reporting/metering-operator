@@ -16,7 +16,7 @@ import (
 func (deploy *Deployer) uninstallNamespace() error {
 	err := deploy.client.CoreV1().Namespaces().Delete(deploy.config.Namespace, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
-		return fmt.Errorf("The %s namespace doesn't exist", deploy.config.Namespace)
+		deploy.logger.Warnf("The %s namespace doesn't exist", deploy.config.Namespace)
 	} else if err == nil {
 		deploy.logger.Infof("Deleted the %s namespace", deploy.config.Namespace)
 	} else {
@@ -47,33 +47,33 @@ func (deploy *Deployer) uninstallMeteringConfig() error {
 }
 
 func (deploy *Deployer) uninstallMeteringResources() error {
-	err := deploy.uninstallMeteringDeployment(filepath.Join(deploy.config.ManifestLocation, meteringDeploymentFile))
+	err := deploy.uninstallMeteringDeployment(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringDeploymentFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.uninstallMeteringServiceAccount(filepath.Join(deploy.config.ManifestLocation, meteringServiceAccountFile))
+	err = deploy.uninstallMeteringServiceAccount(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringServiceAccountFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.uninstallMeteringRole(filepath.Join(deploy.config.ManifestLocation, meteringRoleFile))
+	err = deploy.uninstallMeteringRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role: %v", err)
 	}
 
-	err = deploy.uninstallMeteringRoleBinding(filepath.Join(deploy.config.ManifestLocation, meteringRoleBindingFile))
+	err = deploy.uninstallMeteringRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role binding: %v", err)
 	}
 
 	if deploy.config.DeleteCRB {
-		err = deploy.uninstallMeteringClusterRole(filepath.Join(deploy.config.ManifestLocation, meteringClusterRoleFile))
+		err = deploy.uninstallMeteringClusterRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleFile))
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role: %v", err)
 		}
 
-		err = deploy.uninstallMeteringClusterRoleBinding(filepath.Join(deploy.config.ManifestLocation, meteringClusterRoleBindingFile))
+		err = deploy.uninstallMeteringClusterRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleBindingFile))
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role binding: %v", err)
 		}

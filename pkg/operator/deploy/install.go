@@ -73,7 +73,7 @@ func (deploy *Deployer) installMeteringConfig() error {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
 
-	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get("operator-metering", metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(&res)
 		if err != nil {
@@ -96,32 +96,32 @@ func (deploy *Deployer) installMeteringConfig() error {
 }
 
 func (deploy *Deployer) installMeteringResources() error {
-	err := deploy.installMeteringDeployment(filepath.Join(deploy.config.ManifestLocation, meteringDeploymentFile))
+	err := deploy.installMeteringDeployment(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringDeploymentFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering deployment: %v", err)
 	}
 
-	err = deploy.installMeteringServiceAccount(filepath.Join(deploy.config.ManifestLocation, meteringServiceAccountFile))
+	err = deploy.installMeteringServiceAccount(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringServiceAccountFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering service account: %v", err)
 	}
 
-	err = deploy.installMeteringRole(filepath.Join(deploy.config.ManifestLocation, meteringRoleFile))
+	err = deploy.installMeteringRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role: %v", err)
 	}
 
-	err = deploy.installMeteringRoleBinding(filepath.Join(deploy.config.ManifestLocation, meteringRoleBindingFile))
+	err = deploy.installMeteringRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role binding: %v", err)
 	}
 
-	err = deploy.installMeteringClusterRole(filepath.Join(deploy.config.ManifestLocation, meteringClusterRoleFile))
+	err = deploy.installMeteringClusterRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role: %v", err)
 	}
 
-	err = deploy.installMeteringClusterRoleBinding(filepath.Join(deploy.config.ManifestLocation, meteringClusterRoleBindingFile))
+	err = deploy.installMeteringClusterRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleBindingFile))
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role binding: %v", err)
 	}

@@ -53,37 +53,37 @@ func (deploy *Deployer) initMeteringCRDSlice() {
 
 	crds = append(crds, CRD{
 		Name: "hivetables.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, hivetableFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, hivetableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "prestotables.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, prestotableFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, prestotableFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "storagelocations.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, storagelocationFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, storagelocationFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reports.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, reportFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, reportFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportqueries.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, reportqueryFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, reportqueryFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "reportdatasources.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, reportdatasourceFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, reportdatasourceFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 	crds = append(crds, CRD{
 		Name: "meteringconfigs.metering.openshift.io",
-		Path: filepath.Join(deploy.config.ManifestLocation, meteringconfigFile),
+		Path: filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringconfigFile),
 		CRD:  new(apiextv1beta1.CustomResourceDefinition),
 	})
 
