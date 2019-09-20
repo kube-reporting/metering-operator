@@ -283,14 +283,7 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 				importStatus.NewestImportedMetricTime = &metav1.Time{Time: lastMetric.Timestamp}
 			}
 
-			if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
-				logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
-			}
-			if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
-				logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
-			}
 		}
-
 		// Update the status to indicate where we are in the metric import process
 		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
@@ -299,6 +292,16 @@ func (op *Reporting) handlePrometheusMetricsDataSource(logger log.FieldLogger, d
 		if err != nil {
 			return fmt.Errorf("unable to update ReportDataSource %s PrometheusMetricsImportStatus: %v", dataSource.Name, err)
 		}
+
+		// Queue after the status is updated since other resources check the
+		// status
+		if err := op.queueDependentReportsForDataSource(dataSource); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+		}
+		if err := op.queueDependentReportDataSourcesForDataSource(dataSource); err != nil {
+			logger.WithError(err).Errorf("error queuing Report dependents of ReportDataSource %s", dataSource.Name)
+		}
+
 	}
 
 	nextImport := op.clock.Now().Add(importDelay).UTC()
