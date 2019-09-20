@@ -100,3 +100,13 @@ connector.name=tpch
       key: aws-secret-access-key
 {{- end }}
 {{- end }}
+
+{{- de***REMOVED***ne "presto-image" -}}
+{{- if or .Values.presto.spec.image.repository .Values.presto.spec.image.tag -}}
+{{- .Values.presto.spec.image.repository | default .Values.presto.spec.image.defaultRepository }}:{{ .Values.presto.spec.image.tag | default .Values.presto.spec.image.defaultTag -}}
+{{- ***REMOVED*** if .Values.presto.spec.image.defaultOverride -}}
+{{- .Values.presto.spec.image.defaultOverride -}}
+{{- ***REMOVED*** -}}
+{{-  .Values.presto.spec.image.defaultRepository }}:{{ .Values.presto.spec.image.defaultTag -}}
+{{- end -}}
+{{- end -}}

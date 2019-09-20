@@ -110,7 +110,7 @@ spec:
 {{- end }}
       initContainers:
       - name: copy-starter-hadoop
-        image: "{{ .Values.hadoop.spec.image.override | default (printf "%s:%s" .Values.hadoop.spec.image.repository .Values.hadoop.spec.image.tag) }}"
+        image: "{{ include "hadoop-image" . }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command: ["/hadoop-scripts/copy-hadoop-con***REMOVED***g.sh"]
         env:
@@ -139,7 +139,7 @@ spec:
 {{- end }}
       containers:
       - name: hdfs-namenode
-        image: "{{ .Values.hadoop.spec.image.override | default (printf "%s:%s" .Values.hadoop.spec.image.repository .Values.hadoop.spec.image.tag) }}"
+        image: "{{ include "hadoop-image" . }}"
         imagePullPolicy: {{ .Values.hadoop.spec.image.pullPolicy }}
         command: ["/hadoop-scripts/entrypoint.sh"]
         args: ["/hadoop-scripts/namenode-entrypoint.sh"]
