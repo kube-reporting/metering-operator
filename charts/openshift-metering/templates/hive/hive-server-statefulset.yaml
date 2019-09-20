@@ -73,7 +73,7 @@ spec:
       initContainers:
 {{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
       - name: copy-hive-tls
-        image: "{{ .Values.__ghostunnel.image.override | default (printf "%s:%s" .Values.__ghostunnel.image.repository .Values.__ghostunnel.image.tag) }}"
+        image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
@@ -97,7 +97,7 @@ spec:
           mountPath: /hive-metastore-auth-tls-secrets
 {{- end }}
       - name: copy-starter-hive
-        image: "{{ .Values.hive.spec.image.override | default (printf "%s:%s" .Values.hive.spec.image.repository .Values.hive.spec.image.tag) }}"
+        image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         command: ["/hive-scripts/copy-hadoop-config.sh"]
 {{- if or .Values.hive.spec.config.azure.secretName .Values.hive.spec.config.azure.createSecret }}
@@ -133,7 +133,7 @@ spec:
       - name: hiveserver2
         command: ["/hive-scripts/entrypoint.sh"]
         args: ["/opt/hive/bin/hive", "--service", "hiveserver2"]
-        image: "{{ .Values.hive.spec.image.override | default (printf "%s:%s" .Values.hive.spec.image.repository .Values.hive.spec.image.tag) }}"
+        image: "{{ include "hive-image" . }}"
         imagePullPolicy: {{ .Values.hive.spec.image.pullPolicy }}
         ports:
 {{- if not .Values.hive.spec.server.config.tls.enabled }}
@@ -219,7 +219,7 @@ spec:
 {{ toYaml .Values.hive.spec.server.resources | indent 10 }}
 {{- if .Values.hive.spec.server.config.metastoreTLS.enabled }}
       - name: ghostunnel-client
-        image: "{{ .Values.__ghostunnel.image.override | default (printf "%s:%s" .Values.__ghostunnel.image.repository .Values.__ghostunnel.image.tag) }}"
+        image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
@@ -243,7 +243,7 @@ spec:
 {{- end }}
 {{- if .Values.hive.spec.server.config.tls.enabled }}
       - name: ghostunnel-server
-        image: "{{ .Values.__ghostunnel.image.override | default (printf "%s:%s" .Values.__ghostunnel.image.repository .Values.__ghostunnel.image.tag) }}"
+        image: "{{ include "ghostunnel-image" . }}"
         imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
         env:
         - name: GHOSTUNNEL_SERVER_CA_CRTFILE
