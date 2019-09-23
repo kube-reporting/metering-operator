@@ -191,7 +191,7 @@ verify-docker: metering-src-docker-build
 		make verify
 
 .PHONY: run-metering-operator-local
-run-metering-operator-local: metering-ansible-operator-docker-build
+run-metering-operator-local: $(DEPLOY_METERING_BIN_OUT) metering-ansible-operator-docker-build
 	export \
 		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
