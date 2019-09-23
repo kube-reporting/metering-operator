@@ -64,11 +64,11 @@ CHECK_GO_FILES ?= true
 REPORTING_OPERATOR_BIN_DEPENDENCIES =
 CODEGEN_SOURCE_GO_FILES =
 CODEGEN_OUTPUT_GO_FILES =
-REPORTING_OPERATOR_GO_FILES =
+GOFILES =
 
 # Adds all the Go files in the repo as a dependency to the build-reporting-operator target
 ifeq ($(CHECK_GO_FILES), true)
-	REPORTING_OPERATOR_GO_FILES := $(shell find $(ROOT_DIR) -name '*.go')
+	GOFILES := $(shell find $(ROOT_DIR) -name '*.go' | grep -v -E '(./vendor)')
 endif
 
 # Adds the update-codegen dependency to the build-reporting-operator target
@@ -191,7 +191,7 @@ verify-docker: metering-src-docker-build
 		make verify
 
 .PHONY: run-metering-operator-local
-run-metering-operator-local: metering-ansible-operator-docker-build
+run-metering-operator-local: $(DEPLOY_METERING_BIN_OUT) metering-ansible-operator-docker-build
 	export \
 		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
@@ -199,17 +199,17 @@ run-metering-operator-local: metering-ansible-operator-docker-build
 
 reporting-operator-bin: $(REPORTING_OPERATOR_BIN_OUT)
 
-reporting-operator-local: $(REPORTING_OPERATOR_GO_FILES)
+reporting-operator-local: $(GOFILES)
 	$(MAKE) build-reporting-operator REPORTING_OPERATOR_BIN_OUT=$(REPORTING_OPERATOR_BIN_OUT_LOCAL) GOOS=$(shell go env GOOS)
 
 .PHONY: run-reporting-operator-local
 run-reporting-operator-local: reporting-operator-local
 	./hack/run-reporting-operator-local.sh $(REPORTING_OPERATOR_ARGS)
 
-$(REPORTING_OPERATOR_BIN_OUT): $(REPORTING_OPERATOR_GO_FILES)
+$(REPORTING_OPERATOR_BIN_OUT): $(GOFILES)
 	$(MAKE) build-reporting-operator
 
-build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(REPORTING_OPERATOR_GO_FILES)
+build-reporting-operator: $(REPORTING_OPERATOR_BIN_DEPENDENCIES) $(GOFILES)
 	@:$(call check_defined, REPORTING_OPERATOR_BIN_OUT, Path to output binary location)
 	mkdir -p $(dir $(REPORTING_OPERATOR_BIN_OUT))
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) go build $(GO_BUILD_ARGS) -o $(REPORTING_OPERATOR_BIN_OUT) $(REPORTING_OPERATOR_PKG)
@@ -223,7 +223,7 @@ metering-manifests:
 $(TEST2JSON_BIN_OUT): gotools/test2json/main.go
 	go build -o $(TEST2JSON_BIN_OUT) gotools/test2json/main.go
 
-$(DEPLOY_METERING_BIN_OUT): cmd/deploy-metering/main.go
+$(DEPLOY_METERING_BIN_OUT): $(GOFILES)
 	go build -o $(DEPLOY_METERING_BIN_OUT) $(GO_PKG)/cmd/deploy-metering
 
 .PHONY: \
