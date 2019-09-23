@@ -8,7 +8,8 @@ source "${ROOT_DIR}/hack/common.sh"
 
 : "${UNINSTALL_METERING_BEFORE_INSTALL:=true}"
 : "${INSTALL_METERING:=true}"
-: "${INSTALL_METHOD:=openshift-direct}"
+: "${INSTALL_METHOD:=openshift}"
+: "${UNINSTALL_METHOD:=openshift}"
 : "${METERING_CREATE_PULL_SECRET:=false}"
 : "${METERING_PULL_SECRET_NAME:=metering-pull-secret}"
 : "${DEPLOY_METERING_OPERATOR_LOCAL:=false}"
@@ -20,7 +21,8 @@ if [ "$METERING_CREATE_PULL_SECRET" == "true" ]; then
 
 if [ "$UNINSTALL_METERING_BEFORE_INSTALL" == "true" ]; then
     echo "Uninstalling metering"
-    kubectl delete ns "$METERING_NAMESPACE" || true
+    export METERING_DELETE_NAMESPACE=true
+    uninstall_metering "${UNINSTALL_METHOD}"
 ***REMOVED***
     echo "Skipping uninstall"
 ***REMOVED***
@@ -128,4 +130,3 @@ if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
     done
     echo "reporting-operator is healthy"
 ***REMOVED***
-
