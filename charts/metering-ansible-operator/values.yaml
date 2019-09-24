@@ -233,7 +233,7 @@ olm:
 
       * **Con***REMOVED***gure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.2/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-aws-billing-correlation.html).
 
-      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.2/metering/metering-about-reports.html#metering-reports_metering-about-reports).
+      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.2/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
     keywords: ['metering', 'metrics', 'reporting', 'prometheus', 'chargeback']
     icon:
