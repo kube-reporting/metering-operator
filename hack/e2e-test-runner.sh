@@ -13,6 +13,7 @@
 : "${DEPLOY_METERING:=true}"
 : "${TEST_METERING:=true}"
 : "${CLEANUP_METERING_NAMESPACE:=true}"
+: "${UNINSTALL_METHOD:=openshift}"
 # can be deploy.sh, deploy-custom.sh, deploy-e2e.sh, deploy-integration.sh
 : "${DEPLOY_SCRIPT:=deploy.sh}"
 : "${TEST_OUTPUT_PATH:="$(mktemp -d)"}"
@@ -170,8 +171,8 @@ function cleanup() {
     done <<< "$REPORTS"
 
     if [ "$CLEANUP_METERING_NAMESPACE" == "true" ]; then
-        echo "Deleting namespace"
-        kubectl delete ns "$METERING_NAMESPACE" || true
+        export METERING_DELETE_NAMESPACE="true"
+        uninstall_metering "${UNINSTALL_METHOD}"
     fi
 
     if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
