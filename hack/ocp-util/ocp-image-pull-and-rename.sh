@@ -12,8 +12,8 @@ docker tag 'rhel7:7-released' 'rhel7'
 docker tag 'rhel7:7-released' 'rhel'
 
 # golang
-docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golang-builder:1.10'
-docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golang-builder:1.10' openshift/golang-builder:1.10
+docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golang-builder:1.12'
+docker tag 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/golang-builder:1.12' openshift/golang-builder:1.12
 
 # openshift base
 docker pull 'brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/openshift/ose-base:latest'

@@ -4,7 +4,7 @@ This document describes setting up your environment, as well as installing Meter
 
 ## Development Dependencies
 
-- Go 1.10 or higher
+- Go 1.12 or higher
 - Helm CLI 2.6.2 or higher
 - Make
 - Docker
