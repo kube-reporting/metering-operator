@@ -72,9 +72,9 @@ func NewPrometheusImporter(logger logrus.FieldLogger, promConn prom.API, prometh
 		logger:                logger,
 		promConn:              promConn,
 		prometheusMetricsRepo: prometheusMetricsRepo,
-		clock:             clock,
-		cfg:               cfg,
-		metricsCollectors: collectors,
+		clock:                 clock,
+		cfg:                   cfg,
+		metricsCollectors:     collectors,
 	}
 }
 
