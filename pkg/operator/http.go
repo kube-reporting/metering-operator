@@ -38,7 +38,7 @@ var ErrReportIsRunning = errors.New("the report is still running")
 var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
-	APIV1ReportsGetEndpoint        = "/api/v1/reports/get"
+	APIV1ReportGetEndpoint         = "/api/v1/reports/get"
 	APIV2ReportEndpointPre***REMOVED***x      = "/api/v2/reports"
 	APIV2ReportQueryEndpointPre***REMOVED***x = "/api/v2/reportqueries"
 )
@@ -101,7 +101,7 @@ func newRouter(
 	router.HandleFunc(APIV2ReportEndpointPre***REMOVED***x+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
 	router.HandleFunc(APIV2ReportEndpointPre***REMOVED***x+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
 	router.HandleFunc(APIV2ReportQueryEndpointPre***REMOVED***x+"/{namespace}/{name}/render", srv.renderReportQueryV2Handler)
-	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
+	router.HandleFunc(APIV1ReportGetEndpoint, srv.getReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPrometheusMetricsDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPrometheusMetricsDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/store/{namespace}/{datasourceName}", srv.storePrometheusMetricsDataHandler)
@@ -512,7 +512,7 @@ func (srv *server) collectPrometheusMetricsDataHandler(w http.ResponseWriter, r 
 	var req CollectPrometheusMetricsDataRequest
 	err := decoder.Decode(&req)
 	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode request as JSON: %v", err)
 		return
 	}
 
@@ -545,7 +545,7 @@ func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 	// read opening bracket
 	_, err := decoder.Token()
 	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode request as JSON: %v", err)
 		return
 	}
 
@@ -555,7 +555,7 @@ func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 		var m prestostore.PrometheusMetric
 		err = decoder.Decode(&m)
 		if err != nil {
-			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+			writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode request as JSON: %v", err)
 			return
 		}
 		metrics = append(metrics, &m)
@@ -564,7 +564,7 @@ func (srv *server) storePrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 	// read closing bracket
 	_, err = decoder.Token()
 	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode request as JSON: %v", err)
 		return
 	}
 
@@ -699,7 +699,7 @@ func (srv *server) renderReportQueryV2Handler(w http.ResponseWriter, r *http.Req
 	var req RenderReportQueryRequest
 	err = decoder.Decode(&req)
 	if err != nil {
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode request as JSON: %v", err)
 		return
 	}
 
