@@ -21,11 +21,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
 	listers "github.com/operator-framework/operator-metering/pkg/generated/listers/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
+	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
 	"github.com/operator-framework/operator-metering/pkg/presto"
 	"github.com/operator-framework/operator-metering/pkg/util/chiprometheus"
@@ -36,8 +38,9 @@ var ErrReportIsRunning = errors.New("the report is still running")
 var prometheusMiddleware = chiprometheus.NewMiddleware("reporting-operator")
 
 const (
-	APIV1ReportsGetEndpoint    = "/api/v1/reports/get"
-	APIV2ReportsEndpointPrefix = "/api/v2/reports"
+	APIV1ReportsGetEndpoint        = "/api/v1/reports/get"
+	APIV2ReportEndpointPrefix      = "/api/v2/reports"
+	APIV2ReportQueryEndpointPrefix = "/api/v2/reportqueries"
 )
 
 type server struct {
@@ -48,6 +51,7 @@ type server struct {
 
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo
 	reportResultsGetter   prestostore.ReportResultsGetter
+	dependencyResolver    DependencyResolver
 
 	reportLister           listers.ReportLister
 	reportDataSourceLister listers.ReportDataSourceLister
@@ -68,6 +72,7 @@ func newRouter(
 	rand *rand.Rand,
 	prometheusMetricsRepo prestostore.PrometheusMetricsRepo,
 	reportResultsGetter prestostore.ReportResultsGetter,
+	depResolver DependencyResolver,
 	collectorFunc prometheusImporterFunc,
 	reportLister listers.ReportLister,
 	reportDataSourceLister listers.ReportDataSourceLister,
@@ -86,14 +91,16 @@ func newRouter(
 		collectorFunc:          collectorFunc,
 		prometheusMetricsRepo:  prometheusMetricsRepo,
 		reportResultsGetter:    reportResultsGetter,
+		dependencyResolver:     depResolver,
 		reportLister:           reportLister,
 		reportDataSourceLister: reportDataSourceLister,
 		reportQueryLister:      reportQueryLister,
 		prestoTableLister:      prestoTableLister,
 	}
 
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
-	router.HandleFunc(APIV2ReportsEndpointPrefix+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
+	router.HandleFunc(APIV2ReportEndpointPrefix+"/{namespace}/{name}/full", srv.getReportV2FullHandler)
+	router.HandleFunc(APIV2ReportEndpointPrefix+"/{namespace}/{name}/table", srv.getReportV2TableHandler)
+	router.HandleFunc(APIV2ReportQueryEndpointPrefix+"/{namespace}/{name}/render", srv.renderReportQueryV2Handler)
 	router.HandleFunc(APIV1ReportsGetEndpoint, srv.getReportV1Handler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}", srv.collectPrometheusMetricsDataHandler)
 	router.HandleFunc("/api/v1/datasources/prometheus/collect/{namespace}/{datasourceName}", srv.collectPrometheusMetricsDataHandler)
@@ -199,8 +206,8 @@ func (srv *server) getReport(logger log.FieldLogger, name, namespace, format str
 
 	reportQuery, err := srv.reportQueryLister.ReportQueries(report.Namespace).Get(report.Spec.QueryName)
 	if err != nil {
-		logger.WithError(err).Errorf("error getting report: %v", err)
-		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting report: %v", err)
+		logger.WithError(err).Errorf("error getting reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting reportQuery: %v", err)
 		return
 	}
 
@@ -669,4 +676,109 @@ func (srv *server) fetchPrometheusMetricsDataHandler(w http.ResponseWriter, r *h
 	}
 
 	writeResponseAsJSON(logger, w, http.StatusOK, results)
+}
+
+type RenderReportQueryRequest struct {
+	Inputs metering.ReportQueryInputValues `json:"inputs,omitempty"`
+	Start  time.Time                       `json:"start,omitempty"`
+	End    time.Time                       `json:"end,omitempty"`
+}
+
+func (srv *server) renderReportQueryV2Handler(w http.ResponseWriter, r *http.Request) {
+	logger := newRequestLogger(srv.logger, r, srv.rand)
+
+	name := chi.URLParam(r, "name")
+	namespace := chi.URLParam(r, "namespace")
+	err := r.ParseForm()
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode body: %v", err)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var req RenderReportQueryRequest
+	err = decoder.Decode(&req)
+	if err != nil {
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "unable to decode response as JSON: %v", err)
+		return
+	}
+
+	reportQuery, err := srv.reportQueryLister.ReportQueries(namespace).Get(name)
+	if err != nil {
+		logger.WithError(err).Errorf("error getting reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting reportQuery: %v", err)
+		return
+	}
+
+	deps, err := srv.dependencyResolver.ResolveDependencies(namespace, reportQuery.Spec.Inputs, req.Inputs)
+	if err != nil {
+		logger.WithError(err).Errorf("error resolving reportQuery dependencies: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error resolving reportQuery dependencies: %v", err)
+		return
+
+	}
+
+	prestoTables, err := srv.prestoTableLister.PrestoTables(namespace).List(labels.Everything())
+	if err != nil {
+		logger.WithError(err).Errorf("error getting resources to render reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting resources to render reportQuery: %v", err)
+		return
+
+	}
+
+	reports, err := srv.reportLister.Reports(namespace).List(labels.Everything())
+	if err != nil {
+		logger.WithError(err).Errorf("error getting resources to render reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting resources to render reportQuery: %v", err)
+		return
+
+	}
+
+	datasources, err := srv.reportDataSourceLister.ReportDataSources(namespace).List(labels.Everything())
+	if err != nil {
+		logger.WithError(err).Errorf("error getting resources to render reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting resources to render reportQuery: %v", err)
+		return
+
+	}
+
+	queries, err := srv.reportQueryLister.ReportQueries(namespace).List(labels.Everything())
+	if err != nil {
+		logger.WithError(err).Errorf("error getting resources to render reportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error getting resources to render reportQuery: %v", err)
+		return
+
+	}
+
+	requiredInputs := reportingutil.ConvertInputDefinitionsIntoInputList(reportQuery.Spec.Inputs)
+	queryCtx := &reporting.ReportQueryTemplateContext{
+		Namespace:         namespace,
+		Query:             reportQuery.Spec.Query,
+		RequiredInputs:    requiredInputs,
+		Reports:           reports,
+		ReportQueries:     queries,
+		ReportDataSources: datasources,
+		PrestoTables:      prestoTables,
+	}
+	tmplCtx := reporting.TemplateContext{
+		Report: reporting.ReportTemplateInfo{
+			ReportingStart: &req.Start,
+			ReportingEnd:   &req.End,
+			Inputs:         deps.InputValues,
+		},
+	}
+
+	// Render the query template
+	query, err := reporting.RenderQuery(queryCtx, tmplCtx)
+	if err != nil {
+		logger.WithError(err).Errorf("error rendering ReportQuery: %v", err)
+		writeErrorResponse(logger, w, r, http.StatusInternalServerError, "error rendering ReportQuery: %v", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	if _, err = fmt.Fprint(w, query); err != nil {
+		logger.WithError(err).Error("failed writing HTTP response")
+	}
 }

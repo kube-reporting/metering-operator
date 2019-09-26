@@ -541,7 +541,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 	op.logger.Infof("starting HTTP server")
 	apiRouter := newRouter(
-		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.importPrometheusForTimeRange,
+		op.logger, op.rand, op.prometheusMetricsRepo, op.reportResultsRepo, op.dependencyResolver, op.importPrometheusForTimeRange,
 		op.reportLister, op.reportDataSourceLister, op.reportQueryLister, op.prestoTableLister,
 	)
 	apiRouter.HandleFunc("/ready", op.readinessHandler)
