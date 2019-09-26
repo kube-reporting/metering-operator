@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -66,22 +65,15 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringConfig() error {
-	var res meteringv1.MeteringConfig
-
-	err := decodeYAMLManifestToObject(deploy.config.MeteringCR, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
-	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(res.Name, metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(&res)
+		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(&deploy.config.MeteringConfig)
 		if err != nil {
 			return fmt.Errorf("Failed to create the MeteringConfig resource: %v", err)
 		}
 		deploy.logger.Infof("Created the MeteringConfig resource")
 	} else if err == nil {
-		mc.Spec = res.Spec
+		mc.Spec = deploy.config.MeteringConfig.Spec
 
 		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Update(mc)
 		if err != nil {
@@ -132,7 +124,7 @@ func (deploy *Deployer) installMeteringResources() error {
 func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
 	var res appsv1.Deployment
 
-	err := decodeYAMLManifestToObject(deploymentName, &res)
+	err := DecodeYAMLManifestToObject(deploymentName, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the metering YAML manifest: %v", err)
 	}
@@ -174,7 +166,7 @@ func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
 func (deploy *Deployer) installMeteringServiceAccount(serviceAccountPath string) error {
 	var res corev1.ServiceAccount
 
-	err := decodeYAMLManifestToObject(serviceAccountPath, &res)
+	err := DecodeYAMLManifestToObject(serviceAccountPath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -198,7 +190,7 @@ func (deploy *Deployer) installMeteringServiceAccount(serviceAccountPath string)
 func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error {
 	var res rbacv1.RoleBinding
 
-	err := decodeYAMLManifestToObject(roleBindingPath, &res)
+	err := DecodeYAMLManifestToObject(roleBindingPath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -231,7 +223,7 @@ func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error
 func (deploy *Deployer) installMeteringRole(rolePath string) error {
 	var res rbacv1.Role
 
-	err := decodeYAMLManifestToObject(rolePath, &res)
+	err := DecodeYAMLManifestToObject(rolePath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -258,7 +250,7 @@ func (deploy *Deployer) installMeteringRole(rolePath string) error {
 func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile string) error {
 	var res rbacv1.ClusterRoleBinding
 
-	err := decodeYAMLManifestToObject(clusterrolebindingFile, &res)
+	err := DecodeYAMLManifestToObject(clusterrolebindingFile, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -289,7 +281,7 @@ func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile
 func (deploy *Deployer) installMeteringClusterRole(clusterrolePath string) error {
 	var res rbacv1.ClusterRole
 
-	err := decodeYAMLManifestToObject(clusterrolePath, &res)
+	err := DecodeYAMLManifestToObject(clusterrolePath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -324,7 +316,7 @@ func (deploy *Deployer) installMeteringCRDs() error {
 }
 
 func (deploy *Deployer) installMeteringCRD(resource CRD) error {
-	err := decodeYAMLManifestToObject(resource.Path, resource.CRD)
+	err := DecodeYAMLManifestToObject(resource.Path, resource.CRD)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}

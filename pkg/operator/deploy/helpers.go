@@ -28,10 +28,10 @@ func getBoolEnv(env string, defaultVal bool) (bool, error) {
 	return val, nil
 }
 
-// decodeYAMLManifestToObject is a helper function that takes the path to a manifest file, e.g. the
+// DecodeYAMLManifestToObject is a helper function that takes the path to a manifest file, e.g. the
 // deployment YAML file, and opens that file using os.Open, which returns an io.Reader object that
 // can be passed to the YAML/JSON decoder to build up the @resource parameter for usage in the clientsets.
-func decodeYAMLManifestToObject(path string, resource interface{}) error {
+func DecodeYAMLManifestToObject(path string, resource interface{}) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Failed to open %s, got: %v", path, err)
