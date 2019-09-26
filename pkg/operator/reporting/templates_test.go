@@ -119,7 +119,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName ...>: error calling dataSourceTableName: %s tableRef is empty", ds2.Name),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName .Report.Inputs.MissingDataSourceTableRef>: error calling dataSourceTableName: %s tableRef is empty", ds2.Name),
 		},
 		{
 			name: "valid report query with valid templating but the presto table's table ref returns error",
@@ -137,7 +137,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName ...>: error calling dataSourceTableName: tableRef PrestoTable %s not found", ds1.Status.TableRef.Name),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName .Report.Inputs.MissingPrestoTableRef>: error calling dataSourceTableName: tableRef PrestoTable %s not found", ds1.Status.TableRef.Name),
 		},
 		{
 			name: "ReportDataSource dependencies were not found (due to empty prestoTable.Name) results in error",
@@ -155,7 +155,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName ...>: error calling dataSourceTableName: ReportDataSource  dependency not found",
+			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <dataSourceTableName .Report.Inputs.EmptyPrestoTableName>: error calling dataSourceTableName: ReportDataSource  dependency not found",
 		},
 		{
 			name: "Report dependency was not found (due to no reports) returns error",
@@ -172,7 +172,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Rep...>: error calling reportTableName: Report %s dependency not found", testReportName),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Report.Inputs.MissingReportsField>: error calling reportTableName: Report %s dependency not found", testReportName),
 		},
 		{
 			name: "Report dependency was not found (due to missing Report.Name) returns error",
@@ -192,7 +192,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Rep...>: error calling reportTableName: Report %s dependency not found", testReportName),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Report.Inputs.MissingReportNameInReportsField>: error calling reportTableName: Report %s dependency not found", testReportName),
 		},
 		{
 			name: "Report dependency was not found (due to Report.Name not matching name) returns error",
@@ -213,7 +213,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Rep...>: error calling reportTableName: Report this-does-not-match dependency not found",
+			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Report.Inputs.ReportNameDoesNotMatchInputName>: error calling reportTableName: Report this-does-not-match dependency not found",
 		},
 		{
 			name: "invalid reportTableName templating (Status.TableRef.Name is missing) results in error and the expected errror output",
@@ -232,7 +232,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Rep...>: error calling reportTableName: %s tableRef is empty", testReportName),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Report.Inputs.MissingReportStatusTableRef>: error calling reportTableName: %s tableRef is empty", testReportName),
 		},
 		{
 			name: "query's table ref and presto table don't match up returns error",
@@ -254,7 +254,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Rep...>: error calling reportTableName: tableRef PrestoTable %s not found", testReportName),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <reportTableName .Report.Inputs.EmptyReportStatusTableRef>: error calling reportTableName: tableRef PrestoTable %s not found", testReportName),
 		},
 		{
 			name: "valid reportTableName templating (Status.TableRef.Name matches PrestoTable name) results in nil and expected query output",
@@ -292,7 +292,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <renderReportQuery .R...>: error calling renderReportQuery: unable to render query %s, err: error executing template: template: reportQueryTemplate:1:42: executing \"reportQueryTemplate\" at <.Report.Inputs.Query...>: invalid value; expected string", testReportQuery),
+			expectErrMsg: fmt.Sprintf("error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <renderReportQuery .Report.Inputs.MissingTemplateContext .>: error calling renderReportQuery: unable to render query %s, err: error executing template: template: reportQueryTemplate:1:42: executing \"reportQueryTemplate\" at <.Report.Inputs.QueryReportNameDoesNotMatchInputName>: invalid value; expected string", testReportQuery),
 		},
 		{
 			name: "Query containing an unknown ReportQuery returns error",
@@ -309,7 +309,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <renderReportQuery .R...>: error calling renderReportQuery: unknown ReportQuery FakeReportQueryName",
+			expectErrMsg: "error executing template: template: reportQueryTemplate:1:17: executing \"reportQueryTemplate\" at <renderReportQuery .Report.Inputs.ReportQueryNameDoesNotExist .>: error calling renderReportQuery: unknown ReportQuery FakeReportQueryName",
 		},
 		{
 			name: "renderReportQuery ReportQueries unable to render reportQuery (due to wrong number of args in renderReportQuery templating)",
@@ -383,7 +383,7 @@ func TestRenderQuery(t *testing.T) {
 				},
 			},
 			expectErr:    true,
-			expectErrMsg: "error executing template: template: reportQueryTemplate:1:20: executing \"reportQueryTemplate\" at <prestoTimestamp .Rep...>: error calling prestoTimestamp: couldn't convert 5 to a Presto timestamp",
+			expectErrMsg: "error executing template: template: reportQueryTemplate:1:20: executing \"reportQueryTemplate\" at <prestoTimestamp .Report.Inputs.ReportingStart>: error calling prestoTimestamp: couldn't convert 5 to a Presto timestamp",
 		},
 		{
 			name: "invalid prestoTimestamp input (references an invalid format - integer and default is overrided) returns error",
