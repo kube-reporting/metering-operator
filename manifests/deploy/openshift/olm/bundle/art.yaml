@@ -6,7 +6,7 @@ updates:
     - search: "name: metering-operator.v{MAJOR}.{MINOR}.0"
       replace: "name: metering-operator.{FULL_VER}"
     # replace spec.version value
-    - search: 'version: "4.2.0"'
+    - search: 'version: "4.3.0"'
       replace: 'version: {FULL_VER}'
   - ***REMOVED***le: "metering.package.yaml"
     update_list:
