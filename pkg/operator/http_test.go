@@ -321,7 +321,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				"namespace": []string{namespace},
 			}
 
-			endpoint := server.URL + APIV1ReportsGetEndpoint
+			endpoint := server.URL + APIV1ReportGetEndpoint
 
 			// construct the url object
 			endpointURL, err := url.Parse(endpoint)
