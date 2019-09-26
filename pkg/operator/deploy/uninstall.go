@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/***REMOVED***lepath"
 
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -27,14 +26,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
-	var res meteringv1.MeteringCon***REMOVED***g
-
-	err := decodeYAMLManifestToObject(deploy.con***REMOVED***g.MeteringCR, &res)
-	if err != nil {
-		return fmt.Errorf("Failed while attempting to build up the MeteringCon***REMOVED***g from the YAML ***REMOVED***le, got: %v", err)
-	}
-
-	err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The MeteringCon***REMOVED***g resource doesn't exist")
 	} ***REMOVED*** if err == nil {
@@ -124,7 +116,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 func (deploy *Deployer) uninstallMeteringDeployment(deploymentName string) error {
 	var res appsv1.Deployment
 
-	err := decodeYAMLManifestToObject(deploymentName, &res)
+	err := DecodeYAMLManifestToObject(deploymentName, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -144,7 +136,7 @@ func (deploy *Deployer) uninstallMeteringDeployment(deploymentName string) error
 func (deploy *Deployer) uninstallMeteringServiceAccount(serviceAccountPath string) error {
 	var res corev1.ServiceAccount
 
-	err := decodeYAMLManifestToObject(serviceAccountPath, &res)
+	err := DecodeYAMLManifestToObject(serviceAccountPath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -164,7 +156,7 @@ func (deploy *Deployer) uninstallMeteringServiceAccount(serviceAccountPath strin
 func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) error {
 	var res rbacv1.RoleBinding
 
-	err := decodeYAMLManifestToObject(roleBindingPath, &res)
+	err := DecodeYAMLManifestToObject(roleBindingPath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -192,7 +184,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) err
 func (deploy *Deployer) uninstallMeteringRole(rolePath string) error {
 	var res rbacv1.Role
 
-	err := decodeYAMLManifestToObject(rolePath, &res)
+	err := DecodeYAMLManifestToObject(rolePath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -215,7 +207,7 @@ func (deploy *Deployer) uninstallMeteringRole(rolePath string) error {
 func (deploy *Deployer) uninstallMeteringClusterRole(clusterrolePath string) error {
 	var res rbacv1.ClusterRole
 
-	err := decodeYAMLManifestToObject(clusterrolePath, &res)
+	err := DecodeYAMLManifestToObject(clusterrolePath, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -237,7 +229,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole(clusterrolePath string) err
 func (deploy *Deployer) uninstallMeteringClusterRoleBinding(meteringClusterRoleBindingFile string) error {
 	var res rbacv1.ClusterRoleBinding
 
-	err := decodeYAMLManifestToObject(meteringClusterRoleBindingFile, &res)
+	err := DecodeYAMLManifestToObject(meteringClusterRoleBindingFile, &res)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
@@ -273,7 +265,7 @@ func (deploy *Deployer) uninstallMeteringCRDs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
-	err := decodeYAMLManifestToObject(resource.Path, resource.CRD)
+	err := DecodeYAMLManifestToObject(resource.Path, resource.CRD)
 	if err != nil {
 		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 	}
