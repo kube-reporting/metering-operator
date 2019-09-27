@@ -215,12 +215,12 @@ openshift-reporting:
             spec:
               prometheusMetricsImporter:
                 query: |
-                  sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[1m])) BY (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[5m])) BY (pod, namespace, node)
           - name: pod-usage-memory-bytes
             spec:
               prometheusMetricsImporter:
                 query: |
-                  sum(container_memory_usage_bytes{container!="POD", container!="",pod!=""}) by (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  sum(container_memory_usage_bytes{container!="POD", container!="",pod!=""}) by (pod, namespace, node)
 
       preKube_1_14:
         items:
@@ -228,12 +228,12 @@ openshift-reporting:
             spec:
               prometheusMetricsImporter:
                 query: |
-                  label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[1m])) BY (pod_name, namespace), "pod", "$1", "pod_name", "(.*)") + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[5m])) BY (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
           - name: pod-usage-memory-bytes
             spec:
               prometheusMetricsImporter:
                 query: |
-                  sum(label_replace(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}, "pod", "$1", "pod_name", "(.*)")) by (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  label_replace(sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}) by (pod, namespace, node), "pod", "$1", "pod_name", "(.*)")
 
 reporting-operator:
   spec:
