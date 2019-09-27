@@ -1,10 +1,10 @@
 package testhelpers
 
 import (
-	"time"
-
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -130,4 +130,29 @@ func (store *ReportStore) GetReport(namespace, name string) (*metering.Report, e
 		return report, nil
 	}
 	return nil, errors.NewNotFound(metering.Resource("Report"), name)
+}
+
+func PtrToBool(val bool) *bool {
+	return &val
+}
+
+func SetupLogger(logLevelStr string) logrus.FieldLogger {
+	var err error
+
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:   true,
+		TimestampFormat: "01-02-2006 15:04:05",
+	})
+
+	logger := logrus.WithFields(logrus.Fields{
+		"app": "deploy",
+	})
+	logLevel, err := logrus.ParseLevel(logLevelStr)
+	if err != nil {
+		logger.WithError(err).Fatalf("invalid log level: %s", logLevel)
+	}
+	logger.Infof("Setting the log level to %s", logLevel.String())
+	logger.Logger.Level = logLevel
+
+	return logger
 }
