@@ -209,7 +209,7 @@ openshift-reporting:
                   sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
 
       postKube_1_14:
-        enabled: true
+        enabled: false
         items:
           - name: pod-usage-cpu-cores
             spec:
