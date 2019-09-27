@@ -7,17 +7,21 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
+	"github.com/operator-framework/operator-metering/test/deployframework"
 	"github.com/operator-framework/operator-metering/test/reportingframework"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
 var (
-	testReportingFramework *reportingframework.ReportingFramework
+	df *deployframework.DeployFramework
 
 	reportTestOutputDirectory string
+	testOutputDirectory       string
 	runAWSBillingTests        bool
 )
 
@@ -36,28 +40,114 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
-	ns := flag.String("namespace", "metering-ci", "test namespace")
+	var err error
+
+	kubeConfigFlag := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
+	nsPrefix := flag.String("namespace-prefix", "", "The namespace prefix to install the metering resources.")
+	manifestDir := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
+	cleanupScriptPath := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
+	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
 	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
 	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
-	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
-	routeBearerToken := flag.String("route-bearer-token", "", "The bearer token to the reporting-operator serviceaccount if use-route-for-reporting-api is set to true")
+	logLevel := flag.String("log-level", "debug", "The log level")
+
 	flag.Parse()
 
-	var err error
-	if testReportingFramework, err = reportingframework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL, reportTestOutputDirectory); err != nil {
-		logrus.Fatalf("failed to setup framework: %v\n", err)
+	logger := testhelpers.SetupLogger(*logLevel)
+
+	cfg := deployframework.ReportingFrameworkConfig{
+		HTTPSAPI:                    *httpsAPI,
+		UseKubeProxyForReportingAPI: *useKubeProxyForReportingAPI,
+		UseRouteForReportingAPI:     *useRouteForReportingAPI,
+		ReportingAPIURL:             *reportingAPIURL,
+		KubeConfigPath:              *kubeConfigFlag,
+	}
+
+	if df, err = deployframework.New(cfg, logger, *nsPrefix, *manifestDir, *cleanupScriptPath); err != nil {
+		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
 	os.Exit(m.Run())
 }
 
-func TestReportingProducesData(t *testing.T) {
+func TestMultipleInstalls(t *testing.T) {
+	defaultTargetPods := 7
+	defaultPlatform := "openshift"
+
+	testInstallConfigs := []struct {
+		TargetPods int
+		Name       string
+		Config     deploy.Config
+	}{
+		{
+			Name:       "hdfsInstall",
+			TargetPods: defaultTargetPods,
+			Config: deploy.Config{
+				Platform:        defaultPlatform,
+				DeleteNamespace: true,
+				MeteringConfig: &meteringv1.MeteringConfig{
+					Spec: meteringv1.MeteringConfigSpec{
+						UnsupportedFeatures: &meteringv1.UnsupportedFeaturesConfig{
+							EnableHDFS: testhelpers.PtrToBool(true),
+						},
+						Storage: &meteringv1.StorageConfig{
+							Type: "hive",
+							Hive: &meteringv1.HiveStorageConfig{
+								Type: "hdfs",
+								Hdfs: &meteringv1.HiveHDFSConfig{
+									Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range testInstallConfigs {
+		t.Run(testCase.Name, func(t *testing.T) {
+			testInstall(t, testCase.Config, testCase.TargetPods)
+		})
+	}
+}
+
+func testInstall(
+	t *testing.T,
+	deployerConfig deploy.Config,
+	targetPods int,
+) {
+	cfg, err := df.Setup(deployerConfig, targetPods)
+	require.NoError(t, err, "Initializing the deploy framework should produce no error")
+
+	defer func() {
+		err := df.Teardown()
+		if err != nil {
+			df.Logger.Warnf("Failed to teardown the metering deployment in the %s namespace: %v", cfg.Namespace, err)
+		}
+	}()
+
+	testReportingFramework, err := reportingframework.New(
+		cfg.Namespace,
+		cfg.KubeConfigPath,
+		cfg.HTTPSAPI,
+		cfg.UseKubeProxyForReportingAPI,
+		cfg.UseRouteForReportingAPI,
+		cfg.RouteBearerToken,
+		cfg.ReportingAPIURL,
+		cfg.ReportOutputDir,
+	)
+	require.NoError(t, err, "Initializing the test framework should produce no error")
+
+	testReportingProducesData(t, testReportingFramework)
+}
+
+func testReportingProducesData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
 	// cron schedule to run every minute
-	cronSchedule := &metering.ReportSchedule{
-		Period: metering.ReportPeriodCron,
-		Cron: &metering.ReportScheduleCron{
+	cronSchedule := &meteringv1.ReportSchedule{
+		Period: meteringv1.ReportPeriodCron,
+		Cron: &meteringv1.ReportScheduleCron{
 			Expression: fmt.Sprintf("*/1 * * * *"),
 		},
 	}
