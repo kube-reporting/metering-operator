@@ -8,20 +8,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	meteringclientv1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
-	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
-
-	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
-	cfg            deploy.Con***REMOVED***g
-	deployType     string
-	logLevel       string
-	meteringCRFile string
+	cfg                  deploy.Con***REMOVED***g
+	deployType           string
+	logLevel             string
+	meteringCon***REMOVED***gCRFile string
+	deployManifestsDir   string
 
 	rootCmd = &cobra.Command{
 		Use:   "deploy-metering",
@@ -55,9 +51,9 @@ var (
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfg.Namespace, "namespace", "", "The namespace to install the metering resources. This can also be speci***REMOVED***ed through the METERING_NAMESPACE ENV var.")
 	rootCmd.PersistentFlags().StringVar(&cfg.Platform, "platform", "openshift", "The platform to install the metering stack on. Supported options are 'openshift', 'upstream', or 'ocp-testing'. This can also be speci***REMOVED***ed through the DEPLOY_PLATFORM ENV var.")
-	rootCmd.PersistentFlags().StringVar(&cfg.DeployManifestsDirectory, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be speci***REMOVED***ed through the INSTALLER_MANIFESTS_DIR.")
-	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", log.DebugLevel.String(), "The logging level when deploying metering")
-	rootCmd.PersistentFlags().StringVar(&meteringCRFile, "meteringcon***REMOVED***g", "", "The absolute/relative path to the MeteringCon***REMOVED***g custom resource. This can also be speci***REMOVED***ed through the METERING_CR_FILE ENV var.")
+	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", log.InfoLevel.String(), "The logging level when deploying metering")
+	rootCmd.PersistentFlags().StringVar(&meteringCon***REMOVED***gCRFile, "meteringcon***REMOVED***g", "", "The absolute/relative path to the MeteringCon***REMOVED***g custom resource. This can also be speci***REMOVED***ed through the METERING_CR_FILE ENV var.")
+	rootCmd.PersistentFlags().StringVar(&deployManifestsDir, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be speci***REMOVED***ed through the INSTALLER_MANIFESTS_DIR.")
 
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_CRDS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be speci***REMOVED***ed through METERING_DELETE_CRB ENV var.")
@@ -84,43 +80,20 @@ func main() {
 }
 
 func runDeployMetering(cmd *cobra.Command, args []string) error {
-	var err error
-
 	logger := setupLogger(logLevel)
 
-	kubecon***REMOVED***g := clientcmd.NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
-		clientcmd.NewDefaultClientCon***REMOVED***gLoadingRules(),
-		&clientcmd.Con***REMOVED***gOverrides{},
-	)
-
-	restcon***REMOVED***g, err := kubecon***REMOVED***g.ClientCon***REMOVED***g()
-	if err != nil {
-		return fmt.Errorf("Failed to initialize the kubernetes client con***REMOVED***g: %v", err)
+	if meteringCon***REMOVED***gCRFile == "" {
+		return fmt.Errorf("Failed to set the $METERING_CR_FILE or --meteringcon***REMOVED***g flag")
 	}
 
-	client, err := kubernetes.NewForCon***REMOVED***g(restcon***REMOVED***g)
+	err := deploy.InitObjectFromManifest(deployManifestsDir, meteringCon***REMOVED***gCRFile, &cfg)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
-	}
-
-	apiextClient, err := apiextclientv1beta1.NewForCon***REMOVED***g(restcon***REMOVED***g)
-	if err != nil {
-		return fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
-	}
-
-	meteringClient, err := meteringclientv1.NewForCon***REMOVED***g(restcon***REMOVED***g)
-	if err != nil {
-		return fmt.Errorf("Failed to initialize the metering clientset: %v", err)
-	}
-
-	err = deploy.DecodeYAMLManifestToObject(meteringCRFile, &cfg.MeteringCon***REMOVED***g)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the MeteringCR ***REMOVED***le: %v", err)
+		return fmt.Errorf("Failed to initialize metering resource objects from YAML manifests: %v", err)
 	}
 
 	logger.Debugf("Metering Deploy Con***REMOVED***g: %#v", cfg)
 
-	deployObj, err := deploy.NewDeployer(cfg, client, apiextClient, meteringClient, logger)
+	deployObj, err := deploy.NewDeployer(cfg, logger)
 	if err != nil {
 		return fmt.Errorf("Failed to deploy metering: %v", err)
 	}
