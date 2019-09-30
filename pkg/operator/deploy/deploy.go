@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
@@ -52,18 +53,18 @@ type CRD struct {
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
 type Config struct {
-	Namespace                string
-	Platform                 string
-	DeployManifestsDirectory string
-	MeteringCR               string
 	SkipMeteringDeployment   bool
 	DeleteCRDs               bool
 	DeleteCRB                bool
 	DeleteNamespace          bool
 	DeletePVCs               bool
 	DeleteAll                bool
+	Namespace                string
+	Platform                 string
+	DeployManifestsDirectory string
 	Repo                     string
 	Tag                      string
+	MeteringConfig           meteringv1.MeteringConfig
 }
 
 // Deployer holds all the information needed to handle the deployment

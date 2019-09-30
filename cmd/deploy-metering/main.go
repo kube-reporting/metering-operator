@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	cfg        deploy.Config
-	deployType string
-	logLevel   string
+	cfg            deploy.Config
+	deployType     string
+	logLevel       string
+	meteringCRFile string
 
 	rootCmd = &cobra.Command{
 		Use:   "deploy-metering",
@@ -54,9 +55,9 @@ var (
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfg.Namespace, "namespace", "", "The namespace to install the metering resources. This can also be specified through the METERING_NAMESPACE ENV var.")
 	rootCmd.PersistentFlags().StringVar(&cfg.Platform, "platform", "openshift", "The platform to install the metering stack on. Supported options are 'openshift', 'upstream', or 'ocp-testing'. This can also be specified through the DEPLOY_PLATFORM ENV var.")
-	rootCmd.PersistentFlags().StringVar(&cfg.MeteringCR, "meteringconfig", "", "The absolute/relative path to the MeteringConfig custom resource. This can also be specified through the METERING_CR_FILE ENV var.")
 	rootCmd.PersistentFlags().StringVar(&cfg.DeployManifestsDirectory, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be specified through the INSTALLER_MANIFESTS_DIR.")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", log.DebugLevel.String(), "The logging level when deploying metering")
+	rootCmd.PersistentFlags().StringVar(&meteringCRFile, "meteringconfig", "", "The absolute/relative path to the MeteringConfig custom resource. This can also be specified through the METERING_CR_FILE ENV var.")
 
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be specified through the METERING_DELETE_CRDS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be specified through METERING_DELETE_CRB ENV var.")
@@ -110,6 +111,11 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 	meteringClient, err := meteringclientv1.NewForConfig(restconfig)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize the metering clientset: %v", err)
+	}
+
+	err = deploy.DecodeYAMLManifestToObject(meteringCRFile, &cfg.MeteringConfig)
+	if err != nil {
+		return fmt.Errorf("Failed to decode the MeteringCR file: %v", err)
 	}
 
 	logger.Debugf("Metering Deploy Config: %#v", cfg)
