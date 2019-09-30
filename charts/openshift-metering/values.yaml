@@ -215,12 +215,12 @@ openshift-reporting:
             spec:
               prometheusMetricsImporter:
                 query: |
-                  sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod!=""}[1m])) BY (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[1m])) BY (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
           - name: pod-usage-memory-bytes
             spec:
               prometheusMetricsImporter:
                 query: |
-                  sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod!=""}) by (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
+                  sum(container_memory_usage_bytes{container!="POD", container!="",pod!=""}) by (pod, namespace) + on (pod, namespace) group_left(node) (sum(kube_pod_info{pod_ip!="",node!="",host_ip!=""}) by (pod, namespace, node) * 0)
 
       preKube_1_14:
         items:
