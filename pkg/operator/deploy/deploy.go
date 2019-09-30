@@ -2,17 +2,19 @@ package deploy
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -23,13 +25,6 @@ const (
 	openshiftManifestDirname  = "openshift"
 	ocpTestingManifestDirname = "ocp-testing"
 
-	meteringDeploymentFile         = "metering-operator-deployment.yaml"
-	meteringServiceAccountFile     = "metering-operator-service-account.yaml"
-	meteringRoleBindingFile        = "metering-operator-rolebinding.yaml"
-	meteringRoleFile               = "metering-operator-role.yaml"
-	meteringClusterRoleBindingFile = "metering-operator-clusterrolebinding.yaml"
-	meteringClusterRoleFile        = "metering-operator-clusterrole.yaml"
-
 	hivetableFile        = "hive.crd.yaml"
 	prestotableFile      = "prestotable.crd.yaml"
 	meteringconfigFile   = "meteringconfig.crd.yaml"
@@ -37,6 +32,13 @@ const (
 	reportdatasourceFile = "reportdatasource.crd.yaml"
 	reportqueryFile      = "reportquery.crd.yaml"
 	storagelocationFile  = "storagelocation.crd.yaml"
+
+	meteringDeploymentFile         = "metering-operator-deployment.yaml"
+	meteringServiceAccountFile     = "metering-operator-service-account.yaml"
+	meteringRoleBindingFile        = "metering-operator-rolebinding.yaml"
+	meteringRoleFile               = "metering-operator-role.yaml"
+	meteringClusterRoleBindingFile = "metering-operator-clusterrolebinding.yaml"
+	meteringClusterRoleFile        = "metering-operator-clusterrole.yaml"
 )
 
 // CRD is a structure that holds the information needed to install
@@ -53,18 +55,29 @@ type CRD struct {
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
 type Config struct {
-	SkipMeteringDeployment   bool
-	DeleteCRDs               bool
-	DeleteCRB                bool
-	DeleteNamespace          bool
-	DeletePVCs               bool
-	DeleteAll                bool
-	Namespace                string
-	Platform                 string
-	DeployManifestsDirectory string
-	Repo                     string
-	Tag                      string
-	MeteringConfig           meteringv1.MeteringConfig
+	SkipMeteringDeployment bool
+	DeleteCRDs             bool
+	DeleteCRB              bool
+	DeleteNamespace        bool
+	DeletePVCs             bool
+	DeleteAll              bool
+	Namespace              string
+	Platform               string
+	Repo                   string
+	Tag                    string
+	Resources              *MeteringResources
+}
+
+// MeteringResources contains all the objects that metering manages
+type MeteringResources struct {
+	CRDs               []CRD
+	Deployment         *appsv1.Deployment
+	ServiceAccount     *corev1.ServiceAccount
+	RoleBinding        *rbacv1.RoleBinding
+	Role               *rbacv1.Role
+	ClusterRoleBinding *rbacv1.ClusterRoleBinding
+	ClusterRole        *rbacv1.ClusterRole
+	MeteringConfig     *meteringv1.MeteringConfig
 }
 
 // Deployer holds all the information needed to handle the deployment
@@ -72,13 +85,11 @@ type Config struct {
 // to provision and remove all the metering resources, and a customized
 // deployment configuration.
 type Deployer struct {
-	config                           Config
-	crds                             []CRD
-	ansibleOperatorManifestsLocation string
-	logger                           log.FieldLogger
-	client                           *kubernetes.Clientset
-	apiExtClient                     apiextclientv1beta1.CustomResourceDefinitionsGetter
-	meteringClient                   *metering.MeteringV1Client
+	config         Config
+	logger         log.FieldLogger
+	client         kubernetes.Interface
+	apiExtClient   apiextclientv1beta1.CustomResourceDefinitionsGetter
+	meteringClient metering.MeteringV1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -87,12 +98,32 @@ type Deployer struct {
 // deploy structure
 func NewDeployer(
 	cfg Config,
-	client *kubernetes.Clientset,
-	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
-	meteringClient *metering.MeteringV1Client,
 	logger log.FieldLogger,
 ) (*Deployer, error) {
-	var err error
+	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{},
+	)
+
+	restconfig, err := kubeconfig.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to initialize the kubernetes client config: %v", err)
+	}
+
+	client, err := kubernetes.NewForConfig(restconfig)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
+	}
+
+	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
+	}
+
+	meteringClient, err := metering.NewForConfig(restconfig)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to initialize the metering clientset: %v", err)
+	}
 
 	deploy := &Deployer{
 		client:         client,
@@ -102,48 +133,8 @@ func NewDeployer(
 		config:         cfg,
 	}
 
-	if deploy.config.Namespace == "" {
-		return deploy, fmt.Errorf("Failed to set $METERING_NAMESPACE or --namespace flag")
-	}
 	deploy.logger.Infof("Metering Deploy Namespace: %s", deploy.config.Namespace)
-
-	if deploy.config.DeployManifestsDirectory == "" {
-		return nil, fmt.Errorf("Failed to set the $DEPLOY_MANIFESTS_DIR or --deploy-manifests-dir flag to a non-empty value")
-	}
-
-	deployDir, err := filepath.Abs(deploy.config.DeployManifestsDirectory)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory %s: %v", deploy.config.DeployManifestsDirectory, err)
-	}
-
-	dirStat, err := os.Stat(deploy.config.DeployManifestsDirectory)
-	if os.IsNotExist(err) {
-		return nil, fmt.Errorf("Failed to get the stat the manifest/deploy directory %s: %v", deploy.config.DeployManifestsDirectory, err)
-	}
-	if !dirStat.IsDir() {
-		return nil, fmt.Errorf("Specified deploy directory '%s' is not a directory", deploy.config.DeployManifestsDirectory)
-	}
-
-	var ansibleOperatorManifestDir string
-
-	switch strings.ToLower(deploy.config.Platform) {
-	case "upstream":
-		ansibleOperatorManifestDir = filepath.Join(deployDir, upstreamManifestDirname, manifestAnsibleOperator)
-	case "openshift":
-		ansibleOperatorManifestDir = filepath.Join(deployDir, openshiftManifestDirname, manifestAnsibleOperator)
-	case "ocp-testing":
-		ansibleOperatorManifestDir = filepath.Join(deployDir, ocpTestingManifestDirname, manifestAnsibleOperator)
-	default:
-		return deploy, fmt.Errorf("Failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
-	}
-
-	dirStat, err = os.Stat(ansibleOperatorManifestDir)
-	if os.IsNotExist(err) {
-		return nil, fmt.Errorf("Failed to stat the %s deploy platform directory '%s': %v", deploy.config.Platform, ansibleOperatorManifestDir, err)
-	}
-	if !dirStat.IsDir() {
-		return nil, fmt.Errorf("Specified %s deploy platform directory '%s' is not a directory", deploy.config.Platform, ansibleOperatorManifestDir)
-	}
+	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.config.Platform)
 
 	if deploy.config.DeleteAll {
 		deploy.config.DeletePVCs = true
@@ -152,12 +143,9 @@ func NewDeployer(
 		deploy.config.DeleteCRDs = true
 	}
 
-	deploy.logger.Infof("Metering Deploy Platform: %s", deploy.config.Platform)
-	deploy.ansibleOperatorManifestsLocation = ansibleOperatorManifestDir
-
-	// initialize a slice of CRD structures and assign to the deploy.crds field
-	// this is used by the install/uninstall drivers to manage the metering CRDs
-	deploy.initMeteringCRDSlice()
+	if deploy.config.Namespace == "" {
+		return deploy, fmt.Errorf("Failed to set $METERING_NAMESPACE or --namespace flag")
+	}
 
 	return deploy, nil
 }
