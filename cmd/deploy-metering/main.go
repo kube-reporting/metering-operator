@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	cfg        deploy.Con***REMOVED***g
-	deployType string
-	logLevel   string
+	cfg            deploy.Con***REMOVED***g
+	deployType     string
+	logLevel       string
+	meteringCRFile string
 
 	rootCmd = &cobra.Command{
 		Use:   "deploy-metering",
@@ -54,9 +55,9 @@ var (
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfg.Namespace, "namespace", "", "The namespace to install the metering resources. This can also be speci***REMOVED***ed through the METERING_NAMESPACE ENV var.")
 	rootCmd.PersistentFlags().StringVar(&cfg.Platform, "platform", "openshift", "The platform to install the metering stack on. Supported options are 'openshift', 'upstream', or 'ocp-testing'. This can also be speci***REMOVED***ed through the DEPLOY_PLATFORM ENV var.")
-	rootCmd.PersistentFlags().StringVar(&cfg.MeteringCR, "meteringcon***REMOVED***g", "", "The absolute/relative path to the MeteringCon***REMOVED***g custom resource. This can also be speci***REMOVED***ed through the METERING_CR_FILE ENV var.")
 	rootCmd.PersistentFlags().StringVar(&cfg.DeployManifestsDirectory, "deploy-manifests-dir", "manifests/deploy", "The absolute/relative path to the metering manifest directory. This can also be speci***REMOVED***ed through the INSTALLER_MANIFESTS_DIR.")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", log.DebugLevel.String(), "The logging level when deploying metering")
+	rootCmd.PersistentFlags().StringVar(&meteringCRFile, "meteringcon***REMOVED***g", "", "The absolute/relative path to the MeteringCon***REMOVED***g custom resource. This can also be speci***REMOVED***ed through the METERING_CR_FILE ENV var.")
 
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRDs, "delete-crd", false, "If true, this would delete the metering CRDs during an uninstall. This can also be speci***REMOVED***ed through the METERING_DELETE_CRDS ENV var.")
 	uninstallCmd.Flags().BoolVar(&cfg.DeleteCRB, "delete-crb", false, "If true, this would delete the metering cluster role bindings during an uninstall. This can also be speci***REMOVED***ed through METERING_DELETE_CRB ENV var.")
@@ -110,6 +111,11 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 	meteringClient, err := meteringclientv1.NewForCon***REMOVED***g(restcon***REMOVED***g)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize the metering clientset: %v", err)
+	}
+
+	err = deploy.DecodeYAMLManifestToObject(meteringCRFile, &cfg.MeteringCon***REMOVED***g)
+	if err != nil {
+		return fmt.Errorf("Failed to decode the MeteringCR ***REMOVED***le: %v", err)
 	}
 
 	logger.Debugf("Metering Deploy Con***REMOVED***g: %#v", cfg)
