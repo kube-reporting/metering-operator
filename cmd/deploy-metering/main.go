@@ -82,11 +82,7 @@ func main() {
 func runDeployMetering(cmd *cobra.Command, args []string) error {
 	logger := setupLogger(logLevel)
 
-	if meteringConfigCRFile == "" {
-		return fmt.Errorf("Failed to set the $METERING_CR_FILE or --meteringconfig flag")
-	}
-
-	err := deploy.InitObjectFromManifest(deployManifestsDir, meteringConfigCRFile, &cfg)
+	err := deploy.InitObjectFromManifest(logger, &cfg, deployManifestsDir, meteringConfigCRFile)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize metering resource objects from YAML manifests: %v", err)
 	}

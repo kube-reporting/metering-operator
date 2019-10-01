@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -135,15 +136,17 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 
 // Resource contains information about an individual resource that metering manages
 type Resource struct {
-	UseAbsolutePath  bool
-	SkipYAMLDecoding bool
-	Path             string
-	Resource         interface{}
+	UseAbsolutePath bool
+	SkipResource    bool
+	Path            string
+	Resource        interface{}
 }
 
 // InitObjectFromManifest is the driver function for building up a path to the metering-ansible-operator directory
 // from the base @manifestDir directory and initializing the metering resource/CRD objects from the YAML manifests.
-func InitObjectFromManifest(manifestDir, meteringConfigCRFile string, cfg *Config) error {
+// If @meteringConfigCRFile is empty, and the cfg.Resources.MeteringConfig is not nil, then we skip that resource
+// when decoding the YAML manifests.
+func InitObjectFromManifest(logger logrus.FieldLogger, cfg *Config, manifestDir, meteringConfigCRFile string) error {
 	var resources MeteringResources
 
 	ansibleOperatorManifestDir, err := getMeteringAnsiblePath(manifestDir, cfg.Platform)
@@ -170,10 +173,24 @@ func InitObjectFromManifest(manifestDir, meteringConfigCRFile string, cfg *Confi
 		}
 	}
 
+	var skipMeteringConfig bool
+
+	// check if @cfg has a non-empty MeteringConfig obj when @meteringConfigCRFile is empty
+	if meteringConfigCRFile == "" {
+		// need to null check the cfg.Resources structure before null checking the MeteringConfig obj
+		if cfg.Resources != nil && cfg.Resources.MeteringConfig != nil {
+			resources.MeteringConfig = cfg.Resources.MeteringConfig
+			skipMeteringConfig = true
+		} else {
+			return fmt.Errorf("Failed to set the $METERING_CR_FILE or --meteringconfig flag")
+		}
+	}
+
 	meteringResourceMap := map[string]Resource{
 		"meteringConfig": Resource{
 			Path:            meteringConfigCRFile,
 			UseAbsolutePath: true,
+			SkipResource:    skipMeteringConfig,
 			Resource:        &resources.MeteringConfig,
 		},
 		"deployment": Resource{
@@ -203,6 +220,10 @@ func InitObjectFromManifest(manifestDir, meteringConfigCRFile string, cfg *Confi
 	}
 
 	for name, resource := range meteringResourceMap {
+		if resource.SkipResource {
+			continue
+		}
+
 		path := filepath.Join(ansibleOperatorManifestDir, resource.Path)
 
 		if resource.UseAbsolutePath {
