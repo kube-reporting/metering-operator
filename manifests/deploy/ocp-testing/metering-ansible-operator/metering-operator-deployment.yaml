@@ -24,14 +24,14 @@ spec:
         - /opt/ansible/scripts/ansible-logs.sh
         - /tmp/ansible-operator/runner
         - stdout
-        image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+        image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
         imagePullPolicy: Always
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
           readOnly: true
       - name: operator
-        image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+        image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
         imagePullPolicy: Always
         env:
         - name: OPERATOR_NAME
@@ -47,19 +47,19 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
         - name: METERING_REPORTING_OPERATOR_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.3"
         - name: METERING_PRESTO_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.3"
         - name: METERING_HIVE_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.3"
         - name: METERING_HADOOP_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.3"
         - name: GHOSTUNNEL_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.3"
         - name: OAUTH_PROXY_IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.2"
+          value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.3"
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner

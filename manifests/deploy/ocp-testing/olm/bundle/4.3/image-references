@@ -1,0 +1,34 @@
+# vi: ft=yaml
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+spec:
+  tags:
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3
+    name: metering-ansible-operator
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.3
+    name: metering-reporting-operator
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.3
+    name: metering-presto
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.3
+    name: metering-hive
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.3
+    name: metering-hadoop
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.3
+    name: ghostunnel
+  - from:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.3
+    name: oauth-proxy
+

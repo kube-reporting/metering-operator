@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: metering-operator-testing.v4.2.0
+  name: metering-operator-testing.v4.3.0
   namespace: placeholder
   annotations:
     alm-examples: |-
@@ -217,7 +217,7 @@ spec:
   description: |
     Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the [Operator Framework](https://coreos.com/blog/introducing-operator-framework-metering).
 
-    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.2/metering/metering-using-metering.html).
+    Read the user guide for more details on [running and viewing your first report](https://docs.openshift.com/container-platform/4.3/metering/metering-using-metering.html).
 
     ### Core capabilities
 
@@ -237,18 +237,18 @@ spec:
     At least one Node should have 2GB of RAM and 2 CPU cores.
     Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.2/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
+    Metering requires configuring storage, please review the [configuring persistent storage documentation](https://docs.openshift.com/container-platform/4.3/metering/configuring-metering/metering-configure-persistent-storage.html) before proceeding.
 
     ### Common Configurations
 
-    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.2/metering/configuring-metering/metering-configure-persistent-storage.html).
+    * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.3/metering/configuring-metering/metering-configure-persistent-storage.html).
 
-    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.2/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
+    * **Configure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.3/metering/configuring-metering/metering-configure-aws-billing-correlation.html).
 
-    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.2/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
+    * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.3/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
   keywords: [metering metrics reporting prometheus chargeback]
-  version: "4.2.0"
+  version: "4.3.0"
   minKubeVersion: "1.11.0"
   maturity: stable
   maintainers:
@@ -257,7 +257,7 @@ spec:
 
   links:
     - name: Documentation
-      url: https://docs.openshift.com/container-platform/4.2/metering/metering-about-metering.html
+      url: https://docs.openshift.com/container-platform/4.3/metering/metering-about-metering.html
 
   provider:
     name: Metering OCP testing
@@ -448,14 +448,14 @@ spec:
                   - /opt/ansible/scripts/ansible-logs.sh
                   - /tmp/ansible-operator/runner
                   - stdout
-                  image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+                  image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
                   imagePullPolicy: Always
                   volumeMounts:
                   - mountPath: /tmp/ansible-operator/runner
                     name: runner
                     readOnly: true
                 - name: operator
-                  image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+                  image: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
                   imagePullPolicy: Always
                   env:
                   - name: OPERATOR_NAME
@@ -471,19 +471,19 @@ spec:
                       fieldRef:
                         fieldPath: metadata.name
                   - name: METERING_ANSIBLE_OPERATOR_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator:v4.3"
                   - name: METERING_REPORTING_OPERATOR_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-reporting-operator:v4.3"
                   - name: METERING_PRESTO_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-presto:v4.3"
                   - name: METERING_HIVE_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hive:v4.3"
                   - name: METERING_HADOOP_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-hadoop:v4.3"
                   - name: GHOSTUNNEL_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-ghostunnel:v4.3"
                   - name: OAUTH_PROXY_IMAGE
-                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.2"
+                    value: "image-registry.openshift-image-registry.svc:5000/openshift/ose-oauth-proxy:v4.3"
                   volumeMounts:
                   - mountPath: /tmp/ansible-operator/runner
                     name: runner
