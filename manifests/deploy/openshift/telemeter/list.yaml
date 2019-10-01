@@ -3873,7 +3873,7 @@ objects:
           - /opt/ansible/scripts/ansible-logs.sh
           - /tmp/ansible-operator/runner
           - stdout
-          image: quay.io/openshift/origin-metering-ansible-operator:4.2
+          image: quay.io/openshift/origin-metering-ansible-operator:4.3
           imagePullPolicy: Always
           name: ansible
           volumeMounts:
@@ -3894,20 +3894,20 @@ objects:
               ***REMOVED***eldRef:
                 ***REMOVED***eldPath: metadata.name
           - name: METERING_ANSIBLE_OPERATOR_IMAGE
-            value: quay.io/openshift/origin-metering-ansible-operator:4.2
+            value: quay.io/openshift/origin-metering-ansible-operator:4.3
           - name: METERING_REPORTING_OPERATOR_IMAGE
-            value: quay.io/openshift/origin-metering-reporting-operator:4.2
+            value: quay.io/openshift/origin-metering-reporting-operator:4.3
           - name: METERING_PRESTO_IMAGE
-            value: quay.io/openshift/origin-metering-presto:4.2
+            value: quay.io/openshift/origin-metering-presto:4.3
           - name: METERING_HIVE_IMAGE
-            value: quay.io/openshift/origin-metering-hive:4.2
+            value: quay.io/openshift/origin-metering-hive:4.3
           - name: METERING_HADOOP_IMAGE
-            value: quay.io/openshift/origin-metering-hadoop:4.2
+            value: quay.io/openshift/origin-metering-hadoop:4.3
           - name: GHOSTUNNEL_IMAGE
-            value: quay.io/openshift/origin-ghostunnel:4.2
+            value: quay.io/openshift/origin-ghostunnel:4.3
           - name: OAUTH_PROXY_IMAGE
-            value: quay.io/openshift/origin-oauth-proxy:4.2
-          image: quay.io/openshift/origin-metering-ansible-operator:4.2
+            value: quay.io/openshift/origin-oauth-proxy:4.3
+          image: quay.io/openshift/origin-metering-ansible-operator:4.3
           imagePullPolicy: Always
           name: operator
           resources:

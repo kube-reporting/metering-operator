@@ -4,7 +4,7 @@ set -e
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 
 REPO_NAMESPACE="${REPO_NAMESPACE:-"openshift"}"
-OSE_IMAGE_TAG="${OSE_IMAGE_TAG:-"v4.2"}"
+OSE_IMAGE_TAG="${OSE_IMAGE_TAG:-"v4.3"}"
 CLUSTER_REGISTRY_URL="${CLUSTER_REGISTRY_URL:-"$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')"}"
 SETUP_REGISTRY_AUTH="${SETUP_REGISTRY_AUTH:-"true"}"
 PULL_IMAGES="${PULL_IMAGES:-"true"}"

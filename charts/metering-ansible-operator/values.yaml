@@ -11,7 +11,7 @@ operator:
 
   image:
     repository: quay.io/openshift/origin-metering-ansible-operator
-    tag: 4.2
+    tag: 4.3
     pullPolicy: Always
 
   imagePullSecrets: []
@@ -162,8 +162,8 @@ operator:
 olm:
   packageName: metering-ocp
   channels:
-  - name: 4.2
-    currentCSV: metering-operator.v4.2.0
+  - name: 4.3
+    currentCSV: metering-operator.v4.3.0
 
   skipARTPackage: false
 
@@ -171,41 +171,41 @@ olm:
   - name: metering-ansible-operator
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-ansible-operator:4.2
+      name: quay.io/openshift/origin-metering-ansible-operator:4.3
   - name: metering-reporting-operator
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-reporting-operator:4.2
+      name: quay.io/openshift/origin-metering-reporting-operator:4.3
   - name: metering-presto
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-presto:4.2
+      name: quay.io/openshift/origin-metering-presto:4.3
   - name: metering-hive
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hive:4.2
+      name: quay.io/openshift/origin-metering-hive:4.3
   - name: metering-hadoop
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-metering-hadoop:4.2
+      name: quay.io/openshift/origin-metering-hadoop:4.3
   - name: ghostunnel
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-ghostunnel:4.2
+      name: quay.io/openshift/origin-ghostunnel:4.3
   - name: oauth-proxy
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-oauth-proxy:4.2
+      name: quay.io/openshift/origin-oauth-proxy:4.3
 
   csv:
-    name : metering-operator.v4.2.0
-    version: "4.2.0"
+    name : metering-operator.v4.3.0
+    version: "4.3.0"
     minKubeVersion: "1.11.0"
     displayName: Metering
     description: |
       Operator Metering is a chargeback and reporting tool to provide accountability for how resources are used across a cluster. Cluster admins can schedule reports based on historical usage data by Pod, Namespace, and Cluster wide. Operator Metering is part of the [Operator Framework](https://coreos.com/blog/introducing-operator-framework-metering).
 
-      Read the user guide for more details on [running and viewing your ***REMOVED***rst report](https://docs.openshift.com/container-platform/4.2/metering/metering-using-metering.html).
+      Read the user guide for more details on [running and viewing your ***REMOVED***rst report](https://docs.openshift.com/container-platform/4.3/metering/metering-using-metering.html).
 
       ### Core capabilities
 
@@ -225,15 +225,15 @@ olm:
       At least one Node should have 2GB of RAM and 2 CPU cores.
       Memory and CPU consumption may often be lower, but will spike when running reports, or collecting data for larger clusters.
 
-      Metering requires con***REMOVED***guring storage, please review the [con***REMOVED***guring persistent storage documentation](https://docs.openshift.com/container-platform/4.2/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html) before proceeding.
+      Metering requires con***REMOVED***guring storage, please review the [con***REMOVED***guring persistent storage documentation](https://docs.openshift.com/container-platform/4.3/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html) before proceeding.
 
       ### Common Con***REMOVED***gurations
 
-      * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.2/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html).
+      * **Store data in object storage or in a PersistentVolume** - Store your report output [in an object storage bucket or in a PersistentVolume](https://docs.openshift.com/container-platform/4.3/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-persistent-storage.html).
 
-      * **Con***REMOVED***gure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.2/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-aws-billing-correlation.html).
+      * **Con***REMOVED***gure AWS Billing Data Source** - Assign Pod $$ costs on using your [AWS billing reports stored in S3](https://docs.openshift.com/container-platform/4.3/metering/con***REMOVED***guring-metering/metering-con***REMOVED***gure-aws-billing-correlation.html).
 
-      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.2/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
+      * **Use Reports** - Customize what how you process data. [Specify what you want to report on, set the schedule, and reporting time period](https://docs.openshift.com/container-platform/4.3/metering/reports/metering-about-reports.html#metering-reports_metering-about-reports).
 
     keywords: ['metering', 'metrics', 'reporting', 'prometheus', 'chargeback']
     icon:
@@ -247,7 +247,7 @@ olm:
       name: Red Hat
     links:
     - name: Documentation
-      url: https://docs.openshift.com/container-platform/4.2/metering/metering-about-metering.html
+      url: https://docs.openshift.com/container-platform/4.3/metering/metering-about-metering.html
     labels:
       operator-metering: "true"
     matchLabels:
