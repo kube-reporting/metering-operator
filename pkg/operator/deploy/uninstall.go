@@ -2,11 +2,6 @@ package deploy
 
 import (
 	"fmt"
-	"path/filepath"
-
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +21,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 }
 
 func (deploy *Deployer) uninstallMeteringConfig() error {
-	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.MeteringConfig.Name, &metav1.DeleteOptions{})
+	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.Resources.MeteringConfig.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The MeteringConfig resource doesn't exist")
 	} else if err == nil {
@@ -39,33 +34,33 @@ func (deploy *Deployer) uninstallMeteringConfig() error {
 }
 
 func (deploy *Deployer) uninstallMeteringResources() error {
-	err := deploy.uninstallMeteringDeployment(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringDeploymentFile))
+	err := deploy.uninstallMeteringDeployment()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.uninstallMeteringServiceAccount(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringServiceAccountFile))
+	err = deploy.uninstallMeteringServiceAccount()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering service account: %v", err)
 	}
 
-	err = deploy.uninstallMeteringRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleFile))
+	err = deploy.uninstallMeteringRole()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role: %v", err)
 	}
 
-	err = deploy.uninstallMeteringRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleBindingFile))
+	err = deploy.uninstallMeteringRoleBinding()
 	if err != nil {
 		return fmt.Errorf("Failed to delete the metering role binding: %v", err)
 	}
 
 	if deploy.config.DeleteCRB {
-		err = deploy.uninstallMeteringClusterRole(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleFile))
+		err = deploy.uninstallMeteringClusterRole()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role: %v", err)
 		}
 
-		err = deploy.uninstallMeteringClusterRoleBinding(filepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleBindingFile))
+		err = deploy.uninstallMeteringClusterRoleBinding()
 		if err != nil {
 			return fmt.Errorf("Failed to delete the metering cluster role binding: %v", err)
 		}
@@ -113,15 +108,8 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringDeployment(deploymentName string) error {
-	var res appsv1.Deployment
-
-	err := DecodeYAMLManifestToObject(deploymentName, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
-	err = deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+func (deploy *Deployer) uninstallMeteringDeployment() error {
+	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(deploy.config.Resources.Deployment.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering deployment doesn't exist")
 	} else if err == nil {
@@ -133,15 +121,8 @@ func (deploy *Deployer) uninstallMeteringDeployment(deploymentName string) error
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringServiceAccount(serviceAccountPath string) error {
-	var res corev1.ServiceAccount
-
-	err := DecodeYAMLManifestToObject(serviceAccountPath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
-	err = deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+func (deploy *Deployer) uninstallMeteringServiceAccount() error {
+	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(deploy.config.Resources.ServiceAccount.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering service account doesn't exist")
 	} else if err == nil {
@@ -153,13 +134,8 @@ func (deploy *Deployer) uninstallMeteringServiceAccount(serviceAccountPath strin
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) error {
-	var res rbacv1.RoleBinding
-
-	err := DecodeYAMLManifestToObject(roleBindingPath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) uninstallMeteringRoleBinding() error {
+	res := deploy.config.Resources.RoleBinding
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -169,7 +145,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) err
 		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	err = deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().RoleBindings(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role binding doesn't exist")
 	} else if err == nil {
@@ -181,18 +157,13 @@ func (deploy *Deployer) uninstallMeteringRoleBinding(roleBindingPath string) err
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringRole(rolePath string) error {
-	var res rbacv1.Role
-
-	err := DecodeYAMLManifestToObject(rolePath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) uninstallMeteringRole() error {
+	res := deploy.config.Resources.Role
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.Namespace = deploy.config.Namespace
 
-	err = deploy.client.RbacV1().Roles(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().Roles(deploy.config.Namespace).Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering role doesn't exist")
 	} else if err == nil {
@@ -204,17 +175,12 @@ func (deploy *Deployer) uninstallMeteringRole(rolePath string) error {
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringClusterRole(clusterrolePath string) error {
-	var res rbacv1.ClusterRole
-
-	err := DecodeYAMLManifestToObject(clusterrolePath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) uninstallMeteringClusterRole() error {
+	res := deploy.config.Resources.ClusterRole
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
-	err = deploy.client.RbacV1().ClusterRoles().Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().ClusterRoles().Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role doesn't exist")
 	} else if err == nil {
@@ -226,13 +192,8 @@ func (deploy *Deployer) uninstallMeteringClusterRole(clusterrolePath string) err
 	return nil
 }
 
-func (deploy *Deployer) uninstallMeteringClusterRoleBinding(meteringClusterRoleBindingFile string) error {
-	var res rbacv1.ClusterRoleBinding
-
-	err := DecodeYAMLManifestToObject(meteringClusterRoleBindingFile, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
+	res := deploy.config.Resources.ClusterRoleBinding
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -241,7 +202,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding(meteringClusterRoleB
 		res.Subjects[index].Namespace = deploy.config.Namespace
 	}
 
-	err = deploy.client.RbacV1().ClusterRoleBindings().Delete(res.Name, &metav1.DeleteOptions{})
+	err := deploy.client.RbacV1().ClusterRoleBindings().Delete(res.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering cluster role binding doesn't exist")
 	} else if err == nil {
@@ -254,7 +215,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding(meteringClusterRoleB
 }
 
 func (deploy *Deployer) uninstallMeteringCRDs() error {
-	for _, crd := range deploy.crds {
+	for _, crd := range deploy.config.Resources.CRDs {
 		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to delete a CRD while looping: %v", err)
@@ -265,12 +226,7 @@ func (deploy *Deployer) uninstallMeteringCRDs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
-	err := DecodeYAMLManifestToObject(resource.Path, resource.CRD)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
-	err = deploy.apiExtClient.CustomResourceDefinitions().Delete(resource.Name, &metav1.DeleteOptions{})
+	err := deploy.apiExtClient.CustomResourceDefinitions().Delete(resource.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The %s CRD doesn't exist", resource.Name)
 	} else if err == nil {
