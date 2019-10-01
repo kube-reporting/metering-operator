@@ -133,22 +133,12 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 	return ansibleOperatorManifestDir, nil
 }
 
-// Resource contains information about an individual resource that metering manages
-type Resource struct {
-	UseAbsolutePath  bool
-	SkipYAMLDecoding bool
-	Path             string
-	Resource         interface{}
-}
+func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*OperatorResources, error) {
+	var resources OperatorResources
 
-// InitObjectFromManifest is the driver function for building up a path to the metering-ansible-operator directory
-// from the base @manifestDir directory and initializing the metering resource/CRD objects from the YAML manifests.
-func InitObjectFromManifest(manifestDir, meteringCon***REMOVED***gCRFile string, cfg *Con***REMOVED***g) error {
-	var resources MeteringResources
-
-	ansibleOperatorManifestDir, err := getMeteringAnsiblePath(manifestDir, cfg.Platform)
+	ansibleOperatorManifestDir, err := getMeteringAnsiblePath(manifestDir, platform)
 	if err != nil {
-		return fmt.Errorf("Failed to get the path to the metering-ansible-operator directory: %v", err)
+		return nil, fmt.Errorf("Failed to get the path to the metering-ansible-operator directory: %v", err)
 	}
 
 	pathToCRDMap := map[string]string{
@@ -166,56 +156,48 @@ func InitObjectFromManifest(manifestDir, meteringCon***REMOVED***gCRFile string,
 	for _, crd := range resources.CRDs {
 		err := DecodeYAMLManifestToObject(crd.Path, crd.CRD)
 		if err != nil {
-			return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
+			return nil, fmt.Errorf("Failed to decode the YAML manifest: %v", err)
 		}
 	}
 
-	meteringResourceMap := map[string]Resource{
-		"meteringCon***REMOVED***g": Resource{
-			Path:            meteringCon***REMOVED***gCRFile,
-			UseAbsolutePath: true,
-			Resource:        &resources.MeteringCon***REMOVED***g,
+	meteringResourceMap := map[string]struct {
+		path string
+		obj  interface{}
+	}{
+		"deployment": {
+			path: meteringDeploymentFile,
+			obj:  &resources.Deployment,
 		},
-		"deployment": Resource{
-			Path:     meteringDeploymentFile,
-			Resource: &resources.Deployment,
+		"serviceAccount": {
+			path: meteringServiceAccountFile,
+			obj:  &resources.ServiceAccount,
 		},
-		"serviceAccount": Resource{
-			Path:     meteringServiceAccountFile,
-			Resource: &resources.ServiceAccount,
+		"roleBinding": {
+			path: meteringRoleBindingFile,
+			obj:  &resources.RoleBinding,
 		},
-		"roleBinding": Resource{
-			Path:     meteringRoleBindingFile,
-			Resource: &resources.RoleBinding,
+		"role": {
+			path: meteringRoleFile,
+			obj:  &resources.Role,
 		},
-		"role": Resource{
-			Path:     meteringRoleFile,
-			Resource: &resources.Role,
+		"clusterRoleBinding": {
+			path: meteringClusterRoleBindingFile,
+			obj:  &resources.ClusterRoleBinding,
 		},
-		"clusterRoleBinding": Resource{
-			Path:     meteringClusterRoleBindingFile,
-			Resource: &resources.ClusterRoleBinding,
-		},
-		"clusterRole": Resource{
-			Path:     meteringClusterRoleFile,
-			Resource: &resources.ClusterRole,
+		"clusterRole": {
+			path: meteringClusterRoleFile,
+			obj:  &resources.ClusterRole,
 		},
 	}
 
 	for name, resource := range meteringResourceMap {
-		path := ***REMOVED***lepath.Join(ansibleOperatorManifestDir, resource.Path)
+		path := ***REMOVED***lepath.Join(ansibleOperatorManifestDir, resource.path)
 
-		if resource.UseAbsolutePath {
-			path = resource.Path
-		}
-
-		err = DecodeYAMLManifestToObject(path, resource.Resource)
+		err = DecodeYAMLManifestToObject(path, resource.obj)
 		if err != nil {
-			return fmt.Errorf("Failed to decode the YAML manifest for the %s resource: %v", name, err)
+			return nil, fmt.Errorf("Failed to decode the YAML manifest for the %s resource: %v", name, err)
 		}
 	}
 
-	cfg.Resources = &resources
-
-	return nil
+	return &resources, nil
 }

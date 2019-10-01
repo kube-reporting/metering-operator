@@ -6,7 +6,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 func (deploy *Deployer) installNamespace() error {
@@ -60,15 +60,15 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
-	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g.Name, metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g)
+		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.MeteringCon***REMOVED***g)
 		if err != nil {
 			return fmt.Errorf("Failed to create the MeteringCon***REMOVED***g resource: %v", err)
 		}
 		deploy.logger.Infof("Created the MeteringCon***REMOVED***g resource")
 	} ***REMOVED*** if err == nil {
-		mc.Spec = deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g.Spec
+		mc.Spec = deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Spec
 
 		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Update(mc)
 		if err != nil {
@@ -117,7 +117,7 @@ func (deploy *Deployer) installMeteringResources() error {
 }
 
 func (deploy *Deployer) installMeteringDeployment() error {
-	res := deploy.con***REMOVED***g.Resources.Deployment
+	res := deploy.con***REMOVED***g.OperatorResources.Deployment
 
 	// check if the metering operator image needs to be updated
 	// TODO: implement support for METERING_OPERATOR_ALL_NAMESPACES and METERING_OPERATOR_TARGET_NAMESPACES
@@ -154,9 +154,9 @@ func (deploy *Deployer) installMeteringDeployment() error {
 }
 
 func (deploy *Deployer) installMeteringServiceAccount() error {
-	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.Resources.ServiceAccount.Name, metav1.GetOptions{})
+	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.OperatorResources.ServiceAccount.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.Resources.ServiceAccount)
+		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.OperatorResources.ServiceAccount)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering serviceaccount: %v", err)
 		}
@@ -171,7 +171,7 @@ func (deploy *Deployer) installMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) installMeteringRoleBinding() error {
-	res := deploy.con***REMOVED***g.Resources.RoleBinding
+	res := deploy.con***REMOVED***g.OperatorResources.RoleBinding
 
 	// TODO: implement support for METERING_OPERATOR_TARGET_NAMESPACES
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
@@ -199,7 +199,7 @@ func (deploy *Deployer) installMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringRole() error {
-	res := deploy.con***REMOVED***g.Resources.Role
+	res := deploy.con***REMOVED***g.OperatorResources.Role
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.Namespace = deploy.con***REMOVED***g.Namespace
@@ -221,7 +221,7 @@ func (deploy *Deployer) installMeteringRole() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRoleBinding() error {
-	res := deploy.con***REMOVED***g.Resources.ClusterRoleBinding
+	res := deploy.con***REMOVED***g.OperatorResources.ClusterRoleBinding
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -247,7 +247,7 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRole() error {
-	res := deploy.con***REMOVED***g.Resources.ClusterRole
+	res := deploy.con***REMOVED***g.OperatorResources.ClusterRole
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 
@@ -268,7 +268,7 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) installMeteringCRDs() error {
-	for _, crd := range deploy.con***REMOVED***g.Resources.CRDs {
+	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
 		err := deploy.installMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to create a CRD while looping: %v", err)

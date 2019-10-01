@@ -21,7 +21,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
-	err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g.Name, &metav1.DeleteOptions{})
+	err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The MeteringCon***REMOVED***g resource doesn't exist")
 	} ***REMOVED*** if err == nil {
@@ -109,7 +109,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringDeployment() error {
-	err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.Resources.Deployment.Name, &metav1.DeleteOptions{})
+	err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.OperatorResources.Deployment.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering deployment doesn't exist")
 	} ***REMOVED*** if err == nil {
@@ -122,7 +122,7 @@ func (deploy *Deployer) uninstallMeteringDeployment() error {
 }
 
 func (deploy *Deployer) uninstallMeteringServiceAccount() error {
-	err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.Resources.ServiceAccount.Name, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Delete(deploy.con***REMOVED***g.OperatorResources.ServiceAccount.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering service account doesn't exist")
 	} ***REMOVED*** if err == nil {
@@ -135,7 +135,7 @@ func (deploy *Deployer) uninstallMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRoleBinding() error {
-	res := deploy.con***REMOVED***g.Resources.RoleBinding
+	res := deploy.con***REMOVED***g.OperatorResources.RoleBinding
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -158,7 +158,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRole() error {
-	res := deploy.con***REMOVED***g.Resources.Role
+	res := deploy.con***REMOVED***g.OperatorResources.Role
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.Namespace = deploy.con***REMOVED***g.Namespace
@@ -176,7 +176,7 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRole() error {
-	res := deploy.con***REMOVED***g.Resources.ClusterRole
+	res := deploy.con***REMOVED***g.OperatorResources.ClusterRole
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 
@@ -193,7 +193,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
-	res := deploy.con***REMOVED***g.Resources.ClusterRoleBinding
+	res := deploy.con***REMOVED***g.OperatorResources.ClusterRoleBinding
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -215,7 +215,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRDs() error {
-	for _, crd := range deploy.con***REMOVED***g.Resources.CRDs {
+	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
 		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to delete a CRD while looping: %v", err)
