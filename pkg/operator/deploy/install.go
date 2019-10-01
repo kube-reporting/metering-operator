@@ -2,11 +2,6 @@ package deploy
 
 import (
 	"fmt"
-	"path/***REMOVED***lepath"
-
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -65,15 +60,15 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
-	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Name, metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(&deploy.con***REMOVED***g.MeteringCon***REMOVED***g)
+		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g)
 		if err != nil {
 			return fmt.Errorf("Failed to create the MeteringCon***REMOVED***g resource: %v", err)
 		}
 		deploy.logger.Infof("Created the MeteringCon***REMOVED***g resource")
 	} ***REMOVED*** if err == nil {
-		mc.Spec = deploy.con***REMOVED***g.MeteringCon***REMOVED***g.Spec
+		mc.Spec = deploy.con***REMOVED***g.Resources.MeteringCon***REMOVED***g.Spec
 
 		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Update(mc)
 		if err != nil {
@@ -88,32 +83,32 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 }
 
 func (deploy *Deployer) installMeteringResources() error {
-	err := deploy.installMeteringDeployment(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringDeploymentFile))
+	err := deploy.installMeteringDeployment()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering deployment: %v", err)
 	}
 
-	err = deploy.installMeteringServiceAccount(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringServiceAccountFile))
+	err = deploy.installMeteringServiceAccount()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering service account: %v", err)
 	}
 
-	err = deploy.installMeteringRole(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleFile))
+	err = deploy.installMeteringRole()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role: %v", err)
 	}
 
-	err = deploy.installMeteringRoleBinding(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringRoleBindingFile))
+	err = deploy.installMeteringRoleBinding()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering role binding: %v", err)
 	}
 
-	err = deploy.installMeteringClusterRole(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleFile))
+	err = deploy.installMeteringClusterRole()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role: %v", err)
 	}
 
-	err = deploy.installMeteringClusterRoleBinding(***REMOVED***lepath.Join(deploy.ansibleOperatorManifestsLocation, meteringClusterRoleBindingFile))
+	err = deploy.installMeteringClusterRoleBinding()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering cluster role binding: %v", err)
 	}
@@ -121,13 +116,8 @@ func (deploy *Deployer) installMeteringResources() error {
 	return nil
 }
 
-func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
-	var res appsv1.Deployment
-
-	err := DecodeYAMLManifestToObject(deploymentName, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the metering YAML manifest: %v", err)
-	}
+func (deploy *Deployer) installMeteringDeployment() error {
+	res := deploy.con***REMOVED***g.Resources.Deployment
 
 	// check if the metering operator image needs to be updated
 	// TODO: implement support for METERING_OPERATOR_ALL_NAMESPACES and METERING_OPERATOR_TARGET_NAMESPACES
@@ -143,7 +133,7 @@ func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
 
 	deployment, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Create(&res)
+		_, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering deployment: %v", err)
 		}
@@ -163,17 +153,10 @@ func (deploy *Deployer) installMeteringDeployment(deploymentName string) error {
 	return nil
 }
 
-func (deploy *Deployer) installMeteringServiceAccount(serviceAccountPath string) error {
-	var res corev1.ServiceAccount
-
-	err := DecodeYAMLManifestToObject(serviceAccountPath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
-	_, err = deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+func (deploy *Deployer) installMeteringServiceAccount() error {
+	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Get(deploy.con***REMOVED***g.Resources.ServiceAccount.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(&res)
+		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.Resources.ServiceAccount)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering serviceaccount: %v", err)
 		}
@@ -187,13 +170,8 @@ func (deploy *Deployer) installMeteringServiceAccount(serviceAccountPath string)
 	return nil
 }
 
-func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error {
-	var res rbacv1.RoleBinding
-
-	err := DecodeYAMLManifestToObject(roleBindingPath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) installMeteringRoleBinding() error {
+	res := deploy.con***REMOVED***g.Resources.RoleBinding
 
 	// TODO: implement support for METERING_OPERATOR_TARGET_NAMESPACES
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
@@ -204,9 +182,9 @@ func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error
 		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
 	}
 
-	_, err = deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Create(&res)
+		_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering role binding: %v", err)
 		}
@@ -220,20 +198,15 @@ func (deploy *Deployer) installMeteringRoleBinding(roleBindingPath string) error
 	return nil
 }
 
-func (deploy *Deployer) installMeteringRole(rolePath string) error {
-	var res rbacv1.Role
-
-	err := DecodeYAMLManifestToObject(rolePath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) installMeteringRole() error {
+	res := deploy.con***REMOVED***g.Resources.Role
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.Namespace = deploy.con***REMOVED***g.Namespace
 
-	_, err = deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Create(&res)
+		_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering role: %v", err)
 		}
@@ -247,13 +220,8 @@ func (deploy *Deployer) installMeteringRole(rolePath string) error {
 	return nil
 }
 
-func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile string) error {
-	var res rbacv1.ClusterRoleBinding
-
-	err := DecodeYAMLManifestToObject(clusterrolebindingFile, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) installMeteringClusterRoleBinding() error {
+	res := deploy.con***REMOVED***g.Resources.ClusterRoleBinding
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -262,9 +230,9 @@ func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile
 		res.Subjects[index].Namespace = deploy.con***REMOVED***g.Namespace
 	}
 
-	_, err = deploy.client.RbacV1().ClusterRoleBindings().Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().ClusterRoleBindings().Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().ClusterRoleBindings().Create(&res)
+		_, err := deploy.client.RbacV1().ClusterRoleBindings().Create(res)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering cluster role, got: %v", err)
 		}
@@ -278,19 +246,14 @@ func (deploy *Deployer) installMeteringClusterRoleBinding(clusterrolebindingFile
 	return nil
 }
 
-func (deploy *Deployer) installMeteringClusterRole(clusterrolePath string) error {
-	var res rbacv1.ClusterRole
-
-	err := DecodeYAMLManifestToObject(clusterrolePath, &res)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
+func (deploy *Deployer) installMeteringClusterRole() error {
+	res := deploy.con***REMOVED***g.Resources.ClusterRole
 
 	res.Name = deploy.con***REMOVED***g.Namespace + "-" + res.Name
 
-	_, err = deploy.client.RbacV1().ClusterRoles().Get(res.Name, metav1.GetOptions{})
+	_, err := deploy.client.RbacV1().ClusterRoles().Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.RbacV1().ClusterRoles().Create(&res)
+		_, err := deploy.client.RbacV1().ClusterRoles().Create(res)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering cluster role: %v", err)
 		}
@@ -305,7 +268,7 @@ func (deploy *Deployer) installMeteringClusterRole(clusterrolePath string) error
 }
 
 func (deploy *Deployer) installMeteringCRDs() error {
-	for _, crd := range deploy.crds {
+	for _, crd := range deploy.con***REMOVED***g.Resources.CRDs {
 		err := deploy.installMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to create a CRD while looping: %v", err)
@@ -316,11 +279,6 @@ func (deploy *Deployer) installMeteringCRDs() error {
 }
 
 func (deploy *Deployer) installMeteringCRD(resource CRD) error {
-	err := DecodeYAMLManifestToObject(resource.Path, resource.CRD)
-	if err != nil {
-		return fmt.Errorf("Failed to decode the YAML manifest: %v", err)
-	}
-
 	crd, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Get(resource.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Create(resource.CRD)
