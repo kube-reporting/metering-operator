@@ -65,11 +65,13 @@ type Config struct {
 	Platform               string
 	Repo                   string
 	Tag                    string
-	Resources              *MeteringResources
+	OperatorResources      *OperatorResources
+	MeteringConfig         *meteringv1.MeteringConfig
 }
 
-// MeteringResources contains all the objects that metering manages
-type MeteringResources struct {
+// OperatorResources contains all the objects that make up the
+// Metering Ansible Operator
+type OperatorResources struct {
 	CRDs               []CRD
 	Deployment         *appsv1.Deployment
 	ServiceAccount     *corev1.ServiceAccount
@@ -77,7 +79,6 @@ type MeteringResources struct {
 	Role               *rbacv1.Role
 	ClusterRoleBinding *rbacv1.ClusterRoleBinding
 	ClusterRole        *rbacv1.ClusterRole
-	MeteringConfig     *meteringv1.MeteringConfig
 }
 
 // Deployer holds all the information needed to handle the deployment

@@ -21,7 +21,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 }
 
 func (deploy *Deployer) uninstallMeteringConfig() error {
-	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.Resources.MeteringConfig.Name, &metav1.DeleteOptions{})
+	err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Delete(deploy.config.MeteringConfig.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The MeteringConfig resource doesn't exist")
 	} else if err == nil {
@@ -109,7 +109,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 }
 
 func (deploy *Deployer) uninstallMeteringDeployment() error {
-	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(deploy.config.Resources.Deployment.Name, &metav1.DeleteOptions{})
+	err := deploy.client.AppsV1().Deployments(deploy.config.Namespace).Delete(deploy.config.OperatorResources.Deployment.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering deployment doesn't exist")
 	} else if err == nil {
@@ -122,7 +122,7 @@ func (deploy *Deployer) uninstallMeteringDeployment() error {
 }
 
 func (deploy *Deployer) uninstallMeteringServiceAccount() error {
-	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(deploy.config.Resources.ServiceAccount.Name, &metav1.DeleteOptions{})
+	err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Delete(deploy.config.OperatorResources.ServiceAccount.Name, &metav1.DeleteOptions{})
 	if apierrors.IsNotFound(err) {
 		deploy.logger.Warnf("The metering service account doesn't exist")
 	} else if err == nil {
@@ -135,7 +135,7 @@ func (deploy *Deployer) uninstallMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRoleBinding() error {
-	res := deploy.config.Resources.RoleBinding
+	res := deploy.config.OperatorResources.RoleBinding
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -158,7 +158,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringRole() error {
-	res := deploy.config.Resources.Role
+	res := deploy.config.OperatorResources.Role
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.Namespace = deploy.config.Namespace
@@ -176,7 +176,7 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRole() error {
-	res := deploy.config.Resources.ClusterRole
+	res := deploy.config.OperatorResources.ClusterRole
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
@@ -193,7 +193,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
-	res := deploy.config.Resources.ClusterRoleBinding
+	res := deploy.config.OperatorResources.ClusterRoleBinding
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -215,7 +215,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) uninstallMeteringCRDs() error {
-	for _, crd := range deploy.config.Resources.CRDs {
+	for _, crd := range deploy.config.OperatorResources.CRDs {
 		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to delete a CRD while looping: %v", err)
