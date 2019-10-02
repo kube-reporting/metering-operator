@@ -14,7 +14,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -100,32 +99,10 @@ type Deployer struct {
 func NewDeployer(
 	cfg Con***REMOVED***g,
 	logger log.FieldLogger,
+	client kubernetes.Interface,
+	apiextClient apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter,
+	meteringClient metering.MeteringV1Interface,
 ) (*Deployer, error) {
-	kubecon***REMOVED***g := clientcmd.NewNonInteractiveDeferredLoadingClientCon***REMOVED***g(
-		clientcmd.NewDefaultClientCon***REMOVED***gLoadingRules(),
-		&clientcmd.Con***REMOVED***gOverrides{},
-	)
-
-	restcon***REMOVED***g, err := kubecon***REMOVED***g.ClientCon***REMOVED***g()
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the kubernetes client con***REMOVED***g: %v", err)
-	}
-
-	client, err := kubernetes.NewForCon***REMOVED***g(restcon***REMOVED***g)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
-	}
-
-	apiextClient, err := apiextclientv1beta1.NewForCon***REMOVED***g(restcon***REMOVED***g)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
-	}
-
-	meteringClient, err := metering.NewForCon***REMOVED***g(restcon***REMOVED***g)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the metering clientset: %v", err)
-	}
-
 	deploy := &Deployer{
 		client:         client,
 		apiExtClient:   apiextClient,
