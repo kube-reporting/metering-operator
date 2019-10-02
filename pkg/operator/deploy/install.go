@@ -6,7 +6,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 func (deploy *Deployer) installNamespace() error {
@@ -60,15 +60,15 @@ func (deploy *Deployer) installNamespace() error {
 }
 
 func (deploy *Deployer) installMeteringConfig() error {
-	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.Resources.MeteringConfig.Name, metav1.GetOptions{})
+	mc, err := deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Get(deploy.config.MeteringConfig.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.Resources.MeteringConfig)
+		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Create(deploy.config.MeteringConfig)
 		if err != nil {
 			return fmt.Errorf("Failed to create the MeteringConfig resource: %v", err)
 		}
 		deploy.logger.Infof("Created the MeteringConfig resource")
 	} else if err == nil {
-		mc.Spec = deploy.config.Resources.MeteringConfig.Spec
+		mc.Spec = deploy.config.MeteringConfig.Spec
 
 		_, err = deploy.meteringClient.MeteringConfigs(deploy.config.Namespace).Update(mc)
 		if err != nil {
@@ -117,7 +117,7 @@ func (deploy *Deployer) installMeteringResources() error {
 }
 
 func (deploy *Deployer) installMeteringDeployment() error {
-	res := deploy.config.Resources.Deployment
+	res := deploy.config.OperatorResources.Deployment
 
 	// check if the metering operator image needs to be updated
 	// TODO: implement support for METERING_OPERATOR_ALL_NAMESPACES and METERING_OPERATOR_TARGET_NAMESPACES
@@ -154,9 +154,9 @@ func (deploy *Deployer) installMeteringDeployment() error {
 }
 
 func (deploy *Deployer) installMeteringServiceAccount() error {
-	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Get(deploy.config.Resources.ServiceAccount.Name, metav1.GetOptions{})
+	_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Get(deploy.config.OperatorResources.ServiceAccount.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
-		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Create(deploy.config.Resources.ServiceAccount)
+		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.config.Namespace).Create(deploy.config.OperatorResources.ServiceAccount)
 		if err != nil {
 			return fmt.Errorf("Failed to create the metering serviceaccount: %v", err)
 		}
@@ -171,7 +171,7 @@ func (deploy *Deployer) installMeteringServiceAccount() error {
 }
 
 func (deploy *Deployer) installMeteringRoleBinding() error {
-	res := deploy.config.Resources.RoleBinding
+	res := deploy.config.OperatorResources.RoleBinding
 
 	// TODO: implement support for METERING_OPERATOR_TARGET_NAMESPACES
 	res.Name = deploy.config.Namespace + "-" + res.Name
@@ -199,7 +199,7 @@ func (deploy *Deployer) installMeteringRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringRole() error {
-	res := deploy.config.Resources.Role
+	res := deploy.config.OperatorResources.Role
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.Namespace = deploy.config.Namespace
@@ -221,7 +221,7 @@ func (deploy *Deployer) installMeteringRole() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRoleBinding() error {
-	res := deploy.config.Resources.ClusterRoleBinding
+	res := deploy.config.OperatorResources.ClusterRoleBinding
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 	res.RoleRef.Name = res.Name
@@ -247,7 +247,7 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 }
 
 func (deploy *Deployer) installMeteringClusterRole() error {
-	res := deploy.config.Resources.ClusterRole
+	res := deploy.config.OperatorResources.ClusterRole
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
@@ -268,7 +268,7 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 }
 
 func (deploy *Deployer) installMeteringCRDs() error {
-	for _, crd := range deploy.config.Resources.CRDs {
+	for _, crd := range deploy.config.OperatorResources.CRDs {
 		err := deploy.installMeteringCRD(crd)
 		if err != nil {
 			return fmt.Errorf("Failed to create a CRD while looping: %v", err)
