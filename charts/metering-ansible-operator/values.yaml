@@ -11,7 +11,7 @@ operator:
 
   image:
     repository: quay.io/openshift/origin-metering-ansible-operator
-    tag: 4.3
+    tag: "4.3"
     pullPolicy: Always
 
   imagePullSecrets: []
@@ -162,7 +162,7 @@ operator:
 olm:
   packageName: metering-ocp
   channels:
-  - name: 4.3
+  - name: "4.3"
     currentCSV: metering-operator.v4.3.0
 
   skipARTPackage: false

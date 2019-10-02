@@ -13,7 +13,7 @@ operator:
 olm:
   packageName: metering-upstream
   channels:
-  - name: stable
+  - name: "4.3"
     currentCSV: metering-operator-upstream.v4.3.0
 
   skipARTPackage: true
