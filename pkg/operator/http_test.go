@@ -38,12 +38,12 @@ var (
 
 //for v2 endpoints full
 func apiReportV2URLFull(namespace, reportName string) string {
-	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, namespace, reportName, "full")
+	return path.Join(APIV2ReportEndpointPre***REMOVED***x, namespace, reportName, "full")
 }
 
 //for v2 endpoints TableHidden
 func apiReportV2URLTable(namespace, reportName string) string {
-	return path.Join(APIV2ReportsEndpointPre***REMOVED***x, namespace, reportName, "table")
+	return path.Join(APIV2ReportEndpointPre***REMOVED***x, namespace, reportName, "table")
 }
 
 type fakePrometheusMetricsRepo struct {
@@ -306,7 +306,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, nil, noopPrometheusImporterFunc,
 				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
@@ -321,7 +321,7 @@ func TestAPIV1ReportsGet(t *testing.T) {
 				"namespace": []string{namespace},
 			}
 
-			endpoint := server.URL + APIV1ReportsGetEndpoint
+			endpoint := server.URL + APIV1ReportGetEndpoint
 
 			// construct the url object
 			endpointURL, err := url.Parse(endpoint)
@@ -516,7 +516,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 		},
 		"report-name-not-speci***REMOVED***ed": {
 			reportName:            "",
-			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "/ " + namespace + "//full" + testFormat,
+			apiPath:               APIV2ReportEndpointPre***REMOVED***x + "/ " + namespace + "//full" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -612,7 +612,7 @@ func TestAPIV2ReportsFull(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, nil, noopPrometheusImporterFunc,
 				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
@@ -806,7 +806,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 		},
 		"report-name-not-speci***REMOVED***ed": {
 			reportName:            "",
-			apiPath:               APIV2ReportsEndpointPre***REMOVED***x + "/ " + namespace + "//table" + testFormat,
+			apiPath:               APIV2ReportEndpointPre***REMOVED***x + "/ " + namespace + "//table" + testFormat,
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedAPIError:      "the following ***REMOVED***elds are missing or empty: name",
 			reportResultsGetter:   &fakeReportResultsGetter{},
@@ -902,7 +902,7 @@ func TestAPIV2ReportsTable(t *testing.T) {
 			}
 
 			// setup a test server suitable for making API calls against
-			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, noopPrometheusImporterFunc,
+			router := newRouter(testLogger, testRand, tt.prometheusMetricsRepo, tt.reportResultsGetter, nil, noopPrometheusImporterFunc,
 				reportLister, reportDataSourceLister, reportQueryLister, prestoTableLister,
 			)
 			server := httptest.NewServer(router)
