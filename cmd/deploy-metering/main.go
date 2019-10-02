@@ -8,8 +8,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
+	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
 )
 
 var (
@@ -98,7 +103,32 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 
 	logger.Debugf("Metering Deploy Config: %#v", cfg)
 
-	deployObj, err := deploy.NewDeployer(cfg, logger)
+	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{},
+	)
+
+	restconfig, err := kubeconfig.ClientConfig()
+	if err != nil {
+		return fmt.Errorf("Failed to initialize the kubernetes client config: %v", err)
+	}
+
+	client, err := kubernetes.NewForConfig(restconfig)
+	if err != nil {
+		return fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
+	}
+
+	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
+	if err != nil {
+		return fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
+	}
+
+	meteringClient, err := metering.NewForConfig(restconfig)
+	if err != nil {
+		return fmt.Errorf("Failed to initialize the metering clientset: %v", err)
+	}
+
+	deployObj, err := deploy.NewDeployer(cfg, logger, client, apiextClient, meteringClient)
 	if err != nil {
 		return fmt.Errorf("Failed to deploy metering: %v", err)
 	}
