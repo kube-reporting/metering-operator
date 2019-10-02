@@ -86,9 +86,14 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Failed to set the $METERING_CR_FILE or --meteringcon***REMOVED***g flag")
 	}
 
-	err := deploy.InitObjectFromManifest(deployManifestsDir, meteringCon***REMOVED***gCRFile, &cfg)
+	err := deploy.DecodeYAMLManifestToObject(meteringCon***REMOVED***gCRFile, &cfg.MeteringCon***REMOVED***g)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize metering resource objects from YAML manifests: %v", err)
+		return fmt.Errorf("Failed to read MeteringCon***REMOVED***g: %v", err)
+	}
+
+	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(deployManifestsDir, cfg.Platform)
+	if err != nil {
+		return fmt.Errorf("Failed to read metering-ansible-operator manifests: %v", err)
 	}
 
 	logger.Debugf("Metering Deploy Con***REMOVED***g: %#v", cfg)
