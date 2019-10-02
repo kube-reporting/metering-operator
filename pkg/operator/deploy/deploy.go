@@ -14,7 +14,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -100,32 +99,10 @@ type Deployer struct {
 func NewDeployer(
 	cfg Config,
 	logger log.FieldLogger,
+	client kubernetes.Interface,
+	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
+	meteringClient metering.MeteringV1Interface,
 ) (*Deployer, error) {
-	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{},
-	)
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the kubernetes client config: %v", err)
-	}
-
-	client, err := kubernetes.NewForConfig(restconfig)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
-	}
-
-	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
-	}
-
-	meteringClient, err := metering.NewForConfig(restconfig)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize the metering clientset: %v", err)
-	}
-
 	deploy := &Deployer{
 		client:         client,
 		apiExtClient:   apiextClient,
