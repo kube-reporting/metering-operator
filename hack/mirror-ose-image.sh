@@ -2,27 +2,25 @@
 
 set -e
 
-IMAGE_NAME=$1
-CLUSTER_REGISTRY_URL=$2
+SOURCE_IMAGE=$1
+OUTPUT_IMAGE=$2
 
-OSE_IMAGE_REPO="${OSE_IMAGE_REPO:-"brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888"}"
-
-if [[ -z $IMAGE_NAME ]]; then
-        echo "must pass a image name as the ***REMOVED***rst arg"
+if [[ -z "$SOURCE_IMAGE" ]]; then
+        echo "must pass a source image as the ***REMOVED***rst arg"
         exit 1
 ***REMOVED***
 
-if [[ -z $CLUSTER_REGISTRY_URL ]]; then
-        echo "must pass the cluster registry hostname as the second arg"
+if [[ -z "$OUTPUT_IMAGE" ]]; then
+        echo "must pass the output image as the second arg"
         exit 1
 ***REMOVED***
 
 DOCKER_COMMAND=${DOCKER_COMMAND:-docker}
 
 set -x
-"$DOCKER_COMMAND" pull "$OSE_IMAGE_REPO/$IMAGE_NAME"
-"$DOCKER_COMMAND" tag "$OSE_IMAGE_REPO/$IMAGE_NAME" "$CLUSTER_REGISTRY_URL/$IMAGE_NAME"
-"$DOCKER_COMMAND" push "$CLUSTER_REGISTRY_URL/$IMAGE_NAME"
+"$DOCKER_COMMAND" pull "$SOURCE_IMAGE"
+"$DOCKER_COMMAND" tag "$SOURCE_IMAGE" "$OUTPUT_IMAGE"
+"$DOCKER_COMMAND" push "$OUTPUT_IMAGE"
 
 set +x
-echo "$IMAGE_NAME is added to the cluster"
+echo "Mirrored $SOURCE_IMAGE to $OUTPUT_IMAGE"
