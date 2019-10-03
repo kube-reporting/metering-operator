@@ -1,5 +1,5 @@
 packageName: metering-upstream
 channels:
 - currentCSV: metering-operator-upstream.v4.3.0
-  name: stable
+  name: "4.3"
 
