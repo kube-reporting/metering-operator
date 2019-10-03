@@ -1,7 +1,7 @@
 operator:
   image:
     repository: image-registry.openshift-image-registry.svc:5000/openshift/ose-metering-ansible-operator
-    tag: v4.3
+    tag: "v4.3"
 
 olm:
   imageTags:
@@ -37,7 +37,7 @@ olm:
   skipARTPackage: true
 
   channels:
-  - name: 4.3
+  - name: "4.3"
     currentCSV: metering-operator.v4.3.0
   csv:
     name : metering-operator-testing.v4.3.0
