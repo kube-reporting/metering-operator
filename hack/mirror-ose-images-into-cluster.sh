@@ -5,13 +5,16 @@ ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 
 REPO_NAMESPACE="${REPO_NAMESPACE:-"openshift"}"
 OSE_IMAGE_TAG="${OSE_IMAGE_TAG:-"v4.2"}"
-CLUSTER_REGISTRY_URL="${CLUSTER_REGISTRY_URL:-"$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')"}"
+SOURCE_IMAGE_URL="${SOURCE_IMAGE_URL:-"registry-proxy.engineering.redhat.com"}"
+SOURCE_IMAGE_NAMESPACE="${SOURCE_IMAGE_NAMESPACE:-"rh-osbs"}"
+OUTPUT_IMAGE_URL="${OUTPUT_IMAGE_URL:-"$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')"}"
+OUTPUT_IMAGE_NAMESPACE="${OUTPUT_IMAGE_NAMESPACE:-"$REPO_NAMESPACE"}"
 SETUP_REGISTRY_AUTH="${SETUP_REGISTRY_AUTH:-"true"}"
 PULL_IMAGES="${PULL_IMAGES:-"true"}"
 PUSH_IMAGES="${PUSH_IMAGES:-"true"}"
 
-if [ -z "$CLUSTER_REGISTRY_URL" ]; then
-    echo "Couldn't detect \$CLUSTER_REGISTRY_URL or unset"
+if [ -z "$OUTPUT_IMAGE_URL" ]; then
+    echo "Couldn't detect \$OUTPUT_IMAGE_URL or unset"
     exit 1
 fi
 
@@ -87,10 +90,10 @@ if [ "$SETUP_REGISTRY_AUTH" == "true" ]; then
     oc create serviceaccount registry-editor -n "$REPO_NAMESPACE" || true
     echo "Granting registry-editor registry-editor permissions in $REPO_NAMESPACE"
     oc adm policy add-role-to-user registry-editor -z registry-editor -n "$REPO_NAMESPACE" || true
-    echo "Performing docker login as registry-editor to $CLUSTER_REGISTRY_URL"
+    echo "Performing docker login as registry-editor to $OUTPUT_IMAGE_URL"
     set +x
     docker login \
-        "$CLUSTER_REGISTRY_URL" \
+        "$OUTPUT_IMAGE_URL" \
         -u registry-editor \
         -p "$(oc sa get-token registry-editor -n "$REPO_NAMESPACE")"
     set -x
@@ -98,35 +101,35 @@ fi
 
 echo "Ensuring namespace $REPO_NAMESPACE exists for images to be pushed into"
 oc create namespace "$REPO_NAMESPACE" || true
-echo "Pushing Metering OSE images to $CLUSTER_REGISTRY_URL"
+echo "Pushing Metering OSE images to $OUTPUT_IMAGE_URL"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$METERING_ANSIBLE_OPERATOR_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$METERING_ANSIBLE_OPERATOR_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$METERING_ANSIBLE_OPERATOR_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$METERING_REPORTING_OPERATOR_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$METERING_REPORTING_OPERATOR_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$METERING_REPORTING_OPERATOR_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$METERING_PRESTO_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$METERING_PRESTO_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$METERING_PRESTO_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$METERING_HIVE_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$METERING_HIVE_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$METERING_HIVE_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$METERING_HADOOP_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$METERING_HADOOP_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$METERING_HADOOP_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$GHOSTUNNEL_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$GHOSTUNNEL_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$GHOSTUNNEL_OUTPUT_IMAGE"
 
 "$ROOT_DIR/hack/mirror-ose-image.sh" \
-    "$OAUTH_PROXY_IMAGE" \
-    "$CLUSTER_REGISTRY_URL"
+    "$SOURCE_IMAGE_URL/$OAUTH_PROXY_SOURCE_IMAGE" \
+    "$OUTPUT_IMAGE_URL/$OAUTH_PROXY_OUTPUT_IMAGE"
 
 echo "Granting access to pull images in $REPO_NAMESPACE to all serviceaccounts in \$METERING_NAMESPACE=$METERING_NAMESPACE"
 oc -n "$REPO_NAMESPACE" policy add-role-to-group system:image-puller "system:serviceaccounts:$METERING_NAMESPACE" --rolebinding-name "$METERING_NAMESPACE-image-pullers"
