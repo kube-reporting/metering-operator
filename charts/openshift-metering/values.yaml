@@ -233,7 +233,7 @@ openshift-reporting:
             spec:
               prometheusMetricsImporter:
                 query: |
-                  label_replace(sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}) by (pod, namespace, node), "pod", "$1", "pod_name", "(.*)")
+                  label_replace(sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}) by (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
 
 reporting-operator:
   spec:
