@@ -33,15 +33,15 @@ func testReportsProduceCorrectDataForInput(t *testing.T, reportStart, reportEnd 
 				t.Parallel()
 			}
 
-			report := testFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
+			report := testReportingFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
 
 			reportRunTimeout := 10 * time.Minute
 			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
-			testFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
+			testReportingFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
 			resultTimeout := time.Minute
 			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
-			actualResults := testFramework.GetReportResults(t, report, resultTimeout)
+			actualResults := testReportingFramework.GetReportResults(t, report, resultTimeout)
 
 			// read expected results from a file
 			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)

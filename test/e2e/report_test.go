@@ -9,7 +9,7 @@ import (
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
-	"github.com/operator-framework/operator-metering/test/framework"
+	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
 
 type reportProducesDataTestCase struct {
@@ -21,7 +21,7 @@ type reportProducesDataTestCase struct {
 	parallel      bool
 }
 
-func testReportsProduceData(t *testing.T, testFramework *framework.Framework, testCases []reportProducesDataTestCase) {
+func testReportsProduceData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework, testCases []reportProducesDataTestCase) {
 	for _, test := range testCases {
 		name := test.name
 		// Fix closure captures
@@ -35,12 +35,12 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 				t.Parallel()
 			}
 
-			query, err := testFramework.WaitForMeteringReportQuery(t, test.queryName, 5*time.Second, 5*time.Minute)
+			query, err := testReportingFramework.WaitForMeteringReportQuery(t, test.queryName, 5*time.Second, 5*time.Minute)
 			require.NoError(t, err, "report query for report should exist")
 
-			dsGetter := reporting.NewReportDataSourceClientGetter(testFramework.MeteringClient)
-			queryGetter := reporting.NewReportQueryClientGetter(testFramework.MeteringClient)
-			reportGetter := reporting.NewReportClientGetter(testFramework.MeteringClient)
+			dsGetter := reporting.NewReportDataSourceClientGetter(testReportingFramework.MeteringClient)
+			queryGetter := reporting.NewReportQueryClientGetter(testReportingFramework.MeteringClient)
+			reportGetter := reporting.NewReportClientGetter(testReportingFramework.MeteringClient)
 
 			// get all the datasources for the query used in our report
 			dependencies, err := reporting.GetQueryDependencies(queryGetter, dsGetter, reportGetter, query, nil)
@@ -52,7 +52,7 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 
 			// for each datasource, wait until it's EarliestImportedMetricTime is set
 			for _, ds := range dependencies.ReportDataSources {
-				_, err := testFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *metering.ReportDataSource) (bool, error) {
+				_, err := testReportingFramework.WaitForMeteringReportDataSource(t, ds.Name, 5*time.Second, 5*time.Minute, func(dataSource *metering.ReportDataSource) (bool, error) {
 					if dataSource.Spec.PrometheusMetricsImporter == nil {
 						return true, nil
 					}
@@ -83,11 +83,11 @@ func testReportsProduceData(t *testing.T, testFramework *framework.Framework, te
 			report := test.newReportFunc(test.name, test.queryName, test.schedule, &reportStart, &reportEnd)
 			reportRunTimeout := 10 * time.Minute
 			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
-			testFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
+			testReportingFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
 
 			resultTimeout := time.Minute
 			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
-			reportResults := testFramework.GetReportResults(t, report, resultTimeout)
+			reportResults := testReportingFramework.GetReportResults(t, report, resultTimeout)
 			assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 		})
 	}

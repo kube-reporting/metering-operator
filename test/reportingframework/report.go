@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"encoding/json"
@@ -22,16 +22,16 @@ import (
 	meteringUtil "github.com/operator-framework/operator-metering/pkg/apis/metering/v1/util"
 )
 
-func (f *Framework) CreateMeteringReport(report *metering.Report) error {
-	_, err := f.MeteringClient.Reports(f.Namespace).Create(report)
+func (rf *ReportingFramework) CreateMeteringReport(report *metering.Report) error {
+	_, err := rf.MeteringClient.Reports(rf.Namespace).Create(report)
 	return err
 }
 
-func (f *Framework) GetMeteringReport(name string) (*metering.Report, error) {
-	return f.MeteringClient.Reports(f.Namespace).Get(name, meta.GetOptions{})
+func (rf *ReportingFramework) GetMeteringReport(name string) (*metering.Report, error) {
+	return rf.MeteringClient.Reports(rf.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
+func (rf *ReportingFramework) NewSimpleReport(name, queryName string, schedule *metering.ReportSchedule, reportingStart, reportingEnd *time.Time) *metering.Report {
 	var start, end *meta.Time
 	if reportingStart != nil {
 		start = &meta.Time{*reportingStart}
@@ -42,7 +42,7 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *metering.R
 	return &metering.Report{
 		ObjectMeta: meta.ObjectMeta{
 			Name:      name,
-			Namespace: f.Namespace,
+			Namespace: rf.Namespace,
 		},
 		Spec: metering.ReportSpec{
 			QueryName:      queryName,
@@ -53,21 +53,21 @@ func (f *Framework) NewSimpleReport(name, queryName string, schedule *metering.R
 	}
 }
 
-func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering.Report, waitTimeout time.Duration) {
+func (rf *ReportingFramework) RequireReportSuccessfullyRuns(t *testing.T, report *metering.Report, waitTimeout time.Duration) {
 	t.Helper()
-	err := f.MeteringClient.Reports(f.Namespace).Delete(report.Name, nil)
+	err := rf.MeteringClient.Reports(rf.Namespace).Delete(report.Name, nil)
 	assert.Condition(t, func() bool {
 		return err == nil || errors.IsNotFound(err)
 	}, "failed to ensure Report doesn't exist before creating")
 
 	t.Logf("creating Report %s", report.Name)
-	err = f.CreateMeteringReport(report)
+	err = rf.CreateMeteringReport(report)
 	require.NoError(t, err, "creating Report should succeed")
 
 	prevLogMsg := ""
 	err = wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
 		// poll the status
-		report, err := f.GetMeteringReport(report.Name)
+		report, err := rf.GetMeteringReport(report.Name)
 		if err != nil {
 			return false, err
 		}
@@ -86,7 +86,7 @@ func (f *Framework) RequireReportSuccessfullyRuns(t *testing.T, report *metering
 	require.NoErrorf(t, err, "expected Report to finished within %s timeout", waitTimeout)
 }
 
-func (f *Framework) GetReportResults(t *testing.T, report *metering.Report, waitTimeout time.Duration) []map[string]interface{} {
+func (rf *ReportingFramework) GetReportResults(t *testing.T, report *metering.Report, waitTimeout time.Duration) []map[string]interface{} {
 	t.Helper()
 	var reportResults []map[string]interface{}
 	var reportData []byte
@@ -97,7 +97,7 @@ func (f *Framework) GetReportResults(t *testing.T, report *metering.Report, wait
 		"format":    "json",
 	}
 	err := wait.Poll(time.Second*5, waitTimeout, func() (bool, error) {
-		respBody, respCode, err := f.ReportingOperatorRequest("/api/v1/reports/get", queryParams)
+		respBody, respCode, err := rf.ReportingOperatorRequest("/api/v1/reports/get", queryParams)
 		require.NoError(t, err, "fetching Report results should be successful")
 
 		if respCode == http.StatusAccepted {
@@ -114,7 +114,7 @@ func (f *Framework) GetReportResults(t *testing.T, report *metering.Report, wait
 	require.NoError(t, err, "expected Report to have 1 row of results before timing out")
 	assert.NotEmpty(t, reportResults, "reports should return at least 1 row")
 
-	fileName := path.Join(f.ReportOutputDirectory, fmt.Sprintf("%s.json", report.Name))
+	fileName := path.Join(rf.ReportOutputDirectory, fmt.Sprintf("%s.json", report.Name))
 	err = ioutil.WriteFile(fileName, reportData, os.ModePerm)
 	require.NoError(t, err, "expected writing report results to disk not to error")
 	return reportResults
