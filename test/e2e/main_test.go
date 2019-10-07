@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
@@ -50,7 +51,7 @@ func TestMain(m *testing.M) {
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
 	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
 	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
-	logLevel := flag.String("log-level", "debug", "The log level")
+	logLevel := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
 
 	flag.Parse()
 
