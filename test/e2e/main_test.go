@@ -11,11 +11,11 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	"github.com/operator-framework/operator-metering/test/framework"
+	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
 
 var (
-	testFramework *framework.Framework
+	testReportingFramework *reportingframework.ReportingFramework
 
 	reportTestOutputDirectory string
 	runAWSBillingTests        bool
@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 
 	var err error
-	if testFramework, err = framework.New(*ns, *kubecon***REMOVED***g, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL); err != nil {
+	if testReportingFramework, err = reportingframework.New(*ns, *kubecon***REMOVED***g, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL); err != nil {
 		logrus.Fatalf("failed to setup framework: %v\n", err)
 	}
 
@@ -103,7 +103,7 @@ func TestReportingProducesData(t *testing.T) {
 			name:          query.queryName + "-cron",
 			queryName:     query.queryName,
 			schedule:      cronSchedule,
-			newReportFunc: testFramework.NewSimpleReport,
+			newReportFunc: testReportingFramework.NewSimpleReport,
 			skip:          query.skip,
 			parallel:      !query.nonParallel,
 		}
@@ -111,7 +111,7 @@ func TestReportingProducesData(t *testing.T) {
 			name:          query.queryName + "-runonce",
 			queryName:     query.queryName,
 			schedule:      nil, // runOnce
-			newReportFunc: testFramework.NewSimpleReport,
+			newReportFunc: testReportingFramework.NewSimpleReport,
 			skip:          query.skip,
 			parallel:      !query.nonParallel,
 		}
@@ -119,5 +119,5 @@ func TestReportingProducesData(t *testing.T) {
 		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportcronTestCase, reportRunOnceTestCase)
 	}
 
-	testReportsProduceData(t, testFramework, reportsProduceDataTestCases)
+	testReportsProduceData(t, testReportingFramework, reportsProduceDataTestCases)
 }

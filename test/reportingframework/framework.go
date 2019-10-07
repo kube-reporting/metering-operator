@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator"
 )
 
-type Framework struct {
+type ReportingFramework struct {
 	MeteringClient        metering.MeteringV1Interface
 	KubeClient            kubernetes.Interface
 	HTTPClient            *http.Client
@@ -43,8 +43,8 @@ type Framework struct {
 	collectPrometheusMetricsDataResponse operator.CollectPrometheusMetricsDataResponse
 }
 
-// New initializes a test framework and returns it.
-func New(namespace, kubecon***REMOVED***g string, httpsAPI, useKubeProxyForReportingAPI, useRouteForReportingAPI bool, routeBearerToken, reportingAPIURL string) (*Framework, error) {
+// New initializes a test reporting framework and returns it.
+func New(namespace, kubecon***REMOVED***g string, httpsAPI, useKubeProxyForReportingAPI, useRouteForReportingAPI bool, routeBearerToken, reportingAPIURL string) (*ReportingFramework, error) {
 	con***REMOVED***g, err := clientcmd.BuildCon***REMOVED***gFromFlags("", kubecon***REMOVED***g)
 	if err != nil {
 		return nil, fmt.Errorf("build con***REMOVED***g from flags failed: err %v", err)
@@ -99,7 +99,7 @@ func New(namespace, kubecon***REMOVED***g string, httpsAPI, useKubeProxyForRepor
 		return nil, fmt.Errorf("error making directory %s, err: %s", reportOutputDir, err)
 	}
 
-	f := &Framework{
+	rf := &ReportingFramework{
 		KubeClient:                  kubeClient,
 		MeteringClient:              meteringClient,
 		HTTPClient:                  httpc,
@@ -116,5 +116,5 @@ func New(namespace, kubecon***REMOVED***g string, httpsAPI, useKubeProxyForRepor
 		RouteBearerToken:            routeBearerToken,
 	}
 
-	return f, nil
+	return rf, nil
 }

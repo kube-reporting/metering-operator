@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"testing"
@@ -14,16 +14,16 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 )
 
-func (f *Framework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
-	return f.MeteringClient.ReportQueries(f.Namespace).Get(name, meta.GetOptions{})
+func (rf *ReportingFramework) GetMeteringReportQuery(name string) (*metering.ReportQuery, error) {
+	return rf.MeteringClient.ReportQueries(rf.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {
+func (rf *ReportingFramework) WaitForMeteringReportQuery(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportQuery, error) {
 	t.Helper()
 	var reportQuery *metering.ReportQuery
 	return reportQuery, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
-		reportQuery, err = f.GetMeteringReportQuery(name)
+		reportQuery, err = rf.GetMeteringReportQuery(name)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				t.Logf("ReportQuery %s does not exist yet", name)
@@ -35,14 +35,14 @@ func (f *Framework) WaitForMeteringReportQuery(t *testing.T, name string, pollIn
 	})
 }
 
-func (f *Framework) RequireReportQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
+func (rf *ReportingFramework) RequireReportQueriesReady(t *testing.T, queries []string, pollInterval, timeout time.Duration) {
 	t.Helper()
 	readyReportDataSources := make(map[string]struct{})
 	readyReportGenQueries := make(map[string]struct{})
 
-	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
-	queryGetter := reporting.NewReportQueryClientGetter(f.MeteringClient)
-	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
+	reportGetter := reporting.NewReportClientGetter(rf.MeteringClient)
+	queryGetter := reporting.NewReportQueryClientGetter(rf.MeteringClient)
+	dataSourceGetter := reporting.NewReportDataSourceClientGetter(rf.MeteringClient)
 
 	for _, queryName := range queries {
 		if _, exists := readyReportGenQueries[queryName]; exists {
@@ -50,7 +50,7 @@ func (f *Framework) RequireReportQueriesReady(t *testing.T, queries []string, po
 		}
 
 		t.Logf("waiting for ReportQuery %s to exist", queryName)
-		reportQuery, err := f.WaitForMeteringReportQuery(t, queryName, pollInterval, timeout)
+		reportQuery, err := rf.WaitForMeteringReportQuery(t, queryName, pollInterval, timeout)
 		require.NoError(t, err, "ReportQuery should exist before creating report using it")
 
 		depHandler := &reporting.UninitialiedDependendenciesHandler{
@@ -59,7 +59,7 @@ func (f *Framework) RequireReportQueriesReady(t *testing.T, queries []string, po
 					return
 				}
 				t.Logf("%s dependencies: waiting for ReportDataSource %s to exist", queryName, ds.Name)
-				_, err := f.WaitForMeteringReportDataSourceTable(t, ds.Name, pollInterval, timeout)
+				_, err := rf.WaitForMeteringReportDataSourceTable(t, ds.Name, pollInterval, timeout)
 				require.NoError(t, err, "ReportDataSource %s table for ReportQuery %s should exist before running reports against it", ds.Name, queryName)
 				readyReportDataSources[ds.Name] = struct{}{}
 			},
@@ -73,11 +73,11 @@ func (f *Framework) RequireReportQueriesReady(t *testing.T, queries []string, po
 	}
 }
 
-func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPrometheusMetricsDataResponse) {
+func (rf *ReportingFramework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queries []string, collectResp operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
-	reportGetter := reporting.NewReportClientGetter(f.MeteringClient)
-	queryGetter := reporting.NewReportQueryClientGetter(f.MeteringClient)
-	dataSourceGetter := reporting.NewReportDataSourceClientGetter(f.MeteringClient)
+	reportGetter := reporting.NewReportClientGetter(rf.MeteringClient)
+	queryGetter := reporting.NewReportQueryClientGetter(rf.MeteringClient)
+	dataSourceGetter := reporting.NewReportDataSourceClientGetter(rf.MeteringClient)
 
 	metricsImportedForDS := make(map[string]int)
 	for _, res := range collectResp.Results {
@@ -85,7 +85,7 @@ func (f *Framework) RequireReportDataSourcesForQueryHaveData(t *testing.T, queri
 	}
 
 	for _, queryName := range queries {
-		query, err := f.GetMeteringReportQuery(queryName)
+		query, err := rf.GetMeteringReportQuery(queryName)
 		require.NoError(t, err, "ReportQuery should exist")
 		deps, err := reporting.GetQueryDependencies(queryGetter, dataSourceGetter, reportGetter, query, nil)
 		require.NoError(t, err, "Getting ReportQuery dependencies should succeed")

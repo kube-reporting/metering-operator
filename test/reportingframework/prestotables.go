@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"testing"
@@ -11,16 +11,16 @@ import (
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 )
 
-func (f *Framework) GetPrestoTable(name string) (*metering.PrestoTable, error) {
-	return f.MeteringClient.PrestoTables(f.Namespace).Get(name, meta.GetOptions{})
+func (rf *ReportingFramework) GetPrestoTable(name string) (*metering.PrestoTable, error) {
+	return rf.MeteringClient.PrestoTables(rf.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) WaitForPrestoTable(t *testing.T, name string, pollInterval, timeout time.Duration, tableFunc func(table *metering.PrestoTable) (bool, error)) (*metering.PrestoTable, error) {
+func (rf *ReportingFramework) WaitForPrestoTable(t *testing.T, name string, pollInterval, timeout time.Duration, tableFunc func(table *metering.PrestoTable) (bool, error)) (*metering.PrestoTable, error) {
 	t.Helper()
 	var table *metering.PrestoTable
 	return table, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
-		table, err = f.GetPrestoTable(name)
+		table, err = rf.GetPrestoTable(name)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				t.Logf("PrestoTable %s does not exist yet", name)
@@ -32,8 +32,8 @@ func (f *Framework) WaitForPrestoTable(t *testing.T, name string, pollInterval, 
 	})
 }
 
-func (f *Framework) PrestoTableExists(t *testing.T, name string) (bool, error) {
-	prestoTable, err := f.MeteringClient.PrestoTables(f.Namespace).Get(name, meta.GetOptions{})
+func (rf *ReportingFramework) PrestoTableExists(t *testing.T, name string) (bool, error) {
+	prestoTable, err := rf.MeteringClient.PrestoTables(rf.Namespace).Get(name, meta.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			t.Logf("PrestoTable %s resource does not exist yet", name)
