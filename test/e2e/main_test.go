@@ -6,8 +6,11 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
@@ -50,7 +53,7 @@ func TestMain(m *testing.M) {
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
 	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
 	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
-	logLevel := flag.String("log-level", "debug", "The log level")
+	logLevel := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
 
 	flag.Parse()
 
@@ -88,6 +91,7 @@ func TestMultipleInstalls(t *testing.T) {
 				DeleteNamespace: true,
 				MeteringConfig: &meteringv1.MeteringConfig{
 					Spec: meteringv1.MeteringConfigSpec{
+						LogHelmTemplate: testhelpers.PtrToBool(true),
 						UnsupportedFeatures: &meteringv1.UnsupportedFeaturesConfig{
 							EnableHDFS: testhelpers.PtrToBool(true),
 						},
@@ -97,6 +101,24 @@ func TestMultipleInstalls(t *testing.T) {
 								Type: "hdfs",
 								Hdfs: &meteringv1.HiveHDFSConfig{
 									Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+								},
+							},
+						},
+						ReportingOperator: &meteringv1.ReportingOperator{
+							Spec: &meteringv1.ReportingOperatorSpec{
+								Config: &meteringv1.ReportingOperatorConfig{
+									LogLevel: "debug",
+									Prometheus: &meteringv1.ReportingOperatorPrometheusConfig{
+										MetricsImporter: &meteringv1.ReportingOperatorPrometheusMetricsImporterConfig{
+											Config: &meteringv1.ReportingOperatorPrometheusMetricsImporterConfigSpec{
+												ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
+												PollInterval:              &meta.Duration{Duration: 30 * time.Second},
+												StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
+												MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
+												MaxQueryRangeDuration:     "5m",
+											},
+										},
+									},
 								},
 							},
 						},
