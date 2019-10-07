@@ -214,4 +214,4 @@ When set, you can use [HTTP basic authentication][basic-auth-rfc] to provide you
 [expose-route-config]: ../manifests/metering-config/expose-route.yaml
 [basic-auth-rfc]: https://tools.ietf.org/html/rfc7617
 [advanced-auth-config]: ../manifests/metering-config/advanced-auth.yaml
-[kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
+[kube-prometheus]: https://github.com/coreos/kube-prometheus
