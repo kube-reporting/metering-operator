@@ -108,10 +108,14 @@ func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingF
 		Namespace: namespace,
 	}
 
+	df.Logger.Debugf("Deployer config: %+v", cfg)
+
 	df.Deployer, err = deploy.NewDeployer(cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to construct a new deployer object: %v", err)
 	}
+
+	df.Logger.Debugf("Deployer obj: %+v", df.Deployer)
 
 	err = df.Deployer.Install()
 	if err != nil {
