@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"bytes"
@@ -19,14 +19,14 @@ const (
 	meteringRouteName                = "metering"
 )
 
-func (f *Framework) doRequest(endpoint, method string, body []byte, query map[string]string) (respBody []byte, code int, err error) {
+func (rf *ReportingFramework) doRequest(endpoint, method string, body []byte, query map[string]string) (respBody []byte, code int, err error) {
 	var u *url.URL
 
-	if f.UseRouteForReportingAPI {
+	if rf.UseRouteForReportingAPI {
 		const routeName = "metering"
 
 		// query all routes for the metering route
-		meteringRoute, err := f.RouteClient.Routes(f.Namespace).Get(meteringRouteName, metav1.GetOptions{})
+		meteringRoute, err := rf.RouteClient.Routes(rf.Namespace).Get(meteringRouteName, metav1.GetOptions{})
 		if err != nil {
 			return nil, 0, fmt.Errorf("query for metering route failed, err: %v", err)
 		}
@@ -36,17 +36,17 @@ func (f *Framework) doRequest(endpoint, method string, body []byte, query map[st
 			Host:   meteringRoute.Spec.Host,
 			Path:   endpoint,
 		}
-	} ***REMOVED*** if f.UseKubeProxyForReportingAPI {
-		u = f.KubeAPIURL
+	} ***REMOVED*** if rf.UseKubeProxyForReportingAPI {
+		u = rf.KubeAPIURL
 		proto := "http"
-		if f.HTTPSAPI {
+		if rf.HTTPSAPI {
 			proto = "https"
 		}
-		apiProxyPath := fmt.Sprintf("/api/v1/namespaces/%s/services/%s/proxy/", f.Namespace, net.JoinSchemeNamePort(proto, reportingOperatorServiceName, reportingOperatorServicePortName))
+		apiProxyPath := fmt.Sprintf("/api/v1/namespaces/%s/services/%s/proxy/", rf.Namespace, net.JoinSchemeNamePort(proto, reportingOperatorServiceName, reportingOperatorServicePortName))
 		u.Path = path.Join(apiProxyPath, endpoint)
 	} ***REMOVED*** {
-		u = f.ReportingAPIURL
-		if f.HTTPSAPI {
+		u = rf.ReportingAPIURL
+		if rf.HTTPSAPI {
 			u.Scheme = "https"
 		}
 		u.Path = endpoint
@@ -58,13 +58,13 @@ func (f *Framework) doRequest(endpoint, method string, body []byte, query map[st
 		Header: make(http.Header),
 	}
 
-	if f.UseRouteForReportingAPI {
+	if rf.UseRouteForReportingAPI {
 		// check if the bearer token to the reporting-operator serviceaccount is uninitialized
-		if f.RouteBearerToken == "" {
+		if rf.RouteBearerToken == "" {
 			return nil, 0, fmt.Errorf("use-route-for-reporting-api is set to true, but route-bearer-token is uninitialized: %v", err)
 		}
 
-		accessToken := "Bearer " + f.RouteBearerToken
+		accessToken := "Bearer " + rf.RouteBearerToken
 		req.Header.Set("Authorization", accessToken)
 	}
 
@@ -78,7 +78,7 @@ func (f *Framework) doRequest(endpoint, method string, body []byte, query map[st
 	}
 	req.URL.RawQuery = q.Encode()
 
-	resp, err := f.HTTPClient.Do(req)
+	resp, err := rf.HTTPClient.Do(req)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -92,10 +92,10 @@ func (f *Framework) doRequest(endpoint, method string, body []byte, query map[st
 	return respBody, resp.StatusCode, nil
 }
 
-func (f *Framework) ReportingOperatorRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
-	return f.doRequest(endpoint, "GET", nil, query)
+func (rf *ReportingFramework) ReportingOperatorRequest(endpoint string, query map[string]string) (respBody []byte, code int, err error) {
+	return rf.doRequest(endpoint, "GET", nil, query)
 }
 
-func (f *Framework) ReportingOperatorPOSTRequest(endpoint string, body []byte) (respBody []byte, code int, err error) {
-	return f.doRequest(endpoint, "POST", body, nil)
+func (rf *ReportingFramework) ReportingOperatorPOSTRequest(endpoint string, body []byte) (respBody []byte, code int, err error) {
+	return rf.doRequest(endpoint, "POST", body, nil)
 }

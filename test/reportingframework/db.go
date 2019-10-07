@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"encoding/json"
@@ -9,15 +9,15 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 )
 
-func (f *Framework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {
+func (rf *ReportingFramework) StoreDataSourceData(dataSourceName string, metrics []*prestostore.PrometheusMetric) error {
 	params := operator.StorePrometheusMetricsDataRequest(metrics)
 	body, err := json.Marshal(params)
 	if err != nil {
 		return err
 	}
 
-	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s/%s", f.Namespace, dataSourceName)
-	respBody, respCode, err := f.ReportingOperatorPOSTRequest(url, body)
+	url := fmt.Sprintf("/api/v1/datasources/prometheus/store/%s/%s", rf.Namespace, dataSourceName)
+	respBody, respCode, err := rf.ReportingOperatorPOSTRequest(url, body)
 	if err != nil {
 		return fmt.Errorf("error storing datasource data: %s", err)
 	}

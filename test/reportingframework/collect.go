@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"encoding/json"
@@ -17,9 +17,9 @@ import (
 // imported
 const collectionSize = time.Hour
 
-func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, operator.CollectPrometheusMetricsDataResponse) {
+func (rf *ReportingFramework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, operator.CollectPrometheusMetricsDataResponse) {
 	t.Helper()
-	f.collectOnce.Do(func() {
+	rf.collectOnce.Do(func() {
 		// Use UTC, Prometheus uses UTC for timestamps
 		now := time.Now().UTC()
 
@@ -28,21 +28,21 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, oper
 
 		// set endTime 1 hour into the past to ensure it's far enough into
 		// the past to have it's entire period elapsed
-		f.reportEnd = nearestHour.Add(-time.Hour)
+		rf.reportEnd = nearestHour.Add(-time.Hour)
 		// reportStart is set to be before reportEnd by the size of the
 		// collection we want to make.
-		f.reportStart = f.reportEnd.Add(-collectionSize)
+		rf.reportStart = rf.reportEnd.Add(-collectionSize)
 
 		reqParams := operator.CollectPrometheusMetricsDataRequest{
-			StartTime: f.reportStart,
-			EndTime:   f.reportEnd,
+			StartTime: rf.reportStart,
+			EndTime:   rf.reportEnd,
 		}
 		body, err := json.Marshal(reqParams)
 		require.NoError(t, err, "should be able to json encode request parameters")
-		collectEndpoint := fmt.Sprintf("/api/v1/datasources/prometheus/collect/%s", f.Namespace)
+		collectEndpoint := fmt.Sprintf("/api/v1/datasources/prometheus/collect/%s", rf.Namespace)
 		t.Logf("currentTime: %s", now)
-		t.Logf("querying %s, with startTime: %s endTime: %s", collectEndpoint, f.reportStart, f.reportEnd)
-		respBody, respCode, err := f.ReportingOperatorPOSTRequest(collectEndpoint, body)
+		t.Logf("querying %s, with startTime: %s endTime: %s", collectEndpoint, rf.reportStart, rf.reportEnd)
+		respBody, respCode, err := rf.ReportingOperatorPOSTRequest(collectEndpoint, body)
 		require.Equal(t, http.StatusOK, respCode, "http response status code should be ok")
 		require.NoErrorf(t, err, "expected no errors triggering data collection")
 		t.Logf("***REMOVED***nished querying %s, took: %s to ***REMOVED***nish", collectEndpoint, time.Now().UTC().Sub(now))
@@ -52,7 +52,7 @@ func (f *Framework) CollectMetricsOnce(t *testing.T) (time.Time, time.Time, oper
 		require.NoError(t, err, "expected to unmarshal CollectPrometheusData response as JSON")
 		t.Logf("CollectPrometheusMetricsDataResponse: %s", spew.Sdump(collectResp))
 		require.NotEmpty(t, collectResp.Results, "expected multiple import results")
-		f.collectPrometheusMetricsDataResponse = collectResp
+		rf.collectPrometheusMetricsDataResponse = collectResp
 	})
-	return f.reportStart, f.reportEnd, f.collectPrometheusMetricsDataResponse
+	return rf.reportStart, rf.reportEnd, rf.collectPrometheusMetricsDataResponse
 }
