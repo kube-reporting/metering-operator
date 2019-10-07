@@ -1,4 +1,4 @@
-package framework
+package reportingframework
 
 import (
 	"fmt"
@@ -13,14 +13,14 @@ import (
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 )
 
-func (f *Framework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
-	return f.MeteringClient.ReportDataSources(f.Namespace).Get(name, meta.GetOptions{})
+func (rf *ReportingFramework) GetMeteringReportDataSource(name string) (*metering.ReportDataSource, error) {
+	return rf.MeteringClient.ReportDataSources(rf.Namespace).Get(name, meta.GetOptions{})
 }
 
-func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
+func (rf *ReportingFramework) WaitForMeteringReportDataSourceTable(t *testing.T, name string, pollInterval, timeout time.Duration) (*metering.ReportDataSource, error) {
 	t.Helper()
-	ds, err := f.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *metering.ReportDataSource) (bool, error) {
-		exists, err := f.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
+	ds, err := rf.WaitForMeteringReportDataSource(t, name, pollInterval, timeout, func(ds *metering.ReportDataSource) (bool, error) {
+		exists, err := rf.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
 		if err != nil {
 			return false, err
 		}
@@ -38,16 +38,16 @@ func (f *Framework) WaitForMeteringReportDataSourceTable(t *testing.T, name stri
 	return ds, nil
 }
 
-func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*metering.ReportDataSource, error) {
+func (rf *ReportingFramework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollInterval, timeout time.Duration) ([]*metering.ReportDataSource, error) {
 	t.Helper()
 	var reportDataSources []*metering.ReportDataSource
 	return reportDataSources, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
-		reportDataSourcesList, err := f.MeteringClient.ReportDataSources(f.Namespace).List(meta.ListOptions{})
+		reportDataSourcesList, err := rf.MeteringClient.ReportDataSources(rf.Namespace).List(meta.ListOptions{})
 		require.NoError(t, err, "should not have errors querying API for list of ReportDataSources")
 		reportDataSources = reportDataSourcesList.Items
 
 		for _, ds := range reportDataSources {
-			exists, err := f.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
+			exists, err := rf.WaitForReportDataSourcePrestoTable(t, ds, pollInterval, timeout)
 			if err != nil {
 				return false, err
 			}
@@ -59,12 +59,12 @@ func (f *Framework) WaitForAllMeteringReportDataSourceTables(t *testing.T, pollI
 	})
 }
 
-func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *metering.ReportDataSource) (bool, error)) (*metering.ReportDataSource, error) {
+func (rf *ReportingFramework) WaitForMeteringReportDataSource(t *testing.T, name string, pollInterval, timeout time.Duration, dsFunc func(ds *metering.ReportDataSource) (bool, error)) (*metering.ReportDataSource, error) {
 	t.Helper()
 	var ds *metering.ReportDataSource
 	return ds, wait.PollImmediate(pollInterval, timeout, func() (bool, error) {
 		var err error
-		ds, err = f.GetMeteringReportDataSource(name)
+		ds, err = rf.GetMeteringReportDataSource(name)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				t.Logf("ReportDataSource %s does not exist yet", name)
@@ -76,13 +76,13 @@ func (f *Framework) WaitForMeteringReportDataSource(t *testing.T, name string, p
 	})
 }
 
-func (f *Framework) WaitForReportDataSourcePrestoTable(t *testing.T, ds *metering.ReportDataSource, pollInterval, timeout time.Duration) (bool, error) {
+func (rf *ReportingFramework) WaitForReportDataSourcePrestoTable(t *testing.T, ds *metering.ReportDataSource, pollInterval, timeout time.Duration) (bool, error) {
 	if ds.Status.TableRef.Name == "" {
 		t.Logf("ReportDataSource %s PrestoTable resource is not created yet", ds.Name)
 		return false, nil
 	}
 
-	table, err := f.WaitForPrestoTable(t, ds.Status.TableRef.Name, pollInterval, timeout, func(table *metering.PrestoTable) (bool, error) {
+	table, err := rf.WaitForPrestoTable(t, ds.Status.TableRef.Name, pollInterval, timeout, func(table *metering.PrestoTable) (bool, error) {
 		if table.Status.TableName == "" {
 			t.Logf("ReportDataSource %s PrestoTable %s status.tableName not set yet", ds.Name, table.Name)
 			return false, nil
