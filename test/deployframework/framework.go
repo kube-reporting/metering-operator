@@ -210,16 +210,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 			})
 		}
 
-		df.Logger.Infof("Poll Summary")
-		df.Logger.Infof("Current ratio of ready to target pods: %d/%d", len(readyPods), targetPods)
-
-		for _, unreadyPod := range unreadyPods {
-			if unreadyPod.Total == 0 {
-				df.Logger.Infof("Pod %s is pending", unreadyPod.PodName)
-				continue
-			}
-			df.Logger.Infof("Pod %s has %d/%d ready containers", unreadyPod.PodName, unreadyPod.Ready, unreadyPod.Total)
-		}
+		df.logPollingSummary(targetPods, readyPods, unreadyPods)
 
 		return ((len(pods.Items) == targetPods) && len(unreadyPods) == 0), nil
 	})
