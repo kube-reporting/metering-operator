@@ -50,7 +50,7 @@ go test \
     -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
     -parallel 10 \
-    -timeout 25m \
+    -timeout 30m \
     "./test/e2e" \
     -kubeconfig="${KUBECONFIG}" \
     -namespace-prefix="${METERING_NAMESPACE}" \
