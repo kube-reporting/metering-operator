@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 	"time"
 
@@ -44,7 +43,16 @@ type ReportingFramework struct {
 }
 
 // New initializes a test reporting framework and returns it.
-func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI, useRouteForReportingAPI bool, routeBearerToken, reportingAPIURL string) (*ReportingFramework, error) {
+func New(
+	namespace,
+	kubeconfig string,
+	httpsAPI,
+	useKubeProxyForReportingAPI,
+	useRouteForReportingAPI bool,
+	routeBearerToken,
+	reportingAPIURL,
+	reportOutputDir string,
+) (*ReportingFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("build config from flags failed: err %v", err)
@@ -87,16 +95,6 @@ func New(namespace, kubeconfig string, httpsAPI, useKubeProxyForReportingAPI, us
 	meteringClient, err := metering.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
-	}
-
-	reportOutputDir := os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
-	if reportOutputDir == "" {
-		return nil, fmt.Errorf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-
-	err = os.MkdirAll(reportOutputDir, 0777)
-	if err != nil {
-		return nil, fmt.Errorf("error making directory %s, err: %s", reportOutputDir, err)
 	}
 
 	rf := &ReportingFramework{
