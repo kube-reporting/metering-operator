@@ -10,7 +10,7 @@ source "${ROOT_DIR}/hack/lib/tests.sh"
 # TODO: handle `make e2e-local`
 # TODO: handle uninstall metering (maybe not namespace is not static)
 
-export METERING_NAMESPACE=${METERING_NAMESPACE:-metering-ci-e2e}
+export METERING_NAMESPACE="${METERING_E2E_NAMESPACE:=${METERING_NAMESPACE}-e2e}"
 export TEST_LOG_FILE="${TEST_LOG_FILE:-e2e-tests.log}"
 export DEPLOY_LOG_FILE="${DEPLOY_LOG_FILE:-e2e-deploy.log}"
 export TEST_TAP_FILE="${TEST_TAP_FILE:-e2e-tests.tap}"
@@ -52,13 +52,13 @@ go test \
     -parallel 10 \
     -timeout 25m \
     "./test/e2e" \
-    -kubeconfig "${KUBECONFIG}" \
-    -namespace-prefix $METERING_NAMESPACE \
-    -deploy-manifests-dir ${METERING_DEPLOY_MANIFESTS_PATH} \
-    -cleanup-script-path ${METERING_CLEANUP_SCRIPT_PATH} \
+    -kubeconfig="${KUBECONFIG}" \
+    -namespace-prefix="${METERING_NAMESPACE}" \
+    -deploy-manifests-dir="${METERING_DEPLOY_MANIFESTS_PATH}" \
+    -cleanup-script-path="${METERING_CLEANUP_SCRIPT_PATH}" \
     -https-api="${METERING_HTTPS_API}" \
     -use-kube-proxy-for-reporting-api="${METERING_USE_KUBE_PROXY_FOR_REPORTING_API}" \
     -use-route-for-reporting-api="${METERING_USE_ROUTE_FOR_REPORTING_API}" \
     -reporting-api-url="${METERING_REPORTING_API_URL}" \
-    -log-level debug \
+    -log-level=debug \
     "$@"
