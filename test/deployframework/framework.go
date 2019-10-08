@@ -182,6 +182,8 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 	var readyPods []string
 	var unreadyPods []PodStat
 
+	start := time.Now()
+
 	df.Logger.Infof("Waiting for all metering pods to be ready")
 	err := wait.Poll(10*time.Second, 20*time.Minute, func() (done bool, err error) {
 		unreadyPods = nil
@@ -217,6 +219,8 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 	if err != nil {
 		return false, fmt.Errorf("The metering pods failed to report a ready status before the timeout period occurred: %v", err)
 	}
+
+	df.Logger.Infof("Installing metering took %v", time.Since(start))
 
 	return true, nil
 }
