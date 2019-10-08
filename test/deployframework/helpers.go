@@ -7,7 +7,7 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (df *DeployFramework) logPollingSummary(targetPods int, readyPods []string, unreadyPods []PodStat) {
+func (df *DeployFramework) logPollingSummary(targetPods int, readyPods []string, unreadyPods []podStat) {
 	df.Logger.Infof("Poll Summary")
 	df.Logger.Infof("Current ratio of ready to target pods: %d/%d", len(readyPods), targetPods)
 

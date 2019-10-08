@@ -3,8 +3,9 @@ package e2e
 import (
 	"flag"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -20,6 +21,12 @@ import (
 	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
+/*
+TODO:
+1. Need to pass (as a flag or ENV) an overall parent testing directory, and each test case
+   can create a directory for the resource and test logs, e.g. /tmp/tmp.Zbjals/hdfsInstall/hivetables
+*/
+
 var (
 	df *deployframework.DeployFramework
 
@@ -29,16 +36,7 @@ var (
 )
 
 func init() {
-	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
-	if reportTestOutputDirectory == "" {
-		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-
-	err := os.MkdirAll(reportTestOutputDirectory, 0777)
-	if err != nil {
-		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
-	}
-
+	testOutputDirectory = os.Getenv("METERING_TEST_OUTPUT_DIRECTORY")
 	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
 }
 
@@ -49,6 +47,7 @@ func TestMain(m *testing.M) {
 	nsPrefix := flag.String("namespace-prefix", "", "The namespace prefix to install the metering resources.")
 	manifestDir := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
 	cleanupScriptPath := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
+	// logPath := flag.String("log-path")
 	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
 	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
 	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
@@ -59,6 +58,13 @@ func TestMain(m *testing.M) {
 
 	logger := testhelpers.SetupLogger(*logLevel)
 
+	loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
+	if err != nil {
+		logger.Fatalf("Failed to create the directory %s to log test output: %v", loggingPath, err)
+	}
+
+	logger.Infof("Logging resource and container logs to %s", loggingPath)
+
 	cfg := deployframework.ReportingFrameworkConfig{
 		HTTPSAPI:                    *httpsAPI,
 		UseKubeProxyForReportingAPI: *useKubeProxyForReportingAPI,
@@ -67,7 +73,7 @@ func TestMain(m *testing.M) {
 		KubeConfigPath:              *kubeConfigFlag,
 	}
 
-	if df, err = deployframework.New(cfg, logger, *nsPrefix, *manifestDir, *cleanupScriptPath); err != nil {
+	if df, err = deployframework.New(cfg, logger, *nsPrefix, *manifestDir, *cleanupScriptPath, loggingPath); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -130,7 +136,7 @@ func TestMultipleInstalls(t *testing.T) {
 
 	for _, testCase := range testInstallConfigs {
 		t.Run(testCase.Name, func(t *testing.T) {
-			testInstall(t, testCase.Config, testCase.TargetPods)
+			testInstall(t, testCase.Config, testCase.Name, testCase.TargetPods)
 		})
 	}
 }
@@ -138,13 +144,20 @@ func TestMultipleInstalls(t *testing.T) {
 func testInstall(
 	t *testing.T,
 	deployerConfig deploy.Config,
+	testName string,
 	targetPods int,
 ) {
-	cfg, err := df.Setup(deployerConfig, targetPods)
+	testOutputDir := filepath.Join(df.LoggingPath, testName)
+	err := os.Mkdir(testOutputDir, 0777)
+	if err != nil {
+		df.Logger.Fatalf("Failed to make the directory %s: %v", testOutputDir, err)
+	}
+
+	cfg, err := df.Setup(deployerConfig, testOutputDir, targetPods)
 	require.NoError(t, err, "Initializing the deploy framework should produce no error")
 
 	defer func() {
-		err := df.Teardown()
+		err := df.Teardown(testOutputDir)
 		if err != nil {
 			df.Logger.Warnf("Failed to teardown the metering deployment in the %s namespace: %v", cfg.Namespace, err)
 		}
@@ -158,7 +171,7 @@ func testInstall(
 		cfg.UseRouteForReportingAPI,
 		cfg.RouteBearerToken,
 		cfg.ReportingAPIURL,
-		cfg.ReportOutputDir,
+		cfg.ReportResultsOutputPath,
 	)
 	require.NoError(t, err, "Initializing the test framework should produce no error")
 

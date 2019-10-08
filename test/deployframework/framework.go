@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -21,13 +22,26 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+const (
+	testDirname         = "tests"
+	reportResultsDir    = "report_results"
+	logDir              = "logs"
+	meteringconfigDir   = "meteringconfigs"
+	reportsDir          = "reports"
+	datasourcesDir      = "reportdatasources"
+	reportqueriesDir    = "reportqueries"
+	hivetablesDir       = "hivetables"
+	prestotablesDir     = "prestotables"
+	storagelocationsDir = "storagelocations"
+)
+
 // DeployFramework contains all the information necessary to deploy
 // different metering instances and run tests against them
 type DeployFramework struct {
 	NamespacePrefix   string
 	ManifestsDir      string
 	ReportingAPIURL   string
-	LogPath           string
+	LoggingPath       string
 	CleanupScriptPath string
 	Logger            logrus.FieldLogger
 	Client            kubernetes.Interface
@@ -47,11 +61,11 @@ type ReportingFrameworkConfig struct {
 	HTTPSAPI                    bool
 	ReportingAPIURL             string
 	RouteBearerToken            string
-	ReportOutputDir             string
+	ReportResultsOutputPath     string
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, manifestDir, cleanupScriptPath string) (*DeployFramework, error) {
+func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, manifestDir, cleanupScriptPath, loggingPath string) (*DeployFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to build a kube config from %s: %v", cfg.KubeConfigPath, err)
@@ -80,6 +94,7 @@ func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, mani
 		NamespacePrefix:   nsPrefix,
 		ManifestsDir:      manifestDir,
 		CleanupScriptPath: cleanupScriptPath,
+		LoggingPath:       loggingPath,
 		Config:            cfg,
 	}
 
@@ -88,7 +103,7 @@ func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, mani
 
 // Setup handles the process of deploying metering, and waiting for all necessary resources
 // to become ready in order to proceed with running the reporting tests.
-func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingFrameworkConfig, error) {
+func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targetPods int) (*ReportingFrameworkConfig, error) {
 	var err error
 
 	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(df.ManifestsDir, cfg.Platform)
@@ -115,8 +130,6 @@ func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingF
 		return nil, fmt.Errorf("Failed to construct a new deployer object: %v", err)
 	}
 
-	df.Logger.Debugf("Deployer obj: %+v", df.Deployer)
-
 	err = df.Deployer.Install()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to install metering: %v", err)
@@ -129,7 +142,7 @@ func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingF
 
 	_, err = df.WaitForMeteringPods(targetPods, cfg.Namespace)
 	if err != nil {
-		df.Teardown()
+		df.Teardown(testOutputPath)
 		return nil, fmt.Errorf("Error waiting for metering pods to become ready: %v", err)
 	}
 
@@ -138,13 +151,21 @@ func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingF
 		return nil, fmt.Errorf("Failed to get the route bearer token: %v", err)
 	}
 
+	reportResultsPath := filepath.Join(testOutputPath, reportResultsDir)
+	err = os.Mkdir(reportResultsPath, 0777)
+	if err != nil {
+		df.Logger.Fatalf("Failed to make the directory %s: %v", reportResultsPath, err)
+	}
+
+	df.Logger.Infof("Report results directory: %s", reportResultsPath)
+
 	reportingFrameworkConfig := &ReportingFrameworkConfig{
 		Namespace:                   cfg.Namespace,
 		KubeConfigPath:              df.Config.KubeConfigPath,
 		UseKubeProxyForReportingAPI: df.Config.UseKubeProxyForReportingAPI,
 		UseRouteForReportingAPI:     df.Config.UseRouteForReportingAPI,
 		RouteBearerToken:            routeBearerToken,
-		ReportOutputDir:             "",
+		ReportResultsOutputPath:     reportResultsPath,
 	}
 
 	return reportingFrameworkConfig, nil
@@ -152,11 +173,49 @@ func (df *DeployFramework) Setup(cfg deploy.Config, targetPods int) (*ReportingF
 
 // Teardown is a method that dumps the container and resource logs before uninstalling
 // the metering resource provisioned by the df.Deployer instance
-func (df *DeployFramework) Teardown() error {
-	df.Logger.Infof("Storing container logs before removing the %s namespace", df.Config.Namespace)
+func (df *DeployFramework) Teardown(path string) error {
+	logsPath := filepath.Join(path, logDir)
+	reportsPath := filepath.Join(path, reportsDir)
+	reportqueriesPath := filepath.Join(path, reportqueriesDir)
+	datasourcesPath := filepath.Join(path, datasourcesDir)
+	meteringconfigsPath := filepath.Join(path, meteringconfigDir)
+	hivetablesPath := filepath.Join(path, hivetablesDir)
+	prestotablesPath := filepath.Join(path, prestotablesDir)
+	storagelocationsPath := filepath.Join(path, storagelocationsDir)
+
+	testResultsDir := []string{
+		logsPath,
+		reportsPath,
+		reportqueriesPath,
+		datasourcesPath,
+		meteringconfigsPath,
+		hivetablesPath,
+		prestotablesPath,
+		storagelocationsPath,
+	}
+
+	for _, dir := range testResultsDir {
+		err := os.MkdirAll(dir, 0777)
+		if err != nil {
+			return fmt.Errorf("Failed to create the directory %s: %v", dir, err)
+		}
+	}
+
+	df.Logger.Infof("Storing logs at %s before removing the %s namespace", path, df.Config.Namespace)
 
 	cleanupCmd := exec.Command(df.CleanupScriptPath)
-	cleanupCmd.Env = append(os.Environ(), "METERING_TEST_NAMESPACE="+df.Config.Namespace)
+	cleanupCmd.Env = append(os.Environ(),
+		"METERING_TEST_NAMESPACE="+df.Config.Namespace,
+		"TEST_OUTPUT_DIR="+path,
+		"LOG_DIR="+logsPath,
+		"REPORTS_DIR="+reportsPath,
+		"METERINGCONFIGS_DIR="+meteringconfigsPath,
+		"DATASOURCES_DIR="+datasourcesPath,
+		"REPORTQUERIES_DIR="+reportqueriesPath,
+		"HIVETABLES_DIR="+hivetablesPath,
+		"PRESTOTABLES_DIR="+prestotablesPath,
+		"STORAGELOCATIONS_DIR="+storagelocationsPath,
+	)
 
 	out, err := cleanupCmd.Output()
 	if err != nil {
@@ -168,7 +227,7 @@ func (df *DeployFramework) Teardown() error {
 	return df.Deployer.Uninstall()
 }
 
-type PodStat struct {
+type podStat struct {
 	PodName string
 	Ready   int
 	Total   int
@@ -180,7 +239,7 @@ type PodStat struct {
 // of @targetPods, and all pod containers listed must report a ready status.
 func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string) (bool, error) {
 	var readyPods []string
-	var unreadyPods []PodStat
+	var unreadyPods []podStat
 
 	start := time.Now()
 
@@ -205,7 +264,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 				continue
 			}
 
-			unreadyPods = append(unreadyPods, PodStat{
+			unreadyPods = append(unreadyPods, podStat{
 				PodName: pod.Name,
 				Ready:   readyContainers,
 				Total:   len(pod.Status.ContainerStatuses),
