@@ -183,7 +183,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 	var unreadyPods []PodStat
 
 	df.Logger.Infof("Waiting for all metering pods to be ready")
-	err := wait.Poll(10*time.Second, 15*time.Minute, func() (done bool, err error) {
+	err := wait.Poll(10*time.Second, 20*time.Minute, func() (done bool, err error) {
 		unreadyPods = nil
 		readyPods = nil
 
