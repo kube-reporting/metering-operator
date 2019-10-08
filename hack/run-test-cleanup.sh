@@ -8,9 +8,9 @@ if [[ -z "$METERING_TEST_NAMESPACE" ]]; then
 fi
 
 echo "Performing cleanup"
-
 echo "Storing pod descriptions and logs at $LOG_DIR"
 echo "Capturing pod descriptions"
+
 PODS="$(kubectl get pods --no-headers --namespace "$METERING_TEST_NAMESPACE" -o name | cut -d/ -f2)"
 while read -r pod; do
     if [[ -n "$pod" ]]; then
