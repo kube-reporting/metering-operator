@@ -7,6 +7,19 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func (df *DeployFramework) logPollingSummary(targetPods int, readyPods []string, unreadyPods []PodStat) {
+	df.Logger.Infof("Poll Summary")
+	df.Logger.Infof("Current ratio of ready to target pods: %d/%d", len(readyPods), targetPods)
+
+	for _, unreadyPod := range unreadyPods {
+		if unreadyPod.Total == 0 {
+			df.Logger.Infof("Pod %s is pending", unreadyPod.PodName)
+			continue
+		}
+		df.Logger.Infof("Pod %s has %d/%d ready containers", unreadyPod.PodName, unreadyPod.Ready, unreadyPod.Total)
+	}
+}
+
 func (df *DeployFramework) checkPodStatus(pod v1.Pod) (bool, int) {
 	if pod.Status.Phase != v1.PodRunning {
 		return false, 0
