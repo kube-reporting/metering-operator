@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 
 	var err error
-	if testReportingFramework, err = reportingframework.New(*ns, *kubecon***REMOVED***g, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL); err != nil {
+	if testReportingFramework, err = reportingframework.New(*ns, *kubecon***REMOVED***g, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL, reportTestOutputDirectory); err != nil {
 		logrus.Fatalf("failed to setup framework: %v\n", err)
 	}
 
