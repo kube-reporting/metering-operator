@@ -174,48 +174,37 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 // Teardown is a method that dumps the container and resource logs before uninstalling
 // the metering resource provisioned by the df.Deployer instance
 func (df *DeployFramework) Teardown(path string) error {
-	logsPath := filepath.Join(path, logDir)
-	reportsPath := filepath.Join(path, reportsDir)
-	reportqueriesPath := filepath.Join(path, reportqueriesDir)
-	datasourcesPath := filepath.Join(path, datasourcesDir)
-	meteringconfigsPath := filepath.Join(path, meteringconfigDir)
-	hivetablesPath := filepath.Join(path, hivetablesDir)
-	prestotablesPath := filepath.Join(path, prestotablesDir)
-	storagelocationsPath := filepath.Join(path, storagelocationsDir)
-
-	testResultsDir := []string{
-		logsPath,
-		reportsPath,
-		reportqueriesPath,
-		datasourcesPath,
-		meteringconfigsPath,
-		hivetablesPath,
-		prestotablesPath,
-		storagelocationsPath,
+	cmdEnvVarArr := []string{
+		"METERING_TEST_NAMESPACE=" + df.Config.Namespace,
+		"TEST_OUTPUT_DIR=" + path,
 	}
 
-	for _, dir := range testResultsDir {
-		err := os.MkdirAll(dir, 0777)
+	testDirsMap := map[string]string{
+		logDir:              "LOG_DIR",
+		reportsDir:          "REPORTS_DIR",
+		meteringconfigDir:   "METERINGCONFIGS_DIR",
+		datasourcesDir:      "DATASOURCES_DIR",
+		reportqueriesDir:    "REPORTQUERIES_DIR",
+		hivetablesDir:       "HIVETABLES_DIR",
+		prestotablesDir:     "PRESTOTABLES_DIR",
+		storagelocationsDir: "STORAGELOCATIONS_DIR",
+	}
+
+	for dirname, env := range testDirsMap {
+		dirPath := filepath.Join(path, dirname)
+
+		err := os.MkdirAll(dirPath, 0777)
 		if err != nil {
-			return fmt.Errorf("Failed to create the directory %s: %v", dir, err)
+			return fmt.Errorf("Failed to create the directory %s: %v", dirPath, err)
 		}
+
+		cmdEnvVarArr = append(cmdEnvVarArr, env+"="+dirPath)
 	}
 
 	df.Logger.Infof("Storing logs at %s before removing the %s namespace", path, df.Config.Namespace)
 
 	cleanupCmd := exec.Command(df.CleanupScriptPath)
-	cleanupCmd.Env = append(os.Environ(),
-		"METERING_TEST_NAMESPACE="+df.Config.Namespace,
-		"TEST_OUTPUT_DIR="+path,
-		"LOG_DIR="+logsPath,
-		"REPORTS_DIR="+reportsPath,
-		"METERINGCONFIGS_DIR="+meteringconfigsPath,
-		"DATASOURCES_DIR="+datasourcesPath,
-		"REPORTQUERIES_DIR="+reportqueriesPath,
-		"HIVETABLES_DIR="+hivetablesPath,
-		"PRESTOTABLES_DIR="+prestotablesPath,
-		"STORAGELOCATIONS_DIR="+storagelocationsPath,
-	)
+	cleanupCmd.Env = append(os.Environ(), cmdEnvVarArr...)
 
 	out, err := cleanupCmd.Output()
 	if err != nil {
