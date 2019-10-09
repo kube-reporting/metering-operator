@@ -2,10 +2,43 @@ package deployframework
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func (df *DeployFramework) createResourceDirs(path string) ([]string, error) {
+	envVarArr := []string{
+		"METERING_TEST_NAMESPACE=" + df.Config.Namespace,
+		"TEST_OUTPUT_DIR=" + path,
+	}
+
+	testDirsMap := map[string]string{
+		logDir:              "LOG_DIR",
+		reportsDir:          "REPORTS_DIR",
+		meteringconfigDir:   "METERINGCONFIGS_DIR",
+		datasourcesDir:      "DATASOURCES_DIR",
+		reportqueriesDir:    "REPORTQUERIES_DIR",
+		hivetablesDir:       "HIVETABLES_DIR",
+		prestotablesDir:     "PRESTOTABLES_DIR",
+		storagelocationsDir: "STORAGELOCATIONS_DIR",
+	}
+
+	for dirname, env := range testDirsMap {
+		dirPath := filepath.Join(path, dirname)
+
+		err := os.MkdirAll(dirPath, 0777)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create the directory %s: %v", dirPath, err)
+		}
+
+		envVarArr = append(envVarArr, env+"="+dirPath)
+	}
+
+	return envVarArr, nil
+}
 
 func (df *DeployFramework) logPollingSummary(targetPods int, readyPods []string, unreadyPods []podStat) {
 	df.Logger.Infof("Poll Summary")
