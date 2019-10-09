@@ -156,3 +156,40 @@ func SetupLogger(logLevelStr string) logrus.FieldLogger {
 
 	return logger
 }
+
+// NewMeteringConfigSpec creates a mock meteringconfig resource for use in testing
+func NewMeteringConfigSpec() metering.MeteringConfigSpec {
+	return metering.MeteringConfigSpec{
+		LogHelmTemplate: PtrToBool(true),
+		UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
+			EnableHDFS: PtrToBool(true),
+		},
+		Storage: &metering.StorageConfig{
+			Type: "hive",
+			Hive: &metering.HiveStorageConfig{
+				Type: "hdfs",
+				Hdfs: &metering.HiveHDFSConfig{
+					Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+				},
+			},
+		},
+		ReportingOperator: &metering.ReportingOperator{
+			Spec: &metering.ReportingOperatorSpec{
+				Config: &metering.ReportingOperatorConfig{
+					LogLevel: "debug",
+					Prometheus: &metering.ReportingOperatorPrometheusConfig{
+						MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
+							Config: &metering.ReportingOperatorPrometheusMetricsImporterConfigSpec{
+								ChunkSize:                 &meta.Duration{Duration: 5 * time.Minute},
+								PollInterval:              &meta.Duration{Duration: 30 * time.Second},
+								StepSize:                  &meta.Duration{Duration: 1 * time.Minute},
+								MaxImportBackfillDuration: &meta.Duration{Duration: 15 * time.Minute},
+								MaxQueryRangeDuration:     "5m",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
