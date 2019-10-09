@@ -3,7 +3,6 @@ package e2e
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -27,6 +26,18 @@ var (
 	runAWSBillingTests        bool
 )
 
+/*
+TODO:
+- make sure that the metering and reporting operator images are overrided
+- update this PR so that the CI is passing w/o knowledge of local flags (https-api, use-kube-proxy...)
+  * these flags are more contingent on the meteringconfig spec
+  * https-api: spec.tls.enabled (default true)
+  * use-route: always true
+  * use-https: always true
+  * kube proxy: always false
+  * reporting API URL: setting this to empty
+*/
+
 func init() {
 	testOutputDirectory = os.Getenv("TEST_OUTPUT_PATH")
 	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
@@ -40,35 +51,31 @@ func TestMain(m *testing.M) {
 	manifestDir := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
 	cleanupScriptPath := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
 	testOutputPath := flag.String("test-output-path", "", "The absolute/relative path that you want to store test logs within.")
-	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
-	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
-	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
-	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
 	logLevel := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
 	flag.Parse()
 
 	logger := testhelpers.SetupLogger(*logLevel)
 
 	if testOutputDirectory == "" {
+		if *testOutputPath == "" {
+			logger.Fatalf("You must specify the $TEST_OUTPUT_PATH or --test-output-path.")
+		}
 		testOutputDirectory = *testOutputPath
 	}
 
-	loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
+	err = os.MkdirAll(testOutputDirectory, 077)
 	if err != nil {
 		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
 	}
 
-	logger.Infof("Logging resource and container logs to '%s'", loggingPath)
+	//loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
+	//if err != nil {
+	//	logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
+	//}
 
-	cfg := deployframework.ReportingFrameworkConfig{
-		HTTPSAPI:                    *httpsAPI,
-		UseKubeProxyForReportingAPI: *useKubeProxyForReportingAPI,
-		UseRouteForReportingAPI:     *useRouteForReportingAPI,
-		ReportingAPIURL:             *reportingAPIURL,
-		KubeConfigPath:              *kubeConfigFlag,
-	}
+	logger.Infof("Logging resource and container logs to '%s'", testOutputDirectory)
 
-	if df, err = deployframework.New(cfg, logger, *nsPrefix, *manifestDir, *cleanupScriptPath, loggingPath); err != nil {
+	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, testOutputDirectory); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -85,7 +92,7 @@ func TestMultipleInstalls(t *testing.T) {
 		Config     deploy.Config
 	}{
 		{
-			Name:       "hdfsInstall",
+			Name:       "HDFSInstall",
 			TargetPods: defaultTargetPods,
 			Config: deploy.Config{
 				Platform:        defaultPlatform,
@@ -98,6 +105,9 @@ func TestMultipleInstalls(t *testing.T) {
 	}
 
 	for _, testCase := range testInstallConfigs {
+		t := t
+		testCase := testCase
+
 		t.Run(testCase.Name, func(t *testing.T) {
 			testInstall(t, testCase.Config, testCase.Name, testCase.TargetPods)
 		})
