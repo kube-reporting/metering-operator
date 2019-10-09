@@ -5,7 +5,6 @@ set -e
 # TODO: handle uninstall metering before running tests
 
 : "${KUBECONFIG:?}"
-: "${METERING_NAMESPACE:?}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
 source "${ROOT_DIR}/hack/common.sh"
