@@ -172,34 +172,14 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 	return reportingFrameworkConfig, nil
 }
 
-// Teardown is a method that dumps the container and resource logs before uninstalling
-// the metering resource provisioned by the df.Deployer instance
+// Teardown is a method that first creates the resource and container
+// logging directories, then populates those directories by executing
+// the df.CleanupScriptPath bash script, and lastly uninstalls the metering
+// deployment, returning an error if there is any.
 func (df *DeployFramework) Teardown(path string) error {
-	cmdEnvVarArr := []string{
-		"METERING_TEST_NAMESPACE=" + df.Config.Namespace,
-		"TEST_OUTPUT_DIR=" + path,
-	}
-
-	testDirsMap := map[string]string{
-		logDir:              "LOG_DIR",
-		reportsDir:          "REPORTS_DIR",
-		meteringconfigDir:   "METERINGCONFIGS_DIR",
-		datasourcesDir:      "DATASOURCES_DIR",
-		reportqueriesDir:    "REPORTQUERIES_DIR",
-		hivetablesDir:       "HIVETABLES_DIR",
-		prestotablesDir:     "PRESTOTABLES_DIR",
-		storagelocationsDir: "STORAGELOCATIONS_DIR",
-	}
-
-	for dirname, env := range testDirsMap {
-		dirPath := filepath.Join(path, dirname)
-
-		err := os.MkdirAll(dirPath, 0777)
-		if err != nil {
-			return fmt.Errorf("Failed to create the directory %s: %v", dirPath, err)
-		}
-
-		cmdEnvVarArr = append(cmdEnvVarArr, env+"="+dirPath)
+	envVarArr, err := df.createResourceDirs(path)
+	if err != nil {
+		return err
 	}
 
 	logger := df.Logger.WithFields(logrus.Fields{"component": "cleanup"})
@@ -222,7 +202,7 @@ func (df *DeployFramework) Teardown(path string) error {
 		return
 	}()
 
-	cleanupCmd.Env = append(os.Environ(), cmdEnvVarArr...)
+	cleanupCmd.Env = append(os.Environ(), envVarArr...)
 	err = cleanupCmd.Run()
 	if err != nil {
 		return fmt.Errorf("Failed to run the cleanup script: %v", err)
