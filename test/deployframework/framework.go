@@ -41,9 +41,9 @@ const (
 type DeployFramework struct {
 	NamespacePrefix   string
 	ManifestsDir      string
-	ReportingAPIURL   string
 	LoggingPath       string
 	CleanupScriptPath string
+	KubeConfigPath    string
 	Logger            logrus.FieldLogger
 	Client            kubernetes.Interface
 	Config            ReportingFrameworkConfig
@@ -55,21 +55,21 @@ type DeployFramework struct {
 // ReportingFrameworkConfig is a structure containing information
 // needed to customize a ReportingFramework object
 type ReportingFrameworkConfig struct {
-	Namespace                   string
-	KubeConfigPath              string
 	UseKubeProxyForReportingAPI bool
 	UseRouteForReportingAPI     bool
 	HTTPSAPI                    bool
+	Namespace                   string
+	KubeConfigPath              string
 	ReportingAPIURL             string
 	RouteBearerToken            string
 	ReportResultsOutputPath     string
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, manifestDir, cleanupScriptPath, loggingPath string) (*DeployFramework, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigPath)
+func New(logger logrus.FieldLogger, nsPrefix, manifestDir, kubeconfig, cleanupScriptPath, loggingPath string) (*DeployFramework, error) {
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to build a kube config from %s: %v", cfg.KubeConfigPath, err)
+		return nil, fmt.Errorf("Failed to build a kube config from %s: %v", kubeconfig, err)
 	}
 
 	client, err := kubernetes.NewForConfig(config)
@@ -95,8 +95,9 @@ func New(cfg ReportingFrameworkConfig, logger logrus.FieldLogger, nsPrefix, mani
 		NamespacePrefix:   nsPrefix,
 		ManifestsDir:      manifestDir,
 		CleanupScriptPath: cleanupScriptPath,
+		KubeConfigPath:    kubeconfig,
 		LoggingPath:       loggingPath,
-		Config:            cfg,
+		Config:            ReportingFrameworkConfig{},
 	}
 
 	return deployFramework, nil
@@ -116,7 +117,7 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 	rand.Seed(time.Now().UnixNano())
 	namespace := df.NamespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
-	// update the ommitted namespace fields in the test table index
+	// update the omitted namespace fields in the test table index
 	df.Config.Namespace = namespace
 	cfg.Namespace = namespace
 	cfg.MeteringConfig.ObjectMeta = meta.ObjectMeta{
@@ -160,11 +161,18 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 
 	df.Logger.Infof("Report results directory: %s", reportResultsPath)
 
+	useHTTPSAPI := true
+	useRouteForReportingAPI := true
+	useKubeProxyForReportingAPI := false
+	reportingAPIURL := ""
+
 	reportingFrameworkConfig := &ReportingFrameworkConfig{
+		UseKubeProxyForReportingAPI: useKubeProxyForReportingAPI,
+		UseRouteForReportingAPI:     useRouteForReportingAPI,
+		HTTPSAPI:                    useHTTPSAPI,
 		Namespace:                   cfg.Namespace,
-		KubeConfigPath:              df.Config.KubeConfigPath,
-		UseKubeProxyForReportingAPI: df.Config.UseKubeProxyForReportingAPI,
-		UseRouteForReportingAPI:     df.Config.UseRouteForReportingAPI,
+		KubeConfigPath:              df.KubeConfigPath,
+		ReportingAPIURL:             reportingAPIURL,
 		RouteBearerToken:            routeBearerToken,
 		ReportResultsOutputPath:     reportResultsPath,
 	}
@@ -257,7 +265,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 
 		df.logPollingSummary(targetPods, readyPods, unreadyPods)
 
-		return ((len(pods.Items) == targetPods) && len(unreadyPods) == 0), nil
+		return len(pods.Items) == targetPods && len(unreadyPods) == 0, nil
 	})
 	if err != nil {
 		return false, fmt.Errorf("The metering pods failed to report a ready status before the timeout period occurred: %v", err)
@@ -268,7 +276,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 	return true, nil
 }
 
-// GetRouteBearerToken queries the @namespace for the reporting-operator serviceaccount and attempts
+// GetRouteBearerToken queries the @namespace for the reporting-operator service account and attempts
 // to find the secret that contains the reporting-operator token. If that secret exists, return the
 // string representation of the token (key) byte slice (value), or return an error.
 func (df *DeployFramework) GetRouteBearerToken(namespace string) (string, error) {

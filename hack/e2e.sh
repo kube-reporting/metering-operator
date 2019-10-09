@@ -50,9 +50,5 @@ go test \
     -deploy-manifests-dir="${METERING_DEPLOY_MANIFESTS_PATH}" \
     -cleanup-script-path="${METERING_CLEANUP_SCRIPT_PATH}" \
     -test-output-path="${TEST_OUTPUT_PATH}" \
-    -https-api="${METERING_HTTPS_API}" \
-    -use-kube-proxy-for-reporting-api="${METERING_USE_KUBE_PROXY_FOR_REPORTING_API}" \
-    -use-route-for-reporting-api="${METERING_USE_ROUTE_FOR_REPORTING_API}" \
-    -reporting-api-url="${METERING_REPORTING_API_URL}" \
     -log-level debug \
     "$@"
