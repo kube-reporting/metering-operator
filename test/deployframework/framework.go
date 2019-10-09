@@ -1,6 +1,7 @@
 package deployframework
 
 import (
+	"bufio"
 	"fmt"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/clientcmd"
@@ -201,17 +202,31 @@ func (df *DeployFramework) Teardown(path string) error {
 		cmdEnvVarArr = append(cmdEnvVarArr, env+"="+dirPath)
 	}
 
-	df.Logger.Infof("Storing logs at %s before removing the %s namespace", path, df.Config.Namespace)
+	logger := df.Logger.WithFields(logrus.Fields{"component": "cleanup"})
 
 	cleanupCmd := exec.Command(df.CleanupScriptPath)
-	cleanupCmd.Env = append(os.Environ(), cmdEnvVarArr...)
+	stdout, err := cleanupCmd.StdoutPipe()
+	if err != nil {
+		logger.Warnf("Failed to create pipe from command output to Stdout: %v", err)
+	}
 
-	out, err := cleanupCmd.Output()
+	scanner := bufio.NewScanner(stdout)
+	go func() {
+		for scanner.Scan() {
+			line := scanner.Text()
+			logger.Infof(line)
+		}
+		if err := scanner.Err(); err != nil {
+			logger.Errorf("error reading output from command: %v", err)
+		}
+		return
+	}()
+
+	cleanupCmd.Env = append(os.Environ(), cmdEnvVarArr...)
+	err = cleanupCmd.Run()
 	if err != nil {
 		return fmt.Errorf("Failed to run the cleanup script: %v", err)
 	}
-
-	df.Logger.Debugf(string(out))
 
 	return df.Deployer.Uninstall()
 }

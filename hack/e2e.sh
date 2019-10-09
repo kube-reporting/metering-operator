@@ -3,6 +3,7 @@ set -e
 
 # TODO: handle `make e2e-local`
 # TODO: handle uninstall metering before running tests
+# TODO: add a metering-poll-timeout for the pod readiness?
 
 : "${KUBECONFIG:?}"
 
