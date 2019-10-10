@@ -3,12 +3,13 @@ package e2e
 import (
 	"flag"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
@@ -36,6 +37,19 @@ TODO:
   * use-https: always true
   * kube proxy: always false
   * reporting API URL: setting this to empty
+
+Current Problems:
+- ioutil.TempDir has the behavior we want, but doesn't create parent directories
+- the reporting framework flags are hardcoded
+- need a way to be able to dump the actual test logs (and log to stdout)
+- need to support overriding the metering and reporting operator images
+- need to be able to create a base directory (and the parent if applicable) w/o permission denied error
+- the defer closure isn't respected when with require.NoError or t.Fatalf (t.FailNow), or require.FailNow
+- need to support decoding a METERING_CR_FILE for local testing?
+
+Questions:
+- should we be able to provide a test output directory, or should it always use a prefix + tempDir
+  * could change the `$TEST_OUTPUT_PATH` defined in openshift-release and remove the `/e2e` dir
 */
 
 func init() {
@@ -63,19 +77,14 @@ func TestMain(m *testing.M) {
 		testOutputDirectory = *testOutputPath
 	}
 
-	err = os.Mkdir(testOutputDirectory, 077)
+	loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
 	if err != nil {
 		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
 	}
 
-	//loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
-	//if err != nil {
-	//	logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
-	//}
+	logger.Infof("Logging resource and container logs to '%s'", loggingPath)
 
-	logger.Infof("Logging resource and container logs to '%s'", testOutputDirectory)
-
-	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, testOutputDirectory); err != nil {
+	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, loggingPath); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -122,33 +131,32 @@ func testInstall(
 ) {
 	testOutputDir := filepath.Join(df.LoggingPath, testName)
 	err := os.Mkdir(testOutputDir, 0777)
-	if err != nil {
-		df.Logger.Fatalf("Failed to make the directory '%s': %v", testOutputDir, err)
-	}
+	assert.NoError(t, err, "creating the base test output directory should produce no error")
 
 	cfg, err := df.Setup(deployerConfig, testOutputDir, targetPods)
-	require.NoError(t, err, "Initializing the deploy framework should produce no error")
+	assert.NoError(t, err, "deploying metering should produce no error")
+	assert.NotNil(t, cfg, "the ReportingFrameworkConfig object returned from df.Setup should not be nil")
 
 	defer func() {
 		err := df.Teardown(testOutputDir)
-		if err != nil {
-			df.Logger.Warnf("Failed to teardown the metering deployment in the %s namespace: %v", cfg.Namespace, err)
-		}
+		assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 	}()
 
-	testReportingFramework, err := reportingframework.New(
-		cfg.Namespace,
-		cfg.KubeConfigPath,
-		cfg.HTTPSAPI,
-		cfg.UseKubeProxyForReportingAPI,
-		cfg.UseRouteForReportingAPI,
-		cfg.RouteBearerToken,
-		cfg.ReportingAPIURL,
-		cfg.ReportResultsOutputPath,
-	)
-	require.NoError(t, err, "Initializing the test framework should produce no error")
+	if cfg != nil {
+		testReportingFramework, err := reportingframework.New(
+			cfg.Namespace,
+			cfg.KubeConfigPath,
+			cfg.HTTPSAPI,
+			cfg.UseKubeProxyForReportingAPI,
+			cfg.UseRouteForReportingAPI,
+			cfg.RouteBearerToken,
+			cfg.ReportingAPIURL,
+			cfg.ReportResultsOutputPath,
+		)
+		assert.NoError(t, err, "initializing the reporting test framework should produce no error")
 
-	testReportingProducesData(t, testReportingFramework)
+		testReportingProducesData(t, testReportingFramework)
+	}
 }
 
 func testReportingProducesData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {

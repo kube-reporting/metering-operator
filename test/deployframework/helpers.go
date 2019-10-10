@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -31,7 +32,7 @@ func (df *DeployFramework) createResourceDirs(path string) ([]string, error) {
 
 		err := os.MkdirAll(dirPath, 0777)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to create the directory %s: %v", dirPath, err)
+			return nil, fmt.Errorf("failed to create the directory %s: %v", dirPath, err)
 		}
 
 		envVarArr = append(envVarArr, env+"="+dirPath)
@@ -66,13 +67,13 @@ func (df *DeployFramework) checkPodStatus(pod v1.Pod) (bool, int) {
 		}
 	}
 
-	return (unreadyContainers == 0), (len(pod.Status.ContainerStatuses) - unreadyContainers)
+	return unreadyContainers == 0, len(pod.Status.ContainerStatuses) - unreadyContainers
 }
 
 func (df *DeployFramework) addE2ENamespaceLabel(namespace string) error {
 	ns, err := df.Client.CoreV1().Namespaces().Get(namespace, meta.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("Failed to get the %s namespace: %v", namespace, err)
+		return fmt.Errorf("failed to get the %s namespace: %v", namespace, err)
 	}
 
 	if ns.ObjectMeta.Labels != nil {
@@ -87,8 +88,18 @@ func (df *DeployFramework) addE2ENamespaceLabel(namespace string) error {
 
 	_, err = df.Client.CoreV1().Namespaces().Update(ns)
 	if err != nil {
-		return fmt.Errorf("Failed to add the 'name=e2e-testing' label to the %s namespace: %v", namespace, err)
+		return fmt.Errorf("failed to add the 'name=e2e-testing' label to the %s namespace: %v", namespace, err)
 	}
 
 	return nil
+}
+
+func (df *DeployFramework) checkForHTTPSAPI(mc meteringv1.MeteringConfig) bool {
+	// check if any of the parent structures are nil
+	// if nil, we can assume we can return false
+	if mc.Spec.TLS == nil {
+		return false
+	}
+
+	return *mc.Spec.TLS.Enabled
 }

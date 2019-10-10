@@ -110,7 +110,7 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 
 	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(df.ManifestsDir, cfg.Platform)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to initialize objects from manifests: %v", err)
+		return nil, fmt.Errorf("failed to initialize objects from manifests: %v", err)
 	}
 
 	// randomize namespace and update namespace fields
@@ -129,28 +129,27 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 
 	df.Deployer, err = deploy.NewDeployer(cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to construct a new deployer object: %v", err)
+		return nil, fmt.Errorf("failed to construct a new deployer object: %v", err)
 	}
 
 	err = df.Deployer.Install()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to install metering: %v", err)
+		return nil, fmt.Errorf("failed to install metering: %v", err)
 	}
 
 	err = df.addE2ENamespaceLabel(namespace)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to add the testing label to the %s namespace", namespace)
+		return nil, fmt.Errorf("failed to add the testing label to the %s namespace", namespace)
 	}
 
 	_, err = df.WaitForMeteringPods(targetPods, cfg.Namespace)
 	if err != nil {
-		df.Teardown(testOutputPath)
-		return nil, fmt.Errorf("Error waiting for metering pods to become ready: %v", err)
+		return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
 	}
 
 	routeBearerToken, err := df.GetRouteBearerToken(cfg.Namespace)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get the route bearer token: %v", err)
+		return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
 	}
 
 	reportResultsPath := filepath.Join(testOutputPath, reportResultsDir)
@@ -161,7 +160,10 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 
 	df.Logger.Infof("Report results directory: %s", reportResultsPath)
 
-	useHTTPSAPI := true
+	// we can hardcode these values for now as we only have one
+	// meteringconfig configuration that gets installed and we dont
+	// support passing a METERING_CR_FILE yaml file for local testing
+	useHTTPSAPI := df.checkForHTTPSAPI(*cfg.MeteringConfig)
 	useRouteForReportingAPI := true
 	useKubeProxyForReportingAPI := false
 	reportingAPIURL := ""
@@ -187,7 +189,7 @@ func (df *DeployFramework) Setup(cfg deploy.Config, testOutputPath string, targe
 func (df *DeployFramework) Teardown(path string) error {
 	envVarArr, err := df.createResourceDirs(path)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create the resource output directories: %v", err)
 	}
 
 	logger := df.Logger.WithFields(logrus.Fields{"component": "cleanup"})
@@ -213,7 +215,7 @@ func (df *DeployFramework) Teardown(path string) error {
 	cleanupCmd.Env = append(os.Environ(), envVarArr...)
 	err = cleanupCmd.Run()
 	if err != nil {
-		return fmt.Errorf("Failed to run the cleanup script: %v", err)
+		return fmt.Errorf("failed to run the cleanup script: %v", err)
 	}
 
 	return df.Deployer.Uninstall()
@@ -246,7 +248,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 		}
 
 		if len(pods.Items) == 0 {
-			return false, fmt.Errorf("The number of pods in the %s namespace should exceed zero", namespace)
+			return false, fmt.Errorf("the number of pods in the %s namespace should exceed zero", namespace)
 		}
 
 		for _, pod := range pods.Items {
@@ -268,7 +270,7 @@ func (df *DeployFramework) WaitForMeteringPods(targetPods int, namespace string)
 		return len(pods.Items) == targetPods && len(unreadyPods) == 0, nil
 	})
 	if err != nil {
-		return false, fmt.Errorf("The metering pods failed to report a ready status before the timeout period occurred: %v", err)
+		return false, fmt.Errorf("the metering pods failed to report a ready status before the timeout period occurred: %v", err)
 	}
 
 	df.Logger.Infof("Installing metering took %v", time.Since(start))
@@ -297,11 +299,11 @@ func (df *DeployFramework) GetRouteBearerToken(namespace string) (string, error)
 		return true, nil
 	})
 	if err != nil {
-		return "", fmt.Errorf("Failed to get the reporting-operator service account before timeout has occurred: %v", err)
+		return "", fmt.Errorf("failed to get the reporting-operator service account before timeout has occurred: %v", err)
 	}
 
 	if len(sa.Secrets) == 0 {
-		return "", fmt.Errorf("Failed to return a list of secrets in the reporting-operator service account")
+		return "", fmt.Errorf("failed to return a list of secrets in the reporting-operator service account")
 	}
 
 	for _, secret := range sa.Secrets {
@@ -311,12 +313,12 @@ func (df *DeployFramework) GetRouteBearerToken(namespace string) (string, error)
 	}
 
 	if secretName == "" {
-		return "", fmt.Errorf("Failed to get the secret token for the reporting-operator serviceaccount")
+		return "", fmt.Errorf("failed to get the secret token for the reporting-operator serviceaccount")
 	}
 
 	secret, err := df.Client.CoreV1().Secrets(namespace).Get(secretName, meta.GetOptions{})
 	if err != nil {
-		return "", fmt.Errorf("Failed to get the secret containing the reporting-operator service account token: %v", err)
+		return "", fmt.Errorf("failed to get the secret containing the reporting-operator service account token: %v", err)
 	}
 
 	return string(secret.Data["token"]), nil
