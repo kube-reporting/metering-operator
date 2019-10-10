@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -77,14 +76,19 @@ func TestMain(m *testing.M) {
 		testOutputDirectory = *testOutputPath
 	}
 
-	loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
+	err = os.MkdirAll(testOutputDirectory, 02777)
 	if err != nil {
 		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
 	}
 
-	logger.Infof("Logging resource and container logs to '%s'", loggingPath)
+	//loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
+	//if err != nil {
+	//	logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
+	//}
 
-	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, loggingPath); err != nil {
+	logger.Infof("Logging resource and container logs to '%s'", testOutputDirectory)
+
+	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, testOutputDirectory); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
