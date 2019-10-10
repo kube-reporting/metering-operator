@@ -63,7 +63,7 @@ func TestMain(m *testing.M) {
 		testOutputDirectory = *testOutputPath
 	}
 
-	err = os.MkdirAll(testOutputDirectory, 077)
+	err = os.Mkdir(testOutputDirectory, 077)
 	if err != nil {
 		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
 	}
