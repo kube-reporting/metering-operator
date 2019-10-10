@@ -76,15 +76,10 @@ func TestMain(m *testing.M) {
 		testOutputDirectory = *testOutputPath
 	}
 
-	err = os.MkdirAll(testOutputDirectory, 02777)
+	err = os.MkdirAll(testOutputDirectory, 0777)
 	if err != nil {
 		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
 	}
-
-	//loggingPath, err := ioutil.TempDir(testOutputDirectory, *nsPrefix)
-	//if err != nil {
-	//	logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
-	//}
 
 	logger.Infof("Logging resource and container logs to '%s'", testOutputDirectory)
 
