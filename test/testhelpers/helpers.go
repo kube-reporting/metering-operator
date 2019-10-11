@@ -2,9 +2,12 @@ package testhelpers
 
 import (
 	"github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/api/errors"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
+
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/reportingutil"
@@ -157,7 +160,15 @@ func SetupLogger(logLevelStr string) logrus.FieldLogger {
 	return logger
 }
 
-// NewMeteringConfigSpec creates a mock meteringconfig resource for use in testing
+/*
+: "${REPORTING_OPERATOR_REPLICAS:=1}"
+: "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
+: "${HDFS_NAMENODE_MEMORY:=500Mi}"
+: "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
+: "${HDFS_DATANODE_MEMORY:=500Mi}"
+*/
+
+// NewMeteringConfigSpec creates a mock MeteringConfig resource for use in testing
 func NewMeteringConfigSpec() metering.MeteringConfigSpec {
 	return metering.MeteringConfigSpec{
 		LogHelmTemplate: PtrToBool(true),
@@ -175,6 +186,12 @@ func NewMeteringConfigSpec() metering.MeteringConfigSpec {
 		},
 		ReportingOperator: &metering.ReportingOperator{
 			Spec: &metering.ReportingOperatorSpec{
+				Resources: &v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						v1.ResourceCPU:    resource.MustParse("1"),
+						v1.ResourceMemory: resource.MustParse("250Mi"),
+					},
+				},
 				Config: &metering.ReportingOperatorConfig{
 					LogLevel: "debug",
 					Prometheus: &metering.ReportingOperatorPrometheusConfig{
@@ -189,6 +206,29 @@ func NewMeteringConfigSpec() metering.MeteringConfigSpec {
 						},
 					},
 				},
+			},
+		},
+		Presto: &metering.Presto{
+			Spec: &metering.PrestoSpec{
+				Coordinator: &metering.PrestoCoordinatorSpec{
+					Resources: &v1.ResourceRequirements{
+						Requests: v1.ResourceList{
+							v1.ResourceCPU:    resource.MustParse("1"),
+							v1.ResourceMemory: resource.MustParse("1Gi"),
+						},
+					},
+				},
+			},
+		},
+		Hive: &metering.Hive{
+			Spec: metering.HiveSpec{
+				//: "${HIVE_METASTORE_STORAGE_SIZE:=5Gi}"
+				//: "${HIVE_METASTORE_MEMORY:=650Mi}"
+				//: "${HIVE_METASTORE_CPU:=1}"
+				//: "${HIVE_SERVER_MEMORY:=650Mi}"
+				//: "${HIVE_SERVER_CPU:=500m}"
+				Metastore: nil,
+				Server:    nil,
 			},
 		},
 	}
