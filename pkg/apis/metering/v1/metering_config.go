@@ -470,7 +470,7 @@ End of Presto section
 */
 
 type Hive struct {
-	Spec HiveSpec `json:"spec,omitempty"`
+	Spec *HiveSpec `json:"spec,omitempty"`
 }
 type HiveSpec struct {
 	TerminationGracePeriodSeconds *int64                  `json:"terminationGracePeriodSeconds,omitempty"`
