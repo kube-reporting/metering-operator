@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -21,9 +22,8 @@ import (
 var (
 	df *deployframework.DeployFramework
 
-	reportTestOutputDirectory string
-	testOutputDirectory       string
-	runAWSBillingTests        bool
+	testOutputDirectory string
+	runAWSBillingTests  bool
 )
 
 /*
@@ -38,52 +38,46 @@ TODO:
   * reporting API URL: setting this to empty
 
 Current Problems:
-- ioutil.TempDir has the behavior we want, but doesn't create parent directories
 - the reporting framework flags are hardcoded
 - need a way to be able to dump the actual test logs (and log to stdout)
 - need to support overriding the metering and reporting operator images
-- need to be able to create a base directory (and the parent if applicable) w/o permission denied error
-- the defer closure isn't respected when with require.NoError or t.Fatalf (t.FailNow), or require.FailNow
-- need to support decoding a METERING_CR_FILE for local testing?
-
-Questions:
-- should we be able to provide a test output directory, or should it always use a prefix + tempDir
-  * could change the `$TEST_OUTPUT_PATH` defined in openshift-release and remove the `/e2e` dir
 */
 
 func init() {
-	testOutputDirectory = os.Getenv("TEST_OUTPUT_PATH")
 	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
 }
 
 func TestMain(m *testing.M) {
-	var err error
-
 	kubeConfigFlag := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
-	nsPrefix := flag.String("namespace-prefix", "", "The namespace prefix to install the metering resources.")
-	manifestDir := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
-	cleanupScriptPath := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
-	testOutputPath := flag.String("test-output-path", "", "The absolute/relative path that you want to store test logs within.")
-	logLevel := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
+	nsPrefixFlag := flag.String("namespace-prefix", "", "The namespace prefix to install the metering resources.")
+	manifestDirFlag := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
+	cleanupScriptPathFlag := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
+	testOutputPathFlag := flag.String("test-output-path", "", "The absolute/relative path that you want to store test logs within.")
+	logLevelFlag := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
 	flag.Parse()
 
-	logger := testhelpers.SetupLogger(*logLevel)
+	logger := testhelpers.SetupLogger(*logLevelFlag)
 
-	if testOutputDirectory == "" {
-		if *testOutputPath == "" {
-			logger.Fatalf("You must specify the $TEST_OUTPUT_PATH or --test-output-path.")
+	var testOutputBaseDir string
+	// check if the a test output path has been provided, else create tmpdir
+	// TODO stat directory before executing os.MkdirAll (support passing an existing dir)
+	if *testOutputPathFlag != "" {
+		err := os.MkdirAll(*testOutputPathFlag, 0777)
+		if err != nil {
+			logger.Fatalf("Failed to create the test output directory '%s': %v", testOutputDirectory, err)
 		}
-		testOutputDirectory = *testOutputPath
+		testOutputBaseDir = *testOutputPathFlag
+	} else {
+		testOutputBaseDir, err := ioutil.TempDir("", *nsPrefixFlag)
+		if err != nil {
+			logger.Fatalf("Failed to create the temporary directory '%s': %v", testOutputBaseDir, err)
+		}
 	}
 
-	err = os.MkdirAll(testOutputDirectory, 0777)
-	if err != nil {
-		logger.Fatalf("Failed to create the directory '%s' to log test output: %v", testOutputDirectory, err)
-	}
+	logger.Infof("Logging resource and container logs to '%s'", testOutputBaseDir)
 
-	logger.Infof("Logging resource and container logs to '%s'", testOutputDirectory)
-
-	if df, err = deployframework.New(logger, *nsPrefix, *manifestDir, *kubeConfigFlag, *cleanupScriptPath, testOutputDirectory); err != nil {
+	var err error
+	if df, err = deployframework.New(logger, *nsPrefixFlag, *manifestDirFlag, *kubeConfigFlag, *cleanupScriptPathFlag, testOutputBaseDir); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -130,7 +124,7 @@ func testInstall(
 ) {
 	testOutputDir := filepath.Join(df.LoggingPath, testName)
 	err := os.Mkdir(testOutputDir, 0777)
-	assert.NoError(t, err, "creating the base test output directory should produce no error")
+	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
 	cfg, err := df.Setup(deployerConfig, testOutputDir, targetPods)
 	assert.NoError(t, err, "deploying metering should produce no error")
