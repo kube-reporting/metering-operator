@@ -160,14 +160,6 @@ func SetupLogger(logLevelStr string) logrus.FieldLogger {
 	return logger
 }
 
-/*
-: "${REPORTING_OPERATOR_REPLICAS:=1}"
-: "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
-: "${HDFS_NAMENODE_MEMORY:=500Mi}"
-: "${HDFS_DATANODE_STORAGE_SIZE:=5Gi}"
-: "${HDFS_DATANODE_MEMORY:=500Mi}"
-*/
-
 // NewMeteringConfigSpec creates a mock MeteringConfig resource for use in testing
 func NewMeteringConfigSpec() metering.MeteringConfigSpec {
 	return metering.MeteringConfigSpec{
@@ -221,14 +213,55 @@ func NewMeteringConfigSpec() metering.MeteringConfigSpec {
 			},
 		},
 		Hive: &metering.Hive{
-			Spec: metering.HiveSpec{
-				//: "${HIVE_METASTORE_STORAGE_SIZE:=5Gi}"
-				//: "${HIVE_METASTORE_MEMORY:=650Mi}"
-				//: "${HIVE_METASTORE_CPU:=1}"
-				//: "${HIVE_SERVER_MEMORY:=650Mi}"
-				//: "${HIVE_SERVER_CPU:=500m}"
-				Metastore: nil,
-				Server:    nil,
+			Spec: &metering.HiveSpec{
+				Metastore: &metering.HiveMetastoreSpec{
+					Resources: &v1.ResourceRequirements{
+						Requests: v1.ResourceList{
+							v1.ResourceCPU:    resource.MustParse("1"),
+							v1.ResourceMemory: resource.MustParse("650Mi"),
+						},
+					},
+					Storage: &metering.HiveMetastoreStorageConfig{
+						Size: "5Gi",
+					},
+				},
+				Server: &metering.HiveServerSpec{
+					Resources: &v1.ResourceRequirements{
+						Requests: v1.ResourceList{
+							v1.ResourceCPU:    resource.MustParse("500m"),
+							v1.ResourceMemory: resource.MustParse("650Mi"),
+						},
+					},
+				},
+			},
+		},
+		//: "${HDFS_NAMENODE_STORAGE_SIZE:=5Gi}"
+		//: "${HDFS_NAMENODE_MEMORY:=500Mi}"
+		Hadoop: &metering.Hadoop{
+			Spec: &metering.HadoopSpec{
+				HDFS: &metering.HadoopHDFS{
+					Enabled: PtrToBool(true),
+					Datanode: &metering.HadoopHDFSDatanodeSpec{
+						Resources: &v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceMemory: resource.MustParse("500Mi"),
+							},
+						},
+						Storage: &metering.HadoopHDFSStorageConfig{
+							Size: "5Gi",
+						},
+					},
+					Namenode: &metering.HadoopHDFSNamenodeSpec{
+						Resources: &v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceMemory: resource.MustParse("500Mi"),
+							},
+						},
+						Storage: &metering.HadoopHDFSStorageConfig{
+							Size: "5Gi",
+						},
+					},
+				},
 			},
 		},
 	}
