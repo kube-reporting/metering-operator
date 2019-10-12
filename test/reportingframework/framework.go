@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
 
@@ -95,6 +96,14 @@ func New(
 	meteringClient, err := metering.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
+	}
+
+	stat, err := os.Stat(reportOutputDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat the path to the report results directory %s: %v", reportOutputDir, err)
+	}
+	if !stat.IsDir() {
+		return nil, fmt.Errorf("the %s path to the report results directory is not a directory", reportOutputDir)
 	}
 
 	rf := &ReportingFramework{
