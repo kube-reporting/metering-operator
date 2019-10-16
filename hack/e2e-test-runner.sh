@@ -6,7 +6,7 @@
 : "${TEST_SCRIPT:?}"
 
 : "${TEST_TAP_FILE:=tests.tap}"
-: "${TEST_JUNIT_REPORT_FILE:=tests-junit.xml}"
+: "${TEST_JUNIT_REPORT_FILE:=junit-e2e-tests.xml}"
 : "${TEST_LOG_FILE:=tests.txt}"
 : "${DEPLOY_LOG_FILE:=deploy.log}"
 
