@@ -64,6 +64,7 @@ type Config struct {
 	Platform               string
 	Repo                   string
 	Tag                    string
+	ExtraNamespaceLabels   map[string]string
 	OperatorResources      *OperatorResources
 	MeteringConfig         *meteringv1.MeteringConfig
 }
