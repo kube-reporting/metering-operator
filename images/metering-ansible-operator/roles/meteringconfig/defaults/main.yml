@@ -355,6 +355,8 @@ _ocp_disabled_overrides:
       hdfs:
         securityContext:
           fsGroup: 0
+          runAsNonRoot: false
+          runAsUser: 0
 
 _ocp_enabled_overrides:
   reporting-operator:
