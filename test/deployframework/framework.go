@@ -84,6 +84,8 @@ func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (
 	return deployFramework, nil
 }
 
+// NewDeployerConfig handles the process of validating inputs before returning
+// an initialized Deploy.Config object, or an error if there is any.
 func (df *DeployFramework) NewDeployerConfig(
 	namespace,
 	meteringOperatorImageRepo,
