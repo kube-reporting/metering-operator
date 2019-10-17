@@ -113,8 +113,8 @@ unit-docker: metering-src-docker-build
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
-integration: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
-	hack/integration.sh
+integration:
+	@:
 
 integration-local: reporting-operator-local metering-ansible-operator-docker-build
 	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
