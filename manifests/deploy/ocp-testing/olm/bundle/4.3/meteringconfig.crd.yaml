@@ -1443,6 +1443,8 @@ spec:
                             hive:
                               type: object
                               properties:
+                                useHadoopCon***REMOVED***g:
+                                  type: boolean
                                 hadoopCon***REMOVED***gSecretName:
                                   type: string
                                 metastoreTimeout:
@@ -1527,8 +1529,11 @@ spec:
                                         - true
                                       secretName:
                                         minLength: 1
-                                useHadoopCon***REMOVED***g:
-                                  type: boolean
+                                s3:
+                                  type: object
+                                  properties:
+                                    useInstanceCredentials:
+                                      type: boolean
                         environment:
                           type: string
                         maxQueryLength:
