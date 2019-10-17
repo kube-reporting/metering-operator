@@ -62,6 +62,8 @@ func TestMain(m *testing.M) {
 		*kubeConfigFlag,
 		*cleanupScriptPathFlag,
 		*testOutputPathFlag,
+		reportingOperatorImageRepo,
+		reportingOperatorImageTag,
 	); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
@@ -202,8 +204,8 @@ func TestInstallMeteringAndReportingProducesData(t *testing.T) {
 
 func testInstall(
 	t *testing.T,
-	repo,
-	tag,
+	meteringOperatorImageRepo,
+	meteringOperatorImageTag,
 	testName string,
 	targetPods int,
 	spec metering.MeteringConfigSpec,
@@ -217,7 +219,7 @@ func testInstall(
 	rand.Seed(time.Now().UnixNano())
 	namespace := df.NamespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
-	deployerCtx, err := df.NewDeployerCtx(repo, tag, namespace, testOutputDir, targetPods, spec)
+	deployerCtx, err := df.NewDeployerCtx(meteringOperatorImageRepo, meteringOperatorImageTag, namespace, testOutputDir, targetPods, spec)
 	assert.NoError(t, err, "creating a new deployer context should produce no error")
 
 	rf, err := deployerCtx.Setup()

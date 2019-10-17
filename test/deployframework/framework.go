@@ -31,15 +31,17 @@ const (
 // DeployFramework contains all the information necessary to deploy
 // different metering instances and run tests against them
 type DeployFramework struct {
-	NamespacePrefix   string
-	ManifestsDir      string
-	LoggingPath       string
-	CleanupScriptPath string
-	KubeConfigPath    string
-	Logger            logrus.FieldLogger
-	Client            kubernetes.Interface
-	APIExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
-	MeteringClient    meteringv1.MeteringV1Interface
+	NamespacePrefix            string
+	ManifestsDir               string
+	LoggingPath                string
+	CleanupScriptPath          string
+	KubeConfigPath             string
+	ReportingOperatorImageRepo string
+	ReportingOperatorImageTag  string
+	Logger                     logrus.FieldLogger
+	Client                     kubernetes.Interface
+	APIExtClient               apiextclientv1beta1.CustomResourceDefinitionsGetter
+	MeteringClient             meteringv1.MeteringV1Interface
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
@@ -49,7 +51,9 @@ func New(
 	manifestDir,
 	kubeconfig,
 	cleanupScriptPath,
-	loggingPath string,
+	loggingPath,
+	reportingOperatorImageRepo,
+	reportingOperatorImageTag string,
 ) (*DeployFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -72,15 +76,17 @@ func New(
 	}
 
 	deployFramework := &DeployFramework{
-		NamespacePrefix:   nsPrefix,
-		ManifestsDir:      manifestDir,
-		CleanupScriptPath: cleanupScriptPath,
-		KubeConfigPath:    kubeconfig,
-		LoggingPath:       loggingPath,
-		Logger:            logger,
-		Client:            client,
-		APIExtClient:      apiextClient,
-		MeteringClient:    meteringClient,
+		NamespacePrefix:            nsPrefix,
+		ManifestsDir:               manifestDir,
+		CleanupScriptPath:          cleanupScriptPath,
+		KubeConfigPath:             kubeconfig,
+		LoggingPath:                loggingPath,
+		ReportingOperatorImageRepo: reportingOperatorImageRepo,
+		ReportingOperatorImageTag:  reportingOperatorImageTag,
+		Logger:                     logger,
+		Client:                     client,
+		APIExtClient:               apiextClient,
+		MeteringClient:             meteringClient,
 	}
 
 	return deployFramework, nil
