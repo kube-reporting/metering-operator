@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
@@ -28,6 +29,7 @@ type DeployerCtx struct {
 	TestCaseOutputPath string
 	Deployer           *deploy.Deployer
 	Logger             logrus.FieldLogger
+	Config             *rest.Config
 	Client             kubernetes.Interface
 	APIExtClient       apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient     meteringclient.MeteringV1Interface
@@ -63,6 +65,7 @@ func (df *DeployFramework) NewDeployerCtx(
 		Deployer:           deployer,
 		KubeConfigPath:     df.KubeConfigPath,
 		Logger:             df.Logger,
+		Config:             df.Config,
 		Client:             df.Client,
 		APIExtClient:       df.APIExtClient,
 		MeteringClient:     df.MeteringClient,
@@ -118,14 +121,16 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 	reportingAPIURL := ""
 
 	rf, err := reportingframework.New(
-		ctx.Namespace,
-		ctx.KubeConfigPath,
 		useHTTPSAPI,
 		useKubeProxyForReportingAPI,
 		useRouteForReportingAPI,
+		ctx.Namespace,
 		routeBearerToken,
 		reportingAPIURL,
 		reportResultsPath,
+		ctx.Config,
+		ctx.Client,
+		ctx.MeteringClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct a reportingframework: %v", err)
