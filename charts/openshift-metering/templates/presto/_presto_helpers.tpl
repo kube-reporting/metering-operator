@@ -18,6 +18,10 @@ hive.metastore.uri=thrift://hive-metastore:9083
 {{- if .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTimeout }}
 {{- end }}
+{{- if .Values.presto.spec.config.connectors.hive.s3.useInstanceCredentials }}
+hive.s3.use-instance-credentials={{ .Values.presto.spec.config.connectors.hive.s3.useInstanceCredentials }}
+{{- end }}
+
 {{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
 {{- end }}
@@ -25,6 +29,8 @@ hive.config.resources=/hadoop-config/core-site.xml
 hive.s3.endpoint={{ .Values.presto.spec.config.s3Compatible.endpoint }}
 hive.s3.path-style-access=true
 {{- end }}
+
+
 {{- end }}
 
 {{- define "presto-jmx-catalog-properties" -}}
