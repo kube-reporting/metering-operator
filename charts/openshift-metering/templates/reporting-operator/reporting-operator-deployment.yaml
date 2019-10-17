@@ -61,7 +61,7 @@ spec:
 {{- end }}
     spec:
       securityContext:
-        runAsNonRoot: true
+{{ toYaml $operatorValues.spec.securityContext | indent 8 }}
 {{- if $operatorValues.spec.nodeSelector }}
       nodeSelector:
 {{ toYaml $operatorValues.spec.nodeSelector | indent 8 }}

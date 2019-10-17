@@ -448,6 +448,10 @@ reporting-operator:
           cpu: 100m
           memory: 50Mi
 
+    securityContext:
+      fsGroup: null
+      runAsNonRoot: true
+
 presto:
   spec:
     labels: {}
