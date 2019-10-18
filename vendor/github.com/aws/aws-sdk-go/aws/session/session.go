@@ -8,17 +8,35 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/corehandlers"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/csm"
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/request"
 )
+
+const (
+	// ErrCodeSharedCon***REMOVED***g represents an error that occurs in the shared
+	// con***REMOVED***guration logic
+	ErrCodeSharedCon***REMOVED***g = "SharedCon***REMOVED***gErr"
+)
+
+// ErrSharedCon***REMOVED***gSourceCollision will be returned if a section contains both
+// source_pro***REMOVED***le and credential_source
+var ErrSharedCon***REMOVED***gSourceCollision = awserr.New(ErrCodeSharedCon***REMOVED***g, "only source pro***REMOVED***le or credential source can be speci***REMOVED***ed, not both", nil)
+
+// ErrSharedCon***REMOVED***gECSContainerEnvVarEmpty will be returned if the environment
+// variables are empty and Environment was set as the credential source
+var ErrSharedCon***REMOVED***gECSContainerEnvVarEmpty = awserr.New(ErrCodeSharedCon***REMOVED***g, "EcsContainer was speci***REMOVED***ed as the credential_source, but 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI' was not set", nil)
+
+// ErrSharedCon***REMOVED***gInvalidCredSource will be returned if an invalid credential source was provided
+var ErrSharedCon***REMOVED***gInvalidCredSource = awserr.New(ErrCodeSharedCon***REMOVED***g, "credential source values must be EcsContainer, Ec2InstanceMetadata, or Environment", nil)
 
 // A Session provides a central location to create service clients from and
 // store con***REMOVED***gurations and request handlers for those services.
@@ -55,7 +73,7 @@ type Session struct {
 // func is called instead of waiting to receive an error until a request is made.
 func New(cfgs ...*aws.Con***REMOVED***g) *Session {
 	// load initial con***REMOVED***g from environment
-	envCfg := loadEnvCon***REMOVED***g()
+	envCfg, envErr := loadEnvCon***REMOVED***g()
 
 	if envCfg.EnableSharedCon***REMOVED***g {
 		var cfg aws.Con***REMOVED***g
@@ -75,16 +93,31 @@ func New(cfgs ...*aws.Con***REMOVED***g) *Session {
 			// Session creation failed, need to report the error and prevent
 			// any requests from succeeding.
 			s = &Session{Con***REMOVED***g: defaults.Con***REMOVED***g()}
-			s.Con***REMOVED***g.MergeIn(cfgs...)
-			s.Con***REMOVED***g.Logger.Log("ERROR:", msg, "Error:", err)
-			s.Handlers.Validate.PushBack(func(r *request.Request) {
-				r.Error = err
-			})
+			s.logDeprecatedNewSessionError(msg, err, cfgs)
 		}
+
 		return s
 	}
 
-	return deprecatedNewSession(cfgs...)
+	s := deprecatedNewSession(cfgs...)
+	if envErr != nil {
+		msg := "failed to load env con***REMOVED***g"
+		s.logDeprecatedNewSessionError(msg, envErr, cfgs)
+	}
+
+	if csmCfg, err := loadCSMCon***REMOVED***g(envCfg, []string{}); err != nil {
+		if l := s.Con***REMOVED***g.Logger; l != nil {
+			l.Log(fmt.Sprintf("ERROR: failed to load CSM con***REMOVED***guration, %v", err))
+		}
+	} ***REMOVED*** if csmCfg.Enabled {
+		err := enableCSM(&s.Handlers, csmCfg, s.Con***REMOVED***g.Logger)
+		if err != nil {
+			msg := "failed to enable CSM"
+			s.logDeprecatedNewSessionError(msg, err, cfgs)
+		}
+	}
+
+	return s
 }
 
 // NewSession returns a new Session created from SDK defaults, con***REMOVED***g ***REMOVED***les,
@@ -100,7 +133,7 @@ func New(cfgs ...*aws.Con***REMOVED***g) *Session {
 // to be built with retrieving credentials with AssumeRole set in the con***REMOVED***g.
 //
 // See the NewSessionWithOptions func for information on how to override or
-// control through code how the Session will be created. Such as specifying the
+// control through code how the Session will be created, such as specifying the
 // con***REMOVED***g pro***REMOVED***le, and controlling if shared con***REMOVED***g is enabled or not.
 func NewSession(cfgs ...*aws.Con***REMOVED***g) (*Session, error) {
 	opts := Options{}
@@ -184,6 +217,12 @@ type Options struct {
 	// the con***REMOVED***g enables assume role wit MFA via the mfa_serial ***REMOVED***eld.
 	AssumeRoleTokenProvider func() (string, error)
 
+	// When the SDK's shared con***REMOVED***g is con***REMOVED***gured to assume a role this option
+	// may be provided to set the expiry duration of the STS credentials.
+	// Defaults to 15 minutes if not set as documented in the
+	// stscreds.AssumeRoleProvider.
+	AssumeRoleDuration time.Duration
+
 	// Reader for a custom Credentials Authority (CA) bundle in PEM format that
 	// the SDK will use instead of the default system's root CA bundle. Use this
 	// only if you want to replace the CA bundle the SDK uses for TLS requests.
@@ -198,6 +237,12 @@ type Options struct {
 	// to also enable this feature. CustomCABundle session option ***REMOVED***eld has priority
 	// over the AWS_CA_BUNDLE environment variable, and will be used if both are set.
 	CustomCABundle io.Reader
+
+	// The handlers that the session and all API clients will be created with.
+	// This must be a complete set of handlers. Use the defaults.Handlers()
+	// function to initialize this value before changing the handlers to be
+	// used by the SDK.
+	Handlers request.Handlers
 }
 
 // NewSessionWithOptions returns a new Session created from SDK defaults, con***REMOVED***g ***REMOVED***les,
@@ -231,13 +276,20 @@ type Options struct {
 //     }))
 func NewSessionWithOptions(opts Options) (*Session, error) {
 	var envCfg envCon***REMOVED***g
+	var err error
 	if opts.SharedCon***REMOVED***gState == SharedCon***REMOVED***gEnable {
-		envCfg = loadSharedEnvCon***REMOVED***g()
+		envCfg, err = loadSharedEnvCon***REMOVED***g()
+		if err != nil {
+			return nil, fmt.Errorf("failed to load shared con***REMOVED***g, %v", err)
+		}
 	} ***REMOVED*** {
-		envCfg = loadEnvCon***REMOVED***g()
+		envCfg, err = loadEnvCon***REMOVED***g()
+		if err != nil {
+			return nil, fmt.Errorf("failed to load environment con***REMOVED***g, %v", err)
+		}
 	}
 
-	if len(opts.Pro***REMOVED***le) > 0 {
+	if len(opts.Pro***REMOVED***le) != 0 {
 		envCfg.Pro***REMOVED***le = opts.Pro***REMOVED***le
 	}
 
@@ -300,18 +352,36 @@ func deprecatedNewSession(cfgs ...*aws.Con***REMOVED***g) *Session {
 	}
 
 	initHandlers(s)
-
 	return s
+}
+
+func enableCSM(handlers *request.Handlers, cfg csmCon***REMOVED***g, logger aws.Logger) error {
+	if logger != nil {
+		logger.Log("Enabling CSM")
+	}
+
+	r, err := csm.Start(cfg.ClientID, csm.AddressWithDefaults(cfg.Host, cfg.Port))
+	if err != nil {
+		return err
+	}
+	r.InjectHandlers(handlers)
+
+	return nil
 }
 
 func newSession(opts Options, envCfg envCon***REMOVED***g, cfgs ...*aws.Con***REMOVED***g) (*Session, error) {
 	cfg := defaults.Con***REMOVED***g()
-	handlers := defaults.Handlers()
+
+	handlers := opts.Handlers
+	if handlers.IsEmpty() {
+		handlers = defaults.Handlers()
+	}
 
 	// Get a merged version of the user provided con***REMOVED***g to determine if
 	// credentials were.
 	userCfg := &aws.Con***REMOVED***g{}
 	userCfg.MergeIn(cfgs...)
+	cfg.MergeIn(userCfg)
 
 	// Ordered con***REMOVED***g ***REMOVED***les will be loaded in with later ***REMOVED***les overwriting
 	// previous con***REMOVED***g ***REMOVED***le values.
@@ -328,9 +398,17 @@ func newSession(opts Options, envCfg envCon***REMOVED***g, cfgs ...*aws.Con***RE
 	}
 
 	// Load additional con***REMOVED***g from ***REMOVED***le(s)
-	sharedCfg, err := loadSharedCon***REMOVED***g(envCfg.Pro***REMOVED***le, cfgFiles)
+	sharedCfg, err := loadSharedCon***REMOVED***g(envCfg.Pro***REMOVED***le, cfgFiles, envCfg.EnableSharedCon***REMOVED***g)
 	if err != nil {
-		return nil, err
+		if len(envCfg.Pro***REMOVED***le) == 0 && !envCfg.EnableSharedCon***REMOVED***g && (envCfg.Creds.HasKeys() || userCfg.Credentials != nil) {
+			// Special case where the user has not explicitly speci***REMOVED***ed an AWS_PROFILE,
+			// or session.Options.pro***REMOVED***le, shared con***REMOVED***g is not enabled, and the
+			// environment has credentials, allow the shared con***REMOVED***g ***REMOVED***le to fail to
+			// load since the user has already provided credentials, and nothing ***REMOVED***
+			// is required to be read ***REMOVED***le. Github(aws/aws-sdk-go#2455)
+		} ***REMOVED*** if _, ok := err.(SharedCon***REMOVED***gPro***REMOVED***leNotExistsError); !ok {
+			return nil, err
+		}
 	}
 
 	if err := mergeCon***REMOVED***gSrcs(cfg, userCfg, envCfg, sharedCfg, handlers, opts); err != nil {
@@ -344,6 +422,17 @@ func newSession(opts Options, envCfg envCon***REMOVED***g, cfgs ...*aws.Con***RE
 
 	initHandlers(s)
 
+	if csmCfg, err := loadCSMCon***REMOVED***g(envCfg, cfgFiles); err != nil {
+		if l := s.Con***REMOVED***g.Logger; l != nil {
+			l.Log(fmt.Sprintf("ERROR: failed to load CSM con***REMOVED***guration, %v", err))
+		}
+	} ***REMOVED*** if csmCfg.Enabled {
+		err = enableCSM(&s.Handlers, csmCfg, s.Con***REMOVED***g.Logger)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Setup HTTP client with custom cert bundle if enabled
 	if opts.CustomCABundle != nil {
 		if err := loadCustomCABundle(s, opts.CustomCABundle); err != nil {
@@ -352,6 +441,46 @@ func newSession(opts Options, envCfg envCon***REMOVED***g, cfgs ...*aws.Con***RE
 	}
 
 	return s, nil
+}
+
+type csmCon***REMOVED***g struct {
+	Enabled  bool
+	Host     string
+	Port     string
+	ClientID string
+}
+
+var csmPro***REMOVED***leName = "aws_csm"
+
+func loadCSMCon***REMOVED***g(envCfg envCon***REMOVED***g, cfgFiles []string) (csmCon***REMOVED***g, error) {
+	if envCfg.CSMEnabled != nil {
+		if *envCfg.CSMEnabled {
+			return csmCon***REMOVED***g{
+				Enabled:  true,
+				ClientID: envCfg.CSMClientID,
+				Host:     envCfg.CSMHost,
+				Port:     envCfg.CSMPort,
+			}, nil
+		}
+		return csmCon***REMOVED***g{}, nil
+	}
+
+	sharedCfg, err := loadSharedCon***REMOVED***g(csmPro***REMOVED***leName, cfgFiles, false)
+	if err != nil {
+		if _, ok := err.(SharedCon***REMOVED***gPro***REMOVED***leNotExistsError); !ok {
+			return csmCon***REMOVED***g{}, err
+		}
+	}
+	if sharedCfg.CSMEnabled != nil && *sharedCfg.CSMEnabled == true {
+		return csmCon***REMOVED***g{
+			Enabled:  true,
+			ClientID: sharedCfg.CSMClientID,
+			Host:     sharedCfg.CSMHost,
+			Port:     sharedCfg.CSMPort,
+		}, nil
+	}
+
+	return csmCon***REMOVED***g{}, nil
 }
 
 func loadCustomCABundle(s *Session, bundle io.Reader) error {
@@ -366,7 +495,10 @@ func loadCustomCABundle(s *Session, bundle io.Reader) error {
 		}
 	}
 	if t == nil {
-		t = &http.Transport{}
+		// Nil transport implies `http.DefaultTransport` should be used. Since
+		// the SDK cannot modify, nor copy the `DefaultTransport` specifying
+		// the values the next closest behavior.
+		t = getCABundleTransport()
 	}
 
 	p, err := loadCertPool(bundle)
@@ -399,9 +531,11 @@ func loadCertPool(r io.Reader) (*x509.CertPool, error) {
 	return p, nil
 }
 
-func mergeCon***REMOVED***gSrcs(cfg, userCfg *aws.Con***REMOVED***g, envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g, handlers request.Handlers, sessOpts Options) error {
-	// Merge in user provided con***REMOVED***guration
-	cfg.MergeIn(userCfg)
+func mergeCon***REMOVED***gSrcs(cfg, userCfg *aws.Con***REMOVED***g,
+	envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g,
+	handlers request.Handlers,
+	sessOpts Options,
+) error {
 
 	// Region if not already set by user
 	if len(aws.StringValue(cfg.Region)) == 0 {
@@ -412,101 +546,44 @@ func mergeCon***REMOVED***gSrcs(cfg, userCfg *aws.Con***REMOVED***g, envCfg envC
 		}
 	}
 
-	// Con***REMOVED***gure credentials if not already set
-	if cfg.Credentials == credentials.AnonymousCredentials && userCfg.Credentials == nil {
-		if len(envCfg.Creds.AccessKeyID) > 0 {
-			cfg.Credentials = credentials.NewStaticCredentialsFromCreds(
-				envCfg.Creds,
-			)
-		} ***REMOVED*** if envCfg.EnableSharedCon***REMOVED***g && len(sharedCfg.AssumeRole.RoleARN) > 0 && sharedCfg.AssumeRoleSource != nil {
-			cfgCp := *cfg
-			cfgCp.Credentials = credentials.NewStaticCredentialsFromCreds(
-				sharedCfg.AssumeRoleSource.Creds,
-			)
-			if len(sharedCfg.AssumeRole.MFASerial) > 0 && sessOpts.AssumeRoleTokenProvider == nil {
-				// AssumeRole Token provider is required if doing Assume Role
-				// with MFA.
-				return AssumeRoleTokenProviderNotSetError{}
-			}
-			cfg.Credentials = stscreds.NewCredentials(
-				&Session{
-					Con***REMOVED***g:   &cfgCp,
-					Handlers: handlers.Copy(),
-				},
-				sharedCfg.AssumeRole.RoleARN,
-				func(opt *stscreds.AssumeRoleProvider) {
-					opt.RoleSessionName = sharedCfg.AssumeRole.RoleSessionName
-
-					// Assume role with external ID
-					if len(sharedCfg.AssumeRole.ExternalID) > 0 {
-						opt.ExternalID = aws.String(sharedCfg.AssumeRole.ExternalID)
-					}
-
-					// Assume role with MFA
-					if len(sharedCfg.AssumeRole.MFASerial) > 0 {
-						opt.SerialNumber = aws.String(sharedCfg.AssumeRole.MFASerial)
-						opt.TokenProvider = sessOpts.AssumeRoleTokenProvider
-					}
-				},
-			)
-		} ***REMOVED*** if len(sharedCfg.Creds.AccessKeyID) > 0 {
-			cfg.Credentials = credentials.NewStaticCredentialsFromCreds(
-				sharedCfg.Creds,
-			)
-		} ***REMOVED*** {
-			// Fallback to default credentials provider, include mock errors
-			// for the credential chain so user can identify why credentials
-			// failed to be retrieved.
-			cfg.Credentials = credentials.NewCredentials(&credentials.ChainProvider{
-				VerboseErrors: aws.BoolValue(cfg.CredentialsChainVerboseErrors),
-				Providers: []credentials.Provider{
-					&credProviderError{Err: awserr.New("EnvAccessKeyNotFound", "failed to ***REMOVED***nd credentials in the environment.", nil)},
-					&credProviderError{Err: awserr.New("SharedCredsLoad", fmt.Sprintf("failed to load pro***REMOVED***le, %s.", envCfg.Pro***REMOVED***le), nil)},
-					defaults.RemoteCredProvider(*cfg, handlers),
-				},
-			})
+	if cfg.EnableEndpointDiscovery == nil {
+		if envCfg.EnableEndpointDiscovery != nil {
+			cfg.WithEndpointDiscovery(*envCfg.EnableEndpointDiscovery)
+		} ***REMOVED*** if envCfg.EnableSharedCon***REMOVED***g && sharedCfg.EnableEndpointDiscovery != nil {
+			cfg.WithEndpointDiscovery(*sharedCfg.EnableEndpointDiscovery)
 		}
+	}
+
+	// Regional Endpoint flag for STS endpoint resolving
+	mergeSTSRegionalEndpointCon***REMOVED***g(cfg, envCfg, sharedCfg)
+
+	// Con***REMOVED***gure credentials if not already set by the user when creating the
+	// Session.
+	if cfg.Credentials == credentials.AnonymousCredentials && userCfg.Credentials == nil {
+		creds, err := resolveCredentials(cfg, envCfg, sharedCfg, handlers, sessOpts)
+		if err != nil {
+			return err
+		}
+		cfg.Credentials = creds
 	}
 
 	return nil
 }
 
-// AssumeRoleTokenProviderNotSetError is an error returned when creating a session when the
-// MFAToken option is not set when shared con***REMOVED***g is con***REMOVED***gured load assume a
-// role with an MFA token.
-type AssumeRoleTokenProviderNotSetError struct{}
+// mergeSTSRegionalEndpointCon***REMOVED***g function merges the STSRegionalEndpoint into cfg from
+// envCon***REMOVED***g and SharedCon***REMOVED***g with envCon***REMOVED***g being given precedence over SharedCon***REMOVED***g
+func mergeSTSRegionalEndpointCon***REMOVED***g(cfg *aws.Con***REMOVED***g, envCfg envCon***REMOVED***g, sharedCfg sharedCon***REMOVED***g) error {
 
-// Code is the short id of the error.
-func (e AssumeRoleTokenProviderNotSetError) Code() string {
-	return "AssumeRoleTokenProviderNotSetError"
-}
+	cfg.STSRegionalEndpoint = envCfg.STSRegionalEndpoint
 
-// Message is the description of the error
-func (e AssumeRoleTokenProviderNotSetError) Message() string {
-	return fmt.Sprintf("assume role with MFA enabled, but AssumeRoleTokenProvider session option not set.")
-}
+	if cfg.STSRegionalEndpoint == endpoints.UnsetSTSEndpoint {
+		cfg.STSRegionalEndpoint = sharedCfg.STSRegionalEndpoint
+	}
 
-// OrigErr is the underlying error that caused the failure.
-func (e AssumeRoleTokenProviderNotSetError) OrigErr() error {
+	if cfg.STSRegionalEndpoint == endpoints.UnsetSTSEndpoint {
+		cfg.STSRegionalEndpoint = endpoints.LegacySTSEndpoint
+	}
 	return nil
-}
-
-// Error satis***REMOVED***es the error interface.
-func (e AssumeRoleTokenProviderNotSetError) Error() string {
-	return awserr.SprintError(e.Code(), e.Message(), "", nil)
-}
-
-type credProviderError struct {
-	Err error
-}
-
-var emptyCreds = credentials.Value{}
-
-func (c credProviderError) Retrieve() (credentials.Value, error) {
-	return credentials.Value{}, c.Err
-}
-func (c credProviderError) IsExpired() bool {
-	return true
 }
 
 func initHandlers(s *Session) {
@@ -517,7 +594,7 @@ func initHandlers(s *Session) {
 	}
 }
 
-// Copy creates and returns a copy of the current Session, coping the con***REMOVED***g
+// Copy creates and returns a copy of the current Session, copying the con***REMOVED***g
 // and handlers. If any additional con***REMOVED***gs are provided they will be merged
 // on top of the Session's copied con***REMOVED***g.
 //
@@ -562,6 +639,9 @@ func (s *Session) clientCon***REMOVED***gWithErr(serviceName string, cfgs ...*aw
 			func(opt *endpoints.Options) {
 				opt.DisableSSL = aws.BoolValue(s.Con***REMOVED***g.DisableSSL)
 				opt.UseDualStack = aws.BoolValue(s.Con***REMOVED***g.UseDualStack)
+				// Support for STSRegionalEndpoint where the STSRegionalEndpoint is
+				// provided in envcon***REMOVED***g or sharedcon***REMOVED***g with envcon***REMOVED***g getting precedence.
+				opt.STSRegionalEndpoint = s.Con***REMOVED***g.STSRegionalEndpoint
 
 				// Support the condition where the service is modeled but its
 				// endpoint metadata is not available.
@@ -603,4 +683,15 @@ func (s *Session) ClientCon***REMOVED***gNoResolveEndpoint(cfgs ...*aws.Con***RE
 		SigningNameDerived: resolved.SigningNameDerived,
 		SigningName:        resolved.SigningName,
 	}
+}
+
+// logDeprecatedNewSessionError function enables error handling for session
+func (s *Session) logDeprecatedNewSessionError(msg string, err error, cfgs []*aws.Con***REMOVED***g) {
+	// Session creation failed, need to report the error and prevent
+	// any requests from succeeding.
+	s.Con***REMOVED***g.MergeIn(cfgs...)
+	s.Con***REMOVED***g.Logger.Log("ERROR:", msg, "Error:", err)
+	s.Handlers.Validate.PushBack(func(r *request.Request) {
+		r.Error = err
+	})
 }

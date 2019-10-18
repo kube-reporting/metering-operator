@@ -1,97 +1,93 @@
 /*
-Package session provides con***REMOVED***guration for the SDK's service clients.
-
-Sessions can be shared across all service clients that share the same base
-con***REMOVED***guration.  The Session is built from the SDK's default con***REMOVED***guration and
-request handlers.
-
-Sessions should be cached when possible, because creating a new Session will
-load all con***REMOVED***guration values from the environment, and con***REMOVED***g ***REMOVED***les each time
-the Session is created. Sharing the Session value across all of your service
-clients will ensure the con***REMOVED***guration is loaded the fewest number of times possible.
-
-Concurrency
+Package session provides con***REMOVED***guration for the SDK's service clients. Sessions
+can be shared across service clients that share the same base con***REMOVED***guration.
 
 Sessions are safe to use concurrently as long as the Session is not being
-modi***REMOVED***ed. The SDK will not modify the Session once the Session has been created.
-Creating service clients concurrently from a shared Session is safe.
+modi***REMOVED***ed. Sessions should be cached when possible, because creating a new
+Session will load all con***REMOVED***guration values from the environment, and con***REMOVED***g
+***REMOVED***les each time the Session is created. Sharing the Session value across all of
+your service clients will ensure the con***REMOVED***guration is loaded the fewest number
+of times possible.
 
-Sessions from Shared Con***REMOVED***g
-
-Sessions can be created using the method above that will only load the
-additional con***REMOVED***g if the AWS_SDK_LOAD_CONFIG environment variable is set.
-Alternatively you can explicitly create a Session with shared con***REMOVED***g enabled.
-To do this you can use NewSessionWithOptions to con***REMOVED***gure how the Session will
-be created. Using the NewSessionWithOptions with SharedCon***REMOVED***gState set to
-SharedCon***REMOVED***gEnable will create the session as if the AWS_SDK_LOAD_CONFIG
-environment variable was set.
-
-Creating Sessions
-
-When creating Sessions optional aws.Con***REMOVED***g values can be passed in that will
-override the default, or loaded con***REMOVED***g values the Session is being created
-with. This allows you to provide additional, or case based, con***REMOVED***guration
-as needed.
+Sessions options from Shared Con***REMOVED***g
 
 By default NewSession will only load credentials from the shared credentials
 ***REMOVED***le (~/.aws/credentials). If the AWS_SDK_LOAD_CONFIG environment variable is
 set to a truthy value the Session will be created from the con***REMOVED***guration
 values from the shared con***REMOVED***g (~/.aws/con***REMOVED***g) and shared credentials
-(~/.aws/credentials) ***REMOVED***les. See the section Sessions from Shared Con***REMOVED***g for
-more information.
+(~/.aws/credentials) ***REMOVED***les. Using the NewSessionWithOptions with
+SharedCon***REMOVED***gState set to SharedCon***REMOVED***gEnable will create the session as if the
+AWS_SDK_LOAD_CONFIG environment variable was set.
 
-Create a Session with the default con***REMOVED***g and request handlers. With credentials
-region, and pro***REMOVED***le loaded from the environment and shared con***REMOVED***g automatically.
-Requires the AWS_PROFILE to be set, or "default" is used.
+Credential and con***REMOVED***g loading order
+
+The Session will attempt to load con***REMOVED***guration and credentials from the
+environment, con***REMOVED***guration ***REMOVED***les, and other credential sources. The order
+con***REMOVED***guration is loaded in is:
+
+  * Environment Variables
+  * Shared Credentials ***REMOVED***le
+  * Shared Con***REMOVED***guration ***REMOVED***le (if SharedCon***REMOVED***g is enabled)
+  * EC2 Instance Metadata (credentials only)
+
+The Environment variables for credentials will have precedence over shared
+con***REMOVED***g even if SharedCon***REMOVED***g is enabled. To override this behavior, and use
+shared con***REMOVED***g credentials instead specify the session.Options.Pro***REMOVED***le, (e.g.
+when using credential_source=Environment to assume a role).
+
+  sess, err := session.NewSessionWithOptions(session.Options{
+	  Pro***REMOVED***le: "myPro***REMOVED***le",
+  })
+
+Creating Sessions
+
+Creating a Session without additional options will load credentials region, and
+pro***REMOVED***le loaded from the environment and shared con***REMOVED***g automatically. See,
+"Environment Variables" section for information on environment variables used
+by Session.
 
 	// Create Session
-	sess := session.Must(session.NewSession())
+	sess, err := session.NewSession()
+
+
+When creating Sessions optional aws.Con***REMOVED***g values can be passed in that will
+override the default, or loaded, con***REMOVED***g values the Session is being created
+with. This allows you to provide additional, or case based, con***REMOVED***guration
+as needed.
 
 	// Create a Session with a custom region
-	sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
-		Region: aws.String("us-east-1"),
-	}))
+	sess, err := session.NewSession(&aws.Con***REMOVED***g{
+		Region: aws.String("us-west-2"),
+	})
 
-	// Create a S3 client instance from a session
-	sess := session.Must(session.NewSession())
-
-	svc := s3.New(sess)
-
-Create Session With Option Overrides
-
-In addition to NewSession, Sessions can be created using NewSessionWithOptions.
-This func allows you to control and override how the Session will be created
-through code instead of being driven by environment variables only.
-
-Use NewSessionWithOptions when you want to provide the con***REMOVED***g pro***REMOVED***le, or
-override the shared con***REMOVED***g state (AWS_SDK_LOAD_CONFIG).
+Use NewSessionWithOptions to provide additional con***REMOVED***guration driving how the
+Session's con***REMOVED***guration will be loaded. Such as, specifying shared con***REMOVED***g
+pro***REMOVED***le, or override the shared con***REMOVED***g state,  (AWS_SDK_LOAD_CONFIG).
 
 	// Equivalent to session.NewSession()
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
+	sess, err := session.NewSessionWithOptions(session.Options{
 		// Options
-	}))
+	})
 
-	// Specify pro***REMOVED***le to load for the session's con***REMOVED***g
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		 Pro***REMOVED***le: "pro***REMOVED***le_name",
-	}))
+	sess, err := session.NewSessionWithOptions(session.Options{
+		// Specify pro***REMOVED***le to load for the session's con***REMOVED***g
+		Pro***REMOVED***le: "pro***REMOVED***le_name",
 
-	// Specify pro***REMOVED***le for con***REMOVED***g and region for requests
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		 Con***REMOVED***g: aws.Con***REMOVED***g{Region: aws.String("us-east-1")},
-		 Pro***REMOVED***le: "pro***REMOVED***le_name",
-	}))
+		// Provide SDK Con***REMOVED***g options, such as Region.
+		Con***REMOVED***g: aws.Con***REMOVED***g{
+			Region: aws.String("us-west-2"),
+		},
 
-	// Force enable Shared Con***REMOVED***g support
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		// Force enable Shared Con***REMOVED***g support
 		SharedCon***REMOVED***gState: session.SharedCon***REMOVED***gEnable,
-	}))
+	})
 
 Adding Handlers
 
-You can add handlers to a session for processing HTTP requests. All service
-clients that use the session inherit the handlers. For example, the following
-handler logs every request and its payload made by a service client:
+You can add handlers to a session to decorate API operation, (e.g. adding HTTP
+headers). All clients that use the Session receive a copy of the Session's
+handlers. For example, the following request handler added to the Session logs
+every requests made.
 
 	// Create a session, and add additional handlers for all service
 	// clients created with the Session to inherit. Adds logging handler.
@@ -99,22 +95,15 @@ handler logs every request and its payload made by a service client:
 
 	sess.Handlers.Send.PushFront(func(r *request.Request) {
 		// Log every request made and its payload
-		logger.Println("Request: %s/%s, Payload: %s",
+		logger.Printf("Request: %s/%s, Params: %s",
 			r.ClientInfo.ServiceName, r.Operation, r.Params)
 	})
 
-Deprecated "New" function
-
-The New session function has been deprecated because it does not provide good
-way to return errors that occur when loading the con***REMOVED***guration ***REMOVED***les and values.
-Because of this, NewSession was created so errors can be retrieved when
-creating a session fails.
-
 Shared Con***REMOVED***g Fields
 
-By default the SDK will only load the shared credentials ***REMOVED***le's (~/.aws/credentials)
-credentials values, and all other con***REMOVED***g is provided by the environment variables,
-SDK defaults, and user provided aws.Con***REMOVED***g values.
+By default the SDK will only load the shared credentials ***REMOVED***le's
+(~/.aws/credentials) credentials values, and all other con***REMOVED***g is provided by
+the environment variables, SDK defaults, and user provided aws.Con***REMOVED***g values.
 
 If the AWS_SDK_LOAD_CONFIG environment variable is set, or SharedCon***REMOVED***gEnable
 option is used to create the Session the full shared con***REMOVED***g values will be
@@ -125,24 +114,31 @@ addition the Session will load its con***REMOVED***guration from both the shared
 
 If both con***REMOVED***g ***REMOVED***les are present the con***REMOVED***guration from both ***REMOVED***les will be
 read. The Session will be created from con***REMOVED***guration values from the shared
-credentials ***REMOVED***le (~/.aws/credentials) over those in the shared con***REMOVED***g ***REMOVED***le (~/.aws/con***REMOVED***g).
+credentials ***REMOVED***le (~/.aws/credentials) over those in the shared con***REMOVED***g ***REMOVED***le
+(~/.aws/con***REMOVED***g).
 
-Credentials are the values the SDK should use for authenticating requests with
-AWS Services. They arfrom a con***REMOVED***guration ***REMOVED***le will need to include both
-aws_access_key_id and aws_secret_access_key must be provided together in the
-same ***REMOVED***le to be considered valid. The values will be ignored if not a complete
-group. aws_session_token is an optional ***REMOVED***eld that can be provided if both of
-the other two ***REMOVED***elds are also provided.
+Credentials are the values the SDK uses to authenticating requests with AWS
+Services. When speci***REMOVED***ed in a ***REMOVED***le, both aws_access_key_id and
+aws_secret_access_key must be provided together in the same ***REMOVED***le to be
+considered valid. They will be ignored if both are not present.
+aws_session_token is an optional ***REMOVED***eld that can be provided in addition to the
+other two ***REMOVED***elds.
 
 	aws_access_key_id = AKID
 	aws_secret_access_key = SECRET
 	aws_session_token = TOKEN
 
-Assume Role values allow you to con***REMOVED***gure the SDK to assume an IAM role using
-a set of credentials provided in a con***REMOVED***g ***REMOVED***le via the source_pro***REMOVED***le ***REMOVED***eld.
-Both "role_arn" and "source_pro***REMOVED***le" are required. The SDK supports assuming
-a role with MFA token if the session option AssumeRoleTokenProvider
-is set.
+	; region only supported if SharedCon***REMOVED***gEnabled.
+	region = us-east-1
+
+Assume Role con***REMOVED***guration
+
+The role_arn ***REMOVED***eld allows you to con***REMOVED***gure the SDK to assume an IAM role using
+a set of credentials from another source. Such as when paired with static
+credentials, "pro***REMOVED***le_source", "credential_process", or "credential_source"
+***REMOVED***elds. If "role_arn" is provided, a source of credentials must also be
+speci***REMOVED***ed, such as "source_pro***REMOVED***le", "credential_source", or
+"credential_process".
 
 	role_arn = arn:aws:iam::<account_number>:role/<role_name>
 	source_pro***REMOVED***le = pro***REMOVED***le_with_creds
@@ -150,40 +146,16 @@ is set.
 	mfa_serial = <serial or mfa arn>
 	role_session_name = session_name
 
-Region is the region the SDK should use for looking up AWS service endpoints
-and signing requests.
 
-	region = us-east-1
-
-Assume Role with MFA token
-
-To create a session with support for assuming an IAM role with MFA set the
-session option AssumeRoleTokenProvider to a function that will prompt for the
-MFA token code when the SDK assumes the role and refreshes the role's credentials.
-This allows you to con***REMOVED***gure the SDK via the shared con***REMOVED***g to assumea role
-with MFA tokens.
-
-In order for the SDK to assume a role with MFA the SharedCon***REMOVED***gState
-session option must be set to SharedCon***REMOVED***gEnable, or AWS_SDK_LOAD_CONFIG
-environment variable set.
-
-The shared con***REMOVED***guration instructs the SDK to assume an IAM role with MFA
-when the mfa_serial con***REMOVED***guration ***REMOVED***eld is set in the shared con***REMOVED***g
-(~/.aws/con***REMOVED***g) or shared credentials (~/.aws/credentials) ***REMOVED***le.
-
-If mfa_serial is set in the con***REMOVED***guration, the SDK will assume the role, and
-the AssumeRoleTokenProvider session option is not set an an error will
-be returned when creating the session.
+The SDK supports assuming a role with MFA token. If "mfa_serial" is set, you
+must also set the Session Option.AssumeRoleTokenProvider. The Session will fail
+to load if the AssumeRoleTokenProvider is not speci***REMOVED***ed.
 
     sess := session.Must(session.NewSessionWithOptions(session.Options{
         AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
     }))
 
-    // Create service client value con***REMOVED***gured for credentials
-    // from assumed role.
-    svc := s3.New(sess)
-
-To setup assume role outside of a session see the stscrds.AssumeRoleProvider
+To setup Assume Role outside of a session see the stscreds.AssumeRoleProvider
 documentation.
 
 Environment Variables

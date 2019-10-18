@@ -29,8 +29,9 @@ var initRequest func(*request.Request)
 
 // Service information constants
 const (
-	ServiceName = "sts"       // Service endpoint pre***REMOVED***x API calls made to.
-	EndpointsID = ServiceName // Service ID for Regions and Endpoints metadata.
+	ServiceName = "sts"       // Name of service.
+	EndpointsID = ServiceName // ID to lookup a service endpoint with.
+	ServiceID   = "STS"       // ServiceID is a unique identifer of a speci***REMOVED***c service.
 )
 
 // New creates a new instance of the STS client with a session.
@@ -55,6 +56,7 @@ func newClient(cfg aws.Con***REMOVED***g, handlers request.Handlers, endpoint, s
 			cfg,
 			metadata.ClientInfo{
 				ServiceName:   ServiceName,
+				ServiceID:     ServiceID,
 				SigningName:   signingName,
 				SigningRegion: signingRegion,
 				Endpoint:      endpoint,

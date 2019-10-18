@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-ini/ini"
-
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/internal/ini"
 	"github.com/aws/aws-sdk-go/internal/shareddefaults"
 )
 
@@ -77,36 +76,37 @@ func (p *SharedCredentialsProvider) IsExpired() bool {
 // The credentials retrieved from the pro***REMOVED***le will be returned or error. Error will be
 // returned if it fails to read from the ***REMOVED***le, or the data is invalid.
 func loadPro***REMOVED***le(***REMOVED***lename, pro***REMOVED***le string) (Value, error) {
-	con***REMOVED***g, err := ini.Load(***REMOVED***lename)
+	con***REMOVED***g, err := ini.OpenFile(***REMOVED***lename)
 	if err != nil {
 		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to load shared credentials ***REMOVED***le", err)
 	}
-	iniPro***REMOVED***le, err := con***REMOVED***g.GetSection(pro***REMOVED***le)
-	if err != nil {
-		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to get pro***REMOVED***le", err)
+
+	iniPro***REMOVED***le, ok := con***REMOVED***g.GetSection(pro***REMOVED***le)
+	if !ok {
+		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsLoad", "failed to get pro***REMOVED***le", nil)
 	}
 
-	id, err := iniPro***REMOVED***le.GetKey("aws_access_key_id")
-	if err != nil {
+	id := iniPro***REMOVED***le.String("aws_access_key_id")
+	if len(id) == 0 {
 		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsAccessKey",
 			fmt.Sprintf("shared credentials %s in %s did not contain aws_access_key_id", pro***REMOVED***le, ***REMOVED***lename),
-			err)
+			nil)
 	}
 
-	secret, err := iniPro***REMOVED***le.GetKey("aws_secret_access_key")
-	if err != nil {
+	secret := iniPro***REMOVED***le.String("aws_secret_access_key")
+	if len(secret) == 0 {
 		return Value{ProviderName: SharedCredsProviderName}, awserr.New("SharedCredsSecret",
 			fmt.Sprintf("shared credentials %s in %s did not contain aws_secret_access_key", pro***REMOVED***le, ***REMOVED***lename),
 			nil)
 	}
 
 	// Default to empty string if not found
-	token := iniPro***REMOVED***le.Key("aws_session_token")
+	token := iniPro***REMOVED***le.String("aws_session_token")
 
 	return Value{
-		AccessKeyID:     id.String(),
-		SecretAccessKey: secret.String(),
-		SessionToken:    token.String(),
+		AccessKeyID:     id,
+		SecretAccessKey: secret,
+		SessionToken:    token,
 		ProviderName:    SharedCredsProviderName,
 	}, nil
 }
