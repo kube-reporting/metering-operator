@@ -24,6 +24,9 @@ spec:
   - name: NodeMemoryAllocatableRawDataSourceName
     type: ReportDataSource
     default: node-memory-allocatable-raw
+  - name: AWSBillingDataSourceName
+    type: ReportDataSource
+    default: aws-billing
   query: |
     WITH resource_id_list AS (
       SELECT resource_id
@@ -36,7 +39,7 @@ spec:
            lineItem_BlendedCost as period_cost,
            billing_period_start as partition_start,
            billing_period_end as partition_stop
-    FROM {| dataSourceTableName "aws-billing" |} as aws_billing
+    FROM {| dataSourceTableName .Report.Inputs.AWSBillingDataSourceName |} as aws_billing
     INNER JOIN resource_id_list
     ON aws_billing.lineItem_resourceId = resource_id_list.resource_id
     WHERE position('.csv' IN aws_billing."$path") != 0 -- This prevents JSON manifest ***REMOVED***les from being loaded.
@@ -44,7 +47,9 @@ spec:
     AND lineItem_operation LIKE 'RunInstances%'
     AND lineItem_UsageStartDate IS NOT NULL
     AND lineItem_UsageEndDate IS NOT NULL
+
 ---
+
 apiVersion: metering.openshift.io/v1
 kind: ReportQuery
 metadata:
