@@ -136,6 +136,11 @@ func generateCreateTableSQL(catalog, schema, tableName string, columns []Column,
 
 	columnsStr := generateColumnDe***REMOVED***nitionListSQL(columns)
 
+	commentStr := ""
+	if comment != "" {
+		commentStr = "COMMENT " + comment
+	}
+
 	propsStr := ""
 	if len(properties) != 0 {
 		propsStr = fmt.Sprintf("WITH (%s)", generatePropertiesSQL(properties))
@@ -149,7 +154,7 @@ func generateCreateTableSQL(catalog, schema, tableName string, columns []Column,
 )
 %s
 %s`
-	return fmt.Sprintf(sqlStr, ifNotExists, table, columnsStr, propsStr)
+	return fmt.Sprintf(sqlStr, ifNotExists, table, columnsStr, commentStr, propsStr)
 }
 
 func generateCreateTableAsSQL(catalog, schema, tableName string, columns []Column, comment string, properties map[string]string, ignoreExists bool, query string) string {
