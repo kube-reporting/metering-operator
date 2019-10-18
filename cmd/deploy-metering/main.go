@@ -88,17 +88,17 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 	logger := setupLogger(logLevel)
 
 	if meteringConfigCRFile == "" {
-		return fmt.Errorf("Failed to set the $METERING_CR_FILE or --meteringconfig flag")
+		return fmt.Errorf("failed to set the $METERING_CR_FILE or --meteringconfig flag")
 	}
 
 	err := deploy.DecodeYAMLManifestToObject(meteringConfigCRFile, &cfg.MeteringConfig)
 	if err != nil {
-		return fmt.Errorf("Failed to read MeteringConfig: %v", err)
+		return fmt.Errorf("failed to read MeteringConfig: %v", err)
 	}
 
 	cfg.OperatorResources, err = deploy.ReadMeteringAnsibleOperatorManifests(deployManifestsDir, cfg.Platform)
 	if err != nil {
-		return fmt.Errorf("Failed to read metering-ansible-operator manifests: %v", err)
+		return fmt.Errorf("failed to read metering-ansible-operator manifests: %v", err)
 	}
 
 	logger.Debugf("Metering Deploy Config: %#v", cfg)
@@ -110,39 +110,39 @@ func runDeployMetering(cmd *cobra.Command, args []string) error {
 
 	restconfig, err := kubeconfig.ClientConfig()
 	if err != nil {
-		return fmt.Errorf("Failed to initialize the kubernetes client config: %v", err)
+		return fmt.Errorf("failed to initialize the kubernetes client config: %v", err)
 	}
 
 	client, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize the kubernetes clientset: %v", err)
+		return fmt.Errorf("failed to initialize the kubernetes clientset: %v", err)
 	}
 
 	apiextClient, err := apiextclientv1beta1.NewForConfig(restconfig)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize the apiextensions clientset: %v", err)
+		return fmt.Errorf("failed to initialize the apiextensions clientset: %v", err)
 	}
 
 	meteringClient, err := metering.NewForConfig(restconfig)
 	if err != nil {
-		return fmt.Errorf("Failed to initialize the metering clientset: %v", err)
+		return fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
 
 	deployObj, err := deploy.NewDeployer(cfg, logger, client, apiextClient, meteringClient)
 	if err != nil {
-		return fmt.Errorf("Failed to deploy metering: %v", err)
+		return fmt.Errorf("failed to deploy metering: %v", err)
 	}
 
 	if deployType == "install" {
 		err := deployObj.Install()
 		if err != nil {
-			return fmt.Errorf("Failed to install metering: %v", err)
+			return fmt.Errorf("failed to install metering: %v", err)
 		}
 		logger.Infof("Finished installing metering")
 	} else if deployType == "uninstall" {
 		err := deployObj.Uninstall()
 		if err != nil {
-			return fmt.Errorf("Failed to uninstall metering: %v", err)
+			return fmt.Errorf("failed to uninstall metering: %v", err)
 		}
 		logger.Infof("Finished uninstall metering")
 	}
@@ -228,12 +228,12 @@ func mapEnvVarToFlag(vars map[string]string, flagset *pflag.FlagSet) error {
 	for env, flag := range vars {
 		flagObj := flagset.Lookup(flag)
 		if flagObj == nil {
-			return fmt.Errorf("The %s flag doesn't exist", flag)
+			return fmt.Errorf("the %s flag doesn't exist", flag)
 		}
 
 		if val := os.Getenv(env); val != "" {
 			if err := flagObj.Value.Set(val); err != nil {
-				return fmt.Errorf("Failed to set the %s flag: %v", flag, err)
+				return fmt.Errorf("failed to set the %s flag: %v", flag, err)
 			}
 		}
 
