@@ -12,6 +12,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -213,14 +214,14 @@ func testInstall(
 	// create a directory used to store the @testName container and resource logs
 	testOutputDir := filepath.Join(df.LoggingPath, testName)
 	err := os.Mkdir(testOutputDir, 0777)
-	assert.NoError(t, err, "creating the test case output directory should produce no error")
+	require.NoError(t, err, "creating the test case output directory should produce no error")
 
 	// randomize the namespace to avoid existing namespaces
 	rand.Seed(time.Now().UnixNano())
 	namespace := df.NamespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
 	deployerCtx, err := df.NewDeployerCtx(meteringOperatorImageRepo, meteringOperatorImageTag, namespace, testOutputDir, targetPods, spec)
-	assert.NoError(t, err, "creating a new deployer context should produce no error")
+	require.NoError(t, err, "creating a new deployer context should produce no error")
 
 	rf, err := deployerCtx.Setup()
 	assert.NoError(t, err, "deploying metering should produce no error")
