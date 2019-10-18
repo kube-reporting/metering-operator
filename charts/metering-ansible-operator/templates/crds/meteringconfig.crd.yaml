@@ -1965,8 +1965,6 @@ spec:
                               type: string
                             username:
                               type: string
-                        defaultCompression:
-                          type: string
                         defaultFileFormat:
                           type: string
                         hadoopCon***REMOVED***gSecretName:

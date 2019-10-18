@@ -81,7 +81,7 @@ data:
         <name>hive.metastore.schema.veri***REMOVED***cation</name>
         <value>{{ .Values.hive.spec.con***REMOVED***g.db.enableMetastoreSchemaVeri***REMOVED***cation }}</value>
       </property>
-{{- if .Values.hive.spec.con***REMOVED***g.db.defaultFileFormat }}
+{{- if .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}
       <property>
         <name>hive.default.***REMOVED***leformat</name>
         <value>{{ .Values.hive.spec.con***REMOVED***g.defaultFileFormat }}</value>
