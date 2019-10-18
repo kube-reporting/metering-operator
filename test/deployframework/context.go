@@ -38,8 +38,8 @@ type DeployerCtx struct {
 
 // NewDeployerCtx constructs and returns a new DeployerCtx object
 func (df *DeployFramework) NewDeployerCtx(
-	repo,
-	tag,
+	meteringOperatorImageRepo,
+	meteringOperatorImageTag,
 	namespace,
 	outputPath string,
 	targetPods int,
@@ -52,8 +52,8 @@ func (df *DeployFramework) NewDeployerCtx(
 
 	cfg := deploy.Config{
 		Namespace:       namespace,
-		Repo:            repo,
-		Tag:             tag,
+		Repo:            meteringOperatorImageRepo,
+		Tag:             meteringOperatorImageTag,
 		Platform:        defaultPlatform,
 		DeleteNamespace: defaultDeleteNamespace,
 		ExtraNamespaceLabels: map[string]string{
@@ -67,6 +67,25 @@ func (df *DeployFramework) NewDeployerCtx(
 			},
 			Spec: spec,
 		},
+	}
+
+	// validate the reporting-operator image is non-empty when overrided
+	if df.ReportingOperatorImageRepo != "" || df.ReportingOperatorImageTag != "" {
+		err := validateImageConfig(*cfg.MeteringConfig.Spec.ReportingOperator.Spec.Image)
+		if err != nil {
+			return nil, fmt.Errorf("the overrided reporting-operator image is empty: %v", err)
+		}
+	}
+	if meteringOperatorImageRepo != "" || meteringOperatorImageTag != "" {
+		// validate both the metering operator image fields are non-empty
+		meteringOperatorImage := &metering.ImageConfig{
+			Repository: meteringOperatorImageRepo,
+			Tag:        meteringOperatorImageTag,
+		}
+		err = validateImageConfig(*meteringOperatorImage)
+		if err != nil {
+			return nil, fmt.Errorf("the metering operator image was improperly managed: %v", err)
+		}
 	}
 
 	df.Logger.Debugf("Deployer config: %+v", cfg)

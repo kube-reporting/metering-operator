@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 )
@@ -66,4 +68,21 @@ func logPollingSummary(logger logrus.FieldLogger, targetPods int, readyPods []st
 		}
 		logger.Infof("Pod %s has %d/%d ready containers", unreadyPod.PodName, unreadyPod.Ready, unreadyPod.Total)
 	}
+}
+
+func validateImageConfig(image metering.ImageConfig) error {
+	var errArr []string
+
+	if image.Repository == "" {
+		errArr = append(errArr, "the image repository is empty")
+	}
+	if image.Tag == "" {
+		errArr = append(errArr, "the image tag is empty")
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
+
+	return nil
 }
