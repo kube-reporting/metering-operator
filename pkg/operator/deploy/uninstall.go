@@ -14,7 +14,7 @@ func (deploy *Deployer) uninstallNamespace() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the %s namespace", deploy.con***REMOVED***g.Namespace)
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+		return err
 	}
 
 	return nil
@@ -27,7 +27,7 @@ func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the MeteringCon***REMOVED***g resource")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the MeteringCon***REMOVED***g resource: %v", err)
+		return err
 	}
 
 	return nil
@@ -36,33 +36,33 @@ func (deploy *Deployer) uninstallMeteringCon***REMOVED***g() error {
 func (deploy *Deployer) uninstallMeteringResources() error {
 	err := deploy.uninstallMeteringDeployment()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the metering service account: %v", err)
+		return fmt.Errorf("failed to delete the metering service account: %v", err)
 	}
 
 	err = deploy.uninstallMeteringServiceAccount()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the metering service account: %v", err)
+		return fmt.Errorf("failed to delete the metering service account: %v", err)
 	}
 
 	err = deploy.uninstallMeteringRole()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the metering role: %v", err)
+		return fmt.Errorf("failed to delete the metering role: %v", err)
 	}
 
 	err = deploy.uninstallMeteringRoleBinding()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the metering role binding: %v", err)
+		return fmt.Errorf("failed to delete the metering role binding: %v", err)
 	}
 
 	if deploy.con***REMOVED***g.DeleteCRB {
 		err = deploy.uninstallMeteringClusterRole()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the metering cluster role: %v", err)
+			return fmt.Errorf("failed to delete the metering cluster role: %v", err)
 		}
 
 		err = deploy.uninstallMeteringClusterRoleBinding()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the metering cluster role binding: %v", err)
+			return fmt.Errorf("failed to delete the metering cluster role binding: %v", err)
 		}
 	} ***REMOVED*** {
 		deploy.logger.Infof("Skipped deleting the metering cluster role resources")
@@ -71,7 +71,7 @@ func (deploy *Deployer) uninstallMeteringResources() error {
 	if deploy.con***REMOVED***g.DeletePVCs {
 		err = deploy.uninstallMeteringPVCs()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the metering PVCs: %v", err)
+			return fmt.Errorf("failed to delete the metering PVCs: %v", err)
 		}
 	} ***REMOVED*** {
 		deploy.logger.Infof("Skipped deleting the metering PVCs")
@@ -88,7 +88,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 		LabelSelector: "app in (hdfs,hive)",
 	})
 	if err != nil {
-		return fmt.Errorf("Failed to list all the metering PVCs in the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+		return fmt.Errorf("failed to list all the metering PVCs in the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
 	}
 
 	if len(pvcs.Items) == 0 {
@@ -99,7 +99,7 @@ func (deploy *Deployer) uninstallMeteringPVCs() error {
 	for _, pvc := range pvcs.Items {
 		err = deploy.client.CoreV1().PersistentVolumeClaims(deploy.con***REMOVED***g.Namespace).Delete(pvc.Name, &metav1.DeleteOptions{})
 		if err != nil {
-			return fmt.Errorf("Failed to delete the PVC %s: %v", pvc.Name, err)
+			return fmt.Errorf("failed to delete the %s PVC: %v", pvc.Name, err)
 		}
 	}
 
@@ -115,7 +115,7 @@ func (deploy *Deployer) uninstallMeteringDeployment() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering deployment")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering deployment: %v", err)
+		return err
 	}
 
 	return nil
@@ -128,7 +128,7 @@ func (deploy *Deployer) uninstallMeteringServiceAccount() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering serviceaccount")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering serviceaccount: %v", err)
+		return err
 	}
 
 	return nil
@@ -151,7 +151,7 @@ func (deploy *Deployer) uninstallMeteringRoleBinding() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering role binding")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering role binding: %v", err)
+		return err
 	}
 
 	return nil
@@ -169,7 +169,7 @@ func (deploy *Deployer) uninstallMeteringRole() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering role")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering role: %v", err)
+		return err
 	}
 
 	return nil
@@ -186,7 +186,7 @@ func (deploy *Deployer) uninstallMeteringClusterRole() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering cluster role")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering cluster role: %v", err)
+		return err
 	}
 
 	return nil
@@ -208,7 +208,7 @@ func (deploy *Deployer) uninstallMeteringClusterRoleBinding() error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the metering cluster role binding")
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to delete the metering cluster role binding: %v", err)
+		return err
 	}
 
 	return nil
@@ -218,7 +218,7 @@ func (deploy *Deployer) uninstallMeteringCRDs() error {
 	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
 		err := deploy.uninstallMeteringCRD(crd)
 		if err != nil {
-			return fmt.Errorf("Failed to delete a CRD while looping: %v", err)
+			return fmt.Errorf("failed to delete a CRD while looping: %v", err)
 		}
 	}
 
@@ -232,7 +232,7 @@ func (deploy *Deployer) uninstallMeteringCRD(resource CRD) error {
 	} ***REMOVED*** if err == nil {
 		deploy.logger.Infof("Deleted the %s CRD", resource.Name)
 	} ***REMOVED*** {
-		return fmt.Errorf("Failed to remove the %s CRD: %v", resource.Name, err)
+		return fmt.Errorf("failed to remove the %s CRD: %v", resource.Name, err)
 	}
 
 	return nil

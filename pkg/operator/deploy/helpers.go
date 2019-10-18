@@ -23,7 +23,7 @@ func getBoolEnv(env string, defaultVal bool) (bool, error) {
 
 	val, err := strconv.ParseBool(key)
 	if err != nil {
-		return false, fmt.Errorf("Failed to convert the %s env variable into a boolean: %v", env, err)
+		return false, fmt.Errorf("failed to convert the %s env variable into a boolean: %v", env, err)
 	}
 
 	return val, nil
@@ -35,7 +35,7 @@ func getBoolEnv(env string, defaultVal bool) (bool, error) {
 func DecodeYAMLManifestToObject(path string, resource interface{}) error {
 	***REMOVED***le, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("Failed to open %s, got: %v", path, err)
+		return fmt.Errorf("failed to open %s, got: %v", path, err)
 	}
 
 	err = yaml.NewYAMLOrJSONDecoder(***REMOVED***le, 100).Decode(&resource)
@@ -93,20 +93,20 @@ func InitMeteringCRDSlice(manifestDir string, pathToCRDMap map[string]string) []
 
 func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 	if manifestDir == "" {
-		return "", fmt.Errorf("Failed to set the $DEPLOY_MANIFESTS_DIR or --deploy-manifests-dir flag to a non-empty value")
+		return "", fmt.Errorf("failed to set the $DEPLOY_MANIFESTS_DIR or --deploy-manifests-dir flag to a non-empty value")
 	}
 
 	deployDir, err := ***REMOVED***lepath.Abs(manifestDir)
 	if err != nil {
-		return "", fmt.Errorf("Failed to get the absolute path of the manifest/deploy directory %s: %v", manifestDir, err)
+		return "", fmt.Errorf("failed to get the absolute path of the manifest/deploy directory %s: %v", manifestDir, err)
 	}
 
 	dirStat, err := os.Stat(manifestDir)
 	if os.IsNotExist(err) {
-		return "", fmt.Errorf("Failed to get the stat the manifest/deploy directory %s: %v", manifestDir, err)
+		return "", fmt.Errorf("failed to get the stat the manifest/deploy directory %s: %v", manifestDir, err)
 	}
 	if !dirStat.IsDir() {
-		return "", fmt.Errorf("Speci***REMOVED***ed deploy directory '%s' is not a directory", manifestDir)
+		return "", fmt.Errorf("speci***REMOVED***ed deploy directory '%s' is not a directory", manifestDir)
 	}
 
 	var ansibleOperatorManifestDir string
@@ -119,15 +119,15 @@ func getMeteringAnsiblePath(manifestDir, platform string) (string, error) {
 	case "ocp-testing":
 		ansibleOperatorManifestDir = ***REMOVED***lepath.Join(deployDir, ocpTestingManifestDirname, manifestAnsibleOperator)
 	default:
-		return "", fmt.Errorf("Failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
+		return "", fmt.Errorf("failed to set $DEPLOY_PLATFORM or --platform flag to a valid value. Supported platforms: [upstream, openshift, ocp-testing]")
 	}
 
 	dirStat, err = os.Stat(ansibleOperatorManifestDir)
 	if os.IsNotExist(err) {
-		return "", fmt.Errorf("Failed to stat the %s deploy platform directory '%s': %v", platform, ansibleOperatorManifestDir, err)
+		return "", fmt.Errorf("failed to stat the %s deploy platform directory '%s': %v", platform, ansibleOperatorManifestDir, err)
 	}
 	if !dirStat.IsDir() {
-		return "", fmt.Errorf("Speci***REMOVED***ed %s deploy platform directory '%s' is not a directory", platform, ansibleOperatorManifestDir)
+		return "", fmt.Errorf("speci***REMOVED***ed %s deploy platform directory '%s' is not a directory", platform, ansibleOperatorManifestDir)
 	}
 
 	return ansibleOperatorManifestDir, nil
@@ -138,7 +138,7 @@ func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*Operat
 
 	ansibleOperatorManifestDir, err := getMeteringAnsiblePath(manifestDir, platform)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get the path to the metering-ansible-operator directory: %v", err)
+		return nil, fmt.Errorf("failed to get the path to the metering-ansible-operator directory: %v", err)
 	}
 
 	pathToCRDMap := map[string]string{
@@ -156,7 +156,7 @@ func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*Operat
 	for _, crd := range resources.CRDs {
 		err := DecodeYAMLManifestToObject(crd.Path, crd.CRD)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to decode the YAML manifest: %v", err)
+			return nil, fmt.Errorf("failed to decode the YAML manifest: %v", err)
 		}
 	}
 
@@ -195,7 +195,7 @@ func ReadMeteringAnsibleOperatorManifests(manifestDir, platform string) (*Operat
 
 		err = DecodeYAMLManifestToObject(path, resource.obj)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to decode the YAML manifest for the %s resource: %v", name, err)
+			return nil, fmt.Errorf("failed to decode the YAML manifest for the %s resource: %v", name, err)
 		}
 	}
 

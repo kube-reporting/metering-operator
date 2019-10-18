@@ -29,7 +29,7 @@ func (deploy *Deployer) installNamespace() error {
 
 		_, err := deploy.client.CoreV1().Namespaces().Create(namespaceObj)
 		if err != nil {
-			return fmt.Errorf("Failed to create %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+			return err
 		}
 		deploy.logger.Infof("Created the %s namespace", deploy.con***REMOVED***g.Namespace)
 	} ***REMOVED*** if err == nil {
@@ -47,7 +47,7 @@ func (deploy *Deployer) installNamespace() error {
 
 			_, err := deploy.client.CoreV1().Namespaces().Update(namespace)
 			if err != nil {
-				return fmt.Errorf("Failed to add the 'openshift.io/cluster-monitoring' label to the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+				return fmt.Errorf("failed to add the 'openshift.io/cluster-monitoring' label to the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
 			}
 		} ***REMOVED*** {
 			deploy.logger.Infof("The %s namespace already exists", deploy.con***REMOVED***g.Namespace)
@@ -64,7 +64,7 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 	if apierrors.IsNotFound(err) {
 		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.MeteringCon***REMOVED***g)
 		if err != nil {
-			return fmt.Errorf("Failed to create the MeteringCon***REMOVED***g resource: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the MeteringCon***REMOVED***g resource")
 	} ***REMOVED*** if err == nil {
@@ -72,7 +72,7 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 
 		_, err = deploy.meteringClient.MeteringCon***REMOVED***gs(deploy.con***REMOVED***g.Namespace).Update(mc)
 		if err != nil {
-			return fmt.Errorf("Failed to update the MeteringCon***REMOVED***g: %v", err)
+			return fmt.Errorf("failed to update the MeteringCon***REMOVED***g: %v", err)
 		}
 		deploy.logger.Infof("The MeteringCon***REMOVED***g resource has been updated")
 	} ***REMOVED*** {
@@ -85,32 +85,32 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 func (deploy *Deployer) installMeteringResources() error {
 	err := deploy.installMeteringDeployment()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering deployment: %v", err)
+		return fmt.Errorf("failed to create the metering deployment: %v", err)
 	}
 
 	err = deploy.installMeteringServiceAccount()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering service account: %v", err)
+		return fmt.Errorf("failed to create the metering service account: %v", err)
 	}
 
 	err = deploy.installMeteringRole()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering role: %v", err)
+		return fmt.Errorf("failed to create the metering role: %v", err)
 	}
 
 	err = deploy.installMeteringRoleBinding()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering role binding: %v", err)
+		return fmt.Errorf("failed to create the metering role binding: %v", err)
 	}
 
 	err = deploy.installMeteringClusterRole()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering cluster role: %v", err)
+		return fmt.Errorf("failed to create the metering cluster role: %v", err)
 	}
 
 	err = deploy.installMeteringClusterRoleBinding()
 	if err != nil {
-		return fmt.Errorf("Failed to create the metering cluster role binding: %v", err)
+		return fmt.Errorf("failed to create the metering cluster role binding: %v", err)
 	}
 
 	return nil
@@ -135,7 +135,7 @@ func (deploy *Deployer) installMeteringDeployment() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering deployment: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering deployment")
 	} ***REMOVED*** if err == nil {
@@ -143,7 +143,7 @@ func (deploy *Deployer) installMeteringDeployment() error {
 
 		_, err = deploy.client.AppsV1().Deployments(deploy.con***REMOVED***g.Namespace).Update(deployment)
 		if err != nil {
-			return fmt.Errorf("Failed to update the metering deployment: %v", err)
+			return fmt.Errorf("failed to update the metering deployment: %v", err)
 		}
 		deploy.logger.Infof("The metering deployment resource has been updated")
 	} ***REMOVED*** {
@@ -158,7 +158,7 @@ func (deploy *Deployer) installMeteringServiceAccount() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.CoreV1().ServiceAccounts(deploy.con***REMOVED***g.Namespace).Create(deploy.con***REMOVED***g.OperatorResources.ServiceAccount)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering serviceaccount: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering serviceaccount")
 	} ***REMOVED*** if err == nil {
@@ -186,7 +186,7 @@ func (deploy *Deployer) installMeteringRoleBinding() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.RbacV1().RoleBindings(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering role binding: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering role binding")
 	} ***REMOVED*** if err == nil {
@@ -208,7 +208,7 @@ func (deploy *Deployer) installMeteringRole() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.RbacV1().Roles(deploy.con***REMOVED***g.Namespace).Create(res)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering role: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering role")
 	} ***REMOVED*** if err == nil {
@@ -234,7 +234,7 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.RbacV1().ClusterRoleBindings().Create(res)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering cluster role, got: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering cluster role binding")
 	} ***REMOVED*** if err == nil {
@@ -255,7 +255,7 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.RbacV1().ClusterRoles().Create(res)
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering cluster role: %v", err)
+			return err
 		}
 		deploy.logger.Infof("Created the metering cluster role")
 	} ***REMOVED*** if err == nil {
@@ -271,7 +271,7 @@ func (deploy *Deployer) installMeteringCRDs() error {
 	for _, crd := range deploy.con***REMOVED***g.OperatorResources.CRDs {
 		err := deploy.installMeteringCRD(crd)
 		if err != nil {
-			return fmt.Errorf("Failed to create a CRD while looping: %v", err)
+			return fmt.Errorf("failed to create a CRD while looping: %v", err)
 		}
 	}
 
@@ -283,7 +283,7 @@ func (deploy *Deployer) installMeteringCRD(resource CRD) error {
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Create(resource.CRD)
 		if err != nil {
-			return fmt.Errorf("Failed to create the %s CRD: %v", resource.CRD.Name, err)
+			return err
 		}
 		deploy.logger.Infof("Created the %s CRD", resource.Name)
 	} ***REMOVED*** if err == nil {
@@ -291,7 +291,7 @@ func (deploy *Deployer) installMeteringCRD(resource CRD) error {
 
 		_, err := deploy.apiExtClient.CustomResourceDe***REMOVED***nitions().Update(crd)
 		if err != nil {
-			return fmt.Errorf("Failed to update the %s CRD: %v", resource.CRD.Name, err)
+			return fmt.Errorf("failed to update the %s CRD: %v", resource.CRD.Name, err)
 		}
 		deploy.logger.Infof("Updated the %s CRD", resource.CRD.Name)
 	} ***REMOVED*** {
