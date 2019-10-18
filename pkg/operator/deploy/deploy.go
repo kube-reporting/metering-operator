@@ -122,7 +122,7 @@ func NewDeployer(
 	}
 
 	if deploy.con***REMOVED***g.Namespace == "" {
-		return deploy, fmt.Errorf("Failed to set $METERING_NAMESPACE or --namespace flag")
+		return deploy, fmt.Errorf("failed to set $METERING_NAMESPACE or --namespace flag")
 	}
 
 	return deploy, nil
@@ -133,24 +133,24 @@ func NewDeployer(
 func (deploy *Deployer) Install() error {
 	err := deploy.installNamespace()
 	if err != nil {
-		return fmt.Errorf("Failed to create the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+		return fmt.Errorf("failed to create the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
 	}
 
 	err = deploy.installMeteringCRDs()
 	if err != nil {
-		return fmt.Errorf("Failed to create the Metering CRDs: %v", err)
+		return fmt.Errorf("failed to create the Metering CRDs: %v", err)
 	}
 
 	if !deploy.con***REMOVED***g.SkipMeteringDeployment {
 		err = deploy.installMeteringResources()
 		if err != nil {
-			return fmt.Errorf("Failed to create the metering resources: %v", err)
+			return fmt.Errorf("failed to create the metering resources: %v", err)
 		}
 	}
 
 	err = deploy.installMeteringCon***REMOVED***g()
 	if err != nil {
-		return fmt.Errorf("Failed to create the MeteringCon***REMOVED***g resource: %v", err)
+		return fmt.Errorf("failed to create the MeteringCon***REMOVED***g resource: %v", err)
 	}
 
 	return nil
@@ -162,18 +162,18 @@ func (deploy *Deployer) Install() error {
 func (deploy *Deployer) Uninstall() error {
 	err := deploy.uninstallMeteringCon***REMOVED***g()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the MeteringCon***REMOVED***g resource: %v", err)
+		return fmt.Errorf("failed to delete the MeteringCon***REMOVED***g resource: %v", err)
 	}
 
 	err = deploy.uninstallMeteringResources()
 	if err != nil {
-		return fmt.Errorf("Failed to delete the metering resources: %v", err)
+		return fmt.Errorf("failed to delete the metering resources: %v", err)
 	}
 
 	if deploy.con***REMOVED***g.DeleteCRDs {
 		err = deploy.uninstallMeteringCRDs()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the Metering CRDs: %v", err)
+			return fmt.Errorf("failed to delete the Metering CRDs: %v", err)
 		}
 	} ***REMOVED*** {
 		deploy.logger.Infof("Skipped deleting the metering CRDs")
@@ -182,7 +182,7 @@ func (deploy *Deployer) Uninstall() error {
 	if deploy.con***REMOVED***g.DeleteNamespace {
 		err = deploy.uninstallNamespace()
 		if err != nil {
-			return fmt.Errorf("Failed to delete the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
+			return fmt.Errorf("failed to delete the %s namespace: %v", deploy.con***REMOVED***g.Namespace, err)
 		}
 	} ***REMOVED*** {
 		deploy.logger.Infof("Skipped deleting the %s namespace", deploy.con***REMOVED***g.Namespace)
