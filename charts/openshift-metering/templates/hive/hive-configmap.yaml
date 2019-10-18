@@ -81,7 +81,7 @@ data:
         <name>hive.metastore.schema.verification</name>
         <value>{{ .Values.hive.spec.config.db.enableMetastoreSchemaVerification }}</value>
       </property>
-{{- if .Values.hive.spec.config.db.defaultFileFormat }}
+{{- if .Values.hive.spec.config.defaultFileFormat }}
       <property>
         <name>hive.default.fileformat</name>
         <value>{{ .Values.hive.spec.config.defaultFileFormat }}</value>
