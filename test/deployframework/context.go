@@ -11,11 +11,10 @@ import (
 
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
 	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
@@ -31,59 +30,28 @@ type DeployerCtx struct {
 	Logger             logrus.FieldLogger
 	Client             kubernetes.Interface
 	APIExtClient       apiextclientv1beta1.CustomResourceDefinitionsGetter
-	MeteringClient     meteringv1.MeteringV1Interface
+	MeteringClient     meteringclient.MeteringV1Interface
 }
 
 // NewDeployerCtx constructs and returns a new DeployerCtx object
 func (df *DeployFramework) NewDeployerCtx(
+	namespace,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
-	namespace,
+	reportingOperatorImageRepo,
+	reportingOperatorImageTag string,
+	spec metering.MeteringConfigSpec,
 	outputPath string,
 	targetPodsCount int,
-	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
-	cfg := deploy.Config{
-		Namespace:       namespace,
-		Repo:            meteringOperatorImageRepo,
-		Tag:             meteringOperatorImageTag,
-		Platform:        defaultPlatform,
-		DeleteNamespace: defaultDeleteNamespace,
-		ExtraNamespaceLabels: map[string]string{
-			"name": testNamespaceLabel,
-		},
-		OperatorResources: df.OperatorResources,
-		MeteringConfig: &metering.MeteringConfig{
-			ObjectMeta: meta.ObjectMeta{
-				Name:      meteringconfigMetadataName,
-				Namespace: namespace,
-			},
-			Spec: spec,
-		},
-	}
-
-	// validate the reporting-operator image is non-empty when overrided
-	if df.ReportingOperatorImageRepo != "" || df.ReportingOperatorImageTag != "" {
-		err := validateImageConfig(*cfg.MeteringConfig.Spec.ReportingOperator.Spec.Image)
-		if err != nil {
-			return nil, fmt.Errorf("the overrided reporting-operator image is empty: %v", err)
-		}
-	}
-	if meteringOperatorImageRepo != "" || meteringOperatorImageTag != "" {
-		// validate both the metering operator image fields are non-empty
-		meteringOperatorImage := &metering.ImageConfig{
-			Repository: meteringOperatorImageRepo,
-			Tag:        meteringOperatorImageTag,
-		}
-		err := validateImageConfig(*meteringOperatorImage)
-		if err != nil {
-			return nil, fmt.Errorf("the metering operator image was improperly managed: %v", err)
-		}
+	cfg, err := df.NewDeployerConfig(meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, namespace, spec)
+	if err != nil {
+		return nil, err
 	}
 
 	df.Logger.Debugf("Deployer config: %+v", cfg)
 
-	deployer, err := deploy.NewDeployer(cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
+	deployer, err := deploy.NewDeployer(*cfg, df.Logger, df.Client, df.APIExtClient, df.MeteringClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a new deployer instance: %v", err)
 	}

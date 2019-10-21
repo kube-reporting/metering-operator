@@ -71,14 +71,7 @@ func TestMain(m *testing.M) {
 	logger := testhelpers.SetupLogger(logLevel)
 
 	var err error
-	if df, err = deployframework.New(
-		logger,
-		namespacePrefix,
-		deployManifestsDir,
-		kubeConfig,
-		reportingOperatorImageRepo,
-		reportingOperatorImageTag,
-	); err != nil {
+	if df, err = deployframework.New(logger, namespacePrefix, deployManifestsDir, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -120,10 +113,7 @@ func TestInstallMeteringAndReportingProducesData(t *testing.T) {
 								v1.ResourceMemory: resource.MustParse("250Mi"),
 							},
 						},
-						Image: &metering.ImageConfig{
-							Repository: reportingOperatorImageRepo,
-							Tag:        reportingOperatorImageTag,
-						},
+						Image: &metering.ImageConfig{},
 						Config: &metering.ReportingOperatorConfig{
 							LogLevel: "debug",
 							Prometheus: &metering.ReportingOperatorPrometheusConfig{
@@ -236,7 +226,7 @@ func testInstall(
 	rand.Seed(time.Now().UnixNano())
 	namespace := namespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
-	deployerCtx, err := df.NewDeployerCtx(meteringOperatorImageRepo, meteringOperatorImageTag, namespace, testOutputDir, targetPods, spec)
+	deployerCtx, err := df.NewDeployerCtx(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec, testOutputDir, targetPods)
 	assert.NoError(t, err, "creating a new deployer context should produce no error")
 
 	rf, err := deployerCtx.Setup()
