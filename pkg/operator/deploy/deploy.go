@@ -3,8 +3,8 @@ package deploy
 import (
 	"fmt"
 
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
@@ -66,7 +66,7 @@ type Config struct {
 	Tag                    string
 	ExtraNamespaceLabels   map[string]string
 	OperatorResources      *OperatorResources
-	MeteringConfig         *meteringv1.MeteringConfig
+	MeteringConfig         *metering.MeteringConfig
 }
 
 // OperatorResources contains all the objects that make up the
@@ -90,7 +90,7 @@ type Deployer struct {
 	logger         log.FieldLogger
 	client         kubernetes.Interface
 	apiExtClient   apiextclientv1beta1.CustomResourceDefinitionsGetter
-	meteringClient metering.MeteringV1Interface
+	meteringClient meteringclient.MeteringV1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -102,7 +102,7 @@ func NewDeployer(
 	logger log.FieldLogger,
 	client kubernetes.Interface,
 	apiextClient apiextclientv1beta1.CustomResourceDefinitionsGetter,
-	meteringClient metering.MeteringV1Interface,
+	meteringClient meteringclient.MeteringV1Interface,
 ) (*Deployer, error) {
 	deploy := &Deployer{
 		client:         client,
