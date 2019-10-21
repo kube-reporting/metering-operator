@@ -45,11 +45,6 @@ func (df *DeployFramework) NewDeployerCtx(
 	targetPods int,
 	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
-	operatorResources, err := deploy.ReadMeteringAnsibleOperatorManifests(df.ManifestsDir, defaultPlatform)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize objects from manifests: %v", err)
-	}
-
 	cfg := deploy.Config{
 		Namespace:       namespace,
 		Repo:            meteringOperatorImageRepo,
@@ -59,7 +54,7 @@ func (df *DeployFramework) NewDeployerCtx(
 		ExtraNamespaceLabels: map[string]string{
 			"name": testNamespaceLabel,
 		},
-		OperatorResources: operatorResources,
+		OperatorResources: df.OperatorResources,
 		MeteringConfig: &metering.MeteringConfig{
 			ObjectMeta: meta.ObjectMeta{
 				Name:      meteringconfigMetadataName,
@@ -82,7 +77,7 @@ func (df *DeployFramework) NewDeployerCtx(
 			Repository: meteringOperatorImageRepo,
 			Tag:        meteringOperatorImageTag,
 		}
-		err = validateImageConfig(*meteringOperatorImage)
+		err := validateImageConfig(*meteringOperatorImage)
 		if err != nil {
 			return nil, fmt.Errorf("the metering operator image was improperly managed: %v", err)
 		}

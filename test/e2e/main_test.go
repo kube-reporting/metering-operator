@@ -26,17 +26,25 @@ import (
 var (
 	df *deployframework.DeployFramework
 
+	kubeConfig string
+	logLevel   string
+
+	deployManifestsDir         string
 	runAWSBillingTests         bool
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
 	reportingOperatorImageRepo string
 	reportingOperatorImageTag  string
+	namespacePrefix            string
+	cleanupScriptPath          string
+	testOutputPath             string
 
 	defaultTargetPods = 7
 )
 
 func init() {
 	runAWSBillingTests = os.Getenv("ENABLE_AWS_BILLING_TESTS") == "true"
+
 	meteringOperatorImageRepo = os.Getenv("METERING_OPERATOR_IMAGE_REPO")
 	meteringOperatorImageTag = os.Getenv("METERING_OPERATOR_IMAGE_TAG")
 	reportingOperatorImageRepo = os.Getenv("REPORTING_OPERATOR_IMAGE_REPO")
@@ -44,24 +52,30 @@ func init() {
 }
 
 func TestMain(m *testing.M) {
-	kubeConfigFlag := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
-	nsPrefixFlag := flag.String("namespace-prefix", "", "The namespace prefix to install the metering resources.")
-	manifestDirFlag := flag.String("deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
-	cleanupScriptPathFlag := flag.String("cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
-	testOutputPathFlag := flag.String("test-output-path", "", "The absolute/relative path that you want to store test logs within.")
-	logLevelFlag := flag.String("log-level", logrus.DebugLevel.String(), "The log level")
+	flag.StringVar(&kubeConfig, "kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
+	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
+
+	flag.StringVar(&deployManifestsDir, "deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
+	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
+
+	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
+	flag.StringVar(&meteringOperatorImageTag, "metering-operator-image-tag", meteringOperatorImageTag, "")
+	flag.StringVar(&reportingOperatorImageRepo, "reporting-operator-image-repo", reportingOperatorImageRepo, "")
+	flag.StringVar(&reportingOperatorImageTag, "reporting-operator-image-tag", reportingOperatorImageTag, "")
+
+	flag.StringVar(&namespacePrefix, "namespace-prefix", "", "The namespace prefix to install the metering resources.")
+	flag.StringVar(&cleanupScriptPath, "cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
+	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 	flag.Parse()
 
-	logger := testhelpers.SetupLogger(*logLevelFlag)
+	logger := testhelpers.SetupLogger(logLevel)
 
 	var err error
 	if df, err = deployframework.New(
 		logger,
-		*nsPrefixFlag,
-		*manifestDirFlag,
-		*kubeConfigFlag,
-		*cleanupScriptPathFlag,
-		*testOutputPathFlag,
+		namespacePrefix,
+		deployManifestsDir,
+		kubeConfig,
 		reportingOperatorImageRepo,
 		reportingOperatorImageTag,
 	); err != nil {
@@ -197,7 +211,7 @@ func TestInstallMeteringAndReportingProducesData(t *testing.T) {
 		testCase := testCase
 
 		t.Run(testCase.Name, func(t *testing.T) {
-			testInstall(t, testCase.MeteringOperatorImageRepo, testCase.MeteringOperatorImageTag, testCase.Name, testCase.TargetPods, testCase.MeteringConfigSpec)
+			testInstall(t, testCase.MeteringOperatorImageRepo, testCase.MeteringOperatorImageTag, testCase.Name, testCase.TargetPods, testCase.MeteringConfigSpec, namespacePrefix, testOutputPath, cleanupScriptPath)
 		})
 	}
 }
@@ -209,15 +223,18 @@ func testInstall(
 	testName string,
 	targetPods int,
 	spec metering.MeteringConfigSpec,
+	namespacePrefix string,
+	testOuputPath string,
+	cleanupScriptPath string,
 ) {
 	// create a directory used to store the @testName container and resource logs
-	testOutputDir := filepath.Join(df.LoggingPath, testName)
+	testOutputDir := filepath.Join(testOuputPath, testName)
 	err := os.Mkdir(testOutputDir, 0777)
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
 	// randomize the namespace to avoid existing namespaces
 	rand.Seed(time.Now().UnixNano())
-	namespace := df.NamespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
+	namespace := namespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
 	deployerCtx, err := df.NewDeployerCtx(meteringOperatorImageRepo, meteringOperatorImageTag, namespace, testOutputDir, targetPods, spec)
 	assert.NoError(t, err, "creating a new deployer context should produce no error")
@@ -226,7 +243,7 @@ func testInstall(
 	assert.NoError(t, err, "deploying metering should produce no error")
 
 	defer func() {
-		err := deployerCtx.Teardown(df.CleanupScriptPath)
+		err := deployerCtx.Teardown(cleanupScriptPath)
 		assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 	}()
 

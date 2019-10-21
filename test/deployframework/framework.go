@@ -9,6 +9,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	meteringv1 "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
 )
 
 const (
@@ -31,13 +32,10 @@ const (
 // DeployFramework contains all the information necessary to deploy
 // different metering instances and run tests against them
 type DeployFramework struct {
-	NamespacePrefix            string
-	ManifestsDir               string
-	LoggingPath                string
-	CleanupScriptPath          string
 	KubeConfigPath             string
 	ReportingOperatorImageRepo string
 	ReportingOperatorImageTag  string
+	OperatorResources          *deploy.OperatorResources
 	Logger                     logrus.FieldLogger
 	Client                     kubernetes.Interface
 	APIExtClient               apiextclientv1beta1.CustomResourceDefinitionsGetter
@@ -48,10 +46,8 @@ type DeployFramework struct {
 func New(
 	logger logrus.FieldLogger,
 	nsPrefix,
-	manifestDir,
+	manifestsDir,
 	kubeconfig,
-	cleanupScriptPath,
-	loggingPath,
 	reportingOperatorImageRepo,
 	reportingOperatorImageTag string,
 ) (*DeployFramework, error) {
@@ -75,18 +71,20 @@ func New(
 		return nil, fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
 
+	operatorResources, err := deploy.ReadMeteringAnsibleOperatorManifests(manifestsDir, defaultPlatform)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize objects from manifests: %v", err)
+	}
+
 	deployFramework := &DeployFramework{
-		NamespacePrefix:            nsPrefix,
-		ManifestsDir:               manifestDir,
-		CleanupScriptPath:          cleanupScriptPath,
+		OperatorResources:          operatorResources,
 		KubeConfigPath:             kubeconfig,
-		LoggingPath:                loggingPath,
 		ReportingOperatorImageRepo: reportingOperatorImageRepo,
 		ReportingOperatorImageTag:  reportingOperatorImageTag,
-		Logger:                     logger,
-		Client:                     client,
-		APIExtClient:               apiextClient,
-		MeteringClient:             meteringClient,
+		Logger:         logger,
+		Client:         client,
+		APIExtClient:   apiextClient,
+		MeteringClient: meteringClient,
 	}
 
 	return deployFramework, nil
