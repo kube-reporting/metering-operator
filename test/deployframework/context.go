@@ -10,10 +10,8 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	v1 "k8s.io/api/core/v1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
@@ -25,7 +23,7 @@ import (
 // DeployerCtx contains all the information needed to manage the
 // full lifecycle of a single metering deployment
 type DeployerCtx struct {
-	TargetPods         int
+	TargetPodsCount    int
 	Namespace          string
 	KubeConfigPath     string
 	TestCaseOutputPath string
@@ -42,7 +40,7 @@ func (df *DeployFramework) NewDeployerCtx(
 	meteringOperatorImageTag,
 	namespace,
 	outputPath string,
-	targetPods int,
+	targetPodsCount int,
 	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
 	cfg := deploy.Config{
@@ -92,7 +90,7 @@ func (df *DeployFramework) NewDeployerCtx(
 
 	deployerCtx := &DeployerCtx{
 		Namespace:          namespace,
-		TargetPods:         targetPods,
+		TargetPodsCount:    targetPodsCount,
 		TestCaseOutputPath: outputPath,
 		Deployer:           deployer,
 		KubeConfigPath:     df.KubeConfigPath,
@@ -113,12 +111,23 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 		return nil, fmt.Errorf("failed to install metering: %v", err)
 	}
 
-	err = ctx.WaitForMeteringPods()
+	ctx.Logger.Infof("Waiting for pods to be ready")
+	start := time.Now()
+
+	pw := &PodWaiter{
+		Client: ctx.Client,
+		Logger: ctx.Logger.WithField("component", "podWaiter"),
+	}
+	err = pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
 	if err != nil {
 		return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
 	}
 
-	routeBearerToken, err := ctx.GetRouteBearerToken()
+	ctx.Logger.Infof("Installing metering took %v", time.Since(start))
+
+	ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
+
+	routeBearerToken, err := GetServiceAccountToken(ctx.Client, ctx.Namespace, reportingOperatorServiceAccountName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
 	}
@@ -205,107 +214,4 @@ func (ctx *DeployerCtx) Teardown(cleanupScript string) error {
 	}
 
 	return nil
-}
-
-type podStat struct {
-	PodName string
-	Ready   int
-	Total   int
-}
-
-// WaitForMeteringPods periodically polls the list of pods in the ctx.Namespace
-// and ensures the metering pods created are considered ready. In order to exit
-// the polling loop, the number of pods listed must match the expected number
-// of ctx.TargetPods, and all pod containers listed must report a ready status.
-func (ctx *DeployerCtx) WaitForMeteringPods() error {
-	var readyPods []string
-	var unreadyPods []podStat
-
-	start := time.Now()
-
-	ctx.Logger.Infof("Waiting for all metering pods to be ready")
-	err := wait.Poll(10*time.Second, 20*time.Minute, func() (done bool, err error) {
-		unreadyPods = nil
-		readyPods = nil
-
-		pods, err := ctx.Client.CoreV1().Pods(ctx.Namespace).List(meta.ListOptions{})
-		if err != nil {
-			return false, err
-		}
-
-		if len(pods.Items) == 0 {
-			return false, fmt.Errorf("the number of pods in the %s namespace should exceed zero", ctx.Namespace)
-		}
-
-		for _, pod := range pods.Items {
-			podIsReady, readyContainers := checkPodStatus(pod)
-			if podIsReady {
-				readyPods = append(readyPods, pod.Name)
-				continue
-			}
-
-			unreadyPods = append(unreadyPods, podStat{
-				PodName: pod.Name,
-				Ready:   readyContainers,
-				Total:   len(pod.Status.ContainerStatuses),
-			})
-		}
-
-		logPollingSummary(ctx.Logger, ctx.TargetPods, readyPods, unreadyPods)
-
-		return len(pods.Items) == ctx.TargetPods && len(unreadyPods) == 0, nil
-	})
-	if err != nil {
-		return fmt.Errorf("the metering pods failed to report a ready status before the timeout period occurred: %v", err)
-	}
-
-	ctx.Logger.Infof("Installing metering took %v", time.Since(start))
-
-	return nil
-}
-
-// GetRouteBearerToken queries the ctx.Namespace for the reporting-operator service account and attempts
-// to find the secret that contains the reporting-operator token. If that secret exists, return the
-// string representation of the token (key) byte slice (value), or return an error.
-func (ctx *DeployerCtx) GetRouteBearerToken() (string, error) {
-	var sa *v1.ServiceAccount
-	var err error
-
-	ctx.Logger.Infof("Waiting for the reporting-operator service account to be created")
-	err = wait.Poll(5*time.Second, 5*time.Minute, func() (done bool, err error) {
-		sa, err = ctx.Client.CoreV1().ServiceAccounts(ctx.Namespace).Get(reportingOperatorServiceAccountName, meta.GetOptions{})
-		if err != nil {
-			return false, nil
-		}
-
-		ctx.Logger.Infof("The %s service account has been created", reportingOperatorServiceAccountName)
-		return true, nil
-	})
-	if err != nil {
-		return "", fmt.Errorf("failed to get the %s service account before timeout has occurred: %v", reportingOperatorServiceAccountName, err)
-	}
-
-	if len(sa.Secrets) == 0 {
-		return "", fmt.Errorf("failed to return a list of secrets in the reporting-operator service account")
-	}
-
-	var secretName string
-
-	for _, secret := range sa.Secrets {
-		if strings.Contains(secret.Name, "token") {
-			secretName = secret.Name
-			break
-		}
-	}
-
-	if secretName == "" {
-		return "", fmt.Errorf("failed to get the secret token for the reporting-operator serviceaccount")
-	}
-
-	secret, err := ctx.Client.CoreV1().Secrets(ctx.Namespace).Get(secretName, meta.GetOptions{})
-	if err != nil {
-		return "", fmt.Errorf("failed to get the secret containing the reporting-operator service account token: %v", err)
-	}
-
-	return string(secret.Data["token"]), nil
 }
