@@ -26,12 +26,15 @@ WITH SERDEPROPERTIES (
     "timestamp.formats"    = "yyyy-MM-dd'T'HH:mm:ssZ"
 )
 `
+
+	billingPeriodStartPartitionColumnName = "billing_period_start"
+	billingPeriodEndPartitionColumnName   = "billing_period_end"
 )
 
 var (
 	AWSUsageHivePartitions = []hive.Column{
-		{Name: "billing_period_start", Type: "string"},
-		{Name: "billing_period_end", Type: "string"},
+		{Name: billingPeriodStartPartitionColumnName, Type: "string"},
+		{Name: billingPeriodEndPartitionColumnName, Type: "string"},
 	}
 )
 
@@ -151,8 +154,8 @@ func getDesiredPartitions(bucket string, manifests []*aws.Manifest) ([]metering.
 		p := metering.HiveTablePartition{
 			Location: location,
 			PartitionSpec: hive.PartitionSpec{
-				"start": start,
-				"end":   end,
+				billingPeriodStartPartitionColumnName: start,
+				billingPeriodEndPartitionColumnName:   end,
 			},
 		}
 		desiredPartitions = append(desiredPartitions, p)
