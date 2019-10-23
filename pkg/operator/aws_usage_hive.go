@@ -73,7 +73,7 @@ func (op *Reporting) createAWSUsageHiveTableCR(logger logrus.FieldLogger, dataSo
 		if err != nil {
 			return nil, fmt.Errorf("storage incorrectly con***REMOVED***gured for ReportDataSource %s, err: %s", dataSource.Name, err)
 		}
-		if hiveStorage.Spec.Hive.DatabaseName == "" {
+		if hiveStorage.Status.Hive.DatabaseName == "" {
 			op.enqueueStorageLocation(hiveStorage)
 			return nil, fmt.Errorf("StorageLocation %s Hive database %s does not exist yet", hiveStorage.Name, hiveStorage.Spec.Hive.DatabaseName)
 		}
