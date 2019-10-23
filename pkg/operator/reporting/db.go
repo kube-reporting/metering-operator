@@ -52,7 +52,7 @@ func (m *HiveManager) AddPartition(tableName string, partitionColumns []hive.Col
 	partitionSpecStr := FmtPartitionSpec(partitionColumns, partition.PartitionSpec)
 	locationStr := ""
 	if partition.Location != "" {
-		locationStr = "LOCATION " + partition.Location
+		locationStr = fmt.Sprintf("LOCATION '%s'", partition.Location)
 	}
 	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s ADD IF NOT EXISTS PARTITION (%s) %s", tableName, partitionSpecStr, locationStr))
 	return err
@@ -70,7 +70,7 @@ func FmtPartitionSpec(partitionColumns []hive.Column, partSpec hive.PartitionSpe
 		val := partSpec[col.Name]
 		// Quote strings
 		if strings.ToLower(col.Type) == "string" {
-			val = "`" + val + "`"
+			val = fmt.Sprintf("'%s'", val)
 		}
 		partitionVals = append(partitionVals, fmt.Sprintf("`%s`=%s", col.Name, val))
 	}
