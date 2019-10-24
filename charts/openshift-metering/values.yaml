@@ -641,7 +641,6 @@ hive:
       metastoreClientSocketTimeout: null
       metastoreWarehouseDir: null
 
-      defaultCompression: zlib
       defaultFileFormat: orc
 
       hadoopConfigSecretName: hadoop-config
