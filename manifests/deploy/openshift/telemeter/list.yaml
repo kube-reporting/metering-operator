@@ -2567,6 +2567,20 @@ objects:
                         required:
                         - enabled
                         type: object
+                      securityContext:
+                        properties:
+                          fsGroup:
+                            format: int64
+                            type: integer
+                          runAsGroup:
+                            format: int64
+                            type: integer
+                          runAsNonRoot:
+                            type: boolean
+                          runAsUser:
+                            format: int64
+                            type: integer
+                        type: object
                       tolerations:
                         items:
                           properties:
