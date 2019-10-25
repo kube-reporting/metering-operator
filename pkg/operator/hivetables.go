@@ -355,6 +355,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 			NumBuckets:       params.NumBuckets,
 			Location:         params.Location,
 			RowFormat:        params.RowFormat,
+			FileFormat:       params.FileFormat,
 			TableProperties:  params.TableProperties,
 			External:         params.External,
 			ManagePartitions: managePartitions,
