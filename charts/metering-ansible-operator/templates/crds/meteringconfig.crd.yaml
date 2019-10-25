@@ -1284,6 +1284,20 @@ spec:
                       properties:
                         type:
                           type: string
+                    securityContext:
+                      type: object
+                      properties:
+                        fsGroup:
+                          type: integer
+                          format: int64
+                        runAsGroup:
+                          type: integer
+                          format: int64
+                        runAsNonRoot:
+                          type: boolean
+                        runAsUser:
+                          type: integer
+                          format: int64
 
             presto:
               type: object
