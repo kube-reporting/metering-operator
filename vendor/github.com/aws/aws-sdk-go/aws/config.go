@@ -18,9 +18,9 @@ const UseServiceDefaultRetries = -1
 type RequestRetryer interface{}
 
 // A Con***REMOVED***g provides service con***REMOVED***guration for service clients. By default,
-// all clients will use the defaults.DefaultCon***REMOVED***g tructure.
+// all clients will use the defaults.DefaultCon***REMOVED***g structure.
 //
-//     // Create Session with MaxRetry con***REMOVED***guration to be shared by multiple
+//     // Create Session with MaxRetries con***REMOVED***guration to be shared by multiple
 //     // service clients.
 //     sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
 //         MaxRetries: aws.Int(3),
@@ -45,8 +45,8 @@ type Con***REMOVED***g struct {
 	// that overrides the default generated endpoint for a client. Set this
 	// to `""` to use the default generated endpoint.
 	//
-	// @note You must still provide a `Region` value when specifying an
-	//   endpoint for a client.
+	// Note: You must still provide a `Region` value when specifying an
+	// endpoint for a client.
 	Endpoint *string
 
 	// The resolver to use for looking up endpoints for AWS service clients
@@ -65,8 +65,8 @@ type Con***REMOVED***g struct {
 	// noted. A full list of regions is found in the "Regions and Endpoints"
 	// document.
 	//
-	// @see http://docs.aws.amazon.com/general/latest/gr/rande.html
-	//   AWS Regions and Endpoints
+	// See http://docs.aws.amazon.com/general/latest/gr/rande.html for AWS
+	// Regions and Endpoints.
 	Region *string
 
 	// Set this to `true` to disable SSL when sending requests. Defaults
@@ -120,9 +120,10 @@ type Con***REMOVED***g struct {
 	// will use virtual hosted bucket addressing when possible
 	// (`http://BUCKET.s3.amazonaws.com/KEY`).
 	//
-	// @note This con***REMOVED***guration option is speci***REMOVED***c to the Amazon S3 service.
-	// @see http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
-	//   Amazon S3: Virtual Hosting of Buckets
+	// Note: This con***REMOVED***guration option is speci***REMOVED***c to the Amazon S3 service.
+	//
+	// See http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
+	// for Amazon S3: Virtual Hosting of Buckets
 	S3ForcePathStyle *bool
 
 	// Set this to `true` to disable the SDK adding the `Expect: 100-Continue`
@@ -223,12 +224,37 @@ type Con***REMOVED***g struct {
 	//    	Key: aws.String("//foo//bar//moo"),
 	//    })
 	DisableRestProtocolURICleaning *bool
+
+	// EnableEndpointDiscovery will allow for endpoint discovery on operations that
+	// have the de***REMOVED***nition in its model. By default, endpoint discovery is off.
+	//
+	// Example:
+	//    sess := session.Must(session.NewSession(&aws.Con***REMOVED***g{
+	//         EnableEndpointDiscovery: aws.Bool(true),
+	//    }))
+	//
+	//    svc := s3.New(sess)
+	//    out, err := svc.GetObject(&s3.GetObjectInput {
+	//    	Bucket: aws.String("bucketname"),
+	//    	Key: aws.String("/foo/bar/moo"),
+	//    })
+	EnableEndpointDiscovery *bool
+
+	// DisableEndpointHostPre***REMOVED***x will disable the SDK's behavior of pre***REMOVED***xing
+	// request endpoint hosts with modeled information.
+	//
+	// Disabling this feature is useful when you want to use local endpoints
+	// for testing that do not support the modeled host pre***REMOVED***x pattern.
+	DisableEndpointHostPre***REMOVED***x *bool
+
+	// STSRegionalEndpoint will enable regional or legacy endpoint resolving
+	STSRegionalEndpoint endpoints.STSRegionalEndpoint
 }
 
 // NewCon***REMOVED***g returns a new Con***REMOVED***g pointer that can be chained with builder
 // methods to set multiple con***REMOVED***guration values inline without using pointers.
 //
-//     // Create Session with MaxRetry con***REMOVED***guration to be shared by multiple
+//     // Create Session with MaxRetries con***REMOVED***guration to be shared by multiple
 //     // service clients.
 //     sess := session.Must(session.NewSession(aws.NewCon***REMOVED***g().
 //         WithMaxRetries(3),
@@ -377,11 +403,31 @@ func (c *Con***REMOVED***g) WithSleepDelay(fn func(time.Duration)) *Con***REMOVE
 	return c
 }
 
+// WithEndpointDiscovery will set whether or not to use endpoint discovery.
+func (c *Con***REMOVED***g) WithEndpointDiscovery(t bool) *Con***REMOVED***g {
+	c.EnableEndpointDiscovery = &t
+	return c
+}
+
+// WithDisableEndpointHostPre***REMOVED***x will set whether or not to use modeled host pre***REMOVED***x
+// when making requests.
+func (c *Con***REMOVED***g) WithDisableEndpointHostPre***REMOVED***x(t bool) *Con***REMOVED***g {
+	c.DisableEndpointHostPre***REMOVED***x = &t
+	return c
+}
+
 // MergeIn merges the passed in con***REMOVED***gs into the existing con***REMOVED***g object.
 func (c *Con***REMOVED***g) MergeIn(cfgs ...*Con***REMOVED***g) {
 	for _, other := range cfgs {
 		mergeInCon***REMOVED***g(c, other)
 	}
+}
+
+// WithSTSRegionalEndpoint will set whether or not to use regional endpoint flag
+// when resolving the endpoint for a service
+func (c *Con***REMOVED***g) WithSTSRegionalEndpoint(sre endpoints.STSRegionalEndpoint) *Con***REMOVED***g {
+	c.STSRegionalEndpoint = sre
+	return c
 }
 
 func mergeInCon***REMOVED***g(dst *Con***REMOVED***g, other *Con***REMOVED***g) {
@@ -475,6 +521,18 @@ func mergeInCon***REMOVED***g(dst *Con***REMOVED***g, other *Con***REMOVED***g) 
 
 	if other.EnforceShouldRetryCheck != nil {
 		dst.EnforceShouldRetryCheck = other.EnforceShouldRetryCheck
+	}
+
+	if other.EnableEndpointDiscovery != nil {
+		dst.EnableEndpointDiscovery = other.EnableEndpointDiscovery
+	}
+
+	if other.DisableEndpointHostPre***REMOVED***x != nil {
+		dst.DisableEndpointHostPre***REMOVED***x = other.DisableEndpointHostPre***REMOVED***x
+	}
+
+	if other.STSRegionalEndpoint != endpoints.UnsetSTSEndpoint {
+		dst.STSRegionalEndpoint = other.STSRegionalEndpoint
 	}
 }
 

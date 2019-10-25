@@ -1,11 +1,14 @@
 package session
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
 // EnvProviderName provides a name of the provider when con***REMOVED***g is loaded from environment.
@@ -79,7 +82,7 @@ type envCon***REMOVED***g struct {
 	//	AWS_CONFIG_FILE=$HOME/my_shared_con***REMOVED***g
 	SharedCon***REMOVED***gFile string
 
-	// Sets the path to a custom Credentials Authroity (CA) Bundle PEM ***REMOVED***le
+	// Sets the path to a custom Credentials Authority (CA) Bundle PEM ***REMOVED***le
 	// that the SDK will use instead of the system's root CA bundle.
 	// Only use this if you want to con***REMOVED***gure the SDK to use a custom set
 	// of CAs.
@@ -96,9 +99,55 @@ type envCon***REMOVED***g struct {
 	//
 	//  AWS_CA_BUNDLE=$HOME/my_custom_ca_bundle
 	CustomCABundle string
+
+	csmEnabled  string
+	CSMEnabled  *bool
+	CSMPort     string
+	CSMHost     string
+	CSMClientID string
+
+	// Enables endpoint discovery via environment variables.
+	//
+	//	AWS_ENABLE_ENDPOINT_DISCOVERY=true
+	EnableEndpointDiscovery *bool
+	enableEndpointDiscovery string
+
+	// Speci***REMOVED***es the WebIdentity token the SDK should use to assume a role
+	// with.
+	//
+	//  AWS_WEB_IDENTITY_TOKEN_FILE=***REMOVED***le_path
+	WebIdentityTokenFilePath string
+
+	// Speci***REMOVED***es the IAM role arn to use when assuming an role.
+	//
+	//  AWS_ROLE_ARN=role_arn
+	RoleARN string
+
+	// Speci***REMOVED***es the IAM role session name to use when assuming a role.
+	//
+	//  AWS_ROLE_SESSION_NAME=session_name
+	RoleSessionName string
+
+	// Speci***REMOVED***es the Regional Endpoint flag for the sdk to resolve the endpoint for a service
+	//
+	// AWS_STS_REGIONAL_ENDPOINTS =sts_regional_endpoint
+	// This can take value as `regional` or `legacy`
+	STSRegionalEndpoint endpoints.STSRegionalEndpoint
 }
 
 var (
+	csmEnabledEnvKey = []string{
+		"AWS_CSM_ENABLED",
+	}
+	csmHostEnvKey = []string{
+		"AWS_CSM_HOST",
+	}
+	csmPortEnvKey = []string{
+		"AWS_CSM_PORT",
+	}
+	csmClientIDEnvKey = []string{
+		"AWS_CSM_CLIENT_ID",
+	}
 	credAccessEnvKey = []string{
 		"AWS_ACCESS_KEY_ID",
 		"AWS_ACCESS_KEY",
@@ -109,6 +158,10 @@ var (
 	}
 	credSessionEnvKey = []string{
 		"AWS_SESSION_TOKEN",
+	}
+
+	enableEndpointDiscoveryEnvKey = []string{
+		"AWS_ENABLE_ENDPOINT_DISCOVERY",
 	}
 
 	regionEnvKeys = []string{
@@ -125,6 +178,18 @@ var (
 	sharedCon***REMOVED***gFileEnvKey = []string{
 		"AWS_CONFIG_FILE",
 	}
+	webIdentityTokenFilePathEnvKey = []string{
+		"AWS_WEB_IDENTITY_TOKEN_FILE",
+	}
+	roleARNEnvKey = []string{
+		"AWS_ROLE_ARN",
+	}
+	roleSessionNameEnvKey = []string{
+		"AWS_ROLE_SESSION_NAME",
+	}
+	stsRegionalEndpointKey = []string{
+		"AWS_STS_REGIONAL_ENDPOINTS",
+	}
 )
 
 // loadEnvCon***REMOVED***g retrieves the SDK's environment con***REMOVED***guration.
@@ -133,7 +198,7 @@ var (
 // If the environment variable `AWS_SDK_LOAD_CONFIG` is set to a truthy value
 // the shared SDK con***REMOVED***g will be loaded in addition to the SDK's speci***REMOVED***c
 // con***REMOVED***guration values.
-func loadEnvCon***REMOVED***g() envCon***REMOVED***g {
+func loadEnvCon***REMOVED***g() (envCon***REMOVED***g, error) {
 	enableSharedCon***REMOVED***g, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG"))
 	return envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g)
 }
@@ -144,24 +209,42 @@ func loadEnvCon***REMOVED***g() envCon***REMOVED***g {
 // Loads the shared con***REMOVED***guration in addition to the SDK's speci***REMOVED***c con***REMOVED***guration.
 // This will load the same values as `loadEnvCon***REMOVED***g` if the `AWS_SDK_LOAD_CONFIG`
 // environment variable is set.
-func loadSharedEnvCon***REMOVED***g() envCon***REMOVED***g {
+func loadSharedEnvCon***REMOVED***g() (envCon***REMOVED***g, error) {
 	return envCon***REMOVED***gLoad(true)
 }
 
-func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) envCon***REMOVED***g {
+func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) (envCon***REMOVED***g, error) {
 	cfg := envCon***REMOVED***g{}
 
 	cfg.EnableSharedCon***REMOVED***g = enableSharedCon***REMOVED***g
 
-	setFromEnvVal(&cfg.Creds.AccessKeyID, credAccessEnvKey)
-	setFromEnvVal(&cfg.Creds.SecretAccessKey, credSecretEnvKey)
-	setFromEnvVal(&cfg.Creds.SessionToken, credSessionEnvKey)
+	// Static environment credentials
+	var creds credentials.Value
+	setFromEnvVal(&creds.AccessKeyID, credAccessEnvKey)
+	setFromEnvVal(&creds.SecretAccessKey, credSecretEnvKey)
+	setFromEnvVal(&creds.SessionToken, credSessionEnvKey)
+	if creds.HasKeys() {
+		// Require logical grouping of credentials
+		creds.ProviderName = EnvProviderName
+		cfg.Creds = creds
+	}
 
-	// Require logical grouping of credentials
-	if len(cfg.Creds.AccessKeyID) == 0 || len(cfg.Creds.SecretAccessKey) == 0 {
-		cfg.Creds = credentials.Value{}
-	} ***REMOVED*** {
-		cfg.Creds.ProviderName = EnvProviderName
+	// Role Metadata
+	setFromEnvVal(&cfg.RoleARN, roleARNEnvKey)
+	setFromEnvVal(&cfg.RoleSessionName, roleSessionNameEnvKey)
+
+	// Web identity environment variables
+	setFromEnvVal(&cfg.WebIdentityTokenFilePath, webIdentityTokenFilePathEnvKey)
+
+	// CSM environment variables
+	setFromEnvVal(&cfg.csmEnabled, csmEnabledEnvKey)
+	setFromEnvVal(&cfg.CSMHost, csmHostEnvKey)
+	setFromEnvVal(&cfg.CSMPort, csmPortEnvKey)
+	setFromEnvVal(&cfg.CSMClientID, csmClientIDEnvKey)
+
+	if len(cfg.csmEnabled) != 0 {
+		v, _ := strconv.ParseBool(cfg.csmEnabled)
+		cfg.CSMEnabled = &v
 	}
 
 	regionKeys := regionEnvKeys
@@ -173,6 +256,12 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) envCon***REMOV
 
 	setFromEnvVal(&cfg.Region, regionKeys)
 	setFromEnvVal(&cfg.Pro***REMOVED***le, pro***REMOVED***leKeys)
+
+	// endpoint discovery is in reference to it being enabled.
+	setFromEnvVal(&cfg.enableEndpointDiscovery, enableEndpointDiscoveryEnvKey)
+	if len(cfg.enableEndpointDiscovery) > 0 {
+		cfg.EnableEndpointDiscovery = aws.Bool(cfg.enableEndpointDiscovery != "false")
+	}
 
 	setFromEnvVal(&cfg.SharedCredentialsFile, sharedCredsFileEnvKey)
 	setFromEnvVal(&cfg.SharedCon***REMOVED***gFile, sharedCon***REMOVED***gFileEnvKey)
@@ -186,12 +275,23 @@ func envCon***REMOVED***gLoad(enableSharedCon***REMOVED***g bool) envCon***REMOV
 
 	cfg.CustomCABundle = os.Getenv("AWS_CA_BUNDLE")
 
-	return cfg
+	// STS Regional Endpoint variable
+	for _, k := range stsRegionalEndpointKey {
+		if v := os.Getenv(k); len(v) != 0 {
+			STSRegionalEndpoint, err := endpoints.GetSTSRegionalEndpoint(v)
+			if err != nil {
+				return cfg, fmt.Errorf("failed to load, %v from env con***REMOVED***g, %v", k, err)
+			}
+			cfg.STSRegionalEndpoint = STSRegionalEndpoint
+		}
+	}
+
+	return cfg, nil
 }
 
 func setFromEnvVal(dst *string, keys []string) {
 	for _, k := range keys {
-		if v := os.Getenv(k); len(v) > 0 {
+		if v := os.Getenv(k); len(v) != 0 {
 			*dst = v
 			break
 		}
