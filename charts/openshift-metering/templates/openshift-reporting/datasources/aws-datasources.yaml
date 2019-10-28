@@ -19,10 +19,10 @@ spec:
 apiVersion: metering.openshift.io/v1
 kind: ReportDataSource
 metadata:
-  name: "aws-ec2-billing-data-raw-raw"
+  name: "aws-ec2-billing-data-raw"
   labels:
     operator-metering: "true"
 spec:
   reportQueryView:
-    queryName: "aws-ec2-billing-data-raw-raw"
+    queryName: "aws-ec2-billing-data-raw"
 {{- end }}

@@ -241,7 +241,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 				locStr = "location " + p.Location
 			}
 			logger.Debugf("dropping partition %s %s from Hive table %q", partSpecStr, locStr, tableName)
-			err := op.hivePartitionManager.DropPartition(tableName, hivePartitionColumns, hive.TablePartition(p))
+			err := op.hivePartitionManager.DropPartition(hiveTable.Status.DatabaseName, tableName, hivePartitionColumns, hive.TablePartition(p))
 			if err != nil {
 				return fmt.Errorf("failed to drop partition %s %s from Hive table %q: %s", partSpecStr, locStr, tableName, err)
 			}
@@ -255,7 +255,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 				locStr = "location " + p.Location
 			}
 			logger.Debugf("adding partition %s %s to Hive table %q", partSpecStr, locStr, locStr, tableName)
-			err := op.hivePartitionManager.AddPartition(tableName, hivePartitionColumns, hive.TablePartition(p))
+			err := op.hivePartitionManager.AddPartition(hiveTable.Status.DatabaseName, tableName, hivePartitionColumns, hive.TablePartition(p))
 			if err != nil {
 				return fmt.Errorf("failed to add partition %s %s to Hive table %q: %s", partSpecStr, locStr, tableName, err)
 			}
@@ -355,6 +355,7 @@ func (op *Reporting) createHiveTableCR(obj metav1.Object, gvk schema.GroupVersio
 			NumBuckets:       params.NumBuckets,
 			Location:         params.Location,
 			RowFormat:        params.RowFormat,
+			FileFormat:       params.FileFormat,
 			TableProperties:  params.TableProperties,
 			External:         params.External,
 			ManagePartitions: managePartitions,

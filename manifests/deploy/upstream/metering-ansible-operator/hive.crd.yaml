@@ -200,11 +200,13 @@ spec:
                 - location
                 properties:
                   partitionSpec:
-                    type: array
+                    type: object
                     description: |
                       PartitionSpec is a map containing string keys and values, where each key
                       is expected to be the name of a partition column, and the value is the
                       value of the partition column.
+                    additionalProperties:
+                      type: string
                   location:
                     type: string
                     description: |
