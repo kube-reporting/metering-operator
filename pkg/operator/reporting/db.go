@@ -20,8 +20,8 @@ type HiveDatabaseManager interface {
 }
 
 type HivePartitionManager interface {
-	AddPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error
-	DropPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error
+	AddPartition(dbName, tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error
+	DropPartition(dbName, tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error
 }
 
 type HiveManager struct {
@@ -48,19 +48,19 @@ func (m *HiveManager) DropDatabase(dbName string, ignoreNotExists, cascade bool)
 	return hive.ExecuteDropDatabase(m.execer, dbName, ignoreNotExists, cascade)
 }
 
-func (m *HiveManager) AddPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
+func (m *HiveManager) AddPartition(dbName, tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
 	partitionSpecStr := FmtPartitionSpec(partitionColumns, partition.PartitionSpec)
 	locationStr := ""
 	if partition.Location != "" {
-		locationStr = "LOCATION " + partition.Location
+		locationStr = fmt.Sprintf("LOCATION '%s'", partition.Location)
 	}
-	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s ADD IF NOT EXISTS PARTITION (%s) %s", tableName, partitionSpecStr, locationStr))
+	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s.%s ADD IF NOT EXISTS PARTITION (%s) %s", dbName, tableName, partitionSpecStr, locationStr))
 	return err
 }
 
-func (m *HiveManager) DropPartition(tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
+func (m *HiveManager) DropPartition(dbName, tableName string, partitionColumns []hive.Column, partition hive.TablePartition) error {
 	partitionSpecStr := FmtPartitionSpec(partitionColumns, partition.PartitionSpec)
-	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s DROP IF EXISTS PARTITION (%s)", tableName, partitionSpecStr))
+	_, err := m.execer.Exec(fmt.Sprintf("ALTER TABLE %s.%s DROP IF EXISTS PARTITION (%s)", dbName, tableName, partitionSpecStr))
 	return err
 }
 
@@ -70,7 +70,7 @@ func FmtPartitionSpec(partitionColumns []hive.Column, partSpec hive.PartitionSpe
 		val := partSpec[col.Name]
 		// Quote strings
 		if strings.ToLower(col.Type) == "string" {
-			val = "`" + val + "`"
+			val = fmt.Sprintf("'%s'", val)
 		}
 		partitionVals = append(partitionVals, fmt.Sprintf("`%s`=%s", col.Name, val))
 	}
