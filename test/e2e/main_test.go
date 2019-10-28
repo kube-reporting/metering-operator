@@ -6,12 +6,14 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +32,6 @@ var (
 	logLevel   string
 
 	deployManifestsDir         string
-	runAWSBillingTests         bool
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
 	reportingOperatorImageRepo string
@@ -39,7 +40,9 @@ var (
 	cleanupScriptPath          string
 	testOutputPath             string
 
-	defaultTargetPods = 7
+	defaultTargetPods          = 7
+	kubeNamespaceCharLimit     = 63
+	meteringconfigMetadataName = "operator-metering"
 )
 
 func init() {
@@ -78,19 +81,31 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestInstallMeteringAndReportingProducesData(t *testing.T) {
+type InstallTestCase struct {
+	Name     string
+	TestFunc func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
+}
+
+func TestManualMeteringInstall(t *testing.T) {
 	testInstallConfigs := []struct {
 		TargetPods                int
+		Skip                      bool
 		Name                      string
 		MeteringOperatorImageRepo string
 		MeteringOperatorImageTag  string
 		MeteringConfigSpec        metering.MeteringConfigSpec
+		InstallSubTest            InstallTestCase
 	}{
 		{
-			Name:                      "HDFSInstall",
+			Name:                      "HDFSInstallTestReportingProducesData",
 			TargetPods:                defaultTargetPods,
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			InstallSubTest: InstallTestCase{
+				Name:     "testReportingProducesData",
+				TestFunc: testReportingProducesData,
+			},
 			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
 				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
@@ -194,130 +209,190 @@ func TestInstallMeteringAndReportingProducesData(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:                      "HDFSInstallTestReportingProducesCorrectDataForInput",
+			TargetPods:                defaultTargetPods,
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			InstallSubTest: InstallTestCase{
+				Name:     "testReportingProducesCorrectDataForInput",
+				TestFunc: testReportingProducesCorrectDataForInput,
+			},
+			MeteringConfigSpec: metering.MeteringConfigSpec{
+				LogHelmTemplate: testhelpers.PtrToBool(true),
+				UnsupportedFeatures: &metering.UnsupportedFeaturesConfig{
+					EnableHDFS: testhelpers.PtrToBool(true),
+				},
+				Storage: &metering.StorageConfig{
+					Type: "hive",
+					Hive: &metering.HiveStorageConfig{
+						Type: "hdfs",
+						Hdfs: &metering.HiveHDFSConfig{
+							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+						},
+					},
+				},
+				ReportingOperator: &metering.ReportingOperator{
+					Spec: &metering.ReportingOperatorSpec{
+						Resources: &v1.ResourceRequirements{
+							Requests: v1.ResourceList{
+								v1.ResourceCPU:    resource.MustParse("1"),
+								v1.ResourceMemory: resource.MustParse("250Mi"),
+							},
+						},
+						Image: &metering.ImageConfig{},
+						Config: &metering.ReportingOperatorConfig{
+							LogLevel: "debug",
+							Prometheus: &metering.ReportingOperatorPrometheusConfig{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterConfig{
+									Enabled: testhelpers.PtrToBool(false),
+								},
+							},
+						},
+					},
+				},
+				Presto: &metering.Presto{
+					Spec: &metering.PrestoSpec{
+						Coordinator: &metering.PrestoCoordinatorSpec{
+							Resources: &v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("1"),
+									v1.ResourceMemory: resource.MustParse("1Gi"),
+								},
+							},
+						},
+					},
+				},
+				Hive: &metering.Hive{
+					Spec: &metering.HiveSpec{
+						Metastore: &metering.HiveMetastoreSpec{
+							Resources: &v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("1"),
+									v1.ResourceMemory: resource.MustParse("650Mi"),
+								},
+							},
+							Storage: &metering.HiveMetastoreStorageConfig{
+								Size: "5Gi",
+							},
+						},
+						Server: &metering.HiveServerSpec{
+							Resources: &v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("500m"),
+									v1.ResourceMemory: resource.MustParse("650Mi"),
+								},
+							},
+						},
+					},
+				},
+				Hadoop: &metering.Hadoop{
+					Spec: &metering.HadoopSpec{
+						HDFS: &metering.HadoopHDFS{
+							Enabled: testhelpers.PtrToBool(true),
+							Datanode: &metering.HadoopHDFSDatanodeSpec{
+								Resources: &v1.ResourceRequirements{
+									Requests: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("500Mi"),
+									},
+								},
+								Storage: &metering.HadoopHDFSStorageConfig{
+									Size: "5Gi",
+								},
+							},
+							Namenode: &metering.HadoopHDFSNamenodeSpec{
+								Resources: &v1.ResourceRequirements{
+									Requests: v1.ResourceList{
+										v1.ResourceMemory: resource.MustParse("500Mi"),
+									},
+								},
+								Storage: &metering.HadoopHDFSStorageConfig{
+									Size: "5Gi",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testInstallConfigs {
 		t := t
 		testCase := testCase
 
-		t.Run(testCase.Name, func(t *testing.T) {
-			testInstall(t, testCase.MeteringOperatorImageRepo, testCase.MeteringOperatorImageTag, testCase.Name, testCase.TargetPods, testCase.MeteringConfigSpec, namespacePrefix, testOutputPath, cleanupScriptPath)
-		})
+		if !testCase.Skip {
+			t.Run(testCase.Name, func(t *testing.T) {
+				testInstall(
+					t,
+					testCase.Name,
+					namespacePrefix,
+					testCase.MeteringOperatorImageRepo,
+					testCase.MeteringOperatorImageTag,
+					testOutputPath,
+					cleanupScriptPath,
+					testCase.TargetPods,
+					testCase.InstallSubTest,
+					testCase.MeteringConfigSpec,
+				)
+			})
+		}
 	}
 }
 
 func testInstall(
 	t *testing.T,
+	testCaseName,
+	namespacePrefix,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
-	testName string,
-	targetPods int,
-	spec metering.MeteringConfigSpec,
-	namespacePrefix string,
-	testOuputPath string,
+	testOuputPath,
 	cleanupScriptPath string,
+	testTargetPods int,
+	testInstallFunction InstallTestCase,
+	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
-	// create a directory used to store the @testName container and resource logs
-	testOutputDir := filepath.Join(testOuputPath, testName)
-	err := os.Mkdir(testOutputDir, 0777)
+	// create a directory used to store the @testCaseName container and resource logs
+	testCaseOutputBaseDir := filepath.Join(testOuputPath, testCaseName)
+	err := os.Mkdir(testCaseOutputBaseDir, 0777)
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
-	// randomize the namespace to avoid existing namespaces
 	rand.Seed(time.Now().UnixNano())
-	namespace := namespacePrefix + "-" + strconv.Itoa(rand.Intn(50))
 
-	deployerCtx, err := df.NewDeployerCtx(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec, testOutputDir, targetPods)
-	assert.NoError(t, err, "creating a new deployer context should produce no error")
+	// randomize the namespace to avoid existing namespaces
+	testFuncNamespace := fmt.Sprintf("%s-%s-%d", namespacePrefix, strings.ToLower(testCaseName), rand.Intn(50))
+	if len(testFuncNamespace) > kubeNamespaceCharLimit {
+		df.Logger.Infof("The test function namespace exceeded the %d kube namespace character limit, retrying without the test case name", kubeNamespaceCharLimit)
+		testFuncNamespace = fmt.Sprintf("%s-%d", namespacePrefix, rand.Intn(50))
+
+		// if the length of the truncated namespace is still too long, fail the test and continue onto the next test function iteration
+		if len(testFuncNamespace) > kubeNamespaceCharLimit {
+			require.Fail(t, "the length of the test function namespace exceeds the kube namespace limit")
+		}
+	}
+
+	deployerCtx, err := df.NewDeployerCtx(
+		testFuncNamespace,
+		meteringOperatorImageRepo,
+		meteringOperatorImageTag,
+		reportingOperatorImageRepo,
+		reportingOperatorImageTag,
+		testMeteringConfigSpec,
+		testCaseOutputBaseDir,
+		testTargetPods,
+	)
+	require.NoError(t, err, "creating a new deployer context should produce no error")
 
 	rf, err := deployerCtx.Setup()
-	assert.NoError(t, err, "deploying metering should produce no error")
+	assert.Nil(t, err, "expected there would be no error installing and setting up the metering stack")
 
-	defer func() {
-		err := deployerCtx.Teardown(cleanupScriptPath)
-		assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
-	}()
-
-	// note: in order to respect the defer closure and cleanup responsibly, we need
-	// to avoid returning errors or ending the function early as testInstall could
-	// be run in a goroutine - so check if the cfg object is nil to avoid a panic
 	if rf != nil {
-		// note: we need to run the testReportingProducesData as a group in order
-		// to avoid preemptively running the defer closure early and uninstalling
-		// the metering resources during the middle of the test execution
-		// for more information, see:
-		// https://github.com/golang/go/issues/22993
-		// https://github.com/golang/go/issues/31651
-		t.Run("testReportingProducesData", func(t *testing.T) {
-			testReportingProducesData(t, rf)
+		t.Run(testInstallFunction.Name, func(t *testing.T) {
+			testInstallFunction.TestFunc(t, rf)
 		})
 	}
-}
 
-func testReportingProducesData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
-	// cron schedule to run every minute
-	cronSchedule := &metering.ReportSchedule{
-		Period: metering.ReportPeriodCron,
-		Cron: &metering.ReportScheduleCron{
-			Expression: fmt.Sprintf("*/1 * * * *"),
-		},
-	}
-
-	queries := []struct {
-		queryName   string
-		skip        bool
-		nonParallel bool
-	}{
-		{queryName: "namespace-cpu-request"},
-		{queryName: "namespace-cpu-usage"},
-		{queryName: "namespace-memory-request"},
-		{queryName: "namespace-persistentvolumeclaim-request"},
-		{queryName: "namespace-persistentvolumeclaim-usage"},
-		{queryName: "namespace-memory-usage"},
-		{queryName: "persistentvolumeclaim-usage"},
-		{queryName: "persistentvolumeclaim-capacity"},
-		{queryName: "persistentvolumeclaim-request"},
-		{queryName: "pod-cpu-request"},
-		{queryName: "pod-cpu-usage"},
-		{queryName: "pod-memory-request"},
-		{queryName: "pod-memory-usage"},
-		{queryName: "node-cpu-utilization"},
-		{queryName: "node-memory-utilization"},
-		{queryName: "cluster-persistentvolumeclaim-request"},
-		{queryName: "cluster-cpu-capacity"},
-		{queryName: "cluster-memory-capacity"},
-		{queryName: "cluster-cpu-usage"},
-		{queryName: "cluster-memory-usage"},
-		{queryName: "cluster-cpu-utilization"},
-		{queryName: "cluster-memory-utilization"},
-		{queryName: "namespace-memory-utilization"},
-		{queryName: "namespace-cpu-utilization"},
-		{queryName: "pod-cpu-request-aws", skip: !runAWSBillingTests, nonParallel: true},
-		{queryName: "pod-memory-request-aws", skip: !runAWSBillingTests, nonParallel: true},
-		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests, nonParallel: true},
-	}
-
-	var reportsProduceDataTestCases []reportProducesDataTestCase
-
-	for _, query := range queries {
-		reportcronTestCase := reportProducesDataTestCase{
-			name:          query.queryName + "-cron",
-			queryName:     query.queryName,
-			schedule:      cronSchedule,
-			newReportFunc: testReportingFramework.NewSimpleReport,
-			skip:          query.skip,
-			parallel:      !query.nonParallel,
-		}
-		reportRunOnceTestCase := reportProducesDataTestCase{
-			name:          query.queryName + "-runonce",
-			queryName:     query.queryName,
-			schedule:      nil, // runOnce
-			newReportFunc: testReportingFramework.NewSimpleReport,
-			skip:          query.skip,
-			parallel:      !query.nonParallel,
-		}
-
-		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportcronTestCase, reportRunOnceTestCase)
-	}
-
-	testReportsProduceData(t, testReportingFramework, reportsProduceDataTestCases)
+	err = deployerCtx.Teardown(cleanupScriptPath)
+	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }

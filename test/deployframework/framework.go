@@ -2,6 +2,7 @@ package deployframework
 
 import (
 	"fmt"
+	"k8s.io/client-go/rest"
 
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
@@ -37,6 +38,7 @@ type DeployFramework struct {
 	KubeConfigPath    string
 	OperatorResources *deploy.OperatorResources
 	Logger            logrus.FieldLogger
+	Config            *rest.Config
 	Client            kubernetes.Interface
 	APIExtClient      apiextclientv1beta1.CustomResourceDefinitionsGetter
 	MeteringClient    meteringclient.MeteringV1Interface
@@ -73,6 +75,7 @@ func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (
 		OperatorResources: operatorResources,
 		KubeConfigPath:    kubeconfig,
 		Logger:            logger,
+		Config:            config,
 		Client:            client,
 		APIExtClient:      apiextClient,
 		MeteringClient:    meteringClient,
@@ -81,6 +84,8 @@ func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (
 	return deployFramework, nil
 }
 
+// NewDeployerConfig handles the process of validating inputs before returning
+// an initialized Deploy.Config object, or an error if there is any.
 func (df *DeployFramework) NewDeployerConfig(
 	namespace,
 	meteringOperatorImageRepo,

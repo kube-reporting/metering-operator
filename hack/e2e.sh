@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 : "${KUBECONFIG:?}"
 
 ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
@@ -45,7 +47,7 @@ go test \
     -test.short="${METERING_SHORT_TESTS}" \
     -test.v \
     -parallel 10 \
-    -timeout 30m \
+    -timeout 60m \
     "./test/e2e" \
     -kubeconfig="${KUBECONFIG}" \
     -namespace-prefix="${METERING_NAMESPACE}" \
@@ -53,9 +55,11 @@ go test \
     -cleanup-script-path="${METERING_CLEANUP_SCRIPT_PATH}" \
     -test-output-path="${TEST_OUTPUT_PATH}" \
     -log-level="${TEST_LOG_LEVEL}" \
-    |& tee "$TEST_LOG_FILE_PATH"
+    |& tee "$TEST_LOG_FILE_PATH" ; TEST_EXIT_CODE=${PIPESTATUS[0]}
 
 # if go-junit-report is installed, create a junit report also
 if command -v go-junit-report >/dev/null 2>&1; then
     go-junit-report < "$TEST_LOG_FILE_PATH" > "${TEST_JUNIT_REPORT_FILE_PATH}"
 fi
+
+exit "$TEST_EXIT_CODE"

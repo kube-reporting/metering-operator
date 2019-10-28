@@ -1,29 +1,23 @@
-package integration
+package e2e
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	types "k8s.io/apimachinery/pkg/types"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/operator-framework/operator-metering/pkg/operator/prestostore"
 	"github.com/operator-framework/operator-metering/test/reportingframework"
+	"github.com/operator-framework/operator-metering/test/testhelpers"
 )
 
 var (
-	testReportingFramework *reportingframework.ReportingFramework
-
-	reportTestTimeout         = 5 * time.Minute
-	reportTestOutputDirectory string
-
+	reportTestTimeout                              = 5 * time.Minute
 	testReportsProduceCorrectDataForInputTestCases = []reportsProduceCorrectDataForInputTestCase{
 		{
 			name:      "namespace-cpu-request",
@@ -223,42 +217,7 @@ var (
 	}
 )
 
-type testDatasource struct {
-	DatasourceName string
-	FileName       string
-}
-
-func init() {
-	reportTestOutputDirectory = os.Getenv("TEST_RESULT_REPORT_OUTPUT_DIRECTORY")
-	if reportTestOutputDirectory == "" {
-		log.Fatalf("$TEST_RESULT_REPORT_OUTPUT_DIRECTORY must be set")
-	}
-
-	err := os.MkdirAll(reportTestOutputDirectory, 0777)
-	if err != nil {
-		log.Fatalf("error making directory %s, err: %s", reportTestOutputDirectory, err)
-	}
-}
-
-func TestMain(m *testing.M) {
-	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
-	ns := flag.String("namespace", "metering-ci", "test namespace")
-	httpsAPI := flag.Bool("https-api", false, "If true, use https to talk to Metering API")
-	useKubeProxyForReportingAPI := flag.Bool("use-kube-proxy-for-reporting-api", false, "If true, uses kubernetes API proxy to access reportingAPI")
-	useRouteForReportingAPI := flag.Bool("use-route-for-reporting-api", true, "If true, uses a route to access reportingAPI")
-	reportingAPIURL := flag.String("reporting-api-url", "", "reporting-operator URL if useKubeProxyForReportingAPI is false")
-	routeBearerToken := flag.String("route-bearer-token", "", "The bearer token to the reporting-operator serviceaccount if use-route-for-reporting-api is set to true")
-	flag.Parse()
-
-	var err error
-	if testReportingFramework, err = reportingframework.New(*ns, *kubeconfig, *httpsAPI, *useKubeProxyForReportingAPI, *useRouteForReportingAPI, *routeBearerToken, *reportingAPIURL, reportTestOutputDirectory); err != nil {
-		logrus.Fatalf("failed to setup framework: %v\n", err)
-	}
-
-	os.Exit(m.Run())
-}
-
-func TestReportingProducesCorrectDataForInput(t *testing.T) {
+func testReportingProducesCorrectDataForInput(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
 	var queries []string
 	t.Logf("Waiting for ReportDataSources tables to be created")
 	_, err := testReportingFramework.WaitForAllMeteringReportDataSourceTables(t, time.Second*5, 5*time.Minute)
@@ -332,5 +291,62 @@ func TestReportingProducesCorrectDataForInput(t *testing.T) {
 		}
 	}
 
-	testReportsProduceCorrectDataForInput(t, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
+	testReportsProduceCorrectDataForInput(t, testReportingFramework, reportStart, reportEnd, testReportsProduceCorrectDataForInputTestCases)
+}
+
+type testDatasource struct {
+	DatasourceName string
+	FileName       string
+}
+
+type reportsProduceCorrectDataForInputTestCase struct {
+	name                         string
+	queryName                    string
+	dataSources                  []testDatasource
+	expectedReportOutputFileName string
+	comparisonColumnNames        []string
+	timeout                      time.Duration
+	parallel                     bool
+}
+
+func testReportsProduceCorrectDataForInput(
+	t *testing.T,
+	testReportingFramework *reportingframework.ReportingFramework,
+	reportStart,
+	reportEnd time.Time,
+	testCases []reportsProduceCorrectDataForInputTestCase,
+) {
+	require.NotZero(t, reportStart, "reportStart should not be zero")
+	require.NotZero(t, reportEnd, "reportEnd should not be zero")
+	t.Logf("reportStart: %s, reportEnd: %s", reportStart, reportEnd)
+	for _, test := range testCases {
+		// Fix closure captures
+		name := test.name
+		test := test
+		t.Run(name, func(t *testing.T) {
+			if test.parallel {
+				t.Parallel()
+			}
+
+			report := testReportingFramework.NewSimpleReport(test.name, test.queryName, nil, &reportStart, &reportEnd)
+
+			reportRunTimeout := 10 * time.Minute
+			t.Logf("creating report %s and waiting %s to finish", report.Name, reportRunTimeout)
+			testReportingFramework.RequireReportSuccessfullyRuns(t, report, reportRunTimeout)
+
+			resultTimeout := time.Minute
+			t.Logf("waiting %s for report %s results", resultTimeout, report.Name)
+			actualResults := testReportingFramework.GetReportResults(t, report, resultTimeout)
+
+			// read expected results from a file
+			expectedReportData, err := ioutil.ReadFile(test.expectedReportOutputFileName)
+			require.NoError(t, err)
+			// turn the expected results into a list of maps
+			var expectedResults []map[string]interface{}
+			err = json.Unmarshal(expectedReportData, &expectedResults)
+			require.NoError(t, err)
+
+			testhelpers.AssertReportResultsEqual(t, expectedResults, actualResults, test.comparisonColumnNames)
+		})
+	}
 }

@@ -104,12 +104,11 @@ type podStat struct {
 	Total   int
 }
 
-// waitForPods periodically polls the list of pods in the namespace
+// WaitForPods periodically polls the list of pods in the namespace
 // and ensures the metering pods created are considered ready. In order to exit
 // the polling loop, the number of pods listed must match the expected number
 // of targetPodsCount, and all pod containers listed must report a ready status.
 func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
-
 	err := wait.Poll(10*time.Second, 20*time.Minute, func() (done bool, err error) {
 		var readyPods []string
 		var unreadyPods []podStat
@@ -117,12 +116,6 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 		pods, err := pw.Client.CoreV1().Pods(namespace).List(meta.ListOptions{})
 		if err != nil {
 			return false, err
-		}
-
-		// TODO(chancez): is this check needed? If so, maybe move outside of
-		// WaitForPods.
-		if len(pods.Items) == 0 {
-			return false, fmt.Errorf("the number of pods in the %s namespace should not be zero", namespace)
 		}
 
 		for _, pod := range pods.Items {
