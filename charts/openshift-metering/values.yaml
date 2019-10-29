@@ -540,6 +540,8 @@ presto:
             createSecret: false
             enabled: false
             secretName: ""
+          s3:
+            useInstanceCredentials: null
 
         extraConnectorFiles: []
 
