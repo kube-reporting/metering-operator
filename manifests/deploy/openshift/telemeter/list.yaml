@@ -1447,6 +1447,11 @@ objects:
                                     type: string
                                   metastoreURI:
                                     type: string
+                                  s3:
+                                    properties:
+                                      useInstanceCredentials:
+                                        type: boolean
+                                    type: object
                                   tls:
                                     oneOf:
                                     - allOf:

@@ -1458,6 +1458,8 @@ spec:
                             hive:
                               type: object
                               properties:
+                                useHadoopConfig:
+                                  type: boolean
                                 hadoopConfigSecretName:
                                   type: string
                                 metastoreTimeout:
@@ -1542,8 +1544,11 @@ spec:
                                         - true
                                       secretName:
                                         minLength: 1
-                                useHadoopConfig:
-                                  type: boolean
+                                s3:
+                                  type: object
+                                  properties:
+                                    useInstanceCredentials:
+                                      type: boolean
                         environment:
                           type: string
                         maxQueryLength:
