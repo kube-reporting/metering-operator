@@ -1548,6 +1548,29 @@ spec:
                                   properties:
                                     useInstanceCredentials:
                                       type: boolean
+                            prometheus:
+                              type: object
+                              properties:
+                                enabled:
+                                  type: boolean
+                                uri:
+                                  description: URI for Prometheus.
+                                  type: string
+                                chunkSizeDuration:
+                                  description: Default size of each Prometheus query chunk.
+                                  type: string
+                                maxQueryRangeDuration:
+                                  description: Default range for Prometheus query, divided into chunkSizeDuration chunks.
+                                  type: string
+                                cacheDuration:
+                                  description: Time to live for Presto checking connector properties values.
+                                  type: string
+                                bearer:
+                                  type: object
+                                  properties:
+                                    tokenFile:
+                                      description: Path to token ***REMOVED***le for bearer authentication to Prometheus.
+                                      type: string
                         environment:
                           type: string
                         maxQueryLength:
