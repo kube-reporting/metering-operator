@@ -98,10 +98,11 @@ metadata:
 spec:
   type: appregistry
   endpoint: https://quay.io/cnr
-  # change to redhat-operators-art for pre-staged content, and use
-  # redhat-operators-stage for testing staging images
-  # redhat-operators to test live images
-  # use rh-osbs-operators for the latest thing built in OSBS. rh-osbs-operators is the most regularly updated one.
+  # use "redhat-operators" to test production, current release contents.
+  # use redhat-operators-art for pre-production content. This is unreleased, but for the current major release version.
+  # use redhat-operators-stage for testing staging images.
+  # use rh-osbs-operators for the latest thing built in OSBS, eg for stuff in the next major release.
+  # rh-osbs-operators is the most regularly updated one.
   registryNamespace: redhat-operators-art
   # registryNamespace: redhat-operators-stage
   # registryNamespace: redhat-operators
