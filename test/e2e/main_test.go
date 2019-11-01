@@ -36,13 +36,11 @@ var (
 	reportingOperatorImageRepo string
 	reportingOperatorImageTag  string
 	namespacePrefix            string
-	cleanupScriptPath          string
 	testOutputPath             string
 	repoPath                   string
 
-	kubeNamespaceCharLimit     = 63
-	namespacePrefixCharLimit   = 10
-	meteringconfigMetadataName = "operator-metering"
+	kubeNamespaceCharLimit   = 63
+	namespacePrefixCharLimit = 10
 )
 
 func init() {
@@ -96,9 +94,31 @@ func TestManualMeteringInstall(t *testing.T) {
 		MeteringOperatorImageRepo string
 		MeteringOperatorImageTag  string
 		Skip                      bool
+		ExpectInstallErr          bool
+		ExpectInstallErrMsg       []string
 		InstallSubTest            InstallTestCase
 		MeteringConfigSpec        metering.MeteringConfigSpec
 	}{
+		{
+			Name:                      "InvalidHDFS-MissingStorageSpec",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			ExpectInstallErr:          true,
+			ExpectInstallErrMsg: []string{
+				"failed to install metering",
+				"failed to create the MeteringConfig resource",
+				"validation failure list",
+				"spec.storage in body is required",
+			},
+			InstallSubTest: InstallTestCase{
+				Name:     "testInvalidMeteringConfigMissingStorageSpec",
+				TestFunc: testInvalidMeteringConfigMissingStorageSpec,
+			},
+			MeteringConfigSpec: metering.MeteringConfigSpec{
+				LogHelmTemplate: testhelpers.PtrToBool(true),
+			},
+		},
 		{
 			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
@@ -345,6 +365,8 @@ func TestManualMeteringInstall(t *testing.T) {
 				testCase.MeteringOperatorImageRepo,
 				testCase.MeteringOperatorImageTag,
 				testOutputPath,
+				testCase.ExpectInstallErrMsg,
+				testCase.ExpectInstallErr,
 				testCase.InstallSubTest,
 				testCase.MeteringConfigSpec,
 			)
@@ -359,6 +381,8 @@ func testManualMeteringInstall(
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
 	testOutputPath string,
+	expectInstallErrMsg []string,
+	expectInstallErr bool,
 	testInstallFunction InstallTestCase,
 	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
@@ -386,15 +410,24 @@ func testManualMeteringInstall(
 
 	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
 
-	rf, err := deployerCtx.Setup()
-	assert.Nil(t, err, "expected there would be no error installing and setting up the metering stack")
+	rf, err := deployerCtx.Setup(expectInstallErr)
+	if expectInstallErr {
+		testhelpers.AssertErrorContainsErrorMsgs(t, err, expectInstallErrMsg)
+	} else {
+		assert.NoError(t, err, "expected there would be no error installing and setting up the metering stack")
+	}
 
 	if rf != nil {
-		t.Run(testInstallFunction.Name, func(t *testing.T) {
-			testInstallFunction.TestFunc(t, rf)
-		})
+		canSafelyRunTest := (err != nil && expectInstallErr) || err == nil
+		assert.True(t, canSafelyRunTest, "received an unexpected error when no error was expected")
 
-		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
+		if canSafelyRunTest {
+			t.Run(testInstallFunction.Name, func(t *testing.T) {
+				testInstallFunction.TestFunc(t, rf)
+			})
+
+			deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
+		}
 	}
 
 	err = deployerCtx.Teardown()

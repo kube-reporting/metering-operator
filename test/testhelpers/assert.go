@@ -69,3 +69,13 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 		}
 	}
 }
+
+func AssertErrorContainsErrorMsgs(t *testing.T, err error, errMsgArr []string) {
+	t.Helper()
+
+	require.NotNil(t, err, "expected the error would not be nil")
+
+	for _, msg := range errMsgArr {
+		assert.Containsf(t, err.Error(), msg, "expected the error message would contain '%s'", msg)
+	}
+}
