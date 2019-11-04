@@ -54,19 +54,20 @@ type CRD struct {
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
 type Config struct {
-	SkipMeteringDeployment bool
-	DeleteCRDs             bool
-	DeleteCRB              bool
-	DeleteNamespace        bool
-	DeletePVCs             bool
-	DeleteAll              bool
-	Namespace              string
-	Platform               string
-	Repo                   string
-	Tag                    string
-	ExtraNamespaceLabels   map[string]string
-	OperatorResources      *OperatorResources
-	MeteringConfig         *metering.MeteringConfig
+	SkipMeteringDeployment   bool
+	RunMeteringOperatorLocal bool
+	DeleteCRDs               bool
+	DeleteCRB                bool
+	DeleteNamespace          bool
+	DeletePVCs               bool
+	DeleteAll                bool
+	Namespace                string
+	Platform                 string
+	Repo                     string
+	Tag                      string
+	ExtraNamespaceLabels     map[string]string
+	OperatorResources        *OperatorResources
+	MeteringConfig           *metering.MeteringConfig
 }
 
 // OperatorResources contains all the objects that make up the

@@ -89,12 +89,14 @@ func (deploy *Deployer) installMeteringConfig() error {
 }
 
 func (deploy *Deployer) installMeteringResources() error {
-	err := deploy.installMeteringDeployment()
-	if err != nil {
-		return fmt.Errorf("Failed to create the metering deployment: %v", err)
+	if !deploy.config.RunMeteringOperatorLocal {
+		err := deploy.installMeteringDeployment()
+		if err != nil {
+			return fmt.Errorf("Failed to create the metering deployment: %v", err)
+		}
 	}
 
-	err = deploy.installMeteringServiceAccount()
+	err := deploy.installMeteringServiceAccount()
 	if err != nil {
 		return fmt.Errorf("Failed to create the metering service account: %v", err)
 	}
