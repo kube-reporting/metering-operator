@@ -8,12 +8,17 @@ ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
 source "${ROOT_DIR}/hack/common.sh"
 source "${ROOT_DIR}/hack/lib/tests.sh"
 
-function remove_namespaces() {
+function cleanup() {
+    exit_status=$?
+
     echo "Removing namespaces with the 'name=metering-testing-ns' label"
     kubectl delete ns -l "name=metering-testing-ns" || true
+
+    echo "Exiting hack/e2e.sh"
+    exit "$exit_status"
 }
 
-trap remove_namespaces SIGINT
+trap cleanup EXIT
 
 export METERING_NAMESPACE="${METERING_E2E_NAMESPACE:=${METERING_NAMESPACE}-e2e}"
 export METERING_SHORT_TESTS=${METERING_SHORT_TESTS:=false}
