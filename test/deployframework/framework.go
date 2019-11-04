@@ -2,12 +2,14 @@ package deployframework
 
 import (
 	"fmt"
-	"k8s.io/client-go/rest"
+	"os"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
@@ -30,12 +32,20 @@ const (
 	reportingOperatorServiceAccountName = "reporting-operator"
 	defaultPlatform                     = "openshift"
 	defaultDeleteNamespace              = true
+
+	manifestsDeployDir = "manifests/deploy"
+	hackScriptDirName  = "hack"
+
+	defaultTargetPods             = 7
+	meteringOperatorContainerName = "metering-operator-e2e"
 )
 
 // DeployFramework contains all the information necessary to deploy
 // different metering instances and run tests against them
 type DeployFramework struct {
+	RunLocal          bool
 	KubeConfigPath    string
+	RepoDir           string
 	OperatorResources *deploy.OperatorResources
 	Logger            logrus.FieldLogger
 	Config            *rest.Config
@@ -45,7 +55,7 @@ type DeployFramework struct {
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (*DeployFramework, error) {
+func New(logger logrus.FieldLogger, runLocal bool, nsPrefix, repoDir, kubeconfig string) (*DeployFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build a kube config from %s: %v", kubeconfig, err)
@@ -66,6 +76,15 @@ func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (
 		return nil, fmt.Errorf("failed to initialize the metering clientset: %v", err)
 	}
 
+	manifestsDir, err := filepath.Abs(filepath.Join(repoDir, manifestsDeployDir))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the absolute path to the manifest/deploy directory: %v", err)
+	}
+	_, err = os.Stat(manifestsDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to stat the %s path to the manifest/deploy directory: %v", manifestsDir, err)
+	}
+
 	operatorResources, err := deploy.ReadMeteringAnsibleOperatorManifests(manifestsDir, defaultPlatform)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize objects from manifests: %v", err)
@@ -74,6 +93,8 @@ func New(logger logrus.FieldLogger, nsPrefix, manifestsDir, kubeconfig string) (
 	deployFramework := &DeployFramework{
 		OperatorResources: operatorResources,
 		KubeConfigPath:    kubeconfig,
+		RepoDir:           repoDir,
+		RunLocal:          runLocal,
 		Logger:            logger,
 		Config:            config,
 		Client:            client,
@@ -135,11 +156,12 @@ func (df *DeployFramework) NewDeployerConfig(
 	}
 
 	return &deploy.Config{
-		Namespace:       namespace,
-		Repo:            meteringOperatorImageRepo,
-		Tag:             meteringOperatorImageTag,
-		Platform:        defaultPlatform,
-		DeleteNamespace: defaultDeleteNamespace,
+		Namespace:                namespace,
+		Repo:                     meteringOperatorImageRepo,
+		RunMeteringOperatorLocal: df.RunLocal,
+		Tag:                      meteringOperatorImageTag,
+		Platform:                 defaultPlatform,
+		DeleteNamespace:          defaultDeleteNamespace,
 		ExtraNamespaceLabels: map[string]string{
 			"name": testNamespaceLabel,
 		},

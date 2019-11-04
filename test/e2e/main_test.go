@@ -3,7 +3,6 @@ package e2e
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -28,10 +27,10 @@ import (
 var (
 	df *deployframework.DeployFramework
 
-	kubeConfig string
-	logLevel   string
+	kubeConfig    string
+	logLevel      string
+	runTestsLocal bool
 
-	deployManifestsDir         string
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
 	reportingOperatorImageRepo string
@@ -39,9 +38,10 @@ var (
 	namespacePrefix            string
 	cleanupScriptPath          string
 	testOutputPath             string
+	repoPath                   string
 
-	defaultTargetPods          = 7
 	kubeNamespaceCharLimit     = 63
+	namespacePrefixCharLimit   = 10
 	meteringconfigMetadataName = "operator-metering"
 )
 
@@ -57,8 +57,7 @@ func init() {
 func TestMain(m *testing.M) {
 	flag.StringVar(&kubeConfig, "kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
-
-	flag.StringVar(&deployManifestsDir, "deploy-manifests-dir", "../../manifests/deploy", "The absolute/relative path to the metering manifest directory.")
+	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
 	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
 
 	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
@@ -67,14 +66,18 @@ func TestMain(m *testing.M) {
 	flag.StringVar(&reportingOperatorImageTag, "reporting-operator-image-tag", reportingOperatorImageTag, "")
 
 	flag.StringVar(&namespacePrefix, "namespace-prefix", "", "The namespace prefix to install the metering resources.")
-	flag.StringVar(&cleanupScriptPath, "cleanup-script-path", "../../hack/run-test-cleanup.sh", "The absolute/relative path to the testing cleanup hack script.")
+	flag.StringVar(&repoPath, "repo-path", "../../", "The absolute path to the operator-metering directory.")
 	flag.StringVar(&testOutputPath, "test-output-path", "", "The absolute/relative path that you want to store test logs within.")
 	flag.Parse()
 
 	logger := testhelpers.SetupLogger(logLevel)
 
+	if len(namespacePrefix) > namespacePrefixCharLimit {
+		logger.Fatalf("Error: the --namespace-prefix exceeds the limit of %d characters", namespacePrefixCharLimit)
+	}
+
 	var err error
-	if df, err = deployframework.New(logger, namespacePrefix, deployManifestsDir, kubeConfig); err != nil {
+	if df, err = deployframework.New(logger, runTestsLocal, namespacePrefix, repoPath, kubeConfig); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
@@ -82,29 +85,35 @@ func TestMain(m *testing.M) {
 }
 
 type InstallTestCase struct {
-	Name     string
-	TestFunc func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
+	Name         string
+	ExtraEnvVars []string
+	TestFunc     func(t *testing.T, testReportingFramework *reportingframework.ReportingFramework)
 }
 
 func TestManualMeteringInstall(t *testing.T) {
 	testInstallConfigs := []struct {
-		TargetPods                int
-		Skip                      bool
 		Name                      string
 		MeteringOperatorImageRepo string
 		MeteringOperatorImageTag  string
-		MeteringConfigSpec        metering.MeteringConfigSpec
+		Skip                      bool
 		InstallSubTest            InstallTestCase
+		MeteringConfigSpec        metering.MeteringConfigSpec
 	}{
 		{
-			Name:                      "HDFSInstallTestReportingProducesData",
-			TargetPods:                defaultTargetPods,
+			Name:                      "ValidHDFS-ReportDynamicInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesData",
 				TestFunc: testReportingProducesData,
+				ExtraEnvVars: []string{
+					"REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION=15m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=30s",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE=5m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL=5m",
+					"REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE=60s",
+				},
 			},
 			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
@@ -210,14 +219,16 @@ func TestManualMeteringInstall(t *testing.T) {
 			},
 		},
 		{
-			Name:                      "HDFSInstallTestReportingProducesCorrectDataForInput",
-			TargetPods:                defaultTargetPods,
+			Name:                      "ValidHDFS-ReportStaticInputData",
 			MeteringOperatorImageRepo: meteringOperatorImageRepo,
 			MeteringOperatorImageTag:  meteringOperatorImageTag,
 			Skip:                      false,
 			InstallSubTest: InstallTestCase{
 				Name:     "testReportingProducesCorrectDataForInput",
 				TestFunc: testReportingProducesCorrectDataForInput,
+				ExtraEnvVars: []string{
+					"REPORTING_OPERATOR_DISABLE_PROMETHEUS_METRICS_IMPORTER=true",
+				},
 			},
 			MeteringConfigSpec: metering.MeteringConfigSpec{
 				LogHelmTemplate: testhelpers.PtrToBool(true),
@@ -322,54 +333,43 @@ func TestManualMeteringInstall(t *testing.T) {
 		t := t
 		testCase := testCase
 
-		if !testCase.Skip {
-			t.Run(testCase.Name, func(t *testing.T) {
-				testInstall(
-					t,
-					testCase.Name,
-					namespacePrefix,
-					testCase.MeteringOperatorImageRepo,
-					testCase.MeteringOperatorImageTag,
-					testOutputPath,
-					cleanupScriptPath,
-					testCase.TargetPods,
-					testCase.InstallSubTest,
-					testCase.MeteringConfigSpec,
-				)
-			})
+		if testCase.Skip {
+			continue
 		}
+
+		t.Run(testCase.Name, func(t *testing.T) {
+			testManualMeteringInstall(
+				t,
+				testCase.Name,
+				namespacePrefix,
+				testCase.MeteringOperatorImageRepo,
+				testCase.MeteringOperatorImageTag,
+				testOutputPath,
+				testCase.InstallSubTest,
+				testCase.MeteringConfigSpec,
+			)
+		})
 	}
 }
 
-func testInstall(
+func testManualMeteringInstall(
 	t *testing.T,
 	testCaseName,
 	namespacePrefix,
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
-	testOuputPath,
-	cleanupScriptPath string,
-	testTargetPods int,
+	testOutputPath string,
 	testInstallFunction InstallTestCase,
 	testMeteringConfigSpec metering.MeteringConfigSpec,
 ) {
 	// create a directory used to store the @testCaseName container and resource logs
-	testCaseOutputBaseDir := filepath.Join(testOuputPath, testCaseName)
+	testCaseOutputBaseDir := filepath.Join(testOutputPath, testCaseName)
 	err := os.Mkdir(testCaseOutputBaseDir, 0777)
 	assert.NoError(t, err, "creating the test case output directory should produce no error")
 
-	rand.Seed(time.Now().UnixNano())
-
-	// randomize the namespace to avoid existing namespaces
-	testFuncNamespace := fmt.Sprintf("%s-%s-%d", namespacePrefix, strings.ToLower(testCaseName), rand.Intn(50))
+	testFuncNamespace := fmt.Sprintf("%s-%s", namespacePrefix, strings.ToLower(testCaseName))
 	if len(testFuncNamespace) > kubeNamespaceCharLimit {
-		df.Logger.Infof("The test function namespace exceeded the %d kube namespace character limit, retrying without the test case name", kubeNamespaceCharLimit)
-		testFuncNamespace = fmt.Sprintf("%s-%d", namespacePrefix, rand.Intn(50))
-
-		// if the length of the truncated namespace is still too long, fail the test and continue onto the next test function iteration
-		if len(testFuncNamespace) > kubeNamespaceCharLimit {
-			require.Fail(t, "the length of the test function namespace exceeds the kube namespace limit")
-		}
+		require.Fail(t, "The length of the test function namespace exceeded the kube namespace limit of %d characters", kubeNamespaceCharLimit)
 	}
 
 	deployerCtx, err := df.NewDeployerCtx(
@@ -378,11 +378,13 @@ func testInstall(
 		meteringOperatorImageTag,
 		reportingOperatorImageRepo,
 		reportingOperatorImageTag,
-		testMeteringConfigSpec,
 		testCaseOutputBaseDir,
-		testTargetPods,
+		testInstallFunction.ExtraEnvVars,
+		testMeteringConfigSpec,
 	)
 	require.NoError(t, err, "creating a new deployer context should produce no error")
+
+	deployerCtx.Logger.Infof("DeployerCtx: %+v", deployerCtx)
 
 	rf, err := deployerCtx.Setup()
 	assert.Nil(t, err, "expected there would be no error installing and setting up the metering stack")
@@ -391,8 +393,10 @@ func testInstall(
 		t.Run(testInstallFunction.Name, func(t *testing.T) {
 			testInstallFunction.TestFunc(t, rf)
 		})
+
+		deployerCtx.Logger.Infof("The %s test has finished running", testInstallFunction.Name)
 	}
 
-	err = deployerCtx.Teardown(cleanupScriptPath)
+	err = deployerCtx.Teardown()
 	assert.NoError(t, err, "capturing logs and uninstalling metering should produce no error")
 }

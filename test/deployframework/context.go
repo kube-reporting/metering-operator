@@ -1,10 +1,8 @@
 package deployframework
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -20,19 +18,42 @@ import (
 	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
 
+var (
+	httpScheme = "http"
+	localAddr  = "127.0.0.1"
+
+	apiPort     = 8100
+	metricsPort = 8101
+	pprofPort   = 8102
+
+	healthCheckEndpoint      = "healthy"
+	healthCheckTimeoutPeriod = 5 * time.Minute
+
+	useHTTPSAPI                 = true
+	useRouteForReportingAPI     = true
+	useKubeProxyForReportingAPI = false
+	reportingAPIURL             string
+)
+
 // DeployerCtx contains all the information needed to manage the
 // full lifecycle of a single metering deployment
 type DeployerCtx struct {
-	TargetPodsCount    int
-	Namespace          string
-	KubeConfigPath     string
-	TestCaseOutputPath string
-	Deployer           *deploy.Deployer
-	Logger             logrus.FieldLogger
-	Config             *rest.Config
-	Client             kubernetes.Interface
-	APIExtClient       apiextclientv1beta1.CustomResourceDefinitionsGetter
-	MeteringClient     meteringclient.MeteringV1Interface
+	TargetPodsCount           int
+	Namespace                 string
+	KubeConfigPath            string
+	TestCaseOutputPath        string
+	HackScriptPath            string
+	MeteringOperatorImageRepo string
+	MeteringOperatorImageTag  string
+	RunTestLocal              bool
+	ExtraLocalEnvVars         []string
+	LocalCtx                  *LocalCtx
+	Deployer                  *deploy.Deployer
+	Logger                    logrus.FieldLogger
+	Config                    *rest.Config
+	Client                    kubernetes.Interface
+	APIExtClient              apiextclientv1beta1.CustomResourceDefinitionsGetter
+	MeteringClient            meteringclient.MeteringV1Interface
 }
 
 // NewDeployerCtx constructs and returns a new DeployerCtx object
@@ -41,14 +62,34 @@ func (df *DeployFramework) NewDeployerCtx(
 	meteringOperatorImageRepo,
 	meteringOperatorImageTag,
 	reportingOperatorImageRepo,
-	reportingOperatorImageTag string,
-	spec metering.MeteringConfigSpec,
+	reportingOperatorImageTag,
 	outputPath string,
-	targetPodsCount int,
+	extraLocalEnvVars []string,
+	spec metering.MeteringConfigSpec,
 ) (*DeployerCtx, error) {
 	cfg, err := df.NewDeployerConfig(namespace, meteringOperatorImageRepo, meteringOperatorImageTag, reportingOperatorImageRepo, reportingOperatorImageTag, spec)
 	if err != nil {
 		return nil, err
+	}
+
+	hackScriptDir, err := filepath.Abs(filepath.Join(df.RepoDir, hackScriptDirName))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the absolute path to the hack script directory: %v", err)
+	}
+	_, err = os.Stat(hackScriptDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to successfully stat the %s path to the hack script directory: %v", hackScriptDir, err)
+	}
+
+	targetPodCount := defaultTargetPods
+
+	if df.RunLocal {
+		var replicas int32
+
+		if cfg.MeteringConfig.Spec.ReportingOperator != nil && cfg.MeteringConfig.Spec.ReportingOperator.Spec != nil {
+			cfg.MeteringConfig.Spec.ReportingOperator.Spec.Replicas = &replicas
+		}
+		targetPodCount -= 2
 	}
 
 	df.Logger.Debugf("Deployer config: %+v", cfg)
@@ -59,17 +100,37 @@ func (df *DeployFramework) NewDeployerCtx(
 	}
 
 	return &DeployerCtx{
-		Namespace:          namespace,
-		TargetPodsCount:    targetPodsCount,
-		TestCaseOutputPath: outputPath,
-		Deployer:           deployer,
-		KubeConfigPath:     df.KubeConfigPath,
-		Logger:             df.Logger,
-		Config:             df.Config,
-		Client:             df.Client,
-		APIExtClient:       df.APIExtClient,
-		MeteringClient:     df.MeteringClient,
+		Namespace:                 namespace,
+		TargetPodsCount:           targetPodCount,
+		TestCaseOutputPath:        outputPath,
+		MeteringOperatorImageRepo: meteringOperatorImageRepo,
+		MeteringOperatorImageTag:  meteringOperatorImageTag,
+		Deployer:                  deployer,
+		HackScriptPath:            hackScriptDir,
+		ExtraLocalEnvVars:         extraLocalEnvVars,
+		RunTestLocal:              df.RunLocal,
+		KubeConfigPath:            df.KubeConfigPath,
+		Logger:                    df.Logger,
+		Config:                    df.Config,
+		Client:                    df.Client,
+		APIExtClient:              df.APIExtClient,
+		MeteringClient:            df.MeteringClient,
 	}, nil
+}
+
+// NewLocalCtx returns a new LocalCtx object
+func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
+	meteringOperatorImage := fmt.Sprintf("%s:%s", ctx.MeteringOperatorImageRepo, ctx.MeteringOperatorImageTag)
+
+	return &LocalCtx{
+		Namespace:                     ctx.Namespace,
+		KubeConfigPath:                ctx.KubeConfigPath,
+		BasePath:                      ctx.TestCaseOutputPath,
+		HackScriptPath:                ctx.HackScriptPath,
+		ExtraReportingOperatorEnvVars: ctx.ExtraLocalEnvVars,
+		Logger:                        ctx.Logger,
+		MeteringOperatorImage:         meteringOperatorImage,
+	}
 }
 
 // Setup handles the process of deploying metering, and waiting for all the necessary
@@ -80,6 +141,15 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 	if err != nil {
 		ctx.Logger.Infof("Failed to install metering: %v", err)
 		return nil, fmt.Errorf("failed to install metering: %v", err)
+	}
+
+	if ctx.RunTestLocal {
+		ctx.LocalCtx = ctx.NewLocalCtx()
+
+		err = ctx.LocalCtx.RunMeteringOperatorLocal()
+		if err != nil {
+			return nil, fmt.Errorf("failed to run the metering-operator docker container: %v", err)
+		}
 	}
 
 	ctx.Logger.Infof("Waiting for the metering pods to be ready")
@@ -111,14 +181,24 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 
 	ctx.Logger.Infof("Report results directory: %s", reportResultsPath)
 
-	// TODO create functions that determine the reportingframework fields
-	// we can hardcode these values for now as we only have one
-	// meteringconfig configuration that gets installed and we dont
-	// support passing a METERING_CR_FILE yaml file for local testing
-	useHTTPSAPI := true
-	useRouteForReportingAPI := true
-	useKubeProxyForReportingAPI := false
-	reportingAPIURL := ""
+	if ctx.RunTestLocal {
+		useHTTPSAPI = false
+		useRouteForReportingAPI = false
+		useKubeProxyForReportingAPI = false
+		reportingAPIURL = fmt.Sprintf("%s://%s:%d", httpScheme, localAddr, apiPort)
+
+		err = ctx.LocalCtx.RunReportingOperatorLocal(apiPort, metricsPort, pprofPort, routeBearerToken)
+		if err != nil {
+			return nil, fmt.Errorf("failed to run the reporting-operator locally: %v", err)
+		}
+
+		reportingAPIHealthCheck := fmt.Sprintf("%s/%s", reportingAPIURL, healthCheckEndpoint)
+
+		err := waitForURLToReportStatusOK(ctx.Logger, reportingAPIHealthCheck, healthCheckTimeoutPeriod)
+		if err != nil {
+			return nil, fmt.Errorf("failed to wait for the reporting-operator to become healthy: %v", err)
+		}
+	}
 
 	rf, err := reportingframework.New(
 		useHTTPSAPI,
@@ -133,7 +213,6 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 		ctx.MeteringClient,
 	)
 	if err != nil {
-		ctx.Logger.Infof("Failed to construct a reportingframework: %v", err)
 		return nil, fmt.Errorf("failed to construct a reportingframework: %v", err)
 	}
 
@@ -142,40 +221,35 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 
 // Teardown is a method that creates the resource and container logging
 // directories, then populates those directories by executing the
-// @cleanupScript bash script, while streaming the script output
+// cleanup bash script, while streaming the script output
 // to stdout. Once the cleanup script has finished execution, we can
 // uninstall the metering stack and return an error if there is any.
-func (ctx *DeployerCtx) Teardown(cleanupScript string) error {
+func (ctx *DeployerCtx) Teardown() error {
+	var errArr []string
+
 	logger := ctx.Logger.WithFields(logrus.Fields{"component": "cleanup"})
 
-	var errArr []string
-	envVarArr, err := createResourceDirs(ctx.Namespace, ctx.TestCaseOutputPath)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to create the resource output directories: %v", err))
+	if ctx.RunTestLocal && ctx.LocalCtx != nil {
+		err := ctx.LocalCtx.CleanupLocal()
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully cleanup local resources: %v", err))
+		}
 	}
 
-	cleanupCmd := exec.Command(cleanupScript)
-	cleanupStdout, err := cleanupCmd.StdoutPipe()
+	relPath := filepath.Join(ctx.HackScriptPath, cleanupScriptName)
+	targetScriptDir, err := filepath.Abs(relPath)
 	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to create a pipe from command output to stdout: %v", err))
+		errArr = append(errArr, fmt.Sprintf("failed to get the absolute path from '%s': %v", relPath, err))
 	}
 
-	go func() {
-		scanner := bufio.NewScanner(cleanupStdout)
-		for scanner.Scan() {
-			line := scanner.Text()
-			logger.Infof(line)
-		}
-		if err := scanner.Err(); err != nil {
-			errArr = append(errArr, fmt.Sprintf("error reading output from command: %v", err))
-		}
-		return
-	}()
-
-	cleanupCmd.Env = append(os.Environ(), envVarArr...)
-	err = cleanupCmd.Run()
+	_, err = os.Stat(targetScriptDir)
 	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("error running the cleanup script: %v", err))
+		errArr = append(errArr, fmt.Sprintf("failed to stat the '%s' path: %v", targetScriptDir, err))
+	}
+
+	err = runCleanupScript(logger, ctx.Namespace, ctx.TestCaseOutputPath, targetScriptDir)
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
 	}
 
 	err = ctx.Deployer.Uninstall()
