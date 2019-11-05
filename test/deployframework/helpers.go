@@ -1,8 +1,12 @@
 package deployframework
 
 import (
+	"bufio"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -189,4 +193,96 @@ func GetServiceAccountToken(client kubernetes.Interface, namespace, serviceAccou
 	}
 
 	return string(secret.Data["token"]), nil
+}
+
+func waitForURLToReportStatusOK(logger logrus.FieldLogger, targetURL string, timeout time.Duration) error {
+	u, err := url.Parse(targetURL)
+	if err != nil {
+		return fmt.Errorf("failed to parse the %s URL: %v", targetURL, err)
+	}
+
+	logger.Debugf("Waiting for the %s url to report a 200 status", u)
+
+	err = wait.Poll(10*time.Second, timeout, func() (done bool, err error) {
+		resp, err := http.Get(u.String())
+		if err != nil {
+			return false, nil
+		}
+		defer resp.Body.Close()
+
+		return resp.StatusCode == http.StatusOK, nil
+	})
+	if err != nil {
+		return fmt.Errorf("timed-out while waiting for the %s url to report a 200 status code: %v", u, err)
+	}
+
+	logger.Infof("The %s url reported a 200 status code", u)
+
+	return nil
+}
+
+func runCleanupScript(logger logrus.FieldLogger, namespace, outputPath, scriptPath string) error {
+	var errArr []string
+	envVarArr, err := createResourceDirs(namespace, outputPath)
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to create the resource output directories: %v", err))
+	}
+
+	cleanupCmd := exec.Command(scriptPath)
+	cleanupStdout, err := cleanupCmd.StdoutPipe()
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to create a pipe from command output to stdout: %v", err))
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(cleanupStdout)
+		for scanner.Scan() {
+			line := scanner.Text()
+			logger.Infof(line)
+		}
+		if err := scanner.Err(); err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to read the command output: %v", err))
+		}
+		return
+	}()
+
+	cleanupCmd.Env = append(os.Environ(), envVarArr...)
+	err = cleanupCmd.Run()
+	if err != nil {
+		errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
+
+	return nil
+}
+
+func cleanupLocalCmds(logger logrus.FieldLogger, commands ...exec.Cmd) error {
+	var errArr []string
+
+	for _, cmd := range commands {
+		logger.Infof("Sending an interrupt to the %s command (pid %d)", cmd.Path, cmd.Process.Pid)
+
+		err := cmd.Process.Signal(os.Interrupt)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to interrupt pid %d: %v", cmd.Process.Pid, err))
+		}
+
+		err = cmd.Wait()
+		if err != nil {
+			_, ok := err.(*exec.ExitError)
+			if !ok {
+				logger.Infof("There was an error while waiting for the %s command to finish running: %v", cmd.Path, err)
+				errArr = append(errArr, fmt.Sprintf("failed to wait for the %s command to finish running: %v", cmd.Path, err))
+			}
+		}
+	}
+
+	if len(errArr) != 0 {
+		return fmt.Errorf(strings.Join(errArr, "\n"))
+	}
+
+	return nil
 }

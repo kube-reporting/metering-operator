@@ -69,6 +69,7 @@ func init() {
 	installCmd.Flags().StringVar(&cfg.Repo, "repo", "", "The name of the metering-ansible-operator image repository. This can also be specified through the METERING_OPERATOR_IMAGE_REPO ENV var.")
 	installCmd.Flags().StringVar(&cfg.Tag, "tag", "", "The name of the metering-ansible-operator image tag. This can also be specified through the METERING_OPERATOR_IMAGE_TAG ENV var.")
 	installCmd.Flags().BoolVar(&cfg.SkipMeteringDeployment, "skip-metering-operator-deployment", false, "If true, only create the metering namespace, CRDs, and MeteringConfig resources. This can also be specified through the SKIP_METERING_OPERATOR_DEPLOY ENV var.")
+	installCmd.Flags().BoolVar(&cfg.RunMeteringOperatorLocal, "run-metering-operator-local", false, "If true, skip installing the metering deployment. This can also be specified through the $SKIP_METERING_OPERATOR_DEPLOYMENT ENV var.")
 
 	if err := initFlagsFromEnv(); err != nil {
 		log.WithError(err).Fatalf("Failed to update flags from ENV vars: %v", err)
@@ -202,6 +203,7 @@ func initFlagsFromEnv() error {
 				"SKIP_METERING_OPERATOR_DEPLOYMENT": "skip-metering-operator-deployment",
 				"METERING_OPERATOR_IMAGE_REPO":      "repo",
 				"METERING_OPERATOR_IMAGE_TAG":       "tag",
+				"DEPLOY_METERING_OPERATOR_LOCAL":    "run-metering-operator-local",
 			},
 		},
 	}
