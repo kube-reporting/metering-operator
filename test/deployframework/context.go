@@ -29,6 +29,8 @@ var (
 	healthCheckEndpoint      = "healthy"
 	healthCheckTimeoutPeriod = 5 * time.Minute
 
+	waitingForPodsTimeoutPeriod = 20 * time.Minute
+
 	useHTTPSAPI                 = true
 	useRouteForReportingAPI     = true
 	useKubeProxyForReportingAPI = false
@@ -136,41 +138,75 @@ func (ctx *DeployerCtx) NewLocalCtx() *LocalCtx {
 // Setup handles the process of deploying metering, and waiting for all the necessary
 // resources to become ready in order to proceeed with running the reporting tests.
 // This returns an initialized reportingframework object, or an error if there is any.
-func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) {
+func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.ReportingFramework, error) {
+	var (
+		installErrMsg    string
+		routeBearerToken string
+		installErr       bool
+	)
+
+	// If we expect an install error, and there was an install error, then delay returning
+	// that error message until after the reportingframework has been constructed.
 	err := ctx.Deployer.Install()
 	if err != nil {
-		ctx.Logger.Infof("Failed to install metering: %v", err)
-		return nil, fmt.Errorf("failed to install metering: %v", err)
-	}
+		installErr = true
+		installErrMsg = fmt.Sprintf("failed to install metering: %v", err)
 
-	if ctx.RunTestLocal {
-		ctx.LocalCtx = ctx.NewLocalCtx()
-
-		err = ctx.LocalCtx.RunMeteringOperatorLocal()
-		if err != nil {
-			return nil, fmt.Errorf("failed to run the metering-operator docker container: %v", err)
+		if !expectInstallErr {
+			return nil, fmt.Errorf(installErrMsg)
 		}
 	}
 
-	ctx.Logger.Infof("Waiting for the metering pods to be ready")
-	start := time.Now()
+	if !installErr {
+		if ctx.RunTestLocal {
+			ctx.LocalCtx = ctx.NewLocalCtx()
 
-	pw := &PodWaiter{
-		Client: ctx.Client,
-		Logger: ctx.Logger.WithField("component", "podWaiter"),
-	}
-	err = pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
-	if err != nil {
-		return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
-	}
+			err = ctx.LocalCtx.RunMeteringOperatorLocal()
+			if err != nil {
+				return nil, fmt.Errorf("failed to run the metering-operator docker container: %v", err)
+			}
+		}
 
-	ctx.Logger.Infof("Installing metering took %v", time.Since(start))
+		ctx.Logger.Infof("Waiting for the metering pods to be ready")
+		start := time.Now()
 
-	ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
+		pw := &PodWaiter{
+			TimeoutPeriod: waitingForPodsTimeoutPeriod,
+			Client:        ctx.Client,
+			Logger:        ctx.Logger.WithField("component", "podWaiter"),
+		}
+		err = pw.WaitForPods(ctx.Namespace, ctx.TargetPodsCount)
+		if err != nil {
+			return nil, fmt.Errorf("error waiting for metering pods to become ready: %v", err)
+		}
 
-	routeBearerToken, err := GetServiceAccountToken(ctx.Client, ctx.Namespace, reportingOperatorServiceAccountName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
+		ctx.Logger.Infof("Installing metering took %v", time.Since(start))
+
+		ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
+
+		routeBearerToken, err = GetServiceAccountToken(ctx.Client, ctx.Namespace, reportingOperatorServiceAccountName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
+		}
+
+		if ctx.RunTestLocal {
+			useHTTPSAPI = false
+			useRouteForReportingAPI = false
+			useKubeProxyForReportingAPI = false
+			reportingAPIURL = fmt.Sprintf("%s://%s:%d", httpScheme, localAddr, apiPort)
+
+			err = ctx.LocalCtx.RunReportingOperatorLocal(apiPort, metricsPort, pprofPort, routeBearerToken)
+			if err != nil {
+				return nil, fmt.Errorf("failed to run the reporting-operator locally: %v", err)
+			}
+
+			reportingAPIHealthCheckURL := fmt.Sprintf("%s/%s", reportingAPIURL, healthCheckEndpoint)
+
+			err := waitForURLToReportStatusOK(ctx.Logger, reportingAPIHealthCheckURL, healthCheckTimeoutPeriod)
+			if err != nil {
+				return nil, fmt.Errorf("failed to wait for the reporting-operator to become healthy: %v", err)
+			}
+		}
 	}
 
 	reportResultsPath := filepath.Join(ctx.TestCaseOutputPath, reportResultsDir)
@@ -180,25 +216,6 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 	}
 
 	ctx.Logger.Infof("Report results directory: %s", reportResultsPath)
-
-	if ctx.RunTestLocal {
-		useHTTPSAPI = false
-		useRouteForReportingAPI = false
-		useKubeProxyForReportingAPI = false
-		reportingAPIURL = fmt.Sprintf("%s://%s:%d", httpScheme, localAddr, apiPort)
-
-		err = ctx.LocalCtx.RunReportingOperatorLocal(apiPort, metricsPort, pprofPort, routeBearerToken)
-		if err != nil {
-			return nil, fmt.Errorf("failed to run the reporting-operator locally: %v", err)
-		}
-
-		reportingAPIHealthCheck := fmt.Sprintf("%s/%s", reportingAPIURL, healthCheckEndpoint)
-
-		err := waitForURLToReportStatusOK(ctx.Logger, reportingAPIHealthCheck, healthCheckTimeoutPeriod)
-		if err != nil {
-			return nil, fmt.Errorf("failed to wait for the reporting-operator to become healthy: %v", err)
-		}
-	}
 
 	rf, err := reportingframework.New(
 		useHTTPSAPI,
@@ -214,6 +231,10 @@ func (ctx *DeployerCtx) Setup() (*reportingframework.ReportingFramework, error) 
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct a reportingframework: %v", err)
+	}
+
+	if installErrMsg != "" {
+		return rf, fmt.Errorf(installErrMsg)
 	}
 
 	return rf, nil

@@ -18,7 +18,6 @@ const (
 	meteringOperatorLogName             = "metering-operator.log"
 	reportingOperatorLogName            = "reporting-operator.log"
 	destKubeConfigPath                  = "/kubeconfig"
-	reportingOperatorTLSDirName         = "reporting-operator-tls"
 	runReportingOperatorLocalScriptName = "run-reporting-operator-local.sh"
 	cleanupScriptName                   = "run-test-cleanup.sh"
 
