@@ -3,14 +3,14 @@
 - name: Validate Configurations
   include_tasks: validate.yml
 
+- name: Configure Storage
+  include_tasks: configure_storage.yml
+
 - name: Configure TLS
   include_tasks: configure_tls.yml
 
 - name: Configure Reporting
   include_tasks: configure_reporting.yml
-
-- name: Configure Storage
-  include_tasks: configure_storage.yml
 
 - name: Store MeteringConfig spec into values file
   copy: content="{{ meteringconfig_spec }}" dest=/tmp/metering-values.yaml
