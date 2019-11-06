@@ -24,6 +24,12 @@
       no_log: true
       register: operator_s3_credentials_secret
 
+    - name: Validate that the s3 credentials secret exists
+      assert:
+        that:
+          - s3_credentials_secret_exists
+        msg: "storage.hive.s3.secret does not exist"
+
     - name: Create Metering S3 bucket
       s3_bucket:
         state: present
@@ -31,8 +37,9 @@
         region: "{{ meteringcon***REMOVED***g_storage_s3_bucket_region }}"
         aws_access_key: "{{ operator_s3_credentials_secret.resources[0].data['aws-access-key-id'] | b64decode | default(omit) }}"
         aws_secret_key: "{{ operator_s3_credentials_secret.resources[0].data['aws-secret-access-key'] | b64decode | default(omit) }}"
-      when: operator_s3_credentials_secret.resources | length > 0
-
+      when: s3_credentials_secret_exists
+  vars:
+    s3_credentials_secret_exists: "{{ operator_s3_credentials_secret.resources and operator_s3_credentials_secret.resources | length > 0 }}"
   when: meteringcon***REMOVED***g_storage_hive_storage_type == 's3' and meteringcon***REMOVED***g_storage_s3_create_bucket
 
 - name: Con***REMOVED***gure S3 Compatible Storage
