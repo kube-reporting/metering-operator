@@ -108,8 +108,7 @@ func TestManualMeteringInstall(t *testing.T) {
 			ExpectInstallErrMsg: []string{
 				"failed to install metering",
 				"failed to create the MeteringConfig resource",
-				"validation failure list",
-				"spec.storage in body is required",
+				"spec.storage in body is required|spec.storage: Required value",
 			},
 			InstallSubTest: InstallTestCase{
 				Name:     "testInvalidMeteringConfigMissingStorageSpec",

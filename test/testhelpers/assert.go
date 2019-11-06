@@ -1,6 +1,7 @@
 package testhelpers
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
@@ -76,6 +77,6 @@ func AssertErrorContainsErrorMsgs(t *testing.T, err error, errMsgArr []string) {
 	require.NotNil(t, err, "expected the error would not be nil")
 
 	for _, msg := range errMsgArr {
-		assert.Containsf(t, err.Error(), msg, "expected the error message would contain '%s'", msg)
+		assert.Regexp(t, regexp.MustCompile(msg), err, "expected the error message would contain '%s'", msg)
 	}
 }
