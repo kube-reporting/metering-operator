@@ -2,7 +2,6 @@ package deployframework
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -59,12 +58,13 @@ func (lc *LocalCtx) RunMeteringOperatorLocal() error {
 
 	lc.Logger.Debugf("The metering-operator container was run with the following args: %v", cmd.Args)
 
-	logFile, err := ioutil.TempFile(lc.BasePath, meteringOperatorLogName)
+	logFile, err := os.Create(filepath.Join(lc.BasePath, meteringOperatorLogName))
 	if err != nil {
 		return fmt.Errorf("failed to create the metering-operator container output log file: %v", err)
 	}
+	defer logFile.Close()
 
-	lc.Logger.Infof("Storing the metering-operator container logs to the '%s' path", logFile.Name())
+	lc.Logger.Infof("Storing the metering-operator container logs to the '%s' path", logFile)
 
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
@@ -110,10 +110,11 @@ func (lc *LocalCtx) RunReportingOperatorLocal(apiListenPort, metricsListenPort, 
 
 	lc.Logger.Debugf("The reporting-operator-local script was run with the following args: %v", cmd.Args)
 
-	logFile, err := ioutil.TempFile(lc.BasePath, reportingOperatorLogName)
+	logFile, err := os.Create(filepath.Join(lc.BasePath, reportingOperatorLogName))
 	if err != nil {
 		return fmt.Errorf("failed to create the local reporting-operator log file: %v", err)
 	}
+	defer logFile.Close()
 
 	lc.Logger.Infof("Storing the hack/run-reporting-operator-local.sh logs to the '%s' path", logFile.Name())
 
