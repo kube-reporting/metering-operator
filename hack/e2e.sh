@@ -1,53 +1,70 @@
 #!/bin/bash
+
 set -e
 
 : "${KUBECONFIG:?}"
 
-ROOT_DIR=$(dirname "${BASH_SOURCE}")/..
+ROOT_DIR=$(dirname "${BASH_SOURCE[0]}")/..
 source "${ROOT_DIR}/hack/common.sh"
 source "${ROOT_DIR}/hack/lib/tests.sh"
 
-export METERING_NAMESPACE="${METERING_E2E_NAMESPACE:=${METERING_NAMESPACE}-e2e}"
+function cleanup() {
+    exit_status=$?
 
-export DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-deploy-e2e.sh}"
-export TEST_SCRIPT="$ROOT_DIR/hack/run-e2e-tests.sh"
+    echo "Removing namespaces with the 'name=metering-testing-ns' label"
+    kubectl delete ns -l "name=metering-testing-ns" || true
 
-export TEST_LOG_FILE="${TEST_LOG_FILE:-e2e-tests.log}"
-export DEPLOY_LOG_FILE="${DEPLOY_LOG_FILE:-e2e-deploy.log}"
-export TEST_TAP_FILE="${TEST_TAP_FILE:-e2e-tests.tap}"
-export TEST_JUNIT_REPORT_FILE="${TEST_JUNIT_REPORT_FILE:-junit-e2e-tests.xml}"
+    echo "Exiting hack/e2e.sh"
+    exit "$exit_status"
+}
+
+trap cleanup EXIT
+
+METERING_SHORT_TESTS="${METERING_SHORT_TESTS:=false}"
+METERING_REPO_PATH="${METERING_REPO_PATH:=${ROOT_DIR}}"
+METERING_RUN_TESTS_LOCALLY="${METERING_RUN_TESTS_LOCALLY:=false}"
+
+TEST_OUTPUT_PATH="${TEST_OUTPUT_PATH:="$(mktemp -d)/${METERING_NAMESPACE}"}"
+TEST_LOG_LEVEL="${TEST_LOG_LEVEL:="debug"}"
+TEST_OUTPUT_DIR="${TEST_OUTPUT_PATH}/tests"
+TEST_LOG_FILE="${TEST_LOG_FILE:-e2e-tests.log}"
+TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_LOG_FILE}"
+TEST_JUNIT_REPORT_FILE="${TEST_JUNIT_REPORT_FILE:-junit-e2e-tests.xml}"
+TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_JUNIT_REPORT_FILE}"
+
+mkdir -p "$TEST_OUTPUT_DIR"
 
 echo "\$KUBECONFIG=$KUBECONFIG"
 echo "\$METERING_NAMESPACE=$METERING_NAMESPACE"
+echo "\$METERING_RUN_TESTS_LOCALLY=$METERING_RUN_TESTS_LOCALLY"
 echo "\$METERING_OPERATOR_IMAGE_REPO=$METERING_OPERATOR_IMAGE_REPO"
 echo "\$REPORTING_OPERATOR_IMAGE_REPO=$REPORTING_OPERATOR_IMAGE_REPO"
 echo "\$METERING_OPERATOR_IMAGE_TAG=$METERING_OPERATOR_IMAGE_TAG"
 echo "\$REPORTING_OPERATOR_IMAGE_TAG=$REPORTING_OPERATOR_IMAGE_TAG"
+echo "\$TEST_OUTPUT_PATH=$TEST_OUTPUT_PATH"
 
-export DISABLE_PROMETHEUS_METRICS_IMPORTER=false
-if [ "$DEPLOY_REPORTING_OPERATOR_LOCAL" == "true" ]; then
-    export REPORTING_OPERATOR_PROMETHEUS_DATASOURCE_MAX_IMPORT_BACKFILL_DURATION='15m'
-    export REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL="30s"
-    export REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_CHUNK_SIZE="5m"
-    export REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_INTERVAL="5m"
-    export REPORTING_OPERATOR_PROMETHEUS_METRICS_IMPORTER_STEP_SIZE="60s"
+set +e
+set +o pipefail
+set -x
+echo "Running E2E Tests"
 
-    export REPORTING_OPERATOR_API_LISTEN="127.0.0.1:8100"
-    export REPORTING_OPERATOR_METRICS_LISTEN="127.0.0.1:8101"
-    export REPORTING_OPERATOR_PPROF_LISTEN="127.0.0.1:8102"
+go test \
+    -test.short="${METERING_SHORT_TESTS}" \
+    -test.v \
+    -parallel 10 \
+    -timeout 60m \
+    "./test/e2e" \
+    -kubeconfig="${KUBECONFIG}" \
+    -namespace-prefix="${METERING_NAMESPACE}" \
+    -test-output-path="${TEST_OUTPUT_PATH}" \
+    -log-level="${TEST_LOG_LEVEL}" \
+    -run-tests-local="${METERING_RUN_TESTS_LOCALLY}" \
+    -repo-path="${METERING_REPO_PATH}" \
+    2>&1 | tee "$TEST_LOG_FILE_PATH" ; TEST_EXIT_CODE=${PIPESTATUS[0]}
 
-    export METERING_PRESTO_PORT_FORWARD_PORT="8103"
-    export METERING_HIVE_PORT_FORWARD_PORT="8104"
-    export METERING_PROMETHEUS_PORT_FORWARD_PORT="8105"
-
-    export METERING_HTTPS_API="false"
-    export METERING_REPORTING_API_URL="http://$REPORTING_OPERATOR_API_LISTEN"
-    export METERING_USE_KUBE_PROXY_FOR_REPORTING_API="false"
-    export METERING_USE_ROUTE_FOR_REPORTING_API="false"
+# if go-junit-report is installed, create a junit report also
+if command -v go-junit-report >/dev/null 2>&1; then
+    go-junit-report < "$TEST_LOG_FILE_PATH" > "${TEST_JUNIT_REPORT_FILE_PATH}"
 fi
 
-if [ "$DEPLOY_METERING_OPERATOR_LOCAL" == "true" ]; then
-    export METERING_OPERATOR_CONTAINER_NAME="metering-operator-e2e"
-fi
-
-"$ROOT_DIR/hack/e2e-test-runner.sh"
+exit "$TEST_EXIT_CODE"
