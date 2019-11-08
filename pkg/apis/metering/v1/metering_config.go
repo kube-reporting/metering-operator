@@ -216,7 +216,7 @@ type ReportingOperatorPrometheusMetricsImporterCon***REMOVED***gSpec struct {
 	StepSize                  *meta.Duration `json:"stepSize,omitempty"`
 	ImportFrom                *meta.Time     `json:"importFrom,omitempty"`
 	MaxImportBack***REMOVED***llDuration *meta.Duration `json:"maxImportBack***REMOVED***llDuration,omitempty"`
-	MaxQueryRangeDuration     string         `json:"maxQueryRangeDuration,omitempty"`
+	MaxQueryRangeDuration     *meta.Duration `json:"maxQueryRangeDuration,omitempty"`
 }
 type ReportingOperatorPrometheusCon***REMOVED***gMapCon***REMOVED***g struct {
 	Create   *bool  `json:"create,omitempty"`
@@ -470,7 +470,7 @@ End of Presto section
 */
 
 type Hive struct {
-	Spec HiveSpec `json:"spec,omitempty"`
+	Spec *HiveSpec `json:"spec,omitempty"`
 }
 type HiveSpec struct {
 	TerminationGracePeriodSeconds *int64                  `json:"terminationGracePeriodSeconds,omitempty"`

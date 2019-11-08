@@ -16,13 +16,19 @@ func (deploy *Deployer) installNamespace() error {
 			Name: deploy.con***REMOVED***g.Namespace,
 		}
 
+		labels := make(map[string]string)
+
+		for key, val := range deploy.con***REMOVED***g.ExtraNamespaceLabels {
+			labels[key] = val
+			deploy.logger.Infof("Labeling the %s namespace with '%s=%s'", deploy.con***REMOVED***g.Namespace, key, val)
+		}
+
 		if deploy.con***REMOVED***g.Platform == "openshift" {
-			namespaceObjectMeta.Labels = map[string]string{
-				"openshift.io/cluster-monitoring": "true",
-			}
+			labels["openshift.io/cluster-monitoring"] = "true"
 			deploy.logger.Infof("Labeling the %s namespace with 'openshift.io/cluster-monitoring=true'", deploy.con***REMOVED***g.Namespace)
 		}
 
+		namespaceObjectMeta.Labels = labels
 		namespaceObj := &v1.Namespace{
 			ObjectMeta: namespaceObjectMeta,
 		}
@@ -83,12 +89,14 @@ func (deploy *Deployer) installMeteringCon***REMOVED***g() error {
 }
 
 func (deploy *Deployer) installMeteringResources() error {
-	err := deploy.installMeteringDeployment()
-	if err != nil {
-		return fmt.Errorf("failed to create the metering deployment: %v", err)
+	if !deploy.con***REMOVED***g.RunMeteringOperatorLocal {
+		err := deploy.installMeteringDeployment()
+		if err != nil {
+			return fmt.Errorf("failed to create the metering deployment: %v", err)
+		}
 	}
 
-	err = deploy.installMeteringServiceAccount()
+	err := deploy.installMeteringServiceAccount()
 	if err != nil {
 		return fmt.Errorf("failed to create the metering service account: %v", err)
 	}
