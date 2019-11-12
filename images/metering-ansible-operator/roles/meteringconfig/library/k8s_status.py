@@ -328,19 +328,24 @@ class KubernetesAnsibleStatusModule(KubernetesAnsibleModule):
         merged = copy.deepcopy(old_conditions)
 
         for condition in new_conditions:
-            idx = self.get_condition_idx(merged, condition['type'])
-            if idx is not None:
-                merged[idx] = condition
-            else:
-                merged.append(condition)
+          new_merged_list = self.filter_existing_conditions(merged, condition['type'])
+          new_merged_list.append(condition)
+
+          merged = new_merged_list
+
         new['conditions'] = merged
         return new
 
-    def get_condition_idx(self, conditions, name):
-        for i, condition in enumerate(conditions):
-            if condition.get('type') == name:
-                return i
-        return None
+    def filter_existing_conditions(self, conditions, condition_type):
+        new_conditions = []
+
+        for condition in conditions:
+            if condition.get('type') == condition_type:
+                continue
+
+            new_conditions.append(condition)
+
+        return new_conditions
 
     def object_contains(self, obj, subset):
         def dict_is_subset(obj, subset):
