@@ -18,4 +18,3 @@ if command -v go-junit-report >/dev/null 2>&1; then
     go-junit-report < "$TMP_DIR/metering-test-output.txt" > "${JUNIT_REPORT_OUTFILE}"
 fi
 go test -c -o bin/e2e-tests ./test/e2e
-go test -c -o bin/integration-tests ./test/integration

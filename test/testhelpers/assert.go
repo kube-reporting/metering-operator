@@ -1,6 +1,7 @@
 package testhelpers
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/operator-framework/operator-metering/pkg/util/orderedmap"
@@ -67,5 +68,15 @@ func AssertReportResultsEqual(t *testing.T, expected, actual []map[string]interf
 				assert.Equal(t, expectedValue, actualValue, "expected column %q values between actual and expected rows to be the same", column)
 			}
 		}
+	}
+}
+
+func AssertErrorContainsErrorMsgs(t *testing.T, err error, errMsgArr []string) {
+	t.Helper()
+
+	require.NotNil(t, err, "expected the error would not be nil")
+
+	for _, msg := range errMsgArr {
+		assert.Regexp(t, regexp.MustCompile(msg), err, "expected the error message would contain '%s'", msg)
 	}
 }

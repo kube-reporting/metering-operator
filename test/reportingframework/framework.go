@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
@@ -44,21 +44,18 @@ type ReportingFramework struct {
 
 // New initializes a test reporting framework and returns it.
 func New(
-	namespace,
-	kubeconfig string,
 	httpsAPI,
 	useKubeProxyForReportingAPI,
 	useRouteForReportingAPI bool,
+	namespace,
 	routeBearerToken,
 	reportingAPIURL,
 	reportOutputDir string,
+	kubeconfig *rest.Config,
+	kubeClient kubernetes.Interface,
+	meteringClient metering.MeteringV1Interface,
 ) (*ReportingFramework, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		return nil, fmt.Errorf("build config from flags failed: err %v", err)
-	}
-
-	kubeAPIURL, kubeAPIPath, err := rest.DefaultServerURL(config.Host, config.APIPath, schema.GroupVersion{}, true)
+	kubeAPIURL, kubeAPIPath, err := rest.DefaultServerURL(kubeconfig.Host, kubeconfig.APIPath, schema.GroupVersion{}, true)
 	if err != nil {
 		return nil, fmt.Errorf("getting kubeAPI url failed: err %v", err)
 	}
@@ -71,12 +68,7 @@ func New(
 		}
 	}
 
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, fmt.Errorf("creating new kube-client failed: err %v", err)
-	}
-
-	configCopy := *config
+	configCopy := *kubeconfig
 	transport, err := rest.TransportFor(&configCopy)
 	if err != nil {
 		return nil, fmt.Errorf("creating transport for HTTP client failed: err %v", err)
@@ -87,14 +79,17 @@ func New(
 		httpc.Timeout = configCopy.Timeout
 	}
 
-	routeClient, err := routev1client.NewForConfig(config)
+	routeClient, err := routev1client.NewForConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("creating openshift route client failed, err: %v", err)
 	}
 
-	meteringClient, err := metering.NewForConfig(config)
+	stat, err := os.Stat(reportOutputDir)
 	if err != nil {
-		return nil, fmt.Errorf("creating monitoring client failed: err %v", err)
+		return nil, fmt.Errorf("failed to stat the path to the report results directory %s: %v", reportOutputDir, err)
+	}
+	if !stat.IsDir() {
+		return nil, fmt.Errorf("the %s path to the report results directory is not a directory", reportOutputDir)
 	}
 
 	rf := &ReportingFramework{
