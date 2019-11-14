@@ -39,6 +39,7 @@ spec:
     type: "double"
   - name: "currency"
     type: "varchar"
+  unmanaged: false
   createTableAs: true
   query: |
     SELECT * FROM (
