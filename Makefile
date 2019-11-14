@@ -113,31 +113,6 @@ unit-docker: metering-src-docker-build
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
-integration:
-	@:
-
-integration-local: reporting-operator-local metering-ansible-operator-docker-build
-	$(MAKE) integration DEPLOY_REPORTING_OPERATOR_LOCAL=true DEPLOY_METERING_OPERATOR_LOCAL=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
-
-integration-docker: metering-src-docker-build
-	docker run \
-		--name metering-integration-docker \
-		-t \
-		-e METERING_NAMESPACE \
-		-e METERING_OPERATOR_IMAGE_REPO -e METERING_OPERATOR_IMAGE_TAG \
-		-e REPORTING_OPERATOR_IMAGE_REPO -e REPORTING_OPERATOR_IMAGE_TAG \
-		-e KUBECONFIG=/kubeconfig \
-		-e TEST_OUTPUT_PATH=/out \
-		-w /go/src/github.com/operator-framework/operator-metering \
-		-v $(KUBECONFIG):/kubeconfig \
-		-v $(PWD):/go/src/github.com/operator-framework/operator-metering \
-		-v /out \
-		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
-		make integration
-	rm -rf bin/integration-docker-test-output
-	docker cp metering-integration-docker:/out bin/integration-docker-test-output
-	docker rm metering-integration-docker
-
 e2e: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
 	hack/e2e.sh
 
