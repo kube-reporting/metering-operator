@@ -3,8 +3,8 @@ package deploy
 import (
 	"fmt"
 
-	meteringv1 "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
-	metering "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
+	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextclientv1beta1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 
@@ -54,18 +54,20 @@ type CRD struct {
 // platform to deploy on, whether or not to delete the metering CRDs,
 // or namespace during an install, the location to the manifests dir, etc.
 type Con***REMOVED***g struct {
-	SkipMeteringDeployment bool
-	DeleteCRDs             bool
-	DeleteCRB              bool
-	DeleteNamespace        bool
-	DeletePVCs             bool
-	DeleteAll              bool
-	Namespace              string
-	Platform               string
-	Repo                   string
-	Tag                    string
-	OperatorResources      *OperatorResources
-	MeteringCon***REMOVED***g         *meteringv1.MeteringCon***REMOVED***g
+	SkipMeteringDeployment   bool
+	RunMeteringOperatorLocal bool
+	DeleteCRDs               bool
+	DeleteCRB                bool
+	DeleteNamespace          bool
+	DeletePVCs               bool
+	DeleteAll                bool
+	Namespace                string
+	Platform                 string
+	Repo                     string
+	Tag                      string
+	ExtraNamespaceLabels     map[string]string
+	OperatorResources        *OperatorResources
+	MeteringCon***REMOVED***g           *metering.MeteringCon***REMOVED***g
 }
 
 // OperatorResources contains all the objects that make up the
@@ -89,7 +91,7 @@ type Deployer struct {
 	logger         log.FieldLogger
 	client         kubernetes.Interface
 	apiExtClient   apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter
-	meteringClient metering.MeteringV1Interface
+	meteringClient meteringclient.MeteringV1Interface
 }
 
 // NewDeployer creates a new reference to a deploy structure, and then calls helper
@@ -101,7 +103,7 @@ func NewDeployer(
 	logger log.FieldLogger,
 	client kubernetes.Interface,
 	apiextClient apiextclientv1beta1.CustomResourceDe***REMOVED***nitionsGetter,
-	meteringClient metering.MeteringV1Interface,
+	meteringClient meteringclient.MeteringV1Interface,
 ) (*Deployer, error) {
 	deploy := &Deployer{
 		client:         client,

@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -11,6 +12,79 @@ import (
 	"github.com/operator-framework/operator-metering/pkg/operator/reporting"
 	"github.com/operator-framework/operator-metering/test/reportingframework"
 )
+
+var (
+	runAWSBillingTests bool
+)
+
+func testReportingProducesData(t *testing.T, testReportingFramework *reportingframework.ReportingFramework) {
+	// cron schedule to run every minute
+	cronSchedule := &metering.ReportSchedule{
+		Period: metering.ReportPeriodCron,
+		Cron: &metering.ReportScheduleCron{
+			Expression: fmt.Sprintf("*/1 * * * *"),
+		},
+	}
+
+	queries := []struct {
+		queryName   string
+		skip        bool
+		nonParallel bool
+	}{
+		{queryName: "namespace-cpu-request"},
+		{queryName: "namespace-cpu-usage"},
+		{queryName: "namespace-memory-request"},
+		{queryName: "namespace-persistentvolumeclaim-request"},
+		{queryName: "namespace-persistentvolumeclaim-usage"},
+		{queryName: "namespace-memory-usage"},
+		{queryName: "persistentvolumeclaim-usage"},
+		{queryName: "persistentvolumeclaim-capacity"},
+		{queryName: "persistentvolumeclaim-request"},
+		{queryName: "pod-cpu-request"},
+		{queryName: "pod-cpu-usage"},
+		{queryName: "pod-memory-request"},
+		{queryName: "pod-memory-usage"},
+		{queryName: "node-cpu-utilization"},
+		{queryName: "node-memory-utilization"},
+		{queryName: "cluster-persistentvolumeclaim-request"},
+		{queryName: "cluster-cpu-capacity"},
+		{queryName: "cluster-memory-capacity"},
+		{queryName: "cluster-cpu-usage"},
+		{queryName: "cluster-memory-usage"},
+		{queryName: "cluster-cpu-utilization"},
+		{queryName: "cluster-memory-utilization"},
+		{queryName: "namespace-memory-utilization"},
+		{queryName: "namespace-cpu-utilization"},
+		{queryName: "pod-cpu-request-aws", skip: !runAWSBillingTests, nonParallel: true},
+		{queryName: "pod-memory-request-aws", skip: !runAWSBillingTests, nonParallel: true},
+		{queryName: "aws-ec2-cluster-cost", skip: !runAWSBillingTests, nonParallel: true},
+	}
+
+	var reportsProduceDataTestCases []reportProducesDataTestCase
+
+	for _, query := range queries {
+		reportcronTestCase := reportProducesDataTestCase{
+			name:          query.queryName + "-cron",
+			queryName:     query.queryName,
+			schedule:      cronSchedule,
+			newReportFunc: testReportingFramework.NewSimpleReport,
+			skip:          query.skip,
+			parallel:      !query.nonParallel,
+		}
+		reportRunOnceTestCase := reportProducesDataTestCase{
+			name:          query.queryName + "-runonce",
+			queryName:     query.queryName,
+			schedule:      nil, // runOnce
+			newReportFunc: testReportingFramework.NewSimpleReport,
+			skip:          query.skip,
+			parallel:      !query.nonParallel,
+		}
+
+		reportsProduceDataTestCases = append(reportsProduceDataTestCases, reportcronTestCase, reportRunOnceTestCase)
+	}
+
+	testReportsProduceData(t, testReportingFramework, reportsProduceDataTestCases)
+}
 
 type reportProducesDataTestCase struct {
 	name          string
