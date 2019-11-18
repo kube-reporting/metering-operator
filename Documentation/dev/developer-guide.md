@@ -152,7 +152,3 @@ If you need a minimal storage configuration with no external dependencies, use t
 ### Testing OCP images
 
 See [Documentation/dev/testing-ocp-images.md](testing-ocp-images.md) for details on how to do a Metering install using OCP images instead of OKD (origin) images.
-
-# Releasing
-
-See the [release documentation](release.md).
