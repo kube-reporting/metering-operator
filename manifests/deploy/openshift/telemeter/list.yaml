@@ -1534,6 +1534,22 @@ objects:
                                     type: boolean
                                 type: object
                               prometheus:
+                                oneOf:
+                                - properties:
+                                    enabled:
+                                      enum:
+                                      - true
+                                  required:
+                                  - enabled
+                                  - uri
+                                - allOf:
+                                  - not:
+                                      required:
+                                      - uri
+                                  properties:
+                                    enabled:
+                                      enum:
+                                      - false
                                 properties:
                                   bearer:
                                     properties:
@@ -1551,6 +1567,8 @@ objects:
                                       chunk.
                                     type: string
                                   enabled:
+                                    description: Whether or not to enable the Presto-Prometheus
+                                      connector.
                                     type: boolean
                                   maxQueryRangeDuration:
                                     description: Default range for Prometheus query,
@@ -1558,6 +1576,7 @@ objects:
                                     type: string
                                   uri:
                                     description: URI for Prometheus.
+                                    format: uri
                                     type: string
                                 type: object
                             type: object
