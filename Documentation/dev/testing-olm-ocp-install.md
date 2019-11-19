@@ -101,12 +101,12 @@ spec:
   # use "redhat-operators" to test production, current release contents.
   # use redhat-operators-art for pre-production content. This is unreleased, but for the current major release version.
   # use redhat-operators-stage for testing staging images.
-  # use rh-osbs-operators for the latest thing built in OSBS, eg for stuff in the next major release.
+  # use rh-verified-operators for the latest thing built (is the replacement of rh-osbs-operators) for stuff in the next major release.
   # rh-osbs-operators is the most regularly updated one.
   registryNamespace: redhat-operators-art
   # registryNamespace: redhat-operators-stage
   # registryNamespace: redhat-operators
-  # registryNamespace: rh-osbs-operators
+  # registryNamespace: rh-verified-operators
   authorizationToken:
     secretName: marketplacesecret
 ```
