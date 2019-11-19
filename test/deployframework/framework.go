@@ -13,8 +13,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	metering "github.com/operator-framework/operator-metering/pkg/apis/metering/v1"
+	"github.com/operator-framework/operator-metering/pkg/deploy"
 	meteringclient "github.com/operator-framework/operator-metering/pkg/generated/clientset/versioned/typed/metering/v1"
-	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
 )
 
 const (
