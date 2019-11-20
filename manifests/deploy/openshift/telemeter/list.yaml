@@ -1533,6 +1533,52 @@ objects:
                                   useHadoopCon***REMOVED***g:
                                     type: boolean
                                 type: object
+                              prometheus:
+                                oneOf:
+                                - properties:
+                                    enabled:
+                                      enum:
+                                      - true
+                                  required:
+                                  - enabled
+                                  - uri
+                                - allOf:
+                                  - not:
+                                      required:
+                                      - uri
+                                  properties:
+                                    enabled:
+                                      enum:
+                                      - false
+                                properties:
+                                  bearer:
+                                    properties:
+                                      tokenFile:
+                                        description: Path to token ***REMOVED***le for bearer
+                                          authentication to Prometheus.
+                                        type: string
+                                    type: object
+                                  cacheDuration:
+                                    description: Time to live for Presto checking
+                                      connector properties values.
+                                    type: string
+                                  chunkSizeDuration:
+                                    description: Default size of each Prometheus query
+                                      chunk.
+                                    type: string
+                                  enabled:
+                                    description: Whether or not to enable the Presto-Prometheus
+                                      connector.
+                                    type: boolean
+                                  maxQueryRangeDuration:
+                                    description: Default range for Prometheus query,
+                                      divided into chunkSizeDuration chunks.
+                                    type: string
+                                  uri:
+                                    description: URI for Prometheus.
+                                    format: uri
+                                    type: string
+                                type: object
                             type: object
                           environment:
                             type: string
