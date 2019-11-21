@@ -5,3 +5,4 @@
   role: /opt/ansible/roles/meteringcon***REMOVED***g
   watchDependentResources: false
   reconcilePeriod: 5m
+  manageStatus: false
