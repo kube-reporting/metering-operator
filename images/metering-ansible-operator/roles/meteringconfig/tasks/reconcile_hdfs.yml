@@ -1,5 +1,13 @@
 ---
 
+- include_tasks: update_meteringcon***REMOVED***g_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Reconciling HDFS resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - name: Deploy hdfs resources
   include_tasks: deploy_resources.yml
   vars:
@@ -50,3 +58,11 @@
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hdfs-namenode-statefulset
         create: "{{ meteringcon***REMOVED***g_enable_hdfs }}"
+
+- include_tasks: update_meteringcon***REMOVED***g_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished reconciling HDFS resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"

@@ -29,6 +29,17 @@
       that:
         - meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.metastore.con***REMOVED***g.auth.enabled
       msg: "Invalid con***REMOVED***guration for hive.spec.metastore.con***REMOVED***g.tls: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_hive_metastore_tls_secret
 
 - name: Validate user-provided Hive Server TLS ***REMOVED***elds are non-empty
@@ -56,6 +67,17 @@
       that:
         - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.auth.enabled
       msg: "Invalid con***REMOVED***guration for hive.spec.server.con***REMOVED***g.tls: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_hive_server_tls_secret
 
 - name: Validate user-provided Hive Server Auth (metastoreTLS) ***REMOVED***elds are non-empty
@@ -77,4 +99,15 @@
       that:
         - meteringcon***REMOVED***g_spec.hive.spec.server.con***REMOVED***g.metastoreTLS.key != ""
       msg: "hive.spec.server.con***REMOVED***g.metastoreTLS.key cannot be empty if createSecret: true and secretName != ''"
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_hive_server_auth_secret

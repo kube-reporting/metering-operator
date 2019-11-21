@@ -2,6 +2,14 @@
 
 - name: Con***REMOVED***gure TLS
   block:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      current_conditions:
+        type: "Running"
+        status: "True"
+        message: "Con***REMOVED***guring TLS"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
   - name: Create temporary directory to store all the necessary certi***REMOVED***cates/keys
     temp***REMOVED***le:
       suf***REMOVED***x: certi***REMOVED***cates
@@ -19,9 +27,27 @@
 
   - name: Con***REMOVED***gure TLS and authentication in the reporting-operator
     include_tasks: con***REMOVED***gure_reporting_operator_tls.yml
-
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   always:
   - name: Cleanup the temporary directory which held the certi***REMOVED***cates and keys
     ***REMOVED***le:
       path: "{{ certi***REMOVED***cates_dir.path }}"
       state: absent
+
+- include_tasks: update_meteringcon***REMOVED***g_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished con***REMOVED***guring TLS"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
