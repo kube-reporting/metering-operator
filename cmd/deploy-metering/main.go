@@ -14,7 +14,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/operator-framework/operator-metering/pkg/operator/deploy"
+	"github.com/operator-framework/operator-metering/pkg/deploy"
 )
 
 var (
