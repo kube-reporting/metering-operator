@@ -1,0 +1,120 @@
+---
+
+#
+# Validate the Hive storage configuration
+#
+- name: Validate the user-provided hive storage type matches a supported storage
+  assert:
+    that:
+      - hiveStorageType is not undefined and hiveStorageType in ['s3', 'sharedPVC', 'hdfs', 'azure', 'gcs' , 's3Compatible']
+    msg: "Invalid spec.storage.hive.type: '{{ hiveStorageType }}', must be one of hdfs, s3, azure, gcs, s3Compatible or sharedPVC"
+
+#
+# Validate GCS storage configuration
+#
+- name: Validate a GCS storage configuration
+  block:
+  - name: Validate the user-provied GCS bucket name is non-empty
+    assert:
+      that:
+        - meteringconfig_storage_gcs_bucket_name != ""
+      msg: "storage.hive.gcs.bucket cannot be empty"
+
+  - name: Validate that the GCS secretName is empty when createSecret is true
+    assert:
+      that:
+        - meteringconfig_storage_gcs_credentials_secret_name == ""
+      msg: "storage.hive.gcs.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+    when: meteringconfig_storage_gcs_create_secret
+
+  - name: Validate that the GCS secretName is non-empty when createSecret is false
+    assert:
+      that:
+        - meteringconfig_storage_gcs_credentials_secret_name != ""
+      msg: "storage.hive.gcs.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+    when: not meteringconfig_storage_gcs_create_secret
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+  when: hiveStorageType == 'gcs'
+
+#
+# Validate Azure storage configuration
+#
+- name: Validate an Azure storage configuration
+  block:
+  - name: Validate the user-provided Azure container name
+    assert:
+      that:
+        - meteringconfig_storage_azure_container_name != ""
+        - meteringconfig_storage_azure_storage_account_name != ""
+      msg: "storage.hive.azure.container and storage.hive.azure.storageAccountName cannot be empty"
+
+  - name: Validate the user-provided Azure credentials
+    assert:
+      that:
+        - meteringconfig_storage_azure_credentials_secret_name == ""
+      msg: "storage.hive.azure.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+  when: hiveStorageType == 'azure' and not meteringconfig_storage_azure_create_secret
+
+#
+# Validate S3-Compatible storage configuration
+#
+- name: Validate a S3-Compatible storage configuration
+  block:
+  - name: Validate the S3-Compatible bucket name
+    assert:
+      that:
+        - meteringconfig_storage_s3Compatible_bucket_name != ""
+      msg: "storage.hive.s3Compatible.bucket cannot be empty"
+
+  - name: Validating the user-provided S3-Compatible endpoint is non-empty
+    assert:
+      that:
+        - meteringconfig_storage_s3Compatible_endpoint != ""
+      msg: "storage.hive.s3Compatible.endpoint cannot be empty"
+
+  - name: Validate that createSecret is true when the secretName is empty
+    assert:
+      that:
+        - meteringconfig_storage_s3Compatible_credentials_secret_name == ""
+      msg: "storage.hive.s3Compatible.secretName is only used to reference existing secrets, must be empty if creating new secrets"
+    when: meteringconfig_storage_s3Compatible_create_secret
+
+  - name: Validate that createSecret is false when secretName is non-empty
+    assert:
+      that:
+        - meteringconfig_storage_s3Compatible_credentials_secret_name != ""
+      msg: "storage.hive.s3Compatible.secretName is used to reference existing secrets, must not be empty if creatSecret is set to false"
+    when: not meteringconfig_storage_s3Compatible_create_secret
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+  when: hiveStorageType == 's3Compatible'

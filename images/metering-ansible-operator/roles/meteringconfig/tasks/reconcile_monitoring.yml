@@ -1,5 +1,13 @@
 ---
 
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Reconciling monitoring resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - name: Deploy monitoring resources
   include_tasks: deploy_resources.yml
   vars:
@@ -26,3 +34,10 @@
         prune_label_value: metering-reporting-operator-service-monitor
         create: "{{ meteringconfig_create_metering_monitoring_resources }}"
 
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished reconciling monitoring resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"

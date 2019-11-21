@@ -1,5 +1,13 @@
 ---
 
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Reconciling Hive resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - name: Deploy hive resources
   include_tasks: deploy_resources.yml
   vars:
@@ -69,3 +77,11 @@
       - template_file: templates/hive/hive-server-statefulset.yaml
         apis: [ {kind: statefulset, api_version: 'apps/v1'} ]
         prune_label_value: hive-server-statefulset
+
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished reconciling Hive resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
