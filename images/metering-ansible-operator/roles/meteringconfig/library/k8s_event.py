@@ -106,10 +106,11 @@ options:
       - Warning
       - Normal
   source:
-    description:
+    description: EventSource
       - Component for reporting this Event
-    required: true
-    type: string
+    - component
+      required: true
+      type: string
   involvedObject:
     description: ObjectReference
       - Object event is reporting on. ApiVersion, kind, name and namespace are of the involvedObject.
@@ -143,7 +144,7 @@ EXAMPLES = """
     reportingComponent: Reporting components
     type: Normal
     source:
-    component: Metering components
+      component: Metering components
     involvedObject:
       apiVersion: v1
       kind: Service
@@ -199,9 +200,9 @@ result:
        returned: success
        type: str
      source:
-       description: Component for reporting this Event
+       description: Source contains information for an Event
        returned: success
-       type: string
+       type: complex
      type:
        description: Type of Event. Either Normal or Warning
        returned: success
@@ -229,7 +230,10 @@ EVENT_ARG_SPEC = {
     "reason": {"type": "str", "required": True},
     "reportingComponent": {"type": "str", "required": True},
     "type": {"choices": ["Normal", "Warning"]},
-    "source": {"type": "str", "component": {"type": "str", "required": True}},
+    "source": {
+        "type": "dict",
+        "component": {"type": "str", "required": True}
+    },
     "involvedObject": {
         "type": "dict",
         "apiVersion": {"type": "str", "required": True},
@@ -318,7 +322,7 @@ class KubernetesEvent(KubernetesRawModule):
             "reason": reason,
             "reportingComponent": reporting_component,
             "reportingInstance": "",
-            "source": {"component": source},
+            "source": source,
             "type": event_type,
         }
 
