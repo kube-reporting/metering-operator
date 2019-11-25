@@ -119,7 +119,7 @@ For further reading on using metering, see the [using metering documentation][us
 [using-metering]: using-metering.md
 [con***REMOVED***guring-metering]: metering-con***REMOVED***g.md
 [con***REMOVED***guring-storage]: con***REMOVED***guring-storage.md
-[con***REMOVED***gure-prometheus-url]: metering-con***REMOVED***g.md#prometheus-connection
+[con***REMOVED***gure-prometheus-url]: con***REMOVED***guring-reporting-operator.md#prometheus-connection
 [kube-prometheus]: https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 [olm-install]: olm-install.md
 [manual-install]: manual-install.md
