@@ -1,8 +1,8 @@
 # Metering Configuration
 
-Metering supports configuration options which may be set in the `spec` section of the `Metering` resource.
+Metering supports configuration options which may be set in the `spec` section of the `MeteringConfig` resource.
 
-A minimal configuration example that doesn't override anything can be found in [default.yaml](../manifests/metering-config/default.yaml).
+**Note**: Metering does not support any default storage at this moment. If a storage configuration is not specified or improperly set, then it will fail the `MeteringConfig` schema validation.
 
 For details on different types of configuration read the relevant document:
 
@@ -39,6 +39,8 @@ spec:
 ```
 
 ## Using a custom configuration
+
+**Note**: Ensure the environment variable `$METERING_NAMESPACE` is properly set to the correct namespace.
 
 To install the custom configuration file, run the following command:
 
