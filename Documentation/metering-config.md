@@ -1,8 +1,8 @@
 # Metering Con***REMOVED***guration
 
-Metering supports con***REMOVED***guration options which may be set in the `spec` section of the `Metering` resource.
+Metering supports con***REMOVED***guration options which may be set in the `spec` section of the `MeteringCon***REMOVED***g` resource.
 
-A minimal con***REMOVED***guration example that doesn't override anything can be found in [default.yaml](../manifests/metering-con***REMOVED***g/default.yaml).
+**Note**: Metering does not support any default storage at this moment. If a storage con***REMOVED***guration is not speci***REMOVED***ed or improperly set, then it will fail the `MeteringCon***REMOVED***g` schema validation.
 
 For details on different types of con***REMOVED***guration read the relevant document:
 
@@ -39,6 +39,8 @@ spec:
 ```
 
 ## Using a custom con***REMOVED***guration
+
+**Note**: Ensure the environment variable `$METERING_NAMESPACE` is properly set to the correct namespace.
 
 To install the custom con***REMOVED***guration ***REMOVED***le, run the following command:
 
