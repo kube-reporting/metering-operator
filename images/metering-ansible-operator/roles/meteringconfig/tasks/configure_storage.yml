@@ -188,6 +188,7 @@
       when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
   when: meteringcon***REMOVED***g_storage_hive_storage_type == 'gcs'
 
+
 - include_tasks: update_meteringcon***REMOVED***g_status.yml
   vars:
     current_conditions:
@@ -195,3 +196,22 @@
       status: "True"
       message: "Finished con***REMOVED***guring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Con***REMOVED***guring Storage
+  k8s_event:
+    state: present
+    name: Con***REMOVED***guring Storage Event
+    namespace: "{{ meta.namespace }}"
+    message: Con***REMOVED***gure Storage
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringCon***REMOVED***g
+      name: storage
+      namespace: "{{ meta.namespace }}"
+
+

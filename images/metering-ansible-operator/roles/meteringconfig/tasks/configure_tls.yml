@@ -51,3 +51,22 @@
       status: "True"
       message: "Finished con***REMOVED***guring TLS"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for validating TLS
+  k8s_event:
+    state: present
+    name: Validate TLS
+    namespace: "{{ meta.namespace }}"
+    message: Validating TLS
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringCon***REMOVED***g
+      name: tls
+      namespace: "{{ meta.namespace }}"
+
+
