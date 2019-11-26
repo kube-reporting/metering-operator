@@ -68,6 +68,7 @@
   vars:
     storageType: "{{ meteringconfig_spec_overrides | json_query('storage.type') }}"
     hiveStorageType: "{{ meteringconfig_spec_overrides | json_query('storage.hive.type') }}"
+
   rescue:
   - include_tasks: update_meteringconfig_status.yml
     vars:
@@ -87,3 +88,21 @@
       status: "True"
       message: "Finished the validation process"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for validating configurations
+  k8s_event:
+    state: present
+    name: Validate Configuration
+    namespace: "{{ meta.namespace }}"
+    message: Validate Configurations
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: config
+      namespace: "{{ meta.namespace }}"
+

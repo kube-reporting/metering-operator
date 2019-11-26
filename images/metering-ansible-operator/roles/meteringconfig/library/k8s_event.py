@@ -135,7 +135,7 @@ requirements:
 EXAMPLES = """
 
 - name: Create Kubernetes Event
-  k8s_events
+  k8s_event:
     state: present
     name: test-https-emily109
     namespace: default
@@ -309,6 +309,7 @@ class KubernetesEvent(KubernetesRawModule):
                 pass
 
         event = {
+            "kind": "Event",
             "count": prior_count,
             "eventTime": None,
             "firstTimestamp": first_timestamp,

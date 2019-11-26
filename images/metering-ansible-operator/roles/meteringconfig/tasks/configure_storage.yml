@@ -188,6 +188,7 @@
       when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
   when: meteringconfig_storage_hive_storage_type == 'gcs'
 
+
 - include_tasks: update_meteringconfig_status.yml
   vars:
     current_conditions:
@@ -195,3 +196,22 @@
       status: "True"
       message: "Finished configuring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Configuring Storage
+  k8s_event:
+    state: present
+    name: Configuring Storage Event
+    namespace: "{{ meta.namespace }}"
+    message: Configure Storage
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: storage
+      namespace: "{{ meta.namespace }}"
+
+
