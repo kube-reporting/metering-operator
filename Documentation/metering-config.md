@@ -15,7 +15,7 @@ For details on different types of con***REMOVED***guration read the relevant doc
   - [exposing the reporting API](con***REMOVED***guring-reporting-operator.md#exposing-the-reporting-api)
   - [con***REMOVED***guring Authentication on Openshift](con***REMOVED***guring-reporting-operator.md#openshift-authentication)
 - [con***REMOVED***guring storage](con***REMOVED***guring-storage.md)
-  - [storing data in Amazon S3](con***REMOVED***guring-storage.md#storing-data-in-s3)
+  - [storing data in Amazon S3](con***REMOVED***guring-storage.md#storing-data-in-amazon-s3)
 - [con***REMOVED***guring the Hive metastore](con***REMOVED***guring-hive-metastore.md)
 - [con***REMOVED***guring aws billing correlation for cost correlation](con***REMOVED***guring-aws-billing.md)
 
