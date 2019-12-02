@@ -18,13 +18,13 @@ baseurl=http://pulp.dist.prod.ext.phx2.redhat.com/content/dist/rhel/server/7/7Se
 gpgcheck=0
 enabled=1
 
-[rhel-7-server-ose-4.3-rpms]
-name=Red Hat OCP 4.3
+[rhel-7-server-ose-4.4-rpms]
+name=Red Hat OCP 4.4
 enabled=1
 gpgcheck=0
-baseurl=http://download.lab.eng.bos.redhat.com/rcm-guest/puddles/RHAOS/AtomicOpenShift/4.3/building/x86_64/os/
+baseurl=http://download.lab.eng.bos.redhat.com/rcm-guest/puddles/RHAOS/AtomicOpenShift/4.4/building/x86_64/os/
 
-[hel-7-server-ansible-runner-1.1-rpms]
+[rhel-7-server-ansible-runner-1.1-rpms]
 name=ansible runner 1.1
 enabled=1
 gpgcheck=0

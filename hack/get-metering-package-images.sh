@@ -2,7 +2,7 @@
 
 # kubectl -n openshift-marketplace port-forward svc/art-applications 50051
 
-CHANNEL="${CHANNEL:-"4.3"}"
+CHANNEL="${CHANNEL:-"4.4"}"
 
 read -r -d '' JQ_PROGRAM << EOM
  .spec.install.spec.deployments[0].spec.template.spec.containers[]
