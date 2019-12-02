@@ -24,14 +24,14 @@ spec:
         - /opt/ansible/scripts/ansible-logs.sh
         - /tmp/ansible-operator/runner
         - stdout
-        image: "quay.io/coreos/metering-ansible-operator:release-4.3"
+        image: "quay.io/coreos/metering-ansible-operator:release-4.4"
         imagePullPolicy: Always
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
           readOnly: true
       - name: operator
-        image: "quay.io/coreos/metering-ansible-operator:release-4.3"
+        image: "quay.io/coreos/metering-ansible-operator:release-4.4"
         imagePullPolicy: Always
         env:
         - name: OPERATOR_NAME
@@ -47,17 +47,17 @@ spec:
             ***REMOVED***eldRef:
               ***REMOVED***eldPath: metadata.name
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
-          value: "quay.io/coreos/metering-ansible-operator:release-4.3"
+          value: "quay.io/coreos/metering-ansible-operator:release-4.4"
         - name: METERING_REPORTING_OPERATOR_IMAGE
-          value: "quay.io/coreos/metering-reporting-operator:release-4.3"
+          value: "quay.io/coreos/metering-reporting-operator:release-4.4"
         - name: METERING_PRESTO_IMAGE
-          value: "quay.io/coreos/presto:release-4.3"
+          value: "quay.io/coreos/presto:release-4.4"
         - name: METERING_HIVE_IMAGE
-          value: "quay.io/coreos/hive:release-4.3"
+          value: "quay.io/coreos/hive:release-4.4"
         - name: METERING_HADOOP_IMAGE
-          value: "quay.io/coreos/hadoop:release-4.3"
+          value: "quay.io/coreos/hadoop:release-4.4"
         - name: GHOSTUNNEL_IMAGE
-          value: "quay.io/coreos/metering-ghostunnel:release-4.3"
+          value: "quay.io/coreos/metering-ghostunnel:release-4.4"
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
