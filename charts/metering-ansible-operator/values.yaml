@@ -162,8 +162,8 @@ operator:
 olm:
   packageName: metering-ocp
   channels:
-  - name: "4.3"
-    currentCSV: metering-operator.v4.3.0
+  - name: "4.4"
+    currentCSV: metering-operator.v4.4.0
 
   skipARTPackage: false
 
