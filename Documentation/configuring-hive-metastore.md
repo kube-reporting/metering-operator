@@ -44,13 +44,14 @@ spec:
   hive:
     spec:
       config:
-        url: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
-        driver: "com.mysql.jdbc.Driver"
-        username: "REPLACEME"
-        password: "REPLACEME"
+        db:
+          url: "jdbc:mysql://mysql.example.com:3306/hive_metastore"
+          driver: "com.mysql.jdbc.Driver"
+          username: "REPLACEME"
+          password: "REPLACEME"
 ```
 
-You can pass additional JDBC parameters using the `spec.hive.config.url`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html).
+You can pass additional JDBC parameters using the `spec.hive.spec.config.db.url`, for more details see [the MySQL Connector/J documentation](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html).
 
 ## Use PostgreSQL for the Hive Metastore database
 
@@ -59,10 +60,11 @@ spec:
   hive:
     spec:
       config:
-        url: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
-        driver: "org.postgresql.Driver"
-        username: "REPLACEME"
-        password: "REPLACEME"
+        db:
+          url: "jdbc:postgresql://postgresql.example.com:5432/hive_metastore"
+          driver: "org.postgresql.Driver"
+          username: "REPLACEME"
+          password: "REPLACEME"
 ```
 
 You can pass additional JDBC parameters using the `url`, for more details see [the PostgreSQL JDBC driver documentation](https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters).
