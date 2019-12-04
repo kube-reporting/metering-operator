@@ -64,7 +64,7 @@ func (lc *LocalCtx) RunMeteringOperatorLocal() error {
 	}
 	defer logFile.Close()
 
-	lc.Logger.Infof("Storing the metering-operator container logs to the '%s' path", logFile)
+	lc.Logger.Infof("Storing the metering-operator container logs to the '%s' path", logFile.Name())
 
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
