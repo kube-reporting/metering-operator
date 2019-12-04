@@ -198,8 +198,8 @@ olm:
       name: quay.io/openshift/origin-oauth-proxy:4.3
 
   csv:
-    name : metering-operator.v4.3.0
-    version: "4.3.0"
+    name : metering-operator.v4.4.0
+    version: "4.4.0"
     minKubeVersion: "1.11.0"
     displayName: Metering
     description: |
