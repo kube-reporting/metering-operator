@@ -1,0 +1,15 @@
+---
+
+- name: Update the MeteringConfig status
+  k8s_status:
+    api_version: metering.openshift.io/v1
+    kind: MeteringConfig
+    name: "{{ meta.name }}"
+    namespace: "{{ meta.namespace }}"
+    conditions: "{{ [ current_conditions ] }}"
+  when: current_conditions is defined
+
+- name: End role due to failure
+  fail:
+    msg: "Failing role execution after updating the MeteringConfig.Status"
+  when: end_play_after_updating_status is defined and end_play_after_updating_status

@@ -29,6 +29,17 @@
       that:
         - meteringconfig_spec.hive.spec.metastore.config.tls.enabled and meteringconfig_spec.hive.spec.metastore.config.auth.enabled
       msg: "Invalid configuration for hive.spec.metastore.config.tls: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_hive_metastore_tls_secret
 
 - name: Validate user-provided Hive Server TLS fields are non-empty
@@ -56,6 +67,17 @@
       that:
         - meteringconfig_spec.hive.spec.server.config.tls.enabled and meteringconfig_spec.hive.spec.server.config.auth.enabled
       msg: "Invalid configuration for hive.spec.server.config.tls: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_hive_server_tls_secret
 
 - name: Validate user-provided Hive Server Auth (metastoreTLS) fields are non-empty
@@ -77,4 +99,15 @@
       that:
         - meteringconfig_spec.hive.spec.server.config.metastoreTLS.key != ""
       msg: "hive.spec.server.config.metastoreTLS.key cannot be empty if createSecret: true and secretName != ''"
+  rescue:
+  - include_tasks: update_meteringconfig_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringconfig_template_hive_server_auth_secret

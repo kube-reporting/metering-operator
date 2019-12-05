@@ -5,3 +5,4 @@
   role: /opt/ansible/roles/meteringconfig
   watchDependentResources: false
   reconcilePeriod: 5m
+  manageStatus: false

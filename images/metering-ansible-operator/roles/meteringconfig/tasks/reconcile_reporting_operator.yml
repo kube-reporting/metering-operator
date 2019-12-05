@@ -1,5 +1,13 @@
 ---
 
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Reconciling reporting-operator resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - name: Deploy reporting-operator resources
   include_tasks: deploy_resources.yml
   vars:
@@ -76,3 +84,11 @@
       - template_file: templates/reporting-operator/reporting-operator-deployment.yaml
         apis: [ {kind: deployment} ]
         prune_label_value: reporting-operator-deployment
+
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished reconciling reporting-operator resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"

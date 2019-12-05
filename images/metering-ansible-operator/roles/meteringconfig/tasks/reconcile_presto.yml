@@ -1,5 +1,13 @@
 ---
 
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Reconciling Presto resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - name: Deploy presto resources
   include_tasks: deploy_resources.yml
   vars:
@@ -64,3 +72,11 @@
       - template_file: templates/presto/presto-worker-statefulset.yaml
         apis: [ {kind: statefulset} ]
         prune_label_value: presto-worker-statefulset
+
+- include_tasks: update_meteringconfig_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Finished reconciling Presto resources"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
