@@ -24,14 +24,14 @@ spec:
         - /opt/ansible/scripts/ansible-logs.sh
         - /tmp/ansible-operator/runner
         - stdout
-        image: "quay.io/openshift/origin-metering-ansible-operator:4.3"
+        image: "quay.io/openshift/origin-metering-ansible-operator:4.4"
         imagePullPolicy: Always
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
           readOnly: true
       - name: operator
-        image: "quay.io/openshift/origin-metering-ansible-operator:4.3"
+        image: "quay.io/openshift/origin-metering-ansible-operator:4.4"
         imagePullPolicy: Always
         env:
         - name: OPERATOR_NAME
@@ -47,19 +47,19 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: METERING_ANSIBLE_OPERATOR_IMAGE
-          value: "quay.io/openshift/origin-metering-ansible-operator:4.3"
+          value: "quay.io/openshift/origin-metering-ansible-operator:4.4"
         - name: METERING_REPORTING_OPERATOR_IMAGE
-          value: "quay.io/openshift/origin-metering-reporting-operator:4.3"
+          value: "quay.io/openshift/origin-metering-reporting-operator:4.4"
         - name: METERING_PRESTO_IMAGE
-          value: "quay.io/openshift/origin-metering-presto:4.3"
+          value: "quay.io/openshift/origin-metering-presto:4.4"
         - name: METERING_HIVE_IMAGE
-          value: "quay.io/openshift/origin-metering-hive:4.3"
+          value: "quay.io/openshift/origin-metering-hive:4.4"
         - name: METERING_HADOOP_IMAGE
-          value: "quay.io/openshift/origin-metering-hadoop:4.3"
+          value: "quay.io/openshift/origin-metering-hadoop:4.4"
         - name: GHOSTUNNEL_IMAGE
-          value: "quay.io/openshift/origin-ghostunnel:4.3"
+          value: "quay.io/openshift/origin-ghostunnel:4.4"
         - name: OAUTH_PROXY_IMAGE
-          value: "quay.io/openshift/origin-oauth-proxy:4.3"
+          value: "quay.io/openshift/origin-oauth-proxy:4.4"
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
