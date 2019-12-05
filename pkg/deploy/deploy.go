@@ -17,8 +17,6 @@ import (
 )
 
 const (
-	defaultMeteringCon***REMOVED***g     = "meteringcon***REMOVED***g.yaml"
-	manifestDeployDirname     = "manifests/deploy"
 	manifestAnsibleOperator   = "metering-ansible-operator"
 	upstreamManifestDirname   = "upstream"
 	openshiftManifestDirname  = "openshift"
