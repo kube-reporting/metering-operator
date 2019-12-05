@@ -77,7 +77,7 @@ You have two options for installation, you can use the Openshift OperatorHub UI 
 The process for testing is the same as what's documented in [Documentation/olm-install.md](../olm-install.md), the main difference is the package you will want to search for and use.
 
 Follow the existing olm-install documentation, but before searching the OperatorHub UI, tick the *Custom* box underneath the search box to ***REMOVED***lter to packages provided via custom OperatorSources, like the one we just created.
-The metering package you see should have an Operator Version of "4.3.0", with a Provider Type of "Custom".
+The metering package you see should have an Operator Version of "4.4.0", with a Provider Type of "Custom".
 
 ## Install Metering using the CLI
 
