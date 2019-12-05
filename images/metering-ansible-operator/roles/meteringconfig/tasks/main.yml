@@ -1,4 +1,20 @@
 ---
 # task ***REMOVED***le for the MeteringCon***REMOVED***g role
 
+- include_tasks: update_meteringcon***REMOVED***g_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "True"
+      message: "Starting the reconciliation process"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
 - include_tasks: reconcile.yml
+
+- include_tasks: update_meteringcon***REMOVED***g_status.yml
+  vars:
+    current_conditions:
+      type: "Running"
+      status: "False"
+      message: "Awaiting the next reconciliation"
+      lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"

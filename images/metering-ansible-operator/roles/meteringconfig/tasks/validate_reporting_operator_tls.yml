@@ -10,6 +10,17 @@
       that:
         - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate != ""
       msg: "reporting-operator.spec.con***REMOVED***g.presto.tls.caCerti***REMOVED***cate cannot be empty if createSecret: true and secretName != ''"
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_presto_tls_secret
 
 - name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
@@ -31,6 +42,17 @@
       that:
         - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.presto.auth.enabled
       msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_presto_auth_secret
 
 #
@@ -61,6 +83,17 @@
       that:
         - meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.tls.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.con***REMOVED***g.hive.auth.enabled
       msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_hive_secrets
 
 #
@@ -88,3 +121,14 @@
         - meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.data != ""
       msg: "spec.reporting-operator.spec.authProxy.authenticatedEmails: secretName and/or data key(s) cannot be empty when enabled and createSecret is set to true"
     when: meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.enabled and meteringcon***REMOVED***g_spec['reporting-operator'].spec.authProxy.authenticatedEmails.createSecret
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"

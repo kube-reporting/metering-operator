@@ -22,6 +22,17 @@
       that:
         - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.key != ""
       msg: "presto.spec.con***REMOVED***g.tls.key cannot be empty if createSecret: true and secretName != ''"
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_presto_tls_secret
 
 - name: Validate that the user-provided Presto client Auth ***REMOVED***elds are not empty
@@ -49,6 +60,17 @@
       that:
         - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.tls.enabled and meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.auth.enabled
       msg: "Invalid con***REMOVED***guration: you cannot enable auth but disable TLS."
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_presto_auth_secret
 
 - name: Validate that the user provided Presto/Hive client TLS ***REMOVED***elds are not empty
@@ -70,4 +92,15 @@
       that:
         - meteringcon***REMOVED***g_spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate != ""
       msg: "spec.presto.spec.con***REMOVED***g.connectors.hive.tls.caCerti***REMOVED***cate cannot be empty when createSecret is set to true"
+  rescue:
+  - include_tasks: update_meteringcon***REMOVED***g_status.yml
+    vars:
+      end_play_after_updating_status: true
+      current_conditions:
+        type: "Invalid"
+        status: "True"
+        message: |
+          "Failed task name: {{ ansible_failed_task.name }}"
+          "Failed task message: {{ ansible_failed_result.msg }}"
+        lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
   when: meteringcon***REMOVED***g_template_presto_hive_tls_secret

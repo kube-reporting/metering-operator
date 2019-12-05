@@ -25,7 +25,10 @@ RUN ln -f -s /usr/bin/oc /usr/bin/kubectl
 RUN ln -f -s /tini /usr/bin/tini
 
 RUN pip install --no-cache-dir --upgrade openshift boto3 cryptography
-RUN pip install --upgrade ansible>=2.8
+# In order to use the 'ansible_failed_result' and 'ansible_failed_task' variables in a block/rescue,
+# we need to ensure that the 2.8 version is being used while this is ***REMOVED***xed in 2.9 upstream.
+# TODO: revert this change once the issue mentioned above is resolved.
+RUN pip install --upgrade ansible==2.8
 
 ENV HOME /opt/ansible
 ENV HELM_CHART_PATH ${HOME}/charts/openshift-metering
