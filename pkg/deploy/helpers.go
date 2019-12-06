@@ -4,30 +4,11 @@ import (
 	"fmt"
 	"os"
 	"path/***REMOVED***lepath"
-	"strconv"
 	"strings"
 
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
-
-// getBoolEnv is a helper function that queries the users' shell environment for the @env parameter,
-// and if that environment variable has been set, attempts to parse the string returned from
-// os.Getenv into a boolean value, or returns an error. If the @env environment variable is not set
-// then we return the value stored in the @defaultVar parameter.
-func getBoolEnv(env string, defaultVal bool) (bool, error) {
-	key := os.Getenv(env)
-	if key == "" {
-		return defaultVal, nil
-	}
-
-	val, err := strconv.ParseBool(key)
-	if err != nil {
-		return false, fmt.Errorf("failed to convert the %s env variable into a boolean: %v", env, err)
-	}
-
-	return val, nil
-}
 
 // DecodeYAMLManifestToObject is a helper function that takes the path to a manifest ***REMOVED***le, e.g. the
 // deployment YAML ***REMOVED***le, and opens that ***REMOVED***le using os.Open, which returns an io.Reader object that
