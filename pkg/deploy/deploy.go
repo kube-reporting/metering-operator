@@ -17,8 +17,6 @@ import (
 )
 
 const (
-	defaultMeteringConfig     = "meteringconfig.yaml"
-	manifestDeployDirname     = "manifests/deploy"
 	manifestAnsibleOperator   = "metering-ansible-operator"
 	upstreamManifestDirname   = "upstream"
 	openshiftManifestDirname  = "openshift"
