@@ -311,7 +311,7 @@ olm:
       capabilities: Basic Install
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
-      containerImage: "quay.io/openshift/origin-metering-ansible-operator:latest"
+      containerImage: "quay.io/openshift/origin-metering-ansible-operator:4.4"
       description: 'Chargeback and reporting tool to provide accountability for how resources are used across a cluster'
       repository: https://github.com/operator-framework/operator-metering
       alm-examples: |-
