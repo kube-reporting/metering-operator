@@ -4,35 +4,35 @@ Debugging metering can be fairly difficult if you do not know how to directly in
 Below, we detail how you can connect and query Presto and Hive, as well as view the dashboards of the Presto and HDFS components.
 For debugging issues surrounding the metering-ansible-operator, see the [ansible-operator](#metering-ansible-operator) section.
 
-All of the follow commands assume you've set the `METERING_NAMESPACE` environment variable to the namespace your Metering installation is located in:
+**Note**: All of the following commands assume you've set the `METERING_NAMESPACE` environment variable to the namespace your Metering installation is located in:
 
-```
-export METERING_NAMESPACE=your-namespace
+```bash
+$ export METERING_NAMESPACE=<your-namespace>
 ```
 
 ## Get Reporting Operator Logs
 
 The command below will follow the logs of the reporting-operator.
 
-```
-kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods -l app=reporting-operator -o name | cut -c 5-)" -c reporting-operator
+```bash
+$ kubectl -n $METERING_NAMESPACE logs "$(kubectl -n $METERING_NAMESPACE get pods -l app=reporting-operator -o name | cut -c 5-)" -c reporting-operator
 ```
 
 ## Query Presto using presto-cli
 
 The following will open up an interactive presto-cli session where you can interactively query Presto. One thing to note is that this runs in the same container as Presto and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Presto pod. By default, Presto is configured to communicate using TLS, and you would need to run the following command in order to run Presto queries:
-```
-kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema default --user root --keystore-path /opt/presto/tls/keystore.pem
+```bash
+$ kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server https://presto:8080 --catalog hive --schema default --user root --keystore-path /opt/presto/tls/keystore.pem
 ```
 
-In the case where you disabled the top-level `spec.tls.enabled` key, you would instead need to run the command below:
-```
-kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
+In the case where you disabled the top-level `spec.tls.enabled` key, you would need to run the command below:
+```bash
+$ kubectl -n $METERING_NAMESPACE exec -it "$(kubectl -n $METERING_NAMESPACE get pods -l app=presto,presto=coordinator -o name | cut -d/ -f2)"  -- /usr/local/bin/presto-cli --server localhost:8080 --catalog hive --schema default --user root
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables from metering;` query to view the list of tables:
 
-```
+```bash
 presto:default> show tables from metering;
                                  Table
 ------------------------------------------------------------------------
@@ -81,13 +81,13 @@ presto:default>
 
 The following will open up an interactive beeline session where you can interactively query Hive. One thing to note is that this runs in the same container as Hive and launches an additional Java instance, meaning you may run into memory limits for the pod. If this occurs, you should increase the memory request & limits of the Hive pod.
 
-```
-kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
+```bash
+$ kubectl -n $METERING_NAMESPACE exec -it $(kubectl -n $METERING_NAMESPACE get pods -l app=hive,hive=server -o name | cut -d/ -f2) -c hiveserver2 -- beeline -u 'jdbc:hive2://127.0.0.1:10000/default;auth=noSasl'
 ```
 
 After the above command you should be given a prompt, where you can run queries. Use the `show tables;` query to view the list of tables:
 
-```
+```bash
 0: jdbc:hive2://127.0.0.1:10000/default> show tables from metering;
 +----------------------------------------------------+
 |                      tab_name                      |
@@ -134,19 +134,20 @@ After the above command you should be given a prompt, where you can run queries.
 The Presto web UI can be very useful when debugging.
 It will show what queries are running, which have succeeded, and which queries have failed.
 
-Note: Due to client-side authentication being enabled in Presto by default, you won't be able to view the Presto web UI at this time.
-However, you can specify `spec.tls.enabled: false` and stop there to disable TLS/auth entirely, or only configure Presto to work with TLS (`spec.presto.tls`) and not client-side authentication.
+**Note**: Due to client-side authentication being enabled in Presto by default, you won't be able to view the Presto web UI.
 
-```
-kubectl -n $METERING_NAMESPACE get pods  -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
+However, you can specify `spec.tls.enabled: false` and stop there to disable TLS/auth entirely, or only configure Presto to work with TLS (`spec.presto.tls`), and not client-side authentication.
+
+```bash
+$ kubectl -n $METERING_NAMESPACE get pods  -l app=presto,presto=coordinator -o name | cut -d/ -f2 | xargs -I{} kubectl -n $METERING_NAMESPACE port-forward {} 8080
 ```
 
 You can now open http://127.0.0.1:8080 in your browser window to view the Presto web interface.
 
 ## Port-forward to Hive web UI
 
-```
-kubectl -n $METERING_NAMESPACE port-forward hive-server-0 10002
+```bash
+$ kubectl -n $METERING_NAMESPACE port-forward hive-server-0 10002
 ```
 
 You can now open http://127.0.0.1:10002 in your browser window to view the Hive web interface.
@@ -154,50 +155,54 @@ You can now open http://127.0.0.1:10002 in your browser window to view the Hive 
 
 ## Port-forward to hdfs
 
-To the namenode:
+##### Namenode Pod
 
-```
-kubectl -n $METERING_NAMESPACE port-forward hdfs-namenode-0 9870
-```
-
-You can now open http://127.0.0.1:9870 in your browser window to view the HDFS web interface.
-
-
-To the first datanode:
-
-```
-kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 9864
+```bash
+$ kubectl -n $METERING_NAMESPACE port-forward hdfs-namenode-0 9870
 ```
 
-To check other datanodes, run the above command, replacing `hdfs-datanode-0` with the pod you want to view information on.
+You can now open http://127.0.0.1:9870 in your browser window to view the HDFS namenode web interface.
+
+
+##### Datanode Pod(s)
+
+```bash
+$ kubectl -n $METERING_NAMESPACE port-forward hdfs-datanode-0 9864
+```
+
+To check other datanodes, run the above command, and replace `hdfs-datanode-0` with the datanode pod you want to view more information on.
 
 ## Metering Ansible Operator
-Metering uses the ansible operator to watch and reconcile resources in a cluster environment. When debugging a failed Metering install, it can be helpful to view the Ansible logs or status of your `MeteringConfig` custom resource.
+Metering uses the ansible-operator to watch and reconcile resources in a cluster environment.
+
+When debugging a failed Metering install, it can be helpful to view the Ansible logs or status of your `MeteringConfig` custom resource.
 
 ##### Accessing Ansible Logs
 There are a couple of ways of accessing the Ansible logs depending on how you installed the Metering resources.
 
 In a typical install, the Metering operator is deployed as a pod. In this case, we can simply check the logs of the `ansible` container within this pod:
-```
-kubectl -n $METERING_NAMESPACE logs $(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o name | cut -d/ -f2) -c ansible
+```bash
+$ kubectl -n $METERING_NAMESPACE logs $(kubectl -n $METERING_NAMESPACE get pods -l app=metering-operator -o name | cut -d/ -f2) -c ansible
 ```
 
-Alternatively, you can view the logs of the `operator` container (replace `-c ansible` with `-c operator`) for condensed output.
+Alternatively, you can view the logs of the `operator` container (replace `-c ansible` with `-c operator`) for less verbose, condensed output.
 
-If you are running the Metering operator locally (i.e. `make run-metering-operator-local`), there won't be a dedicated pod, and so you would need to run the following command ():
-```
-docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringConfig/*/*/artifacts/*/stdout'
+If you are running the Metering operator locally (i.e. `make run-metering-operator-local`), there won't be a dedicated pod, and so you would need to check the docker container logs:
+```bash
+$ docker exec -it metering-operator bash -c 'tail -n +1 -f /tmp/ansible-operator/runner/metering.openshift.io/v1/MeteringConfig/*/*/artifacts/*/stdout'
 ```
 
 When tracking down a failed task, you may encounter this output:
-```
+```yaml
 changed: [localhost] => (item=None) => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
 ```
 
-This is because we use the Ansible module, `no_log`, on output-extensive tasks (running helm template, creation of resources, etc.). If your install fails during the Helm templating task, you can specify `spec.logHelmTemplate: true` in your `MeteringConfig` CR, which will enable logging for that task, and you can re-run your installation for more information on why it failed.
+This is because we use the Ansible module, `no_log`, on output-extensive tasks (running helm template, creation of resources, etc.) through the metering-ansible-operator.
+
+If your install fails during the Helm templating task, you can specify `spec.logHelmTemplate: true` in your `MeteringConfig` CR, which will enable logging for that task, and then you can re-run your installation for more information on why it failed.
 
 ##### Checking the `MeteringConfig` Status
 It can be helpful to view the `.status` field of your `MeteringConfig` custom resource to debug any recent failures. You can do this with the following command:
-```
-kubectl -n $METERING_NAMESPACE get meteringconfig operator-metering -o json | jq '.status'
+```bash
+$ kubectl -n $METERING_NAMESPACE get meteringconfig operator-metering -o json | jq '.status'
 ```
