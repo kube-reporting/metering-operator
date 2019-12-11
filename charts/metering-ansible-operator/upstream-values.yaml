@@ -96,7 +96,7 @@ olm:
       capabilities: Basic Install
       support: Red Hat, Inc.
       createdAt: "2019-01-01T11:59:59Z"
-      containerImage: "quay.io/coreos/metering-ansible-operator:latest"
+      containerImage: "quay.io/coreos/metering-ansible-operator:4.4"
 
   subscriptionName: metering
   subscriptionChannel: stable
