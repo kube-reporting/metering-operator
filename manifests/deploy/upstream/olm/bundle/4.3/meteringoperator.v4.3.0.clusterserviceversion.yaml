@@ -205,7 +205,7 @@ metadata:
     capabilities: Basic Install
     categories: OpenShift Optional, Monitoring
     certified: "false"
-    containerImage: quay.io/coreos/metering-ansible-operator:latest
+    containerImage: quay.io/coreos/metering-ansible-operator:4.3
     createdAt: 2019-01-01T11:59:59Z
     description: Chargeback and reporting tool to provide accountability for how resources
       are used across a cluster
