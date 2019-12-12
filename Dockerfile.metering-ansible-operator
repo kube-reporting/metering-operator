@@ -53,4 +53,4 @@ LABEL io.k8s.display-name="OpenShift metering-ansible-operator" \
       io.k8s.description="This is a component of OpenShift Container Platform and manages installation and con***REMOVED***guration of all other metering components." \
       io.openshift.tags="openshift" \
       com.redhat.delivery.appregistry=true \
-      maintainer="Chance Zibolski <sd-operator-metering@redhat.com>"
+      maintainer="sd-operator-metering@redhat.com"
