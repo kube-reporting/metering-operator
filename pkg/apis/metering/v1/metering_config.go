@@ -442,8 +442,9 @@ type PrestoWorkerSpec struct {
 	Config                        *PrestoServerConfig          `json:"config,omitempty"`
 }
 type PrestoConnectorConfig struct {
-	Hive              *PrestoConnectorHiveConfig `json:"hive,omitempty"`
-	ConnectorFileList *PrestoConnectorFileList   `json:"extraConnectorFiles,omitempty"`
+	Hive              *PrestoConnectorHiveConfig       `json:"hive,omitempty"`
+	Prometheus        *PrestoConnectorPrometheusConfig `json:"prometheus,omitempty"`
+	ConnectorFileList *PrestoConnectorFileList         `json:"extraConnectorFiles,omitempty"`
 }
 type PrestoConnectorHiveConfig struct {
 	UseHadoopConfig        *bool      `json:"useHadoopConfig,omitempty"`
@@ -451,6 +452,9 @@ type PrestoConnectorHiveConfig struct {
 	MetastoreURI           string     `json:"metastoreURI,omitempty"`
 	MetastoreTimeout       string     `json:"metastoreTimeout,omitempty"`
 	TLS                    *TLSConfig `json:"tls,omitempty"`
+}
+type PrestoConnectorPrometheusConfig struct {
+	Enabled *bool `json:"enabled,omitempty"`
 }
 type PrestoConnectorFileList struct {
 	Name    string `json:"name,omitempty"`
