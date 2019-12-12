@@ -544,6 +544,16 @@ presto:
             useInstanceCredentials: null
 
         extraConnectorFiles: []
+        prometheus:
+          enabled: false
+          con***REMOVED***g:
+            uri: ""
+            chunkSizeDuration: null
+            maxQueryRangeDuration: null
+            cacheDuration: null
+          auth:
+            bearerTokenFile: null
+            useServiceAccountToken: true
 
     coordinator:
       af***REMOVED***nity:
@@ -575,9 +585,6 @@ presto:
           reservedCodeCacheSize: null
           maxCachedBufferSize: null
           maxDirectMemorySize: null
-        logLevel: info
-        taskMaxWorkerThreads: null
-        taskMinDrivers: null
         logLevel: info
         taskMaxWorkerThreads: null
         taskMinDrivers: null

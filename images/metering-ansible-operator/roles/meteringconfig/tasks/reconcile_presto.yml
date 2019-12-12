@@ -57,6 +57,10 @@
       - template_***REMOVED***le: templates/presto/presto-serviceaccount.yaml
         apis: [ {kind: serviceaccount} ]
         prune_label_value: presto-serviceaccount
+      - template_***REMOVED***le: templates/presto/presto-prometheus-auth.yaml
+        apis: [ {kind: serviceaccount} ]
+        prune_label_value: presto-prometheus-auth
+        create: "{{ meteringcon***REMOVED***g_create_presto_prometheus_auth }}"
       - template_***REMOVED***le: templates/presto/presto-jmx-con***REMOVED***g.yaml
         apis: [ {kind: con***REMOVED***gmap} ]
         prune_label_value: presto-jmx-con***REMOVED***g

@@ -45,6 +45,37 @@ connector.name=blackhole
 connector.name=memory
 {{ end }}
 
+{{- de***REMOVED***ne "presto-prometheus-catalog-properties" -}}
+{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.enabled }}
+{{- with .Values.presto.spec.con***REMOVED***g.connectors.prometheus -}}
+connector.name=prometheus
+{{- if .con***REMOVED***g.uri }}
+prometheus-uri={{ .con***REMOVED***g.uri }}
+{{- ***REMOVED*** }}
+prometheus-uri=http://localhost:9090
+{{- end }}
+{{- if .con***REMOVED***g.chunkSizeDuration }}
+query-chunk-size-duration={{ .con***REMOVED***g.chunkSizeDuration }}
+{{- ***REMOVED*** }}
+query-chunk-size-duration=1h
+{{- end }}
+{{- if .con***REMOVED***g.maxQueryRangeDuration }}
+max-query-range-duration={{ .con***REMOVED***g.maxQueryRangeDuration }}
+{{- ***REMOVED*** }}
+max-query-range-duration=1d
+{{- end }}
+{{- if .con***REMOVED***g.cacheDuration }}
+cache-duration={{ .con***REMOVED***g.cacheDuration }}
+{{- ***REMOVED*** }}
+cache-duration=30s
+{{- end }}
+{{- if or .auth.useServiceAccountToken .auth.bearerTokenFile }}
+bearer-token-***REMOVED***le={{ .auth.bearerTokenFile }}
+{{ end }} {{- /* end-if */ -}}
+{{ end }} {{- /* end-with */ -}}
+{{ end }} {{- /* end-if-enabled */ -}}
+{{ end }} {{- /* end-de***REMOVED***ne */ -}}
+
 {{- de***REMOVED***ne "presto-tpcds-catalog-properties" -}}
 connector.name=tpcds
 {{ end }}

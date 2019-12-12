@@ -121,6 +121,13 @@ spec:
               name: "{{ .Values.presto.spec.con***REMOVED***g.azure.secretName | default "presto-azure-credentials" }}"
               key: azure-secret-access-key
 {{- end }}
+{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.enabled }}
+        - name: PRESTO_PROMETHEUS_CONNECTOR_BEARER_TOKEN_FILE
+          valueFrom:
+            con***REMOVED***gMapKeyRef:
+              name: presto-coordinator-con***REMOVED***g
+              key: prometheus-connector-bearer-token-***REMOVED***le
+{{- end }}
 {{- include "presto-common-env" . | indent 8 }}
         volumeMounts:
         - name: presto-etc

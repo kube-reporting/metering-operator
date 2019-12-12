@@ -17,6 +17,9 @@ _reporting_op_default_spec: "{{ meteringcon***REMOVED***g_default_values['report
 _hadoop_default_spec: "{{ meteringcon***REMOVED***g_default_values.hadoop.spec }}"
 _ghostunnel_default: "{{ meteringcon***REMOVED***g_default_values.__ghostunnel }}"
 
+# Allow Presto to query Prometheus
+meteringcon***REMOVED***g_create_presto_prometheus_auth: "{{ _presto_spec.con***REMOVED***g.connectors.prometheus.enabled | default(false) }}"
+
 meteringcon***REMOVED***g_reporting_operator_default_image_override: "{{ lookup('env', 'METERING_REPORTING_OPERATOR_IMAGE') }}"
 meteringcon***REMOVED***g_oauth_proxy_default_image_override: "{{ lookup('env', 'OAUTH_PROXY_IMAGE') }}"
 meteringcon***REMOVED***g_presto_default_image_override: "{{ lookup('env', 'METERING_PRESTO_IMAGE') }}"
@@ -362,6 +365,18 @@ _ocp_enabled_overrides:
       con***REMOVED***g:
         prometheus:
           url: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+
+  presto:
+    spec:
+      con***REMOVED***g:
+        connectors:
+          prometheus:
+            enabled: true
+            con***REMOVED***g:
+              uri: "https://prometheus-k8s.openshift-monitoring.svc:9091/"
+
+            auth:
+              bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 #
 # Override the default values with _tls_overrides when spec.tls.enabled is set to true, ***REMOVED*** use values.yaml and meteringcon***REMOVED***g_spec_overrides

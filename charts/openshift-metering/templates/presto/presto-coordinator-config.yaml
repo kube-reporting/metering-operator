@@ -52,6 +52,12 @@ data:
     task.min-drivers: {{ .Values.presto.spec.coordinator.con***REMOVED***g.taskMinDrivers }}
 {{- end }}
 
+{{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.auth.useServiceAccountToken }}
+  prometheus-connector-bearer-token-***REMOVED***le: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+{{ ***REMOVED*** }}
+  prometheus-connector-bearer-token-***REMOVED***le: {{ .Values.presto.spec.con***REMOVED***g.connectors.prometheus.auth.bearerTokenFile }}
+{{- end }}
+
   jvm.con***REMOVED***g: |
     -server
     -XX:+UseContainerSupport

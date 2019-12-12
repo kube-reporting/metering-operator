@@ -1570,25 +1570,31 @@ spec:
                                 enabled:
                                   description: Whether or not to enable the Presto-Prometheus connector.
                                   type: boolean
-                                uri:
-                                  description: URI for Prometheus.
-                                  type: string
-                                  format: uri
-                                chunkSizeDuration:
-                                  description: Default size of each Prometheus query chunk.
-                                  type: string
-                                maxQueryRangeDuration:
-                                  description: Default range for Prometheus query, divided into chunkSizeDuration chunks.
-                                  type: string
-                                cacheDuration:
-                                  description: Time to live for Presto checking connector properties values.
-                                  type: string
-                                bearer:
+                                con***REMOVED***g:
                                   type: object
                                   properties:
-                                    tokenFile:
+                                    uri:
+                                      description: URI for Prometheus.
+                                      type: string
+                                      format: uri
+                                    chunkSizeDuration:
+                                      description: Default size of each Prometheus query chunk.
+                                      type: string
+                                    maxQueryRangeDuration:
+                                      description: Default range for Prometheus query, divided into chunkSizeDuration chunks.
+                                      type: string
+                                    cacheDuration:
+                                      description: Time to live for Presto checking connector properties values.
+                                      type: string
+                                auth:
+                                  type: object
+                                  properties:
+                                    bearerTokenFile:
                                       description: Path to token ***REMOVED***le for bearer authentication to Prometheus.
                                       type: string
+                                    useServiceAccountToken:
+                                      description: Whether to use the cluster service account token for the bearer token
+                                      type: boolean
                         environment:
                           type: string
                         maxQueryLength:

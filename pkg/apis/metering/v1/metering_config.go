@@ -442,8 +442,9 @@ type PrestoWorkerSpec struct {
 	Con***REMOVED***g                        *PrestoServerCon***REMOVED***g          `json:"con***REMOVED***g,omitempty"`
 }
 type PrestoConnectorCon***REMOVED***g struct {
-	Hive              *PrestoConnectorHiveCon***REMOVED***g `json:"hive,omitempty"`
-	ConnectorFileList *PrestoConnectorFileList   `json:"extraConnectorFiles,omitempty"`
+	Hive              *PrestoConnectorHiveCon***REMOVED***g       `json:"hive,omitempty"`
+	Prometheus        *PrestoConnectorPrometheusCon***REMOVED***g `json:"prometheus,omitempty"`
+	ConnectorFileList *PrestoConnectorFileList         `json:"extraConnectorFiles,omitempty"`
 }
 type PrestoConnectorHiveCon***REMOVED***g struct {
 	UseHadoopCon***REMOVED***g        *bool      `json:"useHadoopCon***REMOVED***g,omitempty"`
@@ -451,6 +452,9 @@ type PrestoConnectorHiveCon***REMOVED***g struct {
 	MetastoreURI           string     `json:"metastoreURI,omitempty"`
 	MetastoreTimeout       string     `json:"metastoreTimeout,omitempty"`
 	TLS                    *TLSCon***REMOVED***g `json:"tls,omitempty"`
+}
+type PrestoConnectorPrometheusCon***REMOVED***g struct {
+	Enabled *bool `json:"enabled,omitempty"`
 }
 type PrestoConnectorFileList struct {
 	Name    string `json:"name,omitempty"`
