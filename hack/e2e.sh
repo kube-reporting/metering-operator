@@ -11,8 +11,12 @@ source "${ROOT_DIR}/hack/lib/tests.sh"
 function cleanup() {
     exit_status=$?
 
-    echo "Removing namespaces with the 'name=metering-testing-ns' label"
-    kubectl delete ns -l "name=metering-testing-ns" || true
+    if [[ "${METERING_RUN_DEV_TEST_SETUP}" = false ]]; then
+        echo "Removing namespaces with the 'name=metering-testing-ns' label"
+        kubectl delete ns -l "name=metering-testing-ns" || true
+    ***REMOVED***
+        echo "Skipping the namespace deletion"
+    ***REMOVED***
 
     echo "Exiting hack/e2e.sh"
     exit "$exit_status"
@@ -31,12 +35,15 @@ TEST_LOG_FILE="${TEST_LOG_FILE:-e2e-tests.log}"
 TEST_LOG_FILE_PATH="${TEST_LOG_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_LOG_FILE}"
 TEST_JUNIT_REPORT_FILE="${TEST_JUNIT_REPORT_FILE:-junit-e2e-tests.xml}"
 TEST_JUNIT_REPORT_FILE_PATH="${TEST_JUNIT_REPORT_FILE_PATH:-$TEST_OUTPUT_DIR/$TEST_JUNIT_REPORT_FILE}"
+METERING_RUN_DEV_TEST_SETUP="${METERING_RUN_DEV_TEST_SETUP:-false}"
+
 
 mkdir -p "$TEST_OUTPUT_DIR"
 
 echo "\$KUBECONFIG=$KUBECONFIG"
 echo "\$METERING_NAMESPACE=$METERING_NAMESPACE"
 echo "\$METERING_RUN_TESTS_LOCALLY=$METERING_RUN_TESTS_LOCALLY"
+echo "\$METERING_RUN_DEV_TEST_SETUP=$METERING_RUN_DEV_TEST_SETUP"
 echo "\$METERING_OPERATOR_IMAGE_REPO=$METERING_OPERATOR_IMAGE_REPO"
 echo "\$REPORTING_OPERATOR_IMAGE_REPO=$REPORTING_OPERATOR_IMAGE_REPO"
 echo "\$METERING_OPERATOR_IMAGE_TAG=$METERING_OPERATOR_IMAGE_TAG"
@@ -60,6 +67,7 @@ go test \
     -log-level="${TEST_LOG_LEVEL}" \
     -run-tests-local="${METERING_RUN_TESTS_LOCALLY}" \
     -repo-path="${METERING_REPO_PATH}" \
+    -run-dev-setup="${METERING_RUN_DEV_TEST_SETUP}" \
     2>&1 | tee "$TEST_LOG_FILE_PATH" ; TEST_EXIT_CODE=${PIPESTATUS[0]}
 
 # if go-junit-report is installed, create a junit report also
