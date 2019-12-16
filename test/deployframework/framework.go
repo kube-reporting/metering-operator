@@ -44,6 +44,7 @@ const (
 // different metering instances and run tests against them
 type DeployFramework struct {
 	RunLocal          bool
+	RunDevSetup       bool
 	KubeConfigPath    string
 	RepoDir           string
 	OperatorResources *deploy.OperatorResources
@@ -55,7 +56,7 @@ type DeployFramework struct {
 }
 
 // New is the constructor function that creates and returns a new DeployFramework object
-func New(logger logrus.FieldLogger, runLocal bool, nsPrefix, repoDir, kubeconfig string) (*DeployFramework, error) {
+func New(logger logrus.FieldLogger, runLocal, runDevSetup bool, nsPrefix, repoDir, kubeconfig string) (*DeployFramework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build a kube config from %s: %v", kubeconfig, err)
@@ -95,6 +96,7 @@ func New(logger logrus.FieldLogger, runLocal bool, nsPrefix, repoDir, kubeconfig
 		KubeConfigPath:    kubeconfig,
 		RepoDir:           repoDir,
 		RunLocal:          runLocal,
+		RunDevSetup:       runDevSetup,
 		Logger:            logger,
 		Config:            config,
 		Client:            client,

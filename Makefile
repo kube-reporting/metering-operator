@@ -119,6 +119,12 @@ e2e: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
 e2e-local: reporting-operator-local metering-ansible-operator-docker-build
 	$(MAKE) e2e METERING_RUN_TESTS_LOCALLY=true METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG)
 
+e2e-dev:
+	$(MAKE) e2e METERING_RUN_DEV_TEST_SETUP=true
+
+e2e-dev-local:
+	$(MAKE) e2e-local METERING_RUN_DEV_TEST_SETUP=true
+
 e2e-docker: metering-src-docker-build
 	docker run \
 		--name metering-e2e-docker \

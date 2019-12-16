@@ -29,7 +29,8 @@ var (
 	healthCheckEndpoint      = "healthy"
 	healthCheckTimeoutPeriod = 5 * time.Minute
 
-	waitingForPodsTimeoutPeriod = 20 * time.Minute
+	waitingForPodsTimeoutPeriod        = 20 * time.Minute
+	waitingForServiceAccountTimePeriod = 10 * time.Minute
 
 	useHTTPSAPI                 = true
 	useRouteForReportingAPI     = true
@@ -48,6 +49,7 @@ type DeployerCtx struct {
 	MeteringOperatorImageRepo string
 	MeteringOperatorImageTag  string
 	RunTestLocal              bool
+	RunDevSetup               bool
 	ExtraLocalEnvVars         []string
 	LocalCtx                  *LocalCtx
 	Deployer                  *deploy.Deployer
@@ -111,6 +113,7 @@ func (df *DeployFramework) NewDeployerCtx(
 		HackScriptPath:            hackScriptDir,
 		ExtraLocalEnvVars:         extraLocalEnvVars,
 		RunTestLocal:              df.RunLocal,
+		RunDevSetup:               df.RunDevSetup,
 		KubeConfigPath:            df.KubeConfigPath,
 		Logger:                    df.Logger,
 		Config:                    df.Config,
@@ -170,7 +173,14 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 		ctx.Logger.Infof("Waiting for the metering pods to be ready")
 		start := time.Now()
 
+		initialDelay := 10 * time.Second
+
+		if ctx.RunDevSetup {
+			initialDelay = 1 * time.Second
+		}
+
 		pw := &PodWaiter{
+			InitialDelay:  initialDelay,
 			TimeoutPeriod: waitingForPodsTimeoutPeriod,
 			Client:        ctx.Client,
 			Logger:        ctx.Logger.WithField("component", "podWaiter"),
@@ -184,7 +194,13 @@ func (ctx *DeployerCtx) Setup(expectInstallErr bool) (*reportingframework.Report
 
 		ctx.Logger.Infof("Getting the service account %s", reportingOperatorServiceAccountName)
 
-		routeBearerToken, err = GetServiceAccountToken(ctx.Client, ctx.Namespace, reportingOperatorServiceAccountName)
+		routeBearerToken, err = GetServiceAccountToken(
+			ctx.Client,
+			initialDelay,
+			waitingForServiceAccountTimePeriod,
+			ctx.Namespace,
+			reportingOperatorServiceAccountName,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get the route bearer token: %v", err)
 		}
@@ -257,25 +273,30 @@ func (ctx *DeployerCtx) Teardown() error {
 		}
 	}
 
-	relPath := filepath.Join(ctx.HackScriptPath, cleanupScriptName)
-	targetScriptDir, err := filepath.Abs(relPath)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to get the absolute path from '%s': %v", relPath, err))
-	}
+	// Check if the user wants to run the E2E suite using the developer setup.
+	// If true, we skip the process of deleting and logging of the metering
+	// resources that were provisioned during the manual install.
+	if !ctx.RunDevSetup {
+		relPath := filepath.Join(ctx.HackScriptPath, cleanupScriptName)
+		targetScriptDir, err := filepath.Abs(relPath)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to get the absolute path from '%s': %v", relPath, err))
+		}
 
-	_, err = os.Stat(targetScriptDir)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to stat the '%s' path: %v", targetScriptDir, err))
-	}
+		_, err = os.Stat(targetScriptDir)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to stat the '%s' path: %v", targetScriptDir, err))
+		}
 
-	err = runCleanupScript(logger, ctx.Namespace, ctx.TestCaseOutputPath, targetScriptDir)
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
-	}
+		err = runCleanupScript(logger, ctx.Namespace, ctx.TestCaseOutputPath, targetScriptDir)
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to successfully run the cleanup script: %v", err))
+		}
 
-	err = ctx.Deployer.Uninstall()
-	if err != nil {
-		errArr = append(errArr, fmt.Sprintf("failed to uninstall metering: %v", err))
+		err = ctx.Deployer.Uninstall()
+		if err != nil {
+			errArr = append(errArr, fmt.Sprintf("failed to uninstall metering: %v", err))
+		}
 	}
 
 	if len(errArr) != 0 {
