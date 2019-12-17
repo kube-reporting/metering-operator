@@ -348,6 +348,56 @@ func TestManualMeteringInstall(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:                      "PrometheusConnectorWorks",
+			MeteringOperatorImageRepo: meteringOperatorImageRepo,
+			MeteringOperatorImageTag:  meteringOperatorImageTag,
+			Skip:                      false,
+			InstallSubTest: InstallTestCase{
+				Name:     "testPrometheusConnectorWorks",
+				TestFunc: testPrometheusConnectorWorks,
+			},
+			MeteringCon***REMOVED***gSpec: metering.MeteringCon***REMOVED***gSpec{
+				LogHelmTemplate: testhelpers.PtrToBool(true),
+				UnsupportedFeatures: &metering.UnsupportedFeaturesCon***REMOVED***g{
+					EnableHDFS: testhelpers.PtrToBool(true),
+				},
+				Storage: &metering.StorageCon***REMOVED***g{
+					Type: "hive",
+					Hive: &metering.HiveStorageCon***REMOVED***g{
+						Type: "hdfs",
+						Hdfs: &metering.HiveHDFSCon***REMOVED***g{
+							Namenode: "hdfs-namenode-0.hdfs-namenode:9820",
+						},
+					},
+				},
+				Presto: &metering.Presto{
+					Spec: &metering.PrestoSpec{
+						Coordinator: &metering.PrestoCoordinatorSpec{
+							Resources: &v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("1"),
+									v1.ResourceMemory: resource.MustParse("1Gi"),
+								},
+							},
+						},
+					},
+				},
+				ReportingOperator: &metering.ReportingOperator{
+					Spec: &metering.ReportingOperatorSpec{
+						Image: &metering.ImageCon***REMOVED***g{},
+						Con***REMOVED***g: &metering.ReportingOperatorCon***REMOVED***g{
+							LogLevel: "debug",
+							Prometheus: &metering.ReportingOperatorPrometheusCon***REMOVED***g{
+								MetricsImporter: &metering.ReportingOperatorPrometheusMetricsImporterCon***REMOVED***g{
+									Enabled: testhelpers.PtrToBool(false),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testInstallCon***REMOVED***gs {
