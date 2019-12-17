@@ -98,6 +98,7 @@ func validateImageConfig(image metering.ImageConfig) error {
 }
 
 type PodWaiter struct {
+	InitialDelay  time.Duration
 	TimeoutPeriod time.Duration
 	Logger        logrus.FieldLogger
 	Client        kubernetes.Interface
@@ -114,7 +115,7 @@ type podStat struct {
 // the polling loop, the number of pods listed must match the expected number
 // of targetPodsCount, and all pod containers listed must report a ready status.
 func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
-	err := wait.Poll(10*time.Second, pw.TimeoutPeriod, func() (done bool, err error) {
+	err := wait.Poll(pw.InitialDelay, pw.TimeoutPeriod, func() (done bool, err error) {
 		var readyPods []string
 		var unreadyPods []podStat
 
@@ -152,13 +153,13 @@ func (pw *PodWaiter) WaitForPods(namespace string, targetPodsCount int) error {
 
 // GetServiceAccountToken queries the namespace for the service account and attempts
 // to find the secret that contains the serviceAccount token and return it.
-func GetServiceAccountToken(client kubernetes.Interface, namespace, serviceAccountName string) (string, error) {
+func GetServiceAccountToken(client kubernetes.Interface, initialDelay, timeoutPeriod time.Duration, namespace, serviceAccountName string) (string, error) {
 	var (
 		sa  *v1.ServiceAccount
 		err error
 	)
 
-	err = wait.Poll(5*time.Second, 5*time.Minute, func() (done bool, err error) {
+	err = wait.Poll(initialDelay, timeoutPeriod, func() (done bool, err error) {
 		sa, err = client.CoreV1().ServiceAccounts(namespace).Get(serviceAccountName, meta.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
