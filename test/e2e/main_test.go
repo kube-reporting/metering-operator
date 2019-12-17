@@ -30,6 +30,7 @@ var (
 	kubeCon***REMOVED***g    string
 	logLevel      string
 	runTestsLocal bool
+	runDevSetup   bool
 
 	meteringOperatorImageRepo  string
 	meteringOperatorImageTag   string
@@ -56,6 +57,7 @@ func TestMain(m *testing.M) {
 	flag.StringVar(&kubeCon***REMOVED***g, "kubecon***REMOVED***g", "", "kube con***REMOVED***g path, e.g. $HOME/.kube/con***REMOVED***g")
 	flag.StringVar(&logLevel, "log-level", logrus.DebugLevel.String(), "The log level")
 	flag.BoolVar(&runTestsLocal, "run-tests-local", false, "Controls whether the metering and reporting operators are run locally during tests")
+	flag.BoolVar(&runDevSetup, "run-dev-setup", false, "Controls whether the e2e suite uses the dev-friendly con***REMOVED***guration")
 	flag.BoolVar(&runAWSBillingTests, "run-aws-billing-tests", runAWSBillingTests, "")
 
 	flag.StringVar(&meteringOperatorImageRepo, "metering-operator-image-repo", meteringOperatorImageRepo, "")
@@ -75,7 +77,7 @@ func TestMain(m *testing.M) {
 	}
 
 	var err error
-	if df, err = deployframework.New(logger, runTestsLocal, namespacePre***REMOVED***x, repoPath, kubeCon***REMOVED***g); err != nil {
+	if df, err = deployframework.New(logger, runTestsLocal, runDevSetup, namespacePre***REMOVED***x, repoPath, kubeCon***REMOVED***g); err != nil {
 		logger.Fatalf("Failed to create a new deploy framework: %v", err)
 	}
 
