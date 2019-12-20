@@ -74,3 +74,20 @@
       status: "True"
       message: "Finished reconciling reporting resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Reconciling Reporting
+  k8s_event:
+    state: present
+    name: Reconcile Reporting Event
+    namespace: "{{ meta.namespace }}"
+    message: Reconcile Reporting
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringCon***REMOVED***g
+      name: reporting
+      namespace: "{{ meta.namespace }}"
