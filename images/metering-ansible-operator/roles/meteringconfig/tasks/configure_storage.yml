@@ -210,5 +210,6 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringConfig
-      name: storage
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
+
