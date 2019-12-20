@@ -22,7 +22,7 @@
 - name: Log Events for Configuring Reporting
   k8s_event:
     state: present
-    name: Config Reporting
+    name: Configure Reporting resources
     namespace: "{{ meta.namespace }}"
     message: Configure reporting
     reason: Created

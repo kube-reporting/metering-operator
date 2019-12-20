@@ -107,5 +107,5 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringConfig
-      name: reportingOperator
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
