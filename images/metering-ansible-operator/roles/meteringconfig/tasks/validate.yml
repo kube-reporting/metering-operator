@@ -68,7 +68,6 @@
   vars:
     storageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.type') }}"
     hiveStorageType: "{{ meteringcon***REMOVED***g_spec_overrides | json_query('storage.hive.type') }}"
-
   rescue:
   - include_tasks: update_meteringcon***REMOVED***g_status.yml
     vars:
@@ -103,5 +102,6 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringCon***REMOVED***g
-      name: con***REMOVED***g
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
+
