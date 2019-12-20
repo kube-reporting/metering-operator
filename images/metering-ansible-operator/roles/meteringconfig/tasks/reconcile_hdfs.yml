@@ -81,5 +81,5 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringCon***REMOVED***g
-      name: hdfs
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

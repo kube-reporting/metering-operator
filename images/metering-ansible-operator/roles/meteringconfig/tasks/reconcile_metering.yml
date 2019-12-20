@@ -46,5 +46,5 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringCon***REMOVED***g
-      name: metering
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

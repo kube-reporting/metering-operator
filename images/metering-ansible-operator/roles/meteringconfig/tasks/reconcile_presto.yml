@@ -99,5 +99,5 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringCon***REMOVED***g
-      name: presto
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"

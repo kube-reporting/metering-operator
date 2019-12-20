@@ -100,5 +100,5 @@
     involvedObject:
       apiVersion: metering.openshift.io
       kind: MeteringCon***REMOVED***g
-      name: hive
+      name: "{{ meta.name }}"
       namespace: "{{ meta.namespace }}"
