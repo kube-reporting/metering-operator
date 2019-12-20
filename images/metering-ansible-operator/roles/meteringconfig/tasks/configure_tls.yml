@@ -68,5 +68,3 @@
       kind: MeteringConfig
       name: tls
       namespace: "{{ meta.namespace }}"
-
-

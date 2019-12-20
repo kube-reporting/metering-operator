@@ -105,4 +105,3 @@
       kind: MeteringConfig
       name: config
       namespace: "{{ meta.namespace }}"
-
