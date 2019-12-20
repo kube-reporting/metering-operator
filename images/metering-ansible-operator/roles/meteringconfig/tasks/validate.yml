@@ -105,4 +105,3 @@
       kind: MeteringCon***REMOVED***g
       name: con***REMOVED***g
       namespace: "{{ meta.namespace }}"
-

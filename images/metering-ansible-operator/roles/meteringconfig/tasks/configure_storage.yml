@@ -188,7 +188,6 @@
       when: ansible_failed_result and (ansible_failed_result.msg | length > 0)
   when: meteringcon***REMOVED***g_storage_hive_storage_type == 'gcs'
 
-
 - include_tasks: update_meteringcon***REMOVED***g_status.yml
   vars:
     current_conditions:
@@ -213,5 +212,3 @@
       kind: MeteringCon***REMOVED***g
       name: storage
       namespace: "{{ meta.namespace }}"
-
-

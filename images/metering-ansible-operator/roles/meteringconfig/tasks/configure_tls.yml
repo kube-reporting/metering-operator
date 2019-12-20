@@ -68,5 +68,3 @@
       kind: MeteringCon***REMOVED***g
       name: tls
       namespace: "{{ meta.namespace }}"
-
-
