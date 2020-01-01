@@ -5,7 +5,7 @@ There are two endpoints for the V2 versions of the endpoint:
 - `/api/v2/reports/{namespace}/{name}/full`
 - `/api/v2/reports/{namespace}/{name}/table`
 
-`{name}` is the name if the report that you are looking to run. Output format is specified as a query string at the end.
+`{name}` is the name of the report that you are looking to run. Output format is specified as a query string at the end.
 
 # Sample URLs
 
