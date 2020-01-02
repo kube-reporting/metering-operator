@@ -446,9 +446,6 @@ func (op *Reporting) Run(ctx context.Context) error {
 	}
 
 	hiveQueryer := sql.OpenDB(hiveDB)
-	if err != nil {
-		return err
-	}
 	hiveQueryer.SetConnMaxLifetime(time.Minute)
 	hiveQueryer.SetMaxOpenConns(2)
 	hiveQueryer.SetMaxIdleConns(2)
@@ -497,7 +494,10 @@ func (op *Reporting) Run(ctx context.Context) error {
 
 		prestoURL.Scheme = "https"
 		val.Set("custom_client", "httpClient")
-		presto.RegisterCustomClient("httpClient", httpClient)
+		err = presto.RegisterCustomClient("httpClient", httpClient)
+		if err != nil {
+			return fmt.Errorf("presto: Failed to register a custom HTTP client: %v", err)
+		}
 	}
 
 	prestoURL.RawQuery = val.Encode()

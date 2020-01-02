@@ -428,7 +428,7 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		}
 
 		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
-		dataSource, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
+		_, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		})
 		if err != nil {
