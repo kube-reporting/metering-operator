@@ -3,7 +3,7 @@ Read more in the [introduction blog post](https://coreos.com/blog/introducing-op
 
 <img src="Documentation/operator_logo_metering_color.svg" height="125px"></img>
 
-Metering records historical cluster usage, and can generate usage reports showing usage breakdowns by pod or namespace over arbitrary time periods.
+Metering records historical cluster usage and can generate usage reports showing usage breakdowns by pod or namespace over arbitrary time periods.
 
 ## Project status: alpha
 
