@@ -92,3 +92,20 @@
       status: "True"
       message: "Finished reconciling reporting-operator resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Reporting Operator
+  k8s_event:
+    state: present
+    name: Reconcile Reporting Operator Event
+    namespace: "{{ meta.namespace }}"
+    message: Reconcile Reporting Operator
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"

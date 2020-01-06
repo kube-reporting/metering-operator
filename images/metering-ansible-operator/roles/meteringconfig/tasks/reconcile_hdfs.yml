@@ -66,3 +66,20 @@
       status: "True"
       message: "Finished reconciling HDFS resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Reconciling HDFS
+  k8s_event:
+    state: present
+    name: Reconcile Hdfs Event
+    namespace: "{{ meta.namespace }}"
+    message: Reconcile HDFS
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringConfig
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
