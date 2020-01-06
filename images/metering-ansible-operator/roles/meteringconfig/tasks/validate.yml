@@ -87,3 +87,21 @@
       status: "True"
       message: "Finished the validation process"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for validating con***REMOVED***gurations
+  k8s_event:
+    state: present
+    name: Validate Con***REMOVED***guration
+    namespace: "{{ meta.namespace }}"
+    message: Validate Con***REMOVED***gurations
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringCon***REMOVED***g
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+

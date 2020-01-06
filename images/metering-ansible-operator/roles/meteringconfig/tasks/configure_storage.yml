@@ -195,3 +195,21 @@
       status: "True"
       message: "Finished con***REMOVED***guring Hive storage"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
+
+- name: Log Events for Con***REMOVED***guring Storage
+  k8s_event:
+    state: present
+    name: Con***REMOVED***guring Storage Event
+    namespace: "{{ meta.namespace }}"
+    message: Con***REMOVED***gure Storage
+    reason: Created
+    reportingComponent: Reporting components
+    type: Normal
+    source:
+      component: Metering components
+    involvedObject:
+      apiVersion: metering.openshift.io
+      kind: MeteringCon***REMOVED***g
+      name: "{{ meta.name }}"
+      namespace: "{{ meta.namespace }}"
+
