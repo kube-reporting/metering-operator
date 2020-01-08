@@ -264,7 +264,7 @@ func (op *Reporting) handleHiveTable(logger log.FieldLogger, hiveTable *metering
 
 		hiveTable.Status.Partitions = desiredPartitions
 		var err error
-		hiveTable, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
+		_, err = op.meteringClient.MeteringV1().HiveTables(hiveTable.Namespace).Update(hiveTable)
 		if err != nil {
 			return err
 		}
