@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,14 +33,16 @@ type ManifestRetriever interface {
 }
 
 type manifestRetriever struct {
+	logger         log.FieldLogger
 	s3API          s3iface.S3API
 	bucket, prefix string
 }
 
-func NewManifestRetriever(region, bucket, prefix string) ManifestRetriever {
+func NewManifestRetriever(logger log.FieldLogger, region, bucket, prefix string) ManifestRetriever {
 	awsSession := session.Must(session.NewSession())
 	client := s3.New(awsSession, aws.NewConfig().WithRegion(region))
 	return &manifestRetriever{
+		logger: logger,
 		s3API:  client,
 		bucket: bucket,
 		prefix: prefix,
@@ -58,13 +61,26 @@ func (r *manifestRetriever) RetrieveManifests() ([]*Manifest, error) {
 	} else if prefix[len(prefix)-1] != '/' {
 		prefix += "/"
 	}
+	logger := r.logger.WithFields(log.Fields{
+		"bucket": r.bucket,
+		"prefix": prefix,
+	})
 
-	var manifests []*Manifest
-	var manifestErr error
+	var (
+		manifests   []*Manifest
+		manifestErr error
+		page        int
+	)
 	pageFn := func(out *s3.ListObjectsV2Output, lastPage bool) bool {
+		page++
 		keys := r.filterObjects(prefix, out.Contents)
+		if len(keys) == 0 {
+			logger.Debugf("page %d had no manifests", page)
+			return true
+		}
 
 		for _, key := range keys {
+			logger.WithField("key", key).Debugf("retrieving manifest")
 			manifest, err := retrieveManifest(r.s3API, r.bucket, key)
 			if err != nil {
 				manifestErr = fmt.Errorf("can't get manifest from bucket '%s' with key '%s': %v", r.bucket, key, err)

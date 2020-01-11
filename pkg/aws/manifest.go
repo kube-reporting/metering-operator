@@ -9,18 +9,18 @@ import (
 
 // Manifest is a representation of the file AWS provides with metadata for current usage information.
 type Manifest struct {
-	AssemblyID             string        `json:"assemblyId"`
-	Account                string        `json:"account"`
-	Columns                []Column      `json:"columns"`
-	Charset                string        `json:"charset"`
-	Compression            string        `json:"compression"`
-	ContentType            string        `json:"contentType"`
-	ReportID               string        `json:"reportId"`
-	ReportName             string        `json:"reportName"`
-	BillingPeriod          BillingPeriod `json:"billingPeriod"`
-	Bucket                 string        `json:"bucket"`
-	ReportKeys             []string      `json:"reportKeys"`
-	AdditionalArtifactKeys []string      `json:"additionalArtifactKeys"`
+	AssemblyID             string               `json:"assemblyId"`
+	Account                string               `json:"account"`
+	Columns                []Column             `json:"columns"`
+	Charset                string               `json:"charset"`
+	Compression            string               `json:"compression"`
+	ContentType            string               `json:"contentType"`
+	ReportID               string               `json:"reportId"`
+	ReportName             string               `json:"reportName"`
+	BillingPeriod          BillingPeriod        `json:"billingPeriod"`
+	Bucket                 string               `json:"bucket"`
+	ReportKeys             []string             `json:"reportKeys"`
+	AdditionalArtifactKeys []AdditionalArtifact `json:"additionalArtifactKeys"`
 }
 
 type BillingPeriod struct {
@@ -32,6 +32,11 @@ type BillingPeriod struct {
 type Column struct {
 	Category string `json:"category"`
 	Name     string `json:"name"`
+}
+
+type AdditionalArtifact struct {
+	ArtifactType string `json:"artifactType"`
+	Name         string `json:"name"`
 }
 
 // Paths returns the directories containing usage data. The result will be free of duplicates.
