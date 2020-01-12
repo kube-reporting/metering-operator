@@ -20,7 +20,7 @@ import (
 
 var (
 	httpScheme = "http"
-	localAddr  = "127.0.0.1"
+	localAddr  = "[::1]"
 
 	apiPort     = 8100
 	metricsPort = 8101

@@ -69,9 +69,9 @@ func init() {
 	startCmd.Flags().BoolVar(&cfg.AllNamespaces, "all-namespaces", false, "if true, reporting-operator monitors all namespaces.")
 	startCmd.Flags().StringSliceVar(&cfg.TargetNamespaces, "target-namespaces", nil, "the namespaces for reporting-operator to watch for resources, if empty defaults to the value of --namespace, or all namespaces if --all-namespaces is specified.")
 
-	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "127.0.0.1:8080", "ip:port to listen on for the reporting API")
-	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "127.0.0.1:8082", "ip:port to listen on for Prometheus metrics")
-	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "127.0.0.1:6060", "ip:port to listen on for the pprof debug info")
+	startCmd.Flags().StringVar(&cfg.APIListen, "api-listen", "[::1]:8080", "ip:port to listen on for the reporting API")
+	startCmd.Flags().StringVar(&cfg.MetricsListen, "metrics-listen", "[::1]:8082", "ip:port to listen on for Prometheus metrics")
+	startCmd.Flags().StringVar(&cfg.PprofListen, "pprof-listen", "[::1]:6060", "ip:port to listen on for the pprof debug info")
 
 	startCmd.Flags().StringVar(&cfg.HiveHost, "hive-host", defaultHiveHost, "the hostname:port for connecting to Hive")
 	startCmd.Flags().BoolVar(&cfg.HiveUseTLS, "hive-use-tls", false, "If true, enables TLS when connecting to Hive")
