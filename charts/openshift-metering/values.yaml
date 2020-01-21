@@ -6,6 +6,8 @@ unsupportedFeatures:
 
 disableOCPFeatures: false
 
+useIPV6Networking: false
+
 storage:
   type: "hive"
   hive: {}
