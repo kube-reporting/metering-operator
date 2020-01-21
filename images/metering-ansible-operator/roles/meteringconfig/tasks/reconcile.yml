@@ -9,6 +9,9 @@
 - name: Configure TLS
   include_tasks: configure_tls.yml
 
+- name: Configure Networking
+  include_tasks: configure_networking.yml
+
 - name: Configure Reporting
   include_tasks: configure_reporting.yml
 

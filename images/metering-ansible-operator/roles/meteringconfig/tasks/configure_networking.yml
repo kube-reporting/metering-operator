@@ -1,0 +1,28 @@
+---
+
+# Get the Openshift cluster's networking config object
+- name: Check the IP version infrastructure provisioned
+  k8s_facts:
+    api_version: "config.openshift.io/v1"
+    kind: Network
+    name: cluster
+  register: cluster_network_config
+  when: not meteringconfig_ocp_disabled
+
+# Attempt to auto-detect whether there are any ipv4 addresses in the serviceNetwork array.
+# If there are, treat the cluster as single-stack IPV4, else enable IPV6 networking.
+#
+# TODO: fix this logic when better support for Openshift dual-stack has been developed.
+# Note: the ipv4 Jinja2 filter has a dependency on the "netaddr" python module.
+- name: Detect if cluster is single-stack ipv4
+  block:
+  - set_fact:
+      service_network_contains_ipv4_address: "{{ item | ipv4 }}"
+    loop: "{{ serviceNetworkList.status.serviceNetwork }}"
+
+  - set_fact:
+      _ocp_enabled_use_ipv6_networking: true
+    when: not service_network_contains_ipv4_address
+  vars:
+    serviceNetworkList: "{{ cluster_network_config.resources | first }}"
+  when: cluster_network_config is defined and cluster_network_config.resources is defined and cluster_network_config.resources | length > 0
