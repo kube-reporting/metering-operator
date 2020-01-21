@@ -85,20 +85,3 @@
       status: "True"
       message: "Finished reconciling Hive resources"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for Reconciling Hive
-  k8s_event:
-    state: present
-    name: Reconcile Hive Event
-    namespace: "{{ meta.namespace }}"
-    message: Reconcile Hive
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"

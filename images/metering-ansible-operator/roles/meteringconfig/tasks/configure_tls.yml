@@ -51,21 +51,3 @@
       status: "True"
       message: "Finished configuring TLS"
       lastTransitionTime: "{{ now(utc=False).isoformat() + 'Z' }}"
-
-- name: Log Events for validating TLS
-  k8s_event:
-    state: present
-    name: Validate TLS
-    namespace: "{{ meta.namespace }}"
-    message: Validating TLS
-    reason: Created
-    reportingComponent: Reporting components
-    type: Normal
-    source:
-      component: Metering components
-    involvedObject:
-      apiVersion: metering.openshift.io
-      kind: MeteringConfig
-      name: "{{ meta.name }}"
-      namespace: "{{ meta.namespace }}"
-
