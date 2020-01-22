@@ -36,6 +36,13 @@ operator:
       verbs:
       - get
       - list
+    # grants access to view the networking con***REMOVED***g
+    - apiGroups:
+      - con***REMOVED***g.openshift.io
+      resources:
+      - networks
+      verbs:
+      - list
     # used by openshift auth-proxy
     - apiGroups:
       - authorization.k8s.io
