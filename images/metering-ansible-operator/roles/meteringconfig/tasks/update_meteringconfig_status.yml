@@ -9,7 +9,6 @@
     conditions: "{{ [ current_conditions ] }}"
   when: current_conditions is de***REMOVED***ned
 
-- name: End role due to failure
-  fail:
+- fail:
     msg: "Failing role execution after updating the MeteringCon***REMOVED***g.Status"
   when: end_play_after_updating_status is de***REMOVED***ned and end_play_after_updating_status
