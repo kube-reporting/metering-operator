@@ -295,6 +295,12 @@ spec:
             - get
             - list
           - apiGroups:
+            - config.openshift.io
+            resources:
+            - networks
+            verbs:
+            - list
+          - apiGroups:
             - authorization.k8s.io
             resources:
             - subjectaccessreviews
