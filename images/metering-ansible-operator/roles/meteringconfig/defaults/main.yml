@@ -79,6 +79,7 @@ _base_storage_overrides:
         con***REMOVED***g:
           aws:
             secretName: "{{ _storage_spec | json_query('hive.s3.secretName') }}"
+            region: "{{ _storage_spec | json_query('hive.s3.region') }}"
             createSecret: false
     hive:
       spec:
@@ -93,6 +94,8 @@ _base_storage_overrides:
         con***REMOVED***g:
           # regex_replace to append a trailing slash if missing
           defaultFS: "s3a://{{ _storage_spec | json_query('hive.s3.bucket') | regex_replace('\\/?$', '/') }}"
+          aws:
+            region: "{{ _storage_spec | json_query('hive.s3.region') }}"
         hdfs:
           enabled: false
 
