@@ -359,7 +359,11 @@ _ocp_disabled_overrides:
         securityContext:
           fsGroup: 0
 
+_ocp_enabled_use_ipv6_networking: false
+
 _ocp_enabled_overrides:
+  useIPV6Networking: "{{ _ocp_enabled_use_ipv6_networking }}"
+
   reporting-operator:
     spec:
       config:
