@@ -3892,6 +3892,12 @@ objects:
     - get
     - list
   - apiGroups:
+    - con***REMOVED***g.openshift.io
+    resources:
+    - networks
+    verbs:
+    - list
+  - apiGroups:
     - authorization.k8s.io
     resources:
     - subjectaccessreviews

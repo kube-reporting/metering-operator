@@ -9,6 +9,9 @@
 - name: Con***REMOVED***gure TLS
   include_tasks: con***REMOVED***gure_tls.yml
 
+- name: Con***REMOVED***gure Networking
+  include_tasks: con***REMOVED***gure_networking.yml
+
 - name: Con***REMOVED***gure Reporting
   include_tasks: con***REMOVED***gure_reporting.yml
 
