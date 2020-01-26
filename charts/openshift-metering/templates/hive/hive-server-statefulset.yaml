@@ -230,7 +230,11 @@ spec:
         args:
         - client
         - --listen
+{{- if .Values.useIPV6Networking }}
+        - "[::1]:9083"
+{{- else }}
         - localhost:9083
+{{- end }}
         - --target
         - hive-metastore:9083
         - --keystore
@@ -256,9 +260,17 @@ spec:
         args:
         - server
         - --listen
+{{- if .Values.useIPV6Networking }}
+        - "[::]:10001"
+{{- else }}
         - 0.0.0.0:10001
+{{- end }}
         - --target
+{{- if .Values.useIPV6Networking }}
+        - "[::1]:10000"
+{{- else }}
         - localhost:10000
+{{- end }}
         - --key
         -  $(GHOSTUNNEL_SERVER_KEYFILE)
         - --cert

@@ -262,7 +262,6 @@ spec:
         - name: REPORTING_OPERATOR_HIVE_USE_AUTH
           value: "false"
 {{- end }}
-
         - name: REPORTING_OPERATOR_LEASE_DURATION
           valueFrom:
             configMapKeyRef:
@@ -301,15 +300,27 @@ spec:
               key: target-namespaces
               optional: true
         - name: REPORTING_OPERATOR_API_LISTEN
-{{- if $operatorValues.spec.authProxy.enabled }}
+{{- if and $operatorValues.spec.authProxy.enabled .Values.useIPV6Networking }}
+          value: "[::1]:8080"
+{{- else if $operatorValues.spec.authProxy.enabled }}
           value: 127.0.0.1:8080
+{{- else if .Values.useIPV6Networking }}
+          value: "[::]:8080"
 {{- else }}
           value: 0.0.0.0:8080
 {{- end }}
         - name: REPORTING_OPERATOR_METRICS_LISTEN
+{{- if .Values.useIPV6Networking }}
+          value: "[::]:8082"
+{{- else }}
           value: 0.0.0.0:8082
+{{- end }}
         - name: REPORTING_OPERATOR_PPROF_LISTEN
+{{- if .Values.useIPV6Networking }}
+          value: "[::1]:6060"
+{{- else }}
           value: 127.0.0.1:6060
+{{- end }}
         resources:
 {{ toYaml $operatorValues.spec.resources | indent 10 }}
         ports:
@@ -374,7 +385,11 @@ spec:
         - -https-address=
         - -http-address=:8081
 {{- end }}
+{{- if .Values.useIPV6Networking }}
+        - -upstream=http://[::1]:8080
+{{- else }}
         - -upstream=http://127.0.0.1:8080
+{{- end }}
         - -htpasswd-file=/etc/proxy/htpasswd/auth
 {{- if $operatorValues.spec.config.tls.api.enabled }}
         - -tls-cert=/etc/tls/tls.crt

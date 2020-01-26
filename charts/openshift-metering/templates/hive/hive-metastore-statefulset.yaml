@@ -204,9 +204,17 @@ spec:
         args:
         - server
         - --listen
+{{- if .Values.useIPV6Networking }}
+        - "[::]:9084"
+{{- else }}
         - 0.0.0.0:9084
+{{- end }}
         - --target
+{{- if .Values.useIPV6Networking }}
+        - "[::1]:9083"
+{{- else }}
         - localhost:9083
+{{- end }}
         - --key
         -  $(HIVE_METASTORE_KEYFILE)
         - --cert
