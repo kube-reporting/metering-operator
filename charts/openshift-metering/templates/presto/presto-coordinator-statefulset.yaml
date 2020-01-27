@@ -56,6 +56,13 @@ spec:
 {{ toYaml .Values.presto.spec.annotations | indent 8 }}
 {{- end }}
     spec:
+{{- if .Values.useIPV6Networking }}
+      hostAliases:
+      - ip: "::1"
+        hostnames:
+          - "presto.local"
+          - "presto"
+{{- end }}
 {{- if .Values.presto.spec.securityContext }}
       securityContext:
 {{ toYaml .Values.presto.spec.securityContext | indent 8 }}
