@@ -43,6 +43,7 @@ operator:
       - networks
       verbs:
       - list
+      - get
     # used by openshift auth-proxy
     - apiGroups:
       - authorization.k8s.io
