@@ -16,6 +16,7 @@ rules:
     - networks
     verbs:
     - list
+    - get
   - apiGroups:
     - authorization.k8s.io
     resources:
