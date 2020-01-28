@@ -1,4 +1,4 @@
-FROM openshift/golang-builder:1.12 AS build
+FROM openshift/golang-builder:1.13 AS build
 
 COPY . /go/src/github.com/operator-framework/operator-metering
 WORKDIR /go/src/github.com/operator-framework/operator-metering
