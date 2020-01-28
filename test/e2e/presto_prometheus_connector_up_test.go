@@ -13,27 +13,33 @@ import (
 
 func testPrometheusConnectorWorks(t *testing.T, rf *reportingframework.ReportingFramework) {
 	t.Helper()
-	cmdPrep := exec.Command(
+
+	// query for the presto-coordinator pod name
+	podNameCmd := exec.Command(
 		"kubectl",
 		"-n", rf.Namespace,
 		"get", "pods",
 		"-l", "app=presto,presto=coordinator",
 		"-o", "name",
 	)
+
 	var prestoHostResults bytes.Buffer
-	cmdPrep.Stderr = os.Stderr
-	cmdPrep.Stdout = &prestoHostResults
-	err := cmdPrep.Run()
-	t.Logf("pod name returned as: %s", string(prestoHostResults.Bytes()))
+	podNameCmd.Stderr = os.Stderr
+	podNameCmd.Stdout = &prestoHostResults
+
+	err := podNameCmd.Run()
 	require.Nil(t, err, "expected querying for the presto pod name would produce no error")
-	require.NotEmpty(t, string(prestoHostResults.Bytes()), "unable to parse presto pod name")
+	require.NotEmpty(t, prestoHostResults.String(), "unable to parse the presto-coordinator pod name")
+
+	t.Logf("querying for the pod/presto-coordinator name returned: %s", prestoHostResults.String())
 
 	// we know the output is going to be of the form `pod/<presto coordinator pod name>` so split by '/'
-	tmp := strings.Split(string(prestoHostResults.Bytes()), "/")[1]
+	tmp := strings.Split(prestoHostResults.String(), "/")[1]
 	host := strings.TrimSuffix(tmp, "\n")
 	t.Logf("host found for presto from prep phase: %s", host)
 
-	cmdTest := exec.Command(
+	// TODO: need to handle the case where TLS is disabled
+	queryCmd := exec.Command(
 		"kubectl",
 		"-n", rf.Namespace,
 		"exec",
@@ -49,9 +55,12 @@ func testPrometheusConnectorWorks(t *testing.T, rf *reportingframework.Reporting
 		"--execute",
 		"SELECT * FROM prometheus.default.up where timestamp > (NOW() - INTERVAL '10' second)",
 	)
+
 	var queryResults bytes.Buffer
-	cmdTest.Stderr = os.Stderr
-	cmdTest.Stdout = &queryResults
-	err = cmdTest.Run()
-	require.Containsf(t, string(queryResults.Bytes()), "endpoint=metrics", "query output didn't contain `endpoint=metrics`")
+	queryCmd.Stderr = os.Stderr
+	queryCmd.Stdout = &queryResults
+
+	err = queryCmd.Run()
+	require.Nil(t, err, "expected running the a presto query would produce no error")
+	require.Containsf(t, queryResults.String(), "endpoint=metrics", "expected the presto query output would contain `endpoint=metrics`")
 }
