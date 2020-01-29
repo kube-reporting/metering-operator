@@ -33,11 +33,6 @@ RUN helm init --client-only --skip-refresh && helm repo remove stable || true
 
 COPY gotools /go/src/gotools
 
-ENV TEST2JSON_BIN /go/bin/test2json
-
-RUN go build -o $TEST2JSON_BIN /go/src/gotools/test2json/main.go \
-        && chmod +x $TEST2JSON_BIN
-
 RUN go get -u github.com/jstemmer/go-junit-report
 
 ENV GOCACHE='/tmp'

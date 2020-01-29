@@ -54,7 +54,6 @@ GO_BUILD_ARGS := -ldflags '-extldflags "-static"'
 GOOS = "linux"
 CGO_ENABLED = 0
 
-TEST2JSON_BIN_OUT = bin/test2json
 DEPLOY_METERING_BIN_OUT = bin/deploy-metering
 REPORTING_OPERATOR_BIN_OUT = bin/reporting-operator
 REPORTING_OPERATOR_BIN_OUT_LOCAL = bin/reporting-operator-local
@@ -113,7 +112,7 @@ unit-docker: metering-src-docker-build
 		$(METERING_SRC_IMAGE_REPO):$(METERING_SRC_IMAGE_TAG) \
 		make unit
 
-e2e: $(TEST2JSON_BIN_OUT) $(DEPLOY_METERING_BIN_OUT)
+e2e: $(DEPLOY_METERING_BIN_OUT)
 	hack/e2e.sh
 
 e2e-local: reporting-operator-local metering-ansible-operator-docker-build
@@ -200,9 +199,6 @@ metering-manifests:
 		METERING_OPERATOR_IMAGE_REPO=$(METERING_OPERATOR_IMAGE_REPO) \
 		METERING_OPERATOR_IMAGE_TAG=$(METERING_OPERATOR_IMAGE_TAG); \
 	./hack/generate-metering-manifests.sh
-
-$(TEST2JSON_BIN_OUT): gotools/test2json/main.go
-	go build -o $(TEST2JSON_BIN_OUT) gotools/test2json/main.go
 
 $(DEPLOY_METERING_BIN_OUT): $(GOFILES)
 	go build -o $(DEPLOY_METERING_BIN_OUT) $(GO_PKG)/cmd/deploy-metering
