@@ -4,7 +4,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli as cli
 
-FROM openshift/origin-release:golang-1.12
+FROM openshift/origin-release:golang-1.13
 
 # our copy of faq and jq
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
@@ -30,8 +30,6 @@ RUN ln -s /usr/bin/oc /usr/bin/kubectl
 COPY --from=helm /usr/local/bin/helm /usr/local/bin/helm
 
 RUN helm init --client-only --skip-refresh && helm repo remove stable || true
-
-COPY gotools /go/src/gotools
 
 RUN go get -u github.com/jstemmer/go-junit-report
 
