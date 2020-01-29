@@ -153,6 +153,12 @@ def get_fingerprint_of_bytes(source):
         except AttributeError:
             return None
 
+    try:
+        algorithms = list(algorithms)
+        algorithms.remove('md5')
+    except ValueError:
+        pass
+
     for algo in algorithms:
         f = getattr(hashlib, algo)
         h = f(source)
