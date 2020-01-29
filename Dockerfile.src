@@ -4,7 +4,7 @@ FROM quay.io/openshift/origin-metering-helm:latest as helm
 # image needs kubectl, so we copy `oc` from cli image to use as kubectl.
 FROM openshift/origin-cli as cli
 
-FROM openshift/origin-release:golang-1.13
+FROM openshift/origin-release:golang-1.12
 
 # our copy of faq and jq
 COPY hack/faq.repo /etc/yum.repos.d/ecnahc515-faq-epel-7.repo
