@@ -50,8 +50,6 @@ import (
 )
 
 const (
-	connBackoff         = time.Second * 15
-	maxConnRetries      = 3
 	defaultResyncPeriod = time.Minute * 15
 	prestoUsername      = "reporting-operator"
 
@@ -265,7 +263,6 @@ func newReportingOperator(
 	meteringClient cbClientset.Interface,
 	informerNamespace string,
 ) *Reporting {
-
 	informerFactory := factory.NewFilteredSharedInformerFactory(meteringClient, defaultResyncPeriod, informerNamespace, nil)
 
 	prestoTableInformer := informerFactory.Metering().V1().PrestoTables()
@@ -558,7 +555,7 @@ func (op *Reporting) Run(ctx context.Context) error {
 		defer wg.Done()
 		var srvErr error
 		if op.cfg.APITLSCon***REMOVED***g.UseTLS {
-			op.logger.Infof("HTTP API server listening with TLS on 127.0.0.1:8080")
+			op.logger.Infof("HTTP API server listening with TLS on %s", op.cfg.APIListen)
 			srvErr = httpServer.ListenAndServeTLS(op.cfg.APITLSCon***REMOVED***g.TLSCert, op.cfg.APITLSCon***REMOVED***g.TLSKey)
 		} ***REMOVED*** {
 			op.logger.Infof("HTTP API server listening on %s", op.cfg.APIListen)
