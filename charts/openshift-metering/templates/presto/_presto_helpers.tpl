@@ -21,16 +21,18 @@ hive.metastore-timeout={{ .Values.presto.spec.config.connectors.hive.metastoreTi
 {{- if .Values.presto.spec.config.connectors.hive.s3.useInstanceCredentials }}
 hive.s3.use-instance-credentials={{ .Values.presto.spec.config.connectors.hive.s3.useInstanceCredentials }}
 {{- end }}
-
 {{- if .Values.presto.spec.config.connectors.hive.useHadoopConfig}}
 hive.config.resources=/hadoop-config/core-site.xml
+{{- end }}
+
+{{- if and .Values.presto.spec.config.aws.region .Values.useIPV6Networking }}
+hive.s3.endpoint=https://s3.dualstack.{{ .Values.presto.spec.config.aws.region }}.amazonaws.com
+hive.s3.path-style-access=true
 {{- end }}
 {{- if .Values.presto.spec.config.s3Compatible.endpoint }}
 hive.s3.endpoint={{ .Values.presto.spec.config.s3Compatible.endpoint }}
 hive.s3.path-style-access=true
 {{- end }}
-
-
 {{- end }}
 
 {{- define "presto-jmx-catalog-properties" -}}
