@@ -210,13 +210,10 @@ $(DEPLOY_METERING_BIN_OUT): $(GOFILES)
 .PHONY: \
 	test vendor fmt verify \
 	update-codegen verify-codegen \
-	docker-build docker-tag docker-push \
-	docker-build-all docker-tag-all docker-push-all \
-	metering-test-docker \
+	docker-build-all \
 	metering-src-docker-build \
 	build-reporting-operator reporting-operator-bin reporting-operator-local \
-	metering-manifests \
-	install-kube-prometheus-helm
+	metering-manifests
 
 update-codegen: $(CODEGEN_OUTPUT_GO_FILES)
 	./hack/update-codegen.sh
