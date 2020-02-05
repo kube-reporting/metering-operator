@@ -33,7 +33,7 @@ type ReportDataSourceSpec struct {
 	// bucket.
 	AWSBilling *AWSBillingDataSource `json:"awsBilling,omitempty"`
 	// PrestoTable represents a datasource which points to an existing
-	// PrestoTable CR.
+	// PrestoTable CR or an existing, fully-qualified table name in Presto.
 	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
 
 	// ReportQueryView  represents a datasource which creates a Presto
@@ -70,7 +70,8 @@ type PrometheusMetricsImporterDataSource struct {
 }
 
 type PrestoTableDataSource struct {
-	TableRef v1.LocalObjectReference `json:"tableRef"`
+	TableRef  *v1.LocalObjectReference `json:"tableRef,omitempty"`
+	TableName string                   `json:"tableName"`
 }
 
 type ReportQueryViewDataSource struct {
