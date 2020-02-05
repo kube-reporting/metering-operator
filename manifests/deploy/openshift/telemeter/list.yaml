@@ -3521,17 +3521,27 @@ objects:
                 - source
                 type: object
               prestoTable:
+                oneOf:
+                - required:
+                  - tableRef
+                - required:
+                  - tableName
                 properties:
+                  tableName:
+                    description: |
+                      TableName is the fully-qualified table name of an existing table in Presto.
+                    minLength: 1
+                    type: string
                   tableRef:
                     properties:
                       name:
+                        description: |
+                          Name is the name of an existing PrestoTable custom resource.
                         minLength: 1
                         type: string
                     required:
                     - name
                     type: object
-                required:
-                - tableRef
                 type: object
               prometheusMetricsImporter:
                 properties:
