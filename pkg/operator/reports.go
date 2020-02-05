@@ -452,7 +452,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 			},
 			Spec: metering.ReportDataSourceSpec{
 				PrestoTable: &metering.PrestoTableDataSource{
-					TableRef: v1.LocalObjectReference{
+					TableRef: &v1.LocalObjectReference{
 						Name: prestoTable.Name,
 					},
 				},
