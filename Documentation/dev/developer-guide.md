@@ -31,7 +31,7 @@ $ pip3 install operator-courier
 
 It is important that you clone the project to the right location in your $GOPATH.
 
-The repository much be located at:
+The repository path must be located at:
 
 ```
 $GOPATH/src/github.com/operator-framework/operator-metering
