@@ -314,6 +314,8 @@ olm:
         version: v1
 
     annotations:
+      operatorframework.io/suggested-namespace: openshift-metering
+      operatorframework.io/cluster-monitoring: true
       categories: "OpenShift Optional, Monitoring"
       certified: "false"
       capabilities: Basic Install
