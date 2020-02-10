@@ -77,6 +77,36 @@ func DropView(queryer db.Queryer, catalog, schema, viewName string, ignoreNotExi
 	return err
 }
 
+// QueryMetadata executes a "DESCRIBE" Presto query against an existing, fully-qualified
+// table name to determine that table's column information.
+func QueryMetadata(queryer db.Queryer, catalog, schema, tableName string) ([]Column, error) {
+	rows, err := ExecuteSelect(queryer, fmt.Sprintf("DESCRIBE %s", FullyQualifiedTableName(catalog, schema, tableName)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to query the %s Presto table's metadata: %v", tableName, err)
+	}
+
+	var cols []Column
+	for _, row := range rows {
+		// note: row is in the form of map[string]interface{}
+		// so we need to use type assertions to access values
+		colName, ok := row["Column"].(string)
+		if !ok {
+			return nil, fmt.Errorf("failed to convert the Presto column name to a string")
+		}
+		colType, ok := row["Type"].(string)
+		if !ok {
+			return nil, fmt.Errorf("failed to convert the Presto column type to a string")
+		}
+
+		cols = append(cols, Column{
+			Name: colName,
+			Type: colType,
+		})
+	}
+
+	return cols, nil
+}
+
 func GenerateGetRowsSQL(tableName string, columns []Column) string {
 	columnsSQL := GenerateQuotedColumnsListSQL(columns)
 	orderBySQL := GenerateOrderBySQL(columns)

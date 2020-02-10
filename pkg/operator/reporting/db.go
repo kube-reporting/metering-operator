@@ -81,6 +81,7 @@ type PrestoTableManager interface {
 	CreateTable(catalog, schema, tableName string, columns []presto.Column, comment string, properties map[string]string, ignoreExists bool) error
 	CreateTableAs(catalog, schema, tableName string, columns []presto.Column, comment string, properties map[string]string, ignoreExists bool, query string) error
 	DropTable(catalog, schema, tableName string, ignoreNotExists bool) error
+	QueryMetadata(catalog, schema, tableName string) ([]presto.Column, error)
 
 	CreateView(catalog, schema, viewName, query string) error
 	DropView(catalog, schema, viewName string, ignoreNotExists bool) error
@@ -112,4 +113,8 @@ func (c *PrestoTableManagerImpl) CreateView(catalog, schema, viewName, query str
 
 func (c *PrestoTableManagerImpl) DropView(catalog, schema, viewName string, ignoreNotExists bool) error {
 	return presto.DropView(c.queryer, catalog, schema, viewName, ignoreNotExists)
+}
+
+func (c *PrestoTableManagerImpl) QueryMetadata(catalog, schema, tableName string) ([]presto.Column, error) {
+	return presto.QueryMetadata(c.queryer, catalog, schema, tableName)
 }

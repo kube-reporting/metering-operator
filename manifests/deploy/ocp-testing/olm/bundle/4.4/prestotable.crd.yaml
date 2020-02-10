@@ -35,7 +35,7 @@ spec:
           type: object
           description: |
             PrestoTableSpec is the desired specification of a PrestoTable custom resource.
-            Required fields: unmanaged, catalog, schema, tableName, and columns.
+            Required fields: unmanaged, catalog, schema, tableName. Note: columns is required when unmanaged is set to false.
             Optional fields: query, view, createTableAs, properties, and comment.
             More info: https://github.com/operator-framework/operator-metering/blob/master/Documentation/prestotables.md
           required:
@@ -43,7 +43,6 @@ spec:
           - catalog
           - schema
           - tableName
-          - columns
           properties:
             unmanaged:
               type: boolean
@@ -123,44 +122,4 @@ spec:
                 Note: this is an optional field.
                 More info: https://prestosql.io/docs/current/overview/concepts.html#query
               minLength: 1
-          oneOf:
-          - required:
-            - createTableAs
-            - query
-            properties:
-              createTableAs:
-                enum:
-                - true
-              unmanaged:
-                enum:
-                - false
-            allOf:
-            - not:
-                required:
-                - view
-          - required:
-            - view
-            - query
-            properties:
-              view:
-                enum:
-                - true
-              unmanaged:
-                enum:
-                - false
-            allOf:
-            - not:
-                required:
-                - createTableAs
-          - properties:
-              unmanaged:
-                enum:
-                - true
-            allOf:
-            - not:
-                required:
-                - view
-            - not:
-                required:
-                - createTableAs
 
