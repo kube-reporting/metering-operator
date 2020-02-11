@@ -246,7 +246,11 @@ func (deploy *Deployer) installMeteringClusterRoleBinding() error {
 		}
 		deploy.logger.Infof("Created the metering cluster role binding")
 	} else if err == nil {
-		deploy.logger.Infof("The metering cluster role binding already exists")
+		_, err = deploy.client.RbacV1().ClusterRoleBindings().Update(res)
+		if err != nil {
+			return fmt.Errorf("failed to update the metering clusterrolebinding: %v", err)
+		}
+		deploy.logger.Infof("The metering cluster role binding has been updated")
 	} else {
 		return err
 	}
@@ -259,7 +263,7 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 
 	res.Name = deploy.config.Namespace + "-" + res.Name
 
-	_, err := deploy.client.RbacV1().ClusterRoles().Get(res.Name, metav1.GetOptions{})
+	clusterRole, err := deploy.client.RbacV1().ClusterRoles().Get(res.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		_, err := deploy.client.RbacV1().ClusterRoles().Create(res)
 		if err != nil {
@@ -267,7 +271,13 @@ func (deploy *Deployer) installMeteringClusterRole() error {
 		}
 		deploy.logger.Infof("Created the metering cluster role")
 	} else if err == nil {
-		deploy.logger.Infof("The metering cluster role already exists")
+		clusterRole.Rules = res.Rules
+
+		_, err = deploy.client.RbacV1().ClusterRoles().Update(clusterRole)
+		if err != nil {
+			return fmt.Errorf("failed to update the metering clusterrole: %v", err)
+		}
+		deploy.logger.Infof("The metering clusterrole has been updated")
 	} else {
 		return err
 	}
