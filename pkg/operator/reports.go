@@ -487,7 +487,7 @@ func (op *Reporting) runReport(logger log.FieldLogger, report *metering.Report) 
 	var runningMsg, runningReason string
 	if report.Spec.RunImmediately {
 		runningReason = meteringUtil.RunImmediatelyReason
-		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true bypassing reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
+		runningMsg = fmt.Sprintf("Report %s scheduled: runImmediately=true and reporting period [%s to %s].", report.Name, reportPeriod.periodStart, reportPeriod.periodEnd)
 	} else {
 		// Check if it's time to generate the report
 		if reportPeriod.periodEnd.After(now) {

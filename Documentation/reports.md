@@ -242,9 +242,9 @@ spec:
 ```
 
 ### runImmediately
+When `runImmediately` is set to `true`, the report will be run immediately. This behavior ensures that the report is immediately processed and queued without requiring additional scheduling parameters.
 
-Set `runImmediately` to `true` to run the report immediately with all available data, regardless of the `reportingStart` or `reportingEnd` values, and without checking if there is any data for the report period.
-For reports with a schedule set, it will not wait for each period's reportingEnd to elapse before processing and all reportPeriods between `reportingStart` and `reportingEnd`.
+> *Note*: When `runImmediately` is set to `true` you must set a `reportingEnd` and `reportingStart` value.
 
 ### Inputs
 
