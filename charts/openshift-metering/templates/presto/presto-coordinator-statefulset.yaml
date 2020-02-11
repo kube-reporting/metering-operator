@@ -204,6 +204,8 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
+        - name: presto-database
+          mountPath: /var/presto-hive/
 {{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g }}
         - name: hadoop-con***REMOVED***g
           mountPath: /hadoop-con***REMOVED***g
@@ -224,7 +226,7 @@ spec:
 {{- end }}
 {{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
-          mountPath: {{ .Values.hive.spec.con***REMOVED***g.sharedVolume.mountPath }}
+          mountPath: /var/presto-hive/
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.coordinator.resources | indent 10 }}

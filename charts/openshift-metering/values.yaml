@@ -74,141 +74,141 @@ openshift-reporting:
         enabled: true
         items:
           # views
-          - name: cluster-cpu-capacity-raw
-            spec:
-              reportQueryView:
-                queryName: cluster-cpu-capacity-raw
-          - name: cluster-cpu-usage-raw
-            spec:
-              reportQueryView:
-                queryName: cluster-cpu-usage-raw
-          - name: cluster-memory-capacity-raw
-            spec:
-              reportQueryView:
-                queryName: cluster-memory-capacity-raw
-          - name: cluster-memory-usage-raw
-            spec:
-              reportQueryView:
-                queryName: cluster-memory-usage-raw
-          - name: node-cpu-allocatable-raw
-            spec:
-              reportQueryView:
-                queryName: node-cpu-allocatable-raw
-          - name: node-cpu-capacity-raw
-            spec:
-              reportQueryView:
-                queryName: node-cpu-capacity-raw
-          - name: node-memory-allocatable-raw
-            spec:
-              reportQueryView:
-                queryName: node-memory-allocatable-raw
-          - name: node-memory-capacity-raw
-            spec:
-              reportQueryView:
-                queryName: node-memory-capacity-raw
-          - name: persistentvolumeclaim-capacity-raw
-            spec:
-              reportQueryView:
-                queryName: persistentvolumeclaim-capacity-raw
-          - name: persistentvolumeclaim-phase-raw
-            spec:
-              reportQueryView:
-                queryName: persistentvolumeclaim-phase-raw
-          - name: persistentvolumeclaim-request-raw
-            spec:
-              reportQueryView:
-                queryName: persistentvolumeclaim-request-raw
-          - name: persistentvolumeclaim-usage-raw
-            spec:
-              reportQueryView:
-                queryName: persistentvolumeclaim-usage-raw
-          - name: persistentvolumeclaim-usage-with-phase-raw
-            spec:
-              reportQueryView:
-                queryName: persistentvolumeclaim-usage-with-phase-raw
-          - name: pod-cpu-request-raw
-            spec:
-              reportQueryView:
-                queryName: pod-cpu-request-raw
-          - name: pod-cpu-usage-raw
-            spec:
-              reportQueryView:
-                queryName: pod-cpu-usage-raw
-          - name: pod-memory-request-raw
-            spec:
-              reportQueryView:
-                queryName: pod-memory-request-raw
-          - name: pod-memory-usage-raw
-            spec:
-              reportQueryView:
-                queryName: pod-memory-usage-raw
+          # - name: cluster-cpu-capacity-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: cluster-cpu-capacity-raw
+          # - name: cluster-cpu-usage-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: cluster-cpu-usage-raw
+          # - name: cluster-memory-capacity-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: cluster-memory-capacity-raw
+          # - name: cluster-memory-usage-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: cluster-memory-usage-raw
+          # - name: node-cpu-allocatable-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: node-cpu-allocatable-raw
+          # - name: node-cpu-capacity-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: node-cpu-capacity-raw
+          # - name: node-memory-allocatable-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: node-memory-allocatable-raw
+          # - name: node-memory-capacity-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: node-memory-capacity-raw
+          # - name: persistentvolumeclaim-capacity-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: persistentvolumeclaim-capacity-raw
+          # - name: persistentvolumeclaim-phase-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: persistentvolumeclaim-phase-raw
+          # - name: persistentvolumeclaim-request-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: persistentvolumeclaim-request-raw
+          # - name: persistentvolumeclaim-usage-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: persistentvolumeclaim-usage-raw
+          # - name: persistentvolumeclaim-usage-with-phase-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: persistentvolumeclaim-usage-with-phase-raw
+          # - name: pod-cpu-request-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: pod-cpu-request-raw
+          # - name: pod-cpu-usage-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: pod-cpu-usage-raw
+          # - name: pod-memory-request-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: pod-memory-request-raw
+          # - name: pod-memory-usage-raw
+          #   spec:
+          #     reportQueryView:
+          #       queryName: pod-memory-usage-raw
 
-          # metrics importers
-          - name: node-allocatable-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_node_status_allocatable_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
-          - name: node-allocatable-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_node_status_allocatable_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
-          - name: node-capacity-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_node_status_capacity_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
-          - name: node-capacity-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_node_status_capacity_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
-          - name: persistentvolumeclaim-capacity-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kubelet_volume_stats_capacity_bytes
-          - name: persistentvolumeclaim-phase
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_persistentvolumeclaim_status_phase
-          - name: persistentvolumeclaim-request-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
-          - name: persistentvolumeclaim-usage-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kubelet_volume_stats_used_bytes
-          - name: pod-limit-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(kube_pod_container_resource_limits_cpu_cores) by (pod, namespace, node)
-          - name: pod-limit-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node)
-          - name: pod-persistentvolumeclaim-request-info
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  kube_pod_spec_volumes_persistentvolumeclaims_info
-          - name: pod-request-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(kube_pod_container_resource_requests_cpu_cores) by (pod, namespace, node)
-          - name: pod-request-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
+          # # metrics importers
+          # - name: node-allocatable-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_node_status_allocatable_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
+          # - name: node-allocatable-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_node_status_allocatable_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
+          # - name: node-capacity-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_node_status_capacity_cpu_cores * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
+          # - name: node-capacity-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_node_status_capacity_memory_bytes * on(node) group_left(provider_id) max(kube_node_info) by (node, provider_id)
+          # - name: persistentvolumeclaim-capacity-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kubelet_volume_stats_capacity_bytes
+          # - name: persistentvolumeclaim-phase
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_persistentvolumeclaim_status_phase
+          # - name: persistentvolumeclaim-request-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         max(kube_persistentvolumeclaim_resource_requests_storage_bytes) by (namespace, persistentvolumeclaim) + on (namespace, persistentvolumeclaim) group_left(storageclass, volumename) sum(kube_persistentvolumeclaim_info) by (namespace, persistentvolumeclaim, storageclass, volumename) * 0
+          # - name: persistentvolumeclaim-usage-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kubelet_volume_stats_used_bytes
+          # - name: pod-limit-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(kube_pod_container_resource_limits_cpu_cores) by (pod, namespace, node)
+          # - name: pod-limit-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(kube_pod_container_resource_limits_memory_bytes) by (pod, namespace, node)
+          # - name: pod-persistentvolumeclaim-request-info
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         kube_pod_spec_volumes_persistentvolumeclaims_info
+          # - name: pod-request-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(kube_pod_container_resource_requests_cpu_cores) by (pod, namespace, node)
+          # - name: pod-request-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(kube_pod_container_resource_requests_memory_bytes) by (pod, namespace, node)
 
       postKube_1_14:
         enabled: true
@@ -218,24 +218,24 @@ openshift-reporting:
               prometheusMetricsImporter:
                 query: |
                   sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[5m])) BY (pod, namespace, node)
-          - name: pod-usage-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(container_memory_usage_bytes{container!="POD", container!="",pod!=""}) by (pod, namespace, node)
+          # - name: pod-usage-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(container_memory_usage_bytes{container!="POD", container!="",pod!=""}) by (pod, namespace, node)
 
       preKube_1_14:
         items:
-          - name: pod-usage-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[5m])) BY (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
-          - name: pod-usage-memory-bytes
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  label_replace(sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}) by (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
+          # - name: pod-usage-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         label_replace(sum(rate(container_cpu_usage_seconds_total{container_name!="POD",container_name!="",pod_name!=""}[5m])) BY (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
+          # - name: pod-usage-memory-bytes
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         label_replace(sum(container_memory_usage_bytes{container_name!="POD", container_name!="",pod_name!=""}) by (pod_name, namespace, node), "pod", "$1", "pod_name", "(.*)")
 
 reporting-operator:
   spec:

@@ -7,32 +7,8 @@ hive.compression-codec=SNAPPY
 hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
 hive.collect-column-statistics-on-write=true
-
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreURI }}
-hive.metastore.uri={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreURI }}
-{{- ***REMOVED*** if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-hive.metastore.uri=thrift://localhost:9083
-{{- ***REMOVED*** }}
-hive.metastore.uri=thrift://hive-metastore:9083
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
-hive.metastore-timeout={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.metastoreTimeout }}
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.s3.useInstanceCredentials }}
-hive.s3.use-instance-credentials={{ .Values.presto.spec.con***REMOVED***g.connectors.hive.s3.useInstanceCredentials }}
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g}}
-hive.con***REMOVED***g.resources=/hadoop-con***REMOVED***g/core-site.xml
-{{- end }}
-
-{{- if and .Values.presto.spec.con***REMOVED***g.aws.region .Values.useIPV6Networking }}
-hive.s3.endpoint=https://s3.dualstack.{{ .Values.presto.spec.con***REMOVED***g.aws.region }}.amazonaws.com
-hive.s3.path-style-access=true
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
-hive.s3.endpoint={{ .Values.presto.spec.con***REMOVED***g.s3Compatible.endpoint }}
-hive.s3.path-style-access=true
-{{- end }}
+hive.metastore=***REMOVED***le
+hive.metastore.catalog.***REMOVED***le=/var/presto-hive/
 {{- end }}
 
 {{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}
