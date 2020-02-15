@@ -213,11 +213,11 @@ openshift-reporting:
       postKube_1_14:
         enabled: true
         items:
-          - name: pod-usage-cpu-cores
-            spec:
-              prometheusMetricsImporter:
-                query: |
-                  sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[5m])) BY (pod, namespace, node)
+          # - name: pod-usage-cpu-cores
+          #   spec:
+          #     prometheusMetricsImporter:
+          #       query: |
+          #         sum(rate(container_cpu_usage_seconds_total{container!="POD",container!="",pod!=""}[5m])) BY (pod, namespace, node)
           # - name: pod-usage-memory-bytes
           #   spec:
           #     prometheusMetricsImporter:
