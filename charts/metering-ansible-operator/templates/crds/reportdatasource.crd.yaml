@@ -130,8 +130,6 @@ spec:
                   minLength: 1
                 tableRef:
                   type: object
-                  required:
-                    - name
                   properties:
                     name:
                       description: |

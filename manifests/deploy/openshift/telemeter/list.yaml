@@ -3534,8 +3534,6 @@ objects:
                           Name is the name of an existing PrestoTable custom resource.
                         minLength: 1
                         type: string
-                    required:
-                    - name
                     type: object
                 required:
                 - tableName

@@ -403,23 +403,19 @@ func (op *Reporting) handleAWSBillingDataSource(logger log.FieldLogger, dataSour
 }
 
 func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger, dataSource *metering.ReportDataSource) error {
-	op.logger.Infof("Before validation")
 	if dataSource.Spec.ExistingPrestoTable == nil {
 		return fmt.Errorf("%s is not a PrestoTable ReportDataSource", dataSource.Name)
 	}
 	if dataSource.Spec.ExistingPrestoTable.TableName == "" {
 		return fmt.Errorf("you need to set the tableName for the RDS: %s", dataSource.Name)
 	}
-	op.logger.Infof("After validation")
 
 	var (
-		prestoTable     *metering.PrestoTable
-		prestoTableName string
-		err             error
+		prestoTable *metering.PrestoTable
+		err         error
 	)
 	// check if the reporting-operator has already processed this ReportDatasource before
 	// if true: verify the PrestoTable.Name listed in data source's status exists, and exit early
-	op.logger.Infof("Before checking tableRef ***REMOVED***eld")
 	if dataSource.Status.TableRef.Name != "" {
 		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
 		if err != nil {
@@ -429,54 +425,39 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 		if err != nil {
 			return err
 		}
-
 		logger.Infof("discovered an existing ExistingPrestoTable ReportDataSource, tableName: %s", tableName)
 		return nil
 	}
-	op.logger.Infof("After checking tableRef ***REMOVED***eld")
 
-	if dataSource.Spec.ExistingPrestoTable.TableRef.Name != "" {
-		prestoTableName = dataSource.Spec.ExistingPrestoTable.TableName
-	} ***REMOVED*** {
-		// we expect the tableName ***REMOVED***eld to be in the form of <catalog>.<schema>.<table_name>
-		// format, so split the string into components and verify the length of the
-		// array is as expected
-		meta := strings.Split(dataSource.Spec.ExistingPrestoTable.TableName, ".")
+	meta := strings.Split(dataSource.Spec.ExistingPrestoTable.TableName, ".")
 
-		if len(meta) != 3 {
-			return fmt.Errorf("spec.ExistingPrestoTable.TableName is not in the format of a fully-quali***REMOVED***ed table name")
-		}
-
-		catalog := meta[0]
-		schema := meta[1]
-		tableName := meta[2]
-
-		// check if we can discover the table's column information dynamically and
-		// in the case where the table doesn't exist in Presto, the presto go-client
-		// will return an error describing a non-existent table
-		cols, err := op.prestoTableManager.QueryMetadata(catalog, schema, tableName)
-		if err != nil {
-			return fmt.Errorf("failed to successfully discover the %s Presto table metadata: %v", dataSource.Spec.ExistingPrestoTable.TableName, err)
-		}
-
-		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
-		_, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
-			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
-		})
-		prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, true, false, "")
-		if err != nil {
-			return fmt.Errorf("failed to create a PrestoTable custom resource for the %s ReportDataSource: %v", dataSource.Name, err)
-		}
-
-		prestoTableName = prestoTable.Name
+	if len(meta) != 3 {
+		return fmt.Errorf("spec.ExistingPrestoTable.TableName is not in the format of a fully-quali***REMOVED***ed table name")
 	}
 
-	prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, prestoTableName, time.Second, 10*time.Second)
+	catalog := meta[0]
+	schema := meta[1]
+	tableName := meta[2]
+
+	// check if we can discover the table's column information dynamically and
+	// in the case where the table doesn't exist in Presto, the presto go-client
+	// will return an error describing a non-existent table
+	cols, err := op.prestoTableManager.QueryMetadata(catalog, schema, tableName)
 	if err != nil {
-		return fmt.Errorf("failed to process the %s PrestoTable for the %s ReportDataSource: %v", prestoTableName, dataSource.Name, err)
+		return fmt.Errorf("failed to successfully discover the %s Presto table metadata: %v", dataSource.Spec.ExistingPrestoTable.TableName, err)
 	}
 
-	logger.Infof("created the %s PrestoTable from the %s ReportDataSource", prestoTableName, dataSource.Name)
+	prestoTable, err = op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, true, false, "")
+	if err != nil {
+		return fmt.Errorf("failed to create a PrestoTable custom resource for the %s ReportDataSource: %v", dataSource.Name, err)
+	}
+
+	logger.Infof("created the %s PrestoTable from the %s ReportDataSource", prestoTable.Name, dataSource.Name)
+
+	prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, prestoTable.Name, time.Second, 10*time.Second)
+	if err != nil {
+		return fmt.Errorf("failed to process the %s PrestoTable for the %s ReportDataSource: %v", prestoTable.Name, dataSource.Name, err)
+	}
 
 	dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 	status, err := updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
@@ -486,7 +467,6 @@ func (op *Reporting) handleExistingPrestoTableDataSource(logger log.FieldLogger,
 		logger.WithError(err).Errorf("failed to update the %s ReportDataSource status.tableRef ***REMOVED***eld to the %s PrestoTable. Here is the datasource object: %+v", dataSource.Name, prestoTable.Name, dataSource.Spec.ExistingPrestoTable)
 		return err
 	}
-
 	dataSource.Status = status.Status
 
 	return nil
@@ -496,18 +476,13 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 	if dataSource.Spec.PrestoTable == nil {
 		return fmt.Errorf("%s is not a PrestoTable ReportDataSource", dataSource.Name)
 	}
-	if dataSource.Spec.PrestoTable.TableName == "" && dataSource.Spec.PrestoTable.TableRef.Name == "" {
-		return fmt.Errorf("invalid PrestoTable ReportDataSource %s, spec.prestoTable was improperly con***REMOVED***gured", dataSource.Name)
+	if dataSource.Spec.PrestoTable.TableRef.Name == "" {
+		return fmt.Errorf("invalid PrestoTable ReportDataSource %s, spec.prestoTable.tableRef.name must be set", dataSource.Name)
 	}
 
-	var (
-		prestoTable     *metering.PrestoTable
-		prestoTableName string
-		err             error
-	)
-	// check if the reporting-operator has already processed this ReportDatasource before
-	// if true: verify the PrestoTable.Name listed in data source's status exists, and exit early
+	var prestoTable *metering.PrestoTable
 	if dataSource.Status.TableRef.Name != "" {
+		var err error
 		prestoTable, err = op.prestoTableLister.PrestoTables(dataSource.Namespace).Get(dataSource.Status.TableRef.Name)
 		if err != nil {
 			return fmt.Errorf("unable to get PrestoTable %s for ReportDataSource %s, %s", dataSource.Status.TableRef, dataSource.Name, err)
@@ -516,64 +491,24 @@ func (op *Reporting) handlePrestoTableDataSource(logger log.FieldLogger, dataSou
 		if err != nil {
 			return err
 		}
-
 		logger.Infof("existing PrestoTable ReportDataSource discovered, tableName: %s", tableName)
-		return nil
-	}
-
-	if dataSource.Spec.PrestoTable.TableRef.Name != "" {
-		prestoTableName = dataSource.Spec.PrestoTable.TableRef.Name
 	} ***REMOVED*** {
-		// we expect the tableName ***REMOVED***eld to be in the form of <catalog>.<schema>.<table_name>
-		// format, so split the string into components and verify the length of the
-		// array is as expected
-		meta := strings.Split(dataSource.Spec.PrestoTable.TableName, ".")
-
-		if len(meta) != 3 {
-			return fmt.Errorf("spec.PrestoTable.TableName is not in the format of a fully-quali***REMOVED***ed table name")
-		}
-
-		catalog := meta[0]
-		schema := meta[1]
-		tableName := meta[2]
-
-		// check if we can discover the table's column information dynamically and
-		// in the case where the table doesn't exist in Presto, the presto go-client
-		// will return an error describing a non-existent table
-		cols, err := op.prestoTableManager.QueryMetadata(catalog, schema, tableName)
+		logger.Infof("new PrestoTable ReportDataSource discovered, tableName: %s", dataSource.Spec.PrestoTable.TableRef.Name)
+		var err error
+		prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, dataSource.Spec.PrestoTable.TableRef.Name, time.Second, 10*time.Second)
 		if err != nil {
-			return fmt.Errorf("failed to successfully discover the %s Presto table metadata: %v", dataSource.Spec.PrestoTable.TableName, err)
+			return fmt.Errorf("error creating table for ReportDataSource %s: %s", dataSource.Name, err)
 		}
 
 		dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
 		_, err = updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
 			newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
 		})
-		prestoTable, err := op.createPrestoTableCR(dataSource, metering.ReportDataSourceGVK, catalog, schema, tableName, cols, true, false, "")
 		if err != nil {
-			return fmt.Errorf("failed to create a PrestoTable custom resource for the %s ReportDataSource: %v", dataSource.Name, err)
+			logger.WithError(err).Errorf("failed to update ReportDataSource status.tableRef ***REMOVED***eld %q", prestoTable.Name)
+			return err
 		}
-
-		prestoTableName = prestoTable.Name
 	}
-
-	prestoTable, err = op.waitForPrestoTable(dataSource.Namespace, prestoTableName, time.Second, 10*time.Second)
-	if err != nil {
-		return fmt.Errorf("failed to process the %s PrestoTable for the %s ReportDataSource: %v", prestoTableName, dataSource.Name, err)
-	}
-
-	logger.Infof("created the %s PrestoTable from the %s ReportDataSource", prestoTableName, dataSource.Name)
-
-	dsClient := op.meteringClient.MeteringV1().ReportDataSources(dataSource.Namespace)
-	status, err := updateReportDataSource(dsClient, dataSource.Name, func(newDS *metering.ReportDataSource) {
-		newDS.Status.TableRef = v1.LocalObjectReference{Name: prestoTable.Name}
-	})
-	if err != nil {
-		logger.WithError(err).Errorf("failed to update the %s ReportDataSource status.tableRef ***REMOVED***eld to the %s PrestoTable. Here is the datasource object: %+v", dataSource.Name, prestoTable.Name, dataSource.Spec.PrestoTable)
-		return err
-	}
-
-	dataSource.Status = status.Status
 
 	return nil
 }
