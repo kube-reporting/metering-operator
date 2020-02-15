@@ -7,29 +7,7 @@ data:
     #!/bin/bash
     set -ex
 
-{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
-    cat $PRESTO_CLIENT_KEYFILE $PRESTO_CLIENT_CRTFILE $PRESTO_CLIENT_CA_CRTFILE > $PRESTO_TRUSTSTORE_PEM
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
-    # copy all necessary tls.crt/tls.key from read-only secret volumes - append server bundle and CA cert to truststore
-    cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE > $PRESTO_KEYSTORE_PEM
-    cat $PRESTO_SERVER_KEYFILE $PRESTO_SERVER_CRTFILE $PRESTO_CA_CRTFILE >> $PRESTO_TRUSTSTORE_PEM
-{{- end }}
-
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-    cp /hive-metastore-auth-tls-secrets/* /opt/ghostunnel/tls
-    cat $GHOSTUNNEL_CLIENT_TLS_CERT $GHOSTUNNEL_CLIENT_TLS_KEY > $GHOSTUNNEL_CLIENT_KEYSTORE
-{{- end }}
-
     cp -v -L -r -f /presto-etc/* /opt/presto/presto-server/etc/
-    cp -v -L -r -f /hadoop-starting-con***REMOVED***g/* /hadoop-con***REMOVED***g/
-    cd /hadoop-con***REMOVED***g/
-    faq '.con***REMOVED***guration.property+=[{name: ("fs.azure.account.key." + env.AZURE_STORAGE_ACCOUNT_NAME + ".blob.core.windows.net"), value: env.AZURE_SECRET_ACCESS_KEY }]' core-site.xml > core-site.xml.temp
-    mv -f core-site.xml.temp core-site.xml
-    if [ -a /gcs-json/gcs-service-account.json ]; then
-      faq '.con***REMOVED***guration.property+=[{name: "fs.gs.auth.service.account.json.key***REMOVED***le" , value: "/gcs-json/gcs-service-account.json" }]' core-site.xml > core-site.xml.temp
-      mv -f core-site.xml.temp core-site.xml
-    ***REMOVED***
 
   entrypoint.sh: |
     #!/bin/bash

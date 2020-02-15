@@ -86,48 +86,6 @@ spec:
         command: ['/presto-common/initialize_presto.sh']
         # Copy the mounted con***REMOVED***guration data into the presto-etc emptyDir volume so we can write to the con***REMOVED***g ***REMOVED***les
         env:
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
-        - name: PRESTO_SERVER_KEYFILE
-          value: /presto-server/tls.key
-        - name: PRESTO_SERVER_CRTFILE
-          value: /presto-server/tls.crt
-        - name: PRESTO_CA_CRTFILE
-          value: /presto-server/ca.crt
-        - name: PRESTO_KEYSTORE_PEM
-          value: /opt/presto/tls/keystore.pem
-        - name: PRESTO_TRUSTSTORE_PEM
-          value: /opt/presto/tls/truststore.pem
-{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
-        - name: PRESTO_CLIENT_KEYFILE
-          value: /presto-client/tls.key
-        - name: PRESTO_CLIENT_CRTFILE
-          value: /presto-client/tls.crt
-        - name: PRESTO_CLIENT_CA_CRTFILE
-          value: /presto-client/ca.crt
-{{- end }}
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
-          value: /opt/ghostunnel/tls/ca.crt
-        - name: GHOSTUNNEL_CLIENT_TLS_CERT
-          value: /opt/ghostunnel/tls/tls.crt
-        - name: GHOSTUNNEL_CLIENT_TLS_KEY
-          value: /opt/ghostunnel/tls/tls.key
-        - name: GHOSTUNNEL_CLIENT_KEYSTORE
-          value: /opt/ghostunnel/tls/keystore-combined.pem
-{{- end }}
-{{- if or .Values.presto.spec.con***REMOVED***g.azure.secretName .Values.presto.spec.con***REMOVED***g.azure.createSecret }}
-        - name: AZURE_STORAGE_ACCOUNT_NAME
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.presto.spec.con***REMOVED***g.azure.secretName | default "presto-azure-credentials" }}"
-              key: azure-storage-account-name
-        - name: AZURE_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.presto.spec.con***REMOVED***g.azure.secretName | default "presto-azure-credentials" }}"
-              key: azure-secret-access-key
-{{- end }}
 {{- if .Values.presto.spec.con***REMOVED***g.connectors.prometheus.enabled }}
         - name: PRESTO_PROMETHEUS_CONNECTOR_BEARER_TOKEN_FILE
           valueFrom:
@@ -147,30 +105,6 @@ spec:
           mountPath: /var/presto/data
         - name: presto-common-con***REMOVED***g
           mountPath: /presto-common
-        - name: hadoop-con***REMOVED***g
-          mountPath: /hadoop-con***REMOVED***g
-        - name: hadoop-starting-con***REMOVED***g
-          mountPath: /hadoop-starting-con***REMOVED***g
-{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
-        - name: gcs-json
-          mountPath: /gcs-json
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
-        - name: presto-tls
-          mountPath: /opt/presto/tls
-        - name: presto-server-pem
-          mountPath: /presto-server
-{{- if .Values.presto.spec.con***REMOVED***g.auth.enabled }}
-        - name: presto-client-pem
-          mountPath: /presto-client
-{{- end }}
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-        - name: hive-metastore-auth-tls
-          mountPath: /opt/ghostunnel/tls
-        - name: hive-metastore-auth-tls-secrets
-          mountPath: /hive-metastore-auth-tls-secrets
-{{- end }}
         resources:
           limits:
             cpu: 100m
@@ -204,56 +138,12 @@ spec:
           mountPath: /var/presto/data
         - name: presto-logs
           mountPath: /var/presto/logs
-        - name: presto-database
-          mountPath: /var/presto-hive/
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g }}
-        - name: hadoop-con***REMOVED***g
-          mountPath: /hadoop-con***REMOVED***g
-        - name: hadoop-starting-con***REMOVED***g
-          mountPath: /hadoop-starting-con***REMOVED***g
-{{- end }}
-{{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
-        - name: gcs-json
-          mountPath: /gcs-json
-{{- end }}
-{{- if or .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.secretName .Values.presto.spec.con***REMOVED***g.s3Compatible.ca.createSecret }}
-        - name: s3-compatible-ca
-          mountPath: /s3-compatible-ca
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.tls.enabled }}
-        - name: presto-tls
-          mountPath: /opt/presto/tls
-{{- end }}
 {{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
         - name: hive-warehouse-data
           mountPath: /var/presto-hive/
 {{- end }}
         resources:
 {{ toYaml .Values.presto.spec.coordinator.resources | indent 10 }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-      - name: ghostunnel-client
-        image: "{{ include "ghostunnel-image" . }}"
-        imagePullPolicy: {{ .Values.__ghostunnel.image.pullPolicy }}
-        env:
-        - name: GHOSTUNNEL_CLIENT_CA_CRTFILE
-          value: /opt/ghostunnel/tls/ca.crt
-        - name: GHOSTUNNEL_CLIENT_KEYSTORE
-          value: /opt/ghostunnel/tls/keystore-combined.pem
-        command: ["ghostunnel"]
-        args:
-        - client
-        - --listen
-        - localhost:9083
-        - --target
-        - hive-metastore:9083
-        - --keystore
-        -  $(GHOSTUNNEL_CLIENT_KEYSTORE)
-        - --cacert
-        -  $(GHOSTUNNEL_CLIENT_CA_CRTFILE)
-        volumeMounts:
-        - name: hive-metastore-auth-tls
-          mountPath: /opt/ghostunnel/tls
-{{- end }}
       volumes:
       - name: presto-coordinator-con***REMOVED***g
         con***REMOVED***gMap:
@@ -274,13 +164,6 @@ spec:
         emptyDir: {}
       - name: presto-logs
         emptyDir: {}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.useHadoopCon***REMOVED***g }}
-      - name: hadoop-con***REMOVED***g
-        emptyDir: {}
-      - name: hadoop-starting-con***REMOVED***g
-        secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.connectors.hive.hadoopCon***REMOVED***gSecretName }}
-{{- end }}
 {{- if or .Values.presto.spec.con***REMOVED***g.gcs.secretName .Values.presto.spec.con***REMOVED***g.gcs.createSecret }}
       - name: gcs-json
         secret:
@@ -302,13 +185,6 @@ spec:
         secret:
           secretName: {{ .Values.presto.spec.con***REMOVED***g.auth.secretName }}
 {{- end }}
-{{- end }}
-{{- if .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.enabled }}
-      - name: hive-metastore-auth-tls
-        emptyDir: {}
-      - name: hive-metastore-auth-tls-secrets
-        secret:
-          secretName: {{ .Values.presto.spec.con***REMOVED***g.connectors.hive.tls.secretName }}
 {{- end }}
 {{- if .Values.hive.spec.con***REMOVED***g.sharedVolume.enabled }}
       - name: hive-warehouse-data

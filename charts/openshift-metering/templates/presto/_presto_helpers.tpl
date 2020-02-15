@@ -8,7 +8,7 @@ hive.hdfs.authentication.type=NONE
 hive.metastore.authentication.type=NONE
 hive.collect-column-statistics-on-write=true
 hive.metastore=***REMOVED***le
-hive.metastore.catalog.***REMOVED***le=/var/presto-hive/
+hive.metastore.catalog.dir=/var/presto-hive/
 {{- end }}
 
 {{- de***REMOVED***ne "presto-jmx-catalog-properties" -}}

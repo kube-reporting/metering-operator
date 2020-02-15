@@ -120,6 +120,24 @@ spec:
                     region:
                       type: string
                       minLength: 1
+            existingPrestoTable:
+              type: object
+              required:
+              - tableName
+              properties:
+                tableName:
+                  type: string
+                  minLength: 1
+                tableRef:
+                  type: object
+                  required:
+                    - name
+                  properties:
+                    name:
+                      description: |
+                        Name is the name of an existing PrestoTable custom resource.
+                      type: string
+                      minLength: 1
             prestoTable:
               type: object
               properties:
@@ -133,16 +151,6 @@ spec:
                         Name is the name of an existing PrestoTable custom resource.
                       type: string
                       minLength: 1
-                tableName:
-                  description: |
-                    TableName is the fully-quali***REMOVED***ed table name of an existing table in Presto.
-                  type: string
-                  minLength: 1
-              oneOf:
-              - required:
-                - tableRef
-              - required:
-                - tableName
           oneOf:
           - required:
             - prometheusMetricsImporter
@@ -152,4 +160,6 @@ spec:
             - awsBilling
           - required:
             - prestoTable
+          - required:
+            - existingPrestoTable
 

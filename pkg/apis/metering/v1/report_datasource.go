@@ -36,6 +36,8 @@ type ReportDataSourceSpec struct {
 	// PrestoTable CR or an existing, fully-quali***REMOVED***ed table name in Presto.
 	PrestoTable *PrestoTableDataSource `json:"prestoTable,omitempty"`
 
+	ExistingPrestoTable *ExistingPrestoTableDataSource `json:"existingPrestoTable,omitempty"`
+
 	// ReportQueryView  represents a datasource which creates a Presto
 	// view from a ReportQuery
 	ReportQueryView *ReportQueryViewDataSource `json:"reportQueryView,omitempty"`
@@ -67,6 +69,11 @@ type PrometheusMetricsImporterDataSource struct {
 	QueryCon***REMOVED***g      *PrometheusQueryCon***REMOVED***g      `json:"queryCon***REMOVED***g,omitempty"`
 	Storage          *StorageLocationRef         `json:"storage,omitempty"`
 	PrometheusCon***REMOVED***g *PrometheusConnectionCon***REMOVED***g `json:"prometheusCon***REMOVED***g,omitempty"`
+}
+
+type ExistingPrestoTableDataSource struct {
+	TableRef  *v1.LocalObjectReference `json:"tableRef,omitempty"`
+	TableName string                   `json:"tableName"`
 }
 
 type PrestoTableDataSource struct {

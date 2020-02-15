@@ -3500,6 +3500,8 @@ objects:
               - awsBilling
             - required:
               - prestoTable
+            - required:
+              - existingPrestoTable
             properties:
               awsBilling:
                 properties:
@@ -3520,18 +3522,26 @@ objects:
                 required:
                 - source
                 type: object
-              prestoTable:
-                oneOf:
-                - required:
-                  - tableRef
-                - required:
-                  - tableName
+              existingPrestoTable:
                 properties:
                   tableName:
-                    description: |
-                      TableName is the fully-quali***REMOVED***ed table name of an existing table in Presto.
                     minLength: 1
                     type: string
+                  tableRef:
+                    properties:
+                      name:
+                        description: |
+                          Name is the name of an existing PrestoTable custom resource.
+                        minLength: 1
+                        type: string
+                    required:
+                    - name
+                    type: object
+                required:
+                - tableName
+                type: object
+              prestoTable:
+                properties:
                   tableRef:
                     properties:
                       name:
